@@ -23,6 +23,7 @@ import java.awt.image.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.text.*;
+import java.net.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -210,25 +211,31 @@ public class ChartModule extends JPanel implements Module,
     // Adds the toolbar that gives the user the options to zoom in and out
     // of the chart
     private void addFunctionToolBar() {
-	JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
-
 	// Create image on toolbar to zoom to default zoom level
-	ImageIcon defaultZoomImageIcon =
-	    new ImageIcon(ClassLoader.getSystemResource(defaultZoomImage));
-	defaultZoom = new JButton(defaultZoomImageIcon);
-	defaultZoom.addActionListener(this);
-	defaultZoom.setEnabled(defaultZoomEnabled);
-	toolBar.add(defaultZoom);
+        URL defaultZoomURL = ClassLoader.getSystemResource(defaultZoomImage);
+        URL zoomInImageURL = ClassLoader.getSystemResource(zoomInImage);
 
-	// Create image on toolbar to zoom in to highlighted region
-	ImageIcon zoomInImageIcon =
-	    new ImageIcon(ClassLoader.getSystemResource(zoomInImage));
-	zoomIn = new JButton(zoomInImageIcon);
-	zoomIn.addActionListener(this);
-	zoomIn.setEnabled(zoomInEnabled);
-	toolBar.add(zoomIn);
+        // If either image is not available, then do not create the
+        // toolbar
+        if(defaultZoomURL != null && zoomInImageURL != null) {
+            JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
 
-	add(toolBar, BorderLayout.WEST);
+            // Create image on toolbar to return to default zoom
+            ImageIcon defaultZoomImageIcon = new ImageIcon(defaultZoomURL);
+            defaultZoom = new JButton(defaultZoomImageIcon);
+            defaultZoom.addActionListener(this);
+            defaultZoom.setEnabled(defaultZoomEnabled);
+            toolBar.add(defaultZoom);
+
+            // Create image on toolbar to zoom in to highlighted region
+            ImageIcon zoomInImageIcon = new ImageIcon(zoomInImageURL);
+            zoomIn = new JButton(zoomInImageIcon);
+            zoomIn.addActionListener(this);
+            zoomIn.setEnabled(zoomInEnabled);
+            toolBar.add(zoomIn);
+
+            add(toolBar, BorderLayout.WEST);
+        }
     }
 
     /**
@@ -541,7 +548,9 @@ public class ChartModule extends JPanel implements Module,
 
     public void mouseClicked(MouseEvent e) { 
 	chart.clearHighlightedRegion();
-	zoomIn.setEnabled(zoomInEnabled = false);
+
+        if(zoomIn != null)
+            zoomIn.setEnabled(zoomInEnabled = false);
     }
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
@@ -559,7 +568,8 @@ public class ChartModule extends JPanel implements Module,
 	    chart.setHighlightedEnd(x);
 
 	// can now zoom in!
-	zoomIn.setEnabled(zoomInEnabled = true);
+        if(zoomIn != null)
+            zoomIn.setEnabled(zoomInEnabled = true);
     }
     public void mouseMoved(MouseEvent e) {}
 
@@ -570,23 +580,24 @@ public class ChartModule extends JPanel implements Module,
      */
     public void actionPerformed(ActionEvent e) {
 
-	if(e.getSource() == zoomIn) {
+	if(zoomIn != null && e.getSource() == zoomIn) {
 	    chart.zoomToHighlightedRegion();
-	    zoomIn.setEnabled(zoomInEnabled = false);
-	    defaultZoom.setEnabled(defaultZoomEnabled = true);
+            zoomIn.setEnabled(zoomInEnabled = false);
+            defaultZoom.setEnabled(defaultZoomEnabled = true);
 	    // This tells the scrollpane to re-asses whether it needs
 	    // the horizontal scrollbar now
 	    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	    repaint();
 	}
-	else if(e.getSource() == defaultZoom) {
+	else if(defaultZoom != null && e.getSource() == defaultZoom) {
 	    chart.zoomToDefaultRegion();
-	    defaultZoom.setEnabled(defaultZoomEnabled = false);
+            defaultZoom.setEnabled(defaultZoomEnabled = false);
 	    // This tells the scrollpane to re-asses whether it needs
 	    // the horizontal scrollbar now
 	    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	    repaint();
 	}
+
 	else if(e.getSource() == closeMenuItem) {
 	    propertySupport.
 		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);

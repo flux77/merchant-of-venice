@@ -22,6 +22,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.lang.*;
 import java.lang.reflect.*;
+import java.net.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -88,15 +89,27 @@ public class SortedTable extends JTable implements MouseListener
 		setIcon(null);
 	    else if(sortedTable.getColumnSortStatus(column) == SORT_UP) {
 		// Create up arrow for header column
-		ImageIcon upImageIcon = 
-		    new ImageIcon(ClassLoader.getSystemResource(upImage));
-		setIcon(upImageIcon);
+                URL upImageURL = 
+                    ClassLoader.getSystemResource(upImage);
+
+                // Handle case where jlfgr isn't installed and the image
+                // isn't availabe
+                if(upImageURL != null) {
+                    ImageIcon upImageIcon = new ImageIcon(upImageURL);
+                    setIcon(upImageIcon);
+                }
 	    }
 	    else {
 		// Create down arrow for header column
-		ImageIcon downImageIcon = 
-		    new ImageIcon(ClassLoader.getSystemResource(downImage));
-		setIcon(downImageIcon);
+                URL downImageURL = 
+                    ClassLoader.getSystemResource(downImage);
+
+                // Handle case where jlfgr isn't installed and the image
+                // isn't availabe
+                if(downImageURL != null) {
+                    ImageIcon downImageIcon = new ImageIcon(downImageURL);
+                    setIcon(downImageIcon);
+                }
 	    }
 
 	    return this;

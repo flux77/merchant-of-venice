@@ -62,11 +62,6 @@ public class Symbol implements Cloneable, Comparable {
         throws SymbolFormatException {
         set(string);
     }
-
-    // Create a new symbol from the internal symbol format
-    private Symbol(int symbol) {
-        this.symbol = symbol;
-    }
    
     /**
      * Return the symbol string.
@@ -93,14 +88,9 @@ public class Symbol implements Cloneable, Comparable {
 	
 	return String.copyValueOf(characters, 0, i);
     }
-    
-    /**
-     * Set the symbol string.
-     *
-     * @param string a string containing a single symbol
-     * @exception SymbolFormatException if the string doesn't contain a valid quote
-     */
-    public void set(String string) 
+
+    // Set the symbol string.
+    private void set(String string) 
         throws SymbolFormatException {
 	
         string = string.toUpperCase();
@@ -145,7 +135,7 @@ public class Symbol implements Cloneable, Comparable {
      * for more details.
      *
      * @param offset the character offset
-     * @param the character at the given offset
+     * @return the character at the given offset
      */
     public char charAt(int offset) {
         String string = get();
@@ -203,6 +193,8 @@ public class Symbol implements Cloneable, Comparable {
 
         if(symbolsArray.length > 1)
             throw new SymbolFormatException("Expecting only a single symbol.");
+        else if(symbolsArray.length == 0)
+            throw new SymbolFormatException("Missing symbol.");
         else
             return (Symbol)symbolsArray[0];
     }
@@ -213,13 +205,17 @@ public class Symbol implements Cloneable, Comparable {
      * @return clone of this symbol
      */
     public Object clone() {
-        return new Symbol(symbol);
+
+        // Since the symbol class is immutable and because we may
+        // potentially have thousands of them, a clone can actually
+        // be the same class.
+        return this;
     }
     
     /**
      * Compare this symbol to the given symbol.
      *
-     * @param the symbol to compare
+     * @param object symbol to compare
      * @return the value <code>0</code> if the symbols are equal;
      * <code>1</code> if this symbol is after the specified symbol or
      * <code>-1</code> if this symbol is before the specified symbol.
@@ -231,7 +227,7 @@ public class Symbol implements Cloneable, Comparable {
     /**
      * Compare this symbol to the given symbol.
      *
-     * @param the symbol to compare
+     * @param object the symbol to compare
      * @return <code>true</code> if they are equal
      */
     public boolean equals(Object object) {
@@ -241,7 +237,7 @@ public class Symbol implements Cloneable, Comparable {
     /**
      * Calculate the hash code for this symbol.
      *
-     * @param the hash code
+     * @return the hash code
      */
     public int hashCode() {
         return symbol;

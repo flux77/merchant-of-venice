@@ -113,9 +113,9 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
         
 	addPage(new EquationPage(desktop));
 	addPage(new LanguagePage(desktop));
+	addPage(new MacrosPage(desktop));
         addPage(new ProxyPage(desktop));
 	addPage(new QuoteSourcePage(desktop));	
-	addPage(new MacrosPage(desktop));
 	addPage(new TuningPage(desktop));
 
 	pageList = new JList(pageListModel);

@@ -1,23 +1,20 @@
-/*
- * Created on 18-May-2003
- *
- * Merchant of Venice - technical analysis software for the stock market.
- * Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
- * This portion of code Copyright (C) 2003 Dan Makovec (venice@makovec.net)
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *  
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *  
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+/* Merchant of Venice - technical analysis software for the stock market.
+   Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
+   This portion of code Copyright (C) 2004 Dan Makovec (venice@makovec.net)
+  
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+    
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+    
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
 package org.mov.prefs;
@@ -32,6 +29,7 @@ import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
 
+import org.mov.main.Main;
 import org.mov.macro.StoredMacro;
 import org.mov.portfolio.Account;
 import org.mov.portfolio.CashAccount;
@@ -50,6 +48,12 @@ import org.mov.util.TradingDateFormatException;
  * preferences data for the application. Consolidating these routines in a single
  * place allows us to maintain preferences namespace convention and also
  * allows us to easily change the method of storage at a later date if desired.
+ * <p>
+ * If a save method first clears all preferences data from a node, it is imperative
+ * that both the save and the equivalent load methods are <code>synchronized</code>.
+ * Otherwise there is the possibility the load call is called just after the
+ * delete call which would nuke all the values. Perhaps all the methods
+ * should be synchronized.
  *
  * @author Daniel Makovec
  */
@@ -94,12 +98,12 @@ public class PreferencesManager {
 	
         /** Is authentication enabled? */
         public boolean authEnabled;
-	
+        
         /** Authentication user name. */
-    public String user;
+        public String user;
 
         /** Authentication password. */
-    public String password;
+        public String password;
     }
 
     /** Database preferences fields. */
@@ -170,6 +174,28 @@ public class PreferencesManager {
     }
 
     /**
+     * Return whether we require the user to explicitly accept the GPL
+     * license. Currently the license must be explicilty accepted by
+     * the user for each version.
+     *
+     * @return <code>true</code> if the user needs to explicitly accept the GPL
+     */
+    public static boolean requireGPLAcceptance() {
+        Preferences node = getUserNode("/license");
+        String acceptedVersion = node.get("accepted_version", "not_accepted");
+        return !acceptedVersion.equals(Main.SHORT_VERSION);
+    }
+
+    /**
+     * Set that the user has been shown the GPL and has accepted it. The user
+     * will not be bothered again until the next version.
+     */
+    public static void setGPLAcceptance() {
+        Preferences node = getUserNode("/license");
+        node.put("accepted_version", Main.SHORT_VERSION);
+    }
+
+    /**
      * Load the last directory used when importing quote files.
      *
      * @param  dirtype the directory type (e.g. macros, importer, etc)
@@ -202,7 +228,7 @@ public class PreferencesManager {
      * @return the list of stored equations.
      * @see StoredEquation
      */
-    public static List loadStoredEquations() {
+    public static synchronized List loadStoredEquations() {
 	List storedEquations = new ArrayList();
 	Preferences prefs = getUserNode("/equations");
 
@@ -224,7 +250,7 @@ public class PreferencesManager {
      * @param storedEquations the stored equations.
      * @see StoredEquation
      */
-    public static void saveStoredEquations(List storedEquations) {
+    public static synchronized void saveStoredEquations(List storedEquations) {
 	try {
 	    // Remove old equations
 	    Preferences prefs = getUserNode("/equations");
@@ -247,8 +273,7 @@ public class PreferencesManager {
      * @return the list of registered macros
      * @see StoredMacro
      */
-
-    public static List loadStoredMacros() {
+    public static synchronized List loadStoredMacros() {
         List stored_macros = new ArrayList();
         Preferences prefs = getUserNode("/macros/info");
 
@@ -283,7 +308,7 @@ public class PreferencesManager {
      * @param stored_macros the registered macros.
      * @see StoredMacro
      */
-    public static void saveStoredMacros(List stored_macros) {
+    public static synchronized void saveStoredMacros(List stored_macros) {
         try {
             // Remove old macro definitions
             Preferences prefs = getUserNode("/macros_info");
@@ -306,11 +331,11 @@ public class PreferencesManager {
     
     //Store the users text made for this symbol     
     public static void saveUserNotes(String symbol, String text) {
-	    String xpath = "/userNotes/" + symbol;
-	    Preferences prefs = getUserNode("/userNotes");
-	    
-	    prefs = getUserNode("/userNotes");
-	    prefs.put(symbol, text);
+        String xpath = "/userNotes/" + symbol;
+        Preferences prefs = getUserNode("/userNotes");
+	
+        prefs = getUserNode("/userNotes");
+        prefs.put(symbol, text);
     }
 
     // Retrieve the notes made for this symbol.
@@ -445,7 +470,7 @@ public class PreferencesManager {
      * @param name the name of the watch screen to load.
      * @return the watch screen.
      */
-    public static WatchScreen loadWatchScreen(String name) {
+    public static synchronized WatchScreen loadWatchScreen(String name) {
         WatchScreen watchScreen = new WatchScreen(name);
 
         Preferences p = getUserNode("/watchscreens/" + name);
@@ -473,16 +498,16 @@ public class PreferencesManager {
      *
      * @param watchScreen the watch screen.
      */
-    public static void saveWatchScreen(WatchScreen watchScreen) {
+    public static synchronized void saveWatchScreen(WatchScreen watchScreen) {
         Preferences p = getUserNode("/watchscreens/" + watchScreen.getName());
 	p.put("name", watchScreen.getName());
 
         // Clear old symbols
         try {
-        	p.node("symbols").removeNode();
+            p.node("symbols").removeNode();
         }
         catch(BackingStoreException e) {
-        		// don't care
+            // don't care
         }
 
         // Save watched symbols
@@ -504,7 +529,7 @@ public class PreferencesManager {
      *
      * @param name the watch screen name.
      */
-    public static void deleteWatchScreen(String name) {
+    public static synchronized void deleteWatchScreen(String name) {
 	Preferences p = getUserNode("/watchscreens/" + name);
 
 	try {
@@ -520,7 +545,7 @@ public class PreferencesManager {
      *
      * @return the list of portfolio names.
      */
-    public static String[] getPortfolioNames() {
+    public static synchronized String[] getPortfolioNames() {
 	Preferences p = getUserNode("/portfolio");
 	String[] portfolioNames = null;
 
@@ -539,7 +564,7 @@ public class PreferencesManager {
      *
      * @param name the portfolio name.
      */
-    public static void deletePortfolio(String name) {
+    public static synchronized void deletePortfolio(String name) {
 	Preferences p = getUserNode("/portfolio/" + name);
 
 	try {
@@ -556,7 +581,7 @@ public class PreferencesManager {
      * @param name the name of the portfolio to load.
      * @return the portfolio.
      */
-    public static Portfolio loadPortfolio(String name) {
+    public static synchronized Portfolio loadPortfolio(String name) {
 	Portfolio portfolio = new Portfolio(name);
 	
 	Preferences p = getUserNode("/portfolio/" + name);
@@ -694,7 +719,7 @@ public class PreferencesManager {
      *
      * @param portfolio the portfolio.
      */
-    public static void savePortfolio(Portfolio portfolio) {
+    public static synchronized void savePortfolio(Portfolio portfolio) {
 	Preferences p = getUserNode("/portfolio/" + portfolio.getName());
 	p.put("name", portfolio.getName());
 

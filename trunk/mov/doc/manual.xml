@@ -44,10 +44,10 @@ in Venice. For charting see <link to="Graphs">Graphs</link>.
 </para>
 </help>
 
-<text>Merchant of Venice, 0.5 alpha / 14/Mar/2005
+<text>Merchant of Venice, 0.5 alpha / 13/Mar/2005
 ===========================================
 
-Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
+Copyright (C) 2003-5, Andrew Leppard (aleppard picknowl com au)
 See COPYING.txt for license terms.
 
 </text>
@@ -230,17 +230,17 @@ can't find a table. If you get this, it probably means that you haven't
 imported any quotes into Venice yet. Venice will automatically create its
 required tables the first time you import quotes. For reference, this is
 the format of the SQL shares table:</para>
-<para><codeblock>+--------+---------+------+-----+------------+-------+
-| Field  | Type    | Null | Key | Default    | Extra |
-+--------+---------+------+-----+------------+-------+
-| date   | date    |      | PRI | 0000-00-00 |       |
-| symbol | char(6) |      | PRI |            |       |
-| open   | float   | YES  |     | 0          |       |
-| close  | float   | YES  |     | 0          |       |
-| high   | float   | YES  |     | 0          |       |
-| low    | float   | YES  |     | 0          |       |
-| volume | int(11) | YES  |     | 0          |       |
-+--------+---------+------+-----+------------+-------+
+<para><codeblock>+--------+----------+------+-----+------------+-------+
+| Field  | Type     | Null | Key | Default    | Extra |
++--------+----------+------+-----+------------+-------+
+| date   | date     |      | PRI | 0000-00-00 |       |
+| symbol | char(12) |      | PRI |            |       |
+| open   | float    | YES  |     | 0          |       |
+| close  | float    | YES  |     | 0          |       |
+| high   | float    | YES  |     | 0          |       |
+| low    | float    | YES  |     | 0          |       |
+| volume | int(11)  | YES  |     | 0          |       |
++--------+----------+------+-----+------------+-------+
 </codeblock></para>
 </section>
 
@@ -295,10 +295,7 @@ possible default configurations.
 </chapter>
 
 <chapter name="Language">
-<para>You can change the default language and use a different Venice localization.
-The default language is got from your system.
-If your language is not localized in Venice, English is choosen as default.</para>
-
+<para>You can change the default language and use a different Venice localisation.</para>
 <para>You can reach the language configuration page by:</para>
 <list><item>Clicking on the <highlight>File</highlight> menu item.
 </item>
@@ -308,7 +305,7 @@ If your language is not localized in Venice, English is choosen as default.</par
 </item>
 </list>
 
-<para>When you change the localization language, you should restart Venice,
+<para>When you change the localisation language, you should restart Venice,
 so that all menus are refreshed.</para>
 </chapter></chapter>
 
@@ -544,9 +541,18 @@ future direction of the market.</para>
 
 <section name="Stock Charts">
 
-<para>Venice supports a variety of technical charts. See the literature
-for how the meaning and how to interpret these charts.</para>
+<para>Venice supports a variety of technical charts. Some of these charts are
+described below, for the others, please consult the literature for their
+meaning and interpretation.</para>
 
+<section name="Custom">
+<para>Venice supports the charting of user-defined custom indicators. Using the
+<link to="Gondola Language">Gondola Language</link> you can write custom indicators which can
+then be charted. The custom chart user interface allows you to enter a Gondola
+equation to chart and to specify the chart as either primary or secondary.
+A primary chart is one that appears in the top graph. A secondary chart will
+appear in its own smaller graph below.</para>
+</section>
 </section>
 </chapter>
 

@@ -40,6 +40,9 @@ import org.mov.quote.*;
  */
 public class MainMenu implements ActionListener, ModuleListener
 {
+    // Application's main menu
+    private JMenuBar menuBar;
+
     // All the menu items
     private JMenuItem filePortfolioNewMenuItem;
     private JMenuItem fileImportPreferencesMenuItem;
@@ -78,7 +81,8 @@ public class MainMenu implements ActionListener, ModuleListener
 
     private JMenuItem helpContentsMenuItem;
     private JMenuItem helpAboutMenuItem;
-    
+    private JMenuItem helpViewLicenseMenuItem;
+
     private JMenu helpMenu;
     private JMenu windowMenu;
     private JMenu filePortfolioMenu;
@@ -142,7 +146,8 @@ public class MainMenu implements ActionListener, ModuleListener
         // changed
         desktopManager.addModuleListener(this);
         
-        JMenuBar menuBar = new JMenuBar();
+        menuBar = new JMenuBar();
+
         /**********************************************
          * File
          **********************************************/
@@ -250,8 +255,7 @@ public class MainMenu implements ActionListener, ModuleListener
         
         // Table -> Portfolio
         tablePortfolioMenu = MenuHelper.addMenu(quoteMenu, Locale.getString("PORTFOLIO"));
-        
-        
+                
         /**********************************************
          * Graph
          **********************************************/
@@ -329,11 +333,12 @@ public class MainMenu implements ActionListener, ModuleListener
          * Help
          **********************************************/
         helpMenu = MenuHelper.addMenu(menuBar, Locale.getString("HELP"), 'H');
-        helpContentsMenuItem = MenuHelper.addMenuItem(this, helpMenu,
-                Locale.getString("CONTENTS"));
         helpAboutMenuItem = MenuHelper.addMenuItem(this, helpMenu,
-                Locale.getString("ABOUT"));
-        
+                                                   Locale.getString("ABOUT"));
+        helpContentsMenuItem = MenuHelper.addMenuItem(this, helpMenu,
+                                                      Locale.getString("CONTENTS"));
+        helpViewLicenseMenuItem = MenuHelper.addMenuItem(this, helpMenu,
+                                                         Locale.getString("VIEW_LICENSE"));
         
         // Build portfolio and watchscreen menus
         updatePortfolioMenu();
@@ -529,6 +534,8 @@ public class MainMenu implements ActionListener, ModuleListener
                     CommandManager.getInstance().openHelp();
                 else if (menu == helpAboutMenuItem)
                     CommandManager.getInstance().openAboutDialog();
+                else if (menu == helpViewLicenseMenuItem)
+                    CommandManager.getInstance().openLicenseDialog();
                 
                 else
                     assert false;
@@ -674,7 +681,8 @@ public class MainMenu implements ActionListener, ModuleListener
         return menuMap;
     }
     
-    /** Take the list of menu item and add them to the given menu. Return
+    /** 
+     * Take the list of menu item and add them to the given menu. Return
      *  a hashmap which maps each menu created with the given menu item.
      */
     public void buildMacroMenu()
@@ -695,6 +703,17 @@ public class MainMenu implements ActionListener, ModuleListener
                 menuItemToMacroHash.put(menuItem, m);
             }
         }
+    }
+
+    // doc me
+    public void disableMenus() {
+        for(int i = 0; i < menuBar.getMenuCount(); i++)
+            menuBar.getMenu(i).setEnabled(false);
+    }
+
+    public void enableMenus() {
+        for(int i = 0; i < menuBar.getMenuCount(); i++)
+            menuBar.getMenu(i).setEnabled(true);
     }
 }
 

@@ -28,6 +28,7 @@ import javax.swing.UIManager;
 import org.mov.macro.MacroManager;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.QuoteSourceManager;
+import org.mov.ui.GPLViewDialog;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
 import org.mov.util.Locale;
@@ -47,13 +48,13 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.4a";
+    public static String SHORT_VERSION = "0.5a";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION = "0.4 alpha";
+    public static String LONG_VERSION = "0.5 alpha";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "14/" + Locale.getString("AUG") + "/2004";
+    public static String RELEASE_DATE = "13/" + Locale.getString("AUG") + "/2005";
 
     /**
      * Get the main frame for the current application
@@ -75,7 +76,7 @@ public class Main extends JFrame {
         for(int i = 0; i < title.length(); i++)
             System.out.print("-");
         System.out.println("");
-        System.out.println(Locale.getString("COPYRIGHT", "2003-4") + ", " +
+        System.out.println(Locale.getString("COPYRIGHT", "2003-5") + ", " +
 			   "Andrew Leppard (aleppard@picknowl.com.au)");
         System.out.println(Locale.getString("SEE_LICENSE"));
 
@@ -97,7 +98,7 @@ public class Main extends JFrame {
 	CommandManager.getInstance().setDesktopManager(desktopManager);
 
 	// Instantiate main menu singleton
-	MainMenu.getInstance(this, desktopManager);
+        MainMenu.getInstance(this, desktopManager);
 
 	setContentPane(desktop);
 	addWindowListener(new WindowAdapter() {
@@ -140,21 +141,38 @@ public class Main extends JFrame {
 	// Set the look and feel to be the default for the current platform
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            //In win2000, below display is better then default
-            //MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
-            //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-            
         }
         catch(Exception e) {
             // Shouldn't happen, but if it does just keep going
         }
         venice = new Main();
+
+        // Temporarily disable functionality if the user has not accepted the license.
+        if(PreferencesManager.requireGPLAcceptance())
+            MainMenu.getInstance().disableMenus();
+
         venice.setVisible(true);
+
+        // First make sure user has agreed to GPL. If they do not agree to
+        // the license, then quit the application immediately.
+        if (PreferencesManager.requireGPLAcceptance()) {
+            if(!GPLViewDialog.showGPLAcceptanceDialog()) {
+                venice.dispose();
+                System.exit(0);
+            }
+
+            // Record user's acceptance and re-enable functionality.
+            else {
+                PreferencesManager.setGPLAcceptance();
+                MainMenu.getInstance().enableMenus();
+            }
+        }
+
+        // Now run Jython start up macros
         try {
             MacroManager.executeStartupMacros();
-
         } catch (java.lang.NoClassDefFoundError err) {
-            System.out.println("Jython library not found, no macros executed");
+            System.out.println(Locale.getString("NO_JYTHON_ERROR"));
         }
     }
 }

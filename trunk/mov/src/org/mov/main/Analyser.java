@@ -7,6 +7,7 @@ import java.util.prefs.*;
 import javax.swing.*;
 
 import org.mov.util.*;
+import org.mov.ui.*;
 
 public class Analyser extends JFrame implements WindowListener {
     
@@ -24,6 +25,7 @@ public class Analyser extends JFrame implements WindowListener {
 		    p.getInt("default_y", 0));
 
 	desktop = new JDesktopPane();
+	desktop.setDesktopManager(new AnalyserDesktopManager(desktop));
 	Progress.getInstance().setDesktop(desktop);
 	menu = new AnalyserMenu(this, desktop);
 	setContentPane(desktop);
@@ -77,4 +79,5 @@ public class Analyser extends JFrame implements WindowListener {
 	analyser.setVisible(true);
     }
 }
+
 

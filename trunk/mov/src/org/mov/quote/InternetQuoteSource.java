@@ -22,6 +22,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.NoRouteToHostException;
 import java.net.MalformedURLException;
 import java.net.BindException;
@@ -31,8 +34,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
 
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
@@ -97,14 +103,21 @@ public class InternetQuoteSource implements QuoteSource
      "http://se.table.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
     };
     */
-  
+
+    // Each Yahoo site uses the same URL formatting. So we define it once here.
+    private final static String YAHOOTODAY_FORMAT = ("?s=" + SYMBOL +
+                                                "&f=sl1d1t1c1ohgv&e=.csv");
+    
     // You can get all the stock quotes from the one URL
     private final static String[] sources = {
 	"Yahoo",
 //	"http://table.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
 	"http://ichart.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
-    };
 
+	"YahooToday",//获取当日数据
+	"http://finance.yahoo.com/d/quotes.csv" + YAHOOTODAY_FORMAT,
+
+    };
     private final static int numberExchanges = (sources.length / 2);
 
     // The exchange name and pattern we are using
@@ -307,15 +320,43 @@ public class InternetQuoteSource implements QuoteSource
 	    PreferencesManager.loadProxySettings();
 
         try {
-	    URL url = new URL(URLString);
+	    URL url;
+
+		url = new URL(URLString);
 
             InputStreamReader input = new InputStreamReader(url.openStream());
             BufferedReader bufferedInput = new BufferedReader(input);
             String line;
                 
             while((line = bufferedInput.readLine()) != null) {
-                QuoteFilter quoteFilter = new YahooQuoteFilter(symbol);
-                Quote quote = quoteFilter.toQuote(line);
+                Class cl=null;
+                Constructor cnst = null; 
+                QuoteFilter filter = null;
+                try {
+                    cl = Class.forName("org.mov.quote."+name+"QuoteFilter");
+                    try {
+                        //Look for the constructor that has one Symbol parameter 
+                        cnst = cl.getConstructor( new Class[] { Symbol.class } );
+                    } catch (SecurityException e2) {
+                        e2.printStackTrace();
+                    } catch (NoSuchMethodException e2) {
+                        e2.printStackTrace();
+                    } 
+                    try {
+                        filter = (QuoteFilter) cnst.newInstance( new Object[] { symbol} );
+                    } catch (IllegalArgumentException e3) {
+                        e3.printStackTrace();
+                    } catch (InstantiationException e3) {
+                        e3.printStackTrace();
+                    } catch (IllegalAccessException e3) {
+                        e3.printStackTrace();
+                    } catch (InvocationTargetException e3) {
+                        e3.printStackTrace();
+                    }
+                } catch (ClassNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+                Quote quote = filter.toQuote(line);                
                     
                 if(quote != null)
                     quoteCache.load(quote);
@@ -358,7 +399,7 @@ public class InternetQuoteSource implements QuoteSource
         catch(IOException e) {
             DesktopManager.showErrorMessage(Locale.getString("ERROR_DOWNLOADING_QUOTES"));
             success = false;
-        }
+        } 
         
         return success;
     }

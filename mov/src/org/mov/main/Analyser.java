@@ -26,3 +26,4 @@ public class Analyser extends JFrame {
 	analyser.setVisible(true);
     }
 }
+

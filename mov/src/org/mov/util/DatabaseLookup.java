@@ -10,8 +10,8 @@ public class DatabaseLookup {
     public final String driverclass = "org.gjt.mm.mysql.Driver";
 
     // Account info
-    public final String user        = "";
-    public final String password    = "";
+    public final String user        = "shares";
+    public final String password    = "money5me";
 
     public Prices prices;
     public Info info;

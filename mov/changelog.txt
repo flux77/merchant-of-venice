@@ -1,4 +1,4 @@
-Changes for Venice, 0.5 alpha 14/Jan/2005
+Changes for Venice, 0.5 alpha 13/Mar/2005
 ==========================================
 
 * Chart Update:
@@ -59,6 +59,8 @@ Changes for Venice, 0.5 alpha 14/Jan/2005
     inappropriate places (e.g. "$" in symbol, date or number fields).
   - Fixed user interface display bugs under Mac OS X. Also under Mac OS X
     it now uses the standard, and better looking, progress bar.
+  - Fixed portfolio import/export bug. Exported portfolio format has now
+    changed and is not backwards compatible.
 
 Changes for Venice, 0.4 alpha 14/Aug/2004
 ==========================================

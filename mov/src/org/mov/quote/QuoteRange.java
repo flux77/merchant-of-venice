@@ -195,6 +195,24 @@ public class QuoteRange implements Cloneable {
 	this.lastDate = lastDate;
     }
 
+    /** 
+     * Create a quote range that represents all the symbols of the given
+     * type for all the dates we have quotes.
+     * This might use up a lot of memory!
+     *
+     * @param type      the type, one of {@link #ALL_ORDINARIES}, {@link #ALL_SYMBOLS},
+     *                  {@link #MARKET_INDICES}
+     */
+    public QuoteRange(int type) {
+        
+        assert type != GIVEN_SYMBOLS;
+
+	this.symbols = null;
+	this.type = type;
+	this.firstDate = null;
+	this.lastDate = null;
+    }
+
     /**
      * Create a clone of this quote range.
      *

@@ -1,62 +1,58 @@
 package org.mov.util;
 
-/* Provides a lookup mapping for our different table and field names
+import java.util.Hashtable;
+import java.util.prefs.*;
+
+/** Provides a lookup mapping for our different table and field names
  */
 
 public class DatabaseLookup {
 
-    // Driver details - just in case we want to switch to Postgres or whatever
-    public final String drivername  = "mysql";
-    public final String driverclass = "org.gjt.mm.mysql.Driver";
+    /**
+     * Factory method for generating new Database lookup engine */
 
-    // Account info
-    public final String user        = "shares";
-    public final String password    = "money5me";
-
-    public Prices prices;
-    public Info info;
-
+    public static DatabaseLookup getInstance() {
+	return new DatabaseLookup();
+    }
     
-    public DatabaseLookup() {
-	prices = new Prices();
-	info = new Info();
+    Hashtable hash;
+
+    /** Private constructor */
+
+    private DatabaseLookup() {
+	hash = new Hashtable();
+	
+	Preferences p = Preferences.userRoot().node("/connection");
+	hash.put("drivername", p.get("drivername", "mysql"));
+	hash.put("driverclass", p.get("driverclass", "org.gjt.mm.mysql.Driver"));
+	hash.put("host", p.get("host", "db"));
+	hash.put("port", p.get("port", "3306"));
+	hash.put("dbname", p.get("dbname", "shares"));
+	
+	hash.put("username", p.get("username", ""));
+	hash.put("password", p.get("password", ""));
+	
+	p = Preferences.userRoot().node("/connection/tables");
+	hash.put("prices", p.get("prices", "prices"));
+	hash.put("info", p.get("info", "info"));
+	
+	p = Preferences.userRoot().node("/connection/tables/prices_fields");
+	hash.put("prices.date", hash.get("prices")+"."+p.get("date", "date"));
+	hash.put("prices.symbol", hash.get("prices")+"."+p.get("symbol", "symbol"));
+	hash.put("prices.open", hash.get("prices")+"."+p.get("open", "open"));
+	hash.put("prices.high", hash.get("prices")+"."+p.get("high", "high"));
+	hash.put("prices.low", hash.get("prices")+"."+p.get("low", "low"));
+	hash.put("prices.close", hash.get("prices")+"."+p.get("close", "close"));
+	hash.put("prices.volume", hash.get("prices")+"."+p.get("volume", "volume"));
+	
+	p = Preferences.userRoot().node("/connection/tables/info_fields");
+	hash.put("info.name", hash.get("info")+"."+p.get("name", "name"));
+	hash.put("info.symbol", hash.get("info")+"."+p.get("symbol", "symbol"));
     }
 
-
-    /*
-     * This class represents the table that records daily stock price action.
-     * Modify these variables to reflect the name of the table and respective fields
-     */
-    class Prices {
-	public static final String table_name = "shares";
-	public static final String date       = "date";
-	public static final String symbol     = "symbol";
-	public static final String open       = "open";
-	public static final String high       = "high";
-	public static final String low        = "low";
-	public static final String close      = "close";
-	public static final String volume     = "volume";
-
-
-	public String toString() {
-	    return table_name;
-	}
-
-    }
-
-    /*
-     * This class represents the table that records information about a particular stock.
-     * Modify these variables to reflect the name of the table and respective fields
-     */
-    class Info {
-	public static final String table_name = "lookup";
-	public static final String symbol     = "symbol";
-	public static final String name       = "name";
-
-	public String toString() {
-	    return table_name;
-	}
-
+    /** Retrieve the relavent database variable */
+    public String get(String key) {
+	return (String)hash.get(key);
     }
 }
 

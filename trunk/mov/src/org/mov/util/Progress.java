@@ -84,10 +84,22 @@ public class Progress {
      * Set the desktop to display on. This must be called once before
      * any progress window is opened.
      *
-     * @param	desktop	the desktop to display on.
+     * @param	desktop	the desktop to display on
      */
     public void setDesktop(JDesktopPane desktop) {
 	this.desktop = desktop;
+    }
+
+    /**
+     * Update the message being displayed
+     * 
+     * @param	message	the new message
+     * @param	owner	are we the owner?
+     */
+    public void setText(String message, boolean owner) {
+
+	if(owner && frame != null)
+	    label.setText(message);
     }
 
     // Resets the message and progress bar value and maximum

@@ -170,7 +170,32 @@ public class DesktopManager
     }
 
     /**
-     * Show a simple error message to the user.
+     * Show a simple warning message to the user. Unlike the
+     * show error message dialog, this will not cancel the
+     * current thread. Use this if the operation is not totally
+     * unsuccessful.
+     *
+     * @param	message	the warning message to display
+     */
+    public static void showWarningMessage(final String message) {
+        // Now show the dialog in a new thread. This way our dialog isn't
+        // hidden behind the progress dialog.
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                String multiLineMessage = breakUpMessage(message);
+                
+                JOptionPane.showInternalMessageDialog(desktop_instance,
+                                                      multiLineMessage,
+                                                      "Venice problem!",
+                                                      JOptionPane.WARNING_MESSAGE);
+            }
+        });
+        thread.start();            
+    }
+
+    /**
+     * Show a simple error message to the user. This will also 
+     * cancel the current thread if the progress dialog is up.
      *
      * @param	message	the error message to display
      */
@@ -188,36 +213,8 @@ public class DesktopManager
         // hidden behind the progress dialog.
         Thread thread = new Thread(new Runnable() {
             public void run() {
-                // If message is a one really long line, break it up
-                StringTokenizer tokeniser = new StringTokenizer(message, " \n", true);
-                String multiLineMessage = "";
-
-                // This isn't hard and fast but a rough maximum.
-                final int MAX_LINE_LENGTH = 40;
-                int lineLength = 0;
-
-                while(tokeniser.hasMoreTokens()) {
-                    String token = tokeniser.nextToken();
-
-                    // If the token is a newline, the line length is now 0
-                    if(token.equals("\n"))
-                        lineLength = 0;
-
-                    // Are we about due for anothe rnew line?
-                    if(lineLength > MAX_LINE_LENGTH) {
-                        multiLineMessage = multiLineMessage.concat("\n");
-                        lineLength = 0;
-                    }
-
-                    // Don't add spaces at the start of a line!
-                    if(lineLength > 0 || !token.equals(" "))
-                        multiLineMessage = multiLineMessage.concat(token);
-
-                    // Don't count "\n" as a string length
-                    if(!token.equals("\n"))
-                        lineLength += token.length();
-                }
-
+                String multiLineMessage = breakUpMessage(message);
+                
                 JOptionPane.showInternalMessageDialog(desktop_instance,
                                                       multiLineMessage,
                                                       "Venice problem!",
@@ -225,6 +222,42 @@ public class DesktopManager
             }
         });
         thread.start();            
+    }
+
+    // Break up a single line message into multiple line messages ready
+    // for display in a dialog box.
+    private static String breakUpMessage(String message) {
+        // If message is a one really long line, break it up
+        StringTokenizer tokeniser = new StringTokenizer(message, " \n", true);
+        String multiLineMessage = "";
+        
+        // This isn't hard and fast but a rough maximum.
+        final int MAX_LINE_LENGTH = 40;
+        int lineLength = 0;
+        
+        while(tokeniser.hasMoreTokens()) {
+            String token = tokeniser.nextToken();
+            
+            // If the token is a newline, the line length is now 0
+            if(token.equals("\n"))
+                lineLength = 0;
+            
+            // Are we about due for anothe rnew line?
+                if(lineLength > MAX_LINE_LENGTH) {
+                    multiLineMessage = multiLineMessage.concat("\n");
+                    lineLength = 0;
+                }
+            
+            // Don't add spaces at the start of a line!
+            if(lineLength > 0 || !token.equals(" "))
+                multiLineMessage = multiLineMessage.concat(token);
+            
+            // Don't count "\n" as a string length
+            if(!token.equals("\n"))
+                lineLength += token.length();
+        }
+
+        return multiLineMessage;
     }
 
     /**

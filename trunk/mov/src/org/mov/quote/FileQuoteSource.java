@@ -56,6 +56,10 @@ import org.mov.ui.ProgressDialogManager;
  */
 public class FileQuoteSource implements QuoteSource
 {
+    // Only display this many errors about not being able to load files.
+    // This prevents the user from being swamped with error messages.
+    private final static int MAXIMUM_ERRORS = 5;
+
     // Construct a map between TradingDates and file names
     private HashMap dateToURL = null;
 
@@ -149,7 +153,9 @@ public class FileQuoteSource implements QuoteSource
 	    br.close();
 
 	} catch (IOException e) {
-	    DesktopManager.showErrorMessage("Can't load " + fileURL.getPath());
+            // This is only a warning message because as long as one file
+            // loaded we can continue.
+	    DesktopManager.showWarningMessage("Can't load " + fileURL.getPath());
 	}
 
         return quotes;
@@ -211,19 +217,20 @@ public class FileQuoteSource implements QuoteSource
                     dateToURL.put(date, fileURL);
                 }		
                 else {
-                    if(errorCount < 5) {
-                        DesktopManager.
-                            showErrorMessage("No quotes found in " +
-                                             fileURL.getPath());
-                        errorCount++;
+                    if(errorCount++ < MAXIMUM_ERRORS) {
+                        // These messages are only warning messages because we
+                        // can continue.
+                        String message = "No quotes found in " + fileURL.getPath();
+                        DesktopManager.showWarningMessage(message);
                     }
                 }
                 
             } catch (IOException e) {
-                if(errorCount < 5) {
-                    DesktopManager.showErrorMessage("Can't load " +
-                                                    fileURL.getPath());
-                    errorCount++;	
+                if(errorCount++ < MAXIMUM_ERRORS) {
+                    // These messages are only warning messages because we
+                    // can continue.
+                    String message = "Can't load " + fileURL.getPath();
+                    DesktopManager.showWarningMessage(message);
                 }
             }
             
@@ -403,13 +410,7 @@ public class FileQuoteSource implements QuoteSource
                     // Load quotes into cache
                     for(Iterator quoteIterator = quotes.iterator(); quoteIterator.hasNext();) {
                         Quote quote = (Quote)quoteIterator.next();
-                        quoteCache.load(quote.getSymbol(),
-                                        quote.getDate(),
-                                        quote.getDayVolume(),
-                                        (float)quote.getDayLow(),
-                                        (float)quote.getDayHigh(),
-                                        (float)quote.getDayOpen(),
-                                        (float)quote.getDayClose());
+                        quoteCache.load(quote);
                     }
                 }
                 

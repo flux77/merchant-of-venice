@@ -30,10 +30,14 @@ import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
+import org.mov.util.TradingDate;
 
 public class EquationColumn extends Column implements Cloneable {
     private String equation;
     private Expression expression;
+
+    // Contains a mapping between Symbol and TradingDate concatenated with
+    // result for that date.
     private Map results;
 
     public EquationColumn(int number, 
@@ -94,7 +98,7 @@ public class EquationColumn extends Column implements Cloneable {
                     double result = expression.evaluate(new Variables(), 
                                                         quoteBundle, quote.getSymbol(), 
                                                         dateOffset);
-                    results.put(quote.getSymbol(),
+                    results.put(quote.getSymbol().toString() + quote.getDate().toString(),
                                 new EquationResult(expression.getType(), result));
                 }
                 catch(WeekendDateException e) {
@@ -105,14 +109,14 @@ public class EquationColumn extends Column implements Cloneable {
         }
     }
    
-    public EquationResult getResult(Symbol symbol) {
+    public EquationResult getResult(Symbol symbol, TradingDate date) {
         // If we don't have that many results, just return an empty
         // result. This will show up as an empty cell in the table
         // and be sorted as so the result was 0.0.
         EquationResult equationResult = null;
 
         if(results != null)
-            equationResult = (EquationResult)results.get(symbol);
+            equationResult = (EquationResult)results.get(symbol.toString() + date.toString());
 
         if(equationResult == null)
             equationResult = EquationResult.EMPTY;

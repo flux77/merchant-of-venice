@@ -48,7 +48,7 @@ public class AccountTable extends AbstractTable {
 	    "Account", "Value"};
 
 	private Class[] columnClasses = {
-	    String.class, String.class};
+	    String.class, PriceFormat.class};
 
 	private QuoteBundle quoteBundle;
 	private Portfolio portfolio;
@@ -113,8 +113,7 @@ public class AccountTable extends AbstractTable {
 		    
 		case(VALUE_COLUMN):
 		    try {
-			return 
-			    Converter.quoteToString(account.getValue(quoteBundle, date));
+			return new PriceFormat(account.getValue(quoteBundle, date));
 		    }
 		    catch(MissingQuoteException e) {
 			assert false;
@@ -145,8 +144,7 @@ public class AccountTable extends AbstractTable {
 			}
 		    }
 
-		    return 
-			Converter.quoteToString(value);
+		    return new PriceFormat(value);
 		}
 	    }
 

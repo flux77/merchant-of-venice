@@ -53,8 +53,8 @@ public class StockHoldingTable extends AbstractTable {
 	    "Symbol", "Shares", "Day Close", "Mkt Value", "Change"};
 
 	private Class[] columnClasses = {
-	    String.class, Integer.class, String.class, String.class,
-	    Change.class}; 
+	    String.class, Integer.class, QuoteFormat.class, PriceFormat.class,
+	    ChangeFormat.class}; 
 
 	private QuoteBundle quoteBundle;
 	private HashMap stockHoldings;
@@ -110,19 +110,15 @@ public class StockHoldingTable extends AbstractTable {
 		    return new Integer(stockHolding.getShares());
 		    
 		case(DAY_CLOSE_COLUMN):
-		    return Converter.quoteToString
-			(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
+		    return new QuoteFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
 		    
 		case(MARKET_VALUE_COLUMN):
-		    return Converter.quoteToString
-			(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date) *
-			 stockHolding.getShares());
+		    return new PriceFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date) *
+                                           stockHolding.getShares());
 		    
 		case(CHANGE_COLUMN):
-		    return 
-			Converter.changeToChange
-			(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date),
-			 quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
+		    return new ChangeFormat(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date),
+                                            quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
 		}
 	    }
 	    catch(MissingQuoteException e) {

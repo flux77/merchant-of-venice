@@ -41,8 +41,10 @@ public class AbstractTable extends SortedTable {
     private String downImage = "org/mov/images/Down.png";
     private String unchangedImage = "org/mov/images/Unchanged.png";
 
-    class StockQuoteRenderer extends JPanel implements TableCellRenderer,
-						       MouseListener
+    // Keep instance of number format handy
+    private NumberFormat format;
+
+    class StockQuoteRenderer extends JPanel implements TableCellRenderer
     {
 
 	private JLabel textLabel = new JLabel();
@@ -75,7 +77,7 @@ public class AbstractTable extends SortedTable {
 			      alternativeBackgroundColor);
 
 	    // The change column has specific rendering
-	    if(value instanceof Change) 
+	    if(value instanceof ChangeFormat) 
 		renderChangeComponent(table, value, isSelected,
 				      hasFocus, row, column); 
 	    else if(value instanceof TradingDate) {
@@ -98,15 +100,15 @@ public class AbstractTable extends SortedTable {
 					   boolean hasFocus, 
 					   int row, int column) {
 
-	    Change change = (Change)value;
+	    ChangeFormat change = (ChangeFormat)value;
 	    double changePercent = change.getChange();
-	    String text;
+	    String text = new String();
 
 	    if(changePercent > 0)
-		text = "+" + Double.toString(changePercent) + "%";
-	    else
-		text = Double.toString(changePercent) + "%";
-
+		text = "+";
+            
+            text = text.concat(format.format(changePercent));
+            text = text.concat("%");
 	    textLabel.setText(text);
 
 	    if(changePercent > 0) {
@@ -133,19 +135,6 @@ public class AbstractTable extends SortedTable {
 	    add(textLabel);
 	    add(iconLabel);
 	}
-
-	public void checkPopup(MouseEvent e) {
-	    //	    System.out.println("pop up");
-
-	    //    if (e.isPopupTrigger()) 
-	    ///		Table.popup.show(this, e.getX(), e.getY());
-	}
-	
-	public void mousePressed(MouseEvent e) { checkPopup(e); }
-	public void mouseClicked(MouseEvent e) { checkPopup(e); }
-	public void mouseEntered(MouseEvent e) {}
-	public void mouseExited(MouseEvent e) {} 
-	public void mouseReleased(MouseEvent e) { checkPopup(e); }
     }
 
     public AbstractTable() {
@@ -153,22 +142,24 @@ public class AbstractTable extends SortedTable {
 	setShowGrid(true);
 
 	// Our own stock quote renderer
-	setDefaultRenderer(Change.class, 
-			   new StockQuoteRenderer());
-	setDefaultRenderer(String.class, 
-			   new StockQuoteRenderer());
-	setDefaultRenderer(Integer.class, 
-			   new StockQuoteRenderer());
-	setDefaultRenderer(Double.class, 
-			   new StockQuoteRenderer());
-	setDefaultRenderer(Float.class, 
-			   new StockQuoteRenderer());
-	setDefaultRenderer(TradingDate.class, 
-			   new StockQuoteRenderer());
+	setDefaultRenderer(String.class, new StockQuoteRenderer());
+	setDefaultRenderer(Integer.class, new StockQuoteRenderer());
+	setDefaultRenderer(Double.class, new StockQuoteRenderer());
+	setDefaultRenderer(Float.class, new StockQuoteRenderer());
+	setDefaultRenderer(TradingDate.class, new StockQuoteRenderer());
+	setDefaultRenderer(ChangeFormat.class, new StockQuoteRenderer());
+	setDefaultRenderer(PriceFormat.class, new StockQuoteRenderer());
+	setDefaultRenderer(QuoteFormat.class, new StockQuoteRenderer());
+
+        // Set up number formatter for rendering ChangeFormat.java
+        format = NumberFormat.getInstance();
+        format.setMinimumIntegerDigits(1);
+        format.setMinimumFractionDigits(2);
+        format.setMaximumFractionDigits(2);
     }
 
     public void setModel(TableModel model) {
-	super.setModel(model);
+	super.setModel(model);        
     }
 }
 

@@ -7,8 +7,17 @@ import org.mov.chart.*;
 import org.mov.chart.source.*;
 import org.mov.util.*;
 
+/**
+ * Simple line graph. This graph is used to draw any kind of line such
+ * as day close, day open, day high, day low etc.
+ */
 public class LineGraph extends AbstractGraph {
 
+    /**
+     * Create a new simple line graph.
+     *
+     * @param	source	the source to render
+     */
     public LineGraph(GraphSource source) {
 	super(source);
     }

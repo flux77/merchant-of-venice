@@ -271,29 +271,6 @@ caching and set the maximum amount. From time to time, Venice may need
 to go a little higher than this amount.</para>
 </chapter>
 
-<chapter name="Windows Preferences">
-<para>You can load from or save to an XML file the whole Venice preferences.</para>
-
-<para>You can reach the windows preferences configuration page by:</para>
-<list><item>Clicking on the <highlight>File</highlight> menu item.
-</item>
-<item>Then clicking on the <highlight>Preferences</highlight> menu item.
-</item>
-<item>Then selecting the <highlight>Windows Preferences</highlight> page.
-</item>
-</list>
-
-<para>This feature can be used in several ways:</para>
-<list><item>You can do a library of XML files, so that you can choose many different
-possible default configurations.
-</item>
-<item>You can import preferences created with another user.
-</item>
-<item>You can import preferences in another working copy of Venice.
-</item>
-</list>
-</chapter>
-
 <chapter name="Language">
 <para>You can change the default language and use a different Venice localisation.</para>
 <para>You can reach the language configuration page by:</para>
@@ -308,6 +285,34 @@ possible default configurations.
 <para>When you change the localisation language, you should restart Venice,
 so that all menus are refreshed.</para>
 </chapter></chapter>
+
+<chapter name="Importing and Exporting Preferences">
+<para>You can load from or save to an XML file the whole Venice preferences.</para>
+
+<para>You can reach the import preferences dialog by:</para>
+<list><item>Clicking on the <highlight>File</highlight> menu item.
+</item>
+<item>Then clicking on the <highlight>Import Preferences</highlight> menu item.
+</item>
+</list>
+
+<para>You can reach the export preferences dialog by:</para>
+<list><item>Clicking on the <highlight>File</highlight> menu item.
+</item>
+<item>Then clicking on the <highlight>Export Preferences</highlight> menu item.
+</item>
+</list>
+
+<para>This feature can be used in several ways:</para>
+<list><item>You can do a library of XML files, so that you can choose many different
+possible default configurations.
+</item>
+<item>You can import preferences created with another user.
+</item>
+<item>You can import preferences in another working copy of Venice.
+</item>
+</list>
+</chapter>
 
 <chapter name="Importing Quotes">
 <para>Before you import quotes, you'll need to decide whether Venice will read the

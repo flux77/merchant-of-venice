@@ -158,9 +158,14 @@ public class PointAndFigureGraph extends AbstractGraph {
 		    upmove = (upmove) ? false: true;
 		    // This places the marker on when the price changed
 		    // direction
-		    col = x;	
+		    // Which seems to work ok for small datasets
+		    //col = x;	
+		    
 		    // This places it in the next column
-		    //col = (Comparable)iterator2.next();
+		    // This seems to work better for larger (more realistic)
+		    // datasets, even though the user may have to zoom
+		    // a few times.
+		    col = (Comparable)iterator2.next();
 		
 		}
 		

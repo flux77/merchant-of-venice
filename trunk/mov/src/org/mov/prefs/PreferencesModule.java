@@ -7,12 +7,12 @@ import java.beans.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
-import java.util.prefs.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
 import org.mov.main.ModuleFrame;
 import org.mov.main.Module;
+import org.mov.prefs.PreferencesManager;
 
 /**
  * The preferences module for venice. This class provides the user
@@ -149,9 +149,9 @@ public class PreferencesModule extends JPanel
 
 	    // flush changes to backing store
 	    try {
-		Preferences.userRoot().flush();
+		PreferencesManager.userRoot().flush();
 	    }
-	    catch(BackingStoreException be) {
+	    catch(Exception be) {
 		// ignore it
 	    }
 	}

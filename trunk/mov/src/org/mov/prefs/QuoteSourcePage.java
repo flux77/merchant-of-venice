@@ -7,12 +7,13 @@ import java.beans.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
-import java.util.prefs.*;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
 import org.mov.importer.*;
+import org.mov.prefs.PreferencesManager;
 import org.mov.quote.*;
 
 /** 
@@ -58,7 +59,7 @@ public class QuoteSourcePage extends JPanel
 
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-	Preferences p = Preferences.userRoot().node("/quote_source");
+	Preferences p = PreferencesManager.getUserNode("/quote_source");
 	String quoteSource = p.get("source", "database");
 
 	// Tab Pane
@@ -66,7 +67,7 @@ public class QuoteSourcePage extends JPanel
 
 	// Database Pane
 	{
-	    p = Preferences.userRoot().node("/quote_source/database");
+	    p = PreferencesManager.getUserNode("/quote_source/database");
 
 	    useDatabase = new JRadioButton("Use Database", true);
 	    useDatabase.addActionListener(this);
@@ -136,7 +137,7 @@ public class QuoteSourcePage extends JPanel
 
 	// File Pane
 	{
-	    p = Preferences.userRoot().node("/quote_source/files");
+	    p = PreferencesManager.getUserNode("/quote_source/files");
 
 	    useFiles = new JRadioButton("Use Files", true);
 	    useFiles.addActionListener(this);
@@ -209,7 +210,7 @@ public class QuoteSourcePage extends JPanel
 
 	// Internet Pane
 	{
-	    p = Preferences.userRoot().node("/quote_source/internet");
+	    p = PreferencesManager.getUserNode("/quote_source/internet");
 
 	    useInternet = new JRadioButton("Use Internet", true);
 	    useInternet.addActionListener(this);
@@ -397,7 +398,7 @@ public class QuoteSourcePage extends JPanel
     public void save() {
 	// Type
 	Preferences p = 
-	    Preferences.userRoot().node("/quote_source");
+	    PreferencesManager.getUserNode("/quote_source");
 	if(useFiles.isSelected())
 	    p.put("source", "files");
 	else if(useInternet.isSelected())
@@ -407,7 +408,7 @@ public class QuoteSourcePage extends JPanel
 
 	// Save database preferences
 	{
-	    p = Preferences.userRoot().node("/quote_source/database");
+	    p = PreferencesManager.getUserNode("/quote_source/database");
 	    p.put("host", databaseHost.getText());
 	    p.put("port", databasePort.getText());
 	    p.put("username", databaseUsername.getText());
@@ -417,7 +418,7 @@ public class QuoteSourcePage extends JPanel
 
 	// Save file preferences
 	{
-	    p = Preferences.userRoot().node("/quote_source/files");
+	    p = PreferencesManager.getUserNode("/quote_source/files");
 
 	    p.put("format", (String)formatComboBox.getSelectedItem());
 
@@ -432,7 +433,7 @@ public class QuoteSourcePage extends JPanel
 
 	// Save internet preferences
 	{
-	    p = Preferences.userRoot().node("/quote_source/internet");
+	    p = PreferencesManager.getUserNode("/quote_source/internet");
 	    p.put("username", internetUsername.getText());
 	    p.put("password", new String(internetPassword.getPassword()));
 	}

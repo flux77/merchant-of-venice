@@ -73,6 +73,7 @@ public class QuoteFunctions {
      * @param	cache	the quote cache to read the quotes from.
      * @param	symbol	the symbol to use.
      * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
+     * @param	days	Number of days to run RSI calculation over
      * @param	lastDay	fast access date offset in cache.
      * @return  the RSI value
      */

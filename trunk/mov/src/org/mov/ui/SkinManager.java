@@ -2,7 +2,7 @@ package org.mov.ui;
 
 
 import java.net.URL;
-import java.util.prefs.*;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 
 import com.l2fprod.gui.plaf.skin.Skin;
@@ -11,7 +11,7 @@ import com.l2fprod.gui.plaf.skin.SkinLookAndFeel;
 import com.l2fprod.util.*;
 
 import org.mov.main.Main;
-
+import org.mov.prefs.PreferencesManager;
 /**
  * This class is responsible for the loading of UI skins 
  */
@@ -19,7 +19,7 @@ public class SkinManager {
     /** Can be called from anywhere to update the current skin to the most recent settings */
     public static void loadSkin() {
 	try {
-	    Preferences p = Preferences.userRoot().node("/display/skin");
+	    Preferences p = PreferencesManager.getUserNode("/display/skin");
 	    /* Possible skin types:
 	       none - No skin
 	       pack - l2fprod.com Theme Pack skin

@@ -104,7 +104,8 @@ public class PointAndFigureGraph extends AbstractGraph {
      * @return	the graphable containing averaged data from the source
      */
     public static PFGraphable createPointAndFigureGraph(Graphable source,
-                                                        double priceScale) {
+                                                        double priceReversalScale,
+							double boxPriceScale) {
 	PFGraphable pointAndFigure = new PFGraphable();
 
 	// Date set and value array will be in sync
@@ -120,26 +121,32 @@ public class PointAndFigureGraph extends AbstractGraph {
 	boolean upmove = true, changeDirection = false;	
 	String marker;
 	Comparable col;	
-	
+
 	int i = 0;	
 	double average;
+		
+	upmove = getFirstDirection(source, boxPriceScale);
 
 	col = (Comparable)iterator2.next();
 	
 	while(iterator.hasNext()) {
 	    Comparable x = (Comparable)iterator.next();
 
-	    diff = (i == 0)  ? values[i] : (values[i] - prev);
-	    plot = (Math.abs(diff) >= priceScale) ? true : false;
+	    diff = (i == 0)  ? 0 : (values[i] - prev);
+	    plot = (Math.abs(diff) >= boxPriceScale) ? true : false;
 
 	    // Now check the direction
 	    if (plot) {
-		if (upmove == true && diff < 0) {
-		    changeDirection = true;
-		} else if (upmove == false && diff > 0) {
-		    changeDirection = true;
+		if (Math.abs(diff) >= priceReversalScale) {
+		    if (upmove == true && diff < 0) {
+			changeDirection = true;
+		    } else if (upmove == false && diff > 0) {
+			changeDirection = true;
+		    } else {
+			changeDirection = false;		
+		    }
 		} else {
-		    changeDirection = false;		
+		    changeDirection = false;
 		}
 		
 		// Stay in the same column until theres a change in direction
@@ -182,28 +189,43 @@ public class PointAndFigureGraph extends AbstractGraph {
      *
      * @return default price scale
      */
-    private double calculateDefaultPriceScale() {
-        double defaultPriceScale;
+    private double calculateDefaultPriceReversalScale() {
+        double defaultPriceReversalScale;
 
         // Heuristic for a starting value for the default price scale
         Graphable graphable = getSource().getGraphable();
         double[] values = graphable.toArray();
-        defaultPriceScale = QuoteFunctions.sd(values, 1, values.length) / 2;
-        defaultPriceScale = QuoteFunctions.roundDouble(defaultPriceScale, 2);
-        return defaultPriceScale;
+        defaultPriceReversalScale = QuoteFunctions.sd(values, 1, values.length) / 1.75;
+        defaultPriceReversalScale = QuoteFunctions.roundDouble(defaultPriceReversalScale, 2);
+        return defaultPriceReversalScale;
     }
+
+    private double calculateDefaultBoxPriceScale() {
+        double defaultBoxPriceScale;
+
+        // Heuristic for a starting value for the default price scale
+        Graphable graphable = getSource().getGraphable();
+        double[] values = graphable.toArray();
+        defaultBoxPriceScale = QuoteFunctions.sd(values, 1, values.length) / 4;
+        defaultBoxPriceScale = QuoteFunctions.roundDouble(defaultBoxPriceScale, 2);
+        return defaultBoxPriceScale;
+    }
+
+
 
     public void setSettings(HashMap settings) {
         super.setSettings(settings);
 
         // Calculate default price scale from data
-        double defaultPriceScale = calculateDefaultPriceScale();
+        double defaultPriceReversalScale = calculateDefaultPriceReversalScale();
+        double defaultBoxPriceScale = calculateDefaultBoxPriceScale();
 
         // Retrieve values from hashmap
-        double priceScale = PointAndFigureGraphUI.getPriceScale(settings, defaultPriceScale);
+        double priceReversalScale = PointAndFigureGraphUI.getPriceReversalScale(settings, defaultPriceReversalScale);
+        double boxPriceScale = PointAndFigureGraphUI.getBoxPriceScale(settings, defaultBoxPriceScale);	
 
 	// Create point and figure graphable
-	pointAndFigure = createPointAndFigureGraph(getSource().getGraphable(), priceScale);
+	pointAndFigure = createPointAndFigureGraph(getSource().getGraphable(), priceReversalScale, boxPriceScale);
     }
 
     /**
@@ -213,8 +235,39 @@ public class PointAndFigureGraph extends AbstractGraph {
      * @return user interface
      */
     public GraphUI getUI(HashMap settings) {
-        return new PointAndFigureGraphUI(settings, calculateDefaultPriceScale());
+        return new PointAndFigureGraphUI(settings, 
+					 calculateDefaultPriceReversalScale(),
+					 calculateDefaultBoxPriceScale());
     }
+
+    // Return true if the stock is moving upwards, false otherwise.
+    private static boolean getFirstDirection(Graphable source, double boxValue) {
+	Set xRange = source.getXRange();
+	Iterator iterator = xRange.iterator();
+	double diff, prev = 0.0;
+	int i = 0;
+	double[] values = source.toArray();
+	
+	while(iterator.hasNext()) {
+	    Comparable x = (Comparable)iterator.next();
+	    
+	    diff = (i <= 1)  ? 0 : (values[i] - prev);
+	    prev = values[i];
+	    i++;
+	    
+	    if (Math.abs(diff) >= boxValue) {
+		if (diff > 0) {
+		    return true;
+		}
+		if (diff < 0) {
+		    return false;
+		}
+	    }
+	}
+	
+	return true;
+    }
+
 }
 
 

@@ -38,8 +38,7 @@ import java.util.*;
  * FACTOR = VARIABLE | NUMBER | FUNCTION | "(" EXPR ")"
  * NUMBER = ["-"]{0-9}+ ["." {0-9}+] | "true" | "false"
  * VARIABLE = {a-zA-Z}{a-zA-Z0-9}*
- * QUOTE      "day_open" | "day_close" | "day_low" | "day_high" | 
- *            "day_volume"
+ * QUOTE      "open" | "close" | "low" | "high" | "volume"
  * FUNCTION = "lag" "(" QUOTE "," EXPR ")" | 
  *            "min" "(" QUOTE "," EXPR "," EXPR ")" | 
  *            "max" "(" QUOTE "," EXPR "," EXPR ")" |
@@ -304,7 +303,6 @@ public class Parser {
 	switch(function.getType()) {
 	case(Token.LAG_TOKEN):
 	case(Token.RSI_TOKEN):	  
-	case(Token.PERCENT_TOKEN): 
 	    arg1 = parseQuote(tokens);
 	    parseComma(tokens);
 	    arg2 = parseExpression(tokens);
@@ -320,6 +318,12 @@ public class Parser {
 	    parseComma(tokens);
 	    arg3 = parseExpression(tokens);	    
 	    break;
+
+	case(Token.PERCENT_TOKEN): 
+	    arg1 = parseExpression(tokens);
+            parseComma(tokens);
+	    arg2 = parseExpression(tokens);
+            break;
 
 	case(Token.NOT_TOKEN):
         case(Token.SQRT_TOKEN):

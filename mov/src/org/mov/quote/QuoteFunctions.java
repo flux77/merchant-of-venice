@@ -39,10 +39,23 @@ public class QuoteFunctions {
 	return avg;
     }
 
+    static public float sd(float[] values, int start, int end) {
+	double average = avg2(values, start, end);
+	int period = end - start;
+
+	double deviationSum = 0;
+	for(int i = start; i < end; i++) {
+	    deviationSum += (values[i] - average)*(values[i] - average);
+	}
+
+	return (float)Math.sqrt(deviationSum / period);
+
+    }
+
     // start inclusive, end exclusive
     static public float avg2(float[] values, int start, int end) {
 	float avg = 0;
-	int days = end - start;
+	int period = end - start;
 
 	// Sum quotes
 	for(int i = start; i < end; i++) {
@@ -50,12 +63,10 @@ public class QuoteFunctions {
 	}
 
 	// Average
-	avg /= days;
+	avg /= period;
 
 	return avg;
     }
-
-
 
     /**
      * RSI algorithm 

@@ -35,18 +35,21 @@ import org.mov.main.Module;
 
 public class PreferencesModule extends JPanel
     implements Module, ActionListener {
-
+    
     /**
      * Preferences page for retrieving stock quotes.
      */
+    
+    private Vector pages;
     public static int QUOTE_SOURCE_PAGE = 0;
-
+    
     private JDesktopPane desktop;
     private PropertyChangeSupport propertySupport;
     private PreferencesPage activePage;
-
+    
     private JButton okButton;
     private JButton cancelButton;
+    private JSplitPane split;
     
     /**
      * Create a new Preference Module.
@@ -55,22 +58,38 @@ public class PreferencesModule extends JPanel
      * @param	initialPage	the initial page to display, so far we only
      *				support 
      */
-    public PreferencesModule(JDesktopPane desktop, int initialPage) {
-
+    public PreferencesModule(JDesktopPane desktop) {
+	
 	this.desktop = desktop;
 	propertySupport = new PropertyChangeSupport(this);       
+	
+	DefaultListModel pageListModel = new DefaultListModel();
+	pages = new Vector();
+	pageListModel.addElement((Object)new String("Quote Source"));
+	pages.addElement(new QuoteSourcePage(desktop));
+	
+	pageListModel.addElement((Object)new String("Skins"));
+	pages.addElement(new SkinPage(desktop));
 
-	DefaultListModel fileListModel = new DefaultListModel();
-	JList pageList = new JList();
-	pageList.setModel(fileListModel);
-	fileListModel.addElement((Object)new String("Quote Source"));
+	final JList pageList = new JList(pageListModel);
+
+	MouseListener mouseListener = new MouseAdapter() {
+		public void mouseClicked(MouseEvent e) {
+		    int index = pageList.locationToIndex(e.getPoint());
+		    pageList.setSelectedIndex(index);
+		    activePage = (PreferencesPage) pages.elementAt(index);
+		    split.setRightComponent(activePage.getComponent());
+		}
+	    };
+	pageList.addMouseListener(mouseListener);
+
+
 	pageList.setSelectedIndex(0);
-
-	activePage = new QuoteSourcePage(desktop);
+	activePage = (PreferencesPage) pages.elementAt(0);
 
 	//setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	setLayout(new BorderLayout());
-	add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+	add(split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 			   pageList,
 			   activePage.getComponent()),
 	    BorderLayout.CENTER);
@@ -173,7 +192,7 @@ public class PreferencesModule extends JPanel
      * @return	enclose module in scroll bar
      */
     public boolean encloseInScrollPane() {
-	return true;
+	return false;
     }
 
     /**

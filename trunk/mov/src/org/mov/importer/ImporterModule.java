@@ -584,7 +584,6 @@ public class ImporterModule extends JPanel
      * @return	the frame icon.
      */
     public ImageIcon getFrameIcon() {
-	//	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/GraphIcon.gif"));
 	return null;
     }
 

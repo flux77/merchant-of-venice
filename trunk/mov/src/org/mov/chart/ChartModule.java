@@ -130,7 +130,6 @@ public class ChartModule extends JPanel implements Module,
     // Function Toolbar 
     private JButton defaultZoom = null;
     private JButton zoomIn = null;    
-    //    private JButton zoomOut = null;
 
     // Menus
     private JMenuItem addMenuItem = null;
@@ -141,6 +140,13 @@ public class ChartModule extends JPanel implements Module,
     private boolean zoomInEnabled = false;
 
     private JDesktopPane desktop;
+
+    // Frame Icon
+    private String frameIcon = "org.mov/images/TableIcon.gif";
+
+    // ToolBar Images - these are from jlfgr-1.0.jar
+    private String defaultZoomImage = "toolbarButtonGraphics/general/Zoom24.gif";
+    private String zoomInImage = "toolbarButtonGraphics/general/ZoomIn24.gif";
 
     /**
      * Create a new Chart.
@@ -188,20 +194,21 @@ public class ChartModule extends JPanel implements Module,
     private void addFunctionToolBar() {
 	JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
 
-	defaultZoom = new JButton(new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/Zoom24.gif")));
-	zoomIn = new JButton(new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/ZoomIn24.gif")));
-	//	zoomOut = new JButton(new ImageIcon("ZoomOut24.gif"));
-
-	//	zoomIn.addActionListener(this);
+	// Create image on toolbar to zoom to default zoom level
+	ImageIcon defaultZoomImageIcon =
+	    new ImageIcon(ClassLoader.getSystemResource(defaultZoomImage));
+	defaultZoom = new JButton(defaultZoomImageIcon);
 	defaultZoom.addActionListener(this);
-	zoomIn.addActionListener(this);
-
 	defaultZoom.setEnabled(defaultZoomEnabled);
-	zoomIn.setEnabled(zoomInEnabled);
-
 	toolBar.add(defaultZoom);
+
+	// Create image on toolbar to zoom in to highlighted region
+	ImageIcon zoomInImageIcon =
+	    new ImageIcon(ClassLoader.getSystemResource(zoomInImage));
+	zoomIn = new JButton(zoomInImageIcon);
+	zoomIn.addActionListener(this);
+	zoomIn.setEnabled(zoomInEnabled);
 	toolBar.add(zoomIn);
-	//	toolBar.add(zoomOut);
 
 	add(toolBar, BorderLayout.WEST);
     }
@@ -603,7 +610,7 @@ public class ChartModule extends JPanel implements Module,
      * @return	the frame icon
      */
     public ImageIcon getFrameIcon() {
-	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/GraphIcon.gif"));
+	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource(frameIcon));
     }
 
     /**

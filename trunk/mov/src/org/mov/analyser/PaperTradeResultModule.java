@@ -379,7 +379,7 @@ public class PaperTradeResultModule extends AbstractTable
      * @return	the frame icon.
      */
     public ImageIcon getFrameIcon() {
-	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/TableIcon.gif"));
+	return null;
     }    
 
     /**

@@ -52,6 +52,9 @@ public class QuoteModule extends AbstractTable
 
     private Model model;
 
+    // Frame Icon
+    private String frameIcon = "org.mov/images/TableIcon.gif";
+
     // Current equation we are filtering by
     private String filterEquationString;
     
@@ -496,7 +499,7 @@ public class QuoteModule extends AbstractTable
      * @return	the frame icon.
      */
     public ImageIcon getFrameIcon() {
-	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/TableIcon.gif"));
+	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource(frameIcon));
     }    
 
     /**

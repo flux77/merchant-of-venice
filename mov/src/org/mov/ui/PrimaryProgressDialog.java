@@ -147,7 +147,8 @@ public class PrimaryProgressDialog implements ProgressDialog {
      * @param note the action we are waiting for
      */
     public void setNote(String note) {
-        noteLabel.setText(note);
+        if(!noteLabel.getText().equals(note))       
+            noteLabel.setText(note);
     }
     
     // Set the text to display in the dialog title. This should be set

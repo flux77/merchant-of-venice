@@ -21,6 +21,7 @@ package org.mov.analyser.gp;
 import java.util.Iterator;
 import java.util.Random;
 
+import org.mov.analyser.GPGondolaSelection;
 import org.mov.parser.Expression;
 import org.mov.parser.expression.*;
 import org.mov.quote.Quote;
@@ -38,11 +39,13 @@ public class Mutator {
     private final static int MODIFICATION_MUTATION_PERCENT = 70;
 
     private Random random;
+    private GPGondolaSelection GPGondolaSelection;
     private boolean allowHeld;
     private boolean allowOrder;
 
-    public Mutator(Random random, boolean allowHeld, boolean allowOrder) {
+    public Mutator(Random random, GPGondolaSelection GPGondolaSelection, boolean allowHeld, boolean allowOrder) {
         this.random = random;
+        this.GPGondolaSelection = GPGondolaSelection;
         this.allowHeld = allowHeld;
         this.allowOrder = allowOrder;
     }
@@ -125,47 +128,36 @@ public class Mutator {
 
         case Expression.INTEGER_TYPE:
 
-            // Give it a 50/50 that it will generate an ordinary number
-            if(random.nextBoolean())
+            randomNumber = GPGondolaSelection.getRandomToGenerateInteger(allowHeld, allowOrder);
+            
+            if(randomNumber == 0)
+                // Generate an ordinary number
                 return new NumberExpression(50 - random.nextInt(100));
-
-            // Otherwise generate some special values
+            else if(randomNumber == 1)
+                return new DayOfYearExpression();
+            else if(randomNumber == 2)
+                return new MonthExpression();
+            else if(randomNumber == 3)
+                return new DayExpression();
+            else if(randomNumber == 4)
+                return new DayOfWeekExpression();
             else {
-                // We don't generate DayOfYearExpression() or MonthExpression()
-                // because it would make it easy for the GP to hook onto specific dates
-                // where the market is low. By removing these it forces the GP
-                // to use the stock data to generate buy/sell decisions.
-                int numberRandomSymbols = 4;
-
-                if(!allowHeld)
-                    numberRandomSymbols--;
-                if(!allowOrder)
-                    numberRandomSymbols--;
-
-                randomNumber = random.nextInt(numberRandomSymbols);
-
-                if(randomNumber == 0)
-                    return new DayExpression();
-                else if(randomNumber == 1)
-                    return new DayOfWeekExpression();
-                else {
-                    if(allowOrder && allowHeld) {
-                        if(randomNumber == 2)
-                            return new GetVariableExpression("held", Expression.INTEGER_TYPE);
-                        else
-                            return new GetVariableExpression("order", Expression.INTEGER_TYPE);
-                    }
-                    else if(allowHeld)
+                if(allowOrder && allowHeld) {
+                    if(randomNumber == 5)
                         return new GetVariableExpression("held", Expression.INTEGER_TYPE);
-                    else {
-                        assert allowOrder;
+                    else
                         return new GetVariableExpression("order", Expression.INTEGER_TYPE);
-                    }
+                }
+                else if(allowHeld)
+                    return new GetVariableExpression("held", Expression.INTEGER_TYPE);
+                else {
+                    assert allowOrder;
+                    return new GetVariableExpression("order", Expression.INTEGER_TYPE);
                 }
             }
 
         case Expression.FLOAT_QUOTE_TYPE:
-            randomNumber = random.nextInt(4);
+            randomNumber = GPGondolaSelection.getRandomToGenerateFloatQuote();
 
             if(randomNumber == 0)
                 return new QuoteExpression(Quote.DAY_OPEN);
@@ -188,7 +180,7 @@ public class Mutator {
     }
 
     private Expression createRandomNonTerminalBoolean(Expression model, int level) {
-        int randomNumber = random.nextInt(9);
+        int randomNumber = GPGondolaSelection.getRandomToGenerateBoolean();
 
         if(randomNumber == 0) {
             return new NotExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE));
@@ -235,7 +227,7 @@ public class Mutator {
     }
 
     private Expression createRandomNonTerminalFloat(Expression model, int level) {
-        int randomNumber = random.nextInt(14);
+        int randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
 
         // If we are mutating an existing number expression then favour
         // just modifying the number's value rather than replacing it
@@ -306,7 +298,7 @@ public class Mutator {
     }
 
     private Expression createRandomNonTerminalInteger(Expression model, int level) {
-        int randomNumber = random.nextInt(14);
+        int randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
 
         // If we are mutating an existing number expression then favour
         // just modifying the number's value rather than replacing it
@@ -401,7 +393,7 @@ public class Mutator {
            (model.getChild(arg).getType() != Expression.FLOAT_TYPE &&
             model.getChild(arg).getType() != Expression.INTEGER_TYPE)) {
 
-            int randomNumber = random.nextInt(2);
+            int randomNumber = GPGondolaSelection.getRandomToGenerateFloatInteger();
 
             if(randomNumber == 0)
                 return createRandom(null, Expression.FLOAT_TYPE, level);

@@ -298,7 +298,7 @@ public class TransactionModule extends AbstractTable implements Module,
      * @return	the frame icon.
      */
     public ImageIcon getFrameIcon() {
-	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/TableIcon.gif"));
+	return null;
     }    
 
     /**

@@ -19,6 +19,11 @@ public class AbstractTable extends SortedTable {
     private static final Color alternativeBackgroundColor = 
 	new Color(237, 237, 237);
 
+    // Images used for arrows representing when stock has gone up, down or is unchanged
+    private String upImage = "org.mov/images/Up.gif";
+    private String downImage = "org.mov/images/Down.gif";
+    private String unchangedImage = "org.mov/images/Unchanged.gif";
+
     class StockQuoteRenderer extends JPanel implements TableCellRenderer,
 						       MouseListener
     {
@@ -87,12 +92,25 @@ public class AbstractTable extends SortedTable {
 
 	    textLabel.setText(text);
 
-	    if(changePercent > 0)
-		iconLabel.setIcon(Loader.loadImage("images/up.gif"));
-	    else if(changePercent < 0)
-		iconLabel.setIcon(Loader.loadImage("images/down.gif"));
-	    else
-		iconLabel.setIcon(Loader.loadImage("images/unch.gif"));
+	    if(changePercent > 0) {
+		// Create up arrow
+		ImageIcon upImageIcon = 
+		    new ImageIcon(ClassLoader.getSystemResource(upImage));
+		iconLabel.setIcon(upImageIcon);
+	    }
+
+	    else if(changePercent < 0) {
+		// Create down arrow
+		ImageIcon downImageIcon = 
+		    new ImageIcon(ClassLoader.getSystemResource(downImage));
+		iconLabel.setIcon(downImageIcon);
+	    }
+	    else {
+		// Create down arrow
+		ImageIcon unchangedImageIcon = 
+		    new ImageIcon(ClassLoader.getSystemResource(unchangedImage));
+		iconLabel.setIcon(unchangedImageIcon);
+	    }
 
 	    add(glue);
 	    add(textLabel);

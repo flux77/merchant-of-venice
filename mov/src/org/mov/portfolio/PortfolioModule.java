@@ -294,7 +294,7 @@ public class PortfolioModule extends JPanel implements Module,
      * @return	the frame icon.
      */
     public ImageIcon getFrameIcon() {
-	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/TableIcon.gif"));
+	return null;
     }    
 
     /**

@@ -19,6 +19,7 @@
 package org.mov.chart.source;
 
 import org.mov.chart.*;
+import org.mov.ui.*;
 import org.mov.util.*;
 import org.mov.quote.*;
 
@@ -68,6 +69,9 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 		// ignore
 	    }
 	}	
+        
+        // Make sure we contain at least one value!
+        assert graphable.getXRange().size() > 0;        
     }
 
     public Graphable getGraphable() {
@@ -144,7 +148,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    return Integer.toString((int)value) + extension;
 	}
 	else {
-	    return Converter.priceToString(value);
+	    return PriceFormat.priceToString(value);
 	}
     }
 

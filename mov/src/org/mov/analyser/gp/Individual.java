@@ -61,8 +61,9 @@ public class Individual implements Comparable {
     }
 
     public Individual(Mutator buyRuleMutator, Mutator sellRuleMutator) {
-        buyRule = buyRuleMutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE);
-        sellRule = sellRuleMutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE);
+        // By setting the level low we create bushier trees
+        buyRule = buyRuleMutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE, 0);
+        sellRule = sellRuleMutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE, 0);
 
         buyRule = buyRule.simplify();
         sellRule = sellRule.simplify();

@@ -71,6 +71,24 @@ public class PreferencesManager {
 	p.putInt(date.toString(), value);
     }
 
+    public static HashMap loadEquations() {
+	
+	HashMap equations = new HashMap();
+	Preferences p = getUserNode("/filters/functions");
+
+	try {
+	    String[] keys = p.keys();
+	    for(int i = 0; i < keys.length; i++) {
+		equations.put(keys[i], p.get(keys[i], ""));
+	    }
+	}
+	catch(BackingStoreException e) {
+	    // dont care
+	}
+
+	return equations;
+    }
+
     public static HashMap loadLastPaperTradeSettings() {
 
 	HashMap settings = new HashMap();
@@ -198,6 +216,7 @@ public class PreferencesManager {
 		}
 		catch(ClassCastException e) {
 		    // Shouldnt happen unless portfolio gets corrupted
+		    assert false;
 		}
 	    }
 
@@ -214,7 +233,16 @@ public class PreferencesManager {
     public static void savePortfolio(Portfolio portfolio) {
 	Preferences p = getUserNode("/portfolio/" + portfolio.getName());
 	p.put("name", portfolio.getName());
-	
+
+	// Clear old accounts and transactions
+	try {
+	    p.node("accounts").removeNode();
+	    p.node("transactions").removeNode();
+	}
+	catch(BackingStoreException e) {
+	    // don't care
+	}
+
 	// Save accounts
 	Vector accounts = portfolio.getAccounts();
 	Iterator iterator = accounts.iterator();

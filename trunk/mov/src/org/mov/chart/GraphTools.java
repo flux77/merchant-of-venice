@@ -3,11 +3,13 @@ package org.mov.chart;
 import java.awt.*;
 import java.util.*;
 
+import org.mov.chart.graph.*;
+import org.mov.chart.source.*;
 import org.mov.util.*;
 
 public class GraphTools {
 
-    public static void renderLine(Graphics g, BasicGraphDataSource source, 
+    public static void renderLine(Graphics g, Graphable source, 
 				  int xoffset, int yoffset,
 				  float horizontalScale, float verticalScale,
 				  float bottomLineValue, Vector dates) {
@@ -54,7 +56,7 @@ public class GraphTools {
 	}
     }
 
-    public static void renderBar(Graphics g, BasicGraphDataSource source, 
+    public static void renderBar(Graphics g, Graphable source, 
 				 int xoffset, int yoffset,
 				 float horizontalScale, float verticalScale,
 				 float bottomLineValue, Vector dates) {
@@ -121,8 +123,8 @@ public class GraphTools {
     //
     // Assumption both graph1 & graph2 have the same date range
 
-    public static HashMap createAnnotations(BasicGraphDataSource graph1,
-					    BasicGraphDataSource graph2) {
+    public static HashMap createAnnotations(Graphable graph1,
+					    Graphable graph2) {
 	HashMap annotations = new HashMap();
 
 	TradingDate today = 

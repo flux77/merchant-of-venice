@@ -53,7 +53,7 @@ public class QuoteModule extends AbstractTable
     private Model model;
 
     // Frame Icon
-    private String frameIcon = "org.mov/images/TableIcon.gif";
+    private String frameIcon = "org/mov/images/TableIcon.gif";
 
     // Current equation we are filtering by
     private String filterEquationString;

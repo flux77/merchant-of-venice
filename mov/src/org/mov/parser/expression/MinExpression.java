@@ -18,8 +18,13 @@
 
 package org.mov.parser.expression;
 
-import org.mov.quote.*;
-import org.mov.parser.*;
+import org.mov.parser.Expression;
+import org.mov.parser.EvaluationException;
+import org.mov.parser.TypeMismatchException;
+import org.mov.parser.Variables;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.Symbol;
 
 /**
  * An expression which finds the minimum quote over a given trading period.

@@ -45,12 +45,15 @@ public class QuoteFunctions {
 	double average = avg(values, start, end);
 	int period = end - start;
 
-	double deviationSum = 0;
+	double deviationSum = 0.0D;
 	for(int i = start; i < end; i++) {
 	    deviationSum += (values[i] - average)*(values[i] - average);
 	}
 
-	return Math.sqrt(deviationSum / period);
+        if(period > 2)
+            deviationSum /= (period - 1);
+
+	return Math.sqrt(deviationSum);
     }
 
     /**
@@ -64,7 +67,7 @@ public class QuoteFunctions {
      * @return the average
      */
     static public double avg(double[] values, int start, int end) {
-	double avg = 0;
+	double avg = 0.0D;
 	int period = end - start;
 
 	// Sum quotes
@@ -73,9 +76,58 @@ public class QuoteFunctions {
 	}
 
 	// Average
-	avg /= period;
+        if(period > 1)
+            avg /= period;
 
 	return avg;
+    }
+
+    /**
+     * Calculate the Pearson product-moment correlation between the two
+     * variables. This will return a correlation co-efficient which is in the range of
+     * -1 (negative correlation) through to (no correlation) through to 1 (perfect
+     * correlation.
+     *
+     * The correlation co-efficient is calculated as follows:
+     *
+     * r = sum(Zx * Zy)
+     *     ------------
+     *         N - 1
+     *
+     * Where Zx = X - E(X)
+     *            --------
+     *              Sx
+     *
+     * Where E(X) is the mean of X and Sx is the standard deviation of X.
+     *
+     * Simillarly for Zy.
+     *
+     * @param x     array of values to test against
+     * @param y     array of values to detect correlation against x
+     * @param start analyse values from start
+     * @param end   to end
+     * @return the correlation co-efficient
+     */
+    static public double corr(double[] x, double y[], int start, int end) {
+        double r = 0.0D;
+        double ex = avg(x, start, end);
+        double sx = sd(x, start, end);
+        double ey = avg(y, start, end);
+        double sy = sd(y, start, end);
+
+        if(sx != 0.0D && sy != 0.0D) {
+            for(int i = start; i < end; i++) {
+                double zx = (x[i] - ex) / sx;
+                double zy = (y[i] - ey) / sy;
+                
+                r += zx * zy;
+            }
+
+            if((end - start) > 1)
+                r /= (end - start - 1);
+        }
+
+        return r;
     }
 
     /**
@@ -104,8 +156,8 @@ public class QuoteFunctions {
      * @return RSI
      */
     static public double rsi(double[] values, int start, int end) {
-        double sumGain = 0;
-        double sumLoss = 0;
+        double sumGain = 0.0D;
+        double sumLoss = 0.0D;
         int numberGains = 0;
         int numberLosses = 0;
         double previous;

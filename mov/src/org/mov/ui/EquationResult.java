@@ -28,7 +28,7 @@ public class EquationResult implements Comparable {
     public final static EquationResult EMPTY = new EquationResult();
 
     private EquationResult() {
-        result = 0.0F;
+        result = 0.0D;
         isResult = false;
     }
 

@@ -12,7 +12,7 @@ Venice is a stock market trading programme that supports portfolio
 management, charting, technical analysis, paper trading and
 experimental methods like genetic programming. Venice runs in a
 graphical user interface with online help and has full documentation.
-Venice runs on UNIX, including MacOSX and Windows.
+Venice runs on UNIX, including Mac OS X and Windows.
 
 2 Running
 

@@ -48,7 +48,8 @@ import org.mov.util.Locale;
  * ADD_OPERATION     = "-" | "+"
  * MULTIPLY_EXPR     = FACTOR [ MULTIPLY_OPERATOR FACTOR ]
  * MULTIPLY_OPERATOR = "*" | "/"
- * FACTOR            = VARIABLE | NUMBER | FUNCTION | FLOW_CONTROL | QUOTE | "(" SUB_EXPR ")"
+ * FACTOR            = STRING | VARIABLE | NUMBER | FUNCTION | FLOW_CONTROL | QUOTE | "(" SUB_EXPR ")"
+ * STRING            = "{a-zA-Z0-9}*"
  * NUMBER            = ["-"]{0-9}+ ["." {0-9}+] | "true" | "false"
  * VARIABLE_NAME     = {a-zA-Z}{a-zA-Z0-9_}*
  * TYPE              = "boolean" | "float" | "int"
@@ -68,7 +69,8 @@ import org.mov.util.Locale;
  *                     "month" "(" ")"     |
  *                     "year" "(" ")"      |
  *                     "sqrt" "(" SUB_EXPR ")" |
- *                     "abs" "(" SUB_EXPR ")"
+ *                     "abs" "(" SUB_EXPR ")" |
+ *                     "corr" "(" STRING "," QUOTE "," SUB_EXPR ["," SUB_EXPR] ")"
  * FLOW_CONTROL      = "if"  "(" SUB_EXPR ")" EXPR "else" EXPR |
  *                     "for" "(" SUB_EXPR ";" SUB_EXPR ";" SUB_EXPR ")" EXPR |
  *                     "while" "(" SUB_EXPR ")" EXPR
@@ -276,6 +278,10 @@ public class Parser {
            tokens.match(Token.FALSE_TOKEN) ||
            tokens.match(Token.SUBTRACT_TOKEN))
 	    expression = parseNumber(variables, tokens);
+
+        // STRING
+        else if(tokens.match(Token.STRING_TOKEN))
+            expression = parseString(variables, tokens);
 	
 	// FUNCTION
 	else if(tokens.match(Token.LAG_TOKEN) ||
@@ -292,7 +298,8 @@ public class Parser {
 		tokens.match(Token.MONTH_TOKEN) ||
 		tokens.match(Token.YEAR_TOKEN) ||
                 tokens.match(Token.SQRT_TOKEN) ||
-                tokens.match(Token.ABS_TOKEN))
+                tokens.match(Token.ABS_TOKEN) ||
+                tokens.match(Token.CORR_TOKEN))
 	    expression = parseFunction(variables, tokens);
 
         // ABBREVIATION QUOTE FUNCTIONS
@@ -434,6 +441,15 @@ public class Parser {
 	return expression;
     }
 
+    private static Expression parseString(Variables variables, TokenStack tokens)
+	throws ParserException {
+
+	Token string = tokens.pop();
+
+        assert string.getType() == Token.STRING_TOKEN;
+        return ExpressionFactory.newExpression(string);
+    }
+
     private static Expression parseNumber(Variables variables, TokenStack tokens)
 	throws ParserException {
 
@@ -468,6 +484,7 @@ public class Parser {
 	Expression arg1 = null;
 	Expression arg2 = null;
 	Expression arg3 = null;
+	Expression arg4 = null;
 	
 	Token function = tokens.pop();
 
@@ -526,6 +543,22 @@ public class Parser {
 
             break;
 
+        case(Token.CORR_TOKEN):
+            arg1 = parseString(variables, tokens);
+            parseComma(variables, tokens);
+            arg2 = parseQuote(variables, tokens);
+            parseComma(variables, tokens);
+            arg3 = parseSubExpression(variables, tokens);
+
+            // Parse optional offset argument
+            if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+                parseComma(variables, tokens);
+                arg4 = parseSubExpression(variables, tokens);
+            }
+            arg4 = new NumberExpression(0);
+
+            break;
+
 	case(Token.PERCENT_TOKEN):
 	    arg1 = parseSubExpression(variables, tokens);
             parseComma(variables, tokens);
@@ -552,7 +585,7 @@ public class Parser {
 
 	// Create epxression
 	expression = ExpressionFactory.newExpression(function, arg1, arg2,
-						     arg3);
+						     arg3, arg4);
 	
 	// All functions must end with a right parenthesis
 	parseRightParenthesis(variables, tokens);

@@ -224,7 +224,7 @@ public abstract class AbstractExpression implements Expression {
         int count = 0;
 
         assert(type == BOOLEAN_TYPE || type == FLOAT_TYPE || type == INTEGER_TYPE ||
-               type == FLOAT_QUOTE_TYPE || type == INTEGER_QUOTE_TYPE);
+               type == FLOAT_QUOTE_TYPE || type == INTEGER_QUOTE_TYPE || type == STRING_TYPE);
 
         if(getType() == type)
             count = 1;

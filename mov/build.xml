@@ -17,6 +17,7 @@
              sourcepath="${src}"
 	     source="1.4"
              destdir="${api}"
+             additionalparam="-breakiterator"
 	     windowtitle="Venice ${VERSION}">
     <header><![CDATA[<b>Venice ${VERSION}</b>]]></header>
     <footer><![CDATA[<b>Venice ${VERSION}</b>]]></footer>

@@ -62,11 +62,11 @@ public class QuoteCache {
     private static QuoteCache instance = null;
 
     private class QuoteCacheQuote {
-        private int day_volume;
-        private float day_low;
-        private float day_high;
-        private float day_open;
-        private float day_close;
+        public int day_volume;
+        public float day_low;
+        public float day_high;
+        public float day_open;
+        public float day_close;
 
         public QuoteCacheQuote(int day_volume, float day_low, float day_high,
                                float day_open, float day_close) {
@@ -93,6 +93,15 @@ public class QuoteCache {
                 assert false;
                 return 0.0F;
             }
+        }
+
+        public boolean equals(int day_volume, float day_low, float day_high,
+                              float day_open, float day_close) {
+            return (day_volume == this.day_volume &&
+                    day_low == this.day_low &&
+                    day_high == this.day_high &&
+                    day_open == this.day_open &&
+                    day_close == this.day_close);
         }
     }
 
@@ -146,17 +155,13 @@ public class QuoteCache {
     public float getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws QuoteNotLoadedException {
 
-	// First get the hash map for the given date
-	HashMap symbols = getQuotesForDate(dateOffset);
-	assert symbols != null;
+	// Get the quote cache quote for the given symbol + date
+	QuoteCacheQuote quote = getQuoteCacheQuote(symbol, dateOffset);
 
-	// Second get the quote for the given symbol on the given date
-
-	QuoteCacheQuote quote = (QuoteCacheQuote)symbols.get(symbol);
-	if(quote == null)
+	if(quote != null)
+            return quote.getQuote(quoteType);
+        else
 	    throw QuoteNotLoadedException.getInstance();
-	
-	return quote.getQuote(quoteType);
     }
 
     /**
@@ -188,21 +193,57 @@ public class QuoteCache {
      * @return list of symbols
      */
     public List getSymbols(int firstDateOffset, int lastDateOffset) {
-        HashMap symbols = new HashMap();
+        HashMap allSymbols = new HashMap();
 
         // Go through each day, collecting symbols. We put them all in
-        // a hashmap to quickly weed out the numerous duplicates.
-        for(int date = firstDateOffset; date <= lastDateOffset; date++) {
-            List datesSymbols = getSymbols(date);
-
-            for(Iterator iterator = datesSymbols.iterator(); iterator.hasNext();) {
-                Symbol symbol = (Symbol)iterator.next();
-
-                symbols.put(symbol, symbol);
+        // a hashmap to quickly weed out the numerous duplicates. We
+        // don't call getSymbols() for each day because unrolling the
+        // call is much, much faster.
+        for(int dateOffset = firstDateOffset; dateOffset <= lastDateOffset; dateOffset++) {
+            try {
+                HashMap todaySymbols = getQuotesForDate(dateOffset);
+                allSymbols.putAll(todaySymbols);
+            }
+            catch(QuoteNotLoadedException e) {
+                // no symbols loaded on date
             }
         }
 
-        return new ArrayList(symbols.keySet());
+        return new ArrayList(allSymbols.keySet());
+    }
+
+    /**
+     * Return whether we currently have any quotes for the given symbol on the given date
+     *
+     * @param symbol symbol
+     * @param dateOffset fast access date offset
+     * @return <code>TRUE</code> if we have the quote
+     */
+    public boolean containsQuote(Symbol symbol, int dateOffset) {
+	assert dateOffset <= 0;
+
+	if(dateOffset > -dates.size()) {
+            HashMap symbols = (HashMap)cache.get(-dateOffset);
+
+            if(symbols != null) {
+                QuoteCacheQuote quote = (QuoteCacheQuote)symbols.get(symbol);
+                if (quote != null)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    // Returns the quote cache object for the given date
+    private QuoteCacheQuote getQuoteCacheQuote(Symbol symbol, int dateOffset)
+        throws QuoteNotLoadedException {
+
+	// First get the hash map for the given date
+	HashMap symbols = getQuotesForDate(dateOffset);
+	assert symbols != null;
+
+	// Second get the quote for the given symbol on the given date
+	return  (QuoteCacheQuote)symbols.get(symbol);
     }
 
     // Returns a HashMap containing quotes for that date
@@ -236,9 +277,6 @@ public class QuoteCache {
     public synchronized void load(Symbol symbol, TradingDate date, int day_volume, float day_low,
                                   float day_high, float day_open, float day_close) {
 
-        QuoteCacheQuote quote = new QuoteCacheQuote(day_volume, day_low, day_high,
-                                                    day_open, day_close);
-
         // Find the fast date offset for the quote
         int dateOffset;
 
@@ -264,10 +302,30 @@ public class QuoteCache {
             quotesForDate = new HashMap(0);
         }
 
+        // Lots of stocks don't change between days, so check to see if
+        // this stock's quote is identical to yesterdays. If so then
+        // just use that
+        QuoteCacheQuote yesterdayQuote = null;
+        QuoteCacheQuote todayQuote = null;
+
+        try {
+            yesterdayQuote = getQuoteCacheQuote(symbol, dateOffset - 1);
+        }
+        catch(QuoteNotLoadedException e) {
+            // OK
+        }
+
+        if(yesterdayQuote != null && 
+           yesterdayQuote.equals(day_volume, day_low, day_high, day_open, day_close))
+            todayQuote = yesterdayQuote;
+        else
+            todayQuote = new QuoteCacheQuote(day_volume, day_low, day_high,
+                                             day_open, day_close);
+
         // Put stock in map and remove symbol and date to reduce memory
         // (they are our indices so we already know them)
-        Object previousQuote = quotesForDate.put(symbol, quote);
-
+        Object previousQuote = quotesForDate.put(symbol, todayQuote);
+                                              
         // If the quote wasn't already there then increase size counter
         if(previousQuote == null)
             size++;

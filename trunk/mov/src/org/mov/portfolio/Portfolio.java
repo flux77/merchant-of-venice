@@ -246,6 +246,24 @@ public class Portfolio implements Cloneable {
     }
 
     /**
+     * Count the number of transactions of the given type.
+     *
+     * @return	the number of transactions
+     */
+    public int countTransactions(int type) {
+	int count = 0;
+	Iterator iterator = transactions.iterator();
+
+	while(iterator.hasNext()) {
+	    Transaction transaction = (Transaction)iterator.next();
+	    if(transaction.getType() == type)
+		count++;
+	}
+	
+	return count;
+    }
+
+    /**
      * Return the transaction history.
      *
      * @param	transaction history

@@ -18,20 +18,17 @@
 
 package org.mov.main;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.URL;
-import java.text.*;
-import java.util.*;
-import java.util.prefs.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import org.mov.util.*;
-import org.mov.portfolio.*;
+import java.util.prefs.Preferences;
+import javax.swing.JDesktopPane;
+import javax.swing.UIManager;
+import javax.swing.JFrame;
 import org.mov.prefs.PreferencesManager;
-import org.mov.quote.*;
-import org.mov.ui.*;
+import org.mov.ui.DesktopManager;
+import org.mov.ui.MainMenu;
 
 /**
  * The top level class which contains the main() function. This class builds 
@@ -40,7 +37,7 @@ import org.mov.ui.*;
 public class Main extends JFrame {
     
     private JDesktopPane desktop;
-    private org.mov.ui.DesktopManager desktopManager;
+    private DesktopManager desktopManager;
 
     private static Main venice;
 
@@ -85,14 +82,19 @@ public class Main extends JFrame {
 	desktop = new JDesktopPane();
 	desktopManager = new org.mov.ui.DesktopManager(desktop);
 	desktop.setDesktopManager(desktopManager);
+
+        // I didn't mind the blue colour background on the desktop pane
+        // under the default steel l&f, but the Windows XP uses a very
+        // strong blue colour that looks horrible. So this light green
+        // which is the Venice theme will be the default.
+        desktop.setBackground(new Color(238, 241,238));
 	CommandManager.getInstance().setDesktop(desktop);
 
-	// Instantiate main menu singletons
+	// Instantiate main menu singleton
 	MainMenu.getInstance(this, desktopManager, desktop);
 
 	setContentPane(desktop);
-	addWindowListener(new WindowListener() {
-		public void windowActivated(WindowEvent e) {}
+	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    // User closed window by hitting "X" button
 		    saveSettingsAndExit();
@@ -101,10 +103,6 @@ public class Main extends JFrame {
 		    // User closed window by selecting exit from the menu
 		    saveSettingsAndExit();
 		}
-		public void windowDeactivated(WindowEvent e) {}
-		public void windowDeiconified(WindowEvent e) {}
-		public void windowIconified(WindowEvent e) {}
-		public void windowOpened(WindowEvent e) {}
 	    });
     }
 

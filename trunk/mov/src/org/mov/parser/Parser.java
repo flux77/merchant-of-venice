@@ -27,6 +27,7 @@ import org.mov.parser.expression.GetVariableExpression;
 import org.mov.parser.expression.LagExpression;
 import org.mov.parser.expression.NumberExpression;
 import org.mov.parser.expression.SetVariableExpression;
+import org.mov.quote.QuoteFunctions;
 import org.mov.util.Locale;
 
 /**
@@ -476,7 +477,6 @@ public class Parser {
 
 	switch(function.getType()) {
 	case(Token.LAG_TOKEN):
-	case(Token.RSI_TOKEN):	
 	    arg1 = parseQuote(variables, tokens);
 	    parseComma(variables, tokens);
 	    arg2 = parseSubExpression(variables, tokens);
@@ -492,6 +492,25 @@ public class Parser {
 	    parseComma(variables, tokens);
 	    arg3 = parseSubExpression(variables, tokens);	
 	    break;
+
+	case(Token.RSI_TOKEN):	
+            // Default period and no offset
+            arg1 = new NumberExpression(QuoteFunctions.DEFAULT_RSI_PERIOD);
+            arg2 = new NumberExpression(0);
+
+            // Parse optional period argument
+            if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+
+                arg1 = parseSubExpression(variables, tokens);
+
+                // Parse optional offset argument
+                if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+                    parseComma(variables, tokens);
+                    arg2 = parseSubExpression(variables, tokens);
+                }
+            }
+
+            break;
 
 	case(Token.PERCENT_TOKEN):
 	    arg1 = parseSubExpression(variables, tokens);
@@ -531,7 +550,7 @@ public class Parser {
         throws ParserException {
 
         return new LagExpression(parseQuote(variables, tokens),
-                                 new NumberExpression(0.0D, Expression.INTEGER_TYPE));
+                                 new NumberExpression(0));
     }
 
     private static Expression parseFlowControl(Variables variables, TokenStack tokens)

@@ -28,6 +28,9 @@ package org.mov.quote;
  */
 public class QuoteFunctions {
 
+    /** This is the default/recommended period for the RSI. */
+    final public static int DEFAULT_RSI_PERIOD = 45;
+
     /**
      * Find the standard deviation of the given values. This
      * algorthim will calculate the standard deviation on the values in

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.parser;
@@ -29,30 +29,33 @@ import org.mov.util.Locale;
  */
 public class EvaluationException extends ExpressionException {
 
-    private static EvaluationException divideByZeroException = 
+    private static EvaluationException divideByZeroException =
         new EvaluationException(Locale.getString("DIVIDE_BY_ZERO_ERROR"));
 
     // The next two errors should never appear to the user so it isn't
     // localised.
-    private static EvaluationException futureDateException = 
+    private static EvaluationException futureDateException =
         new EvaluationException("Future date");
 
-    private static EvaluationException pastDateException = 
+    private static EvaluationException pastDateException =
         new EvaluationException("Date too far into past");
 
-    private static EvaluationException rangeForSumException = 
+    private static EvaluationException rangeForSumException =
         new EvaluationException(Locale.getString("SUM_RANGE_ERROR"));
 
-    private static EvaluationException rangeForAvgException = 
+    private static EvaluationException rangeForAvgException =
         new EvaluationException(Locale.getString("AVG_RANGE_ERROR"));
 
-    private static EvaluationException rangeForMaxException = 
+    private static EvaluationException rangeForMaxException =
         new EvaluationException(Locale.getString("MAX_RANGE_ERROR"));
 
-    private static EvaluationException rangeForMinException = 
+    private static EvaluationException rangeForMinException =
         new EvaluationException(Locale.getString("MIN_RANGE_ERROR"));
 
-    private static EvaluationException squareRootNegativeNumberException = 
+    private static EvaluationException rangeForRSIException =
+        new EvaluationException(Locale.getString("RSI_RANGE_ERROR"));
+
+    private static EvaluationException squareRootNegativeNumberException =
         new EvaluationException(Locale.getString("SQUARE_ROOT_NEGATIVE_ERROR"));
 
     /**
@@ -134,6 +137,16 @@ public class EvaluationException extends ExpressionException {
      */
     public static EvaluationException rangeForMin() {
         return rangeForMinException;
+    }
+
+    /**
+     * Returns an instance where the range in the rsi() expression
+     * is less than or equal to zero.
+     *
+     * @return range for rsi exception
+     */
+    public static EvaluationException rangeForRSI() {
+        return rangeForRSIException;
     }
 
     /**

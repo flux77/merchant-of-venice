@@ -89,7 +89,7 @@ public class GPModule extends JPanel implements Module {
         if (tradeValuePage.getPreferredSize().getHeight()>maxHeight)
             maxHeight = tradeValuePage.getPreferredSize().getHeight();
         
-        GPPage = new GPPage(desktop, maxHeight);
+        GPPage = new GPPage(desktop);
         tabbedPane.addTab(GPPage.getTitle(), GPPage.getComponent());
         
         // Get the max height
@@ -245,16 +245,17 @@ public class GPModule extends JPanel implements Module {
         Money tradeCost = portfolioPage.getTradeCost();
         int breedingPopulation = GPPage.getBreedingPopulation();
         int displayPopulation = GPPage.getDisplayPopulation();
+        int window = GPPage.getWindow();
         Money stockValue = portfolioPage.getStockValue();
         int numberStocks = portfolioPage.getNumberStocks();
         // number of mutations to be applied to the rules defined in Initial Population Section
         int mutations = GPPageInitialPopulation.getMutations();
         String tradeValueBuy = tradeValuePage.getTradeValueBuy();
         String tradeValueSell = tradeValuePage.getTradeValueSell();
-        
-        // quote bundle needs to load 30 days before quote range.
+
+        // quote bundle should load window days before quote range...
         GPQuoteBundle quoteBundle =
-            new GPQuoteBundle(new ScriptQuoteBundle(quoteRangePage.getQuoteRange()), 30);
+            new GPQuoteBundle(new ScriptQuoteBundle(quoteRangePage.getQuoteRange()), window);
         OrderComparator orderComparator = quoteRangePage.getOrderComparator(quoteBundle);
         OrderCache orderCache = new OrderCache(quoteBundle, orderComparator);
         

@@ -5,6 +5,9 @@ Changes for Venice, 0.5 alpha 14/Jan/2005
   - Added the custom graph to allow users to graph arbitrary indicators
     using the Gondola language.
 
+* Updates to Genetic Programming:
+  - Can now specify window size in days.
+
 * Internationalisation:
   - Can now specify the language to use in preferences (Alberto Nacher).
   - Swedish translation added (Pontus Strömdahl).

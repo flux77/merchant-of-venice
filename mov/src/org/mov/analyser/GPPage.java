@@ -36,28 +36,66 @@ import org.mov.prefs.PreferencesManager;
 import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
+/**
+ * An analysis tool page that lets the user enter basic Genetic
+ * Programming configuration parameters. This page is used only
+ * by the {@link GPModule}. The page contains the following user fields:
+ *
+ * <ul><li>Generations</li>
+ *     <li>Population</li>
+ *     <li>Breeding Population</li>
+ *     <li>Display Population</li>
+ *     <li>Window Size</li>
+ * </ul>
+ *
+ * The generations field describes the number of generations the
+ * GP will run for. The population field describes the number of
+ * individuals that will be randomly generated (or breed) for
+ * that generation. The first generation may generate more random
+ * individuals than this value, it will generate enough individuals
+ * so that the minimum breeding population has been reached.
+ * <p>
+ * The breeding population field describes the number of individuals
+ * that will breed, i.e. will contribute parts of their buy/sell
+ * rules to the next generation. The display population field describes
+ * the number of top individuals that should be displayed in the results
+ * table.
+ * <p>
+ * The window size field describes the number of quote days that
+ * the buy/sell rules can access. When equations are evaluating buy or
+ * sell decisions, they can only access this many quote days into the
+ * past.
+ *
+ * @author Andrew Leppard
+ */
 public class GPPage extends JPanel implements AnalyserPage {
 
     private JDesktopPane desktop;
 
     // Swing components
     private JTextField generationsTextField;
+    private JTextField windowTextField;
     private JTextField populationTextField;
     private JTextField breedingPopulationTextField;
     private JTextField displayPopulationTextField;
 
     // Parsed input
     private int generations;
+    private int window;
     private int population;
     private int breedingPopulation;
     private int displayPopulation;
 
-    public GPPage(JDesktopPane desktop, double maxHeight) {
-        this.desktop = desktop;
+    /** Minimum number of quote days an equation can see. */
+    private final static int MINIMUM_WINDOW_SIZE = 3;
 
-        Dimension preferredSize = new Dimension();
-        preferredSize.setSize(this.getPreferredSize().getWidth(), maxHeight/2);
-        
+    /**
+     * Construct a new genetic programming parameters page.
+     *
+     * @param desktop the desktop
+     */
+    public GPPage(JDesktopPane desktop) {
+        this.desktop = desktop;
         layoutPage();
     }
 
@@ -74,6 +112,8 @@ public class GPPage extends JPanel implements AnalyserPage {
 
             if(setting.equals("generations"))
                 generationsTextField.setText(value);
+            else if(setting.equals("window"))
+                windowTextField.setText(value);
             else if(setting.equals("population"))
                 populationTextField.setText(value);
             else if(setting.equals("breeding_population"))
@@ -87,6 +127,7 @@ public class GPPage extends JPanel implements AnalyserPage {
         HashMap settings = new HashMap();
 
 	settings.put("generations", generationsTextField.getText());
+	settings.put("window", windowTextField.getText());
 	settings.put("population", populationTextField.getText());
 	settings.put("breeding_population", breedingPopulationTextField.getText());
 	settings.put("display_population", displayPopulationTextField.getText());
@@ -100,11 +141,16 @@ public class GPPage extends JPanel implements AnalyserPage {
         population = 0;
         breedingPopulation = 0;
         displayPopulation = 0;
+        window = 0;
 
         try {
 	    if(!generationsTextField.getText().equals(""))
 		generations =
 		    Integer.parseInt(generationsTextField.getText());
+
+	    if(!windowTextField.getText().equals(""))
+		window =
+		    Integer.parseInt(windowTextField.getText());
 
 	    if(!populationTextField.getText().equals(""))
 		population =
@@ -143,6 +189,14 @@ public class GPPage extends JPanel implements AnalyserPage {
 	    return false;
         }
 
+        if(window < MINIMUM_WINDOW_SIZE) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("WINDOW_SIZE_ERROR", MINIMUM_WINDOW_SIZE),
+                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
         if(population <= 0) {
             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("NO_INDIVIDUAL_ERROR"),
@@ -178,18 +232,53 @@ public class GPPage extends JPanel implements AnalyserPage {
         return Locale.getString("GP_PAGE_PARAMETERS_SHORT");
     }
 
+    /**
+     * Return the number of generations in the genetic programme.
+     *
+     * @return the number of generations
+     */
     public int getGenerations() {
         return generations;
     }
 
+    /**
+     * Return the number of quote days that any indivdual's buy or sell rules
+     * can access at anyone time. The buy or sell rule will only be able to
+     * see this many quote days into the past.
+     *
+     * @return the window size in days
+     */
+    public int getWindow() {
+        return window;
+    }
+
+    /**
+     * Return the number of individuals to generate for each generation.
+     * The first generation may generate more than this number of
+     * individuals, if the breeding population size has not been reached.
+     *
+     * @return generation's population size
+     */
     public int getPopulation() {
         return population;
     }
 
+    /**
+     * Return the number of individuals, for each generation, that can
+     * contribute their buy/sell rules to the next generation.
+     *
+     * @return the breeding population size
+     */
     public int getBreedingPopulation() {
         return breedingPopulation;
     }
 
+    /**
+     * Return the number of top performing individuals that are displayed
+     * in the results table.
+     *
+     * @return the display population size
+     */
     public int getDisplayPopulation() {
         return displayPopulation;
     }
@@ -215,6 +304,7 @@ public class GPPage extends JPanel implements AnalyserPage {
             GridBagHelper.addTextRow(innerPanel, Locale.getString("GENERATIONS"), "",
                                      gridbag, c,
                                      5);
+
         populationTextField =
             GridBagHelper.addTextRow(innerPanel,
                                      Locale.getString("POPULATION"), "",
@@ -229,6 +319,10 @@ public class GPPage extends JPanel implements AnalyserPage {
             GridBagHelper.addTextRow(innerPanel,
                                      Locale.getString("DISPLAY_POPULATION"), "",
                                      gridbag, c, 7);
+        windowTextField =
+            GridBagHelper.addTextRow(innerPanel, Locale.getString("WINDOW_SIZE"), "",
+                                     gridbag, c,
+                                     5);
 
         panel.add(innerPanel, BorderLayout.NORTH);
         add(panel);

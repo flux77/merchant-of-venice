@@ -47,7 +47,7 @@ import org.mov.util.TradingDate;
 public class GPQuoteBundle implements QuoteBundle {
 
     private QuoteBundle quoteBundle;
-    private int earliestDateOffset;
+    private int window;
 
     /**
      * Create a new quote bundle for the GP.
@@ -58,8 +58,7 @@ public class GPQuoteBundle implements QuoteBundle {
      */
     public GPQuoteBundle(QuoteBundle quoteBundle, int window) {
         this.quoteBundle = quoteBundle;
-
-        earliestDateOffset = getFirstDateOffset() - window;
+        this.window = window;
     }
 
     /**
@@ -101,7 +100,7 @@ public class GPQuoteBundle implements QuoteBundle {
             throw EvaluationException.futureDate();
 
         // Trying to access a date too far into the past?
-        else if(offset < earliestDateOffset)
+        else if(offset <= window)
             throw EvaluationException.pastDate();
 
         // Date is within range

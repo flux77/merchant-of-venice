@@ -267,9 +267,10 @@ public class DesktopManager
      * displayed at (0,0) and not centred.
      * 
      * @param module the module to render in the frame
+     * @return	module frame
      */
-    public void newFrame(Module module) {
-	newFrame(module, false, false);
+    public ModuleFrame newFrame(Module module) {
+	return newFrame(module, false, false);
     }
 
     /**
@@ -278,8 +279,10 @@ public class DesktopManager
      * @param module the module to render in the frame
      * @param centre should the frame be centred?
      * @param honourSize should we honour the frame's preferred size?
+     * @return	module frame
      */
-    public void newFrame(Module module, boolean centre, boolean honourSize) {
+    public ModuleFrame newFrame(Module module, boolean centre, 
+				boolean honourSize) {
 
 	ModuleFrame frame = new ModuleFrame(module, centre, honourSize);
 	desktop_instance.add(frame);
@@ -292,6 +295,8 @@ public class DesktopManager
 	}
 	
 	frame.moveToFront();		    
+
+	return frame;
     }
 
     /**

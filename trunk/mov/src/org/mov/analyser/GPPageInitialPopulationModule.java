@@ -50,6 +50,7 @@ import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
 import org.mov.ui.ConfirmDialog;
 import org.mov.ui.ExpressionEditorDialog;
+import org.mov.ui.TextsEditorDialog;
 import org.mov.ui.MenuHelper;
 import org.mov.util.Locale;
 
@@ -122,23 +123,6 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
             
             // Notify table that the whole data has changed
             fireTableDataChanged();
-        }
-        
-        public void addEmptyIfNot() {
-            // If there is neither a row empty,
-            // add an empty row so the user can add a new buy/sell rules
-            boolean isAlreadyEmpty = false;
-            for (int i=0; i<getRowCount(); i++) {
-                String[] result = (String[])results.get(i);
-                if (result[BUY_RULE_COLUMN].equals("") &&
-                    result[SELL_RULE_COLUMN].equals("")) {
-                    isAlreadyEmpty = true;
-                }
-                result = null;
-            }
-            if (!isAlreadyEmpty) {
-                this.addEmpty();
-            }
         }
         
         private void addEmpty() {
@@ -336,7 +320,6 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
                     String newBuyRule = ExpressionEditorDialog.showEditDialog(Locale.getString("EDIT_EQUATION"),
                     result[BUY_RULE_COLUMN]);
                     model.setValueAt(row, BUY_RULE_COLUMN, newBuyRule);
-                    model.addEmptyIfNot();
                     model.fireTableDataChanged();
                     repaint();
                 }});
@@ -359,7 +342,6 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
                     String newSellRule = ExpressionEditorDialog.showEditDialog(Locale.getString("EDIT_EQUATION"),
                     result[SELL_RULE_COLUMN]);
                     model.setValueAt(row, SELL_RULE_COLUMN, newSellRule);
-                    model.addEmptyIfNot();
                     model.fireTableDataChanged();
                     repaint();
                 }});
@@ -468,7 +450,7 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
     }
     
     // Removes all the selected results from the table
-    private void removeSelectedResults() {
+    public void removeSelectedResults() {
         
         // Get selected rows and put them in order from highest to lowest
         int[] rows = getSelectedRows();
@@ -492,7 +474,57 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
         }
         
         model.setResults(results);
-        model.addEmptyIfNot();
+    }
+    
+    // Display a dialog allowing the user to edit the selected rules and the percentage value.
+    public void editRules() {
+        // Get result at row
+        final int row = getSelectedRow();
+        
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            final String[] result = model.getResult(row);
+            
+            Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    String[] labels = {Locale.getString("BUY_RULE_COLUMN_HEADER"),
+                        Locale.getString("SELL_RULE_COLUMN_HEADER"),
+                        Locale.getString("PERCENT_MUTATION_COLUMN_HEADER")};
+                    boolean[] areas = {true,
+                        true,
+                        false};
+                    String[] newRules = TextsEditorDialog.showEditDialog(Locale.getString("EDIT"),
+                        labels, areas, result);
+                    model.setValueAt(row, BUY_RULE_COLUMN, newRules[BUY_RULE_COLUMN]);
+                    model.setValueAt(row, SELL_RULE_COLUMN, newRules[SELL_RULE_COLUMN]);
+                    model.setValueAt(row, PERCENT_COLUMN, newRules[PERCENT_COLUMN]);
+                    model.fireTableDataChanged();
+                    repaint();
+                }});
+                
+                thread.start();
+        }
+    }
+    
+    // Display a dialog allowing the user to add rules and the percentage value.
+    public void addRules() {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                String[] labels = {Locale.getString("BUY_RULE_COLUMN_HEADER"),
+                    Locale.getString("SELL_RULE_COLUMN_HEADER"),
+                    Locale.getString("PERCENT_MUTATION_COLUMN_HEADER")};
+                boolean[] areas = {true,
+                    true,
+                    false};
+                String[] newRules = TextsEditorDialog.showAddDialog(Locale.getString("ADD"),
+                    labels, areas);
+                if (newRules[0]!=null)
+                    addRowTable(newRules[BUY_RULE_COLUMN], newRules[SELL_RULE_COLUMN], newRules[PERCENT_COLUMN]);
+                model.fireTableDataChanged();
+                repaint();
+            }});
+
+            thread.start();
     }
     
     // Some menu items are only enabled/disabled depending on what is
@@ -810,10 +842,6 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
                 model.addResults(newModel);
             }
         }
-    }
-    
-    public void loadEmpty() {
-        model.addEmptyIfNot();
     }
     
     public int getRandom() {

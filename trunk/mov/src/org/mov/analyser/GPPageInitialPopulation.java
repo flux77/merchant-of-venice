@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
+import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -125,7 +126,6 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
 
             GPPageInitialPopulationModule.load(valueInitPop);
         }
-        this.loadEmpty();
     }
     
     private void loadCommon(String setting, String value) {
@@ -138,10 +138,6 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         if(setting.equals("generations_init_pop")) {
             generateInitPopTextRow.setText(value);
         }
-    }
-    
-    private void loadEmpty() {
-        GPPageInitialPopulationModule.loadEmpty();
     }
     
     public void addRowTable(String buyRule, String sellRule, String perc) {
@@ -389,6 +385,18 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         return retValue;
     }
     
+    private void addRules() {
+        GPPageInitialPopulationModule.addRules();
+    }
+    
+    private void editRules() {
+        GPPageInitialPopulationModule.editRules();
+    }
+    
+    private void deleteRules() {
+        GPPageInitialPopulationModule.removeSelectedResults();
+    }
+    
     private void setDefaultValues() {
         // Default values means GP works with random initial population
         perc[PERCENT_RANDOM] = PERCENT_INT;
@@ -403,15 +411,53 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
     private void setGraphic(Dimension preferredSize) {
         
         GridBagLayout gridbag = new GridBagLayout();
-        
+                
+        TitledBorder titledBorder = new TitledBorder(Locale.getString("GP_PAGE_INITIAL_POPULATION_LONG"));
+        this.setBorder(titledBorder);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setPreferredSize(preferredSize);
+        
+        JPanel panelUp = new JPanel();
+        JPanel panelDown = new JPanel();
+        panelUp.setLayout(new BoxLayout(panelUp, BoxLayout.Y_AXIS));
+        panelDown.setLayout(new BoxLayout(panelDown, BoxLayout.Y_AXIS));
+        TitledBorder titledBorderSectionUp = new TitledBorder(Locale.getString("RULES_PAGE_TITLE"));
+        TitledBorder titledBorderSectionDown = new TitledBorder(Locale.getString("GP_PAGE_PERCENTAGE"));
+        panelUp.setBorder(titledBorderSectionUp);
+        panelDown.setBorder(titledBorderSectionDown);
         
         // GPPageInitialPopulationModule is already declared as global variable
         GPPageInitialPopulationModule.setLayout(new BoxLayout(GPPageInitialPopulationModule, BoxLayout.Y_AXIS));
         
         JScrollPane upDownScrollPane = new JScrollPane(GPPageInitialPopulationModule);
         upDownScrollPane.setLayout(new ScrollPaneLayout());
-        upDownScrollPane.setPreferredSize(preferredSize);
+        
+        JButton addButton = new JButton(Locale.getString("ADD"));
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                addRules();
+            }
+        });
+        
+        JButton editButton = new JButton(Locale.getString("EDIT"));
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                editRules();
+            }
+        });
+        
+        JButton deleteButton = new JButton(Locale.getString("DELETE"));
+        deleteButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                deleteRules();
+            }
+        });
+        
+        JPanel rulesButtons = new JPanel();
+        rulesButtons.add(addButton);
+        rulesButtons.add(editButton);
+        rulesButtons.add(deleteButton);
+
         
         JButton fitAllButton = new JButton(Locale.getString("FIT"));
         fitAllButton.addActionListener(new ActionListener() {
@@ -459,12 +505,18 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         6);
         
         
-        this.add(upDownScrollPane);
-        this.add(innerPanel);
+        panelUp.add(upDownScrollPane);
+        rulesButtons.setAlignmentX(CENTER_ALIGNMENT);
+        panelUp.add(rulesButtons);
+        
+        panelDown.add(innerPanel);
         fitAllButton.setAlignmentX(CENTER_ALIGNMENT);
         defaultButton.setAlignmentX(CENTER_ALIGNMENT);
-        this.add(fitAllButton);
-        this.add(defaultButton);
+        panelDown.add(fitAllButton);
+        panelDown.add(defaultButton);
+        
+        this.add(panelUp);
+        this.add(panelDown);
         
         // Put the default values so that random initial population is the default behaviour
         this.setDefaultValues();

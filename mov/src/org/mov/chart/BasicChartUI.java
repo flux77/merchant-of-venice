@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.plaf.*;
 
 import org.mov.util.*;
+import org.mov.quote.*;
 
 public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
@@ -424,7 +425,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    if(title.length() != 0) 
 		title = title.concat(", ");
 
-	    companyName = Database.getInstance().getCompanyName(symbol);
+	    companyName = Quote.getSource().getCompanyName(symbol);
 
 	    if(companyName != null)
 		title = 

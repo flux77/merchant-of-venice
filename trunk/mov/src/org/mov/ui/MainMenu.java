@@ -54,12 +54,17 @@ public class MainMenu
 
     private JMenuItem quoteCompanyListAllMenuItem;
     private JMenuItem quoteCompanyListRuleMenuItem;
+    private JMenuItem quoteCompanyListDateMenuItem;
     private JMenuItem quoteIndicesListAllMenuItem;
     private JMenuItem quoteIndicesListRuleMenuItem;
+    private JMenuItem quoteIndicesListDateMenuItem;
     private JMenuItem quoteCommoditiesListAllMenuItem;
     private JMenuItem quoteCommoditiesListRuleMenuItem;
+    private JMenuItem quoteCommoditiesListDateMenuItem;
+    private JMenuItem quoteStocksListSymbolsMenuItem;
 
     private JMenuItem analysisPaperTradeMenuItem;
+    private JMenuItem analysisGeneticProgrammingMenuItem;
 
     private JMenuItem windowTileHorizontalMenuItem;
     private JMenuItem windowTileVerticalMenuItem;
@@ -149,49 +154,71 @@ public class MainMenu
 	    fileExitMenuItem = MenuHelper.addMenuItem(this, fileMenu, "Exit", 'Q');
 	}
 
-	// Quote
+	// Table
 	{
 	    JMenu quoteMenu = MenuHelper.addMenu(menuBar, "Table", 'T');
 	    
-	    // Quote -> Companies + Funds
+	    // Table -> Companies + Funds
 	    JMenu quoteMenuCompany = MenuHelper.addMenu(quoteMenu, 
 							"All Ordinaries",
 					     'C');
 
-	    // Quote -> Companies + Funds -> List all
+	    // Table -> Companies + Funds -> List all
 	    quoteCompanyListAllMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuCompany, "List all");
+		MenuHelper.addMenuItem(this, quoteMenuCompany, "List All");
 
-	    // Quote -> Companies + Funds -> List by rule
+	    // Table -> Companies + Funds -> List by rule
 	    quoteCompanyListRuleMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuCompany, "List by rule");
+		MenuHelper.addMenuItem(this, quoteMenuCompany, "List by Rule");
+
+	    // Table -> Companies + Funds -> List by date
+	    quoteCompanyListDateMenuItem = 
+		MenuHelper.addMenuItem(this, quoteMenuCompany, "List by Date");
 	    
-	    // Quote -> Indices
+	    // Table -> Indices
 	    JMenu quoteMenuIndices = MenuHelper.addMenu(quoteMenu, 
 							"Market Indices", 'I');
 
-	    // Quote -> Indices -> List All
+	    // Table -> Indices -> List All
 	    quoteIndicesListAllMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuIndices, "List all");
+		MenuHelper.addMenuItem(this, quoteMenuIndices, "List All");
 
-	    // Quote -> Indices -> List by Rule
+	    // Table -> Indices -> List by Rule
 	    quoteIndicesListRuleMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuIndices, "List by rule");
+		MenuHelper.addMenuItem(this, quoteMenuIndices, "List by Rule");
+
+	    // Table -> Indices -> List by Date
+	    quoteIndicesListDateMenuItem = 
+		MenuHelper.addMenuItem(this, quoteMenuIndices, "List by Date");
 	    
-	    // Quote -> All Commodities
+	    // Table -> All Stocks
 	    JMenu quoteMenuCommodities = MenuHelper.addMenu(quoteMenu, 
-							    "All Symbols",
+							    "All Stocks",
 							    'A');
 
-	    // Quote -> All Commodities -> List All
+	    // Table -> All Stocks -> List All
 	    quoteCommoditiesListAllMenuItem = 
 		MenuHelper.addMenuItem(this, quoteMenuCommodities, 
-				       "List all", 'L');
+				       "List All", 'L');
 
-	    // Quote -> All Commodities -> List by Rule
+	    // Table -> All Stocks -> List by Rule
 	    quoteCommoditiesListRuleMenuItem = 
 		MenuHelper.addMenuItem(this, quoteMenuCommodities, 
-				       "List by rule",'B');
+				       "List by Rule",'B');
+
+	    // Table -> All Stocks -> List by Date
+	    quoteCommoditiesListDateMenuItem = 
+		MenuHelper.addMenuItem(this, quoteMenuCommodities, 
+				       "List by Date",'D');
+
+            quoteMenu.addSeparator();
+
+            // Table -> Stocks -> List by Symbols
+            JMenu quoteMenuStocks = MenuHelper.addMenu(quoteMenu,
+                                                       "Stocks", 'S');
+
+            quoteStocksListSymbolsMenuItem =
+                MenuHelper.addMenuItem(this, quoteMenuStocks, "List by Symbols", 'B');
 	}
 	
 	// Graph        
@@ -200,12 +227,12 @@ public class MainMenu
 	    
 	    // Graph -> Commodities
 	    JMenu graphCommodityMenu = MenuHelper.addMenu(graphMenu, 
-							  "Symbol");
+							  "Stock");
 	    
 	    // Graph -> Commodities -> By Codes
 	    graphCommodityCodeMenuItem = 
 		MenuHelper.addMenuItem(this, graphCommodityMenu, 
-				       "By Symbols", 'G');
+				       "Graph by Symbols", 'G');
 	    
 	    // Graph -> Commodities -> By Name
             //	    graphCommodityNameMenuItem = 
@@ -233,6 +260,10 @@ public class MainMenu
 	    analysisPaperTradeMenuItem = 
 		MenuHelper.addMenuItem(this, analysisMenu,
 				       "Paper Trade");
+
+	    analysisGeneticProgrammingMenuItem = 
+		MenuHelper.addMenuItem(this, analysisMenu,
+				       "Genetic Programming");
 	}
 
 	// Window menu
@@ -308,19 +339,30 @@ public class MainMenu
 			    .newFrame(new PreferencesModule(desktop), true, true);
 		    }
 		    
-		    // Quote Menu
+		    // Table Menu
 		    else if(menu == quoteCommoditiesListAllMenuItem)
-			CommandManager.getInstance().quoteListCommoditiesAll();
+			CommandManager.getInstance().tableStocks(QuoteRange.ALL_SYMBOLS);
 		    else if (menu == quoteCommoditiesListRuleMenuItem)
-			CommandManager.getInstance().quoteListCommoditiesByRule();
+			CommandManager.getInstance().tableStocksByRule(QuoteRange.ALL_SYMBOLS);
+		    else if (menu == quoteCommoditiesListDateMenuItem)
+			CommandManager.getInstance().tableStocksByDate(QuoteRange.ALL_SYMBOLS);
+
 		    else if(menu == quoteCompanyListAllMenuItem)
-			CommandManager.getInstance().quoteListCompanyNamesAll();
+                        CommandManager.getInstance().tableStocks(QuoteRange.ALL_ORDINARIES);
 		    else if (menu == quoteCompanyListRuleMenuItem)
-			CommandManager.getInstance().quoteListCompanyNamesByRule();
+			CommandManager.getInstance().tableStocksByRule(QuoteRange.ALL_ORDINARIES);
+		    else if (menu == quoteCompanyListDateMenuItem)
+			CommandManager.getInstance().tableStocksByDate(QuoteRange.ALL_ORDINARIES);
+
 		    else if (menu == quoteIndicesListAllMenuItem)
-			CommandManager.getInstance().quoteListIndicesAll();
+			CommandManager.getInstance().tableStocks(QuoteRange.MARKET_INDICES);
 		    else if (menu == quoteIndicesListRuleMenuItem)
-			CommandManager.getInstance().quoteListIndicesByRule();
+			CommandManager.getInstance().tableStocksByRule(QuoteRange.MARKET_INDICES);
+		    else if (menu == quoteIndicesListDateMenuItem)
+			CommandManager.getInstance().tableStocksByDate(QuoteRange.MARKET_INDICES);
+
+                    else if (menu == quoteStocksListSymbolsMenuItem)
+			CommandManager.getInstance().tableStocks(null);
 		    
 		    // Graph Menu
 		    else if (menu == graphCommodityCodeMenuItem) 
@@ -344,6 +386,8 @@ public class MainMenu
 		    // Analysis Menu
 		    else if (menu == analysisPaperTradeMenuItem)
 			CommandManager.getInstance().paperTrade();
+		    else if (menu == analysisGeneticProgrammingMenuItem)
+			CommandManager.getInstance().geneticProgramming();
 
 		    // Window Menu
 		    else if (menu == windowTileHorizontalMenuItem)

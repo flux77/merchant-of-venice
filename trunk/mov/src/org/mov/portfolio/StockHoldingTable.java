@@ -66,8 +66,10 @@ public class StockHoldingTable extends AbstractTable {
 	    this.stockHoldings = stockHoldings;
 	    symbols = stockHoldings.keySet().toArray();
 
-	    // Pull first date from quoteBundle
-	    date = quoteBundle.getFirstDate();
+            // Display the latest quote dates in the bundle. The bundle
+            // should contain two days of quotes - yesterday's are used
+            // to properly calculate the change.
+	    date = quoteBundle.getLastDate();
 	}
 	
 	public int getRowCount() {
@@ -96,37 +98,67 @@ public class StockHoldingTable extends AbstractTable {
 		(StockHolding)stockHoldings.get(symbol);
 
 	    // Shouldnt happen
-	    if(stockHolding == null) 
+	    if(stockHolding == null) {
+                assert false;
 		return "";
+            }
 
 	    symbol = symbol.toLowerCase();
 
-	    try {
-		switch(column) {
-		case(SYMBOL_COLUMN):
-		    return symbol.toUpperCase();
-		    
-		case(SHARES_COLUMN):
-		    return new Integer(stockHolding.getShares());
-		    
-		case(DAY_CLOSE_COLUMN):
-		    return new QuoteFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
-		    
-		case(MARKET_VALUE_COLUMN):
-		    return new PriceFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date) *
+            switch(column) {
+            case(SYMBOL_COLUMN):
+                return symbol.toUpperCase();
+                
+            case(SHARES_COLUMN):
+                return new Integer(stockHolding.getShares());
+                
+            case(DAY_CLOSE_COLUMN):
+                try {
+                    return new QuoteFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
+                }
+                catch(MissingQuoteException e) {
+                    return new QuoteFormat(0.0F);
+                }
+                
+            case(MARKET_VALUE_COLUMN):
+                try {
+                    return new PriceFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date) *
                                            stockHolding.getShares());
-		    
-		case(CHANGE_COLUMN):
-		    return new ChangeFormat(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date),
-                                            quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
-		}
-	    }
-	    catch(MissingQuoteException e) {
-		assert false;
-	    }
-
+                }
+                catch(MissingQuoteException e) {
+                    return new PriceFormat(0.0F);
+                }
+                
+            case(CHANGE_COLUMN):
+                try {
+                    // Change is calculated by the percent gain between
+                    // yesterday's day close and today's day close. If we don't
+                    // have yesterday's day close available, we just use today's
+                    // day open. These first two should always work.
+                    float finalQuote = quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date);
+                    float initialQuote = quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date);
+                    
+                    // There might not be any quotes for yesterday, so don't throw an
+                    // assert if we can't get any.
+                    try {
+                        initialQuote = 
+                            quoteBundle.getQuote(symbol,
+                                                 Quote.DAY_CLOSE, 
+                                                 date.previous(1)); 
+                    }
+                    catch(MissingQuoteException e) {
+                        // No big deal - we default to day open
+                    }
+                    
+                    return new ChangeFormat(initialQuote, finalQuote);
+                }
+                catch(MissingQuoteException e) {
+                        return new ChangeFormat(1.0F, 1.0F);
+                }
+            }
+            
+            assert false;
 	    return "";
-
 	}
     }
 

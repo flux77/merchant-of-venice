@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
+import org.mov.importer.*;
 import org.mov.quote.*;
 
 /** 
@@ -23,7 +24,6 @@ public class QuoteSourcePage extends JPanel
 {
 
     private JDesktopPane desktop;
-    private DatabaseLookup db = DatabaseLookup.getInstance();
 
     // Widgets from database pane
     private JRadioButton useDatabase;
@@ -66,6 +66,8 @@ public class QuoteSourcePage extends JPanel
 
 	// Database Pane
 	{
+	    p = Preferences.userRoot().node("/quote_source/database");
+
 	    useDatabase = new JRadioButton("Use Database", true);
 	    useDatabase.addActionListener(this);
 	    if(quoteSource.equals("database"))
@@ -99,24 +101,26 @@ public class QuoteSourcePage extends JPanel
 	    borderPanel.add(databaseType);
 	    
 	    // Host
-	    databaseHost = addTextRow(borderPanel, "Host", db.get("host"), 
+	    databaseHost = addTextRow(borderPanel, "Host", p.get("host", "db"),
 				      gridbag, c);
 	    
 	    // Port
-	    databasePort = addTextRow(borderPanel, "Port", db.get("port"), 
+	    databasePort = addTextRow(borderPanel, "Port", 
+				      p.get("port",  "3306"), 
 				      gridbag, c);
 	    
 	    // Username
 	    databaseUsername = addTextRow(borderPanel, "Username", 
-					  db.get("username"), gridbag, c);
+					  p.get("username", ""), gridbag, c);
 	    
 	    // Password
 	    databasePassword = addPasswordRow(borderPanel, "Password", 
-					      db.get("password"), gridbag, c);
+					      p.get("password", ""), 
+					      gridbag, c);
 	    
 	    // Database Name
 	    databaseName = addTextRow(borderPanel, "Database Name", 
-				      db.get("dbname"), gridbag, c);
+				      p.get("dbname", "shares"), gridbag, c);
 
 	    databasePreferences.add(borderPanel, BorderLayout.NORTH);
 	    	    
@@ -172,10 +176,14 @@ public class QuoteSourcePage extends JPanel
 				BorderLayout.CENTER);
 
 	    // Add files from prefs
-	    String fileList = p.get("list", "");
-	    String[] fileListArray = fileList.split(", ");
-	    for(int i = 0; i < fileListArray.length; i++) 
-		fileListModel.addElement(fileListArray[i]);
+	    Vector fileList = ImporterModule.getFileList();
+	    iterator = fileList.iterator();
+	    String fileName;
+
+	    while(iterator.hasNext()) {
+		fileName = (String)iterator.next();
+		fileListModel.addElement(fileName);
+	    }
 
 	    // Add, Delete buttons
 	    JPanel buttonPanel = new JPanel();
@@ -411,14 +419,13 @@ public class QuoteSourcePage extends JPanel
 
 	    p.put("format", (String)formatComboBox.getSelectedItem());
 
-	    String fileList = "";
+	    // Extract list of files from list
+	    Vector fileList = new Vector();
 	    for(int i = 0; i < fileListModel.getSize(); i++) {
-		if(!fileList.equals(""))
-		    fileList = fileList.concat(", ");
-		fileList = fileList.concat((String)fileListModel.elementAt(i));
+		fileList.add((String)fileListModel.elementAt(i));
 	    }
 
-	    p.put("list", fileList);
+	    ImporterModule.putFileList(fileList);
 	}
 
 	// Save internet preferences

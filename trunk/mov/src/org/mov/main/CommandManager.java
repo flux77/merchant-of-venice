@@ -75,65 +75,69 @@ public class CommandManager {
     /**************************************************************************/
     
     /** Display an internal frame, listing all the stocks by company name */
-    public void tableListCompanyNamesAll() {
+    public void quoteListCompanyNamesAll() {
         Thread t = new Thread(new Runnable() {
             public void run() {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
                 p.setTitle("Displaying list of all companies");
                 p.show();
                 displayStockList(QuoteSource.COMPANIES_AND_FUNDS, null);
-                if (!Thread.currentThread().interrupted())
-                    ProgressDialogManager.closeProgressDialog();
+
+		ProgressDialogManager.closeProgressDialog();
             }
         });
         t.start();
     }
 
     /** Display an internal frame, listing stocks by company name, matching a rule that is to be input by the user */
-    public void tableListCompanyNamesByRule() {
+    public void quoteListCompanyNamesByRule() {
         Thread t = new Thread(new Runnable() {
             public void run() {
-                Expression expr = ExpressionQuery.getExpression(desktop_instance,
-				 "List Companies and Funds",
-				 "By Rule");
-                ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying list of companies by rule \""+expr+"\"");
-                p.show();
+                String expr = ExpressionQuery.getExpression(desktop_instance,
+							    "List Companies and Funds",
+							    "By Rule");
+		if(expr != null) {
+		    ProgressDialog p = 
+			ProgressDialogManager.getProgressDialog();
+		    p.setTitle("Displaying quotes of companies by rule \""+expr+"\"");
+		    p.show();
 
-                displayStockList(QuoteSource.COMPANIES_AND_FUNDS,
-                                 expr);
+		    displayStockList(QuoteSource.COMPANIES_AND_FUNDS,
+				     expr);
                 
-                ProgressDialogManager.closeProgressDialog();
+		    ProgressDialogManager.closeProgressDialog();
+		}
             }
         });
         t.start();
     }
 
     /** Display an internal frame, listing all the stocks by symbol */
-    public void tableListCommoditiesAll() {
+    public void quoteListCommoditiesAll() {
         final Thread t = new Thread(new Runnable() {
             public void run() {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying table of all commodities");
+                p.setTitle("Displaying quotes of all commodities");
                 p.show();
 
                 displayStockList(QuoteSource.ALL_COMMODITIES, null);
-                if (!Thread.currentThread().interrupted())
-                    ProgressDialogManager.closeProgressDialog();
+
+		ProgressDialogManager.closeProgressDialog();
             }
         });
         t.start();
     }
 
-    /** Display an internal frame, listing stocks by symbol, matching a rule that is to be input by the user */
-    public void tableListCommoditiesByRule() {
+    /** Display an internal frame, listing stocks by symbol, 
+	matching a rule that is to be input by the user */
+    public void quoteListCommoditiesByRule() {
         Thread t = new Thread(new Runnable() {
             public void run() {
-                Expression expr = ExpressionQuery.getExpression(desktop_instance,
-                                                               "List Commodities",
-                                                               "By Rule"); 
+                String expr = ExpressionQuery.getExpression(desktop_instance,
+							    "List Commodities",
+							    "By Rule"); 
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying table commodities by rule \""+expr+"\"");
+                p.setTitle("Displaying quotes of commodities by rule \""+expr+"\"");
                 p.show();
 
                 displayStockList(QuoteSource.ALL_COMMODITIES,expr);
@@ -144,11 +148,11 @@ public class CommandManager {
     }
 
     /** Display an internal frame, listing all the indices by symbol */
-    public void tableListIndicesAll() {
+    public void quoteListIndicesAll() {
         Thread t = new Thread(new Runnable() {
             public void run() {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying table of all indices");
+                p.setTitle("Displaying quotes of all indices");
                 p.show();
 
                 displayStockList(QuoteSource.INDICES, null);
@@ -159,15 +163,15 @@ public class CommandManager {
     }
 
     /** Display an internal frame, listing indices by symbol, matching a rule that is to be input by the user */
-    public void tableListIndicesByRule() {
+    public void quoteListIndicesByRule() {
         Thread t = new Thread(new Runnable() {
             public void run() {
-                Expression expr = ExpressionQuery.getExpression(desktop_instance,
-                                                               "List Indices",
-                                                               "By Rule"); 
+                String expr = ExpressionQuery.getExpression(desktop_instance,
+							    "List Indices",
+							    "By Rule"); 
 
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying list of companies by rule \""+expr+"\"");
+                p.setTitle("Displaying quotes of companies by rule \""+expr+"\"");
                 p.show();
                 displayStockList(QuoteSource.INDICES, expr);
             }
@@ -182,10 +186,9 @@ public class CommandManager {
      * @param searchRestriction as defined by QuoteSource
      * @param expression as defined by Expression
      * @see org.mov.quote.QouteSource
-     * @see org.mov.parser.Expression
      */
     private void displayStockList(int searchRestriction, 
-				  Expression expression) {
+				  String expression) {
         try {
             final Thread thread = Thread.currentThread();
             ProgressDialogManager.getProgressDialog().addActionListener(new ActionListener() {
@@ -214,7 +217,6 @@ public class CommandManager {
      * @param	portfolioName	name of portfolio to display
      */
     public void openPortfolio(String portfolioName) {
-
 	final Thread thread = Thread.currentThread();
 	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 	progress.addActionListener(new ActionListener() {
@@ -235,13 +237,15 @@ public class CommandManager {
 		cache = 
 		    new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
 				   QuoteSource.ALL_COMMODITIES);
-	    if (!thread.isInterrupted())
+
+	    if (!thread.isInterrupted()) 
 		((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, cache));
 
 	    if (!Thread.currentThread().interrupted())
 		ProgressDialogManager.closeProgressDialog();
 	    	
 	} catch (Exception e) {
+	    e.printStackTrace();
             ProgressDialogManager.closeProgressDialog();
         }
     }
@@ -282,11 +286,11 @@ public class CommandManager {
 
 	if(portfolioName != null && portfolioName.length() > 0) {
 	    Portfolio portfolio = new Portfolio(portfolioName);
-
+	    
 	    // Save portfolio so we can update the menu
 	    PreferencesManager.savePortfolio(portfolio);
 	    MainMenu.getInstance().updatePortfolioMenu();
-
+	    
 	    // Open as normal
 	    openPortfolio(portfolioName);
 	}

@@ -58,7 +58,9 @@ public class TuningPage extends JPanel implements PreferencesPage
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
 
-        int currentCachedQuotes = QuoteCache.getInstance().size();
+        int currentCachedQuotes = (QuoteCache.isInstantiated()?
+                                   QuoteCache.getInstance().size() :
+                                   0);
         GridBagHelper.addLabelRow(borderPanel, 
                                   "Current Cached Quotes", 
                                   Integer.toString(currentCachedQuotes),

@@ -323,8 +323,10 @@ public class DatabaseQuoteSource implements QuoteSource
 	    firstDate = new TradingDate(date);
 	    return firstDate;
 	}
-	else
+	else {
+            showEmptyDatabaseError();
 	    return null;
+        }
     }
 
     /**
@@ -368,8 +370,10 @@ public class DatabaseQuoteSource implements QuoteSource
 	    lastDate = new TradingDate(date);
 	    return lastDate;
 	}
-	else
+	else {
+            showEmptyDatabaseError();
 	    return null;
+        }
     }
 
     /**
@@ -935,6 +939,17 @@ public class DatabaseQuoteSource implements QuoteSource
                                             e.getMessage());
             return 0;
         }
+    }
+
+    // This function shows an error message if there are no quotes in the
+    // database. We generally only care about this when trying to get the
+    // the current date or the lowest or highest. This method will also
+    // interrupt the current thread. This way calling code only needs to
+    // check for cancellation, rather than each individual fault.
+    private void showEmptyDatabaseError() {
+        DesktopManager.showErrorMessage("Venice couldn't find any quotes.\n" +
+                                        "You can import quotes using the import\n" +
+                                        "quote tool under the File menu.");
     }
 }
 

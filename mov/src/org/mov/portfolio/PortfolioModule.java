@@ -438,16 +438,20 @@ public class PortfolioModule extends JPanel implements Module,
 
     // Graph this portfolio
     private void graphPortfolio() {
-
-        // If this portfolio has been given to us from a paper trade we will
-        // also get a fully loaded quote bundle ready for graphing.
-        // We do a simple check to see if we can graph using that quote bundle:
-        // If the quote bundle has quotes before or at the first trade in the
-        // portfolio then we will use the quote bundle given.
-        if(quoteBundle.getFirstDate().compareTo(portfolio.getStartDate()) <= 0)             
-            CommandManager.getInstance().graphPortfolio(portfolio, quoteBundle);
-        else 
-            CommandManager.getInstance().graphPortfolio(portfolio);
+        // Can only graph if there are shares in the portfolio...
+        if(portfolio.getStartDate() == null) 
+            DesktopManager.showErrorMessage("Nothing to graph!");
+        else {
+            // If this portfolio has been given to us from a paper trade we will
+            // also get a fully loaded quote bundle ready for graphing.
+            // We do a simple check to see if we can graph using that quote bundle:
+            // If the quote bundle has quotes before or at the first trade in the
+            // portfolio then we will use the quote bundle given.
+            if(quoteBundle.getFirstDate().compareTo(portfolio.getStartDate()) <= 0)             
+                CommandManager.getInstance().graphPortfolio(portfolio, quoteBundle);
+            else 
+                CommandManager.getInstance().graphPortfolio(portfolio);
+        }
     }
 
     // Delete this portfolio
@@ -504,9 +508,8 @@ public class PortfolioModule extends JPanel implements Module,
 	
 	    }
 	    catch(java.io.IOException e) {
-		org.mov.ui.DesktopManager.
-		    showErrorMessage("Error writing to file: " +
-				     fileName);
+		DesktopManager.showErrorMessage("Error writing to file: " +
+                                                fileName);
 	    }
 	}
     }

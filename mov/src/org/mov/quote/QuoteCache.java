@@ -120,6 +120,20 @@ public class QuoteCache {
     }
 
     /**
+     * Returns whether this class has been instantiated yet. This is
+     * used by the tuning page, which needs to know the number of
+     * quotes in the cache. But it doesn't want to be the first
+     * to instantiate the cache, because that would cause it to
+     * access the quote source.. which might not be set up at that
+     * stage.
+     *
+     * @return <code>true</code> if this class has been instantiated.
+     */
+    public static boolean isInstantiated() {
+        return (instance != null);
+    }
+
+    /**
      * Get a quote from the cache.
      *
      * @param symbol    the symbol to load

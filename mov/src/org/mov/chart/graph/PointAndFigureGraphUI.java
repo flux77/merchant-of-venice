@@ -37,26 +37,32 @@ public class PointAndFigureGraphUI implements GraphUI {
 
     // The graph's user interface
     private JPanel panel;
-    private JTextField priceScaleTextField;
+    private JTextField priceReversalTextField;
+    private JTextField boxPriceTextField;
 
     // String name of settings
-    private final static String PRICE_SCALE = "price_scale";
+    private final static String PRICE_REVERSAL_SCALE = "price_reversal_scale";
+    private final static String BOX_PRICE_SCALE = "box_price";
 
     // Limits
     private final static double MINIMUM_PRICE_SCALE = 0.0001D;
 
-    // Default values - this is not a constant because the default
+    // Default values - these are not constants because the default
     // value will be set depending on the graph
-    private double defaultPriceScale;
+    private double defaultPriceReversalScale;
+    private double defaultBoxPriceScale;
 
     /**
      * Create a new Point and Figure user interface with the initial settings.
      *
      * @param settings the initial settings
-     * @param defaultPriceScale default price scale based on data
+     * @param defaultPriceReversalScale default price scale based on data
      */
-    public PointAndFigureGraphUI(HashMap settings, double defaultPriceScale) {
-        this.defaultPriceScale = defaultPriceScale;
+    public PointAndFigureGraphUI(HashMap settings, 
+				 double defaultPriceReversalScale,
+				 double defaultBoxPriceScale) {
+        this.defaultPriceReversalScale = defaultPriceReversalScale;
+	this.defaultBoxPriceScale = defaultBoxPriceScale;
         buildPanel();
         setSettings(settings);
     }
@@ -74,26 +80,44 @@ public class PointAndFigureGraphUI implements GraphUI {
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
 
-        priceScaleTextField =
-            GridBagHelper.addTextRow(panel, Locale.getString("PRICE_SCALE"), "",
+        priceReversalTextField =
+            GridBagHelper.addTextRow(panel, Locale.getString("PRICE_REVERSAL_SCALE"), "",
                                      layout, c, 8);
+
+	boxPriceTextField =
+            GridBagHelper.addTextRow(panel, Locale.getString("BOX_PRICE_SCALE"), "",
+                                     layout, c, 8);
+		
     }
 
     public String checkSettings() {
         HashMap settings = getSettings();
 
         // Check price scale
-        String priceScaleString = (String)settings.get(PRICE_SCALE);
-        double priceScale;
+        String priceReversalScaleString = (String)settings.get(PRICE_REVERSAL_SCALE);
+	String boxPriceScaleString = (String)settings.get(BOX_PRICE_SCALE);
+        double priceReversalScale;
+	double boxPriceScale;
+	
 
         try {
-            priceScale = Double.parseDouble(priceScaleString);
+            priceReversalScale = Double.parseDouble(priceReversalScaleString);
         }
         catch(NumberFormatException e) {
-            return Locale.getString("ERROR_PARSING_NUMBER", priceScaleString);
+            return Locale.getString("ERROR_PARSING_NUMBER", priceReversalScaleString);
         }
 
-        if (priceScale < MINIMUM_PRICE_SCALE)
+        try {
+            boxPriceScale = Double.parseDouble(boxPriceScaleString);
+        }
+        catch(NumberFormatException e) {
+            return Locale.getString("ERROR_PARSING_NUMBER", boxPriceScaleString);
+        }
+
+        if (priceReversalScale < MINIMUM_PRICE_SCALE)
+            return Locale.getString("ERROR_PRICE_SCALE_TOO_SMALL");
+
+        if (boxPriceScale < MINIMUM_PRICE_SCALE)
             return Locale.getString("ERROR_PRICE_SCALE_TOO_SMALL");
 
         // Settings are OK
@@ -102,13 +126,16 @@ public class PointAndFigureGraphUI implements GraphUI {
 
     public HashMap getSettings() {
         HashMap settings = new HashMap();
-        settings.put(PRICE_SCALE, priceScaleTextField.getText());
+        settings.put(PRICE_REVERSAL_SCALE, priceReversalTextField.getText());
+	settings.put(BOX_PRICE_SCALE, boxPriceTextField.getText());
         return settings;
     }
 
     public void setSettings(HashMap settings) {
-        priceScaleTextField.setText(Double.toString(getPriceScale(settings,
-                                                                  defaultPriceScale)));
+        priceReversalTextField.setText(Double.toString(getPriceReversalScale(settings,
+								     defaultPriceReversalScale)));
+        boxPriceTextField.setText(Double.toString(getBoxPriceScale(settings,
+								   defaultBoxPriceScale)));
     }
 
     public JPanel getPanel() {
@@ -120,16 +147,16 @@ public class PointAndFigureGraphUI implements GraphUI {
      * is empty, then return the default price scale.
      *
      * @param settings the settings
-     * @param defaultPriceScale the default price scale
+     * @param defaultPriceReversalScale the default price scale
      * @return the price scale
      */
-    public static double getPriceScale(HashMap settings, double defaultPriceScale) {
-        double priceScale = defaultPriceScale;
-        String priceScaleString = (String)settings.get(PRICE_SCALE);
+    public static double getPriceReversalScale(HashMap settings, double defaultPriceReversalScale) {
+        double priceReversalScale = defaultPriceReversalScale;
+        String priceReversalScaleString = (String)settings.get(PRICE_REVERSAL_SCALE);
 
-        if(priceScaleString != null) {
+        if(priceReversalScaleString != null) {
             try {
-                priceScale = Double.parseDouble(priceScaleString);
+                priceReversalScale = Double.parseDouble(priceReversalScaleString);
             }
             catch(NumberFormatException e) {
                 // Value should already be checked
@@ -137,6 +164,33 @@ public class PointAndFigureGraphUI implements GraphUI {
             }
         }
 
-        return priceScale;
+        return priceReversalScale;
     }
+
+    /**
+     * Retrieve the box price from the settings hashmap. If the hashmap
+     * is empty, then return the default box scale.
+     *
+     * @param settings the settings
+     * @param defaultBoxScale the default price scale
+     * @return the box price
+     */
+    public static double getBoxPriceScale(HashMap settings, double defaultBoxPrice) {
+        double boxPriceScale = defaultBoxPrice;
+        String boxPriceScaleString = (String)settings.get(BOX_PRICE_SCALE);
+
+        if(boxPriceScaleString != null) {
+            try {
+                boxPriceScale = Double.parseDouble(boxPriceScaleString);
+            }
+            catch(NumberFormatException e) {
+                // Value should already be checked
+                assert false;
+            }
+        }
+
+        return boxPriceScale;
+    }
+
+
 }

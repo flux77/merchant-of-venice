@@ -25,9 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.mov.chart.Graphable;
+import org.mov.chart.GraphableQuoteFunctionSource;
 import org.mov.chart.GraphTools;
 import org.mov.chart.source.GraphSource;
+import org.mov.parser.EvaluationException;
+import org.mov.quote.QuoteFunctions;
 import org.mov.util.Locale;
+import org.mov.util.TradingDate;
 import org.mov.quote.QuoteFunctions;
 
 /**
@@ -118,27 +122,27 @@ public class StandardDeviationGraph extends AbstractGraph {
      */
     public static Graphable createStandardDeviation(Graphable source,
 						    int period) {
+
 	Graphable standardDeviation = new Graphable();
+        TradingDate date = (TradingDate)source.getStartX();
+        GraphableQuoteFunctionSource quoteFunctionSource 
+            = new GraphableQuoteFunctionSource(source, date, period);
 
-	// Date set and value array will be in sync
-	double[] values = source.toArray();
-	Iterator iterator = source.getXRange().iterator();
+        for(Iterator iterator = source.iterator(); iterator.hasNext();) {
+            date = (TradingDate)iterator.next();
+            quoteFunctionSource.setDate(date);
 
-	int i = 0;	
-	double sd;
+            try {
+                double value = QuoteFunctions.sd(quoteFunctionSource, period);
+                standardDeviation.putY(date, new Double(value));
+            }
+            catch(EvaluationException e) {
+                // This can't happen since our source does not throw this exception
+                assert false;
+            }
+        }
 
-	while(iterator.hasNext()) {
-	    Comparable x = (Comparable)iterator.next();
-
-	    sd = QuoteFunctions.sd(values,
-				   i - Math.min(period - 1, i),
-				   i + 1);
-	    i++;
-
-	    standardDeviation.putY(x, new Double(sd));
-	}
-
-	return standardDeviation;
+        return standardDeviation;
     }
 
     public void setSettings(HashMap settings) {

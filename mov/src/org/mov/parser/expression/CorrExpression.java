@@ -24,6 +24,7 @@ import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteBundleFunctionSource;
 import org.mov.quote.QuoteFunctions;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
@@ -31,6 +32,8 @@ import org.mov.util.Locale;
 
 /**
  * An expression which finds the correleation between two stock quotes.
+ *
+ * @author Andrew Leppard
  */
 public class CorrExpression extends QuaternaryExpression {
    
@@ -55,11 +58,9 @@ public class CorrExpression extends QuaternaryExpression {
         // Get and check arguments
         String correlatedSymbolString = ((StringExpression)getChild(0)).getText();
         int quoteKind = ((QuoteExpression)getChild(1)).getQuoteKind();
-	int days = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
-
-        if(days <= 1)
+	int period = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        if(period <= 1)
             throw new EvaluationException(Locale.getString("CORR_RANGE_ERROR"));
-
         int offset = (int)getChild(3).evaluate(variables, quoteBundle, symbol, day);
         Symbol correlatedSymbol;
 
@@ -71,29 +72,14 @@ public class CorrExpression extends QuaternaryExpression {
             throw new EvaluationException(e.getReason());
         }
 
-        // Store the data into an array
-        double[] values = new double[days];
-        double[] correlatedValues = new double[days];
-
-        int actualDays = 0;
-
-        for(int i = 0; i < days; i++) {
-            try {
-                values[actualDays] = quoteBundle.getQuote(symbol, quoteKind, day, i - days + offset);
-                correlatedValues[actualDays] = quoteBundle.getQuote(correlatedSymbol, quoteKind, 
-                                                                    day, i - days + offset);
-                actualDays++;
-            }
-            catch(MissingQuoteException e) {
-                // nothing to do
-            }
-        }
-
-        // If there is not enough data, assume there is no correlation.
-        if(actualDays <= 1)
-            return 0.0D;
-        else
-            return QuoteFunctions.corr(values, correlatedValues, 0, actualDays);
+        // Calculate and return the correleation
+        QuoteBundleFunctionSource source =
+            new QuoteBundleFunctionSource(quoteBundle, symbol, quoteKind, day, offset, period);
+        QuoteBundleFunctionSource correlatedSource =
+            new QuoteBundleFunctionSource(quoteBundle, correlatedSymbol, quoteKind, day, offset, 
+                                          period);
+        
+        return QuoteFunctions.corr(source, correlatedSource, period);
     }
 
     public String toString() {

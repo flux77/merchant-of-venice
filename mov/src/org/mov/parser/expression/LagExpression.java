@@ -30,6 +30,8 @@ import org.mov.quote.Symbol;
 
 /**
  * An expression which returns a quote.
+ *
+ * @author Andrew Leppard
  */
 public class LagExpression extends BinaryExpression {
 
@@ -91,5 +93,4 @@ public class LagExpression extends BinaryExpression {
         return new LagExpression((Expression)getChild(0).clone(),
                                  (Expression)getChild(1).clone());
     }
-
 }

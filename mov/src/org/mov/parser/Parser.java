@@ -75,6 +75,8 @@ import org.mov.util.Locale;
  *                     "for" "(" SUB_EXPR ";" SUB_EXPR ";" SUB_EXPR ")" EXPR |
  *                     "while" "(" SUB_EXPR ")" EXPR
  * </pre>
+ *
+ * @author Andrew Leppard
  */
 public class Parser {
 
@@ -448,8 +450,10 @@ public class Parser {
 
 	Token string = tokens.pop();
 
-        assert string.getType() == Token.STRING_TOKEN;
-        return ExpressionFactory.newExpression(string);
+        if(string.getType() == Token.STRING_TOKEN)
+            return ExpressionFactory.newExpression(string);
+        else
+            throw new ParserException(Locale.getString("EXPECTED_STRING_TYPE_ERROR"));
     }
 
     private static Expression parseNumber(Variables variables, TokenStack tokens)

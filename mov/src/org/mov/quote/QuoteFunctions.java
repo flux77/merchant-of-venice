@@ -18,31 +18,63 @@
 
 package org.mov.quote;
 
+import org.mov.parser.EvaluationException;
+
 /**
- * Interim class containing statistical functions to be performed on
- * stock quotes. This class will eventually be
- * broken up so that each stat gets put into its own class, e.g.
- * average.java, RSI.java etc. They will then be put into the stats package.
- * The gondola language will be made so that it can turn any stat
- * class into a function.
+ * This class contains functions that manipulate stock quotes. By placing
+ * them together in a single class, they can be used by both the 
+ * Gondola language and charting functions.
  *
  * @author Andrew Leppard
+ * @see QuoteFunctionSource
  */
 public class QuoteFunctions {
 
     /** This is the default/recommended period for the RSI. */
     final public static int DEFAULT_RSI_PERIOD = 45;
 
+    // This class cannot be instantiated
+    private QuoteFunctions() {
+        assert false;
+    }
+
     /**
      * Find the standard deviation of the given values. This
-     * algorthim will calculate the standard deviation on the values in
-     * the given array in the range [start, end]. Start inclusive, end exclusive.
+     * algorthim will calculate the standard deviation of the first period
+     * days. If a quote is missing on any of the days, then
+     * that day will be skipped and the function will find the average of the shorter
+     * period.
      *
-     * @param values array of values to analyse
-     * @param start  analyse values from start
-     * @param end    to end
-     * @return the standard deviation
+     * @param source the source quottes
+     * @param period the number of days to average
+     * @return       the standard deviation
+     * @see          org.mov.chart.graph.StandardDeviationGraph
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
      */
+    static public double sd(QuoteFunctionSource source, int period)
+        throws EvaluationException {
+        
+        double average = avg(source, period);
+        double deviationSum = 0.0D;
+        int actualPeriod = 0;
+        
+        for(int i = 0; i < period; i++) {
+            double value = source.getValue(i);
+
+            if(!Double.isNaN(value)) {
+                deviationSum += (value - average)*(value - average);
+                actualPeriod++;
+            }
+        }
+
+        if(actualPeriod > 2)
+            deviationSum /= (actualPeriod - 1);
+
+        return Math.sqrt(deviationSum);
+    }
+
+    // deprecated - remove me
     static public double sd(double[] values, int start, int end) {
 	double average = avg(values, start, end);
 	int period = end - start;
@@ -59,15 +91,43 @@ public class QuoteFunctions {
     }
 
     /**
-     * Find the average of the given values. This
-     * algorthim will calculate the average on the values in
-     * the given array in the range [start, end]. Start inclusive, end exclusive.
+     * Find the average of the given quotes. This function will calculate the average
+     * of the first period days. If a quote is missing on any of the days, then
+     * that day will be skipped and the function will find the average of the shorter
+     * period.
      *
-     * @param values array of values to analyse
-     * @param start  analyse values from start
-     * @param end    to end
-     * @return the average
+     * @param source source of quotes to average
+     * @param period the number of days to average
+     * @return       the average
+     * @see          org.mov.chart.graph.MovingAverageGraph
+     * @see          org.mov.parser.expression.AvgExpression
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
      */
+    static public double avg(QuoteFunctionSource source, int period)
+        throws EvaluationException {
+
+   	double avg = 0.0D;
+        int actualPeriod = 0;
+
+	// Sum quotes
+        for(int i = 0; i < period; i++) {
+            double value = source.getValue(i);
+
+            if(!Double.isNaN(value)) {
+                avg += value;
+                actualPeriod++;
+            }
+	}
+
+	// Average
+        if(actualPeriod > 1)
+            avg /= actualPeriod;
+
+	return avg;
+    }
+
+    // deprecated - remove me
     static public double avg(double[] values, int start, int end) {
 	double avg = 0.0D;
 	int period = end - start;
@@ -102,29 +162,40 @@ public class QuoteFunctions {
      *
      * Simillarly for Zy.
      *
-     * @param x     array of values to test against
-     * @param y     array of values to detect correlation against x
-     * @param start analyse values from start
-     * @param end   to end
-     * @return the correlation co-efficient
+     * @param x      values to test against
+     * @param y      values to detect correlation against x
+     * @param period number of days to analyse
+     * @return       the correlation co-efficient
+     * @see          org.mov.parser.expression.CorrExpression
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
      */
-    static public double corr(double[] x, double y[], int start, int end) {
+    static public double corr(QuoteFunctionSource x, QuoteFunctionSource y, int period) 
+        throws EvaluationException {
+
         double r = 0.0D;
-        double ex = avg(x, start, end);
-        double sx = sd(x, start, end);
-        double ey = avg(y, start, end);
-        double sy = sd(y, start, end);
+        double ex = avg(x, period);
+        double sx = sd(x, period);
+        double ey = avg(y, period);
+        double sy = sd(y, period);
+        int actualPeriod = 0;
 
         if(sx != 0.0D && sy != 0.0D) {
-            for(int i = start; i < end; i++) {
-                double zx = (x[i] - ex) / sx;
-                double zy = (y[i] - ey) / sy;
+            for(int i = 0; i < period; i++) {
+                double xi = x.getValue(i);
+                double yi = y.getValue(i);
 
-                r += zx * zy;
+                if(!Double.isNaN(xi) && !Double.isNaN(yi)) {
+                    double zx = (xi - ex) / sx;
+                    double zy = (yi - ey) / sy;
+
+                    r += zx * zy;
+                    actualPeriod++;
+                }
             }
 
-            if((end - start) > 1)
-                r /= (end - start - 1);
+            if(actualPeriod > 1)
+                r /= (actualPeriod - 1);
         }
 
         return r;
@@ -147,39 +218,48 @@ public class QuoteFunctions {
      * RS = ------------------------------
      *      average of x days' down closes
      *
-     * </pre>To calculate an X day RSI you need X + 1 quote values. So try and make
-     * sure that <code>start</code> is always greater than zero.
+     * </pre>To calculate an X day RSI you need X + 1 quote values. So make
+     * the period argument one more day that the period of the RSI.
      *
-     * @param values array of values to analyse
-     * @param start  analyse values from start
-     * @param end    to end
-     * @return RSI
+     * @param source source of quotes to average
+     * @param period one plus the period of the RSI
+     * @return       RSI
+     * @see          org.mov.chart.graph.RSIGraph
+     * @see          org.mov.parser.expression.RSIExpression
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
      */
-    static public double rsi(double[] values, int start, int end) {
+    static public double rsi(QuoteFunctionSource source, int period)
+        throws EvaluationException {
+
         double sumGain = 0.0D;
         double sumLoss = 0.0D;
         int numberGains = 0;
         int numberLosses = 0;
-        double previous;
+        double previous = Double.NaN;
+        int i = 0;
 
-        if(start > 0)
-            previous = values[start - 1];
-        else
-            previous = values[start];
+        // Get the day before the RSI calculation
+        while(Double.isNaN(previous) && i < period)
+            previous = source.getValue(i++);
 
         // Calculate average day up and down closes
-        for(int i = start; i < end; i++) {
-            if(values[i] > previous) {
-                sumGain += (values[i] - previous);
-                numberGains++;
-            }
+        while(i < period) {
+            double value = source.getValue(i++);
 
-            else if(values[i] < previous) {
-                sumLoss += (previous - values[i]);
-                numberLosses++;
+            if(!Double.isNaN(value)) {
+                if(value > previous) {
+                    sumGain += (value - previous);
+                    numberGains++;
+                }
+                
+                else if(value < previous) {
+                    sumLoss += (previous - value);
+                    numberLosses++;
+                }
+                
+                previous = value;
             }
-
-            previous = values[i];
         }
 
         // If the period is too small, return a neutral result
@@ -204,30 +284,99 @@ public class QuoteFunctions {
         }
     }
 
-    static public double ema(double values[], int start, int end, double smoothingConstant) {
-	double avg = 0.0D;
-	double prev = 0.0;
-	int period = end - start;
+    /**
+     * Calculate the Exponential Moving Average (EMA) value. The Exponential Moving
+     * Average is a weighted moving average where the most recent values are
+     * weighted higher than the previous values.
+     *
+     * The formule for the EMA is as follows:</pre>
+     *
+     * EMA(current) = EMA(previous) + k * (day close - EMA(previous))
+     *
+     * </pre>Where EMA(current) is the current EMA value you are calculating,
+     * EMA(previous) is the previous value and <code>k</code> is a smoothing
+     * constant.
+     *
+     * @param source the source of quotes to average
+     * @param period the number of days to analyse
+     * @return       the exponential moving average
+     * @see          org.mov.chart.graph.ExpMovingAverageGraph
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     */
+    static public double ema(QuoteFunctionSource source, int period, double smoothingConstant)
+        throws EvaluationException {
 
-	// Formula: AVGcurrent = AVGprev + k(DATAcurrent - AVGprev) where:
-	// AVGcurrent is the avg over values, DATAcurrent is values[i], and k is the smoothing constant.
-	for(int i = start; i < end; i++) {	
-	    if (i > start) {
-		avg = prev + (smoothingConstant) * (values[i] - prev);
-		prev = avg;
-	    } else {
-		prev = values[i];
-		avg = prev;
+	double EMA = 0.0D;
+	double previousEMA = 0.0D;
+	int actualPeriod = 0;
+
+        for(int i = 0; i < period; i++) {
+            double value = source.getValue(i);
+
+            if(!Double.isNaN(value)) {
+                if (actualPeriod >= 1)
+                    EMA = previousEMA + smoothingConstant * (value - previousEMA);
+
+                else
+                    EMA = value;
+                
+                previousEMA = EMA;
+                actualPeriod++;
 	    }
 	}	
-	return avg;
+	return EMA;
+    }
+
+    /**
+     * Calculate the upper band of the bollinger graph. The upper band can
+     * be calculated by:</pre>
+     *
+     * BollingerUpper = Average + 2 * SD
+     *
+     * </pre>Where SD is the standard deviation.
+     *
+     * @param source the source of quotes
+     * @param period the number of days to analyse
+     * @return       the upper bollinger band
+     * @see          org.mov.chart.graph.BollingerBandsGraph
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     */
+    static public double bollingerUpper(QuoteFunctionSource source, int period)
+        throws EvaluationException {
+
+        double sd = sd(source, period);
+        double avg = avg(source, period);
+        return (avg + 2.0D * sd);
+    }
+
+    /**
+     * Calculate the lower band of the bollinger graph. The lower band can
+     * be calculated by:</pre>
+     *
+     * BollingerLower = Average - 2 * SD
+     *
+     * </pre>Where SD is the standard deviation.
+     *
+     * @param source the source of quotes
+     * @param period the number of days to analyse
+     * @return       the lower bollinger band
+     * @see          org.mov.chart.graph.BollingerBandsGraph
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     */
+    static public double bollingerLower(QuoteFunctionSource source, int period)
+        throws EvaluationException {
+
+        double sd = sd(source, period);
+        double avg = avg(source, period);
+        return (avg - 2.0D * sd);
     }
 
     public static final double roundDouble(double d, int places) {
         return Math.round(d * Math.pow(10, (double) places)) / Math.pow(10,
             (double) places);
     }
-
-
 }
 

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.quote;
@@ -26,14 +26,14 @@ import org.mov.analyser.gp.GPQuoteBundle;
 import org.mov.parser.EvaluationException;
 import org.mov.util.TradingDate;
 
-/** 
+/**
  * When a task requires stock quotes, it should create an instance of this class which represents
  * all the task's required quotes. The task can then access quotes from this class,
  * which in turn reads its stock quotes from a global quote cache - {@link QuoteCache}.
  * <p>
  * The purpose of this class is therefore to group together a set of quotes that are
  * needed by a single task. This grouping allows the quotes to be loaded in at one time,
- * which is much faster than loading them in quote by quote. 
+ * which is much faster than loading them in quote by quote.
  * <p>
  * Also by placing a set of quotes in a bundle it simplifies caching. Caching is performed
  * by {@link QuoteBundleCache}.
@@ -50,6 +50,7 @@ import org.mov.util.TradingDate;
  *      }
  * </pre>
  *
+ * @author Andrew Leppard
  * @see QuoteBundle
  * @see GPQuoteBundle
  * @see Quote
@@ -90,7 +91,17 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	quoteBundleCache.load(this);
     }
 
-    /** 
+    /**
+     * Create a new quote bundle with the same quote range as the given
+     * quote bundle.
+     *
+     * @param quoteBundle      the quote bundle to copy
+     */
+    public ScriptQuoteBundle(QuoteBundle quoteBundle) {
+        this(quoteBundle.getQuoteRange());
+    }
+
+    /**
      * Get a stock quote. If the stock is earlier than the first date in the bundle, the
      * bundle will be expand to include the new date given.
      *
@@ -103,14 +114,14 @@ public class ScriptQuoteBundle implements QuoteBundle {
      */
     public double getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException {
-     
+
 	double quote;
 
         try {
             quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
         }
         catch(QuoteNotLoadedException e) {
-            
+
             // If we couldn't load the quote - maybe the bundle isn't laoded?
             try {
                 quote = tryReload(symbol, quoteType, dateOffset);
@@ -125,20 +136,21 @@ public class ScriptQuoteBundle implements QuoteBundle {
                         quote = tryExpand(symbol, quoteType, dateOffset);
                     }
                     catch(QuoteNotLoadedException e3) {
-                        
+
                         // We tried everyting - we just don't have it
                         throw MissingQuoteException.getInstance();
                     }
                 }
                 else
                     throw MissingQuoteException.getInstance();
-            
+
             }
         }
+
         return quote;
     }
 
-    /** 
+    /**
      * Get a stock quote. This function has been primarily created for Gondola
      * scripts. It passes in the current date and the date offset so that
      * specialised QuoteBundle implementations such as {@link GPQuoteBundle} can prevent the GP
@@ -151,20 +163,16 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @param offset offset from current date
      * @return the quote
      * @exception EvaluationException if the script isn't allow access to the quote.
+     * @exception MissingQuoteException if the quote was not found
      */
     public double getQuote(Symbol symbol, int quoteType, int today, int offset)
-	throws EvaluationException {
+	throws EvaluationException, MissingQuoteException {
 
-        try {
-            return getQuote(symbol, quoteType, today + offset);
-        }
-        catch(MissingQuoteException e) {
-            return 0.0D;
-        }
+        return getQuote(symbol, quoteType, today + offset);
     }
 
-    /** 
-     * Get a stock quote. 
+    /**
+     * Get a stock quote.
      *
      * @param symbol  the stock symbol
      * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
@@ -173,7 +181,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public double getQuote(Symbol symbol, int quoteType, TradingDate date) 
+    public double getQuote(Symbol symbol, int quoteType, TradingDate date)
 	throws MissingQuoteException {
 	
 	double quote;
@@ -193,12 +201,12 @@ public class ScriptQuoteBundle implements QuoteBundle {
      *
      * @param symbol    the symbol
      * @param dateOffset fast access date offset, see {@link QuoteCache}
-     * @return  <code>true</code> if this symbol should be in the quote bundle, 
+     * @return  <code>true</code> if this symbol should be in the quote bundle,
      *          <code>false</code> otherwise
      */
     public boolean containsQuote(Symbol symbol, int dateOffset) {
 
-	if(getQuoteRange().containsSymbol(symbol) && 
+	if(getQuoteRange().containsSymbol(symbol) &&
 	   dateOffset >= getFirstDateOffset() &&
 	   dateOffset <= getLastDateOffset())
 	    return true;
@@ -211,7 +219,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      *
      * @param symbol    the symbol
      * @param date      the date
-     * @return  <code>true</code> if this symbol should be in the quote bundle, 
+     * @return  <code>true</code> if this symbol should be in the quote bundle,
      *          <code>false</code> otherwise
      */
     public boolean containsQuote(Symbol symbol, TradingDate date) {
@@ -258,8 +266,8 @@ public class ScriptQuoteBundle implements QuoteBundle {
     }
 
     /**
-     * Return the first symbol in the quote bundle. 
-     * 
+     * Return the first symbol in the quote bundle.
+     *
      * @return the first symbol
      */
     public Symbol getFirstSymbol() {
@@ -277,7 +285,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
         assert false;
         return null;
     }
-    
+
     // Returns all the symbols in the quote bundle between the two dates
     private List getSymbols(int firstDateOffset, int lastDateOffset) {
 	// To get list of symbols - the quote bundle *must* be loaded!
@@ -287,7 +295,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	if(getQuoteRange().getType() == QuoteRange.GIVEN_SYMBOLS) {
             // We can't just call getQuoteRange().getAllSymbols() because
             // for the given quote range it is possible we don't have any
-            // quotes for them. So make sure all the given symbols are 
+            // quotes for them. So make sure all the given symbols are
             // present in the cache for the given range.
             List presentSymbols = new ArrayList();
             List allSymbols = quoteCache.getSymbols(firstDateOffset, lastDateOffset);
@@ -309,10 +317,10 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	}
 	
 	else if(getQuoteRange().getType() == QuoteRange.ALL_ORDINARIES) {
-	    
+	
 	    List ourSymbols = new ArrayList();
 	    List symbols = quoteCache.getSymbols(firstDateOffset, lastDateOffset);
-	    
+	
 	    // Weed out ones that aren't ours
 	    Iterator iterator = symbols.iterator();
 	    while(iterator.hasNext()) {
@@ -321,16 +329,16 @@ public class ScriptQuoteBundle implements QuoteBundle {
 		if(!QuoteSourceManager.getSource().isMarketIndex(symbol))
 		    ourSymbols.add(symbol);
 	    }
-	    
+	
 	    return ourSymbols;
 	}
 	
 	else {
 	    assert getQuoteRange().getType() == QuoteRange.MARKET_INDICES;
-	    
+	
 	    List ourSymbols = new ArrayList();
 	    List symbols = quoteCache.getSymbols(firstDateOffset, lastDateOffset);
-	    
+	
 	    // Weed out ones that aren't ours
 	    Iterator iterator = symbols.iterator();
 	    while(iterator.hasNext()) {
@@ -339,7 +347,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 		if(QuoteSourceManager.getSource().isMarketIndex(symbol))
 		    ourSymbols.add(symbol);
 	    }
-	    
+	
 	    return ourSymbols;
 	}
     }
@@ -418,7 +426,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 		// the last date in the database (to indicate the quote bundle is empty).
 		TradingDate firstDate = getFirstDate();
 
-		if(!firstDate.equals(getLastDate())) 
+		if(!firstDate.equals(getLastDate()))
 		    firstDate = firstDate.next(1);
 		else
 		    firstDate = QuoteSourceManager.getSource().getFirstDate().next(1);
@@ -428,7 +436,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 		    firstDateOffset = quoteCache.dateToOffset(getFirstDate());
 		}
 		catch(WeekendDateException e2) {
-		    assert false; 
+		    assert false;
 		}
 	    }
 	}
@@ -462,7 +470,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 		    lastDateOffset = quoteCache.dateToOffset(getLastDate());
 		}
 		catch(WeekendDateException e2) {
-		    assert false; 
+		    assert false;
 		}
 	    }
 	}
@@ -486,7 +494,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @param date the date
      * @return fast access date offset, see {@link QuoteCache}
      */
-    public int dateToOffset(TradingDate date) 
+    public int dateToOffset(TradingDate date)
         throws WeekendDateException {
         return quoteCache.dateToOffset(date);
     }
@@ -507,22 +515,22 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception QuoteNotLoaded if the quote was not found
      */
-    private double tryReload(Symbol symbol, int quoteType, int dateOffset) 
+    private double tryReload(Symbol symbol, int quoteType, int dateOffset)
         throws QuoteNotLoadedException {
 
         // Perhaps our quote packet is not loaded - if so load
         if(!quoteBundleCache.isLoaded(this)) {
             quoteBundleCache.load(this);
-            
+
             return quoteCache.getQuote(symbol, quoteType, dateOffset);
-        }                
+        }
 
         throw QuoteNotLoadedException.getInstance();
     }
 
     // Try to expand the quote bundle so that it includes the current date.
     // Now reload the quote from the cache and return.
-    private double tryExpand(Symbol symbol, int quoteType, int dateOffset) 
+    private double tryExpand(Symbol symbol, int quoteType, int dateOffset)
         throws QuoteNotLoadedException {
 
         QuoteRange expandedQuoteRange = (QuoteRange)getQuoteRange().clone();
@@ -532,8 +540,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
         quoteBundleCache.expand(this, expandedQuoteRange);
 
         // Now try loading the quote again!
-        return quoteCache.getQuote(symbol, quoteType, dateOffset); 
+        return quoteCache.getQuote(symbol, quoteType, dateOffset);
     }
-
 }
 

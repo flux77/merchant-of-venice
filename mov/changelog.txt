@@ -1,12 +1,20 @@
 Changes for Venice, 0.5 alpha 14/Jan/2005
 ==========================================
 
+* Chart Update:
+  - Added the custom graph to allow users to graph arbitrary indicators
+    using the Gondola language.
+
 * Internationalisation:
-  - Swedish translation added (Pontus Strömdahl).
   - Can now specify the language to use in preferences (Alberto Nacher).
+  - Swedish translation added (Pontus Strömdahl).
 
 * Internet quote download:
   - Added proxy authentication support (Bryan Lin).
+
+* Bug Fixes:
+  - Replaced an assert with error handling when the user specifies
+    something other than a string when a string type is expected.
 
 Changes for Venice, 0.4 alpha 14/Aug/2004
 ==========================================

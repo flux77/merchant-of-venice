@@ -25,10 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.mov.chart.Graphable;
+import org.mov.chart.GraphableQuoteFunctionSource;
 import org.mov.chart.GraphTools;
 import org.mov.chart.source.GraphSource;
+import org.mov.parser.EvaluationException;
 import org.mov.quote.QuoteFunctions;
 import org.mov.util.Locale;
+import org.mov.util.TradingDate;
 
 /**
  * Grpah of the RSI (Relative Strength Indicator). See {@link QuoteFunctions#rsi}
@@ -118,7 +121,7 @@ public class RSIGraph extends AbstractGraph {
     }
 
     /**
-     * Creates a new RSI based on the given data source.
+     * Create a new RSI based on the given data source.
      *
      * @param	source	the input graph source
      * @param	period	the desired period of the RSI
@@ -126,24 +129,25 @@ public class RSIGraph extends AbstractGraph {
      */
     public static Graphable createRSI(Graphable source, int period) {
 	Graphable RSI = new Graphable();
+        TradingDate date = (TradingDate)source.getStartX();
+        GraphableQuoteFunctionSource quoteFunctionSource 
+            = new GraphableQuoteFunctionSource(source, date, period + 1);
 
-	// Date set and value array will be in sync
-	double[] values = source.toArray();
-	Iterator iterator = source.getXRange().iterator();
+        for(Iterator iterator = source.iterator(); iterator.hasNext();) {
+            date = (TradingDate)iterator.next();
+            quoteFunctionSource.setDate(date);
 
-	int i = 0;	
+            try {
+                double rsi = QuoteFunctions.rsi(quoteFunctionSource, period + 1);
+                RSI.putY(date, new Double(rsi));
+            }
+            catch(EvaluationException e) {
+                // This can't happen since our source does not throw this exception
+                assert false;
+            }
+        }
 
-	while(iterator.hasNext()) {
-	    Comparable x = (Comparable)iterator.next();
-	    double rsi = QuoteFunctions.rsi(values,
-                                            i - Math.min(period - 1, i),
-                                            i + 1);
-	    i++;
-
-	    RSI.putY(x, new Double(rsi));
-	}
-
-	return RSI;
+        return RSI;
     }
 
     /**

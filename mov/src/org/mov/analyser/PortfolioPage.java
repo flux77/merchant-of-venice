@@ -43,6 +43,26 @@ import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 
+/**
+ * An analysis tool page that lets the user enter basic portfolio
+ * information. This page is used by both the {@link PaperTradeModule}
+ * and {@link GPModule}. The page contains the following user fields:
+ *
+ * <ul><li>Initial Capital</li>
+ *     <li>Trade Cost</li>
+ *     <li>Number of Stocks</li>
+ *     <li>Stock Value</li>
+ * </ul>
+ *
+ * The initial capital field describes the initial amount of money
+ * that is available for trading in the portfolio. The trade cost
+ * field determines the cost for accumulating or reducing a stock
+ * holding. The last two fields describe whether the portfolio
+ * has a fixed maximum number of stocks, or has a variable number of stocks
+ * depending on the current value of the portfolio.
+ *
+ * @author Andrew Leppard
+ */
 public class PortfolioPage extends JPanel implements AnalyserPage {
 
     private JDesktopPane desktop;
@@ -62,9 +82,17 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
     private int numberStocks;
     private Money stockValue;
 
+    /** Portfolio has a fixed maximum number of stocks. */
     public final static int NUMBER_STOCKS_MODE = 0;
+
+    /** Portfolio has a variable number of stocks depending on the value of the portfolio. */
     public final static int STOCK_VALUE_MODE = 1;
 
+    /**
+     * Construct a new portfolio page.
+     *
+     * @param desktop the desktop
+     */
     public PortfolioPage(JDesktopPane desktop) {
         this.desktop = desktop;
 
@@ -197,20 +225,42 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
         return Locale.getString("PORTFOLIO_PAGE_TITLE");
     }
 
+    /**
+     * Return the portfolio's initial capital.
+     *
+     * @return the initial capital
+     */
     public Money getInitialCapital() {
         return initialCapital;
     }
 
+    /**
+     * Return the cost of an accumulate or reduce trade.
+     *
+     * @return the trade cost
+     */
     public Money getTradeCost() {
         return tradeCost;
     }
 
+    /**
+     * Return whether the maximum number of stocks in the portfolio is fixed or
+     * variable depending on the value of the portfolio.
+     *
+     * @return {@link #NUMBER_STOCKS_MODE} or {@link #STOCK_VALUE_MODE}
+     */
     public int getMode() {
         assert mode == NUMBER_STOCKS_MODE || mode == STOCK_VALUE_MODE;
 
         return mode;
     }
 
+    /**
+     * Return the fixed value of each stock in the portfolio. Only call this function
+     * if the portfolio is in {@link #STOCK_VALUE_MODE}.
+     *
+     * @return the stock value
+     */
     public Money getStockValue() {
         if (mode == STOCK_VALUE_MODE)
             return stockValue;
@@ -219,6 +269,12 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
         }
     }
 
+    /**
+     * Return the maximum number of stocks in the portfolio. Only call this function
+     * if the portfolio is in {@link #NUMBER_STOCKS_MODE}.
+     *
+     * @return the maximum number of stocks
+     */
     public int getNumberStocks() {
         if(mode == NUMBER_STOCKS_MODE)
             return numberStocks;

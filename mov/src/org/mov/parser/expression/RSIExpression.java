@@ -26,6 +26,7 @@ import org.mov.prefs.PreferencesManager;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteBundleFunctionSource;
 import org.mov.quote.QuoteFunctions;
 import org.mov.quote.Symbol;
 
@@ -33,6 +34,8 @@ import java.util.ArrayList;
 
 /**
  * An expression which finds the RSI over a given trading period.
+ *
+ * @author Andrew Leppard
  */
 public class RSIExpression extends BinaryExpression {
 
@@ -42,41 +45,20 @@ public class RSIExpression extends BinaryExpression {
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
-	
-	int days = (int)getChild(0).evaluate(variables, quoteBundle, symbol, day);
 
-        if(days <= 0)
+        // Extract arguments
+	int period = (int)getChild(0).evaluate(variables, quoteBundle, symbol, day);
+        if(period <= 0)
             throw EvaluationException.rangeForRSI();
-
         int offset = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
 
-        // To calculate an X day RSI we need X + 1 days of quotes. Put them in
-        // an ArrayList so we can use the RSI function in quote functions.
-        ArrayList valuesList = new ArrayList();
-        int actualDays = 0;
-
-        for(int i = 0; i <= days; i++) {
-            try {
-                valuesList.add(new Double(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, day,
-                                                          i - days + offset)));
-                actualDays++;
-            }
-            catch(MissingQuoteException e) {
-                // nothing to do
-            }
-        }
-
-        // If we don't have enough quotes then return a neutral value
-        if(actualDays <= 1) {
-            return 50.0D;
-        } else {
-            // Convert the ArrayList in an array.
-            double[] values = new double[valuesList.size()];
-            for(int i=0; i<values.length; i++) {
-                values[i] = ((Double)valuesList.get(i)).doubleValue();
-            }
-            return QuoteFunctions.rsi(values, 1, actualDays);
-        }
+        // Calculate and return the RSI. We start the offset one day before the actual offset
+        // and increase the period by one day, as the RSI calculation needs an extra day
+        // over the period.
+	QuoteBundleFunctionSource source = 
+	    new QuoteBundleFunctionSource(quoteBundle, symbol, Quote.DAY_CLOSE, day, offset + 1,
+					  period + 1);
+	return QuoteFunctions.rsi(source, period + 1);
     }
 
     public String toString() {

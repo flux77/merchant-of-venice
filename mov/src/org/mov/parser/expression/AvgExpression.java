@@ -24,12 +24,15 @@ import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteBundleFunctionSource;
+import org.mov.quote.QuoteFunctions;
 import org.mov.quote.Symbol;
 
 /**
-* An expression which finds the average quote over a given trading period.
+ * An expression which finds the average quote over a given trading period.
+ *
+ * @author Andrew Leppard
  */
-
 public class AvgExpression extends TernaryExpression {
    
     /**
@@ -48,16 +51,19 @@ public class AvgExpression extends TernaryExpression {
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
-	
-	int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
 
-        if(days <= 0)
+        // Extract arguments
+	int period = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+        if(period <= 0)
             throw EvaluationException.rangeForAvg();
-
+        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
 
-        return avg(quoteBundle, symbol, quoteKind, days, day, offset);
+        // Calculate and return the average.
+        QuoteBundleFunctionSource source =
+            new QuoteBundleFunctionSource(quoteBundle, symbol, quoteKind, day, offset, period);
+
+        return QuoteFunctions.avg(source, period);
     }
 
     public String toString() {
@@ -85,31 +91,6 @@ public class AvgExpression extends TernaryExpression {
             assert getChild(0).getType() == INTEGER_QUOTE_TYPE;
             return INTEGER_TYPE;
         }
-    }
-
-    private double avg(QuoteBundle quoteBundle, Symbol symbol, 
-                      int quote, int days, int day, int offset)
-        throws EvaluationException {
-
-	double avg = 0.0D;
-        int daysAveraged = 0;
-
-	// Sum quotes
-	for(int i = offset - days + 1; i <= offset; i++) {
-            try {
-                avg += quoteBundle.getQuote(symbol, quote, day, i);
-                daysAveraged++;
-            }
-            catch(MissingQuoteException e) {
-                // nothing to do
-            }
-        }       
-
-	// Average
-        if(daysAveraged > 1)
-            avg /= daysAveraged;
-
-	return avg;
     }
 
     public Object clone() {

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.source;
@@ -30,6 +30,8 @@ import java.util.*;
  * Provides a <code>QuoteBundle</code> graph source. This class
  * allows graph sources for day Open, High, Low, Close and
  * Volume (OHLCV).
+ *
+ * @author Andrew Leppard
  */
 public class OHLCVQuoteGraphSource implements GraphSource {
 
@@ -43,8 +45,8 @@ public class OHLCVQuoteGraphSource implements GraphSource {
      * quote type.
      *
      * @param	quoteBundle the quote bundle containing stock quotes
-     * @param	quote	the quote kind, one of: {@link Quote#DAY_OPEN}, 
-     * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH} or 
+     * @param	quote	the quote kind, one of: {@link Quote#DAY_OPEN},
+     * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH} or
      * {@link Quote#DAY_LOW}
      */
     public OHLCVQuoteGraphSource(QuoteBundle quoteBundle, int quote) {
@@ -67,12 +69,12 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 		graphable.putY((Comparable)date, value);
 	    }
 	    catch(MissingQuoteException e) {
-		// ignore
+                // ignore
 	    }
 	}	
-        
+
         // Make sure we contain at least one value!
-        assert graphable.getXRange().size() > 0;        
+        assert graphable.getXRange().size() > 0;
     }
 
     public Graphable getGraphable() {
@@ -91,13 +93,13 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    if(quote == Quote.DAY_VOLUME) {
 		return
 		    new String("<html>" +
-			       symbol + 
+			       symbol +
 			       ", " +
 			       date.toLongString() +
 			       "<p>" +
 			       Math.round(quoteBundle.
-					  getQuote(symbol, 
-						   Quote.DAY_VOLUME, 
+					  getQuote(symbol,
+						   Quote.DAY_VOLUME,
 						   date)) +
 			       "</html>");
 	    }
@@ -109,18 +111,18 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 
 		return
 		    new String("<html>" +
-			       symbol + 
+			       symbol +
 			       ", " +
 			       date.toLongString() +
 			       "<p>" +
-			       "<font color=red>" + 
+			       "<font color=red>" +
 			       QuoteFormat.quoteToString(dayLow) +
 			       " </font>" +
-			       "<font color=green>" + 
+			       "<font color=green>" +
 			       QuoteFormat.quoteToString(dayHigh) +
 			       " </font>" +
 			       QuoteFormat.quoteToString(dayOpen) +
-			       " " + 
+			       " " +
 			       QuoteFormat.quoteToString(dayClose) +
 			       "</html>");
 	    }
@@ -135,7 +137,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    final double BILLION = 1000000000D;
 	    final double MILLION = 1000000D;
 	    String extension = "";
-	    
+	
 	    if(Math.abs(value) >= BILLION) {
 		value /= BILLION;
 		extension = "B";
@@ -144,7 +146,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 		value /= MILLION;
 		extension = "M";
 	    }
-	    
+	
 	    return Integer.toString((int)value) + extension;
 	}
 	else {
@@ -164,7 +166,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 			     10000000D,
 			     100000000D,
 			     1000000000D, // 1B
-			     10000000000D}; 
+			     10000000000D};
 	    return major;
 	}
 	else {
@@ -175,7 +177,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 			     10.0D, // $10
 			     100.0D, // $100
 			     1000.0D}; // $1000
-	    return major;	    
+	    return major;	
 	}
     }
 
@@ -185,8 +187,8 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    return minor;
 	}
 	else {
-	    double[] minor = {1D, 1.1D, 1.25D, 1.3333D, 1.5D, 2D, 2.25D, 
-			     2.5D, 3D, 3.3333D, 4D, 5D, 6D, 6.5D, 7D, 7.5D, 
+	    double[] minor = {1D, 1.1D, 1.25D, 1.3333D, 1.5D, 2D, 2.25D,
+			     2.5D, 3D, 3.3333D, 4D, 5D, 6D, 6.5D, 7D, 7.5D,
 			     8D, 9D};
 	    return minor;
 	}

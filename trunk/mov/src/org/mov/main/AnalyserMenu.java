@@ -15,7 +15,7 @@ import org.mov.table.*;
 import org.mov.portfolio.*;
 import org.mov.ui.InternalFrameHandler;
 
-public class AnalyserMenu implements ActionListener {
+public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 
     private JMenuItem fileExitMenuItem;
     private JMenuItem graphCommodityCodeMenuItem;
@@ -31,6 +31,7 @@ public class AnalyserMenu implements ActionListener {
     private JMenuItem windowCascadeMenuItem;
     private JMenuItem windowGridMenuItem;
 
+    private JMenu windowMenu;
 
     private TradingDate lastQuoteDay;
 
@@ -126,11 +127,16 @@ public class AnalyserMenu implements ActionListener {
 
 	// Window menu
 	{
-	    JMenu windowMenu = addMenu(menuBar, "Window");
+	    windowMenu = addMenu(menuBar, "Window");
+	    windowMenu.addSeparator();
 	    windowTileHorizontalMenuItem = addMenuItem(windowMenu, "Tile Horizontally");
+	    windowTileHorizontalMenuItem.setEnabled(false);
 	    windowTileVerticalMenuItem = addMenuItem(windowMenu, "Tile Vertically");
+	    windowTileVerticalMenuItem.setEnabled(false);
 	    windowCascadeMenuItem = addMenuItem(windowMenu, "Cascade");
-	    windowGridMenuItem = addMenuItem(windowMenu, "Grid");
+	    windowCascadeMenuItem.setEnabled(false);
+	    windowGridMenuItem = addMenuItem(windowMenu, "Arrange all");
+	    windowGridMenuItem.setEnabled(false);
 	}
 
 	frame.setJMenuBar(menuBar);
@@ -292,7 +298,9 @@ public class AnalyserMenu implements ActionListener {
     private void newFrame(AnalyserModule module) {
 	AnalyserFrame frame = new AnalyserFrame(module, 0, 0, 400, 300);
 	desktop.add(frame);
-		    
+	int numframes = (new Integer(System.getProperty("number_of_frames", "0"))).intValue();
+	//	System.setProperty();
+
 	try {
 	    frame.setSelected(true);
 	}
@@ -301,6 +309,25 @@ public class AnalyserMenu implements ActionListener {
 	}
 	
 	frame.moveToFront();		    
+    }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+	int numframes = ((Integer)evt.getOldValue()).intValue();
+
+	// Remove the old window menus
+	if (numframes > 0) {
+	    for(int i = 0; i < numframes; i++) {
+		windowMenu.remove(0);
+	    }
+	}
+	
+
+	// Put the new ones up
+	numframes = ((Integer)evt.getNewValue()).intValue();
+
+	for(int i = numframes - 1; i >= 0; i--) {
+	    windowMenu.add(new JMenuItem(Toolkit.getProperty("windowname_"+i, "")), 0);
+	}
     }
 }
 

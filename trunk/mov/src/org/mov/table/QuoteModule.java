@@ -177,6 +177,9 @@ public class QuoteModule extends AbstractAnalyserTable
 	return null;
     }
 
+    public ImageIcon getFrameIcon() {
+	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/TableIcon.gif"));
+    }
     public boolean encloseInScrollPane() {
 	return true;
     }
@@ -219,5 +222,6 @@ public class QuoteModule extends AbstractAnalyserTable
 	}
     }
 }
+
 
 

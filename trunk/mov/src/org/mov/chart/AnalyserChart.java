@@ -81,8 +81,8 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
     private void addFunctionToolBar() {
 	JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
 
-	defaultZoom = new JButton(new ImageIcon("Zoom24.gif"));
-	zoomIn = new JButton(new ImageIcon("ZoomIn24.gif"));
+	defaultZoom = new JButton(new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/Zoom24.gif")));
+	zoomIn = new JButton(new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/ZoomIn24.gif")));
 	//	zoomOut = new JButton(new ImageIcon("ZoomOut24.gif"));
 
 	//	zoomIn.addActionListener(this);
@@ -241,6 +241,10 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
 
     public JMenuBar getJMenuBar() {
 	return menuBar;
+    }
+
+    public ImageIcon getFrameIcon() {
+	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/GraphIcon.gif"));
     }
 
     public boolean encloseInScrollPane() {
@@ -460,4 +464,5 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
 	}
     }
 }
+
 

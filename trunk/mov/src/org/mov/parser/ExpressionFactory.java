@@ -86,6 +86,9 @@ public class ExpressionFactory {
 	case(Token.AVG_TOKEN):
 	    expression = new AvgExpression(arg1, arg2, arg3);
 	    break;
+	case(Token.RSI_TOKEN):
+	    expression = new RSIExpression(arg1, arg2);
+	    break;
 	case(Token.NOT_TOKEN):
 	    expression = new NotExpression(arg1);
 	    break;

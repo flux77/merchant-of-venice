@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.analyser;
@@ -64,7 +64,7 @@ public class PaperTrade {
             portfolio.addAccount(shareAccount);
 
             // Deposit starting capital into portfolio
-            Transaction transaction = 
+            Transaction transaction =
                 Transaction.newDeposit(startDate, capital, cashAccount);
 
             portfolio.addTransaction(transaction);
@@ -76,7 +76,7 @@ public class PaperTrade {
             }
             catch(WeekendDateException e) {
                 assert(false);
-                
+
                 startDateOffset = endDateOffset = 0;
             }
         }
@@ -89,7 +89,7 @@ public class PaperTrade {
     private static void sell(Environment environment,
                              StockHolding stockHolding,
                              Money tradeCost,
-                             int day) 
+                             int day)
 	throws MissingQuoteException {
 
 	// Make sure we have enough money for the trade
@@ -100,11 +100,11 @@ public class PaperTrade {
             Symbol symbol = stockHolding.getSymbol();
 
             // How much are they worth? We sell at the day open price.
-            Money amount = 
-                new Money(shares * 
+            Money amount =
+                new Money(shares *
                           environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day));
             TradingDate date = environment.quoteBundle.offsetToDate(day);
-            Transaction sell = Transaction.newReduce(date, 
+            Transaction sell = Transaction.newReduce(date,
                                                      amount,
                                                      symbol,
                                                      shares,
@@ -115,49 +115,55 @@ public class PaperTrade {
 	}
     }
 
-    private static void buy(Environment environment,
-                            Symbol symbol,
-                            Money amount,				 
-                            Money tradeCost,
-                            int day) 
+    // Returns false if it isn't enough money to buy a single share.
+    private static boolean buy(Environment environment,
+                               Symbol symbol,
+                               Money amount,				
+                               Money tradeCost,
+                               int day)
 	throws MissingQuoteException {
 
 	// Calculate maximum number of shares we can buy with the given amount
 	double sharePrice = environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day);
 	int shares = (int)Math.floor(amount.doubleValue() / sharePrice);
+
+        if(shares > 0) {
+            // Now calculate the actual amount the shares will cost
+            amount = new Money(sharePrice * shares);
 	
-	// Now calculate the actual amount the shares will cost
-	amount = new Money(sharePrice * shares);
-	
-        TradingDate date = environment.quoteBundle.offsetToDate(day);
-        Transaction buy = Transaction.newAccumulate(date, 
-                                                    amount,
-                                                    symbol,
-                                                    shares,
-                                                    tradeCost,
-                                                    environment.cashAccount,
-                                                    environment.shareAccount);
-        
-        environment.portfolio.addTransaction(buy);
+            TradingDate date = environment.quoteBundle.offsetToDate(day);
+            Transaction buy = Transaction.newAccumulate(date,
+                                                        amount,
+                                                        symbol,
+                                                        shares,
+                                                        tradeCost,
+                                                        environment.cashAccount,
+                                                        environment.shareAccount);
+
+            environment.portfolio.addTransaction(buy);
+            return true;
+        }
+
+        return false;
     }
 
-    private static void sellTrades(Environment environment, 
+    private static void sellTrades(Environment environment,
                                    QuoteBundle quoteBundle,
-                                   Variables variables, 
+                                   Variables variables,
                                    Expression sell,
                                    int dateOffset,
                                    Money tradeCost,
                                    List symbols,
-                                   OrderCache orderCache) 
+                                   OrderCache orderCache)
         throws EvaluationException {
 
         // Iterate through our stock holdings and see if we should sell any
         List stockHoldings = new ArrayList(environment.shareAccount.getStockHoldings().values());
-        
+
         for(Iterator iterator = stockHoldings.iterator(); iterator.hasNext();) {
             StockHolding stockHolding = (StockHolding)iterator.next();
             Symbol symbol = stockHolding.getSymbol();
-            
+
             // If we care about the order, make sure the "order" variable is set.
             if(orderCache.isOrdered()) {
                 int order = symbols.indexOf(symbol);
@@ -189,7 +195,7 @@ public class PaperTrade {
                                   Money tradeCost,
                                   List symbols,
                                   OrderCache orderCache,
-                                  Money stockValue) 
+                                  Money stockValue)
         throws EvaluationException {
 
         variables.setValue("held", 0);
@@ -197,7 +203,7 @@ public class PaperTrade {
         // If we have enough money, iterate through stocks available today -
         // should we buy any of it?
         Money cash = environment.cashAccount.getValue();
-        
+
         if(stockValue.add(tradeCost.multiply(2)).isLessThanEqual(cash)) {
             int order = 0;
 
@@ -207,23 +213,26 @@ public class PaperTrade {
 
                 // Skip if we already own it
                 if(!environment.shareAccount.isHolding(symbol)) {
-                   
+
                     // If we care about the order, make sure the "order" variable is set
                     if(orderCache.isOrdered())
                         variables.setValue("order", order);
 
                     try {
-                        if(buy.evaluate(variables, quoteBundle, symbol, 
+                        if(buy.evaluate(variables, quoteBundle, symbol,
                                         dateOffset) >= Expression.TRUE) {
-                            buy(environment, symbol, stockValue,  tradeCost, 
-                                dateOffset + 1);
-                        
-                            // If there is no more money left, don't even look at the
-                            // other stocks
-                            cash = environment.cashAccount.getValue();
 
-                            if(stockValue.add(tradeCost.multiply(2)).isGreaterThan(cash))
-                                break;
+                            // Did we have enough money to buy at least one share?
+                            if(buy(environment, symbol, stockValue,  tradeCost,
+                                   dateOffset + 1)) {
+
+                                // If there is no more money left, don't even look at the
+                                // other stocks
+                                cash = environment.cashAccount.getValue();
+
+                                if(stockValue.add(tradeCost.multiply(2)).isGreaterThan(cash))
+                                    break;
+                            }
                         }
                     }
                     catch(MissingQuoteException e) {
@@ -236,10 +245,10 @@ public class PaperTrade {
         }
     }
 
-    private static int getHoldingTime(Environment environment, StockHolding stockHolding, 
+    private static int getHoldingTime(Environment environment, StockHolding stockHolding,
                                       int dateOffset) {
-        try {              
-            return (1 - (QuoteCache.getInstance().dateToOffset(stockHolding.getDate()) - 
+        try {
+            return (1 - (QuoteCache.getInstance().dateToOffset(stockHolding.getDate()) -
                          dateOffset));
 
         }
@@ -250,16 +259,16 @@ public class PaperTrade {
     }
 
     public static Portfolio paperTrade(String portfolioName,
-                                       QuoteBundle quoteBundle, 
+                                       QuoteBundle quoteBundle,
                                        Variables variables,
                                        OrderCache orderCache,
-                                       TradingDate startDate, 
+                                       TradingDate startDate,
 				       TradingDate endDate,
 				       Expression buy,
 				       Expression sell,
 				       Money capital,
                                        Money stockValue,
-				       Money tradeCost) 
+				       Money tradeCost)
         throws EvaluationException {
 
         // Set up environment for paper trading
@@ -285,9 +294,9 @@ public class PaperTrade {
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);
 
-            sellTrades(environment, quoteBundle, variables, sell, dateOffset, tradeCost, 
+            sellTrades(environment, quoteBundle, variables, sell, dateOffset, tradeCost,
                        symbols, orderCache);
-            buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost, 
+            buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost,
                       symbols, orderCache, stockValue);
 
             dateOffset++;
@@ -297,16 +306,16 @@ public class PaperTrade {
     }
 
     public static Portfolio paperTrade(String portfolioName,
-                                       QuoteBundle quoteBundle, 
+                                       QuoteBundle quoteBundle,
                                        Variables variables,
                                        OrderCache orderCache,
-                                       TradingDate startDate, 
+                                       TradingDate startDate,
 				       TradingDate endDate,
 				       Expression buy,
 				       Expression sell,
 				       Money capital,
                                        int numberStocks,
-				       Money tradeCost) 
+				       Money tradeCost)
         throws EvaluationException {
 
         // Set up environment for paper trading
@@ -332,14 +341,14 @@ public class PaperTrade {
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);
 
-            sellTrades(environment, quoteBundle, variables, sell, dateOffset, tradeCost, 
+            sellTrades(environment, quoteBundle, variables, sell, dateOffset, tradeCost,
                        symbols, orderCache);
             try {
                 // stockValue = (portfolio / numberStocks) - (2 * tradeCost)
                 Money portfolioValue = environment.portfolio.getValue(quoteBundle, dateOffset);
-                Money stockValue = 
+                Money stockValue =
                     portfolioValue.divide(numberStocks).subtract(tradeCost.multiply(2));
-                buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost, 
+                buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost,
                           symbols, orderCache, stockValue);
             }
             catch(MissingQuoteException e) {

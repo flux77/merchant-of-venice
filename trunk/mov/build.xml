@@ -8,7 +8,9 @@
   <property name="api" value="${basedir}/api"/>
   <property name="backup" value="${basedir}/backup"/>
   <property name="release" value="${basedir}/release"/>
+  <property name="report" value="${basedir}/report"/>
   <property name="src" value="${basedir}/src"/>
+  <property name="test" value="${basedir}/test"/>
   <property name="web" value="${basedir}/web"/>
 
   <!-- Generate API documentation -->
@@ -56,6 +58,7 @@
     <delete file="${web}/web.tar"/>
     <delete file="${web}/web.tar.gz"/>
     <delete dir="${web}/api"/>
+    <delete dir="${web}/report"/>
   </target>
 
   <!-- Generate a jar -->
@@ -66,7 +69,7 @@
   </target>
 
   <!-- Package venice up ready for release -->
-  <target name="release" depends="jar">
+  <target name="release" depends="jar, test">
 
     <!-- Layout files ready for release -->
     <mkdir dir="${release}"/>
@@ -103,6 +106,42 @@
         <pathelement path="${src}"/>
       </classpath>
     </java>
+  </target>
+
+  <!-- Run Tests -->
+  <target name="test" depends="build">
+    <mkdir dir="${report}"/>
+
+    <!-- Build Tests -->
+    <javac srcdir="${test}" 
+	   debug="on"
+  	   optimize="on"
+	   source="1.4"
+	   includes="**/*.java">
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+        <pathelement path="${test}"/>
+      </classpath>
+    </javac>
+
+    <!-- Run Tests -->
+    <junit printsummary="on" 
+           dir="${test}"
+           fork="yes" 
+           haltonfailure="yes">
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+        <pathelement path="${test}"/>
+      </classpath>
+      <formatter type="plain" />
+      <batchtest todir="${report}">
+        <fileset dir="${test}">
+          <include name="**/*.java" />
+        </fileset>
+      </batchtest>
+    </junit>
   </target>
 
   <!-- Package up the web page ready for deployment -->

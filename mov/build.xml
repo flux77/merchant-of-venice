@@ -1,7 +1,7 @@
 <project name="Venice" default="build" basedir=".">
 
 <property name="src" value="${basedir}/src"/>
-<property name="docs" value="${basedir}/docs"/>
+<property name="api" value="${basedir}/api"/>
 
 <target name="build">
   <javac srcdir="${src}" 
@@ -17,11 +17,11 @@
   </delete>
 </target>
 
-<target name="docs">
+<target name="api">
   <javadoc packagenames="org.mov.*"
            sourcepath="${src}"
 	   source="1.4"
-           destdir="${docs}"
+           destdir="${api}"
 	   windowtitle="Venice">
     <header><![CDATA[<b>Venice</b>]]></header>
     <footer><![CDATA[<b>Venice</b>]]></footer>

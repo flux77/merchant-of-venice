@@ -117,7 +117,7 @@ public class ExpressionFactory {
 	    expression = new DayVolumeExpression();
 	    break;
 	case(Token.NUMBER_TOKEN):
-	    expression = new NumberExpression(operation.getIntValue());
+	    expression = new NumberExpression(operation.getValue());
 	    break;
 	case(Token.LAG_TOKEN):
 	    expression = new LagExpression(arg1, arg2);

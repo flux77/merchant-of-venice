@@ -10,18 +10,18 @@ import org.mov.quote.*;
 public class NumberExpression extends TerminalExpression {
 
     // The number we represent
-    private int value;
+    private float value;
 
-    public NumberExpression(int value) {
+    public NumberExpression(float value) {
 	this.value = value;
     }
 
     public float evaluate(QuoteCache cache, String symbol, int day) {
-	return (float)value;
+	return value;
     }
 
     public String toString() {
-	return Integer.toString(value);
+	return Float.toString(value);
     }
 
     /**

@@ -1,4 +1,4 @@
-package org.liquid.list;
+package org.mov.ui;
 
 /**
  * This model is used for providing alphabetically sorted displays to JList gadgests

@@ -21,6 +21,7 @@ package org.mov.importer;
 import org.mov.main.ModuleFrame;
 import org.mov.main.Module;
 import org.mov.ui.GridBagHelper;
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 import org.mov.prefs.PreferencesManager;
@@ -132,7 +133,7 @@ public class ImporterModule extends JPanel
 
 	// Import From
 	{
-	    TitledBorder titled = new TitledBorder("Import From");
+	    TitledBorder titled = new TitledBorder(Locale.getString("IMPORT_FROM"));
 	    JPanel importFromPanel = new JPanel();
 	    importFromPanel.setBorder(titled);
 
@@ -144,9 +145,9 @@ public class ImporterModule extends JPanel
 	    c.ipadx = 5;
 	    c.anchor = GridBagConstraints.WEST;
             c.fill = GridBagConstraints.HORIZONTAL;
-
+	    
 	    // From Database
-	    fromDatabase = new JRadioButton("Database");
+	    fromDatabase = new JRadioButton(Locale.getString("DATABASE"));
 	    fromDatabase.addActionListener(this);
 	    if(importFromSource.equals("database"))
 		fromDatabase.setSelected(true);
@@ -155,7 +156,7 @@ public class ImporterModule extends JPanel
 	    importFromPanel.add(fromDatabase);
 
 	    // From Files
-	    fromFiles = new JRadioButton("Files");
+	    fromFiles = new JRadioButton(Locale.getString("FILES"));
 	    fromFiles.addActionListener(this);
 	    if(importFromSource.equals("files"))
 		fromFiles.setSelected(true);
@@ -180,7 +181,7 @@ public class ImporterModule extends JPanel
 	    importFromPanel.add(formatComboBox);
 
 	    // From Internet
-            fromInternet = new JRadioButton("Internet");
+            fromInternet = new JRadioButton(Locale.getString("INTERNET"));
 	    fromInternet.addActionListener(this);
 	    if(importFromSource.equals("internet"))
 		fromInternet.setSelected(true);
@@ -198,19 +199,21 @@ public class ImporterModule extends JPanel
 	    importFromPanel.add(exchangeComboBox);
 
             c.gridx = 1;
-            symbolList = GridBagHelper.addTextRow(importFromPanel, "Symbols", 
+            symbolList = GridBagHelper.addTextRow(importFromPanel, Locale.getString("SYMBOLS"), 
                                                   p.get("internetSymbolList", ""),
                                                   gridbag, c, 11);
             c.gridx = 1;
             TradingDate today = new TradingDate();
             TradingDate previous = today.previous(30);
 
-            startDateTextField = GridBagHelper.addTextRow(importFromPanel, "Start Date",
+            startDateTextField = GridBagHelper.addTextRow(importFromPanel, 
+							  Locale.getString("START_DATE"),
                                                           p.get("internetStartDate", 
                                                                 previous.toString("dd/mm/yyyy")),
                                                           gridbag, c, 11);
             c.gridx = 1;
-            endDateTextField = GridBagHelper.addTextRow(importFromPanel, "End Date", 
+            endDateTextField = GridBagHelper.addTextRow(importFromPanel, 
+							Locale.getString("END_DATE"), 
                                                         p.get("internetEndDate",
                                                               today.toString("dd/mm/yyyy")),
                                                         gridbag, c, 11);
@@ -227,7 +230,7 @@ public class ImporterModule extends JPanel
 
 	// Import to
 	{
-	    TitledBorder titled = new TitledBorder("Import To");
+	    TitledBorder titled = new TitledBorder(Locale.getString("IMPORT_TO"));
 	    JPanel importToPanel = new JPanel();
 	    importToPanel.setBorder(titled);
 
@@ -241,7 +244,7 @@ public class ImporterModule extends JPanel
             c.fill = GridBagConstraints.HORIZONTAL;
 
 	    // To Database
-	    toDatabase = new JCheckBox("Database");
+	    toDatabase = new JCheckBox(Locale.getString("DATABASE"));
 	    toDatabase.addActionListener(this);
 	    if(p.getBoolean("toDatabase", false))
 		toDatabase.setSelected(true);
@@ -250,7 +253,7 @@ public class ImporterModule extends JPanel
 	    importToPanel.add(toDatabase);
 
 	    // To Files
-	    toFiles = new JCheckBox("Files");
+	    toFiles = new JCheckBox(Locale.getString("FILES"));
 	    toFiles.addActionListener(this);
 	    if(p.getBoolean("toFiles", false))
 		toFiles.setSelected(true);
@@ -271,9 +274,9 @@ public class ImporterModule extends JPanel
 
 	// Import, Cancel buttons
 	JPanel buttonPanel = new JPanel();
-	importButton = new JButton("Import");
+	importButton = new JButton(Locale.getString("IMPORT"));
 	importButton.addActionListener(this);
-	cancelButton = new JButton("Cancel");
+	cancelButton = new JButton(Locale.getString("CANCEL"));
 	cancelButton.addActionListener(this);
 	buttonPanel.add(importButton);
 	buttonPanel.add(cancelButton);
@@ -417,7 +420,7 @@ public class ImporterModule extends JPanel
             catch(SymbolFormatException e) {
                 JOptionPane.showInternalMessageDialog(desktop, 
                                                       e.getReason(),
-                                                      "Invalid Symbol List",
+                                                      Locale.getString("INVALID_SYMBOL_LIST"),
                                                       JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -428,8 +431,8 @@ public class ImporterModule extends JPanel
             }
             catch(TradingDateFormatException e) {
                 JOptionPane.showInternalMessageDialog(desktop, 
-                                                      "Invalid date.",
-                                                      "Invalid date range",
+                                                      Locale.getString("INVALID_DATE"),
+                                                      Locale.getString("INVALID_DATE_RANGE"),
                                                       JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -458,8 +461,8 @@ public class ImporterModule extends JPanel
         progress.setIndeterminate(false);
         progress.setProgress(0);
         progress.setMaster(true);
-        progress.show("Importing");
-
+        progress.show(Locale.getString("IMPORTING"));
+	
         TradingDate firstDate = source.getFirstDate();
         TradingDate lastDate;
 
@@ -487,46 +490,43 @@ public class ImporterModule extends JPanel
         for(Iterator iterator = dateRange.iterator(); iterator.hasNext();) {
 	    TradingDate date = (TradingDate)iterator.next();
 
-            // Check to see if the source has any quotes for that date...
-            if(source.containsDate(date)) {
+	    progress.setNote(Locale.getString("IMPORTING_DATE",
+					      date.toString("d?/m?/yyyy")));
 
-                progress.setNote("Importing " + date.toString("d?/m?/yyyy"));
-
-                // Load the next day's quotes to import - but don't
-                // bother if we are just importing files, since we don't
-                // need to load the quotes now. Also note that the internet
-                // quote source accepts a list of specific symbols - and
-                // cannot handle "ALL_SYMBOLS".
-                QuoteBundle quoteBundle = null;
-
-                if(fromInternet.isSelected())
-                    quoteBundle = 
-                        new ScriptQuoteBundle(new QuoteRange(symbols, date));
-                else if(isToDatabase || fromDatabase.isSelected())
-                    quoteBundle = 
-                        new ScriptQuoteBundle(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
-
-                // file -> file
-                if(fromFiles.isSelected() && isToFiles) {
-                    FileQuoteSource fileQuoteSource =
-                        (FileQuoteSource)source;
-                    importFileToFile(fileQuoteSource.
-                                     getURLForDate(date).getPath());
-                }			
-
-                // anything but file -> file
-                if(!fromFiles.isSelected() && isToFiles)
+	    // Load the next day's quotes to import - but don't
+	    // bother if we are just importing files, since we don't
+	    // need to load the quotes now. Also note that the internet
+	    // quote source accepts a list of specific symbols - and
+	    // cannot handle "ALL_SYMBOLS".
+	    QuoteBundle quoteBundle = null;
+	    
+	    if(fromInternet.isSelected())
+		quoteBundle = 
+		    new ScriptQuoteBundle(new QuoteRange(symbols, date));
+	    else if(isToDatabase || fromDatabase.isSelected())
+		quoteBundle = 
+		    new ScriptQuoteBundle(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
+	    
+	    // file -> file
+	    if(fromFiles.isSelected() && isToFiles) {
+		FileQuoteSource fileQuoteSource =
+		    (FileQuoteSource)source;
+		importFileToFile(fileQuoteSource.
+				 getURLForDate(date).getPath());
+	    }			
+	    
+	    // anything but file -> file
+	    if(!fromFiles.isSelected() && isToFiles)
                     importToFile(quoteBundle, date);
-
-                // anything -> database
-                if(isToDatabase)
-                    importToDatabase(quoteBundle, date);
-
-                // Stop if the user hit cancel
-                if(thread.isInterrupted())
-                    break;
-            }
-
+	    
+	    // anything -> database
+	    if(isToDatabase)
+		importToDatabase(quoteBundle, date);
+	    
+	    // Stop if the user hit cancel
+	    if(thread.isInterrupted())
+		break;
+	    
             progress.increment();
 	}
 
@@ -590,8 +590,8 @@ public class ImporterModule extends JPanel
 	}
 	catch(java.io.IOException e) {
 	    org.mov.ui.DesktopManager.
-		showErrorMessage("Error writing to file: " +
-				 fileName);
+		showErrorMessage(Locale.getString("ERROR_WRITING_TO_FILE",
+						  fileName));
 	}
     }
 
@@ -682,7 +682,7 @@ public class ImporterModule extends JPanel
      * @return	the window title.
      */
     public String getTitle() {
-	return "Import Quotes";
+	return Locale.getString("IMPORT_TITLE");
     }
 
     /**

@@ -28,10 +28,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.util.TradingDate;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
+import org.mov.util.Locale;
+import org.mov.util.TradingDate;
 
 /**
  * Provides functionality to obtain stock quotes from a database. This class
@@ -142,7 +143,7 @@ public class DatabaseQuoteSource implements QuoteSource
             }
             catch(Exception e2) {
                 // Neither worked!
-                DesktopManager.showErrorMessage("Unable to load MySQL driver.");
+                DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_MYSQL_DRIVER"));
                 return false;
             }
 	}
@@ -160,8 +161,8 @@ public class DatabaseQuoteSource implements QuoteSource
             return true;
 	}
 	catch (SQLException e) {
-	    DesktopManager.showErrorMessage("Error connecting to database:\n" +
-                                            e.getMessage());
+	    DesktopManager.showErrorMessage(Locale.getString("ERROR_CONNECTING_TO_DATABASE",
+							     e.getMessage()));
             return false;
 	}
     }
@@ -278,8 +279,8 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException e) {
-                DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                                e.getMessage());
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								 e.getMessage()));
 	    }
 	}
 
@@ -318,8 +319,8 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException e) {
-                DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                                e.getMessage());
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								 e.getMessage()));
 	    }
 	}
 
@@ -365,8 +366,8 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException e) {
-                DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                                e.getMessage());
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								 e.getMessage()));
             }
 	}
 
@@ -409,10 +410,10 @@ public class DatabaseQuoteSource implements QuoteSource
         
 	String queryString = buildSQLString(quoteRange);
         boolean success;
-
+	
 	// This query might take a while...
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-        progress.setNote("Loading Quotes...");
+        progress.setNote(Locale.getString("LOADING_QUOTES"));
         progress.setIndeterminate(true);
 	success = executeSQLString(progress, queryString);
         ProgressDialogManager.closeProgressDialog(progress);
@@ -464,12 +465,12 @@ public class DatabaseQuoteSource implements QuoteSource
                 return !thread.isInterrupted();
 	    }
 	    catch(SQLException e) {
-                DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                                e.getMessage());
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								 e.getMessage()));
 	    }
             catch(SymbolFormatException e2) {
-                DesktopManager.showErrorMessage("Database contains badly formatted quote symbol." +
-                                                e2.getReason());
+                DesktopManager.showErrorMessage(Locale.getString("DATABASE_BADLY_FORMATTED_SYMBOL",
+								 e2.getReason()));
             }
 	}
 
@@ -615,7 +616,8 @@ public class DatabaseQuoteSource implements QuoteSource
 	    Statement statement = connection.createStatement();
 	    statement.executeUpdate("CREATE TABLE " + SHARE_TABLE_NAME + " (" +
 				    DATE_FIELD +	" DATE NOT NULL, " +
-				    SYMBOL_FIELD +	" CHAR(6) NOT NULL, " +
+				    SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
+				    ") NOT NULL, " +
 				    DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, " +
 				    DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
 				    DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
@@ -631,15 +633,16 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	    // 3. Create the lookup table
 	    statement.executeUpdate("CREATE TABLE " + LOOKUP_TABLE_NAME + " (" +
-				    SYMBOL_FIELD +		" CHAR(6) NOT NULL, " +
+				    SYMBOL_FIELD +		" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
+				    ") NOT NULL, " +
 				    NAME_FIELD +		" VARCHAR(100), " +
 				    "PRIMARY KEY(" + SYMBOL_FIELD + "))");
 
 	    success = true;
 	}
 	catch (SQLException e) {
-            DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                            e.getMessage());
+	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+							     e.getMessage()));
 	}
 
 	return success;	
@@ -670,9 +673,8 @@ public class DatabaseQuoteSource implements QuoteSource
 		}
 		
 		if(!foundDatabase) {
-		    DesktopManager.showErrorMessage("Can't find " +
-						    databaseName +
-						    " database.");
+		    DesktopManager.showErrorMessage(Locale.getString("CANT_FIND_DATABASE",
+								     databaseName));
 		    return false;
 		}
 	    }
@@ -700,8 +702,8 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	}
 	catch (SQLException e) {
-            DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                            e.getMessage());
+	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+							     e.getMessage()));
 	    return false;
 	}
 
@@ -725,48 +727,55 @@ public class DatabaseQuoteSource implements QuoteSource
 	if(!readyForImport)
 	    readyForImport = prepareForImport(databaseName);
 
-	// Dont import a date thats already there
-	if(!containsDate(date) && readyForImport) {
+	// Make sure the database is ready for import
+	if(readyForImport) {
 	    StringBuffer insertString = new StringBuffer();
 	    boolean firstQuote = true;
 	    String dateString = date.toString();
+
+	    // Get a list of all the symbols for the given date that are
+	    // already in the database
+	    List existingSymbols = getSymbols(date);
 
 	    // Build single query to insert stocks for a whole day into
 	    // the table
             Iterator iterator = quoteBundle.iterator();
 
-            if(iterator.hasNext()) {
-                while(iterator.hasNext()) {
-                    Quote quote = (Quote)iterator.next();
+	    while(iterator.hasNext()) {
+		Quote quote = (Quote)iterator.next();
 
-                    if(firstQuote) {
-                        insertString.append("INSERT INTO " + SHARE_TABLE_NAME +
-                                            " VALUES (");
-                        firstQuote = false;
-                    }
-                    else
-                        insertString.append(", (");
-
-                    // Add new quote
-                    insertString.append("'" + dateString          + "', " +
-                                        "'" + quote.getSymbol()   + "', " +
-                                        "'" + quote.getDayOpen()  + "', " +
-                                        "'" + quote.getDayClose() + "', " +
-                                        "'" + quote.getDayHigh()  + "', " +
-                                        "'" + quote.getDayLow()   + "', " +
-                                        "'" + quote.getDayVolume()   + "')");
-                }
-
-                // Now insert day quote into database
-                try {
-                    Statement statement = connection.createStatement();
-                    statement.executeUpdate(insertString.toString());
-                }
-                catch (SQLException e) {
-                    DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                                    e.getMessage());
-                }
-            }
+		// Don't import quotes that are already in the database
+		if(!existingSymbols.contains(quote.getSymbol())) {
+		    if(firstQuote) {
+			insertString.append("INSERT INTO " + SHARE_TABLE_NAME +
+					    " VALUES (");
+			firstQuote = false;
+		    }
+		    else
+			insertString.append(", (");
+		    
+		    // Add new quote
+		    insertString.append("'" + dateString          + "', " +
+					"'" + quote.getSymbol()   + "', " +
+					"'" + quote.getDayOpen()  + "', " +
+					"'" + quote.getDayClose() + "', " +
+					"'" + quote.getDayHigh()  + "', " +
+					"'" + quote.getDayLow()   + "', " +
+					"'" + quote.getDayVolume()   + "')");
+		}
+	    }
+	    
+	    // Now insert day quote into database - if we had any quotes!
+	    if(!firstQuote) {
+		try {
+		    Statement statement = connection.createStatement();
+		    statement.executeUpdate(insertString.toString());
+		}
+		catch (SQLException e) {
+		    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								     e.getMessage()));
+		}
+	    }
 	}
     }
 
@@ -801,8 +810,8 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException e) {
-                DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                                e.getMessage());
+		DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								 e.getMessage()));
 	    }
 	}
 
@@ -822,11 +831,11 @@ public class DatabaseQuoteSource implements QuoteSource
             // This might take a while
             ProgressDialog progress = ProgressDialogManager.getProgressDialog();
             progress.setIndeterminate(true);
-            progress.show("Getting dates...");
-            progress.setNote("Getting dates...");
+            progress.show(Locale.getString("GETTING_DATES"));
+            progress.setNote(Locale.getString("GETTING_DATES"));
             
             try {
-                // 1. Create the table
+                // Get dates
                 Statement statement = connection.createStatement();
                 ResultSet RS = statement.executeQuery
                     ("SELECT DISTINCT(" + DATE_FIELD + ") FROM " +
@@ -839,8 +848,8 @@ public class DatabaseQuoteSource implements QuoteSource
                 
             }
             catch (SQLException e) {
-                DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                                e.getMessage());
+		DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								 e.getMessage()));
             }
             
             ProgressDialogManager.closeProgressDialog(progress);
@@ -935,10 +944,41 @@ public class DatabaseQuoteSource implements QuoteSource
             return advanceDecline;
         }
         catch (SQLException e) {
-            DesktopManager.showErrorMessage("Error talking to database:\n" +
-                                            e.getMessage());
+	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+							     e.getMessage()));
             return 0;
         }
+    }
+
+    // Retrieve a list of all the symbols on a given date
+    private List getSymbols(TradingDate date) {
+	List symbols = new ArrayList();
+
+	if(checkConnection()) {
+
+	    // Since this is part of import, don't bother with the progress dialog
+
+	    try {
+		Statement statement = connection.createStatement();
+		ResultSet RS = statement.executeQuery("SELECT " + SYMBOL_FIELD + " FROM " +
+						      SHARE_TABLE_NAME + " WHERE " +
+						      DATE_FIELD + " = '" + date + "'");
+		
+		try {
+		    while(RS.next())
+			symbols.add(Symbol.find(RS.getString(1)));
+		}
+		catch(SymbolFormatException e) {
+		    // need to build an error message
+		}
+	    }						   
+            catch (SQLException e) {
+		DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								 e.getMessage()));
+            }
+	}
+
+	return symbols;
     }
 
     // This function shows an error message if there are no quotes in the
@@ -947,9 +987,7 @@ public class DatabaseQuoteSource implements QuoteSource
     // interrupt the current thread. This way calling code only needs to
     // check for cancellation, rather than each individual fault.
     private void showEmptyDatabaseError() {
-        DesktopManager.showErrorMessage("Venice couldn't find any quotes.\n" +
-                                        "You can import quotes using the import\n" +
-                                        "quote tool under the File menu.");
+        DesktopManager.showErrorMessage(Locale.getString("NO_QUOTES_FOUND"));
     }
 }
 

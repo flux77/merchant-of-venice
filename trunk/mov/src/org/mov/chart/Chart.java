@@ -50,9 +50,13 @@ public class Chart extends JComponent implements MouseListener {
     private Comparable endX;
     private Vector xRange;
 
-    // When highlighting the grap keep track of the start and end x
+    // When highlighting the graph keep track of the start and end x
     private Comparable startHighlightedX;
     private Comparable endHighlightedX;
+
+    // When drawning on the graph, keep track of the start and end x
+    private Vector startDrawnLinesX, startDrawnLinesY;
+    private Vector endDrawnLinesX, endDrawnLinesY;
 
     // Are we in a zoomed in view?
     private boolean zoomedIn = false;
@@ -68,6 +72,11 @@ public class Chart extends JComponent implements MouseListener {
 	setForeground(Color.gray);
 	addMouseListener(this);
 	updateUI();
+
+	startDrawnLinesX = new Vector();
+	startDrawnLinesY = new Vector();
+	endDrawnLinesX = new Vector();
+	endDrawnLinesY = new Vector();
     }
 
     // Create a vector of iterators containing the x range iterators
@@ -451,14 +460,74 @@ public class Chart extends JComponent implements MouseListener {
     }
 
     /**
-     * Sets the end X point of the highlighted region. The highlighted
-     * region will now stretch from the start to the end X point.
-     *
-     * @param	x	the ending x value
+     * Sets the start point of a new line draw on the graph.
+     *      
+     * @param	x	the starting x value
+     * @param	y	the starting y value
      */
     public void setHighlightedEnd(Comparable x) {
 	endHighlightedX = x;
 	repaint();
+    }
+
+    /**
+     * Sets the end point of a drawn line. The line
+     * will now stretch from the start to the end point.
+     *
+     * @param	x	the x coordinate of the end of the line
+     * @param   y       the y coordinate of the end of the line.
+     */
+
+    public void setDrawnLineStart(Integer x, Integer y) {
+	startDrawnLinesX.add(x);
+	startDrawnLinesY.add(y);
+	repaint();
+    }
+
+    /**
+     * Sets the end point of a drawn line. The line
+     * will now stretch from the start to the end point.
+     *
+     * @param	x	the x coordinate of the end of the line
+     * @param   y       the y coordinate of the end of the line.
+     */
+    
+    public void setDrawnLineEnd(Integer x, Integer y, boolean newLine) {
+	
+	if (newLine) {
+	    endDrawnLinesX.add(x);
+	    endDrawnLinesY.add(y);
+	} else {
+	    endDrawnLinesX.setElementAt(x, endDrawnLinesX.size()-1);
+	    endDrawnLinesY.setElementAt(y, endDrawnLinesY.size()-1);
+	}
+	repaint();
+    }
+
+    // Find the line ending at x,y and delete it
+    public void setErase(Integer x, Integer y) {
+	int i;
+	int deleteCount = 0;
+
+	for (i = 0; i < endDrawnLinesY.size(); i++) {
+	    Integer valX = (Integer)endDrawnLinesX.elementAt(i);
+	    Integer valY = (Integer)endDrawnLinesY.elementAt(i);
+
+	    int diff1 = Math.abs(valX.intValue() - x.intValue());
+	    int diff2 = Math.abs(valY.intValue() - y.intValue());
+
+	    if (diff1 < 5 &&
+		diff2 < 5) {
+		
+		endDrawnLinesX.remove(i);
+		endDrawnLinesY.remove(i);
+		startDrawnLinesX.remove(i);
+		startDrawnLinesY.remove(i);
+
+		break;
+
+	    }
+	}
     }
 
     /**
@@ -477,6 +546,19 @@ public class Chart extends JComponent implements MouseListener {
      */
     public Comparable getHighlightedEnd() {
 	return endHighlightedX;
+    }
+
+    public Vector getDrawnLineStartX() {
+	return startDrawnLinesX;
+    }
+    public Vector getDrawnLineStartY() {
+	return startDrawnLinesY;
+    }
+    public Vector getDrawnLineEndX() {
+	return endDrawnLinesX;
+    }
+    public Vector getDrawnLineEndY() {
+	return endDrawnLinesY;
     }
 
     /**

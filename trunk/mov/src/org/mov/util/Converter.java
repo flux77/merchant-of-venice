@@ -4,6 +4,11 @@ import java.util.*;
 
 import org.mov.portfolio.Stock;
 
+/**
+ * Contains a set of general conversion functions. These functiosn include
+ * things like converting two digit years to four digits years, integers
+ * to fixed point strings etc.
+ */
 public class Converter {
 
     /**
@@ -44,6 +49,14 @@ public class Converter {
 	return year;
     }
 
+    /**
+     * Convert a change in two floats to the Change object which can
+     * be displayed by SortedTable.
+     *
+     * @param	a	the start value
+     * @param	b	the end value
+     * @return	the Change object
+     */
     public static Change changeToChange(float a, float b) {
 	double percent = 0.0;
 
@@ -57,6 +70,12 @@ public class Converter {
 	return new Change(percent);
     }
 
+    /**
+     * Convert from a quote (in dollars) to string. 
+     *
+     * @param	quote	the quote
+     * @return	the quote string
+     */
     public static String quoteToString(float quote) {
 	// First round to 3 decimal places
 	quote *= 1000;
@@ -66,6 +85,13 @@ public class Converter {
 	return new String(""+quote);
     }
 
+    /**
+     * Convert from a price (in dollars) to string. This will add the
+     * appropriate "$" and "c" symbols as needed.
+     *
+     * @param	price	the price
+     * @return	the price string
+     */
     public static String priceToString(float price) {
 	int dollars = (int)Math.abs(price);
 	float cents = (price - dollars) * 100;
@@ -79,8 +105,14 @@ public class Converter {
 	    return Converter.toFixedString((int)cents, 2) + "c";
     }
 
-    // Converts a start and end date to a vector of all the trading
-    // dates inbetween (i.e. all days except saturdays and sundays).
+    /** 
+     * Convert a start and end date to a vector of all the trading
+     * dates inbetween which do not fall on weekends.
+     *
+     * @param	startDate	the start date of the range
+     * @param	endDate		the end date of the range
+     * @return	a vector of all the trading dates inbetween
+     */
     public static Vector dateRangeToTradingDateVector(TradingDate startDate,
 						      TradingDate endDate) {
 	Vector dates = new Vector();

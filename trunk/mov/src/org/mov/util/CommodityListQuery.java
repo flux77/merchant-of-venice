@@ -8,8 +8,26 @@ import javax.swing.*;
 import org.mov.quote.*;
 import org.mov.ui.TextDialog;
 
+/**
+ * A set of dialogs used for querying the user for commodities either
+ * by name or symbol.
+ */
 public class CommodityListQuery {
 
+    private CommodityListQuery() {
+	// Cannot instantiate this class
+    }
+
+    /**
+     * Open a new <code>CommodityListQuery</code> dialog. Ask the user
+     * to enter a partial name of a company and return the appropriate
+     * symbol.
+     *
+     * @param	parent	the parent desktop
+     * @param	title	the title of the dialog
+     * @return	a sorted set containing a single commodity string or
+     * <code>null</code> if the user cancelled the dialog
+     */
     public static SortedSet getCommodityByName(JDesktopPane parent, 
 					       String title) {
 	SortedSet companySet;
@@ -62,6 +80,16 @@ public class CommodityListQuery {
 	return companySet;
     }
 
+    /**
+     * Open a new <code>CommodityListQuery</code> dialog. Ask the user
+     * to enter a list of company symbols. It will test to make each is
+     * a valid symbol.
+     *
+     * @param	parent	the parent desktop
+     * @param	title	the title of the dialog
+     * @return	a sorted set containing at least one company symbol string or
+     * <code>null</code> if the user cancelled the dialog
+     */
     public static SortedSet getCommoditiesByCode(JDesktopPane parent, 
 						 String title) {
 	SortedSet companySet;
@@ -139,7 +167,8 @@ public class CommodityListQuery {
     }
 
     // Convert space separated list into vector of compay symbols
-    // e.g "CBA WBC TLS" -> [CBA, TLS, WBC]
+    // e.g "CBA WBC TLS" -> [CBA, TLS, WBC]. This should probably be
+    // in the Converter class.
     private static SortedSet stringToSortedSet(String string) {
 	int space;
 	Vector vector = new Vector();

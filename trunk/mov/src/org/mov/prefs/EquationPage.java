@@ -334,16 +334,7 @@ functionList.getSelectionModel().clearSelection();
      * @return	the window title.
      */
     public String getTitle() {
-        return "Functions preferences";
-    }
-    
-    /**
-     * Return menu bar for quote source preferences module.
-     *
-     * @return	the menu bar.
-     */
-    public JMenuBar getJMenuBar() {
-        return null;
+        return "Functions";
     }
     
     public void changedUpdate(javax.swing.event.DocumentEvent documentEvent) {

@@ -28,6 +28,11 @@ import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 
+/**
+ * This package defines a single help page that can be viewed by the
+ * {@link HelpModule} help browser. The help page is actually a node in a tree
+ * so a help page can contain child pages - creating a hierarchichal document.
+ */
 public class HelpPage extends DefaultMutableTreeNode {
 
     // Location of help docs
@@ -39,6 +44,13 @@ public class HelpPage extends DefaultMutableTreeNode {
     private String text;
     private boolean isLoaded;
 
+    /**
+     * Create a new help page with the given chapter name. The page will display
+     * the contents of the help file in the src/org/mov/help/doc/ directory which
+     * has the same name as name with a trailing "html". 
+     *
+     * @param name the name of the chapter
+     */
     public HelpPage(String name) {
         super(name);
         this.name = name;
@@ -47,14 +59,30 @@ public class HelpPage extends DefaultMutableTreeNode {
         isLoaded = false;
     }
 
+    /**
+     * Get the name of the chapter.
+     *
+     * @return the chapter name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Create the text that a HTML link would have if it pointed to us. This
+     * is also the name of the file that contains the page.
+     *
+     * @return the page link
+     */
     public String getLink() {
         return link;
     }
 
+    /**
+     * Return the HTML text in this page.
+     *
+     * @return the HTML text 
+     */
     public String getText() {
         // Make sure page is loaded
         loadText();
@@ -62,6 +90,13 @@ public class HelpPage extends DefaultMutableTreeNode {
         return text;
     }
 
+    /**
+     * Search the document tree, starting with this node and return the first
+     * document that has the given link. Or NULL if not found.
+     *
+     * @param link the page link to search for
+     * @return the page
+     */
     public HelpPage findPageWithLink(String link) {
         for(Enumeration enumeration = preorderEnumeration(); 
             enumeration.hasMoreElements();) {
@@ -75,12 +110,14 @@ public class HelpPage extends DefaultMutableTreeNode {
 
     }
 
+    // Convert the given chapter name to link
     private String nameToLink(String name) {
         String link = name.concat(".html");
         
         return link;
     }
 
+    // Load the help page from disk
     private void loadText() {
 
         if(!isLoaded) {
@@ -113,6 +150,12 @@ public class HelpPage extends DefaultMutableTreeNode {
         }
     }    
 
+    /**
+     * Load the index of the help documentation. This will create a tree of
+     * HelpPages for each chapter in the document. The pages' text won't be loaded.
+     *
+     * @return the root help page
+     */
     public static HelpPage loadIndex() {
         HelpPage index = null;
         Document document = loadIndexDocument();
@@ -130,6 +173,7 @@ public class HelpPage extends DefaultMutableTreeNode {
         return index;
     }
 
+    // Recurse through the index file creating help pages
     private static void buildIndex(HelpPage index, Element root) {
         Node node = root.getFirstChild();
        
@@ -153,6 +197,7 @@ public class HelpPage extends DefaultMutableTreeNode {
         }
     }
 
+    // This loads the index.xml file which contains the index.
     private static Document loadIndexDocument() {
         Document document = null;
 

@@ -69,7 +69,7 @@ public class HighLowBarGraph extends AbstractGraph {
 	int xCoordinate, lowY, highY, closeY;
 	Double dayLowY, dayHighY, dayCloseY;
 	Iterator iterator = xRange.iterator();
-	int i = 0;
+	int i = 0;    int halfbarWidth=(int)(0.309 * horizontalScale);//bryan    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
 
 	while(iterator.hasNext()) {
 
@@ -110,13 +110,13 @@ public class HighLowBarGraph extends AbstractGraph {
 						verticalScale);
 		
 		// Draw bar
-		g.drawLine(xCoordinate, lowY, xCoordinate, highY);
+//		g.drawLine(xCoordinate, lowY, xCoordinate, highY);		g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, lowY, xCoordinate+halfbarWidth+1 +halfBlankWidth, highY);//bryan
 
 		// Draw perpendicular line indicating day close
-		g.drawLine(xCoordinate, closeY,
-			   (int)(xCoordinate +
-				 DAY_CLOSE_BAR_WIDTH * horizontalScale),
-			   closeY);
+//		g.drawLine(xCoordinate, closeY,//
+//			   (int)(xCoordinate +//
+//				 DAY_CLOSE_BAR_WIDTH * horizontalScale),//
+//			   closeY);		g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, closeY,				   (int)(xCoordinate + DAY_CLOSE_BAR_WIDTH * horizontalScale),				   closeY);		
 	    }
 	    i++;
 	}

@@ -100,7 +100,7 @@ public class QuoteRange implements Cloneable {
      *
      * @param symbols   list of symbols
      * @param firstDate earliest date
-     * @param lsatDate  latest date
+     * @param lastDate  latest date
      */
     public QuoteRange(List symbols, TradingDate firstDate,
 		      TradingDate lastDate) {
@@ -146,9 +146,9 @@ public class QuoteRange implements Cloneable {
      * Create a quote range that represents the given symbol between 
      * the first and the last dates given (inclusive).
      *
-     * @param   symbol  the symbol
+     * @param symbol  the symbol
      * @param firstDate earliest date
-     * @param lsatDate  latest date
+     * @param lastDate  latest date
      */
     public QuoteRange(Symbol symbol, TradingDate firstDate,
 		      TradingDate lastDate) {
@@ -185,7 +185,7 @@ public class QuoteRange implements Cloneable {
      * @param type      the type, one of {@link #ALL_ORDINARIES}, {@link #ALL_SYMBOLS},
      *                  {@link #MARKET_INDICES}
      * @param firstDate earliest date
-     * @param lsatDate  latest date
+     * @param lastDate  latest date
      */ 
     public QuoteRange(int type, TradingDate firstDate, TradingDate lastDate) {
 

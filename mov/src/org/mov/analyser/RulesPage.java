@@ -171,10 +171,10 @@ public class RulesPage extends JPanel implements AnalyserPage {
 	}
 
 	try {
-            sellRule = null;
 	    sellRule = Parser.parse(variables, sellRuleString);
 	}
 	catch(ExpressionException e) {
+            sellRule = null;
             JOptionPane.showInternalMessageDialog(desktop, 
                                                   "Error parsing sell rule: " +
                                                   e.getReason(),
@@ -185,6 +185,8 @@ public class RulesPage extends JPanel implements AnalyserPage {
 	}
 
         // Now try reading the ranges
+        aRange = bRange = cRange = 0;
+
 	try {
 	    if(!aRangeTextField.getText().equals(""))
 		aRange = 

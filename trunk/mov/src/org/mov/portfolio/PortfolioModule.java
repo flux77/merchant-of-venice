@@ -470,8 +470,7 @@ public class PortfolioModule extends JPanel implements Module,
 	    JOptionPane.showInternalConfirmDialog(desktop,
 						  "Are you sure you wish to delete this portfolio?",
 						  "Delete Portfolio",
-						  JOptionPane.YES_NO_OPTION,
-						  JOptionPane.WARNING_MESSAGE);
+						  JOptionPane.YES_NO_OPTION);
 	if(option == JOptionPane.YES_OPTION) {
 	    PreferencesManager.deletePortfolio(portfolio.getName());
 

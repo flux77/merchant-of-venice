@@ -371,7 +371,7 @@ public class CommandManager {
 					   Locale.getString("ENTER_WATCH_SCREEN_NAME"),
 					   Locale.getString("NEW_WATCH_SCREEN"));
 	String watchScreenName = dialog.showDialog();
-
+	
         if(watchScreenName != null && watchScreenName.length() > 0) {
             WatchScreen watchScreen = new WatchScreen(watchScreenName);
 
@@ -639,6 +639,49 @@ public class CommandManager {
         thread.start();
         }*/
 
+
+    /**
+     * Displays a graph of closing prices for an index, based on a list of symbols.
+     * The stock(s) is/are determined by a user prompt if a set of symbols
+     * is not supplied.
+     *
+     * @param	symbols	Optional. Set of symbols to graph.
+     */
+    public void graphIndexBySymbol(final java.util.List symbols) {
+
+        final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    SortedSet symbolsCopy;
+
+                    if(symbols == null)
+                        symbolsCopy =
+			    SymbolListDialog.getSymbols(desktop,
+							Locale.getString("GRAPH_BY_SYMBOLS"));
+                    else {
+                        // If we were given the list of symbols - then check each one exists
+                        // before trying to graph it. Abort if any are not found.
+                        symbolsCopy = new TreeSet(symbols);
+
+                        for(Iterator iterator = symbolsCopy.iterator(); iterator.hasNext();) {
+                            Symbol symbol = (Symbol)iterator.next();
+
+                            if(!QuoteSourceManager.getSource().symbolExists(symbol)) {
+                                JOptionPane.showInternalMessageDialog(desktop,
+                                                                      Locale.getString("NO_QUOTES_SYMBOL",
+                                                                                       symbol.toString()),
+                                                                      Locale.getString("INVALID_SYMBOL_LIST"),
+                                                                      JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                        }
+                    }
+
+                    graphIndex(symbolsCopy);
+                }
+            });
+        thread.start();
+    }
+
     /**
      * Internal function for generic setup of graph modules
      *
@@ -694,6 +737,58 @@ public class CommandManager {
 
             ProgressDialogManager.closeProgressDialog(progress);
         }
+    }
+
+    /**
+     * Internal function for generic setup of index graph modules
+     *
+     * @param companySet the list of stock symbols to graph
+     */
+    private void graphIndex(SortedSet symbols) {
+
+        if(symbols != null) {
+            ChartModule chart = new ChartModule(desktop);
+            Thread thread = Thread.currentThread();
+            ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+            Iterator iterator = symbols.iterator();
+            QuoteBundle quoteBundle = null;
+            GraphSource dayClose = null;
+            Graph graph = null;
+
+            String title = symbols.toString();
+            title = title.substring(1, title.length() - 1);
+
+            int progressValue = 0;
+
+            if(symbols.size() > 1) {
+                progress.setIndeterminate(false);
+                progress.setMaximum(symbols.size());
+                progress.setMaster(true);
+            }
+            else
+                progress.setIndeterminate(true);
+
+            progress.show(Locale.getString("GRAPH_SYMBOLS", title));
+
+	    quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbols));
+
+	    dayClose =
+		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+	    graph = new LineGraph(dayClose);
+	    chart.add(graph, quoteBundle, 0);
+	    chart.redraw();
+	    
+	    if(symbols.size() > 1)
+		progress.increment();
+	
+
+	    if (!thread.isInterrupted())
+		desktopManager.newFrame(chart);
+	
+	
+	    ProgressDialogManager.closeProgressDialog(progress);
+	}
+        
     }
 
     /**

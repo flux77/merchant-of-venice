@@ -7,7 +7,7 @@ package org.mov.util;
  * from the other <code>float</code> values used in that object. This way
  * we can format it differently.
  */
-public class Change {
+public class Change implements Comparable {
     double change;
 
     /**
@@ -28,4 +28,25 @@ public class Change {
 	return change;
     }
 
+    /**
+     * Compare two change objects.
+     *
+     * @param	change	change object to compare to
+     * @return	the value <code>0</code> if the change objects are equal;
+     * <code>1</code> if this change object is after the specified change
+     * object or
+     * <code>-1</code> if this change object is before the specified change
+     * object
+     */
+    public int compareTo(Object object) {
+
+	Change change = (Change)object;
+
+	if(getChange() < change.getChange())
+	    return -1;
+	if(getChange() > change.getChange())
+	    return 1;
+
+	return 0;
+    }	    
 }

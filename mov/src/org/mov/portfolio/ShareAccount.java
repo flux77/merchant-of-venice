@@ -8,11 +8,8 @@ import org.mov.quote.*;
 
 public class ShareAccount implements Account {
     
-    // History of trades
-    private Vector trades = new Vector();
-
     // Current stock holdings
-    private HashMap holdings = new HashMap();
+    private HashMap stockHoldings = new HashMap();
 
     // Name of share portfolio
     private String name;
@@ -25,47 +22,51 @@ public class ShareAccount implements Account {
 	return name;
     }
 
-    public float getValue(QuoteCache cache, TradingDate date) 
-	throws EvaluationException { 
-	Set set = getStockHoldings();
+    public float getValue(QuoteCache cache, TradingDate date) {
+
+	Set set = stockHoldings.keySet();
 	Iterator iterator = set.iterator();
-	StockHolding holding;
 	float value = 0;
 
 	while(iterator.hasNext()) {
-	    holding = (StockHolding)iterator.next();
-	    value += cache.getQuote(holding.getSymbol(), Token.DAY_CLOSE_TOKEN,
-				    date) *
-		holding.getShares();
+	    String symbol = (String)iterator.next();
+	    StockHolding holding = (StockHolding)stockHoldings.get(symbol);
+
+	    try {
+		value += cache.getQuote(holding.getSymbol().toLowerCase(), 
+					Token.DAY_CLOSE_TOKEN,
+					date) *
+		    holding.getShares();
+	    }
+	    catch(EvaluationException e) {
+		// shouldn't happen
+	    }
 	}
 	
 	return value;
     }
 
-    public void trade(TradingDate date, int trade, String symbol, int shares, 
-		      float price, float tradeCost) {
+    public void transaction(Transaction transaction) {
 	
-	// Add record of trade
-	trades.add(new Trade((TradingDate)date.clone(), trade, symbol,
-			     shares, price, tradeCost));
+	String symbol = transaction.getSymbol();
+	int shares = transaction.getShares();
+	int type = transaction.getType();
 
 	// Get current holding in this stock
-	StockHolding holding = (StockHolding)holdings.get(symbol);
+	StockHolding holding = 
+	    (StockHolding)stockHoldings.get(symbol);
 
-	switch(trade) {
-	case(Trade.BUY):
+	if(type == Transaction.ACCUMULATE ||
+	   type == Transaction.DIVIDEND_DRP) {
 
 	    // Do we already own the stock? If so accumulate
 	    if(holding != null)
 		holding.accumulate(shares);
 	    else // otherwise add new stock to portfolio
-		holdings.put((Object)symbol, new StockHolding(symbol,
-							      shares));
-
-	    break;
-	    
-	case(Trade.SELL):
-
+		stockHoldings.put((Object)symbol, new StockHolding(symbol,
+								   shares));
+	}
+	else if(type == Transaction.REDUCE) {
 	    // ignore trying to sell stock we dont own
 	    if(holding != null) {
 		holding.reduce(shares);
@@ -73,22 +74,24 @@ public class ShareAccount implements Account {
 		// do we have any left? if not remove stock holding from
 		// holdings
 		if(holding.getShares() <= 0)
-		    holdings.remove(holding);
+		    stockHoldings.remove((Object)symbol);
 	    }
-
-	    break;
 	}
     }
 
     public StockHolding get(String symbol) {
-	return (StockHolding)holdings.get(symbol);
+	return (StockHolding)stockHoldings.get(symbol);
     }
 
-    public Set getStockHoldings() {
-	return holdings.keySet();
+    public HashMap getStockHoldings() {
+	return stockHoldings;
+    }
+
+    public int getType() {
+	return Account.SHARE_ACCOUNT;
     }
 
     public int size() {
-	return holdings.size();
+	return stockHoldings.size();
     }
 }

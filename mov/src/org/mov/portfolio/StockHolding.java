@@ -17,11 +17,11 @@ public class StockHolding {
 	this.shares -= shares;
     }
 
-    String getSymbol() {
+    public String getSymbol() {
 	return symbol;
     }
 
-    int getShares() {
+    public int getShares() {
 	return shares;
     }
 }

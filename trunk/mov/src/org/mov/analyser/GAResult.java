@@ -105,7 +105,10 @@ public class GAResult {
         String temp = sellRule.toString();
         String retValue = null;
         for (int ii=0; ii<individual.size(); ii++) {
-            retValue = temp.replaceAll(individual.parameter(ii),Double.toString((individual.value(ii))));
+            if(individual.type(ii)==Expression.FLOAT_TYPE)
+                retValue = temp.replaceAll(individual.parameter(ii),Double.toString((individual.value(ii))));
+            else    
+                retValue = temp.replaceAll(individual.parameter(ii),Integer.toString(new Double(individual.value(ii)).intValue()));
             temp = retValue;
         }
         return retValue;

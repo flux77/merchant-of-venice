@@ -18,6 +18,7 @@
 
 package org.mov.portfolio;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JComboBox;
@@ -58,6 +59,8 @@ public class PortfolioSymbolComboBox extends JComboBox
 	removeAllItems();
 	
 	List symbols = portfolio.getSymbolsTraded();
+	Collections.sort(symbols);
+
         for(Iterator iterator = symbols.iterator(); iterator.hasNext();) 
             addItem(iterator.next());
     }

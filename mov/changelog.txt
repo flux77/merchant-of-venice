@@ -9,6 +9,7 @@ Changes for Venice, 0.4 alpha 14/Mar/2004
 
 * Internationalised.
   - Chinese translation added (Bryan Lin).
+  - French translation added (Quentin Bossard).
   - Italian translation added (Alberto Nacher).
 
 * Updates to the Gondola Language:

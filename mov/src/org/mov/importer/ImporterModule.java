@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.importer;
@@ -44,7 +44,7 @@ import javax.swing.event.*;
  * imported from the internet, a range of quote file formats and can
  * be imported to a database or another quote file.
  */
-public class ImporterModule extends JPanel 
+public class ImporterModule extends JPanel
     implements Module, ActionListener {
 
     private JDesktopPane desktop;
@@ -77,7 +77,7 @@ public class ImporterModule extends JPanel
     public ImporterModule(JDesktopPane desktop) {
 
 	this.desktop = desktop;
-	propertySupport = new PropertyChangeSupport(this);       
+	propertySupport = new PropertyChangeSupport(this);
 
 	setLayout(new BorderLayout());
 
@@ -157,7 +157,7 @@ public class ImporterModule extends JPanel
 		yearComboBox.addItem("Quotes From " + Integer.toString(year));
 	    }
 	    yearComboBox.addItem("Latest Quotes");
-	    yearComboBox.setSelectedItem(p.get("internetYear", 
+	    yearComboBox.setSelectedItem(p.get("internetYear",
 					       "Latest Quotes"));
 
 	    c.gridwidth = GridBagConstraints.REMAINDER;
@@ -212,7 +212,7 @@ public class ImporterModule extends JPanel
 	    gridbag.setConstraints(toFileName, c);
 	    importToPanel.add(toFileName);
 
-	    importOptions.add(importToPanel);	    
+	    importOptions.add(importToPanel);	
 	}
 
 	add(importOptions, BorderLayout.CENTER);
@@ -255,7 +255,7 @@ public class ImporterModule extends JPanel
 
 	// Import button is only enabled if the user has selected at least
 	// one destination
-	importButton.setEnabled(toFiles.isSelected() || 
+	importButton.setEnabled(toFiles.isSelected() ||
 				(toDatabase.isSelected() &&
 				 toDatabase.isEnabled()));
     }
@@ -271,9 +271,9 @@ public class ImporterModule extends JPanel
            //	   e.getSource() == fromInternet ||
 	   e.getSource() == fromDatabase ||	
 	   e.getSource() == toDatabase ||
-	   e.getSource() == toFiles) {	    
+	   e.getSource() == toFiles) {	
 	    checkDisabledStatus();
-	} 
+	}
 	else if(e.getSource() == cancelButton) {
 	    // Tell frame we want to close
 	    propertySupport.
@@ -294,19 +294,14 @@ public class ImporterModule extends JPanel
 		    public void run() {
 			importQuotes();
 		    }
-		};	    
+		};	
 	    importQuotes.start();
 	}
     }
 
     // Import quotes
     private void importQuotes() {
-
-	//
-	// Step one: Open import data source and/or get list of files to import
-	//
- 
-	QuoteSource source = null;
+        QuoteSource source = null;
 	Vector dates = new Vector();
 
 	// If we are importing from files we'll need to open a dialog
@@ -321,31 +316,29 @@ public class ImporterModule extends JPanel
 		Vector fileNames = Converter.toFileNameVector(files);
 
 		// Cancel if no files were selected (one day = one file)
-		if(fileNames.size() == 0)
-		    return;
+		if(fileNames.size() != 0) {
 
-		// Format is one in combo box - unless its disable
-		// which means we honour the format choosen in the
-		// user's preferences.
-		String format;
-		if(formatComboBox.isEnabled())
-		    format = (String)formatComboBox.getSelectedItem();
-		else {
-		    Preferences p = 
-			PreferencesManager.getUserNode("/quote_source/files");
-		    format = p.get("format", "MetaStock");
-		}
-		
-		source = new FileQuoteSource(format, fileNames);
+                    // Format is one in combo box - unless its disable
+                    // which means we honour the format choosen in the
+                    // user's preferences.
+                    String format;
+                    if(formatComboBox.isEnabled())
+                        format = (String)formatComboBox.getSelectedItem();
+                    else {
+                        Preferences p =
+                            PreferencesManager.getUserNode("/quote_source/files");
+                        format = p.get("format", "MetaStock");
+                    }
 
-		// Get dates contained in files
-		dates = source.getDates();
+                    source = new FileQuoteSource(format, fileNames);
+                    performImport(source);
+                }
 	    }
-	    else
-		return; // if the user cancelled then dont import
 	}
 
 	// Importing from the net
+
+        /*
 	else if(fromInternet.isSelected()) {
 	    // Create dates array from combo box
 	    String start = (String)yearComboBox.getSelectedItem();
@@ -354,21 +347,21 @@ public class ImporterModule extends JPanel
 	    // Otherwise go from the last day in the current qoute source
 	    if(start.equals("Latest Quotes")) {
 		if(toDatabase.isSelected()) {
-		    QuoteSource databaseSource = 
+		    QuoteSource databaseSource =
 			QuoteSourceManager.createDatabaseQuoteSource();
 		    startDate = databaseSource.getLastDate();
 		}
 
 		if(toFiles.isSelected()) {
-		   
+		
 		    TradingDate fileStartDate;
-		    QuoteSource fileQuoteSource = 
+		    QuoteSource fileQuoteSource =
 			QuoteSourceManager.createFileQuoteSource();
 
 		    fileStartDate = fileQuoteSource.getLastDate();
 
 		    // Pick the earliest of the two dates
-		    if(fileStartDate != null && 
+		    if(fileStartDate != null &&
 		       fileStartDate.before(startDate))
 		    	startDate = fileStartDate;
 		}
@@ -379,11 +372,11 @@ public class ImporterModule extends JPanel
 
 	    else {
 		// Year is in last 4 characters
-		String yearString = 
+		String yearString =
 		    start.substring(start.length() - 4,
 				    start.length());
 
-		startDate = new TradingDate(Integer.parseInt(yearString), 
+		startDate = new TradingDate(Integer.parseInt(yearString),
 					    1, 1);
 	    }
 
@@ -399,81 +392,82 @@ public class ImporterModule extends JPanel
 	    source = null;
 	    //	    source = QuoteSourceManager.createInternetQuoteSource();
 	}
+        */
 
 	// Or database
 	else {
 	    source = QuoteSourceManager.createDatabaseQuoteSource();
 
 	    // Export all dates in database
-	    dates = source.getDates(); 
+            performImport(source);
 	}
-	//
-	// Step two: Import
-	//
-
-	// Sort date array so user gets a better progress rather than
-	// being shown the programme is importing random dates
-	Comparator sortByDate = 
-	    new TradingDateComparator(TradingDateComparator.FORWARDS);
-	TreeSet sortedDates = new TreeSet(sortByDate);
-	sortedDates.addAll(dates);
-
-	if(sortedDates.size() > 0)
-	    performImport(source, sortedDates);
-	
     }
 
     // Perform actual import given source and/or file list
-    private void performImport(QuoteSource source, Set dates) {
-        ProgressDialog p = ProgressDialogManager.getProgressDialog();
-        p.setIndeterminate(false);
-        p.setProgress(0);
-        p.setMaximum(dates.size());
-        p.show("Importing");
-	
-	TradingDate date;
-	Iterator iterator = dates.iterator();
-	Vector dayQuotes;
+    private void performImport(QuoteSource source) {
+
+	Thread thread = Thread.currentThread();
+
+        // Get a list of all dates between the first and last
+        Vector dateRange =
+            Converter.dateRangeToTradingDateVector(source.getFirstDate(),
+                                                   source.getLastDate());
+
+        // Now set up progress dialog to display date by date progress
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+        progress.setIndeterminate(false);
+        progress.setMaximum(dateRange.size());
+        progress.setProgress(0);
+        progress.setMaster(true);
+        progress.show("Importing");
 
 	boolean isToFiles = toFiles.isSelected() && toFiles.isEnabled();
-	boolean isToDatabase = 
-	    toDatabase.isSelected() && toDatabase.isEnabled();
+	boolean isToDatabase = toDatabase.isSelected() && toDatabase.isEnabled();
 	
 	// Import a day at a time
-	while(iterator.hasNext()) {
-	    date = (TradingDate)iterator.next();
-	    
-	    p.setNote("Importing " + date.toString("d?/m?/yyyy"));
+        for(Iterator iterator = dateRange.iterator(); iterator.hasNext();) {
+	    TradingDate date = (TradingDate)iterator.next();
 
-	    // Get the days quotes
-	    dayQuotes = 
-		source.loadQuoteRange(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
-	    
-	    // file -> file 
-	    if(fromFiles.isSelected() && isToFiles) {
-		FileQuoteSource fileQuoteSource =
-		    (FileQuoteSource)source;
-		importFileToFile(fileQuoteSource.
-				 getFileForDate(date));
-	    }			
-	    
-	    // anything but file -> file
-	    if(!fromFiles.isSelected() && isToFiles) {
-		importToFile(dayQuotes, date);
-	    }
-	    
-	    // anything -> database
-	    if(isToDatabase) 
-		importToDatabase(dayQuotes, date);
-	    
-	    p.increment();
+            // Check to see if the source has any quotes for that date...
+            if(source.containsDate(date)) {
+
+                progress.setNote("Importing " + date.toString("d?/m?/yyyy"));
+
+                // Load quotes into cache then get them into a bundle
+                QuoteRange quoteRange = new QuoteRange(QuoteRange.ALL_SYMBOLS, date);
+                source.loadQuoteRange(quoteRange);
+                QuoteBundle quoteBundle = new QuoteBundle(quoteRange);
+
+                // file -> file
+                if(fromFiles.isSelected() && isToFiles) {
+                    FileQuoteSource fileQuoteSource =
+                        (FileQuoteSource)source;
+                    importFileToFile(fileQuoteSource.
+                                     getFileForDate(date));
+                }			
+
+                // anything but file -> file
+                if(!fromFiles.isSelected() && isToFiles) {
+                    importToFile(quoteBundle, date);
+                }
+
+                // anything -> database
+                if(isToDatabase)
+                    importToDatabase(quoteBundle, date);
+
+                // Stop if the user hit cancel
+                if(thread.isInterrupted())
+                    break;
+            }
+
+            progress.increment();
 	}
 	
-	// This makes sure the next query uses the new imported 
+	// This makes sure the next query uses the new imported
 	// quotes
 	QuoteSourceManager.flush();	
 
-	ProgressDialogManager.closeProgressDialog(p);
+	ProgressDialogManager.closeProgressDialog(progress);	
     }
 
     // Import file name containing a day's quotes into the file list
@@ -490,7 +484,7 @@ public class ImporterModule extends JPanel
 	    if(traverseFileName.equals(fileName))
 		return; // exit its already there
 	}
-       
+
 	// If we got here its not so add it
 	fileList.add((Object)fileName);
 
@@ -500,10 +494,10 @@ public class ImporterModule extends JPanel
 
     // Create a file containing the given day's quotes and import the file name
     // into file list.
-    private void importToFile(Vector dayQuotes, TradingDate date) {
+    private void importToFile(QuoteBundle quoteBundle, TradingDate date) {
 
 	// Create file name to store file quotes in
-	String template = toFileName.getText(); // get file name format 
+	String template = toFileName.getText(); // get file name format
 	String fileName = date.toString(template); // insert date
 
 	// Get filter we are using
@@ -515,37 +509,35 @@ public class ImporterModule extends JPanel
 	try {
 	    FileWriter fileOut = new FileWriter(fileName);
 	    PrintWriter out = new PrintWriter(new BufferedWriter(fileOut));
- 
-	    // Iterate through stocks printing them to file
-	    Iterator iterator = dayQuotes.iterator();
-	    Quote quote;
 
-	    while(iterator.hasNext()) {
-		quote = (Quote)iterator.next();
+	    // Iterate through stocks printing them to file
+            for(Iterator iterator = quoteBundle.iterator(); iterator.hasNext();) {
+                Quote quote = (Quote)iterator.next();
 		out.println(filter.toString(quote));
-	    }
+            }
+
 	    out.close();
+
+            // Finally add the file we just created to the list of files
+            importFileToFile(fileName);
 	}
 	catch(java.io.IOException e) {
 	    org.mov.ui.DesktopManager.
 		showErrorMessage("Error writing to file: " +
 				 fileName);
 	}
-
-	// Finally add the file we just created to the list of files
-	importFileToFile(fileName);
     }
 
     // Import a day's quotes into the database
-    private void importToDatabase(Vector dayQuotes, TradingDate date) {
+    private void importToDatabase(QuoteBundle quoteBundle, TradingDate date) {
 
 	Preferences p = PreferencesManager.getUserNode("/quote_source/database");
 	String databaseName = p.get("dbname", "shares");
 
-	if(databaseSource == null) 
+	if(databaseSource == null)
 	    databaseSource = QuoteSourceManager.createDatabaseQuoteSource();
 
-	databaseSource.importQuotes(databaseName, dayQuotes, date);
+	databaseSource.importQuotes(databaseName, quoteBundle, date);
     }
 
     // Save the configuration on screen to the preferences file
@@ -659,7 +651,7 @@ public class ImporterModule extends JPanel
 	int bundleNumber = 1;
 
 	while(!complete) {
-	    partialFileList = p.get("list" + 
+	    partialFileList = p.get("list" +
 				    Integer.toString(bundleNumber), "");
 
 	    if(partialFileList.length() > 1) {
@@ -717,7 +709,7 @@ public class ImporterModule extends JPanel
 	String bundle;
 
 	while(beginBundle < fileList.length()) {
-	    endBundle = beginBundle + bundleSize; 
+	    endBundle = beginBundle + bundleSize;
 	    if(endBundle > fileList.length())
 		endBundle = fileList.length();
 
@@ -730,9 +722,9 @@ public class ImporterModule extends JPanel
 
 	// Delete any old bundles that might still contain quotes
 	while(!p.get("list" + Integer.toString(bundleNumber), "").equals("")) {
-	    p.put("list" + Integer.toString(bundleNumber++), "");	    
+	    p.put("list" + Integer.toString(bundleNumber++), "");	
 	}
-    }    
+    }
 }
 
 

@@ -71,7 +71,7 @@ public class GPPage extends JPanel implements AnalyserPage {
         }
        
         HashMap settingsInitPop =
-                PreferencesManager.loadAnalyserPageSettings(key + getClass().getName() + "_gp_initial_population");
+                PreferencesManager.loadAnalyserPageSettings(key + getClass().getName() + "GPInitialPopulation");
 
         Iterator iteratorInitPop = settingsInitPop.keySet().iterator();
 
@@ -89,15 +89,15 @@ public class GPPage extends JPanel implements AnalyserPage {
         
         HashMap settings = new HashMap();
         HashMap settingsInitPop =
-                PreferencesManager.loadAnalyserPageSettings(key + getClass().getName() + "_gp_initial_population");
+                PreferencesManager.loadAnalyserPageSettings(key + getClass().getName() + "GPInitialPopulation");
         HashMap settingsInitPopCommon = new HashMap();
 
         GPPageParameters.save(settings);
-        GPPageInitialPopulation.save(settingsInitPopCommon, settingsInitPop, key + getClass().getName() + "_gp_initial_population");
+        GPPageInitialPopulation.save(settingsInitPopCommon, settingsInitPop, "GPInitialPopulation");
 
         PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
                                                     settings);
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName() + "_gp_initial_population",
+        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName() + "GPInitialPopulation",
                                                     settingsInitPop);
         PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
                                                     settingsInitPopCommon);

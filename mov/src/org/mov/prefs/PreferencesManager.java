@@ -122,6 +122,16 @@ public class PreferencesManager {
 	return settings;
     }
 
+    public static int loadMaximumCachedQuotes() {
+	Preferences prefs = getUserNode("/cache");
+        return prefs.getInt("maximumQuotes", 100000);
+    }
+
+    public static void saveMaximumCachedQuotes(int maximumCachedQuotes) {
+        Preferences prefs = getUserNode("/cache");
+        prefs.putInt("maximumQuotes", maximumCachedQuotes);
+    }
+
     public static void saveAnalyserPageSettings(String key, HashMap settings) {
 	Preferences p = getUserNode("/analyser/" + key);
 

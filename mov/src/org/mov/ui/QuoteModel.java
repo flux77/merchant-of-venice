@@ -200,7 +200,7 @@ public class QuoteModel extends AbstractTableModel {
             
         default:
             EquationColumn equationColumn = (EquationColumn)getColumn(column);
-            return equationColumn.getResult(quote.getSymbol());
+            return equationColumn.getResult(quote.getSymbol(), quote.getDate());
         }
     }
 

@@ -61,87 +61,82 @@ public class CandleStickGraph extends AbstractGraph {
     }
 
 	// See Graph.java
-	public void render(Graphics g, Color c, int xoffset, int yoffset,
-			double horizontalScale, double verticalScale,
-			double bottomLineValue, List xRange) {
+    public void render(Graphics g, Color c, int xoffset, int yoffset,
+        double horizontalScale, double verticalScale, double bottomLineValue,
+        List xRange) {
 
-		int xCoordinate, lowY, highY, closeY, openY;
-		Double dayLowY, dayHighY, dayCloseY, dayOpenY;
-		Iterator iterator = xRange.iterator();
-		int i = 0;
+        int xCoordinate, lowY, highY, closeY, openY;
+        Double dayLowY, dayHighY, dayCloseY, dayOpenY;
+        Iterator iterator = xRange.iterator();
+        int i = 0;
 
-		while (iterator.hasNext()) {
+        while (iterator.hasNext()) {
 
-			Comparable x = (Comparable) iterator.next();
+            Comparable x = (Comparable) iterator.next();
 
-			// Skip until our start date
-			if (x.compareTo(dayClose.getStartX()) < 0) {
-				i++;
-				continue;
-			}
+            // Skip until our start date
+            if (x.compareTo(dayClose.getStartX()) < 0) {
+              i++;
+              continue;
+            }
 
-			// If our graph is finished exit this loop
-			if (x.compareTo(dayClose.getEndX()) > 0)
-				break;
+            // If our graph is finished exit this loop
+            if (x.compareTo(dayClose.getEndX()) > 0)
+                break;
 
-			// Otherwise draw bar
-			dayOpenY = dayOpen.getY(x);
-			dayLowY = dayLow.getY(x);
-			dayHighY = dayHigh.getY(x);
-			dayCloseY = dayClose.getY(x);
+            // Otherwise draw bar
+            dayOpenY = dayOpen.getY(x);
+            dayLowY = dayLow.getY(x);
+            dayHighY = dayHigh.getY(x);
+            dayCloseY = dayClose.getY(x);
 
-			// The graph is allowed to skip points
-			if (dayLowY != null && dayHighY != null && dayCloseY != null
-					&& dayOpen != null) {
+            // The graph is allowed to skip points
+            if (dayLowY != null && dayHighY != null && dayCloseY != null
+                && dayOpen != null) {
 
-				xCoordinate = (int) (xoffset + horizontalScale * i);
+                xCoordinate = (int) (xoffset + horizontalScale * i);
 
-				openY = yoffset
-						- GraphTools.scaleAndFitPoint(dayOpenY.doubleValue(),
-								bottomLineValue, verticalScale);
-				lowY = yoffset
-						- GraphTools.scaleAndFitPoint(dayLowY.doubleValue(),
-								bottomLineValue, verticalScale);
-				highY = yoffset
-						- GraphTools.scaleAndFitPoint(dayHighY.doubleValue(),
-								bottomLineValue, verticalScale);
-				closeY = yoffset
-						- GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(),
-								bottomLineValue, verticalScale);
+                openY = yoffset
+                    - GraphTools.scaleAndFitPoint(dayOpenY.doubleValue(),
+                        bottomLineValue, verticalScale);
+                lowY = yoffset
+                    - GraphTools.scaleAndFitPoint(dayLowY.doubleValue(),
+                        bottomLineValue, verticalScale);
+                highY = yoffset
+                    - GraphTools.scaleAndFitPoint(dayHighY.doubleValue(),
+                        bottomLineValue, verticalScale);
+                closeY = yoffset
+                    - GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(),
+                        bottomLineValue, verticalScale);
 
-				// Draw bar
-				g.setColor(Color.BLACK);
-				g.drawLine(xCoordinate, lowY, xCoordinate, highY);
+                // Draw bar
+                g.setColor(Color.BLACK);
+                g.drawLine(xCoordinate, lowY, xCoordinate, highY);
 
-				if (closeY > openY) { // green candle : close higher than open
-					g.setColor(Color.RED);
-//					g.fillRect(xCoordinate - 2, openY, 4, closeY - openY);
-					g.fillRect((int) (xCoordinate - 0.2 * horizontalScale), openY, 
-							(int) (0.4 * horizontalScale) + 1, closeY - openY);
-					g.setColor(Color.BLACK);
-//					g.drawRect(xCoordinate - 2, openY, 4, closeY - openY); }
-					g.drawRect((int) (xCoordinate - 0.2 * horizontalScale),	openY, 
-							(int) (0.4 * horizontalScale) + 1, closeY - openY);
-				} else if (closeY < openY) { // red candle : open higher than
-											 // close
-					g.setColor(Color.GREEN);
-//					g.fillRect(xCoordinate - 2, closeY, 5, openY - closeY);
-					g.fillRect((int) (xCoordinate - 0.2 * horizontalScale),	closeY, 
-							(int) (0.4 * horizontalScale) + 1, openY - closeY);
-					g.setColor(Color.BLACK);
-//					g.drawRect(xCoordinate - 2, closeY, 5, openY - closeY);
-					g.drawRect((int) (xCoordinate - 0.2 * horizontalScale),	closeY, 
-							(int) (0.4 * horizontalScale) + 1, openY - closeY);
-				} else { // no candle
-					g.setColor(Color.BLACK);
-//					g.drawLine(xCoordinate - 2, openY, xCoordinate +2, openY);
-					g.drawLine((int) (xCoordinate - 0.2 * horizontalScale),	openY, 
-							(int) (xCoordinate + 0.2 * horizontalScale),	openY);
-				}
-			}
-			i++;
-		}
-	}
+                if (closeY > openY) { // green candle : close higher than open
+                    g.setColor(Color.RED);
+                    g.fillRect((int) (xCoordinate - 0.2 * horizontalScale), openY,
+                           (int) (0.4 * horizontalScale) + 1, closeY - openY);
+                    g.setColor(Color.BLACK);
+                    g.drawRect((int) (xCoordinate - 0.2 * horizontalScale), openY,
+                           (int) (0.4 * horizontalScale) + 1, closeY - openY);
+                } else if (closeY < openY) { // red candle : open higher than
+            	    // close
+                    g.setColor(Color.GREEN);
+                    g.fillRect((int) (xCoordinate - 0.2 * horizontalScale), closeY,
+                           (int) (0.4 * horizontalScale) + 1, openY - closeY);
+                    g.setColor(Color.BLACK);
+                    g.drawRect((int) (xCoordinate - 0.2 * horizontalScale), closeY,
+                           (int) (0.4 * horizontalScale) + 1, openY - closeY);
+                } else { // no candle
+                    g.setColor(Color.BLACK);
+                    g.drawLine((int) (xCoordinate - 0.2 * horizontalScale), openY,
+                       (int) (xCoordinate + 0.2 * horizontalScale), openY);
+                }
+            }
+            i++;
+        }
+  }
 
     /**
      * Get the tool tip text for the given X value and y coordinate.

@@ -327,8 +327,8 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	Vector query = 
 	    executeQuery("SELECT * FROM " + SHARE_TABLE_NAME +
-			 " WHERE " + DATE_FIELD +" >= '" + startDate + 
-			 "' AND " + DATE_FIELD +" <= '" + endDate + "' " + 
+			 " WHERE " + DATE_FIELD +" >= '" + startDate + "' " +
+			 " AND " + DATE_FIELD +" <= '" + endDate + "' " + 
 			 restrictTypeString(type) +
 			 " ORDER BY " + DATE_FIELD);
 
@@ -351,7 +351,7 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public Vector getQuotesForDate(TradingDate date, int type) {
 	return executeQuery("SELECT * FROM " + SHARE_TABLE_NAME + " " +
-			    "WHERE " + DATE_FIELD +" = '" + date );
+			    "WHERE " + DATE_FIELD + " = '" + date + "'");
     }
 
     /**
@@ -628,7 +628,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	
 	// This might take a while
 	boolean owner = 
-	    Progress.getInstance().open("Retreiving dates from database", 1);
+	    Progress.getInstance().open("Retrieving dates from database", 1);
 
 	try {
 	    // 1. Create the table

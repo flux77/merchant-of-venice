@@ -112,24 +112,37 @@ public class TransactionDialog extends JInternalFrame
 	// If the portfolio only has a cash account then dont display
 	// the share transactions
 	if(portfolio.countAccounts(Account.SHARE_ACCOUNT) > 0) {
-	    typeComboBox.addItem(Transaction.typeToString(Transaction.ACCUMULATE));
+            boolean haveShares = (portfolio.getSymbolsTraded().size() > 0);
+
+            typeComboBox.addItem(Transaction.typeToString(Transaction.ACCUMULATE));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.DEPOSIT));
-	    typeComboBox.addItem(Transaction.typeToString(Transaction.DIVIDEND));
-	    typeComboBox.addItem(Transaction.typeToString(Transaction.DIVIDEND_DRP));
+
+            if(haveShares) {
+                typeComboBox.addItem(Transaction.typeToString(Transaction.DIVIDEND));
+                typeComboBox.addItem(Transaction.typeToString(Transaction.DIVIDEND_DRP));
+            }
+
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.FEE));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.INTEREST));
-	    typeComboBox.addItem(Transaction.typeToString(Transaction.REDUCE));
+
+            if(haveShares)
+                typeComboBox.addItem(Transaction.typeToString(Transaction.REDUCE));
+
+            if(portfolio.countAccounts(Account.CASH_ACCOUNT) >= 2) 
+                typeComboBox.addItem(Transaction.typeToString(Transaction.TRANSFER));
+
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.WITHDRAWAL));
 	}
 	else {
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.DEPOSIT));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.FEE));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.INTEREST));
+
+            if(portfolio.countAccounts(Account.CASH_ACCOUNT) >= 2) 
+                typeComboBox.addItem(Transaction.typeToString(Transaction.TRANSFER));
+
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.WITHDRAWAL));
 	}
-
-	if(portfolio.countAccounts(Account.CASH_ACCOUNT) >= 2) 
-	    typeComboBox.addItem(Transaction.typeToString(Transaction.TRANSFER));
 
 	typeComboBox.addActionListener(this);
 

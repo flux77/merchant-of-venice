@@ -1,6 +1,5 @@
 /* Merchant of Venice - technical analysis software for the stock market.
    Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -49,7 +48,9 @@ public class AbstractTable extends SortedTable {
 
     // Default values for rendering table rows
     private static final Color backgroundColor = Color.white;
-    private static final Color alternativeBackgroundColor = new Color(237, 237, 237);
+    private static final Color alternativeBackgroundColor = new Color(237, 237, 237);   
+    private static final Color selectedBackgroundColor = Color.blue;   
+    private static final Color selectedForegroundColor = Color.white;
 
     // Images used for arrows representing when stock has gone up, down or is unchanged
     private String upImage = "org/mov/images/Up.png";
@@ -75,7 +76,7 @@ public class AbstractTable extends SortedTable {
 	public StockQuoteRenderer() {
 	    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 	}
-	
+
 	public Component getTableCellRendererComponent(JTable table,
 						       Object value,
 						       boolean isSelected,
@@ -90,12 +91,14 @@ public class AbstractTable extends SortedTable {
 	    textLabel.setForeground(table.getForeground());
 
 	    // Make each alternate row a different colour
-	    if(isSelected)
-		setBackground(table.getSelectionBackground());
-	    else
+	    if(isSelected) {
+		setBackground(selectedBackgroundColor);
+		textLabel.setForeground(selectedForegroundColor);
+	    } else {
 		setBackground(row % 2 != 0?
 			      backgroundColor:
 			      alternativeBackgroundColor);
+            }
 
 	    // The change column has specific rendering
 	    if(value instanceof ChangeFormat)
@@ -107,12 +110,10 @@ public class AbstractTable extends SortedTable {
 	    	String text = date.toString("d?/m?/yyyy");
 	    	textLabel.setText(text);
 	    	add(textLabel);
-	    }
-	    else {
+	    } else {
 		textLabel.setText(value.toString());
 		add(textLabel);
 	    }
-	    	
 	    return this;
 	}
 
@@ -219,12 +220,11 @@ public class AbstractTable extends SortedTable {
                         }, showColumnsMenu, column.getFullName());
 
                 showMenuItem.setState(column.getVisible() == Column.VISIBLE);
-
+                
                 if(isEquationColumn)
                     showEquationColumnMenuItems.add(showMenuItem);
             }
         }
-
         return showColumnsMenu;
     }
 
@@ -264,9 +264,6 @@ public class AbstractTable extends SortedTable {
 		    }
 		}
 	    };
-
 	thread.start();
     }
 }
-
-

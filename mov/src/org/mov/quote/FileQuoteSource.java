@@ -1,11 +1,12 @@
+
 package org.mov.quote;
 
 import java.io.*;
 import java.util.*;
-import java.util.prefs.*;
 
 import org.mov.util.*;
 import org.mov.portfolio.*;
+import org.mov.ui.DesktopManager;
 
 /**
  * Provides functionality to obtain stock quotes from files. This class
@@ -32,23 +33,16 @@ public class FileQuoteSource implements QuoteSource
 
     // Given a name of a file containing a list of day quotes, return the
     // the day 
-    private TradingDate getContainedDate(String fileName) {
+    private TradingDate getContainedDate(String fileName) 
+	throws java.io.IOException {
+
 	TradingDate date = null;
-
-	try {
-	    FileReader fr = new FileReader(fileName);
-	    BufferedReader br = new BufferedReader(fr);
-	    Stock stock = filter.filter(br.readLine());
-	    if(stock != null)
-		date = stock.getDate();
-	    br.close();
-
-	} catch (java.io.IOException ioe) {
-	    System.err.println("IO Exception thrown while loading "+
-			       fileName +
-			       ":\n"+
-			       ioe.getMessage());
-	} 
+	FileReader fr = new FileReader(fileName);
+	BufferedReader br = new BufferedReader(fr);
+	Stock stock = filter.filter(br.readLine());
+	if(stock != null)
+	    date = stock.getDate();
+	br.close();
 
 	return date;
     }
@@ -79,10 +73,7 @@ public class FileQuoteSource implements QuoteSource
 	    br.close();
 
 	} catch (java.io.IOException ioe) {
-	    System.err.println("IO Exception thrown while loading "+
-			       fileName +
-			       ":\n"+
-			       ioe.getMessage());
+	    DesktopManager.showErrorMessage("Can't load " + fileName);
 	} 
 
 	if(found)
@@ -130,24 +121,44 @@ public class FileQuoteSource implements QuoteSource
 	// file containg the given date.
 	TradingDate date;
 
+	// Make sure we don't pop up 1000 error messages if all the files
+	// have been moved :)
+	int errorCount = 0;
+
 	// Indexing might take a while
 	boolean owner = 
 	    Progress.getInstance().open("Indexing files", 
 					files.length);
 
 	for(int i = 0; i < files.length; i++) {
-	    date = getContainedDate(files[i]);
 
-	    if(date != null) {
-		// Buffer the latest quote date 
-		if(latestQuoteDate == null || date.after(latestQuoteDate))
-		    latestQuoteDate = date;
-		
-		// Associate this date with this file
-		dateToFile.put(date, files[i]);
+	    try {
+		date = getContainedDate(files[i]);
+	    
+		if(date != null) {
+		    // Buffer the latest quote date 
+		    if(latestQuoteDate == null || date.after(latestQuoteDate))
+			latestQuoteDate = date;
+		    
+		    // Associate this date with this file
+		    dateToFile.put(date, files[i]);
+		}		    
+		else {
+		    if(errorCount < 5) {
+			DesktopManager.
+			    showErrorMessage("No quotes found in " + files[i]);
+			errorCount++;
+		    }
+		}
 
-		Progress.getInstance().next();
+	    } catch (java.io.IOException ioe) {
+		if(errorCount < 5) {
+		    DesktopManager.showErrorMessage("Can't load " + 
+						    files[i]);
+		    errorCount++;	    
+		}
 	    }
+	    Progress.getInstance().next();	    
 	}
 
 	Progress.getInstance().close(owner);
@@ -285,10 +296,7 @@ public class FileQuoteSource implements QuoteSource
 	    br.close();
 
 	} catch (java.io.IOException ioe) {
-	    System.err.println("IO Exception thrown while loading "+
-			       fileName +
-			       ":\n"+
-			       ioe.getMessage());
+	    DesktopManager.showErrorMessage("Can't load " + fileName);
 	} 
 
 	return quotes;

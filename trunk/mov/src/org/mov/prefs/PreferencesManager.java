@@ -860,8 +860,8 @@ public class PreferencesManager {
             preferencesManager.new DisplayPreferences();
         displayPreferences.x = prefs.getInt("default_x", 0);
         displayPreferences.y = prefs.getInt("default_y", 0);
-        displayPreferences.width = prefs.getInt("default_width", 0);
-        displayPreferences.height = prefs.getInt("default_height", 0);
+        displayPreferences.width = prefs.getInt("default_width", 400);
+        displayPreferences.height = prefs.getInt("default_height", 400);
         return displayPreferences;
     }
 

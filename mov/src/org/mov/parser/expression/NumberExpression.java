@@ -18,6 +18,8 @@
 
 package org.mov.parser.expression;
 
+import java.text.NumberFormat;
+
 import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
@@ -32,6 +34,8 @@ public class NumberExpression extends TerminalExpression {
     private int type;
 
     private final static double EPSILON = 0.001F;
+
+    private static NumberFormat format = null;
 
     public NumberExpression(boolean value) {
         this.value = value? TRUE: FALSE;
@@ -60,22 +64,25 @@ public class NumberExpression extends TerminalExpression {
 	return value;
     }
 
-    public String toString() {
-        if(getType() == BOOLEAN_TYPE) {
+    public static String toString(int type, double value) {
+        switch(type) {
+        case BOOLEAN_TYPE:
             if(value >= TRUE_LEVEL)
                 return "true";
             else
                 return "false";
-        }
-        else if (getType() == FLOAT_TYPE) {
-            return Double.toString(value);
-        }
-        else {
-            assert getType() == INTEGER_TYPE;
 
-            int valueInt = (int)value;
-            return Integer.toString(valueInt);
+        case FLOAT_TYPE:
+            return getNumberFormat().format(value);
+
+        default:
+            assert type == INTEGER_TYPE;
+            return Integer.toString((int)value);
         }
+    }
+
+    public String toString() {
+        return toString(getType(), value);
     }
 
     public boolean equals(double value) {
@@ -123,6 +130,19 @@ public class NumberExpression extends TerminalExpression {
 
     public Object clone() {
         return new NumberExpression(value, type);
+    }
+
+    private static NumberFormat getNumberFormat() {
+        // Synchronisation cannot cause issues here. So this code
+        // isn't synchronised.
+        if(format == null) {
+            format = NumberFormat.getInstance();
+            format.setMinimumIntegerDigits(1);
+            format.setMinimumFractionDigits(1);
+            format.setMaximumFractionDigits(6);
+        }
+
+        return format;
     }
 
 }

@@ -59,10 +59,10 @@ public class CorrExpression extends QuaternaryExpression {
         int quoteKind = ((QuoteExpression)getChild(1)).getQuoteKind();
 	int period = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
         if(period <= 1)
-            throw new EvaluationException(Locale.getString("CORR_RANGE_ERROR"));
+            throw EvaluationException.CORR_RANGE_EXCEPTION;
         int offset = (int)getChild(3).evaluate(variables, quoteBundle, symbol, day);
         if (offset > 0)
-           throw EvaluationException.CORR_OFFSET_EXCEPTION;
+            throw EvaluationException.CORR_OFFSET_EXCEPTION;
 
         Symbol correlatedSymbol;
 

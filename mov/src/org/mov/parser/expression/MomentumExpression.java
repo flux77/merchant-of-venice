@@ -28,25 +28,22 @@ import org.mov.quote.QuoteFunctions;
 import org.mov.quote.Symbol;
 
 /**
- * An expression which finds the EMA (Exponential Moving Average) quote over a given trading period.
+ * An expression which finds the Momentum over a given trading period.
  *
  * @author Alberto Nacher
  */
-public class EMAExpression extends QuaternaryExpression {
+public class MomentumExpression extends TernaryExpression {
 
     /**
-     * Create a new exponential moving average expression for the given <code>quote</code> kind,
-     * for the given number of <code>days</code>, with the given smoothing constant
-     * <code>smoothing</code>, starting with <code>lag</code> days away.
+     * Create a new Momentum expression for the given <code>quote</code> kind,
+     * for the given number of <code>days</code>, starting with <code>lag</code> days away.
      *
-     * @param	quote	the quote kind to average
-     * @param	days	the number of days to average over
-     * @param	smoothing	the smoothing constant for the exponential moving average
+     * @param	quote	the quote kind
+     * @param	days	the number of days to count over
      * @param	lag	the offset from the current day
      */
-    public EMAExpression(Expression quote, Expression days,
-			 Expression lag, Expression smoothing) {
-        super(quote, days, lag, smoothing);
+    public MomentumExpression(Expression quote, Expression days, Expression lag) {
+        super(quote, days, lag);
     }
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
@@ -56,37 +53,31 @@ public class EMAExpression extends QuaternaryExpression {
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
 	int period = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         if(period <= 0)
-            throw EvaluationException.EMA_RANGE_EXCEPTION;
+            throw EvaluationException.MOMENTUM_RANGE_EXCEPTION;
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
         if (offset > 0)
-           throw EvaluationException.EMA_OFFSET_EXCEPTION;
-        double smoothing = (double)getChild(3).evaluate(variables, quoteBundle, symbol, day);
-        if ((smoothing < 0.01) || (smoothing > 1.0))
-           throw EvaluationException.EMA_SMOOTHING_EXCEPTION;
+           throw EvaluationException.MOMENTUM_OFFSET_EXCEPTION;
 
-        // Calculate and return the average.
+        // Calculate and return the momentum.
         QuoteBundleFunctionSource source =
             new QuoteBundleFunctionSource(quoteBundle, symbol, quoteKind, day, offset, period);
 
-        return QuoteFunctions.ema(source, period, smoothing);
+        return QuoteFunctions.momentum(source, period);
     }
 
     public String toString() {
-	return new String("ema(" + 
+	return new String("momentum(" + 
 			  getChild(0).toString() + ", " +
 			  getChild(1).toString() + ", " +
-			  getChild(2).toString() + ", " +
-			  getChild(3).toString() + ")");
+			  getChild(2).toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {
-	// First type must be quote, second and third types must be integer value,
-        // the fourth (the smoothing constant) must be a float value
+	// First type must be quote, second and third types must be integer value
 	if((getChild(0).checkType() == FLOAT_QUOTE_TYPE ||
             getChild(0).checkType() == INTEGER_QUOTE_TYPE) &&
-	   getChild(1).checkType() == INTEGER_TYPE &&
-	   getChild(2).checkType() == INTEGER_TYPE &&
-	   getChild(3).checkType() == FLOAT_TYPE)
+	   getChild(1).checkType() == INTEGER_TYPE  &&
+	   getChild(2).checkType() == INTEGER_TYPE)
 	    return getType();
 	else
 	    throw new TypeMismatchException();
@@ -102,9 +93,8 @@ public class EMAExpression extends QuaternaryExpression {
     }
 
     public Object clone() {
-        return new EMAExpression((Expression)getChild(0).clone(), 
+        return new MomentumExpression((Expression)getChild(0).clone(), 
                                  (Expression)getChild(1).clone(),
-                                 (Expression)getChild(2).clone(),
-                                 (Expression)getChild(3).clone());
+                                 (Expression)getChild(2).clone());
     }
 }

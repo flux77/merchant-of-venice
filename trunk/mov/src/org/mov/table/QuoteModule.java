@@ -27,7 +27,6 @@ public class QuoteModule extends AbstractTable
     private static final int DAY_CLOSE_COLUMN = 5;
     private static final int CHANGE_COLUMN = 6;
 
-
     private JMenuBar menuBar;
     
     private PropertyChangeSupport propertySupport;
@@ -148,15 +147,9 @@ public class QuoteModule extends AbstractTable
 
 	propertySupport = new PropertyChangeSupport(this);
 	setModel(new Model(this.cache, symbols));
-
-	// The table allows several new properties to customise
-	// the column entries
-	setRedColumn(DAY_LOW_COLUMN);
-	setGreenColumn(DAY_HIGH_COLUMN);
     }
 
-    
-
+   
     private Object[] extractSymbolsUsingRule(QuoteCache cache) {
 
 	Object[] symbols = cache.getSymbols();

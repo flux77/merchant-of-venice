@@ -1,26 +1,23 @@
-Merchant of Venice, 0.1 alpha *pre-release* / 07/Feb/2003
-=========================================================
+Merchant of Venice, 0.1 alpha 07/Feb/2003
+=========================================
 
 Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
 See COPYING.txt for license terms.
 
-Introduction
-============
+1 Introduction
 
-Thank you for downloading Merchant of Venice (Venice).
+Thank you for trying Merchant of Venice (Venice).
 
 Project Venice was started with the question of how well could
-Genetic Algorithms or rather Genetic Programming be applied to
-generating successful buy/sell rules on the stock market?
-With some promising preliminary results, the project scope expanded.
-The current goals are: to provide stock market analysis, portfolio management
-and to provide a user friendly interface.
-			
-With these new goals, the project was re-written from scratch and is now
-working towards re-implementing the Genetic Programming.
+Genetic Programming be applied to generating successful buy/sell rules on the 
+stock market? With some promising preliminary results, the project scope 
+expanded and Venice was re-written.
 
-Running
-=======
+Venice now supports portfolio management, charting, technical analysis all
+within a graphical user interface with online help. The current direction
+of the project is to re-implement Genetic Programming.
+
+2 Running
 
 To run Venice you will need the following packages, available from the
 following locations:
@@ -54,8 +51,7 @@ Once they are set up, you can run Venice by typing from the command prompt:
 
 Or in Windows by clicking on the "venice.jar" file.
 
-Bug Reports and Enhancements
-============================
+3 Bug Reports and Enhancements
 
 Please report any bugs that you encounter via the Sourceforge bug
 tracking system at:
@@ -70,8 +66,7 @@ Sourceforge enhancement tracking system at:
 Or if you have any comments, please don't hesitate to email me,
 Andrew Leppard at aleppard@picknowl.com.au.
 
-Building
-========
+4 Building
 
 To build Venice you will need the programmes listed in the "Running"
 section and the following:
@@ -94,12 +89,14 @@ ant run
 
 Or by creating a jar (ant jar) and then running Venice as described above.
 
-The build file (build.xml) provides other functions for developers:
+The build file (build.xml) provides other functions for developers (some
+of these will only work from source checked out from CVS):
 
 api     Generate a javadoc API of the code
 backup  Pulls a backup copy of the CVS tree from Sourceforge and stores it
         in the backup directory.
 clean   Removes all built and temporary files
+doc     Builds the documentation
 release Packages Venice into a file ready for release
 test    Runs the automated test suite
 web     Packages the web files ready for deployment

@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import org.mov.util.*;
+import org.mov.main.*;
 import org.mov.parser.*;
 import org.mov.table.*;
 import org.mov.quote.*;
@@ -22,13 +23,13 @@ import org.mov.quote.*;
  */
 public class StockHoldingTable extends AbstractTable {
 
-    class Model extends AbstractTableModel {
+    private static final int SYMBOL_COLUMN = 0;
+    private static final int SHARES_COLUMN = 1;
+    private static final int DAY_CLOSE_COLUMN = 2;
+    private static final int MARKET_VALUE_COLUMN = 3;
+    private static final int CHANGE_COLUMN = 4;
 
-	private static final int SYMBOL_COLUMN = 0;
-	private static final int SHARES_COLUMN = 1;
-	private static final int DAY_CLOSE_COLUMN = 2;
-	private static final int MARKET_VALUE_COLUMN = 3;
-	private static final int CHANGE_COLUMN = 4;
+    class Model extends AbstractTableModel {
 
 	private String[] headers = {
 	    "Symbol", "Shares", "Day Close", "Mkt Value", "Change"};
@@ -127,5 +128,27 @@ public class StockHoldingTable extends AbstractTable {
      */
     public StockHoldingTable(HashMap stockHoldings, QuoteCache cache) {
 	setModel(new Model(stockHoldings, cache));
+
+	// If the user double clicks on a row then graph the stock
+	addMouseListener(new MouseAdapter() {
+
+		public void mouseClicked(MouseEvent evt) {
+		    
+		    Point point = evt.getPoint();
+		    if (evt.getClickCount() == 2) {
+			int row = rowAtPoint(point);
+			
+			// Get symbol at row
+			String symbol = 
+			    (String)getModel().getValueAt(row, SYMBOL_COLUMN);
+			
+			Vector symbols = new Vector();
+			symbols.add((Object)symbol);
+			    
+			CommandManager.getInstance().graphStockBySymbol(symbols);
+		    }
+		}
+	    });
+
     }
 }

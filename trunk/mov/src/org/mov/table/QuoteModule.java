@@ -122,16 +122,11 @@ public class QuoteModule extends AbstractTable
     }
 
     public QuoteModule(QuoteCache cache) {
-	newTable(cache, null);
+	this(cache, null);
     }
 
     public QuoteModule(QuoteCache cache, 
 		      org.mov.parser.Expression expression) {
-	newTable(cache, expression);
-    }
-
-    private void newTable(QuoteCache cache, 
-			  org.mov.parser.Expression expression) {
 	
 	menuBar = new JMenuBar();
 	menuBar.add(new JMenu("Test menu 1"));
@@ -147,8 +142,28 @@ public class QuoteModule extends AbstractTable
 
 	propertySupport = new PropertyChangeSupport(this);
 	setModel(new Model(this.cache, symbols));
-    }
 
+	// If the user double clicks on a cell then graph the stock
+	addMouseListener(new MouseAdapter() {
+
+		public void mouseClicked(MouseEvent evt) {
+		    
+		    Point point = evt.getPoint();
+		    if (evt.getClickCount() == 2) {
+			int row = rowAtPoint(point);
+			
+			// Get symbol at row
+			String symbol = 
+			    (String)getModel().getValueAt(row, SYMBOL_COLUMN);
+			
+			Vector symbols = new Vector();
+			symbols.add((Object)symbol);
+			    
+			CommandManager.getInstance().graphStockBySymbol(symbols);
+		    }
+		}
+	    });
+    }
    
     private Object[] extractSymbolsUsingRule(QuoteCache cache) {
 

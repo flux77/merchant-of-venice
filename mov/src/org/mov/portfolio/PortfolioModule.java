@@ -32,8 +32,8 @@ public class PortfolioModule extends JPanel implements Module,
     private QuoteCache cache;
 
     private JMenuBar menuBar;
-    private JMenuItem portfolioNewCashAccount;
-    private JMenuItem portfolioNewShareAccount;
+    private JMenuItem accountNewCashAccount;
+    private JMenuItem accountNewShareAccount;
     private JMenuItem portfolioGraph;
     private JMenuItem portfolioExport;
     private JMenuItem portfolioImport;
@@ -46,6 +46,10 @@ public class PortfolioModule extends JPanel implements Module,
     // Set to true if weve deleted this portfolio and shouldn't try
     // to save it when we exit
     private boolean isDeleted = false;
+
+    // Keep a single copy of the transaction history table
+    JInternalFrame historyFrame = null;
+    TransactionModule historyModule = null;
 
     /**
      * Create a new portfolio module.
@@ -64,7 +68,7 @@ public class PortfolioModule extends JPanel implements Module,
 	propertySupport = new PropertyChangeSupport(this);
 
 	createMenu();
-	layoutPortfolio();
+	redraw();
     }
 
     // create new menu for this module
@@ -73,14 +77,6 @@ public class PortfolioModule extends JPanel implements Module,
 
 	JMenu portfolioMenu = MenuHelper.addMenu(menuBar, "Portfolio", 'P');
 	{
-	    portfolioNewCashAccount = 
-		MenuHelper.addMenuItem(this, portfolioMenu,
-				       "New Cash Account");
-	    portfolioNewShareAccount = 
-		MenuHelper.addMenuItem(this, portfolioMenu,
-				       "New Share Account");
-
-	    portfolioMenu.addSeparator();
 	    portfolioGraph =
 		MenuHelper.addMenuItem(this, portfolioMenu,
 				       "Graph");
@@ -106,31 +102,43 @@ public class PortfolioModule extends JPanel implements Module,
 						    "Close");
 	}
 
+	JMenu accountMenu = MenuHelper.addMenu(menuBar, "Account", 'A');
+	{
+	    accountNewCashAccount = 
+		MenuHelper.addMenuItem(this, accountMenu,
+				       "New Cash Account");
+	    accountNewShareAccount = 
+		MenuHelper.addMenuItem(this, accountMenu,
+				       "New Share Account");
+	}
+
 	JMenu transactionMenu = 
 	    MenuHelper.addMenu(menuBar, "Transaction", 'T');
 	{
 	    transactionNew = 
 		MenuHelper.addMenuItem(this, transactionMenu,
-				       "New Transaction");
+				       "New");
 	    transactionShowHistory = 
 		MenuHelper.addMenuItem(this, transactionMenu,
-				       "Show Transaction History");
+				       "Show History");
 	}
 
 	// Make sure appropriate menus are enabled or disabled
-	checkDisabledStatus();
+	checkMenuDisabledStatus();
     }
 
     // You can only create transactions if youve got a cash account
-    private void checkDisabledStatus() {
+    private void checkMenuDisabledStatus() {
 	boolean hasCashAccount = portfolio.hasAccount(Account.CASH_ACCOUNT);
 
 	transactionNew.setEnabled(hasCashAccount);
 	transactionShowHistory.setEnabled(hasCashAccount);
     }
 
-    // Redraw and layout portfolio on screen
-    private void layoutPortfolio() {
+    /**
+     * Layout and redraw portfolio module.
+     */
+    public void redraw() {
 
 	StockHoldingTable table = null;
 	JScrollPane scrolledTable = null;
@@ -345,25 +353,49 @@ public class PortfolioModule extends JPanel implements Module,
 		    else if(e.getSource() == portfolioExport) {
 			exportPortfolio();
 		    }
-		    else if(e.getSource() == portfolioNewCashAccount) {
+		    else if(e.getSource() == accountNewCashAccount) {
 			newCashAccount();
 		    }
-		    else if(e.getSource() == portfolioNewShareAccount) {
+		    else if(e.getSource() == accountNewShareAccount) {
 			newShareAccount();
 		    }
 		    else if(e.getSource() == transactionNew) {
 			newTransaction();
 		    }
 		    else if(e.getSource() == transactionShowHistory) {
-			TransactionModule history =
-			    new TransactionModule(portfolio);
-
-			((org.mov.ui.DesktopManager)(desktop.getDesktopManager())).newFrame(history);
+			showTransactionHistory();
+		    }
+		    else {
+			assert false;
 		    }
 		}
 	    };
 
 	menuAction.start();
+    }
+
+    // Show the transaction history table
+    private void showTransactionHistory() {
+
+	// If we have already created it - then just open it
+	if(historyFrame != null && !historyFrame.isClosed()) {
+	    historyFrame.toFront();
+
+	    try {
+		historyFrame.setIcon(false);
+		historyFrame.setSelected(true);
+	    }
+	    catch(PropertyVetoException e) {
+		    assert false;
+	    }
+	}
+	else {
+	    historyModule = 
+		new TransactionModule(this, portfolio);
+	
+	    historyFrame = 
+		((org.mov.ui.DesktopManager)(desktop.getDesktopManager())).newFrame(historyModule);
+	}
     }
 
     // Delete this portfolio
@@ -509,8 +541,8 @@ public class PortfolioModule extends JPanel implements Module,
 	    }
 	}
 
-	layoutPortfolio();
-	checkDisabledStatus(); // enable transaction menu
+	redraw();
+	checkMenuDisabledStatus(); // enable transaction menu
     }
 
     // Create a new cash account
@@ -518,15 +550,16 @@ public class PortfolioModule extends JPanel implements Module,
 	TextDialog dialog = 
 	    new TextDialog(desktop, "Enter account name",
 			   "New Cash Account");
+
 	String accountName = dialog.showDialog();
-	
+
 	if(accountName != null && accountName.length() > 0) {
 	    Account account = new CashAccount(accountName);
 	    portfolio.addAccount(account);
 	}
-	
-	layoutPortfolio();
-	checkDisabledStatus(); // enable transaction menu
+
+	redraw();
+	checkMenuDisabledStatus(); // enable transaction menu
     }
 
     // Create a new share account
@@ -541,18 +574,21 @@ public class PortfolioModule extends JPanel implements Module,
 	    portfolio.addAccount(account);
 	}
 	
-	layoutPortfolio();
-	checkDisabledStatus(); // enable transaction menu
+	redraw();
+	checkMenuDisabledStatus(); // enable transaction menu
     }
 
     // Create a new transaction
     private void newTransaction() {
-
 	JDesktopPane desktop = 
 	    org.mov.ui.DesktopManager.getDesktop();
 	TransactionDialog dialog = new TransactionDialog(desktop, portfolio);
 	dialog.newTransaction();
 
-	layoutPortfolio();
+	// Layout this portfolio and also the transaction history table (if its open)
+	redraw();
+
+	if(historyFrame != null && !historyFrame.isClosed())
+	    historyModule.redraw();
     }
 }

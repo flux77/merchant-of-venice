@@ -42,7 +42,8 @@ public class QuoteCache {
 
     // Load this many quote dates in any one sql query
     // 96megs holds about 200 trading days
-    private final static int QUERY_PACKET_SIZE = 10;
+    //    private final static int QUERY_PACKET_SIZE = 10;
+    private final static int QUERY_PACKET_SIZE = 30;
 
     // Keep list of dates in cache
     private ArrayList dates = new ArrayList();

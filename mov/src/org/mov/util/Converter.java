@@ -22,6 +22,7 @@ import java.io.File;
 import java.lang.*;
 import java.text.*;
 import java.util.*;
+import java.util.regex.*;
 
 import org.mov.quote.*;
 
@@ -89,35 +90,23 @@ public class Converter {
 	return dates;
     }
 
-    /** Convert space separated list into vector of compay symbols
+    /** 
+     * Convert a string containing a list of symbols separated by spaces
+     * or commas into a sorted set with duplicates removed.
+     *
      * e.g "CBA WBC TLS" -> [CBA, TLS, WBC].
      *
      * @param	string	list of symbols
      * @return	a sorted set of each symbol in string
      */
     public static SortedSet stringToSortedSet(String string) {
-	int space;
-	Vector vector = new Vector();
-	boolean endOfString = false;
-
-	if(string.length() > 0) {
-	    while(!endOfString) {
-		space = string.indexOf(" ");
-		
-		if(space == -1) {
-		    vector.add(string);
-		    endOfString = true;
-		}
-		else {
-		    vector.add(new String(string.substring(0, space)));
-		    string = string.substring(space+1);
-		}
-	    }
-	}
-	
-	// Sort vector
+        // Split the string around spaces or commas
+        Pattern pattern = Pattern.compile("[, ]+");
+        String[] symbols = pattern.split(string);
 	TreeSet sortedSet = new TreeSet(Collator.getInstance());
-	sortedSet.addAll(vector);
+
+        for(int i = 0; i < symbols.length; i++)
+            sortedSet.add(symbols[i]);
 	
 	return sortedSet;
     }

@@ -726,9 +726,11 @@ public class ChartModule extends JPanel implements Module,
 	*/
 	
 	/*
-	   FIXME: Change interface to reflect this. 
+	   FIXME: Change interface to reflect this.	    
 	   Either identify the mode or make the buttons depressed or 
 	   something. 
+
+	   Graph painting buttons now stay depressed. Is this enough?
 	*/
 
 	else if(paintOnChart != null && e.getSource() == paintOnChart) {
@@ -737,6 +739,8 @@ public class ChartModule extends JPanel implements Module,
 		defaultZoom.setEnabled(defaultZoomEnabled = false);
 		inDrawMode = true;
 		inEraseMode = false;
+		paintOnChart.setSelected(true);
+		eraseOnChart.setSelected(false);
 	    } else {		
 		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
 		inDrawMode = false;
@@ -748,8 +752,12 @@ public class ChartModule extends JPanel implements Module,
 		defaultZoom.setEnabled(defaultZoomEnabled = false);
 		inEraseMode = true;
 		inDrawMode = false;
+		eraseOnChart.setSelected(true);
+		paintOnChart.setSelected(false);
 	    } else {		
 		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
+		eraseOnChart.setSelected(false);
+		paintOnChart.setSelected(false);
 		inEraseMode = false;		
 	    }
 	}

@@ -72,7 +72,7 @@ public class ScriptQuoteBundle extends QuoteBundle {
                 // If the quote is still null, maybe we need to expand the bundle?
                 // First check to make sure the new date is older than any date in
                 // the cache
-                if(getFirstDate() != null && dateOffset < getFirstDateOffset()) {
+                if(getQuoteRange().getFirstDate() != null && dateOffset < getFirstDateOffset()) {
                     try {
                         quote = tryExpand(symbol, quoteType, dateOffset);
                     }

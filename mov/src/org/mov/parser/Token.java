@@ -117,7 +117,7 @@ public class Token {
     private int type;
 
     // For NUMBER_TOKEN - the actual number
-    private int intValue; 
+    private float value; 
     
     /**
      * Perform lexical analysis on the given string. Extract the first
@@ -174,18 +174,26 @@ public class Token {
 
 	// First check to see if its a number 
 	if(Character.isDigit(string.charAt(0))) {
-	    int value = 0;
+	    float value = 0.0F;
+	    String numberString = new String();
 
 	    do {
-		// All this to convert a character to an integer!
-		value = value*10 + 
-		    Integer.parseInt(string.substring(0, 1));
+		numberString = numberString.concat(string.substring(0, 1));
 		string = string.substring(1);
 	    } while(string.length() > 0 && 
-		    Character.isDigit(string.charAt(0)));
+		    (Character.isDigit(string.charAt(0)) ||
+		    string.charAt(0) == '.'));
+
+	    // Now convert number string to float value
+	    try {
+		value = Float.parseFloat(numberString);
+	    }
+	    catch(NumberFormatException e) {
+		throw new ParserException("malformed number");
+	    }
 
 	    token.setType(Token.NUMBER_TOKEN);
-	    token.setIntValue(value);
+	    token.setValue(value);
 
 	    matched = true;
 	}
@@ -212,7 +220,7 @@ public class Token {
      */
     public Token() {
 	type = 0;
-	intValue = 0;
+	value = 0;
     }
 
     /**
@@ -238,15 +246,15 @@ public class Token {
      *
      * @return	the value.
      */
-    public int getIntValue() {
-	return intValue;
+    public float getValue() {
+	return value;
     }
 
     /**
      * For number tokens, negate the value.
      */
     public void negate() {
-	intValue = -intValue;
+	value = -value;
     }
 
     /**
@@ -254,7 +262,7 @@ public class Token {
      *
      * @param	value	the value.
      */
-    public void setIntValue(int value) {
-	intValue = value;
+    public void setValue(float value) {
+	this.value = value;
     }
 }

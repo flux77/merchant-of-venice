@@ -42,8 +42,8 @@ public abstract class AbstractExpression implements Expression {
 
     // Constants that manage the USA/Australian/UK localization
     // the goal is forcing that localization also for others languages
-    private final static String fmt = "0.000000#";
-    private final static DecimalFormat df = new DecimalFormat(fmt, new DecimalFormatSymbols(Locale.US));
+    private final static String format = "0.000000#";
+    private final static DecimalFormat decimalFormat = new DecimalFormat(format, new DecimalFormatSymbols(Locale.US));
 
     // Pointer to parent node (if any)
     private Expression parent = null;
@@ -178,10 +178,10 @@ public abstract class AbstractExpression implements Expression {
     public static double parseDouble(String doubleText) throws NumberFormatException {
         double retValue = 0;
         try {
-            Number num = df.parse(doubleText);
+            Number num = decimalFormat.parse(doubleText);
             if (num == null)
                 throw new ParseException("AbstractExpression - parseDouble - null Error", 0);
-            retValue = df.parse(doubleText).doubleValue();
+            retValue = decimalFormat.parse(doubleText).doubleValue();
         } catch (ParseException e) {
             throw new NumberFormatException();
         }
@@ -197,10 +197,10 @@ public abstract class AbstractExpression implements Expression {
     public static int parseInt(String intText) throws NumberFormatException {
         int retValue = 0;
         try {
-            Number num = df.parse(intText);
+            Number num = decimalFormat.parse(intText);
             if (num == null)
                 throw new ParseException("AbstractExpression - parseInt - null Error", 0);
-            retValue = df.parse(intText).intValue();
+            retValue = decimalFormat.parse(intText).intValue();
         } catch (ParseException e) {
             throw new NumberFormatException();
         }
@@ -216,10 +216,10 @@ public abstract class AbstractExpression implements Expression {
     public static Double valueOfDouble(String doubleText) throws NumberFormatException {
         Double retValue = null;
         try {
-            Number num = df.parse(doubleText);
+            Number num = decimalFormat.parse(doubleText);
             if (num == null)
                 throw new ParseException("AbstractExpression - valueOfDouble - null Error", 0);
-            retValue = new Double(df.parse(doubleText).doubleValue());
+            retValue = new Double(decimalFormat.parse(doubleText).doubleValue());
         } catch (ParseException e) {
             throw new NumberFormatException();
         }
@@ -235,10 +235,10 @@ public abstract class AbstractExpression implements Expression {
     public static Integer valueOfInt(String intText) throws NumberFormatException {
         Integer retValue = null;
         try {
-            Number num = df.parse(intText);
+            Number num = decimalFormat.parse(intText);
             if (num == null)
                 throw new ParseException("AbstractExpression - valueOfInt - null Error", 0);
-            retValue = new Integer(df.parse(intText).intValue());
+            retValue = new Integer(decimalFormat.parse(intText).intValue());
         } catch (ParseException e) {
             throw new NumberFormatException();
         }

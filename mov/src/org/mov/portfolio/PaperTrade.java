@@ -105,7 +105,7 @@ public class PaperTrade {
 		// tells us to buy - then buy
 		if(shareAccount.get(symbol) == null &&
 		   buy.evaluate(cache, symbol, today) >=
-		   LogicExpression.TRUE_LEVEL) {
+		   Expression.TRUE_LEVEL) {
 		    
 		    // Put in a bid to the market to buy the share at
 		    // today's close price. If the next day's share low price
@@ -166,7 +166,7 @@ public class PaperTrade {
 
 	    // Evaluates to true?
 	    if(sell.evaluate(cache, symbol, today) >=
-	       LogicExpression.TRUE_LEVEL) {
+	       Expression.TRUE_LEVEL) {
 
 		stock = portfolio.get(symbol);
 		float today_close_price = 

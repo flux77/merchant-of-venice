@@ -71,9 +71,9 @@ public class EquationComboBox extends JComboBox
 
 	setEquationText(equationText);
 
-	// All equation combo boxes must be big enough to hold this
-	// amount of text (the actual string here is unimportant)
-	setPrototypeDisplayValue("avg(day_close, 15, 15) > 121");
+        // The combo box must be big enough to hold this text. This makes it
+        // as wide as the equation combo box. Yes but on 1.4.1 it makes them short!      
+        //	setPrototypeDisplayValue("avg(day_close, 15, 15) > 121");
  
 	// We want to know just before the popup items become visible
 	// so we can update them

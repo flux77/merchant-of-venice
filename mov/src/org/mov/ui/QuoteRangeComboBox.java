@@ -41,13 +41,13 @@ public class QuoteRangeComboBox extends JComboBox {
     public QuoteRangeComboBox(String equationText) {
 	super();
 
-	setEditable(true);
+        setEditable(true);
         updateItems();
         setSelectedItem(equationText);
 
         // The combo box must be big enough to hold this text. This makes it
-        // as wide as the equation combo box
-	setPrototypeDisplayValue("avg(day_close, 15, 15) > 121");
+        // as wide as the equation combo box. Yes but on 1.4.1 it makes them short!
+	//setPrototypeDisplayValue("avg(day_close, 15, 15) > 121");
     }
     
     public QuoteRange getQuoteRange() {

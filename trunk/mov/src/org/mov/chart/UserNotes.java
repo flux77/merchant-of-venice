@@ -93,9 +93,9 @@ public class UserNotes extends JInternalFrame {
 
 	JScrollPane noteContainer = new JScrollPane(notes);
 		
-	JButton save = new JButton("save");
-	JButton close = new JButton("close");
-	JButton revert = new JButton("revert");
+	JButton save = new JButton(Locale.getString("SAVE"));
+	JButton close = new JButton(Locale.getString("CLOSE"));
+	JButton revert = new JButton(Locale.getString("REVERT"));
 	
 	save.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {

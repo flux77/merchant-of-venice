@@ -18,6 +18,8 @@
 
 package org.mov.quote;
 
+import java.text.NumberFormat;
+
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 
@@ -31,6 +33,9 @@ import org.mov.util.TradingDateFormatException;
  * </pre>
  */
 public class MetaStockQuoteFilter implements QuoteFilter {
+
+    // Format used for writing stock quotes
+    private NumberFormat format = null;
 
     /**
      * Creates an instance of the filter.
@@ -108,12 +113,19 @@ public class MetaStockQuoteFilter implements QuoteFilter {
      * @return	string version of the quote
      */
     public String toString(Quote quote) {
+        if(format == null) {
+            format = NumberFormat.getInstance();
+            format.setMinimumIntegerDigits(1);
+            format.setMinimumFractionDigits(1);
+            format.setMaximumFractionDigits(3);
+        }
+
 	return new String(quote.getSymbol() + "," + 
 			  quote.getDate().toString("yyyymmdd") + "," +
-			  quote.getDayOpen() + "," +
-			  quote.getDayHigh() + "," +
-			  quote.getDayLow() + "," +
-			  quote.getDayClose() + "," +
+			  format.format(quote.getDayOpen()) + "," +
+			  format.format(quote.getDayHigh()) + "," +
+			  format.format(quote.getDayLow()) + "," +
+			  format.format(quote.getDayClose()) + "," +
 			  quote.getDayVolume());
     }
 }

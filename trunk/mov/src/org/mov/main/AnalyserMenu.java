@@ -13,6 +13,7 @@ import org.mov.chart.*;
 import org.mov.parser.*;
 import org.mov.table.*;
 import org.mov.portfolio.*;
+import org.mov.ui.InternalFrameHandler;
 
 public class AnalyserMenu implements ActionListener {
 
@@ -25,6 +26,11 @@ public class AnalyserMenu implements ActionListener {
     private JMenuItem tableIndicesListRuleMenuItem;
     private JMenuItem tableCommoditiesListAllMenuItem;
     private JMenuItem tableCommoditiesListRuleMenuItem;
+    private JMenuItem windowTileHorizontalMenuItem;
+    private JMenuItem windowTileVerticalMenuItem;
+    private JMenuItem windowCascadeMenuItem;
+    private JMenuItem windowGridMenuItem;
+
 
     private TradingDate lastQuoteDay;
 
@@ -118,6 +124,15 @@ public class AnalyserMenu implements ActionListener {
 	    JMenu geneticAlgorithmMenu = addMenu(menuBar, "GA");
 	}
 
+	// Window menu
+	{
+	    JMenu windowMenu = addMenu(menuBar, "Window");
+	    windowTileHorizontalMenuItem = addMenuItem(windowMenu, "Tile Horizontally");
+	    windowTileVerticalMenuItem = addMenuItem(windowMenu, "Tile Vertically");
+	    windowCascadeMenuItem = addMenuItem(windowMenu, "Cascade");
+	    windowGridMenuItem = addMenuItem(windowMenu, "Grid");
+	}
+
 	frame.setJMenuBar(menuBar);
     }
 
@@ -162,6 +177,21 @@ public class AnalyserMenu implements ActionListener {
 		menu == graphCommodityNameMenuItem) {
 
 	    handleGraphMenuAction(menu);
+	}
+
+
+	// Is it a window handling function?
+	else if (menu == windowTileHorizontalMenuItem) {
+	    InternalFrameHandler.tileFrames(desktop, InternalFrameHandler.HORIZONTAL);
+	}
+	else if (menu == windowTileVerticalMenuItem) {
+	    InternalFrameHandler.tileFrames(desktop, InternalFrameHandler.VERTICAL);
+	}
+	else if (menu == windowCascadeMenuItem) {
+	    InternalFrameHandler.tileFrames(desktop, InternalFrameHandler.CASCADE);
+	}
+	else if (menu == windowGridMenuItem) {
+	    InternalFrameHandler.tileFrames(desktop, InternalFrameHandler.ARRANGE);
 	}
 
 	// Exit?
@@ -273,3 +303,4 @@ public class AnalyserMenu implements ActionListener {
 	frame.moveToFront();		    
     }
 }
+

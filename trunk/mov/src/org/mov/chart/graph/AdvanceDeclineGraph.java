@@ -18,16 +18,22 @@
 
 package org.mov.chart.graph;
 
-import java.awt.*;
-import java.lang.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
-import org.mov.chart.*;
-import org.mov.chart.source.*;
-import org.mov.util.*;
-import org.mov.prefs.*;
-import org.mov.quote.*;
-import org.mov.ui.*;
+import org.mov.chart.Graphable;
+import org.mov.chart.GraphTools;
+import org.mov.util.TradingDate;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.QuoteSourceManager;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
 
 /**
  * Advance/Decline graph. This graphs the Advance/Decline market indicator. This
@@ -212,8 +218,7 @@ public class AdvanceDeclineGraph implements Graph {
         // Get a list of all dates between the first and last
         TradingDate firstDate = QuoteSourceManager.getSource().getFirstDate();
         TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
-        Vector dates =
-            Converter.dateRangeToTradingDateVector(firstDate, lastDate);
+        List dates = TradingDate.dateRangeToList(firstDate, lastDate);
 
 	Thread thread = Thread.currentThread();
 	ProgressDialog progress = ProgressDialogManager.getProgressDialog();

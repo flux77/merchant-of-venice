@@ -33,7 +33,7 @@ public interface GraphSource {
     /**
      * Return the name of the data.
      *
-     * @param	the name
+     * @return the name
      */
     public String getName();
 

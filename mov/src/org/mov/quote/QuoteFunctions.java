@@ -84,4 +84,12 @@ public class QuoteFunctions {
 
 	return avg;
     }
+
+    static public float rsi(QuoteCache cache, String symbol, 
+			    int quote, int days, int lastDay) 
+	throws EvaluationException {
+
+	return 0;
+    }
+
 }

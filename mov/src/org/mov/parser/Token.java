@@ -41,7 +41,8 @@ public class Token {
     public static final int AGE_TOKEN = 30;               // age
     public static final int PERCENT_TOKEN = 31;      // percent(number, %)
     public static final int NOT_EQUAL_TOKEN = 32;         // !=
-    public static final int FIXED_LENGTH_TOKENS = 33;
+    public static final int RSI_TOKEN = 33;	     // rsi(type, days, lag)
+    public static final int FIXED_LENGTH_TOKENS = 34;
 
     public static final int NUMBER_TOKEN = 100;           // [0-9]+
     
@@ -87,6 +88,7 @@ public class Token {
 	tokenStrings[AGE_TOKEN]                = "age";
 	tokenStrings[PERCENT_TOKEN]            = "percent";
 	tokenStrings[NOT_EQUAL_TOKEN]          = "!=";
+	tokenStrings[RSI_TOKEN]		       = "rsi";
 
 	boolean matched = false;
 

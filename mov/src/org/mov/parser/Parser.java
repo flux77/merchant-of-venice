@@ -22,6 +22,7 @@ public class Parser {
     //            "min" "(" QUOTE "," EXPR "," EXPR ")" | 
     //            "max" "(" QUOTE "," EXPR "," EXPR ")" |
     //            "avg" "(" QUOTE "," EXPR "," EXPR ")" |
+    //		  "rsi" "(" EXPR "," EXPR ")" |
     //            "not" "(" EXPR ")" |
     //		  "percent" "(" EXPR "," EXPR ")" |
     //            "if"  "(" EXPR ")" "{" EXPR "}" "else" "{" EXPR "}"
@@ -153,6 +154,7 @@ public class Parser {
 		tokens.match(Token.MIN_TOKEN) ||
 		tokens.match(Token.MAX_TOKEN) ||
 		tokens.match(Token.AVG_TOKEN) ||
+		tokens.match(Token.RSI_TOKEN) ||
 		tokens.match(Token.NOT_TOKEN) ||
 		tokens.match(Token.IF_TOKEN) ||
 		tokens.match(Token.PERCENT_TOKEN)) {
@@ -279,6 +281,13 @@ public class Parser {
 	    arg2 = parseExpression(tokens);
 	    parseComma(tokens);
 	    arg3 = parseExpression(tokens);	    
+	    break;
+
+	case(Token.RSI_TOKEN):
+	    
+	    arg1 = parseExpression(tokens);
+	    parseComma(tokens);
+	    arg2 = parseExpression(tokens);	    
 	    break;
 
 	case(Token.NOT_TOKEN):

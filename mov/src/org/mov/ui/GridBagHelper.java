@@ -98,6 +98,8 @@ public class GridBagHelper {
 	panel.add(label);
 
 	EquationComboBox comboBox = new EquationComboBox(value);
+        if(c.gridx != -1)
+            c.gridx++;
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(comboBox, c);
 	panel.add(comboBox);
@@ -127,6 +129,8 @@ public class GridBagHelper {
 	panel.add(label);
 	    
 	JPasswordField password = new JPasswordField(value, length);
+        if(c.gridx != -1)
+            c.gridx++;
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(password, c);
 	panel.add(password);
@@ -155,6 +159,8 @@ public class GridBagHelper {
 	panel.add(label);
 
 	JTextField text = new JTextField(value, length);
+        if(c.gridx != -1)
+            c.gridx++;
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(text, c);
 	panel.add(text);
@@ -181,11 +187,44 @@ public class GridBagHelper {
 	panel.add(labelField);
 
 	JLabel label = new JLabel(labelText);
+        if(c.gridx != -1)
+            c.gridx++;
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(label, c);
 	panel.add(label);
 
 	return label;
+    }
+
+    /**
+     * Append a new symbol list combo box to the form.
+     *
+     * @param panel form panel
+     * @param field text to display next to the combo box
+     * @param symbolList initial symbol list
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @return the symbol list combo box
+     */
+    public static SymbolListComboBox addSymbolListComboBox(JPanel panel, 
+                                                           String field, 
+                                                           String symbolList,
+                                                           GridBagLayout gridbag,
+                                                           GridBagConstraints c) {
+	JLabel label = new JLabel(field);
+	c.gridwidth = 1;
+	gridbag.setConstraints(label, c);
+	panel.add(label);
+
+        SymbolListComboBox comboBox = new SymbolListComboBox(symbolList);
+        if(c.gridx != -1)
+            c.gridx++;
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(comboBox, c);
+	panel.add(comboBox);
+
+	return comboBox;
+
     }
 }
 

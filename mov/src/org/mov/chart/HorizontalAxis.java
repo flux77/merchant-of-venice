@@ -60,11 +60,14 @@ public class HorizontalAxis {
 	int thisValue;
 	int i = 0;
 
+        assert dates.size() > 0;
+
 	this.period = period;
 	this.type = type;
 
 	this.dates = new Vector();
 	this.points = new Vector();
+
 
 	while(iterator.hasNext()) {
 	    thisDate = (TradingDate)iterator.next();
@@ -94,6 +97,10 @@ public class HorizontalAxis {
 	Iterator dateIterator = dates.iterator();
 	Iterator pointIterator = points.iterator();
 	String string;
+
+        // There should be at least one point in our graph 
+        assert dates.size() > 0;
+        assert points.size() > 0;
 
 	lastValue = ((Integer)pointIterator.next()).intValue();
 	lastDate = (TradingDate)dateIterator.next();

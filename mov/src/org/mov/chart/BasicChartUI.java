@@ -308,6 +308,8 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	// to see if twice the width of "Feb" can fit within the pixel
 	// space given if we use MONTHS, if not - use QUARTERS.
 
+        assert chart.getXRange().size() > 0;
+
 	// Calculate horizontal scale
 	horizontalScale =
 	    HorizontalAxis.calculateScale(width - Y_LABEL_WIDTH, 

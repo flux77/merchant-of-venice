@@ -21,11 +21,11 @@ package org.mov.chart.graph;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.lang.String;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import org.mov.chart.Graphable;
 import org.mov.chart.GraphTools;
@@ -57,7 +57,7 @@ public class AdvanceDeclineGraph implements Graph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector xRange) {
+		       float bottomLineValue, List xRange) {
 
 	GraphTools.renderLine(g, advanceDecline, xoffset, yoffset,
 			      horizontalScale,
@@ -128,7 +128,7 @@ public class AdvanceDeclineGraph implements Graph {
     /**
      * Return the Y value for the given X value.
      *
-     * @param	X value
+     * @param	x value
      * @return	Y value of the default <code>GraphSource</code>
      */
     public Float getY(Comparable x) {
@@ -138,21 +138,21 @@ public class AdvanceDeclineGraph implements Graph {
     /**
      * Return the highest Y value in the given X range.
      *
-     * @param	xRange	range of X values
+     * @param	x	range of X values
      * @return	the highest Y value of the default <code>GraphSource</code>
      */
-    public float getHighestY(Vector x) {
+    public float getHighestY(List x) {
 	return advanceDecline.getHighestY(x);
     }
 
     /**
      * Return the loweset Y value in the given X range.
      *
-     * @param	xRange	range of X values
+     * @param	x	range of X values
      * @return	the lowest Y value of the default <code>GraphSource</code>
      */
 
-    public float getLowestY(Vector x) {
+    public float getLowestY(List x) {
 	return advanceDecline.getLowestY(x);
     }
 

@@ -19,7 +19,9 @@
 package org.mov.chart.graph;
 
 import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import org.mov.chart.*;
 import org.mov.chart.source.*;
@@ -43,7 +45,7 @@ public class BarGraph extends AbstractGraph {
     // See Graph.java
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector xRange) {
+		       float bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderBar(g, getSource().getGraphable(), 

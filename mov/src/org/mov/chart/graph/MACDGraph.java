@@ -20,7 +20,9 @@ package org.mov.chart.graph;
 
 import java.awt.*;
 import java.lang.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import org.mov.chart.*;
 import org.mov.chart.source.*;
@@ -69,7 +71,7 @@ public class MACDGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector dates) {
+		       float bottomLineValue, List dates) {
 
 	// We ignore the graph colours and use our own custom colours
 
@@ -113,7 +115,7 @@ public class MACDGraph extends AbstractGraph {
     }
 
     // Highest Y value is the highest of both the moving averages
-    public float getHighestY(Vector x) {
+    public float getHighestY(List x) {
 	float fastHighestY = fastMovingAverage.getHighestY(x);
 	float slowHighestY = slowMovingAverage.getHighestY(x);
 
@@ -124,7 +126,7 @@ public class MACDGraph extends AbstractGraph {
     }
 
     // Lowest Y value is the lowest of both the moving averages
-    public float getLowestY(Vector x) {
+    public float getLowestY(List x) {
 	float fastLowestY = fastMovingAverage.getLowestY(x);
 	float slowLowestY = slowMovingAverage.getLowestY(x);
 

@@ -19,7 +19,9 @@
 package org.mov.chart.graph;
 
 import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import org.mov.chart.source.*;
 import org.mov.util.*;
@@ -128,7 +130,7 @@ abstract public class AbstractGraph implements Graph {
     /**
      * Return the Y value for the given X value.
      *
-     * @param	X value
+     * @param	x value
      * @return	Y value of the default <code>GraphSource</code>
      */
     public Float getY(Comparable x) {
@@ -141,7 +143,7 @@ abstract public class AbstractGraph implements Graph {
      * @param	xRange	range of X values
      * @return	the highest Y value of the default <code>GraphSource</code>
      */
-    public float getHighestY(Vector xRange) {
+    public float getHighestY(List xRange) {
 	return source.getGraphable().getHighestY(xRange);
     }
 
@@ -151,7 +153,7 @@ abstract public class AbstractGraph implements Graph {
      * @param	xRange	range of X values
      * @return	the lowest Y value of the default <code>GraphSource</code>
      */
-    public float getLowestY(Vector xRange) {
+    public float getLowestY(List xRange) {
 	return source.getGraphable().getLowestY(xRange);
     }
 

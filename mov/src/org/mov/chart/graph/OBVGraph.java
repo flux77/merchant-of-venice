@@ -19,6 +19,9 @@
 package org.mov.chart.graph;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.lang.*;
 import java.util.*;
 
@@ -61,7 +64,7 @@ public class OBVGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector xRange) {
+		       float bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderLine(g, obv, xoffset, yoffset, 
@@ -77,12 +80,12 @@ public class OBVGraph extends AbstractGraph {
     }
 
     // Override base class
-    public float getHighestY(Vector x) {
+    public float getHighestY(List x) {
 	return obv.getHighestY(x);
     }
 
     // Override base class
-    public float getLowestY(Vector x) {
+    public float getLowestY(List x) {
 	return obv.getLowestY(x);
     }
 
@@ -92,7 +95,7 @@ public class OBVGraph extends AbstractGraph {
      * @param	open	the day open price
      * @param	close	the day close price
      * @param	volume	the day volume
-     * @param	start	arbitary start value
+     * @param	runningOBV	arbitary start value
      * @return	the OBV
      */
     public static Graphable createOBV(Graphable open, Graphable close,

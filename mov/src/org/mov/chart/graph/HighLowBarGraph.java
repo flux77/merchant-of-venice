@@ -19,7 +19,10 @@
 package org.mov.chart.graph;
 
 import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.mov.chart.*;
 import org.mov.chart.source.*;
@@ -59,7 +62,7 @@ public class HighLowBarGraph extends AbstractGraph {
     // See Graph.java
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector xRange) {
+		       float bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 
@@ -157,12 +160,12 @@ public class HighLowBarGraph extends AbstractGraph {
     }
 
     // Highest value will always be in the day high source
-    public float getHighestY(Vector x) {
+    public float getHighestY(List x) {
 	return dayHigh.getHighestY(x);
     }
 
     // Lowest value will always be in the day low source
-    public float getLowestY(Vector x) {
+    public float getLowestY(List x) {
         return dayLow.getLowestY(x);
     }
 }

@@ -20,7 +20,10 @@ package org.mov.chart.graph;
 
 import java.awt.*;
 import java.lang.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.mov.chart.*;
 import org.mov.chart.source.*;
@@ -54,7 +57,7 @@ public class StandardDeviationGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector xRange) {
+		       float bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderLine(g, standardDeviation, xoffset, yoffset, 
@@ -70,12 +73,12 @@ public class StandardDeviationGraph extends AbstractGraph {
     }
 
     // Highest Y value is in the standard deviation graph
-    public float getHighestY(Vector x) {
+    public float getHighestY(List x) {
 	return standardDeviation.getHighestY(x);
     }
 
     // Lowest Y value is in the standard deviation graph
-    public float getLowestY(Vector x) {
+    public float getLowestY(List x) {
 	return standardDeviation.getLowestY(x);
     }
 

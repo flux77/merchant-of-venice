@@ -20,7 +20,10 @@ package org.mov.chart.graph;
 
 import java.awt.*;
 import java.lang.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.mov.chart.*;
 import org.mov.chart.source.*;
@@ -82,7 +85,7 @@ public class BollingerBandsGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector xRange) {
+		       float bottomLineValue, List xRange) {
 
 	// We ignore the graph colours and use our own custom colours
 	g.setColor(Color.green.darker());
@@ -103,12 +106,12 @@ public class BollingerBandsGraph extends AbstractGraph {
     }
 
     // Highest Y value is in the bollinger bands graph
-    public float getHighestY(Vector x) {
+    public float getHighestY(List x) {
 	return upperBand.getHighestY(x);
     }
 
     // Lowest Y value is in the bollinger bands graph
-    public float getLowestY(Vector x) {
+    public float getLowestY(List x) {
 	return lowerBand.getLowestY(x);
     }
 }

@@ -20,7 +20,10 @@ package org.mov.chart.graph;
 
 import java.awt.*;
 import java.lang.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.mov.chart.*;
 import org.mov.chart.source.*;
@@ -55,7 +58,7 @@ public class MomentumGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector xRange) {
+		       float bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderBar(g, momentum, xoffset, yoffset, 
@@ -71,13 +74,13 @@ public class MomentumGraph extends AbstractGraph {
     }
 
     // Centre momentum graph
-    public float getHighestY(Vector x) {
+    public float getHighestY(List x) {
 	return Math.max(Math.abs(momentum.getHighestY(x)),
 			Math.abs(momentum.getLowestY(x)));
     }
 
     // Centre momentum graph
-    public float getLowestY(Vector x) {
+    public float getLowestY(List x) {
 	return -getHighestY(x);
     }
 

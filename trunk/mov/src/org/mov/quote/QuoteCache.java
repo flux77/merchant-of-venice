@@ -213,16 +213,17 @@ public class QuoteCache {
     /**
      * Returns an iterator over all the dates in the cache.
      *
-     * @return	iterator iterator over all the dates.
-     */
-    public Iterator dateIterator() {
-	return dates.iterator();
+     * @param	index	the starting index of the iterator
+     * @return	iterator iterator over all the dates
+      */
+    public ListIterator dateIterator(int index) {
+	return dates.listIterator(index);
     }
 
     /**
      * Returns an array of all symbols in the cache.
      *
-     * @return	an array of symbols.
+     * @return	an array of symbols
      */
     public Object[] getSymbols() {
 	return symbols.toArray();

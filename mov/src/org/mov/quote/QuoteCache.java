@@ -63,9 +63,11 @@ public class QuoteCache {
 
     // Class should only be constructed once by this class
     private QuoteCache() {
-	// Get the newest quote date - we use this as a reference for all other dates.
-	// The date offset of this date is fixed at 0. The next day is -1.
-	addDate(QuoteSourceManager.getSource().getLastDate());
+        TradingDate lastDate = 
+            QuoteSourceManager.getSource().getLastDate();
+
+        if(lastDate != null)
+            addDate(lastDate);
     }
 
     /**
@@ -185,8 +187,7 @@ public class QuoteCache {
             dateOffset = dateToOffset(quote.getDate());
         }
         catch(WeekendDateException e) {
-            // Shouldn't have a quote for a weekend date!
-            assert false;
+            // If the date falls on a weekend then skip it
             return;
         }
 
@@ -216,7 +217,7 @@ public class QuoteCache {
     }
 
     /**
-     * Remove the given quote from the cache. Its OK if the quote isn't loaded.
+     * Remove the given quote from the cache. It's OK if the quote isn't loaded.
      *
      * @param symbol the symbol of the quote to remove
      * @param dateOffset the fast access date offset of the quote to remove
@@ -263,8 +264,11 @@ public class QuoteCache {
 	int dateOffset = -Collections.binarySearch(dates, date, comparator);
 
 	// If the date isn't yet in the cache because its too old, then binary search
-	// will return the negative size of dates. If it does, expand the cache.
-	if(dateOffset > dates.size()) {
+	// will return the negative size of dates. 
+        // If the date isn't yet in the cache because its too new, then binary search
+        // will return 1. 
+        // In either case expand the cache.
+	if(dateOffset > dates.size() || dateOffset == 1) {
 	    expandToDate(date);
 	    dateOffset = -Collections.binarySearch(dates, date, comparator);
 	}
@@ -308,24 +312,40 @@ public class QuoteCache {
     /**
      * Get the oldest date in the cache.
      *
-     * @return the oldest date in cache
+     * @return the oldest date in cache or <code>null</code> if the cache is empty.
      */
     public TradingDate getFirstDate() {
-        return (TradingDate)dates.get(dates.size() - 1);
+        if(dates.size() > 0)
+            return (TradingDate)dates.get(dates.size() - 1);
+        else
+            return null;
+    }
+
+    /**
+     * Get the newest date in the cache.
+     *
+     * @return the newest date in cache or <code>null</code> if the cache is empty.
+     */
+    public TradingDate getLastDate() {
+        if(dates.size() > 0)
+            return (TradingDate)dates.get(0);
+        else
+            return null;
     }
 
     /**
      * Get the fast access offset of the oldest date in the cache.
      *
-     * @return the fast access offset of oldest date in cache
+     * @return the fast access offset of oldest date in cache or +1 if there
+     *         are no dates in the cache.
      */
     public int getFirstDateOffset() {
         return -(dates.size() - 1);
     }
 
-    // Add one day to cache
-    private void addDate(TradingDate date) {
-	
+    // Add one date to cache. The date should be one trading day older than the 
+    // oldest date in the cache.
+    private void addDate(TradingDate date) {       
 	// Create a map with 0 initial capacity. I.e. we create an empty one
 	// because we might not even use it
 	HashMap map = new HashMap(0);
@@ -333,18 +353,51 @@ public class QuoteCache {
 	dates.add(date);	
     }
 
+    // This function is used to insert a date into the cache that is newer
+    // (i.e. more recent) than any other dates in the cache. It's pretty
+    // slow as it needs to shift two arrays but it's only used for import
+    // so it doesn't matter
+    private void insertDate(TradingDate date) {
+	// Create a map with 0 initial capacity. I.e. we create an empty one
+	// because we might not even use it
+	HashMap map = new HashMap(0);
+	cache.add(0, map);
+	dates.add(0, date);       
+    }
+
     // Expand the quote cache to encompass the given date
     private void expandToDate(TradingDate date) {
 
-	// Get oldest date in cache. We have all dates from the newest date to this date
-        // already so no need to check if the given date is newer.
-        TradingDate firstDate = getFirstDate();
+        assert date != null;
 
-        // Keep loading dates until our cache holds this date
-        while(date.before(firstDate)) {
-            firstDate = firstDate.previous(1);
-	    addDate(firstDate);
+        TradingDate firstDate = getFirstDate();
+        TradingDate lastDate = getLastDate();
+
+        // There are four cases to consider, first there are no dates
+        // in the cache
+        if(firstDate == null)
+            addDate(date);
+
+        // Second is that the new date to add is before the first date
+        // in our cache. This is common and we can handle this quickly
+        else if(date.before(firstDate)) {
+            while(date.before(firstDate)) {
+                firstDate = firstDate.previous(1);
+                addDate(firstDate);
+            }
         }
+
+        // The third case is that this date is newer than our newest
+        // date. This can only happen when quotes are imported into the
+        // system while Venice is running. This code is slow but we don't care.
+        else if(date.after(lastDate)) {
+            while(date.after(lastDate)) {
+                lastDate = lastDate.next(1);
+                insertDate(lastDate);
+            }
+        }
+    
+        // The remaining case is the date is already in our range...
     }
 }
 

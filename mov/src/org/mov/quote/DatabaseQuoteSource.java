@@ -112,8 +112,6 @@ public class DatabaseQuoteSource implements QuoteSource
         this.database = database;
         this.username = username;
         this.password = password;
-
-        checkConnection();
     }
 
     // Get the driver and connect to the database. Return FALSE if failed.
@@ -158,7 +156,8 @@ public class DatabaseQuoteSource implements QuoteSource
             return true;
 	}
 	catch (SQLException e) {
-	    DesktopManager.showErrorMessage("Can't connect to database.");
+	    DesktopManager.showErrorMessage("Error connecting to database:\n" +
+                                            e.getMessage());
             return false;
 	}
     }
@@ -272,8 +271,9 @@ public class DatabaseQuoteSource implements QuoteSource
 		RS.close();
 		statement.close();
 	    }
-	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database.");
+	    catch (SQLException e) {
+                DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                                e.getMessage());
 	    }
 	}
 
@@ -311,8 +311,9 @@ public class DatabaseQuoteSource implements QuoteSource
 		RS.close();
 		statement.close();
 	    }
-	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database.");
+	    catch (SQLException e) {
+                DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                                e.getMessage());
 	    }
 	}
 
@@ -355,9 +356,10 @@ public class DatabaseQuoteSource implements QuoteSource
 		RS.close();
 		statement.close();
 	    }
-	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database.");
-	    }
+	    catch (SQLException e) {
+                DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                                e.getMessage());
+            }
 	}
 
 	if(date != null) {
@@ -389,24 +391,28 @@ public class DatabaseQuoteSource implements QuoteSource
      * Load the given quote range into the quote cache.
      *
      * @param	quoteRange	the range of quotes to load
+     * @return  <code>TRUE</code> if the operation suceeded
      * @see Quote
      * @see QuoteCache
      */
-    public void loadQuoteRange(QuoteRange quoteRange) {
-
+    public boolean loadQuoteRange(QuoteRange quoteRange) {
+        
 	String queryString = buildSQLString(quoteRange);
+        boolean success;
 
 	// This query might take a while...
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setNote("Loading Quotes...");
         progress.setIndeterminate(true);
-	executeSQLString(progress, queryString);
+	success = executeSQLString(progress, queryString);
         ProgressDialogManager.closeProgressDialog(progress);
+
+        return success;
     }
 
     // Takes a string containing an SQL statement and then executes it. Returns
     // a vector of quotes.
-    private void executeSQLString(ProgressDialog progress, String SQLString) {
+    private boolean executeSQLString(ProgressDialog progress, String SQLString) {
 
 	if(checkConnection()) {
 	    try {
@@ -438,11 +444,15 @@ public class DatabaseQuoteSource implements QuoteSource
 		// Clean up after ourselves
 		RS.close();
 		statement.close();
+                return true;
 	    }
-	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database.");
+	    catch (SQLException e) {
+                DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                                e.getMessage());
 	    }
 	}
+
+        return false;
     }
 
     // Creates an SQL statement that will return all the quotes in the given
@@ -569,8 +579,9 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	    success = true;
 	}
-	catch (SQLException E) {
-	    DesktopManager.showErrorMessage("Error creating table.");
+	catch (SQLException e) {
+            DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                            e.getMessage());
 	}
 
 	return success;	
@@ -611,15 +622,17 @@ public class DatabaseQuoteSource implements QuoteSource
 	    // 2. Check table exists - if not create it
 	    {
 		ResultSet RS =
-		    meta.getTables(databaseName, null, databaseName, null);
+		    meta.getTables(databaseName, null, "%", null);
 		String traverseTables;
 		boolean foundTable = false;
 
 		while(RS.next()) {
-		    traverseTables = RS.getString(1);
+		    traverseTables = RS.getString(3);
 			
-		    if(traverseTables.equals(SHARE_TABLE_NAME))
+		    if(traverseTables.equals(SHARE_TABLE_NAME)) {
 			foundTable = true;
+                        break;
+                    }
 		}
 		
 		// No table? Well have to go create it
@@ -628,8 +641,9 @@ public class DatabaseQuoteSource implements QuoteSource
 	    }
 
 	}
-	catch (SQLException E) {
-	    DesktopManager.showErrorMessage("Error talking to database.");
+	catch (SQLException e) {
+            DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                            e.getMessage());
 	    return false;
 	}
 
@@ -690,8 +704,9 @@ public class DatabaseQuoteSource implements QuoteSource
                     Statement statement = connection.createStatement();
                     ResultSet RS = statement.executeQuery(insertString.toString());
                 }
-                catch (SQLException E) {
-                    DesktopManager.showErrorMessage("Error talking to database.");
+                catch (SQLException e) {
+                    DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                                    e.getMessage());
                 }
             }
 	}
@@ -727,8 +742,9 @@ public class DatabaseQuoteSource implements QuoteSource
 		RS.close();
 		statement.close();
 	    }
-	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database.");
+	    catch (SQLException e) {
+                DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                                e.getMessage());
 	    }
 	}
 
@@ -764,8 +780,9 @@ public class DatabaseQuoteSource implements QuoteSource
                 }
                 
             }
-            catch (SQLException E) {
-                DesktopManager.showErrorMessage("Error talking to database.");
+            catch (SQLException e) {
+                DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                                e.getMessage());
             }
             
             ProgressDialogManager.closeProgressDialog(progress);
@@ -860,7 +877,8 @@ public class DatabaseQuoteSource implements QuoteSource
             return advanceDecline;
         }
         catch (SQLException e) {
-            DesktopManager.showErrorMessage("Error talking to database.");
+            DesktopManager.showErrorMessage("Error talking to database:\n" +
+                                            e.getMessage());
             return 0;
         }
     }

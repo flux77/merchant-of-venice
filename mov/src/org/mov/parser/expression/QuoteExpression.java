@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.parser.expression;
@@ -36,21 +36,21 @@ public class QuoteExpression extends TerminalExpression {
     /**
      * Create a new quote expression.
      *
-     * @param quoteKind Kind of quote. One of {@link Quote#DAY_OPEN}, 
-     *        {@link Quote#DAY_CLOSE}, {@link Quote#DAY_LOW}, 
+     * @param quoteKind Kind of quote. One of {@link Quote#DAY_OPEN},
+     *        {@link Quote#DAY_CLOSE}, {@link Quote#DAY_LOW},
      *        {@link Quote#DAY_HIGH} or {@link Quote#DAY_VOLUME}
      */
     public QuoteExpression(int quoteKind) {
-        assert(quoteKind == Quote.DAY_OPEN || quoteKind == Quote.DAY_CLOSE || 
-               quoteKind == Quote.DAY_LOW || quoteKind == Quote.DAY_HIGH || 
+        assert(quoteKind == Quote.DAY_OPEN || quoteKind == Quote.DAY_CLOSE ||
+               quoteKind == Quote.DAY_LOW || quoteKind == Quote.DAY_HIGH ||
                quoteKind == Quote.DAY_VOLUME);
         this.quoteKind = quoteKind;
     }
 
     /**
-     * Get the quote kind. 
+     * Get the quote kind.
      *
-     * @return	the quote kind, one of: {@link Quote#DAY_OPEN}, 
+     * @return	the quote kind, one of: {@link Quote#DAY_OPEN},
      * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_LOW}
      * or {@link Quote#DAY_VOLUME}.
      */
@@ -70,12 +70,16 @@ public class QuoteExpression extends TerminalExpression {
             return FLOAT_QUOTE_TYPE;
     }
 
-    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
 
-        // This should never be evaluated
-        assert false;
-        return 0.0D;
+        try {
+            return quoteBundle.getQuote(symbol, getQuoteKind(), day, 0);
+        }
+        catch(MissingQuoteException e) {
+            // What should I do in this case?
+            return 0.0D;
+        }
     }
 
     public String toString() {

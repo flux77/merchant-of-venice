@@ -94,9 +94,7 @@ public class SkinManager {
 		SkinLookAndFeel.setSkin(skin);
 		UIManager.setLookAndFeel("com.l2fprod.gui.plaf.skin.SkinLookAndFeel");
 		SwingUtilities.updateComponentTreeUI(Main.getApplicationFrame());
-	    } else
-		System.out.println("No skin loaded");
-	    
+	    } 
 	    
 	} catch (Exception e) {
 	    System.err.println("SkinManager Exception: "+e);

@@ -348,7 +348,6 @@ public class Mutator {
      * @return randomly generated non-terminal float expression
      */
     private Expression createRandomNonTerminalFloat(Expression model, int level) {
-        int randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
 
         // If we are mutating an existing number expression then favour
         // just modifying the number's value rather than replacing it
@@ -369,6 +368,8 @@ public class Mutator {
             return numberExpression;
         }
 
+        int randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
+        
         if(randomNumber == 0)
             return createRandomTerminal(Expression.FLOAT_TYPE);
         else if(randomNumber == 1)
@@ -429,7 +430,6 @@ public class Mutator {
      * @return randomly generated non-terminal integer expression
      */
     private Expression createRandomNonTerminalInteger(Expression model, int level) {
-        int randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
 
         // If we are mutating an existing number expression then favour
         // just modifying the number's value rather than replacing it
@@ -449,6 +449,14 @@ public class Mutator {
             numberExpression.setValue(numberExpression.getValue() + value);
             return numberExpression;
         }
+
+        int randomNumber = 0;
+        // Count until randomNumber is ok.
+        // If it is 13, that is to say rsi() function,
+        // we must change it, because rsi() is not an integer return function.
+        do {
+            randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
+        } while (randomNumber==13);
 
         if(randomNumber == 0)
             return createRandomTerminal(Expression.INTEGER_TYPE);
@@ -491,9 +499,8 @@ public class Mutator {
 
         else if(randomNumber == 12)
             return new AbsExpression(getChild(model, level, 0, Expression.INTEGER_TYPE));
-        else if(randomNumber == 13)
-            return new RSIExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE));
+        //else if(randomNumber == 13)
+        //    rsi() function never executed, because it does not return an integer
         else {
             assert randomNumber == 14;
             return new AvgExpression(new QuoteExpression(Quote.DAY_VOLUME),

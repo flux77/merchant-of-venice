@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -44,6 +45,7 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.border.TitledBorder;
 
+import org.mov.analyser.ga.GAIndividual;
 import org.mov.parser.Expression;
 import org.mov.parser.ExpressionException;
 import org.mov.parser.Parser;
@@ -54,32 +56,7 @@ import org.mov.ui.EquationComboBox;
 import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
-/**
-* An analysis tool page that lets the user enter a buy and sell rule, or
-* a family of related buy and sell rules. This page is used by the
-* {@link PaperTradeModule}. The page contains the following user fields:
-*
-* <ul><li>Buy Rule</li>
-*     <li>Sell Rule</li>
-*     <li>Enable Rule Families</li>
-*     <ul>
-*        <li>Range of A Variable</li>
-*        <li>Range of B Variable</li>
-*        <li>Range of C Variable</li>
-*     </ul>
-* </ul>
-*
-* The buy and sell rules determine when a stock should be bought or sold
-* respectively. The rule family option allows the user to embedd variables
-* in the rules. This enables them to specify a family of simillar rules. For
-* example, a buy rule might be <code>avg(close, 15) > avg(close, 30)</code>.
-* If the rule family is enabled, the user could enter 
-* <code>avg(close, a) > avg(close, b)</code>. Then the paper trade would
-* try each rule combination of [a, b].
-*
-* @author Andrew Leppard
-* @see PaperTradeModule
-*/
+
 public class GARulesPage extends JPanel implements AnalyserPage {
 
     private JDesktopPane desktop;
@@ -88,6 +65,10 @@ public class GARulesPage extends JPanel implements AnalyserPage {
     private JCheckBox ruleFamilyEnabledCheckBox;
     private EquationComboBox buyRuleEquationComboBox;
     private EquationComboBox sellRuleEquationComboBox;
+    private JTextField parameterTextField;
+    private JTextField minValueTextField;
+    private JTextField maxValueTextField;
+    private JButton addParameterButton;
     
     // Parsed input
     private Expression buyRule;
@@ -101,10 +82,16 @@ public class GARulesPage extends JPanel implements AnalyserPage {
      *
      * @param desktop the desktop
      */    
-    public GARulesPage(JDesktopPane desktop) {      
+    public GARulesPage(JDesktopPane desktop,
+                       double maxHeight) {
+                           
+        Dimension preferredSize = new Dimension();
+        preferredSize.setSize(this.getPreferredSize().getWidth(), maxHeight/2);
+        
         this.desktop = desktop;
         this.GARulesPageModule = new GARulesPageModule(desktop);
-        layoutPage();
+        layoutPage(preferredSize);
+        
     }
     
     public void load(String key) {
@@ -125,6 +112,12 @@ public class GARulesPage extends JPanel implements AnalyserPage {
                 buyRuleEquationComboBox.setEquationText(value);
             else if (setting.equals("sell_rule"))
                 sellRuleEquationComboBox.setEquationText(value);
+            else if (setting.equals("parameter"))
+                parameterTextField.setText(value);
+            else if (setting.equals("min_value"))
+                minValueTextField.setText(value);
+            else if (setting.equals("max_value"))
+                maxValueTextField.setText(value);
         }
         
         HashMap settingsParam =
@@ -138,12 +131,11 @@ public class GARulesPage extends JPanel implements AnalyserPage {
 
             GARulesPageModule.load(valueParam);
         }
-        GARulesPageModule.loadEmpty();
         
     }
     
     public void save(String key) {
-        String idStr = "GPInitialPopulation";
+        String idStr = "Parameters";
 
         HashMap settingsParam =
                 PreferencesManager.loadAnalyserPageSettings(key + idStr);
@@ -152,6 +144,9 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         GARulesPageModule.save(settingsParam, idStr);
         settings.put("buy_rule", buyRuleEquationComboBox.getEquationText());
         settings.put("sell_rule", sellRuleEquationComboBox.getEquationText());
+        settings.put("parameter", parameterTextField.getText());
+        settings.put("min_value", minValueTextField.getText());
+        settings.put("max_value", maxValueTextField.getText());
 
         PreferencesManager.saveAnalyserPageSettings(key + idStr,
                                                     settingsParam);
@@ -167,13 +162,15 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         String buyRuleString = buyRuleEquationComboBox.getEquationText();
         String sellRuleString = sellRuleEquationComboBox.getEquationText();
         
-        // Set the variables in the rules
-        //for () {
-        //    variables.add("xxx", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        //}
-        
         variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
         variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        // Insert all the parameters in variables.
+        // We use lowestGAIndividual, but highestGAIndividual should be the same.
+        // All the GAIndividual have the same parameters during all GA Algorithm,
+        // they just differ one from another because of the values.
+        GAIndividual lowestGAIndividual = this.getLowestIndividual();
+        for (int ii=0; ii<lowestGAIndividual.size(); ii++)
+            variables.add(lowestGAIndividual.parameter(ii), lowestGAIndividual.type(ii), Variable.CONSTANT);
         
         if (buyRuleString.length() == 0) {
             JOptionPane.showInternalMessageDialog(desktop, Locale
@@ -229,29 +226,11 @@ public class GARulesPage extends JPanel implements AnalyserPage {
             return false;
         }
         
-        // Now try reading the ranges
-        
-        try {
-            //if (!aRangeTextField.getText().equals(""))
-            //    aRange = Integer.parseInt(aRangeTextField.getText());
-        } catch (NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("ERROR_PARSING_NUMBER", 
-                                                                   e.getMessage()), 
-                                                  Locale.getString("ERROR_PARSING_RULES"),
-                                                  JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        
-        // Noramlise ranges
-        //if (aRange <= 0)
-        //    aRange = 1;
-        
         return true;
     }
     
     public JComponent getComponent() {
-		return this;
+        return this;
     }
     
     public String getTitle() {
@@ -277,45 +256,117 @@ public class GARulesPage extends JPanel implements AnalyserPage {
     }
     
     /**
-     * Return the A range parameter.
+     * Return the GAIndividual with the lowest parameters.
      *
-     * @return the maximum value of A
+     * @return the individual
      */
-    //public int getARange() {
-    //    return aRange;
-    //}
+    public GAIndividual getLowestIndividual() {
+        int sizeOfIndividual = GARulesPageModule.getRowCount();
+        String[] parameters = new String[sizeOfIndividual];
+        double[] values = new double[sizeOfIndividual];
+        int[] types = new int[sizeOfIndividual];
+        for (int ii=0; ii<sizeOfIndividual; ii++) {
+            parameters[ii]=(String)GARulesPageModule.getValueAt(ii,GARulesPageModule.PARAMETER_COLUMN);
+            String value=(String)GARulesPageModule.getValueAt(ii,GARulesPageModule.MIN_PARAMETER_COLUMN);
+            try {
+                values[ii] = Double.valueOf(value.trim()).doubleValue();
+             } catch (NumberFormatException nfe) {
+                 // it should never happen, because the numbers are already checked in input.
+                return null;
+            }
+            // if there is a full stop in the number string,
+            // interpret it as a FLOAT number
+            if (value.indexOf('.')==-1) {
+                types[ii]=Expression.INTEGER_TYPE;
+            } else {
+                types[ii]=Expression.FLOAT_TYPE;
+            } 
+        }
+        GAIndividual retValue = new GAIndividual(parameters, values, types);
+        return retValue;
+    }
     
-    private void layoutPage() {
+    /**
+     * Return the GAIndividual with the highest parameters.
+     *
+     * @return the individual
+     */
+    public GAIndividual getHighestIndividual() {
+        int sizeOfIndividual = GARulesPageModule.getRowCount();
+        String[] parameters = new String[sizeOfIndividual];
+        double[] values = new double[sizeOfIndividual];
+        int[] types = new int[sizeOfIndividual];
+        for (int ii=0; ii<sizeOfIndividual; ii++) {
+            parameters[ii]=(String)GARulesPageModule.getValueAt(ii,GARulesPageModule.PARAMETER_COLUMN);
+            String value=(String)GARulesPageModule.getValueAt(ii,GARulesPageModule.MAX_PARAMETER_COLUMN);
+            try {
+                values[ii] = Double.valueOf(value.trim()).doubleValue();
+             } catch (NumberFormatException nfe) {
+                 // it should never happen, because the numbers are already checked in input.
+                return null;
+            }
+            // if there is a full stop in the number string,
+            // interpret it as a FLOAT number
+            if (value.indexOf('.')==-1) {
+                types[ii]=Expression.INTEGER_TYPE;
+            } else {
+                types[ii]=Expression.FLOAT_TYPE;
+            } 
+        }
+        GAIndividual retValue = new GAIndividual(parameters, values, types);
+        return retValue;
+    }
+    
+    private void addRow() {
+        double dbl = 0.0D;
+        String str = null;
+        try {
+            // Control if right numbers (minimum and maximum parameters' bounds)
+            // are going to be inserted
+            str = minValueTextField.getText().trim();
+            dbl = Double.valueOf(str).doubleValue();
+            str = maxValueTextField.getText().trim();
+            dbl = Double.valueOf(str).doubleValue();
+            // Insert new row with new parameter
+            GARulesPageModule.addRow(parameterTextField.getText(),
+                    minValueTextField.getText(), maxValueTextField.getText());
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showInternalMessageDialog(desktop, Locale.getString("ERROR_PARSING_NUMBER", str),
+                                                Locale.getString("ERROR_PARSING_RULES"),
+                                                JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+    
+    private void layoutPage(Dimension preferredSize) {
         
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         // Rules panel
-        {
-            TitledBorder equationTitled = new TitledBorder(Locale.getString("RULES_PAGE_TITLE"));
-            JPanel panel = new JPanel();
-            panel.setBorder(equationTitled);
-            panel.setLayout(new BorderLayout());
-            
-            JPanel innerPanel = new JPanel();
-            GridBagLayout gridbag = new GridBagLayout();
-            GridBagConstraints c = new GridBagConstraints();
-            innerPanel.setLayout(gridbag);
-            
-            c.weightx = 1.0;
-            c.ipadx = 5;
-            c.anchor = GridBagConstraints.WEST;
-            c.fill = GridBagConstraints.HORIZONTAL;
-            
-            buyRuleEquationComboBox = GridBagHelper.addEquationRow(innerPanel,
-                                                                   Locale.getString("BUY_RULE"), "",
-                                                                   gridbag, c);
-            sellRuleEquationComboBox = GridBagHelper.addEquationRow(innerPanel,
-                                                                    Locale.getString("SELL_RULE"), 
-                                                                    "", gridbag, c);
-            
-            panel.add(innerPanel, BorderLayout.NORTH);
-            add(panel);
-        }
+        TitledBorder equationTitled = new TitledBorder(Locale.getString("RULES_PAGE_TITLE"));
+        JPanel panel = new JPanel();
+        panel.setBorder(equationTitled);
+        panel.setLayout(new BorderLayout());
+
+        JPanel innerPanel = new JPanel();
+        GridBagLayout gridbag = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
+        innerPanel.setLayout(gridbag);
+
+        c.weightx = 1.0;
+        c.ipadx = 5;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        buyRuleEquationComboBox = GridBagHelper.addEquationRow(innerPanel,
+                                                               Locale.getString("BUY_RULE"), "",
+                                                               gridbag, c);
+        sellRuleEquationComboBox = GridBagHelper.addEquationRow(innerPanel,
+                                                                Locale.getString("SELL_RULE"), 
+                                                                "", gridbag, c);
+
+        panel.add(innerPanel, BorderLayout.NORTH);
+        add(panel);
         
         // Parameters panel
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -325,7 +376,45 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         
         JScrollPane upDownScrollPane = new JScrollPane(GARulesPageModule);
         upDownScrollPane.setLayout(new ScrollPaneLayout());
+        upDownScrollPane.setPreferredSize(preferredSize);
         add(upDownScrollPane);
+        
+        // Text Boxes to add a new parameter
+        JPanel innerPanelParam = new JPanel();
+        innerPanel.setLayout(gridbag);
+
+        c.weightx = 1.0;
+        c.ipadx = 5;
+        c.anchor = GridBagConstraints.WEST;
+
+        parameterTextField =
+            GridBagHelper.addTextRow(innerPanelParam, Locale.getString("PARAMETER"), "",
+                                     gridbag, c,
+                                     7);
+
+        minValueTextField =
+            GridBagHelper.addTextRow(innerPanelParam,
+                                     Locale.getString("MIN_PARAMETER"), "",
+                                     gridbag, c,
+                                     7);
+        maxValueTextField =
+            GridBagHelper.addTextRow(innerPanelParam,
+                                     Locale.getString("MAX_PARAMETER"), "",
+                                     gridbag, c, 7);
+        
+
+        add(innerPanelParam);
+        
+	// button used for inserting a new parameter
+	JPanel buttonPanel = new JPanel();
+	JButton addParameterButton = new JButton(Locale.getString("ADD_PARAMETER"));
+        addParameterButton.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    // add a row to the table with the new parameter
+                    addRow();
+                }
+            });
+	add(addParameterButton);
     }
     
 }

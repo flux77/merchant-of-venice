@@ -74,14 +74,9 @@ public class GARulesPageModule extends AbstractTable implements Module {
 
     private JDesktopPane desktop;
     private Model model;
-    private double[] min = new double[0];
-    private double[] max = new double[0];
     
     // Menus
     private JMenuBar menuBar;
-    private JMenuItem editParameterMenuItem;
-    private JMenuItem editMinParameterMenuItem;
-    private JMenuItem editMaxParameterMenuItem;
     private JMenuItem removeMenuItem;
     private JMenuItem removeAllMenuItem;
     
@@ -121,32 +116,7 @@ public class GARulesPageModule extends AbstractTable implements Module {
             // Notify table that the whole data has changed
             fireTableDataChanged();
         }
-        
-        public void addEmptyIfNot() {
-            // If there is neither a row empty,
-            // add an empty row so the user can add a new buy/sell rules
-            boolean isAlreadyEmpty = false;
-            for (int i=0; i<getRowCount(); i++) {
-                String[] result = (String[])results.get(i);
-                if (result[PARAMETER_COLUMN].equals("") &&
-                    result[MIN_PARAMETER_COLUMN].equals("")) {
-                    isAlreadyEmpty = true;
-                }
-                result = null;
-            }
-            if (!isAlreadyEmpty) {
-                this.addEmpty();
-            }
-        }
-        
-        private void addEmpty() {
-            String values[] = new String[NUMBER_COLUMN];
-            for (int i=0; i<values.length; i++) {
-                values[i] = new String("");
-            }
-            this.results.add(values);
-        }
-        
+                
         public int getRowCount() {
             return results.size();
         }
@@ -173,21 +143,15 @@ public class GARulesPageModule extends AbstractTable implements Module {
             }
         }
         
-        public boolean setValueAt(int row, int column, String value) {
-            if(row >= getRowCount())
-                return false;
-            
-            String[] result = (String[])results.get(row);
-            String[] object = new String[NUMBER_COLUMN];
-            object[PARAMETER_COLUMN] = new String(result[PARAMETER_COLUMN]);
-            object[MIN_PARAMETER_COLUMN] = new String(result[MIN_PARAMETER_COLUMN]);
-            object[MAX_PARAMETER_COLUMN] = new String(result[MAX_PARAMETER_COLUMN]);
-            object[column] = new String(value);
-            
-            result = (String[])results.set(row, object);
-            result = null;
-            
-            return true;
+        public void addRow(String parameter, String minValue, String maxValue) {
+            String[] result = new String[NUMBER_COLUMN];
+            result[PARAMETER_COLUMN] = new String(parameter);
+            result[MIN_PARAMETER_COLUMN] = new String(minValue);
+            result[MAX_PARAMETER_COLUMN] = new String(maxValue);
+
+            this.results.add(result);
+            // Notify table that the whole data has changed
+            fireTableDataChanged();
         }
     }
     
@@ -238,35 +202,6 @@ public class GARulesPageModule extends AbstractTable implements Module {
         if(event.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu menu = new JPopupMenu();
             
-            JMenuItem popupeditParameterMenuItem =
-            new JMenuItem(Locale.getString("EDIT_PARAMETER"));
-            popupeditParameterMenuItem.setEnabled(getSelectedRowCount() == 1);
-            popupeditParameterMenuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    editParameter();
-                }});
-            menu.add(popupeditParameterMenuItem);
-
-            JMenuItem popupeditMinParameterMenuItem =
-            new JMenuItem(Locale.getString("EDIT_MIN_PARAMETER"));
-            popupeditMinParameterMenuItem.setEnabled(getSelectedRowCount() == 1);
-            popupeditMinParameterMenuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    editMinParameter();
-                }});
-            menu.add(popupeditMinParameterMenuItem);
-            
-            JMenuItem popupeditMaxParameterMenuItem =
-            new JMenuItem(Locale.getString("EDIT_MAX_PARAMETER"));
-            popupeditMaxParameterMenuItem.setEnabled(getSelectedRowCount() == 1);
-            popupeditMaxParameterMenuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    editMaxParameter();
-                }});
-            menu.add(popupeditMaxParameterMenuItem);
-
-            menu.addSeparator();
-
             JMenuItem popupRemoveMenuItem =
             new JMenuItem(Locale.getString("REMOVE"));
             popupRemoveMenuItem.setEnabled(getSelectedRowCount() >= 1);
@@ -280,75 +215,6 @@ public class GARulesPageModule extends AbstractTable implements Module {
             menu.show(this, point.x, point.y);
         }
         
-    }
-    
-    // Display a dialog allowing the user to edit the selected parameter.
-    private void editParameter() {
-        // Get result at row
-        final int row = getSelectedRow();
-        
-        // Don't do anything if we couldn't retrieve the selected row
-        if(row != -1) {
-            final String[] result = model.getResult(row);
-            
-            Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    String newBuyRule = ExpressionEditorDialog.showEditDialog(Locale.getString("EDIT_EQUATION"),
-                    result[PARAMETER_COLUMN]);
-                    model.setValueAt(row, PARAMETER_COLUMN, newBuyRule);
-                    model.addEmptyIfNot();
-                    model.fireTableDataChanged();
-                    repaint();
-                }});
-                
-                thread.start();
-        }
-    }
-    
-    // Display a dialog allowing the user to edit the selected minimum parameter.
-    private void editMinParameter() {
-        // Get result at row
-        final int row = getSelectedRow();
-        
-        // Don't do anything if we couldn't retrieve the selected row
-        if(row != -1) {
-            final String[] result = model.getResult(row);
-            
-            Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    String newSellRule = ExpressionEditorDialog.showEditDialog(Locale.getString("EDIT_EQUATION"),
-                    result[MIN_PARAMETER_COLUMN]);
-                    model.setValueAt(row, MIN_PARAMETER_COLUMN, newSellRule);
-                    model.addEmptyIfNot();
-                    model.fireTableDataChanged();
-                    repaint();
-                }});
-                
-                thread.start();
-        }
-    }
-    
-    
-    // Display a dialog allowing the user to edit the selected maximum parameter.
-    private void editMaxParameter() {
-        // Get result at row
-        final int row = getSelectedRow();
-        
-        // Don't do anything if we couldn't retrieve the selected row
-        if(row != -1) {
-            final String[] result = model.getResult(row);
-            
-            Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    String newPerc = ExpressionEditorDialog.showEditDialog(Locale.getString("EDIT_PERC"),
-                    result[MAX_PARAMETER_COLUMN]);
-                    model.setValueAt(row, MAX_PARAMETER_COLUMN, newPerc);
-                    model.fireTableDataChanged();
-                    repaint();
-                }});
-                
-                thread.start();
-        }
     }
     
     // Removes all the selected results from the table
@@ -376,7 +242,6 @@ public class GARulesPageModule extends AbstractTable implements Module {
         }
         
         model.setResults(results);
-        model.addEmptyIfNot();
     }
     
     // Some menu items are only enabled/disabled depending on what is
@@ -384,9 +249,6 @@ public class GARulesPageModule extends AbstractTable implements Module {
     private void checkMenuDisabledStatus() {
         int numberOfSelectedRows = getSelectedRowCount();
         
-        editParameterMenuItem.setEnabled(numberOfSelectedRows == 1);
-        editMinParameterMenuItem.setEnabled(numberOfSelectedRows == 1);
-        editMaxParameterMenuItem.setEnabled(numberOfSelectedRows == 1);
         removeMenuItem.setEnabled(numberOfSelectedRows >= 1);
         removeAllMenuItem.setEnabled(model.getRowCount() > 0);
     }
@@ -397,29 +259,6 @@ public class GARulesPageModule extends AbstractTable implements Module {
         
         JMenu resultMenu = MenuHelper.addMenu(menuBar, Locale.getString("RESULT"));
         
-        editParameterMenuItem = new JMenuItem(Locale.getString("EDIT_PARAMETER"));
-        editParameterMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                editParameter();
-            }});
-        resultMenu.add(editParameterMenuItem);
-
-        editMinParameterMenuItem = new JMenuItem(Locale.getString("EDIT_MIN_PARAMETER"));
-        editMinParameterMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                editMinParameter();
-            }});
-        resultMenu.add(editMinParameterMenuItem);
-
-        editMaxParameterMenuItem = new JMenuItem(Locale.getString("EDIT_MAX_PARAMETER"));
-        editMaxParameterMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                editMaxParameter();
-            }});
-        resultMenu.add(editMaxParameterMenuItem);
-
-        resultMenu.addSeparator();
-
         removeMenuItem = new JMenuItem(Locale.getString("REMOVE"));
         removeMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -454,65 +293,10 @@ public class GARulesPageModule extends AbstractTable implements Module {
         checkMenuDisabledStatus();
     }
     
-    public void addResults(List results) {
-        model.addResults(results);
-        checkMenuDisabledStatus();
-        validate();
-        repaint();
+    public void addRow(String parameter, String minValue, String maxValue) {
+        model.addRow(parameter, minValue, maxValue);
     }
     
-    public void addRowTable(String buyRule, String sellRule, String perc) {
-        List results = new ArrayList();
-        String[] object = new String[NUMBER_COLUMN];
-        object[PARAMETER_COLUMN] = new String(buyRule);
-        object[MIN_PARAMETER_COLUMN] = new String(sellRule);
-        object[MAX_PARAMETER_COLUMN] = new String(perc);
-        results.add(object);
-        model.addResults(results);
-        checkMenuDisabledStatus();
-        validate();
-        repaint();
-    }
-
-    private boolean isAllValuesAcceptable() {
-        try {
-            setNumericalValues();
-        } catch(ParseException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ERROR_PARSING_NUMBER",
-                                                                   e.getMessage()),
-                                                  Locale.getString("INVALID_GA_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
-	    return false;
-	}
-
-        return true;
-    }
-    
-    private void setNumericalValues() throws ParseException {
-        min = new double[model.getRowCount()];
-        max = new double[model.getRowCount()];
-    
-        // decimalFormat manage the localization.
-        DecimalFormat decimalFormat = new DecimalFormat(format);
-        for (int i=0; i<min.length; i++) {
-            final String[] result = model.getResult(i);
-            if((!result[MIN_PARAMETER_COLUMN].equals("")) && (!result[MIN_PARAMETER_COLUMN].equals(nullString))) {
-                min[i] = decimalFormat.parse(result[MIN_PARAMETER_COLUMN]).doubleValue();
-            } else {
-                min[i] = 0;
-            }
-        }
-        for (int i=0; i<max.length; i++) {
-            final String[] result = model.getResult(i);
-            if((!result[MAX_PARAMETER_COLUMN].equals("")) && (!result[MAX_PARAMETER_COLUMN].equals(nullString))) {
-                max[i] = decimalFormat.parse(result[MAX_PARAMETER_COLUMN]).doubleValue();
-            } else {
-                max[i] = 0;
-            }
-        }
-    }
-        
     public String getTitle() {
         return Locale.getString("GA_PAGE_PARAMETERS_LONG");
     }
@@ -572,25 +356,6 @@ public class GARulesPageModule extends AbstractTable implements Module {
         }
     }
     
-    public void loadEmpty() {
-        model.addEmptyIfNot();
-    }
-        
-    public boolean parse() {
-        if(!isAllValuesAcceptable()) {
-            return false;
-        }
-        return true;
-    }
-    
-    public String getBuyRule(int row) {
-        return (String)model.getValueAt(row, PARAMETER_COLUMN);
-    }
-
-    public String getSellRule(int row) {
-        return (String)model.getValueAt(row, MIN_PARAMETER_COLUMN);
-    }
-
     public void addModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
     }

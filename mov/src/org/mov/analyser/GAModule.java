@@ -41,6 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
+import org.mov.analyser.ga.*;
 import org.mov.main.CommandManager;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
@@ -49,6 +50,7 @@ import org.mov.parser.EvaluationException;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.portfolio.Portfolio;
+import org.mov.quote.QuoteBundle;
 import org.mov.quote.ScriptQuoteBundle;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -97,7 +99,10 @@ public class GAModule extends JPanel implements Module {
         quoteRangePage = new QuoteRangePage(desktop);
         tabbedPane.addTab(quoteRangePage.getTitle(), quoteRangePage.getComponent());
 
-        GARulesPage = new GARulesPage(desktop);
+        // Get the max height
+        double maxHeight = quoteRangePage.getPreferredSize().getHeight();
+        
+        GARulesPage = new GARulesPage(desktop, maxHeight);
         tabbedPane.addTab(GARulesPage.getTitle(), GARulesPage.getComponent());
 
         portfolioPage = new PortfolioPage(desktop);
@@ -258,11 +263,151 @@ public class GAModule extends JPanel implements Module {
     }
 
     private void geneticAlgorithm() {
+        ProgressDialog progress =
+            ProgressDialogManager.getProgressDialog();
+        
+        Thread thread = Thread.currentThread();
+        progress.setIndeterminate(true);
+        progress.show(Locale.getString("GENETIC_ALGORITHM_TITLE"));
+        
+        // Get a copy of the values in the GUI, so that if the user changes
+        // them, it won't screw up the GA.
+        TradingDate startDate = quoteRangePage.getStartDate();
+        TradingDate endDate = quoteRangePage.getEndDate();
+        Money initialCapital = portfolioPage.getInitialCapital();
+        Money tradeCost = portfolioPage.getTradeCost();
+        int breedingPopulation = GAPage.getBreedingPopulation();
+        int displayPopulation = GAPage.getDisplayPopulation();
+        Money stockValue = portfolioPage.getStockValue();
+        int numberStocks = portfolioPage.getNumberStocks();
+        String tradeValueBuy = tradeValuePage.getTradeValueBuy();
+        String tradeValueSell = tradeValuePage.getTradeValueSell();
+        GAIndividual lowestGAIndividual = GARulesPage.getLowestIndividual();
+        GAIndividual highestGAIndividual = GARulesPage.getHighestIndividual();
+        
+        // Insert all the parameters in variables.
+        // We use lowestGAIndividual, but highestGAIndividual should be the same.
+        // All the GAIndividual have the same parameters during all GA Algorithm,
+        // they just differ one from another because of the values.
+        Variables variables = new Variables();
+        variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        for (int ii=0; ii<lowestGAIndividual.size(); ii++)
+            variables.add(lowestGAIndividual.parameter(ii), lowestGAIndividual.type(ii), Variable.CONSTANT);
+ 
+        // Get the expression for the buy and sell rules
+        Expression buyRule = GARulesPage.getBuyRule();
+        Expression sellRule = GARulesPage.getSellRule();
+
+        // Get the quote bundle
+        quoteBundle = new ScriptQuoteBundle(quoteRangePage.getQuoteRange());
+        OrderComparator orderComparator = quoteRangePage.getOrderComparator(quoteBundle);
+        OrderCache orderCache = new OrderCache(quoteBundle, orderComparator);
+        
+        if(!thread.isInterrupted()) {
+            int numberGenerations = GAPage.getGenerations();
+            int population = GAPage.getPopulation();
+            
+            progress.setIndeterminate(false);
+            progress.setMaximum(numberGenerations * population);
+            progress.setProgress(0);
+            progress.setMaster(true);
+            
+            GeneticAlgorithm geneticAlgorithm =
+                new GeneticAlgorithm(quoteBundle,
+                            orderCache,
+                            buyRule,
+                            sellRule,
+                            startDate,
+                            endDate,
+                            initialCapital,
+                            stockValue,
+                            numberStocks,
+                            tradeCost,
+                            breedingPopulation,
+                            tradeValueBuy,
+                            tradeValueSell,
+                            lowestGAIndividual,
+                            highestGAIndividual,
+                            variables);
+            
+            for(int generation = 1; generation <= numberGenerations; generation++) {
+                if(thread.isInterrupted())
+                    break;
+                
+                int individual = 1;
+                
+                // Keep generating more individuals until we've created the
+                // breeding population size or if the breeding population size
+                // is too small. The breeding population size can only be too
+                // small for the first generation.
+                int actualBreedingPopulation = geneticAlgorithm.getNextBreedingPopulationSize();
+                while(individual < population ||
+                        actualBreedingPopulation < breedingPopulation) {
+                    if(thread.isInterrupted())
+                        break;
+                    
+                    // "Generation x of y (%)"
+                    progress.setNote(Locale.getString("GENERATION_OF",
+                                                        (new Double((100.0D*actualBreedingPopulation)/breedingPopulation)).intValue(),
+                                                        generation,
+                                                        numberGenerations));
+                    
+                    // If we are looping only to increase the breeding population size
+                    // then don't update the progress counter as we didn't count this
+                    // time in our estimate. Unfortunately this might look to the user
+                    // like it has stalled at the end of the first generation.
+                    if(individual < population)
+                        progress.increment();
+                    
+                    geneticAlgorithm.nextIndividual();
+                    
+                    individual++;
+                    actualBreedingPopulation = geneticAlgorithm.getNextBreedingPopulationSize();
+                }
+                
+                geneticAlgorithm.nextGeneration();
+                
+                // The actual breeding population size and the breeding population
+                // may be different iff the operation was cancelled
+                if(geneticAlgorithm.getBreedingPopulationSize() > 0)
+                    display(getResults(geneticAlgorithm,
+                        geneticAlgorithm.getBreedingPopulationSize(),
+                        displayPopulation,
+                        quoteBundle, startDate, endDate,
+                        initialCapital, tradeCost, generation));
+            }
+        }
+        
+        ProgressDialogManager.closeProgressDialog(progress);
     }
     
-    private List getResults() {
+    private List getResults(GeneticAlgorithm geneticAlgorithm,
+                                int breedingPopulation,
+                                int displayPopulation,
+                                QuoteBundle quoteBundle,
+                                TradingDate startDate,
+                                TradingDate endDate,
+                                Money initialCapital,
+                                Money tradeCost,
+                                int generation) {
         // Create a list of results from the top breeding individuals
         List results = new ArrayList();
+        int displayCount = Math.min(breedingPopulation, displayPopulation);
+        
+        for(int i = 0; i < displayCount; i++) {
+            int offset = breedingPopulation - i - 1;
+            GAIndividual individual = geneticAlgorithm.getBreedingIndividual(offset);
+            results.add(new GAResult(individual,
+                                    geneticAlgorithm.getBuyRule(),
+                                    geneticAlgorithm.getSellRule(),
+                                    quoteBundle,
+                                    initialCapital,
+                                    tradeCost,
+                                    generation,
+                                    startDate,
+                                    endDate));
+        }
         return results;
     }
     

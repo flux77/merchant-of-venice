@@ -26,7 +26,8 @@ package org.mov.analyser;
 import java.util.List;
 import java.util.Iterator;
 
-import org.mov.analyser.gp.Individual;
+import org.mov.analyser.ga.GAIndividual;
+import org.mov.parser.Expression;
 import org.mov.portfolio.Transaction;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.*;
@@ -34,7 +35,9 @@ import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
 public class GAResult {
-    private Individual individual;
+    private GAIndividual individual;
+    private Expression buyRule;
+    private Expression sellRule;
     private QuoteBundle quoteBundle;
     private Money initialCapital;
     private Money tradeCost;
@@ -42,12 +45,16 @@ public class GAResult {
     private TradingDate startDate;	
     private TradingDate endDate;
     
-    public GAResult(Individual individual, QuoteBundle quoteBundle,
+    public GAResult(GAIndividual individual,
+                    Expression buyRule, Expression sellRule,
+                    QuoteBundle quoteBundle,
                     Money initialCapital, Money tradeCost,
                     int generation,
                     TradingDate startDate,
                     TradingDate endDate) {
         this.individual = individual;
+        this.buyRule = buyRule;
+        this.sellRule = sellRule;
         this.quoteBundle = quoteBundle;
         this.initialCapital = initialCapital;
         this.tradeCost = tradeCost;
@@ -82,11 +89,26 @@ public class GAResult {
     }
 
     public String getBuyRule() {
-        return individual.getBuyRule().toString();
+        String temp = buyRule.toString();
+        String retValue = null;
+        for (int ii=0; ii<individual.size(); ii++) {
+            if(individual.type(ii)==Expression.FLOAT_TYPE)
+                retValue = temp.replaceAll(individual.parameter(ii),Double.toString((individual.value(ii))));
+            else    
+                retValue = temp.replaceAll(individual.parameter(ii),Integer.toString(new Double(individual.value(ii)).intValue()));
+            temp = retValue;
+        }
+        return retValue;
     }
 
     public String getSellRule() {
-        return individual.getSellRule().toString();
+        String temp = sellRule.toString();
+        String retValue = null;
+        for (int ii=0; ii<individual.size(); ii++) {
+            retValue = temp.replaceAll(individual.parameter(ii),Double.toString((individual.value(ii))));
+            temp = retValue;
+        }
+        return retValue;
     }
 
     public int getGeneration() {

@@ -407,6 +407,69 @@ public class DatabaseQuoteSource implements QuoteSource
 	return query;
     }
 
+
+    /**
+     * Return all quotes for the given symbols between the given dates. 
+     * They will be returned in order of date.
+     *
+     * @param	symbols	the symbols to query.
+     * @param	startDate	the first trading date to query for
+     * @param	endDate		the last trading date to query for
+     * @return	a vector of stock quotes.
+     * @see Quote
+     */
+    public Vector getQuotesForSymbolsAndDates(Vector symbols, 
+					      TradingDate startDate,
+					      TradingDate endDate) {
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+
+	// Construct string
+	// WHERE SYMBOL = X OR SYMBOL = Y ...
+	String whereSymbolField = "";
+	Iterator iterator = symbols.iterator();
+	while(iterator.hasNext()) {
+	    String symbol = (String)iterator.next();
+	    
+	    whereSymbolField = 
+		whereSymbolField.concat("SYMBOL ='" + symbol + "' ");
+	    if(iterator.hasNext()) {
+		whereSymbolField =
+		    whereSymbolField.concat("OR ");
+	    }
+	}
+	
+        try {
+            progress.setNote("Connecting to source");
+            progress.setIndeterminate(true);
+            Statement statement = connection.createStatement();	       
+            ResultSet RS = 
+		statement.executeQuery("SELECT COUNT(*) FROM " + 
+				       SHARE_TABLE_NAME + 
+				       " WHERE (" + whereSymbolField +
+				       ") AND " + DATE_FIELD +" >= '" + 
+				       startDate + "' " +
+				       " AND " + DATE_FIELD +" <= '" + 
+				       endDate + "' ");
+            if (RS.next()) {
+                // Update the progress bar
+                progress.setMaximum(RS.getInt(1));
+                progress.setNote("Retrieving prices");
+                progress.setProgress(0);
+                progress.setIndeterminate(false);
+            }
+        } catch (Exception e) {}
+
+        
+        Vector query = 
+	    executeQuery("SELECT * FROM " + SHARE_TABLE_NAME +
+			 " WHERE (" + whereSymbolField +
+			 ") AND " + DATE_FIELD +" >= '" + startDate + "' " +
+			 " AND " + DATE_FIELD +" <= '" + endDate + "' " + 
+			 "ORDER BY " + DATE_FIELD);
+	
+	return query;
+    }
+
     // Generate SQL construct the restrict query for types of quotes
     // e.g. indices, commodoties, all quotes etc
     private String restrictTypeString(int type) {

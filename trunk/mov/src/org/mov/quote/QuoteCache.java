@@ -75,6 +75,20 @@ public class QuoteCache {
     }
 
     /**
+     * Create and load cache with all quotes for the given symbols between
+     * the given dates.
+     *
+     * @param	symbols	the symbols to load quotes for.
+     * @param	startDate	earliest date to load quotes for.
+     * @param	endDate		latest date to load quotes for.
+     */
+    public QuoteCache(Vector symbols, TradingDate startDate,
+		      TradingDate endDate) {
+        multipleStocks = true;
+        load(QuoteSourceManager.getSource().getQuotesForSymbolsAndDates(symbols, startDate, endDate));
+    }
+
+    /**
      * Create and load cache for all stock quotes on the given day.
      *
      * @param	date	the date to load.
@@ -200,7 +214,7 @@ public class QuoteCache {
 		oldsize = dates.size();
 		autoload(date);
 	    }
-	    while(oldsize > dates.size() && !containsDateNoAutoload(date));
+	    while(oldsize != dates.size() && !containsDateNoAutoload(date));
 
 	    return(containsDateNoAutoload(date));
 	}

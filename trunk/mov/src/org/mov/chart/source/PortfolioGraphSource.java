@@ -19,6 +19,7 @@
 package org.mov.chart.source;
 
 import org.mov.chart.*;
+import org.mov.ui.*;
 import org.mov.util.*;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
@@ -214,7 +215,7 @@ public class PortfolioGraphSource implements GraphSource {
     }
 
     public String getYLabel(float value) {
-	return Converter.priceToString(value);
+	return PriceFormat.priceToString(value);
     }
 
     public float[] getAcceptableMajorDeltas() {

@@ -34,7 +34,7 @@ import org.mov.prefs.PreferencesManager;
  *
  * Example:
  * <pre>
- *	Vector quotes = QuoteSourceManager.getSource().getQuotesForSymbol("CBA");
+ *	List quotes = QuoteSourceManager.getSource().getQuotesForSymbol("CBA");
  * </pre>
  * 
  * @see QuoteSource
@@ -92,15 +92,16 @@ public class QuoteSourceManager {
     // user has selected in the Preferences->Quote Source page.
     private synchronized QuoteSource getSourceInstance() {
 	if(sourceInstance == null) {
-	    Preferences p = PreferencesManager.getUserNode("/quote_source");
-	    String quoteSource = p.get("source", "database");
+	    int quoteSource = PreferencesManager.getQuoteSource();
 
-	    if(quoteSource.equals("files"))
+	    if(quoteSource == PreferencesManager.FILES)
 		sourceInstance = createFileQuoteSource();
-	    else if(quoteSource.equals("database"))
+	    else if(quoteSource == PreferencesManager.DATABASE)
 		sourceInstance = createDatabaseQuoteSource();
-            else
+            else {
+		assert quoteSource == PreferencesManager.SAMPLES;
                 sourceInstance = createSamplesQuoteSource();
+	    }
 	}
 
 	return sourceInstance;
@@ -189,14 +190,20 @@ public class QuoteSourceManager {
      * @return	the database quote source 
      */
     public static DatabaseQuoteSource createDatabaseQuoteSource() {
-	Preferences p = PreferencesManager.getUserNode("/quote_source/database");
-	String host = p.get("host", "db");
-	String port = p.get("port",  "3306");
-	String database = p.get("dbname", "shares");
-	String username = p.get("username", "");
-	String password = p.get("password", "");
-	return new DatabaseQuoteSource(host, port, database, username,
-				       password);
+	PreferencesManager.DatabasePreferences prefs = PreferencesManager.loadDatabaseSettings();
+	int software;
+
+	if(prefs.software.equals("mysql"))
+	    software = DatabaseQuoteSource.MYSQL;
+	else
+	    software = DatabaseQuoteSource.POSTGRESQL;
+
+	return new DatabaseQuoteSource(software, 
+				       prefs.host, 
+				       prefs.port, 
+				       prefs.database, 
+				       prefs.username, 
+				       prefs.password);
     }
 }
 

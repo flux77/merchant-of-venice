@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.prefs;
@@ -48,7 +48,7 @@ import org.mov.util.TradingDateFormatException;
 public class PreferencesManager {
     // The base in the prefs tree where all Venice settings are stored
     private final static String base = "org.mov";
-    
+
     // The user root from Venice's point of view
     private static Preferences userRoot = Preferences.userRoot().node(base);
 
@@ -57,12 +57,65 @@ public class PreferencesManager {
 	// nothing to do
     }
 
+    /** Indicates the quote source is using the inbuilt sample quotes. */
+    public static int SAMPLES = 0;
+
+    /** Indicates the quote source is accessing quotes in files. */
+    public static int FILES = 1;
+
+    /** Indicates the quote source is accessing quotes in a database */
+    public static int DATABASE = 2;
+
+    /** Web proxy preferences fields. */
     public class ProxyPreferences {
+
+        /** Web proxy host address. */
 	public String host;
+
+        /** Web proxy port. */
 	public String port;
+
+        /** Whether we are using the web proxy. */
 	public boolean isEnabled;
     }
-  
+
+    /** Database preferences fields. */
+    public class DatabasePreferences {
+
+	/** Database software (e.g. "mysql"). */
+	public String software;
+
+	/** Database host. */
+	public String host;
+
+	/** Database port. */
+	public String port;
+
+	/** Database name (e.g. "shares") */
+	public String database;
+
+	/** Database user name. */
+	public String username;
+
+	/** Database password. */
+	public String password;
+    }
+
+    /** Display preferences fields. */
+    public class DisplayPreferences {
+	/** X location of main window. */
+	public int x;
+
+	/** Y location of main window. */
+	public int y;
+
+	/** Width of main window. */
+	public int width;
+
+	/** Height of main window. */
+	public int height;
+    }
+
     /**
      * Forces the preferences data to be saved to the backend store (e.g. disk).
      */
@@ -74,7 +127,7 @@ public class PreferencesManager {
 	}
     }
 
-    /** 
+    /**
      * Fetches the desired user node, based at the <code>base</code> branch
      * @param node the path to the node to be fetched
      */
@@ -85,7 +138,7 @@ public class PreferencesManager {
 
     /**
      * Load the last directory used when importing quote files.
-     * 
+     *
      * @return the directory.
      */
     public static String loadLastImportDirectory() {
@@ -212,7 +265,7 @@ public class PreferencesManager {
 	Preferences prefs = getUserNode("/prefs");
 	return prefs.getInt("page", 0);
     }
-    
+
     /**
      * Save last preferences page visited.
      *
@@ -389,7 +442,7 @@ public class PreferencesManager {
 	    String[] accountNames = p.node("accounts").childrenNames();
 
 	    for(int i = 0; i < accountNames.length; i++) {
-		Preferences accountPrefs = 
+		Preferences accountPrefs =
 		    p.node("accounts").node(accountNames[i]);
 		Account account;
 
@@ -407,11 +460,11 @@ public class PreferencesManager {
 	    // Load transactions
 	    List transactions = new ArrayList();
 
-	    String[] transactionNumbers = 
+	    String[] transactionNumbers =
 		p.node("transactions").childrenNames();
-	    
+	
 	    for(int i = 0; i < transactionNumbers.length; i++) {
-		Preferences transactionPrefs = 
+		Preferences transactionPrefs =
 		    p.node("transactions").node(transactionNumbers[i]);
 
 		int type = getTransactionType(transactionPrefs.get("type", ""));
@@ -419,8 +472,8 @@ public class PreferencesManager {
 		TradingDate date = null;
 
                 try {
-                    date = 
-                        new TradingDate(transactionPrefs.get("date", 
+                    date =
+                        new TradingDate(transactionPrefs.get("date",
                                                              "01/01/2000"),
                                         TradingDate.BRITISH);
                 }
@@ -442,21 +495,21 @@ public class PreferencesManager {
 
 		try {
 		    String cashAccountName = transactionPrefs.get("cash_account", "");
-		    CashAccount cashAccount = 
+		    CashAccount cashAccount =
 			(CashAccount)portfolio.findAccountByName(cashAccountName);
 
 		    String cashAccountName2 = transactionPrefs.get("cash_account2", "");
-		    CashAccount cashAccount2 = 
+		    CashAccount cashAccount2 =
 			(CashAccount)portfolio.findAccountByName(cashAccountName2);
 
 		    String shareAccountName = transactionPrefs.get("share_account", "");
-		    ShareAccount shareAccount = 
+		    ShareAccount shareAccount =
 			(ShareAccount)portfolio.findAccountByName(shareAccountName);
 
 		    // Build transaction and add it to the portfolio
-		    Transaction transaction = 
+		    Transaction transaction =
 			new Transaction(type, date, amount, symbol, shares,
-					tradeCost, cashAccount, cashAccount2, 
+					tradeCost, cashAccount, cashAccount2,
                                         shareAccount);
 						
 		    transactions.add(transaction);
@@ -468,7 +521,7 @@ public class PreferencesManager {
 	    }
 
 	    portfolio.addTransactions(transactions);
-	    
+	
 	}
 	catch(BackingStoreException e) {
 	    // don't care
@@ -494,17 +547,17 @@ public class PreferencesManager {
 	// Otherwise compare with all the old transaction names
 	if(transactionType.equals("Accumulate"))
 	    return Transaction.ACCUMULATE;
-	else if(transactionType.equals("Reduce")) 
+	else if(transactionType.equals("Reduce"))
 	    return Transaction.REDUCE;
-	else if(transactionType.equals("Deposit")) 
+	else if(transactionType.equals("Deposit"))
 	    return Transaction.DEPOSIT;
-	else if(transactionType.equals("Fee")) 
+	else if(transactionType.equals("Fee"))
 	    return Transaction.FEE;
-	else if(transactionType.equals("Interest")) 
+	else if(transactionType.equals("Interest"))
 	    return Transaction.INTEREST;
 	else if(transactionType.equals("Withdrawal"))
 	    return Transaction.WITHDRAWAL;
-	else if(transactionType.equals("Dividend")) 
+	else if(transactionType.equals("Dividend"))
 	    return Transaction.DIVIDEND;
 	else if(transactionType.equals("Dividend DRP"))
 	    return Transaction.DIVIDEND_DRP;
@@ -536,16 +589,16 @@ public class PreferencesManager {
 
 	while(iterator.hasNext()) {
 	    Account account = (Account)iterator.next();
-	    Preferences accountPrefs = 
+	    Preferences accountPrefs =
 		p.node("accounts").node(account.getName());
-	    
+	
 	    if(account.getType() == Account.SHARE_ACCOUNT) {
 		accountPrefs.put("type", "share");
 	    }
 	    else {
 		accountPrefs.put("type", "cash");
 	    }
-	}       
+	}
 
 	// Save transactions
 	List transactions = portfolio.getTransactions();
@@ -556,60 +609,160 @@ public class PreferencesManager {
 	    Transaction transaction = (Transaction)iterator.next();
 	    Preferences transactionPrefs = p.node("transactions/" +
 						  Integer.toString(i++));
-	    
+	
 	    transactionPrefs.put("type", Integer.toString(transaction.getType()));
-	    transactionPrefs.put("date", 
+	    transactionPrefs.put("date",
 			     transaction.getDate().toString("dd/mm/yyyy"));
 	    transactionPrefs.putDouble("amount", transaction.getAmount().doubleValue());
 
-	    if(transaction.getSymbol() != null) 
+	    if(transaction.getSymbol() != null)
 		transactionPrefs.put("symbol", transaction.getSymbol().toString());
 
 	    transactionPrefs.putInt("shares", transaction.getShares());
-	    transactionPrefs.putDouble("trade_cost", 
+	    transactionPrefs.putDouble("trade_cost",
 				      transaction.getTradeCost().doubleValue());
 
 	    CashAccount cashAccount = transaction.getCashAccount();
-	    if(cashAccount != null) 
-		transactionPrefs.put("cash_account", 
+	    if(cashAccount != null)
+		transactionPrefs.put("cash_account",
 				     cashAccount.getName());
 
 	    CashAccount cashAccount2 = transaction.getCashAccount2();
-	    if(cashAccount2 != null) 
-		transactionPrefs.put("cash_account2", 
+	    if(cashAccount2 != null)
+		transactionPrefs.put("cash_account2",
 				     cashAccount2.getName());
 
 	    ShareAccount shareAccount = transaction.getShareAccount();
-	    if(shareAccount != null) 
-		transactionPrefs.put("share_account", 
+	    if(shareAccount != null)
+		transactionPrefs.put("share_account",
 				     shareAccount.getName());
 	}
     }
 
-     /**
-      * Load proxy settings.
-      *
-      * @return proxy preferences.
-      */
-     public static ProxyPreferences loadProxySettings() {
-         Preferences prefs = getUserNode("/proxy");
-	 PreferencesManager preferencesManager = new PreferencesManager();
-	 ProxyPreferences proxyPreferences = preferencesManager.new ProxyPreferences();
-	 proxyPreferences.host = prefs.get("host", "");
-	 proxyPreferences.port = prefs.get("port", "-1");
-	 proxyPreferences.isEnabled = prefs.getBoolean("enabled", false);
-	 return proxyPreferences;
-     }
+    /**
+     * Load proxy settings.
+     *
+     * @return proxy preferences.
+     */
+    public static ProxyPreferences loadProxySettings() {
+        Preferences prefs = getUserNode("/proxy");
+        PreferencesManager preferencesManager = new PreferencesManager();
+        ProxyPreferences proxyPreferences = preferencesManager.new ProxyPreferences();
+        proxyPreferences.host = prefs.get("host", "");
+        proxyPreferences.port = prefs.get("port", "-1");
+        proxyPreferences.isEnabled = prefs.getBoolean("enabled", false);
+        return proxyPreferences;
+    }
 
-     /**
-      * Save proxy settings.
-      *
-      * @param proxyPreferences the new proxy preferences.
-      */
+    /**
+     * Save proxy settings.
+     *
+     * @param proxyPreferences the new proxy preferences.
+     */
     public static void saveProxySettings(ProxyPreferences proxyPreferences) {
 	Preferences prefs = getUserNode("/proxy");
 	prefs.put("host", proxyPreferences.host);
 	prefs.put("port", proxyPreferences.port);
 	prefs.putBoolean("enabled", proxyPreferences.isEnabled);
+    }
+
+    /**
+     * Get quote source setting.
+     *
+     * @return quote source, one of {@link #DATABASE}, {@link #FILES} or {@link #SAMPLES}.
+     */
+    public static int getQuoteSource() {
+	Preferences prefs = getUserNode("/quote_source");
+	String quoteSource = prefs.get("source", "samples");
+	
+	if(quoteSource.equals("samples"))
+	    return SAMPLES;
+	else if(quoteSource.equals("files"))
+	    return FILES;
+	else 
+	    return DATABASE;
+    }
+
+    /**
+     * Set quote source setting.
+     *
+     * @param quoteSource the quote source, one of {@link #DATABASE}, {@link #FILES} or 
+     *                    {@link #SAMPLES}.
+     */
+    public static void setQuoteSource(int quoteSource) {
+	assert(quoteSource == DATABASE || quoteSource == FILES ||
+	       quoteSource == SAMPLES);
+
+	Preferences prefs = getUserNode("/quote_source");
+	if(quoteSource == SAMPLES)
+	    prefs.put("source", "samples");
+	else if(quoteSource == FILES)
+	    prefs.put("source", "files");
+	else
+	    prefs.put("source", "database");
+    }
+
+    /**
+     * Load database settings.
+     *
+     * @return database preferences.
+     */
+    public static DatabasePreferences loadDatabaseSettings() {
+        Preferences prefs = getUserNode("/quote_source/database");
+        PreferencesManager preferencesManager = new PreferencesManager();
+        DatabasePreferences databasePreferences =
+            preferencesManager.new DatabasePreferences();
+        databasePreferences.software = prefs.get("software", "mysql");
+        databasePreferences.host = prefs.get("host", "db");
+        databasePreferences.port = prefs.get("port", "3306");
+	databasePreferences.database = prefs.get("dbname", "shares");
+        databasePreferences.username = prefs.get("username", "");
+        databasePreferences.password = prefs.get("password", "3306");
+        return databasePreferences;
+    }
+
+    /**
+     * Save database settings.
+     *
+     * @param databasePreferences the new database preferences.
+     */
+    public static void saveDatabaseSettings(DatabasePreferences databasePreferences) {
+	Preferences prefs = getUserNode("/quote_source/database");
+	prefs.put("software", databasePreferences.software);
+	prefs.put("host", databasePreferences.host);
+	prefs.put("port", databasePreferences.port);
+	prefs.put("dbname", databasePreferences.database);
+	prefs.put("username", databasePreferences.username);
+	prefs.put("password", databasePreferences.password);
+    }
+
+    /**
+     * Load display settings.
+     *
+     * @return display preferences.
+     */
+    public static DisplayPreferences loadDisplaySettings() {
+        Preferences prefs = getUserNode("/display");
+        PreferencesManager preferencesManager = new PreferencesManager();
+        DisplayPreferences displayPreferences =
+            preferencesManager.new DisplayPreferences();
+        displayPreferences.x = prefs.getInt("default_x", 0);
+        displayPreferences.y = prefs.getInt("default_y", 0);
+        displayPreferences.width = prefs.getInt("default_width", 0);
+        displayPreferences.height = prefs.getInt("default_height", 0);
+        return displayPreferences;
+    }
+
+    /**
+     * Save display settings.
+     *
+     * @param displayPreferences the new display preferences.
+     */
+    public static void saveDisplaySettings(DisplayPreferences displayPreferences) {
+	Preferences prefs = getUserNode("/display");
+	prefs.putInt("default_x", displayPreferences.x);
+	prefs.putInt("default_y", displayPreferences.y);
+	prefs.putInt("default_width", displayPreferences.width);
+	prefs.putInt("default_height", displayPreferences.height);
     }
 }

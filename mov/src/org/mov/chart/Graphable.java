@@ -43,12 +43,14 @@ public class Graphable {
     private Comparable startX = null;
     private Comparable endX = null;
     private LinkedHashMap map;
+    private LinkedHashMap charMap;
 
     /**
      * Create an empty graphable.
      */
     public Graphable() {
 	map = new LinkedHashMap();
+	charMap = new LinkedHashMap();
     }
 
     /**
@@ -94,6 +96,16 @@ public class Graphable {
     }
 
     /**
+     * Get the character value for the given X value.
+     *
+     * @param	x	the x value
+     * @return	y	the associated character value
+     */
+    public String getString(Comparable x) {
+	return (String)charMap.get(x);
+    }
+
+    /**
      * Associate the given X value with the given Y value. This
      * function is used to "load" up the graphable with data.
      * 
@@ -105,6 +117,19 @@ public class Graphable {
 
 	map.put(x, (Object)y);
     }
+
+    /**
+     * Associate the given x value with the given character. This
+     * function is used to "load" up the graphable with data.
+     * 
+     * @param	x	the x value
+     * @param	y	the associated character
+     */
+    public void putString(Comparable x, String s) {
+	charMap.put(x, (Object)s);
+    }
+
+    
 
     /**
      * Given an X range, inspect all the associated Y values and return the 
@@ -145,7 +170,7 @@ public class Graphable {
 	while(iterator.hasNext()) {
 
 	    y = getY((Comparable)iterator.next());
-	    
+
 	    if(y != null && y.compareTo(lowestY) < 0)
 		lowestY = y;
 	}

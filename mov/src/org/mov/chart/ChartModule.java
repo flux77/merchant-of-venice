@@ -211,6 +211,7 @@ public class ChartModule extends JPanel implements Module,
     // Adds the toolbar that gives the user the options to zoom in and out
     // of the chart
     private void addFunctionToolBar() {
+
 	// Create image on toolbar to zoom to default zoom level
         URL defaultZoomURL = ClassLoader.getSystemResource(defaultZoomImage);
         URL zoomInImageURL = ClassLoader.getSystemResource(zoomInImage);
@@ -281,7 +282,7 @@ public class ChartModule extends JPanel implements Module,
      */
     public void add(Graph graph, QuoteBundle quoteBundle, int level) {
 
-        // Make sure it has at least one value
+	// Make sure it has at least one value
         assert graph.getXRange().size() > 0;
 
 	// Add graph to chart
@@ -384,6 +385,7 @@ public class ChartModule extends JPanel implements Module,
      */
     public void add(Graph graph, Portfolio portfolio, QuoteBundle quoteBundle,
 		    int level) {
+
 	// Add graph to chart
 	chart.add(graph, level);
 
@@ -631,6 +633,10 @@ public class ChartModule extends JPanel implements Module,
 	    
 	    menuAction.start();
 	}
+    }
+
+    public JDesktopPane getDesktop() {
+	return desktop; 
     }
 
     /**

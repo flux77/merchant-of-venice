@@ -27,6 +27,8 @@ import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.util.Locale;
 import org.mov.quote.*;
+import org.mov.ui.*;
+
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.
@@ -50,18 +52,29 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
     private static final String STANDARD_DEVIATION = Locale.getString("STANDARD_DEVIATION");
     private static final String DAY_VOLUME     = Locale.getString("VOLUME");
     private static final String POINTANDFIGURE = Locale.getString("POINTANDFIGURE");
-    
-
+    private static final String PRICE_THRESHOLD = Locale.getString("PRICE_THRESHOLD");
+    private static final String SMOOTHING_CONSTANT = Locale.getString("SMOOTHING_CONSTANT");
+        
     JMenu graphMenu;
     JMenu annotateMenu;
-
+    JMenu graphConstantsMenu; // Not convinced this is the best way to allow
+                              // the constants to change
+    
     private JMenuItem removeMenu;
+    private JMenuItem smoothingConstantMenuItem;
+    private JMenuItem priceThresholdMenuItem;
 
     private QuoteBundle quoteBundle;
     private Graph graph;
     private ChartModule listener;
     private HashMap map = new HashMap();
     private HashMap annotateMap = new HashMap();
+
+    //Constants
+    private double smoothingConstant = 0.1;
+    private double priceThreshold;
+
+    GraphConstants graphConstants;
 
     /**
      * Create a new menu allowing the user to graph related graphs
@@ -84,8 +97,12 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	// Create graph + annotation menus
 	graphMenu = new JMenu(Locale.getString("GRAPH"));
 	annotateMenu = new JMenu(Locale.getString("ANNOTATE"));
+	graphConstantsMenu = new JMenu(Locale.getString("GRAPH_CONSTANTS"));
+	graphConstants = new GraphConstants();
+
 	this.add(graphMenu);
 	this.add(annotateMenu);
+	this.add(graphConstantsMenu);
 
 	// Add graph menu items
 	addMenuItem(DAY_OPEN);
@@ -108,6 +125,20 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	// Add annotation menu items
 	addAnnotateMenuItem(MACD, Locale.getString("BUY_SELL"));
 	addAnnotateMenuItem(MOVING_AVERAGE, Locale.getString("BUY_SELL"));
+		
+	// Add graph constant menu items
+	// Used to change the view of a graph where the constants
+	// relate to the data and thus are independent of the scale
+	// (e.g smoothing constant)
+	// FIXME maybe
+
+	smoothingConstantMenuItem = new JMenuItem(SMOOTHING_CONSTANT);
+	smoothingConstantMenuItem.addActionListener(this);
+	graphConstantsMenu.add(smoothingConstantMenuItem);
+	
+	priceThresholdMenuItem = new JMenuItem(PRICE_THRESHOLD);
+	priceThresholdMenuItem.addActionListener(this);
+	graphConstantsMenu.add(priceThresholdMenuItem);
 
 	// Add all static menus
 	this.addSeparator();
@@ -173,10 +204,26 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
             // Only redraw if there are only graphs left
             if(listener.count() > 0)
                 listener.redraw();
+	} 
+	
+	else if (e.getSource() == smoothingConstantMenuItem) {	    
+	    
+	    //Put up a dialog requesting input
+
+	    //This doesn't work and I don't know why.  
+	    //The dialog doesn't appear and the thread hangs
+	    //TextDialog dialog = new TextDialog(listener.getDesktop(), "Smoothing Constant", "Enter Value");
+	    //String val = dialog.showDialog();
+
+	}
+
+	else if (e.getSource() == priceThresholdMenuItem) {
+
 	}
 	
 	// Otherwise check dynamic menus
 	else {
+
 	    JCheckBoxMenuItem menu = (JCheckBoxMenuItem)e.getSource();
 	    String text = menu.getText();
 	
@@ -217,7 +264,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 			 MOVING_AVERAGE, 0);
 
 	    else if(text == EXP_MOVING_AVERAGE)
-		addGraph(new ExpMovingAverageGraph(getDayClose(), 40),
+		addGraph(new ExpMovingAverageGraph(getDayClose(), 40, graphConstants.getSmoothingConstant()),
 			 EXP_MOVING_AVERAGE, 0);	    
 
 	    else if(text == OBV)
@@ -234,11 +281,18 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 		addGraph(new StandardDeviationGraph(getDayClose(), 20),
 			 STANDARD_DEVIATION);
 
-	    else if(text == POINTANDFIGURE) {
-		//coming soon hopefully
-		//addGraph(new PointAndFigureGraph(getDayClose(), 20),
-		//	 POINTANDFIGURE);
+	    else if(text == POINTANDFIGURE) 
+		addGraph(new PointAndFigureGraph(getDayClose(), 20,graphConstants.getPriceReversalThreshold()),
+			 POINTANDFIGURE);
+	    
+	    else if(text == SMOOTHING_CONSTANT) {
+		
 	    }
+
+	    else if(text == PRICE_THRESHOLD) {
+		
+	    }
+	    
 	}
     }
 
@@ -302,6 +356,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 
     // Same as above but add at specific index
     private void addGraph(Graph graph, String mapIdentifier, int index) {
+
 	map.put(mapIdentifier, graph);
 	listener.append(graph, index);
 	listener.redraw();

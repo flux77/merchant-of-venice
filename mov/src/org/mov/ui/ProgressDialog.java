@@ -27,7 +27,7 @@ public class ProgressDialog extends javax.swing.JDialog implements ActionListene
     
     /** Creates new form ProgressDialog */
     public ProgressDialog() {
-        super(Main.getApplicationFrame(), false);
+        super(Main.getApplicationFrame(), "Venice Progress", false);
 
         update_timer = new Timer(10, new ActionListener() {
             public void actionPerformed(ActionEvent e) {

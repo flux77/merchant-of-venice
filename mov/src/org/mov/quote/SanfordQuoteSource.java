@@ -42,6 +42,9 @@ public class SanfordQuoteSource implements QuoteSource {
     // Keep hash of company symbols to name
     private HashMap symbolToName = new HashMap();
 
+    // Are we connected?
+    private boolean connected = false;
+
     /**
      * Creates a new quote source by downloading directly from Sanford's
      * web site. 
@@ -77,6 +80,8 @@ public class SanfordQuoteSource implements QuoteSource {
 	    writer.close();
 
 	    cookie = connection.getHeaderField("Set-Cookie");
+
+	    connected = true;
 	}
 	catch(java.io.IOException io) {
 	    DesktopManager.showErrorMessage("Can't connect to Sanford");
@@ -92,6 +97,10 @@ public class SanfordQuoteSource implements QuoteSource {
      * @return	the company name.
      */
     public String getCompanyName(String symbol) {
+
+	if(!connected) 
+	    return null;
+	    
 	// Have we already got it?
 	String companyName;
 
@@ -177,7 +186,6 @@ public class SanfordQuoteSource implements QuoteSource {
      * @return	whether the symbol was found or not.
      */
     public boolean symbolExists(String symbol) {
-
 	// Try to get name of company - if we cant then we dont have it!
 	return (getCompanyName(symbol) == null)? false : true;
     }
@@ -211,6 +219,10 @@ public class SanfordQuoteSource implements QuoteSource {
 				    int type) {
 
        	Vector quotes = new Vector();
+
+	if(!connected) 
+	    return quotes;
+
 	Vector dates = Converter.dateRangeToTradingDateVector(startDate,
 							      endDate);
 	Iterator iterator = dates.iterator();
@@ -248,6 +260,9 @@ public class SanfordQuoteSource implements QuoteSource {
 
 	Vector quotes = new Vector();
 
+	if(!connected) 
+	    return quotes;
+
 	// This query might take a while
 	boolean owner = 
 	    Progress.getInstance().open("Loading quotes", 1);
@@ -274,7 +289,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    String line;
 
 	    while ((line = reader.readLine()) != null) {
-		stock = filter.filter(line);
+		stock = filter.toQuote(line);
 
 		if(stock != null && isType(stock, type)) 
 		    quotes.add(stock);
@@ -300,7 +315,11 @@ public class SanfordQuoteSource implements QuoteSource {
      * @see Stock
      */
     public Vector getQuotesForSymbol(String symbol) {
+
 	Vector quotes = new Vector();
+
+	if(!connected) 
+	    return quotes;
 
 	// This query might take a while
 	boolean owner = 
@@ -336,7 +355,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    String line;
 
 	    while ((line = reader.readLine()) != null) {
-		stock = filter.filter(line);
+		stock = filter.toQuote(line);
 
 		if(stock != null)
 		    quotes.add(stock);
@@ -346,7 +365,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    
 	}
 	catch(java.io.IOException io) {
-	    System.out.println("io exception" + io);
+	    DesktopManager.showErrorMessage("Error talking to Sanford");
 	}
 
 	Progress.getInstance().close(owner);

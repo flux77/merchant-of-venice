@@ -193,11 +193,17 @@ public class QuoteModule extends AbstractAnalyserTable
     private Object[] extractSymbolsUsingRule(JDesktopPane desktop, 
 					     QuoteCache cache) {
 
+	Object[] symbols = cache.getSymbols();
+
+	boolean owner = false;
+
 	// Add symbols to vector when expression proves true
 	try {
 	    Vector extractedSymbols = new Vector();
-	    Object[] symbols = cache.getSymbols();
 	    String symbol;
+
+	    // Claim ownership
+	    owner = Progress.getInstance().open();
 
 	    // Traverse array
 	    for(int i = 0; i < symbols.length; i++) {
@@ -207,7 +213,17 @@ public class QuoteModule extends AbstractAnalyserTable
 		if(expression.evaluate(cache, symbol, 0) >=
 		   LogicExpression.TRUE_LEVEL)
 		    extractedSymbols.add(symbol);
+
+		// Wait until weve done one evaluation since thats when the
+		// quotes are loaded
+		if(i == 0) {
+		    Progress.getInstance().open("Filtering quotes",
+						symbols.length);
+		    Progress.getInstance().next();
+		}
+		Progress.getInstance().next();
 	    }
+
 	    return extractedSymbols.toArray();
 	}
 	catch(EvaluationException e) {
@@ -225,6 +241,9 @@ public class QuoteModule extends AbstractAnalyserTable
 
 	    // Return all cache's symbols
 	    return cache.getSymbols();
+	}
+	finally {
+	    Progress.getInstance().close(owner);
 	}
     }
 

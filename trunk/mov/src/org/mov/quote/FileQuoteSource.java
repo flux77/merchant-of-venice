@@ -120,7 +120,7 @@ public class FileQuoteSource implements QuoteSource
 	String fileList = p.get("list", "");
 	String[] fileListArray = fileList.split(", ");
 	TradingDate date;
-	
+
 	for(int i = 0; i < fileListArray.length; i++) {
 	    date = getContainedDate(fileListArray[i]);
 
@@ -216,11 +216,21 @@ public class FileQuoteSource implements QuoteSource
 	Iterator iterator = dates.iterator();
 	TradingDate date;
 
+	// This query might take a while
+	boolean owner = 
+	    Progress.getInstance().open("Loading quotes " + 
+					startDate.toShortString() + " to " +
+					endDate.toShortString(), dates.size());
+
 	while(iterator.hasNext()) {
 	    date = (TradingDate)iterator.next();
 
 	    quotes.addAll((Collection)getQuotesForDate(date, type));
+
+	    Progress.getInstance().next();
 	}
+
+	Progress.getInstance().close(owner);
 
 	return quotes;
     }
@@ -237,7 +247,7 @@ public class FileQuoteSource implements QuoteSource
     public Vector getQuotesForDate(TradingDate date, int type) {
 	Vector quotes = new Vector();
 	String fileName = (String)dateToFile.get(date);
-	String line;
+	String line;	
 	Stock stock;
 
 	try {
@@ -286,6 +296,11 @@ public class FileQuoteSource implements QuoteSource
 	TradingDate date;
 	Stock stock;
 
+	// This query might take a while
+	boolean owner = 
+	    Progress.getInstance().open("Loading quotes for " + symbol, 
+					dates.size());
+
 	// All checks are done in lower case no matter what case the
 	// file format is in
 	symbol = symbol.toLowerCase();
@@ -297,7 +312,11 @@ public class FileQuoteSource implements QuoteSource
 				      symbol);
 	    if(stock != null) 
 		quotes.add(stock);
+
+	    Progress.getInstance().next();
 	}
+
+	Progress.getInstance().close(owner);
 
 	return quotes;
     }

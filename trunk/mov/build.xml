@@ -9,6 +9,7 @@
   <property name="backup" value="${basedir}/backup"/>
   <property name="release" value="${basedir}/release"/>
   <property name="src" value="${basedir}/src"/>
+  <property name="web" value="${basedir}/web"/>
 
   <!-- Generate API documentation -->
   <target name="api">
@@ -51,6 +52,9 @@
     <delete file="venice.jar"/>
     <delete dir="${api}"/>
     <delete dir="${release}"/>
+    <delete file="${web}/web.tar"/>
+    <delete file="${web}/web.tar.gz"/>
+    <delete dir="${web}/api"/>
   </target>
 
   <!-- Generate a jar -->
@@ -98,6 +102,28 @@
         <pathelement path="${src}"/>
       </classpath>
     </java>
+  </target>
+
+  <!-- Package up the web page ready for deployment -->
+  <target name="web" depends="api">
+
+    <!-- Copy API files to web page -->
+    <copy todir="${web}/api">
+      <fileset dir="${api}"/>
+    </copy>
+
+    <!-- Make sure permissions are OK -->
+    <chmod perm="u=rw,go=r">
+      <fileset dir="${web}/">
+      </fileset>
+    </chmod>
+
+    <!-- Package it up ready for deployment -->
+    <tar tarfile="${web}/web.tar">
+      <tarfileset dir="${web}/" excludes="web.tar*"/>
+    </tar>
+    <gzip zipfile="${web}/web.tar.gz" 
+      src="${web}/web.tar"/>
   </target>
 
 </project>

@@ -61,17 +61,18 @@ public class QuoteCache {
     // Remember if we loaded a single or multiple stocks
     private boolean multipleStocks;
 
-    // Load cache with single stock of given symbol
-
+    // Used for threading
+    private String symbol         = null;
+    private TradingDate date      = null;
+    
     /**
      * Create and load cache with all quotes for the given symbol.
      *
      * @param	symbol	the symbol to load quotes for.
      */
     public QuoteCache(String symbol) {
-	multipleStocks = false;
-
-	load(Quote.getSource().getQuotesForSymbol(symbol));
+        multipleStocks = false;
+        load(Quote.getSource().getQuotesForSymbol(symbol));
     }
 
     /**
@@ -82,10 +83,8 @@ public class QuoteCache {
      * @see QuoteSource
      */
     public QuoteCache(TradingDate date, int searchRestriction) {
-	this.searchRestriction = searchRestriction;
 	this.multipleStocks = true;
-
-	load(Quote.getSource().getQuotesForDate(date, searchRestriction));
+        load(Quote.getSource().getQuotesForDate(date, searchRestriction));
     }
 
     /**
@@ -373,5 +372,3 @@ public class QuoteCache {
 	Runtime.getRuntime().gc();
     }
 }
-
-

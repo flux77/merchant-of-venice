@@ -4,6 +4,8 @@ import org.mov.chart.*;
 import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
 
 import java.util.*;
 
@@ -42,11 +44,15 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	// it backwards to get the dates in chronological order
 	ListIterator iterator = cache.dateIterator(cache.getNumberDays());
 
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+        progress.setProgress(0);
+        progress.setNote("Graphing dates");
 	while(iterator.hasPrevious()) {
 	    date = (TradingDate)iterator.previous();
 	    try {
 		value = new Float(cache.getQuote(symbol, quote, date));
 		graphable.putY((Comparable)date, value);
+                if (progress != null) progress.increment();
 	    }
 	    catch(EvaluationException e) {
 		// ignore

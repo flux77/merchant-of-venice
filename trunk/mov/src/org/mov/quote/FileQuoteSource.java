@@ -6,6 +6,8 @@ import java.util.*;
 import org.mov.util.*;
 import org.mov.portfolio.*;
 import org.mov.ui.DesktopManager;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
 
 /**
  * Provides functionality to obtain stock quotes from files. This class
@@ -30,6 +32,9 @@ public class FileQuoteSource implements QuoteSource
     // Filter to convert data into quote
     private QuoteFilter filter;
 
+    // The number of dates in the current source
+    private int num_dates = 0;
+    
     // Given a name of a file containing a list of day quotes, return the
     // the day 
     private TradingDate getContainedDate(String fileName) 
@@ -323,6 +328,7 @@ public class FileQuoteSource implements QuoteSource
      * order of date.
      *
      * @param	symbol	the symbol to query.
+     * @param   progress the progress dialog to display progress with
      * @return	a vector of stock quotes.
      * @see Stock
      */
@@ -334,13 +340,12 @@ public class FileQuoteSource implements QuoteSource
 
 	Iterator iterator = dates.iterator();
 	Vector quotes = new Vector();
-	TradingDate date;
-	Stock stock;
+	TradingDate date = null;
+	Stock stock = null;
 
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 	// This query might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Loading quotes for " + symbol, 
-					dates.size());
+        progress.setNote("Retrieving dates");
 
 	// All checks are done in lower case no matter what case the
 	// file format is in
@@ -357,7 +362,7 @@ public class FileQuoteSource implements QuoteSource
 	    Progress.getInstance().next();
 	}
 
-	Progress.getInstance().close(owner);
+	ProgressDialogManager.closeProgressDialog();
 
 	return quotes;
     }

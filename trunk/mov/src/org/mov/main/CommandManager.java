@@ -1,5 +1,6 @@
 package org.mov.main;
 
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.JDesktopPane;
 import org.mov.chart.*;
@@ -137,31 +138,56 @@ public class CommandManager {
 	    .newFrame(new ImporterModule(desktop_instance), true);
     }
 
-    private void graphStock(SortedSet companySet) {
-	if(companySet != null) {
-	    Iterator iterator = companySet.iterator();
-	    String symbol;
-	    ChartModule chart = new ChartModule(desktop_instance);
-	    
-	    // Iterate through companies adding them to the graph
-	    boolean owner =
-		Progress.getInstance().open();
-	    
-	    while(iterator.hasNext()) {
-		symbol = (String)iterator.next();
-		
-		QuoteCache cache = new QuoteCache(symbol);
-		GraphSource dayClose = 
-		    new OHLCVQuoteGraphSource(cache, Token.DAY_CLOSE_TOKEN);
-		Graph graph = new LineGraph(dayClose);
-		
-		chart.add(graph, cache, 0);
-	    }
-	    
-	    Progress.getInstance().close(owner);
-	    
-	    chart.redraw();
-	    ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart, false);
-	}
+    Thread function_thread = null;
+    
+    private void graphStock(final SortedSet companySet) {
+
+        final ChartModule chart = new ChartModule(desktop_instance);
+        
+        function_thread = new Thread(new Runnable() {
+
+            ProgressDialog progress = null;
+
+            public void run() {
+                progress = ProgressDialogManager.getProgressDialog();
+                
+                progress.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {function_thread.interrupt();}
+                });
+
+                try {
+                    if(companySet != null) {
+                        Iterator iterator = companySet.iterator();
+                        String symbol = null;
+                        QuoteCache cache = null;
+                        GraphSource dayClose = null;
+                        Graph graph = null;
+                        while(iterator.hasNext() && !function_thread.isInterrupted()) {
+                            symbol = (String)iterator.next();
+                            progress.setTitle("Loading quotes for "+symbol);
+                            progress.show();
+                            if (!function_thread.isInterrupted())
+                                cache = new QuoteCache(symbol);
+                            if (!function_thread.isInterrupted())
+                                dayClose = 
+                                    new OHLCVQuoteGraphSource(cache, Token.DAY_CLOSE_TOKEN);
+                            if (!function_thread.isInterrupted())
+                                graph = new LineGraph(dayClose);
+                            if (!function_thread.isInterrupted())
+                                chart.add(graph, cache, 0);
+                            chart.redraw();
+                        }
+                        if (!function_thread.isInterrupted())
+                            ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart, false);
+                        if (!function_thread.isInterrupted())
+                            ProgressDialogManager.closeProgressDialog();
+                    }
+                } catch (Exception e) {
+                    ProgressDialogManager.closeProgressDialog();
+                }
+            }
+        });
+
+        function_thread.start();
     }
 }

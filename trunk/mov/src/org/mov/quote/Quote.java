@@ -110,7 +110,6 @@ public class Quote {
 	String database = p.get("dbname", "shares");
 	String username = p.get("username", "");
 	String password = p.get("password", "");
-
 	return new DatabaseQuoteSource(host, port, database, username,
 				       password);
     }

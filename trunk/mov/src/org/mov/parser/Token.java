@@ -25,11 +25,10 @@ import org.mov.util.Locale;
 import org.mov.parser.expression.AbstractExpression;
 
 /**
- *
  * A representation of any token in the <i>Gondola</i> language.
  *
+ * @author Andrew Leppard
  */
-
 public class Token {
     
     /** Represents "<code>(</code>" symbol */
@@ -187,9 +186,12 @@ public class Token {
     
     /** Represents "<code>ema()</code>" symbol */
     public static final int EMA_TOKEN = 51;
+
+    /** Represents "<code>sd()</code>" symbol */
+    public static final int SD_TOKEN = 52;
     
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 52;
+    private static final int FIXED_LENGTH_TOKENS = 53;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -286,6 +288,7 @@ public class Token {
         tokenStrings[WHILE_TOKEN]              = "while";
         tokenStrings[CORR_TOKEN]               = "corr";
         tokenStrings[EMA_TOKEN]                = "ema";
+        tokenStrings[SD_TOKEN]                 = "sd";
         
         boolean matched = false;
         

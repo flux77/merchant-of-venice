@@ -4,10 +4,15 @@ Changes for Venice, 0.5 alpha 14/Jan/2005
 * Chart Update:
   - Added the custom graph to allow users to graph arbitrary indicators
     using the Gondola language.
+  - Improved look of Candle Stick, Bar & Volume Charts (Bryan Lin).
 
 * Updates to Genetic Programming:
   - Can now specify window size in days.
   - Can now specify the buy/sell stock price (Alberto Nacher).
+
+* Updates to the Gondola Language:
+  - Added ema() quote function (Alberto Nacher).
+  - Added sd() quote function (Andrew Leppard, Andrea Varga).
 
 * Internationalisation:
   - Can now specify the language to use in preferences (Alberto Nacher).

@@ -21,16 +21,25 @@ following location:
 
         http://java.sun.com/j2se/1.4.2/download.html
 
-The following packages are optional:
+If you want to connect to a MySQL database you will need the database
+software which is available here:
 
    MySQL
         http://www.mysql.com
+
+You will also need a software driver, this is already included in the
+Venice jar file, but for reference you can download a copy here:
+
    MySQL Java Driver
         http://sourceforge.net/projects/mmmysql
      OR http://www.mysql.com/downloads/api-jdbc-stable.html
 
+If you want to connect to a PostgreSQL databse you will need the
+database software and driver which are available here:
+
    PostgreSQL
         http://www.postgresql.org/
+
    PostgreSQL Java Driver
         http://jdbc.postgresql.org/
 
@@ -87,10 +96,11 @@ of these will only work from source checked out from CVS):
 
 api     Generate a javadoc API of the code
 backup  Pulls a backup copy of the CVS tree from Sourceforge and stores it
-        in the backup directory.
+        in the backup directory
 clean   Removes all built and temporary files
 doc     Builds the documentation
 jar     Create a java archive file for Venice
+locale  Check locale files for consistency
 release Packages Venice into a file ready for release
 test    Runs the automated test suite
 web     Packages the web files ready for deployment

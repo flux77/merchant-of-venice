@@ -48,7 +48,8 @@
 	   debug="on"
   	   optimize="on"
 	   source="1.4"
-	   includes="**/*.java"/>
+	   includes="**/*.java"
+           excludes="org/mov/tools/*"/>
   </target>
 
   <!-- Remove all built files -->
@@ -123,12 +124,88 @@
 
   <!-- Generate a jar -->
   <target name="jar" depends="build, doc">
+
+    <!-- First expand the MySQL driver so we can include it              -->
+    <unjar src="${src}/mysql-connector-java-3.0.16-ga-bin.jar"
+           dest="${src}">
+      <patternset>
+        <include name="com/**"/>
+      </patternset>
+    </unjar>
+
     <jar jarfile="venice.jar"
          includes="**/*.class, **/*.gif, **/*.png, org/mov/help/doc/*.html,
                    org/mov/util/locale/*.properties,
-                   org/mov/help/doc/index.xml, org/mov/quote/samples/*.txt"
+                   org/mov/help/doc/index.xml, org/mov/quote/samples/*.txt,
+                   com/*"
+         excludes="org/mov/tools/*"
          basedir="${src}"
 	 manifest="${src}/MANIFEST.MF"/>
+  </target>
+
+  <!-- Check the locale files for consistency -->
+  <target name="locale">
+    
+    <!-- Make sure locale tool is compiled -->
+    <javac srcdir="${src}"
+           debug="on"
+           source="1.4"
+           includes="src/org/mov/tools/Locale.java"/>
+    
+    <!-- Compare each locale file to the english locale -->
+
+    <echo>Comparing Chinese locale against English reference locale...</echo> 
+    <java classname="org.mov.tools.Locale"
+          dir="${src}"
+          fork="yes">
+      <arg value="org/mov/util/locale/venice_en.properties"/>
+      <Arg value="org/mov/util/locale/venice_zh.properties"/>
+      <jvmarg value="-ea"/>
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+      </classpath>
+    </java>
+
+    <echo>Comparing French locale against English reference locale...</echo> 
+    <java classname="org.mov.tools.Locale"
+          dir="${src}"
+          fork="yes">
+      <arg value="org/mov/util/locale/venice_en.properties"/>
+      <Arg value="org/mov/util/locale/venice_fr.properties"/>
+      <jvmarg value="-ea"/>
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+      </classpath>
+    </java>
+
+    <echo>Comparing Italian locale against English reference locale...</echo> 
+    <java classname="org.mov.tools.Locale"
+          dir="${src}"
+          fork="yes">
+      <arg value="org/mov/util/locale/venice_en.properties"/>
+      <Arg value="org/mov/util/locale/venice_it.properties"/>
+      <jvmarg value="-ea"/>
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+      </classpath>
+    </java>
+
+    <echo>Comparing Swedish locale against English reference locale...</echo> 
+    <java classname="org.mov.tools.Locale"
+          dir="${src}"
+          fork="yes">
+      <arg value="org/mov/util/locale/venice_en.properties"/>
+      <Arg value="org/mov/util/locale/venice_sv.properties"/>
+      <jvmarg value="-ea"/>
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+      </classpath>
+    </java>
+
   </target>
 
   <!-- Package venice up ready for release -->

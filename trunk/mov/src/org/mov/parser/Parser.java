@@ -59,6 +59,7 @@ import org.mov.util.Locale;
  *                     "min" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
  *                     "max" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
  *                     "avg" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "sd" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
  *                     "sum" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
  *                     "rsi" "(" [SUB_EXPR ["," SUB_EXPR]] ")" |
  *                     "not" "(" SUB_EXPR ")" |
@@ -293,6 +294,7 @@ public class Parser {
 		tokens.match(Token.MIN_TOKEN) ||
 		tokens.match(Token.MAX_TOKEN) ||
 		tokens.match(Token.AVG_TOKEN) ||
+		tokens.match(Token.SD_TOKEN) ||
 		tokens.match(Token.SUM_TOKEN) ||
 		tokens.match(Token.RSI_TOKEN) ||
 		tokens.match(Token.NOT_TOKEN) ||
@@ -517,6 +519,7 @@ public class Parser {
 	case(Token.MIN_TOKEN):
 	case(Token.MAX_TOKEN):
 	case(Token.AVG_TOKEN):
+	case(Token.SD_TOKEN):
 	case(Token.SUM_TOKEN):
 	    arg1 = parseQuote(variables, tokens);
 	    parseComma(variables, tokens);

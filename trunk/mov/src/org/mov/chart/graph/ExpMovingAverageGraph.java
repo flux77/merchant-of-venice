@@ -42,7 +42,7 @@ public class ExpMovingAverageGraph extends AbstractGraph {
     private GraphSource source;
     private HashMap annotations;
 
-    public static final double smoothingConstant = 0.1; //Parameterise this later
+    private double smoothingConstant;
 
     /**
      * Create a new simple moving average graph.
@@ -50,12 +50,14 @@ public class ExpMovingAverageGraph extends AbstractGraph {
      * @param	source	the source to create a moving average from
      * @param	period	the period of the moving average
      */
-    public ExpMovingAverageGraph(GraphSource source, int period) {
+    public ExpMovingAverageGraph(GraphSource source, int period, double smoothingConstant) {
 
-	super(source);
+	super(source);	
+
+	this.smoothingConstant = smoothingConstant;
 
 	// Create moving average graphable
-	movingAverage = createMovingAverage(source.getGraphable(), period);
+	movingAverage = createMovingAverage(source.getGraphable(), period, smoothingConstant);
 
 	// Create buy sell recommendations
 	annotations = GraphTools.createAnnotations(getSource().getGraphable(),
@@ -125,7 +127,7 @@ public class ExpMovingAverageGraph extends AbstractGraph {
      * @param	period	the desired period of the averaged data
      * @return	the graphable containing averaged data from the source
      */
-    public static Graphable createMovingAverage(Graphable source, int period) {
+    public static Graphable createMovingAverage(Graphable source, int period, double smoothingConstant) {
 	Graphable movingAverage = new Graphable();
 
 	// Date set and value array will be in sync
@@ -133,7 +135,7 @@ public class ExpMovingAverageGraph extends AbstractGraph {
 	Set xRange = source.getXRange();
 	Iterator iterator = xRange.iterator();
 
-	int i = 0;	
+	int i = 0;
 	double average;
 
 	while(iterator.hasNext()) {

@@ -52,7 +52,7 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
      * Parse the given text string and returns the stock quote or null
      * if it did not contain a valid quote.
      *
-     * @param	quoteList	a single line of text containing a quote
+     * @param	quoteLine	a single line of text containing a quote
      * @return	the stock quote
      */
     public Quote toQuote(String quoteLine) {
@@ -66,7 +66,7 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
                 Symbol symbol = null;
 
                 try {
-                    symbol = new Symbol(quoteParts[i++]);
+                    symbol = SymbolRegistry.find(quoteParts[i++]);
                 }
                 catch(SymbolFormatException e) {
                     // Return null - couldn't parse quote
@@ -82,8 +82,8 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
                     float day_close = Float.parseFloat(quoteParts[i++]);
                     
                     // Convert volume from 1/100th volume to real volume
-                    int volume = Integer.parseInt(quoteParts[i++]) * 100;
-                    quote = new Quote(symbol, date, volume, day_low, day_high,
+                    int day_volume = Integer.parseInt(quoteParts[i++]) * 100;
+                    quote = new Quote(symbol, date, day_volume, day_low, day_high,
                                       day_open, day_close);
                 } 
                 catch(NumberFormatException e) {
@@ -107,6 +107,6 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
 			  quote.getDayHigh() + "," +
 			  quote.getDayLow() + "," +
 			  quote.getDayClose() + "," +
-			  quote.getVolume() / 100);
+			  quote.getDayVolume() / 100);
     }
 }

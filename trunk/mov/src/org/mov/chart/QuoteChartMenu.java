@@ -125,6 +125,7 @@ public class QuoteChartMenu extends JMenu {
 	addMenuItem(graphMenu, Locale.getString("DAY_LOW"));
 	addMenuItem(graphMenu, Locale.getString("VOLUME"));
 	addMenuItem(graphMenu, Locale.getString("MOMENTUM"));
+	addMenuItem(graphMenu, Locale.getString("MACD"));
 	addMenuItem(graphMenu, Locale.getString("SIMPLE_MOVING_AVERAGE"));
 	addMenuItem(graphMenu, Locale.getString("EXP_MOVING_AVERAGE"));
 	addMenuItem(graphMenu, Locale.getString("OBV"));
@@ -382,6 +383,7 @@ public class QuoteChartMenu extends JMenu {
 
         else if(text == Locale.getString("CANDLE_STICK"))
             graph = new CandleStickGraph(getDayOpen(), getDayLow(), getDayHigh(), getDayClose());
+        
         else if(text == Locale.getString("CUSTOM"))
             graph = new CustomGraph(getDayClose(), symbol, quoteBundle);
 
@@ -403,6 +405,9 @@ public class QuoteChartMenu extends JMenu {
         else if(text == Locale.getString("HIGH_LOW_BAR"))
             graph = new HighLowBarGraph(getDayLow(), getDayHigh(), getDayClose());
 
+        else if(text == Locale.getString("MACD"))
+            graph = new MACDGraph(getDayClose());
+	
         else if(text == Locale.getString("MOMENTUM"))
             graph = new MomentumGraph(getDayClose());
 	

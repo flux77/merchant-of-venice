@@ -19,6 +19,7 @@
 package org.mov.chart.graph;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
 import org.mov.chart.*;
 import org.mov.chart.source.*;
@@ -39,23 +40,65 @@ public class MACDGraph extends AbstractGraph {
      * Create a new MACD graph.
      *
      * @param	source	the source to create two moving averages from
+     */
+    public MACDGraph(GraphSource source) {
+
+	super(source);
+        setSettings(new HashMap());
+    }
+
+    /**
+     * Create a new MACD graph according to Exponential Moving Average.
+     *
+     * @param	source	the source to create two moving averages from
+     * @param	periodOne	period of one of the moving averages
+     * @param	periodTwo	period of the other moving average
+     * @param	smoothingConstantOne	smoothing constant of one of the moving averages
+     * @param	smoothingConstantTwo	smoothing constant of the other moving average
+     */
+    private void createMACDGraph(Graphable source, int periodOne,
+		     int periodTwo, double smoothingConstantOne, double smoothingConstantTwo) {
+
+	// Create averaged data sources.
+	int slowPeriod = Math.max(periodOne, periodTwo);
+	int fastPeriod = Math.min(periodOne, periodTwo);
+
+	if (periodOne>periodTwo) {
+            slowMovingAverage =
+                ExpMovingAverageGraph.createMovingAverage(source,
+                                                       periodOne, smoothingConstantOne);
+            fastMovingAverage =
+                ExpMovingAverageGraph.createMovingAverage(source,
+                                                       periodTwo, smoothingConstantTwo);
+        } else {
+            slowMovingAverage =
+                ExpMovingAverageGraph.createMovingAverage(source,
+                                                       periodTwo, smoothingConstantTwo);
+            fastMovingAverage =
+                ExpMovingAverageGraph.createMovingAverage(source,
+                                                       periodOne, smoothingConstantOne);
+        }
+    }
+
+    /**
+     * Create a new MACD graph according to Simple Moving Average.
+     *
+     * @param	source	the source to create two moving averages from
      * @param	periodOne	period of one of the moving averages
      * @param	periodTwo	period of the other moving average
      */
-    public MACDGraph(GraphSource source, int periodOne,
+    private void createMACDGraph(Graphable source, int periodOne,
 		     int periodTwo) {
-
-	super(source);
 
 	// Create averaged data sources.
 	int slowPeriod = Math.max(periodOne, periodTwo);
 	int fastPeriod = Math.min(periodOne, periodTwo);
 
 	slowMovingAverage =
-	    MovingAverageGraph.createMovingAverage(source.getGraphable(),
+	    MovingAverageGraph.createMovingAverage(source,
 						   slowPeriod);
 	fastMovingAverage =
-	    MovingAverageGraph.createMovingAverage(source.getGraphable(),
+	    MovingAverageGraph.createMovingAverage(source,
 						   fastPeriod);
     }
 
@@ -118,6 +161,34 @@ public class MACDGraph extends AbstractGraph {
 
     public boolean isPrimary() {
         return true;
+    }
+
+    public void setSettings(HashMap settings) {
+        super.setSettings(settings);
+
+        // Retrieve values from hashmap
+        String averageType = MACDGraphUI.getAverageType(settings);
+        int periodFirstAverage = MACDGraphUI.getPeriodFirstAverage(settings);
+        int periodSecondAverage = MACDGraphUI.getPeriodSecondAverage(settings);
+        double smoothingConstantFirstAverage = MACDGraphUI.getSmoothingConstantFirstAverage(settings);
+        double smoothingConstantSecondAverage = MACDGraphUI.getSmoothingConstantSecondAverage(settings);
+
+	// create MACD according to the type of average that user have been defined (EMA or SMA)
+	if (averageType.compareTo(MACDGraphUI.SMA)==0)
+            createMACDGraph(getSource().getGraphable(), periodFirstAverage, periodSecondAverage);
+        else
+            createMACDGraph(getSource().getGraphable(), periodFirstAverage, periodSecondAverage, smoothingConstantFirstAverage, smoothingConstantSecondAverage);
+            
+    }
+
+    /**
+     * Return the graph's user interface.
+     *
+     * @param settings the initial settings
+     * @return user interface
+     */
+    public GraphUI getUI(HashMap settings) {
+        return new MACDGraphUI(settings);
     }
 }
 

@@ -19,7 +19,9 @@
 package org.mov.chart.graph;
 
 import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import org.mov.chart.source.*;
 import org.mov.util.*;
@@ -56,13 +58,13 @@ public interface Graph {
      * @param	verticalScale	vertical scale factor; use this to convert
      *                  between Y value to a cartesian coordinate y
      * @param	bottomLineValue	the Y value of the lowest line in the graph
-     * @param	xRange	a <code>Vector</code> of <code>Comparable</code> 
+     * @param	xRange	a <code>List</code> of <code>Comparable</code> 
      *			that contain the X values to plot
      */
     public void render(Graphics g, Color colour, 
 		       int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector xRange);
+		       float bottomLineValue, List xRange);
 
     /**
      * Get the tool tip text for the given X value and y coordinate.
@@ -94,7 +96,7 @@ public interface Graph {
     /**
      * Get all X values that this graph will draw.
      *
-     * @return	<code>Vector</code> of <code>Comparable</code> X values
+     * @return	<code>List</code> of <code>Comparable</code> X values
      */
     public Set getXRange();
 
@@ -117,7 +119,7 @@ public interface Graph {
     /**
      * Return the Y value for the given X value.
      *
-     * @param	X value
+     * @param	xRange value
      * @return	Y value
      */
     public Float getY(Comparable xRange);
@@ -128,7 +130,7 @@ public interface Graph {
      * @param	xRange	range of X values
      * @return	the highest Y value
      */
-    public float getHighestY(Vector xRange);
+    public float getHighestY(List xRange);
 
     /**
      * Return the loweset Y value in the given X range.
@@ -136,7 +138,7 @@ public interface Graph {
      * @param	xRange	range of X values
      * @return	the lowest Y value
      */
-    public float getLowestY(Vector xRange);
+    public float getLowestY(List xRange);
 
     /**
      * Return an array of acceptable major deltas for the vertical

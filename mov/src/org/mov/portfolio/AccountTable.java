@@ -54,7 +54,7 @@ public class AccountTable extends AbstractTable {
 	private QuoteBundle quoteBundle;
 	private Portfolio portfolio;
 	private Object[] accounts;
-	private TradingDate date;
+	private int dateOffset;
 
 	public Model(Portfolio portfolio, QuoteBundle quoteBundle) {
 	    this.quoteBundle = quoteBundle;
@@ -63,7 +63,7 @@ public class AccountTable extends AbstractTable {
 	    accounts = portfolio.getAccounts().toArray();
 
             // Use the latest date in the quote bundle
-	    date = quoteBundle.getLastDate();
+	    dateOffset = quoteBundle.getLastDateOffset();
 	}
 	
 	public int getRowCount() {
@@ -98,7 +98,7 @@ public class AccountTable extends AbstractTable {
 		    
 		case(VALUE_COLUMN):
 		    try {
-			return new PriceFormat(account.getValue(quoteBundle, date));
+			return new PriceFormat(account.getValue(quoteBundle, dateOffset));
 		    }
 		    catch(MissingQuoteException e) {
 			return new PriceFormat(0.0F);
@@ -122,7 +122,7 @@ public class AccountTable extends AbstractTable {
 			Account account = (Account)iterator.next();
 
 			try {
-			    value += account.getValue(quoteBundle, date);
+			    value += account.getValue(quoteBundle, dateOffset);
 			}
 			catch(MissingQuoteException e) {
 			    // nothing to do 

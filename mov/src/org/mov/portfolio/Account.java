@@ -18,10 +18,8 @@
 
 package org.mov.portfolio;
 
-import java.util.*;
-
-import org.mov.util.*;
-import org.mov.quote.*;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.QuoteBundle;
 
 /**
  * Generic interface for all financial account objects. This interface
@@ -55,9 +53,9 @@ public interface Account {
      * Return the value of this account on the given day.
      *
      * @param	quoteBundle	the quote bundle
-     * @param	date	the date to calculate
+     * @param	dateOffset fast date offset
      */
-    public float getValue(QuoteBundle quoteBundle, TradingDate date)
+    public float getValue(QuoteBundle quoteBundle, int dateOffset)
 	throws MissingQuoteException;
 
     /**

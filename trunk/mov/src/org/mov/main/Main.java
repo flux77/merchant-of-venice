@@ -21,7 +21,6 @@ package org.mov.main;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.prefs.Preferences;
 import javax.swing.JDesktopPane;
 import javax.swing.UIManager;
 import javax.swing.JFrame;
@@ -39,6 +38,7 @@ public class Main extends JFrame {
     
     private JDesktopPane desktop;
     private DesktopManager desktopManager;
+    private PreferencesManager.DisplayPreferences displayPreferences;
 
     private static Main venice;
 
@@ -72,11 +72,9 @@ public class Main extends JFrame {
 			   "Andrew Leppard (aleppard@picknowl.com.au)");
         System.out.println(Locale.getString("SEE_LICENSE"));
 
-	Preferences p = PreferencesManager.getUserNode("/display");
-	setSize(p.getInt("default_width", 800),
-		p.getInt("default_height", 600));
-	setLocation(p.getInt("default_x", 0),
-		    p.getInt("default_y", 0));
+	displayPreferences = PreferencesManager.loadDisplaySettings();
+	setSize(displayPreferences.width, displayPreferences.height);
+	setLocation(displayPreferences.x, displayPreferences.y);
 
 	setTitle(Locale.getString("VENICE_SHORT") + " " + SHORT_VERSION);
 
@@ -110,11 +108,11 @@ public class Main extends JFrame {
     // Save settings and exit!
     private void saveSettingsAndExit() {
 	// Save window dimensions in prefs file
-	Preferences p = PreferencesManager.getUserNode("/display");
-	p.putInt("default_width", getWidth());
-	p.putInt("default_height", getHeight());
-	p.putInt("default_x", getX());
-	p.putInt("default_y", getY());
+	displayPreferences.x = getX();
+	displayPreferences.y = getY();
+	displayPreferences.width = getWidth();
+	displayPreferences.height = getHeight();
+	PreferencesManager.saveDisplaySettings(displayPreferences);
 
 	// Call save() on each module so they can save their
 	// preferences data

@@ -253,6 +253,7 @@ public abstract class AbstractExpression implements Expression {
         NumberFormat format = null;
 
         format = NumberFormat.getInstance(Locale.ENGLISH);
+        format.setGroupingUsed(false);
         format.setMinimumIntegerDigits(1);
         format.setMinimumFractionDigits(1);
         format.setMaximumFractionDigits(6);

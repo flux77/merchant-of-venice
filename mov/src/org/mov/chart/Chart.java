@@ -510,24 +510,54 @@ public class Chart extends JComponent implements MouseListener {
 	int deleteCount = 0;
 
 	for (i = 0; i < endDrawnLinesY.size(); i++) {
-	    Integer valX = (Integer)endDrawnLinesX.elementAt(i);
-	    Integer valY = (Integer)endDrawnLinesY.elementAt(i);
 
-	    int diff1 = Math.abs(valX.intValue() - x.intValue());
-	    int diff2 = Math.abs(valY.intValue() - y.intValue());
+	    double slope = 1.0;
+	    double intersect;
+	    double diff = 10.0;
 
-	    if (diff1 < 5 &&
-		diff2 < 5) {
-		
+	    Integer tmp = (Integer)endDrawnLinesX.elementAt(i);	   
+	    int x1 = tmp.intValue();	   	    
+	    tmp = (Integer)endDrawnLinesY.elementAt(i);
+	    int y1 = tmp.intValue();	    
+	    tmp = (Integer)startDrawnLinesX.elementAt(i);
+	    int x2 = tmp.intValue();	    
+	    tmp = (Integer)startDrawnLinesY.elementAt(i);
+	    int y2 = tmp.intValue();	    
+	    
+	    if (x2 == x1) {
+		slope = 0;		
+	    } else {
+		slope = ( (double)(y1) - (double)(y2)) / ((double)(x1) - (double)(x2));
+	    }
+
+	    if (x2 != x1) {
+		intersect = (double)(y2) - slope * (double)(x2);
+	    } else {
+		intersect = (double)(x2);
+	    }
+
+	    Integer tmpx = (Integer)(x);
+	    Integer tmpy = (Integer)(y);
+
+	    double candX = (double)(tmpx.intValue());
+	    double candY = (double)(tmpy.intValue());
+
+	    if (x2 != x1) {
+		diff = candY - (slope * candX + intersect);
+	    } else {
+		diff = candY - intersect;
+	    }
+
+	    if (Math.abs(diff) <= 3.0) {
 		endDrawnLinesX.remove(i);
 		endDrawnLinesY.remove(i);
 		startDrawnLinesX.remove(i);
 		startDrawnLinesY.remove(i);
-
-		break;
-
+		
+		break;		
 	    }
 	}
+	
     }
 
     /**

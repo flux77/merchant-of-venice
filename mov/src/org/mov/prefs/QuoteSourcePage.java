@@ -299,7 +299,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                 public void actionPerformed(ActionEvent e) {
                     // Get files user wants to import
                     JFileChooser chooser;
-                    String lastDirectory = PreferencesManager.loadLastImportDirectory();
+                    String lastDirectory = PreferencesManager.loadDirectoryLocation("importer");
 
                     if(lastDirectory != null)
                         chooser = new JFileChooser(lastDirectory);
@@ -312,7 +312,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                     if(action == JFileChooser.APPROVE_OPTION) {
                         // Remember directory
                         lastDirectory = chooser.getCurrentDirectory().getAbsolutePath();
-                        PreferencesManager.saveLastImportDirectory(lastDirectory);
+                        PreferencesManager.saveDirectoryLocation("importer",lastDirectory);
 
                         // Add files to file list
                         File files[] = chooser.getSelectedFiles();

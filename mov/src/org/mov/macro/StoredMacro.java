@@ -184,6 +184,8 @@ public class StoredMacro {
                 bw.write(this.getCode(), 0, this.getCode().length());
                 bw.flush();
                 bw.close();
+                MacroManager.uncacheCompiledMacro(this);
+
             } catch (Exception e) {
                 System.err.println("Exception at StoredMacro.save(): "+e.toString());
                 return false;

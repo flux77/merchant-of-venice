@@ -53,6 +53,21 @@ public class MacroManager {
     
     private static Hashtable compiled_macros = new Hashtable();
     
+    /**
+     * Removes the compiled macro from memory.  Useful for when editing
+     * macro source, so that changes are automatically compiled in
+     * 
+     * @param m The macro to uncache
+     */
+    public static void uncacheCompiledMacro(StoredMacro m) {
+        compiled_macros.remove(m.getName());
+    }
+    
+    /**
+     * Execute all the macros that have been configured to be run on startup,
+     * in the order that they have been assigned.
+     */
+    
     public static void executeStartupMacros() {
         List macros = PreferencesManager.loadStoredMacros();
         Object array_list = Array.newInstance(StoredMacro.class, macros.size());

@@ -280,7 +280,7 @@ public class QuoteFunctions {
                 avgGain = sumGain / numberGains;
 
             double RS = avgGain / avgLoss;
-            return 100.0D - 100.D / (1.0D + RS);
+            return 100.0D - 100.0D / (1.0D + RS);
         }
     }
 

@@ -130,6 +130,9 @@ public class Main extends JFrame {
 	// Set the look and feel to be the default for the current platform
 	try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            //MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());//In win2000, it's display is better then default
+            //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");//In win2000, it's display is better then default
+
 	}
 	catch(Exception e) {
 	    // Shouldn't happen, but if it does just keep going

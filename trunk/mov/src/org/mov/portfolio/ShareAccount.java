@@ -52,7 +52,7 @@ public class ShareAccount implements Account, Cloneable {
 	return name;
     }
 
-    public float getValue(QuoteBundle quoteBundle, TradingDate date) 
+    public float getValue(QuoteBundle quoteBundle, int dateOffset)
 	throws MissingQuoteException {
  
 	Set set = stockHoldings.keySet();
@@ -64,7 +64,7 @@ public class ShareAccount implements Account, Cloneable {
 	    StockHolding holding = (StockHolding)stockHoldings.get(symbol);
 
 	    value += quoteBundle.getQuote(holding.getSymbol().toLowerCase(), 
-					  Quote.DAY_CLOSE, date) *
+					  Quote.DAY_CLOSE, dateOffset) *
 		holding.getShares();
 	}
 	
@@ -115,6 +115,16 @@ public class ShareAccount implements Account, Cloneable {
      */
     public StockHolding get(String symbol) {
 	return (StockHolding)stockHoldings.get(symbol);
+    }
+
+    /**
+     * Return whether the account is holding the current symbol.
+     *
+     * @param symbol the stock symbol
+     * @return <code>TRUE</code> if we are holding the symbol; <code>FALSE</code> otherwise
+     */
+    public boolean isHolding(String symbol) {
+        return (stockHoldings.get(symbol) != null);
     }
 
     /**

@@ -83,7 +83,7 @@ public class CashAccount implements Account, Cloneable {
 	return name;
     }
 
-    public float getValue(QuoteBundle quoteBundle, TradingDate date) {
+    public float getValue(QuoteBundle quoteBundle, int dateOffset) {
 	return capital;
     }
 

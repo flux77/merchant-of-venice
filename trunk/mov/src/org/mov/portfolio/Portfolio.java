@@ -21,6 +21,8 @@ package org.mov.portfolio;
 import org.mov.util.TradingDate;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteCache;
+import org.mov.quote.WeekendDateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,13 +47,29 @@ public class Portfolio implements Cloneable {
     // Transaction history
     List transactions = new ArrayList();
 
+    // If the portfolio is transient it is just used for displaying
+    // information to the user and shouldn't be saved
+    boolean isTransient;
+
     /**
      * Create a new empty portfolio.
      *
      * @param	name	The name of the portfolio
      */
     public Portfolio(String name) {
+        this(name, false);
+    }
+
+    /**
+     * Create a new empty portfolio.
+     *
+     * @param	name	The name of the portfolio
+     * @param   isTransient Set to <code>true</code> if the portfolio displays
+     *                      working information and shouldn't be saved.
+     */
+    public Portfolio(String name, boolean isTransient) {
 	this.name = name;
+        this.isTransient = isTransient;
     }
 
     /**
@@ -61,6 +79,16 @@ public class Portfolio implements Cloneable {
      */
     public String getName() {
 	return name;
+    }
+
+    /**
+     * Return whether the portfolio is transient or permanent.
+     *
+     * @return <code>true</code> if the portfolio is transient and shouldn't
+     *         be saved 
+     */
+    public boolean isTransient() {
+        return isTransient;
     }
 
     /**
@@ -353,13 +381,34 @@ public class Portfolio implements Cloneable {
     public float getValue(QuoteBundle quoteBundle, TradingDate date) 
 	throws MissingQuoteException {
 
+        try {
+            return getValue(quoteBundle, QuoteCache.getInstance().dateToOffset(date));
+        }
+        catch(WeekendDateException e) {
+            throw new MissingQuoteException();
+        }
+    }
+
+    /**
+     * Get the value of the portfolio on the given day. Currently
+     * this function should only be called for dates after the last
+     * transaction. When it calculates the value it will assume all
+     * transactions have taken place.
+     *
+     * @param	quoteBundle	the quote bundle
+     * @param	dateOffset fast date offset
+     * @return	the value
+     */
+    public float getValue(QuoteBundle quoteBundle, int dateOffset) 
+	throws MissingQuoteException {
+
 	Iterator iterator = accounts.iterator();
 	float value = 0.0F;
 	
 	while(iterator.hasNext()) {
 	    Account account = (Account)iterator.next();
 
-	    value += account.getValue(quoteBundle, date);
+	    value += account.getValue(quoteBundle, dateOffset);
 	}
 	
 	return value;

@@ -58,7 +58,7 @@ public class GraphTools {
 	Comparable x;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
-
+    int halfbarWidth=(int)(0.309 * horizontalScale);//bryan    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
 	while(iterator.hasNext()) {
 
 	    x = (Comparable)iterator.next();
@@ -84,13 +84,12 @@ public class GraphTools {
 							 verticalScale);
 		
 		if(lastXCoordinate != -1)
-		    g.drawLine(xCoordinate, yCoordinate,
-			       lastXCoordinate, lastYCoordinate);
+//		    g.drawLine(xCoordinate, yCoordinate,//
+//			       lastXCoordinate, lastYCoordinate);		    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, yCoordinate,				       lastXCoordinate, lastYCoordinate);
 		else
-		    g.drawLine(xCoordinate, yCoordinate,
-			       xCoordinate, yCoordinate);
-
-		lastXCoordinate = xCoordinate;
+//		    g.drawLine(xCoordinate, yCoordinate,//
+//			       xCoordinate, yCoordinate);		    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, yCoordinate,		    		xCoordinate+halfbarWidth+1 +halfBlankWidth, yCoordinate);
+//		lastXCoordinate = xCoordinate;		lastXCoordinate = xCoordinate+halfbarWidth+1 +halfBlankWidth;
 		lastYCoordinate = yCoordinate ;
 	    }
 

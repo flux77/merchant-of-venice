@@ -29,7 +29,7 @@ import org.mov.util.TradingDate;
  * Example:
  * <pre>
  * QuoteFilter filter = 
- *	QuoteFilterList.getInstance().getFilter("Insight Trader")
+ *	QuoteFilterList.getInstance().getFilter("Insight Trader");
  * Quote quote = filter.filter("XXX 07/15/99 173 182 171 181 36489");
  * </pre>
  * OR
@@ -120,12 +120,13 @@ public class QuoteFilterList {
      * Perform unit tests on the filters to make sure they are reading and
      * writing properly.
      */
+    /*
     public static void main(String[] args) {
 	QuoteFilterList filters = new QuoteFilterList();
 	Vector list = filters.getList();
 	Iterator iterator = list.iterator();
 	QuoteFilter filter;
-	Quote quote = new Quote("AAA", new TradingDate(), 10000,
+	Quote quote = new Quote(new Symbol("AAA"), new TradingDate(), 10000,
 				10.00F, 20.00F, 30.00F, 40.00F);
 	Quote filteredQuote;
 	String filteredString;
@@ -148,4 +149,5 @@ public class QuoteFilterList {
 	    }
 	}       
     }
+    */
 }

@@ -34,7 +34,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 
     private QuoteBundle quoteBundle;
     private int quote;
-    private String symbol;
+    private Symbol symbol;
     private Graphable graphable;
 
     /**
@@ -79,8 +79,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
     }
 
     public String getName() {
-	// Display symbols in upper case
-	return symbol.toUpperCase();
+	return symbol.toString();
     }
 
     public String getToolTipText(Comparable x) {
@@ -92,7 +91,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    if(quote == Quote.DAY_VOLUME) {
 		return
 		    new String("<html>" +
-			       symbol.toUpperCase() + 
+			       symbol + 
 			       ", " +
 			       date.toLongString() +
 			       "<p>" +
@@ -105,7 +104,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    else {
 		return
 		    new String("<html>" +
-			       symbol.toUpperCase() + 
+			       symbol + 
 			       ", " +
 			       date.toLongString() +
 			       "<p>" +

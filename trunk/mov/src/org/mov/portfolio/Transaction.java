@@ -20,7 +20,8 @@ package org.mov.portfolio;
 
 import java.util.*;
 
-import org.mov.util.*;
+import org.mov.quote.Symbol;
+import org.mov.util.TradingDate;
 
 /**
  * Representation of a single transaction on the portfolio. A transaction
@@ -65,7 +66,7 @@ public class Transaction implements Cloneable, Comparable {
     private TradingDate date;
     private int type;
     private float amount;
-    private String symbol;
+    private Symbol symbol;
     private int shares;
     private float tradeCost;
     private CashAccount cashAccount;
@@ -88,7 +89,7 @@ public class Transaction implements Cloneable, Comparable {
      * @param	shareAccount	related share account (if any)
      */
     public Transaction(int type, TradingDate date, float amount, 
-		       String symbol, int shares, float tradeCost,
+		       Symbol symbol, int shares, float tradeCost,
 		       CashAccount cashAccount, CashAccount cashAccount2, 
 		       ShareAccount shareAccount) {
 	this.type = type;
@@ -176,7 +177,7 @@ public class Transaction implements Cloneable, Comparable {
      */
     public static Transaction newAccumulate(TradingDate date, 
 					    float amount,
-					    String symbol,
+					    Symbol symbol,
 					    int shares,
 					    float tradeCost,
 					    CashAccount cashAccount,
@@ -199,7 +200,7 @@ public class Transaction implements Cloneable, Comparable {
      */
     public static Transaction newReduce(TradingDate date, 
 					float amount,
-					String symbol,
+					Symbol symbol,
 					int shares,
 					float tradeCost,
 					CashAccount cashAccount,
@@ -219,7 +220,7 @@ public class Transaction implements Cloneable, Comparable {
      */
     public static Transaction newDividend(TradingDate date, 
 					  float amount,
-					  String symbol,
+					  Symbol symbol,
 					  CashAccount cashAccount,
 					  ShareAccount shareAccount) {
 	return new Transaction(DIVIDEND, date, amount, symbol, 0, 
@@ -240,7 +241,7 @@ public class Transaction implements Cloneable, Comparable {
      */
     public static Transaction newDividendDRP(TradingDate date, 
 					     float amount,
-					     String symbol,
+					     Symbol symbol,
 					     int shares,
 					     ShareAccount shareAccount) {
 	return new Transaction(DIVIDEND_DRP, date, 0.0F, symbol, shares, 
@@ -366,22 +367,14 @@ public class Transaction implements Cloneable, Comparable {
 	// Write in CSV format
 	// date, type, amount, symbol, shares, tradeCost,
 	// cashAccount, shareAccount
-	return new String(getDate().toString("dd/mm/yyyy")
-			  + "," +
-			  Transaction.typeToString(getType())
-			  + "," +
-			  getAmount()
-			  + "," +
-			  getSymbol()
-			  + "," +
-			  getShares()
-			  + "," +
-			  getTradeCost()
-			  + "," +
-			  cashAccountName
-			  + "," +
-			  cashAccountName2
-			  + "," +
+	return new String(getDate().toString("dd/mm/yyyy") + "," +
+			  Transaction.typeToString(getType()) + "," +
+			  getAmount() + "," +
+			  getSymbol() + "," +
+			  getShares() + "," +
+			  getTradeCost() + "," +
+			  cashAccountName + "," +
+			  cashAccountName2 + "," +
 			  shareAccountName);
     }
 
@@ -418,7 +411,7 @@ public class Transaction implements Cloneable, Comparable {
      * @return	symbol or <code>null</code> if this transaction was not a
      *		share transaction
      */
-    public String getSymbol() {
+    public Symbol getSymbol() {
 	return symbol;
     }
 

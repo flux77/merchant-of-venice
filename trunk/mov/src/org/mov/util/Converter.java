@@ -18,13 +18,6 @@
 
 package org.mov.util;
 
-import java.lang.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-
-import org.mov.quote.*;
-
 /**
  * Contains a set of general conversion functions. Previously this was a
  * grab bag of functions that converted anything to anything else.
@@ -51,27 +44,6 @@ public class Converter {
 	    string = zero.concat(string);
 	}
 	return string;
-    }
-
-    /**
-     * Convert a string containing a list of symbols separated by spaces
-     * or commas into a sorted set with duplicates removed.
-     *
-     * e.g "CBA WBC TLS" -> [CBA, TLS, WBC].
-     *
-     * @param	string	list of symbols
-     * @return	a sorted set of each symbol in string
-     */
-    public static SortedSet stringToSortedSet(String string) {
-        // Split the string around spaces or commas
-        Pattern pattern = Pattern.compile("[, ]+");
-        String[] symbols = pattern.split(string);
-	TreeSet sortedSet = new TreeSet(Collator.getInstance());
-
-        for(int i = 0; i < symbols.length; i++)
-            sortedSet.add(symbols[i]);
-	
-	return sortedSet;
     }
 }
 

@@ -63,13 +63,12 @@ public class BasicPaperTradeResult implements PaperTradeResult {
         String string = new String();
         Iterator iterator = symbolsTraded.iterator();
         while(iterator.hasNext()) {
-            String symbol = (String)iterator.next();
-            symbol = symbol.toUpperCase();
+            Symbol symbol = (Symbol)iterator.next();
             
             if(string.length() > 0)
-                string = string.concat(", " + symbol);
+                string = string.concat(", " + symbol.toString());
             else
-                string = symbol;
+                string = symbol.toString();
         }
         
         return string;

@@ -18,13 +18,11 @@
 
 package org.mov.parser;
 
-import java.util.*;
-
 /**
- * An exception which is thrown when there is a problem parsing or
+ * An exception which is raised when there is a problem parsing or
  * executing an expression.
  */
-public class ExpressionException extends java.lang.Throwable {
+public class ExpressionException extends Throwable {
     
     private String reason = null;
 
@@ -38,9 +36,9 @@ public class ExpressionException extends java.lang.Throwable {
     }
 
     /**
-     * Return the reason this exception was thrown.
+     * Return the reason this exception was raised.
      *
-     * @return	the reason the exception was thrown
+     * @return	the reason the exception was raised
      */
     public String getReason() {
 	return reason;
@@ -54,5 +52,4 @@ public class ExpressionException extends java.lang.Throwable {
     public String toString() {
 	return getReason();
     }
-
 }

@@ -60,10 +60,10 @@ public class ShareAccount implements Account, Cloneable {
 	float value = 0;
 
 	while(iterator.hasNext()) {
-	    String symbol = (String)iterator.next();
+	    Symbol symbol = (Symbol)iterator.next();
 	    StockHolding holding = (StockHolding)stockHoldings.get(symbol);
 
-	    value += quoteBundle.getQuote(holding.getSymbol().toLowerCase(), 
+	    value += quoteBundle.getQuote(holding.getSymbol(), 
 					  Quote.DAY_CLOSE, dateOffset) *
 		holding.getShares();
 	}
@@ -73,7 +73,7 @@ public class ShareAccount implements Account, Cloneable {
 
     public void transaction(Transaction transaction) {
 	
-	String symbol = transaction.getSymbol();
+	Symbol symbol = transaction.getSymbol();
 	int shares = transaction.getShares();
 	int type = transaction.getType();
 
@@ -113,7 +113,7 @@ public class ShareAccount implements Account, Cloneable {
      * @return	stock holding for the symbol or <code>null</code> if we
      *		do not own any
      */
-    public StockHolding get(String symbol) {
+    public StockHolding get(Symbol symbol) {
 	return (StockHolding)stockHoldings.get(symbol);
     }
 
@@ -123,7 +123,7 @@ public class ShareAccount implements Account, Cloneable {
      * @param symbol the stock symbol
      * @return <code>TRUE</code> if we are holding the symbol; <code>FALSE</code> otherwise
      */
-    public boolean isHolding(String symbol) {
+    public boolean isHolding(Symbol symbol) {
         return (stockHoldings.get(symbol) != null);
     }
 

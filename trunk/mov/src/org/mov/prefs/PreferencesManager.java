@@ -28,10 +28,17 @@
 
 package org.mov.prefs;
 
-import org.mov.util.*;
-import org.mov.portfolio.*;
 import java.util.*;
 import java.util.prefs.*;
+
+import org.mov.portfolio.Account;
+import org.mov.portfolio.CashAccount;
+import org.mov.portfolio.ShareAccount;
+import org.mov.portfolio.Portfolio;
+import org.mov.portfolio.Transaction;
+import org.mov.quote.Symbol;
+import org.mov.quote.SymbolFormatException;
+import org.mov.util.TradingDate;
 
 /**
  *
@@ -128,46 +135,6 @@ public class PreferencesManager {
 	}
     }
 
-
-
-    // deprecate me
-    public static HashMap loadLastPaperTradeSettings() {
-
-	HashMap settings = new HashMap();
-	Preferences p = getUserNode("/papertrade");
-	String[] settingList = null;
-
-	// Get all the settings that we've saved
-	try {
-	    settingList = p.keys();
-	}
-	catch(BackingStoreException e) {
-	    // ignore
-	}
-
-	// Now populate settings into a hash
-	for(int i = 0; i < settingList.length; i++) {
-	    String value = p.get(settingList[i], "");
-	    settings.put((Object)settingList[i], (Object)value);
-	}
-
-	return settings;
-    }
-
-    // deprecate me
-    public static void saveLastPaperTradeSettings(HashMap settings) {
-	Preferences p = getUserNode("/papertrade");
-
-	Iterator iterator = settings.keySet().iterator();
-
-	while(iterator.hasNext()) {
-	    String setting = (String)iterator.next();
-	    String value = (String)settings.get((Object)setting);
-
-	    p.put(setting, value);
-	}
-    }
-
     public static String[] getPortfolioNames() {
 	Preferences p = getUserNode("/portfolio");
 	String[] portfolioNames = null;
@@ -236,10 +203,16 @@ public class PreferencesManager {
 							 "01/01/2000"),
 				    TradingDate.BRITISH);
 		float amount = transactionPrefs.getFloat("amount", 0.0F);
-		String symbol = transactionPrefs.get("symbol", "");
+		Symbol symbol = null;
 		int shares = transactionPrefs.getInt("shares", 0);
 		float tradeCost = transactionPrefs.getFloat("trade_cost",
 							    0.0F);
+                try {
+                    symbol = new Symbol(transactionPrefs.get("symbol", ""));
+                }
+                catch(SymbolFormatException e) {
+                    // Shouldnt happen unless portfolio gets corrupted
+                }
 
 		try {
 		    String cashAccountName = transactionPrefs.get("cash_account", "");
@@ -324,7 +297,7 @@ public class PreferencesManager {
 	    transactionPrefs.putFloat("amount", transaction.getAmount());
 
 	    if(transaction.getSymbol() != null) 
-		transactionPrefs.put("symbol", transaction.getSymbol());
+		transactionPrefs.put("symbol", transaction.getSymbol().toString());
 
 	    transactionPrefs.putInt("shares", transaction.getShares());
 	    transactionPrefs.putFloat("trade_cost", 

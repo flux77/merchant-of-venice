@@ -43,7 +43,7 @@ public class LagExpression extends QuoteExpression {
 	add(lag);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
         int lag = (int)get(1).evaluate(variables, quoteBundle, symbol, day);

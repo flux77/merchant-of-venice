@@ -456,6 +456,7 @@ public class CommandManager {
      * Displays a graph closing prices for stock(s), based on their name.
      *  The stock(s) is/are determined by a user prompt
      */
+    /*
     public void graphStockByName() {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
@@ -465,7 +466,7 @@ public class CommandManager {
             }
         });
         thread.start();
-    }
+        }*/
 
     /**
      * Internal function for generic setup of graph modules
@@ -480,7 +481,6 @@ public class CommandManager {
             ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
             Iterator iterator = symbols.iterator();
-            String symbol = null;
             QuoteBundle quoteBundle = null;
             GraphSource dayClose = null;
             Graph graph = null;
@@ -501,7 +501,7 @@ public class CommandManager {
             progress.show("Graph " + title);
 
             while(iterator.hasNext() && !thread.isInterrupted()) {
-                symbol = (String)iterator.next();
+                Symbol symbol = (Symbol)iterator.next();
 
                 quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
 

@@ -31,7 +31,7 @@ public class DivideExpression extends ArithmeticExpression {
 	super(left, right);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
 	float right = getRight().evaluate(variables, quoteBundle, symbol, day);

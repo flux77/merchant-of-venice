@@ -310,7 +310,7 @@ public class Portfolio implements Cloneable {
 	while(iterator.hasNext()) {
 	    Transaction transaction = (Transaction)iterator.next();
 	    if(transaction.getType() == Transaction.ACCUMULATE) 
-		symbolsTraded.add(transaction.getSymbol().toLowerCase());
+		symbolsTraded.add(transaction.getSymbol());
 	}
 
 	return new ArrayList(symbolsTraded);

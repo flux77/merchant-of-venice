@@ -133,7 +133,7 @@ public class QuoteRange implements Cloneable {
      *
      * @param   symbol  the symbol
      */
-    public QuoteRange(String symbol) {
+    public QuoteRange(Symbol symbol) {
 	this.symbols = new ArrayList();
 	symbols.add(symbol);
 
@@ -150,7 +150,7 @@ public class QuoteRange implements Cloneable {
      * @param firstDate earliest date
      * @param lsatDate  latest date
      */
-    public QuoteRange(String symbol, TradingDate firstDate,
+    public QuoteRange(Symbol symbol, TradingDate firstDate,
 		      TradingDate lastDate) {
 	this.symbols = new ArrayList();
 	symbols.add(symbol);
@@ -298,7 +298,7 @@ public class QuoteRange implements Cloneable {
      * @return  <code>true</code> if the symbol is in the quote range, <code>false</code>
      *          otherwise
      */
-    public boolean containsSymbol(String symbol) {
+    public boolean containsSymbol(Symbol symbol) {
 
 	// containsSymbols() and containsAllSymbols() could be factored together
 	// but are not since containsSymbol() can be called a lot by QuoteBundle so its best
@@ -344,7 +344,7 @@ public class QuoteRange implements Cloneable {
 	    Iterator iterator = containedSymbols.iterator();
 	    
 	    while(iterator.hasNext()) {
-		String symbol = (String)iterator.next();
+		Symbol symbol = (Symbol)iterator.next();
 
 		if(QuoteSourceManager.getSource().isMarketIndex(symbol) ||
                    symbol.length() > 3)
@@ -360,7 +360,7 @@ public class QuoteRange implements Cloneable {
 	    Iterator iterator = containedSymbols.iterator();
 	    
 	    while(iterator.hasNext()) {
-		String symbol = (String)iterator.next();
+		Symbol symbol = (Symbol)iterator.next();
 
 		if(!QuoteSourceManager.getSource().isMarketIndex(symbol))
 		    return false;
@@ -386,9 +386,9 @@ public class QuoteRange implements Cloneable {
             Iterator iterator = getAllSymbols().iterator();
 
             while(iterator.hasNext()) {
-                String symbol = (String)iterator.next();
+                Symbol symbol = (Symbol)iterator.next();
 
-                string = string.concat(symbol.toUpperCase());
+                string = string.concat(symbol.toString());
                 
                 if(iterator.hasNext()) 
                     string = string.concat(", ");

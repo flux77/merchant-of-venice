@@ -132,7 +132,7 @@ public class FileQuoteSource implements QuoteSource
                     assert quote.getSymbol() != null;
 
                     // Is this one of the ones we are looking for?
-                    if(quoteRange.containsSymbol(quote.getSymbol().toLowerCase())) {
+                    if(quoteRange.containsSymbol(quote.getSymbol())) {
                         quotes.add(quote);
 
                         // If we are only looking for a certain set of
@@ -244,8 +244,8 @@ public class FileQuoteSource implements QuoteSource
      * @param	symbol	the stock symbol.
      * @return	always an empty string.
      */
-    public String getSymbolName(String symbol) {
-	return new String("");
+    public String getSymbolName(Symbol symbol) {
+	return null;
     }
 
     /**
@@ -255,8 +255,8 @@ public class FileQuoteSource implements QuoteSource
      * @param	symbol	a partial company name.
      * @return	always an empty string.
      */
-    public String getSymbol(String partialSymbolName) {
-	return new String("");
+    public Symbol getSymbol(String partialSymbolName) {
+	return null;
     }
 
     /**
@@ -265,7 +265,7 @@ public class FileQuoteSource implements QuoteSource
      * @param	symbol	the symbol we are searching for.
      * @return	whether the symbol was found or not.
      */
-    public boolean symbolExists(String symbol) {
+    public boolean symbolExists(Symbol symbol) {
 
         if(checkFiles()) {
             // Iterate through all files until we find one containing the
@@ -402,9 +402,8 @@ public class FileQuoteSource implements QuoteSource
                     List quotes = getContainedQuotes(fileURL, quoteRange);
                                         
                     // Load quotes into cache
-                    for(Iterator quoteIterator = quotes.iterator(); quoteIterator.hasNext();) {
+                    for(Iterator quoteIterator = quotes.iterator(); quoteIterator.hasNext();) 
                         quoteCache.load((Quote)quoteIterator.next());
-                    }
                 }
                 
                 if(thread.isInterrupted())
@@ -428,12 +427,12 @@ public class FileQuoteSource implements QuoteSource
      * @param	symbol to test
      * @return	yes or no
      */
-    public boolean isMarketIndex(String symbol) {
+    public boolean isMarketIndex(Symbol symbol) {
         // HACK. It needs to keep a file which maintains a flag
         // for whether a symbol is an index or not.
 	assert symbol != null;
 
-	if(symbol.length() == 3 && symbol.toUpperCase().charAt(0) == 'X')
+	if(symbol.length() == 3 && symbol.charAt(0) == 'X')
 	    return true;
 	else
 	    return false;

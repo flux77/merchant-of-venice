@@ -46,7 +46,7 @@ public class MaxExpression extends QuoteExpression {
 	add(lag);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
 	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
@@ -90,7 +90,7 @@ public class MaxExpression extends QuoteExpression {
      * @param	lastDay	fast access date offset in cache.
      * @return	the maximum stock quote.
      */
-    static public float max(QuoteBundle quoteBundle, String symbol, 
+    static public float max(QuoteBundle quoteBundle, Symbol symbol, 
 			    int quote, int days, int lastDay) {
 
 	float max = 0.0F;

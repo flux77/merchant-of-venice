@@ -16,13 +16,40 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.analyser;
+package org.mov.quote;
 
-import javax.swing.JComponent;
+/**
+ * An exception which is raised when there is a problem parsing a 
+ * symbol string.
+ */
+public class SymbolFormatException extends Throwable {
 
-public interface AnalyserPage {
-    public void save(String key);
-    public void load(String key);
-    public boolean parse();
-    public JComponent getComponent();
+    private String reason = null;
+
+    /** 
+     * Create a new symbol format exception with the given error reason.
+     *
+     * @param reason the reason why the string isn't a valid symbol
+     */
+    public SymbolFormatException(String reason) {
+        this.reason = reason;
+    }
+
+    /**
+     * Return the reason this exception was raised.
+     *
+     * @return the reason why the string isn't a valid symbol
+     */
+    public String getReason() {
+        return reason;
+    }
+
+    /**
+     * Convert the exception to a string
+     *
+     * @return	string version of the exception
+     */
+    public String toString() {
+	return getReason();
+    }
 }

@@ -27,9 +27,7 @@ import org.mov.parser.Variables;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
-
-
-import org.mov.quote.QuoteCache;
+import org.mov.quote.Symbol;
 
 public class OrderComparator implements Comparator {
 
@@ -84,8 +82,8 @@ public class OrderComparator implements Comparator {
 
     public int compare(Object object1, Object object2) {
 
-        String symbol1 = (String)object1;
-        String symbol2 = (String)object2;
+        Symbol symbol1 = (Symbol)object1;
+        Symbol symbol2 = (Symbol)object2;
 
         assert isDateSet;
 
@@ -148,7 +146,7 @@ public class OrderComparator implements Comparator {
         }
     }
 
-    private int compareByEquation(String symbol1, String symbol2) {
+    private int compareByEquation(Symbol symbol1, Symbol symbol2) {
         assert orderByKey == EQUATION;
         
         try {

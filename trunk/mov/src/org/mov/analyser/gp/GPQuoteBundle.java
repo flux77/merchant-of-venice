@@ -30,6 +30,7 @@ import org.mov.quote.QuoteBundleCache;
 import org.mov.quote.QuoteBundleIterator;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteRange;
+import org.mov.quote.Symbol;
 import org.mov.util.TradingDate;
 
 public class GPQuoteBundle implements QuoteBundle {
@@ -51,7 +52,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(String symbol, int quoteType, int dateOffset)
+    public float getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException {
         assert false;
         return 0.0F;
@@ -71,7 +72,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception EvaluationException if the script isn't allow access to the quote.
      */
-    public float getQuote(String symbol, int quoteType, int today, int offset)
+    public float getQuote(Symbol symbol, int quoteType, int today, int offset)
 	throws EvaluationException {
         
         // Trying to access a future quote?
@@ -104,7 +105,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(String symbol, int quoteType, TradingDate date) 
+    public float getQuote(Symbol symbol, int quoteType, TradingDate date) 
         throws MissingQuoteException {
         assert false;
         return 0.0F;
@@ -118,7 +119,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * @return  <code>true</code> if this symbol should be in the quote bundle, 
      *          <code>false</code> otherwise
      */
-    public boolean containsQuote(String symbol, int dateOffset) {
+    public boolean containsQuote(Symbol symbol, int dateOffset) {
         return quoteBundle.containsQuote(symbol, dateOffset);
     }
 
@@ -130,7 +131,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * @return  <code>true</code> if this symbol should be in the quote bundle, 
      *          <code>false</code> otherwise
      */
-    public boolean containsQuote(String symbol, TradingDate date) {
+    public boolean containsQuote(Symbol symbol, TradingDate date) {
         return quoteBundle.containsQuote(symbol, date);
     }
 
@@ -168,7 +169,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * 
      * @return the first symbol
      */
-    public String getFirstSymbol() {
+    public Symbol getFirstSymbol() {
         return quoteBundle.getFirstSymbol();
     }
 

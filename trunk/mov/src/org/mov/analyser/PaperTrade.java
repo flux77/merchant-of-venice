@@ -84,7 +84,7 @@ public class PaperTrade {
     }
 
     private static boolean sell(Environment environment,
-				String symbol,
+				Symbol symbol,
 				float tradeCost,
 				int day) 
 	throws MissingQuoteException {
@@ -123,7 +123,7 @@ public class PaperTrade {
     }
 
     private static boolean buy(Environment environment,
-			       String symbol,
+			       Symbol symbol,
 			       float amount,				 
 			       float tradeCost,
 			       int day) 
@@ -174,7 +174,7 @@ public class PaperTrade {
             new ArrayList(environment.shareAccount.getStockHoldings().keySet());
         
         for(Iterator iterator = heldSymbols.iterator(); iterator.hasNext();) {
-            String symbol = (String)iterator.next();
+            Symbol symbol = (Symbol)iterator.next();
             
             // If we care about the order, make sure the "order" variable is set
             if(orderComparator != null) {
@@ -222,7 +222,7 @@ public class PaperTrade {
             // Iterate through stocks available today - should we buy or sell any of it?
             for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
                 
-                String symbol = (String)iterator.next();
+                Symbol symbol = (Symbol)iterator.next();
 
                 // Skip if we already own it
                 if(!environment.shareAccount.isHolding(symbol)) {
@@ -253,7 +253,7 @@ public class PaperTrade {
         }
     }
 
-    private static int getHoldingTime(Environment environment, String symbol, int dateOffset) {
+    private static int getHoldingTime(Environment environment, Symbol symbol, int dateOffset) {
         int holdingTime = 0;
         StockHolding stockHolding = environment.shareAccount.get(symbol);
 

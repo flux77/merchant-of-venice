@@ -688,7 +688,7 @@ public class TransactionDialog extends JInternalFrame
 	if(type == Transaction.ACCUMULATE) {
 	    cashAccountComboBox.setSelectedItem(transaction.getCashAccount().getName());
 	    shareAccountComboBox.setSelectedItem(transaction.getShareAccount().getName());
-	    symbolTextField.setText(transaction.getSymbol());
+	    symbolTextField.setText(transaction.getSymbol().toString());
 	    sharesTextField.setText(String.valueOf(transaction.getShares()));
 	    amountTextField.setText(String.valueOf(transaction.getAmount()));
 	    tradeCostTextField.setText(String.valueOf(transaction.getTradeCost()));
@@ -801,6 +801,7 @@ public class TransactionDialog extends JInternalFrame
     // Transaction
     private Transaction buildTransaction() {
 	Transaction transaction = null;
+        String symbolParseError = null;
 
 	//
 	// First extract data from GUI
@@ -813,13 +814,18 @@ public class TransactionDialog extends JInternalFrame
 
 	// Get symbol - try the combo box first. If it doesn't exist then try the
 	// text field.
-	String symbol = new String("");
+	Symbol symbol = null;
 
 	if(symbolComboBox != null) {
-	    symbol = (String)symbolComboBox.getSelectedItem();
+	    symbol = (Symbol)symbolComboBox.getSelectedItem();
 	}
 	else if(symbolTextField != null) {
-	    symbol = symbolTextField.getText();
+            try {
+                symbol = Symbol.toSymbol(symbolTextField.getText());
+            }
+            catch(SymbolFormatException e) {
+                symbolParseError = e.getReason();
+            }
 	}
 
 	CashAccount cashAccount = null;
@@ -904,21 +910,14 @@ public class TransactionDialog extends JInternalFrame
 	    
 	// If we are using the stock symbol check that its valid
 	if((type == Transaction.ACCUMULATE || type == Transaction.REDUCE ||
-	    type == Transaction.DIVIDEND_DRP) &&
-	   !QuoteSourceManager.getSource().symbolExists(symbol)) {
-	    String message;
+	    type == Transaction.DIVIDEND_DRP) && symbolParseError != null) {
 
-	    if(symbol.equals(""))
-		message = new String("Missing symbol");
-	    else
-		message = new String("Unknown symbol '" + symbol + "'");
-	    
-	    JOptionPane.showInternalMessageDialog(desktop, 
-						  message,
-						  "Error building transaction",
-						  JOptionPane.ERROR_MESSAGE);
-	    return null;
-	}
+            JOptionPane.showInternalMessageDialog(desktop, 
+                                                  symbolParseError,
+                                                  "Error building transaction",
+                                                  JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
 
 	//
 	// Build transaction

@@ -11,19 +11,19 @@ import javax.swing.table.*;
 import org.mov.main.*;
 import org.mov.util.*;
 import org.mov.parser.*;
+import org.mov.quote.*;
 
 public class QuoteModule extends AbstractAnalyserTable
     implements AnalyserModule {
 
-    public static final int SYMBOL_COLUMN = 0;
-    public static final int VOLUME_COLUMN = 1;
-    public static final int DAY_LOW_COLUMN = 2;
-    public static final int DAY_HIGH_COLUMN = 3;
-    public static final int DAY_OPEN_COLUMN = 4;
-    public static final int DAY_CLOSE_COLUMN = 5;
-    public static final int CHANGE_COLUMN = 6;
+    private static final int SYMBOL_COLUMN = 0;
+    private static final int VOLUME_COLUMN = 1;
+    private static final int DAY_LOW_COLUMN = 2;
+    private static final int DAY_HIGH_COLUMN = 3;
+    private static final int DAY_OPEN_COLUMN = 4;
+    private static final int DAY_CLOSE_COLUMN = 5;
+    private static final int CHANGE_COLUMN = 6;
 
-    public static JPopupMenu popup;
     private PropertyChangeSupport propertySupport;
     private QuoteCache cache;
     private Object[] symbols;
@@ -38,7 +38,7 @@ public class QuoteModule extends AbstractAnalyserTable
 	    String.class, Integer.class, String.class, String.class,
 	    String.class, String.class, Change.class};
 
-	private TradingDate date;
+	private TradingDate date = null;
 	private QuoteCache cache;
 	private Object[] symbols;
     
@@ -48,7 +48,8 @@ public class QuoteModule extends AbstractAnalyserTable
 	    
 	    // Pull first date from cache
 	    Iterator iterator = cache.dateIterator();
-	    date = (TradingDate)iterator.next();
+	    if(iterator.hasNext())
+		date = (TradingDate)iterator.next();
 	}
 	
 	public int getRowCount() {
@@ -126,6 +127,7 @@ public class QuoteModule extends AbstractAnalyserTable
 
     private void newTable(JDesktopPane desktop, QuoteCache cache, 
 			  org.mov.parser.Expression expression) {
+
 	this.expression = expression;
 	this.cache = cache;
 
@@ -146,25 +148,29 @@ public class QuoteModule extends AbstractAnalyserTable
 
     public String getTitle() {
 	// Get date in cache (should only be one so get the first one)
-	Iterator iterator = cache.dateIterator();
-	TradingDate date = (TradingDate)iterator.next();
-	String expressionString = "";
+	String dateString = "???";
+	Iterator iterator = cache.dateIterator();       
+	if(iterator.hasNext()) {
+	    TradingDate date = (TradingDate)iterator.next();
+	    dateString = date.toLongString();
+	}
 
+	String expressionString = "";
 	if(expression != null) 
 	    expressionString = " [" + expression + "]";
 
 	return "Stock Quotes for " + 
-	    date.toLongString() +
+	    dateString +
 	    expressionString + " (" +
 	    symbols.length +
 	    ")";	    
     }
 
-    public void addPropertyChangeListener (PropertyChangeListener listener) {
-        propertySupport.addPropertyChangeListener (listener);
+    public void addModuleChangeListener (PropertyChangeListener listener) {
+	propertySupport.addPropertyChangeListener (listener);
     }
 
-    public void removePropertyChangeListener (PropertyChangeListener listener)
+    public void removeModuleChangeListener (PropertyChangeListener listener)
     {
         propertySupport.removePropertyChangeListener (listener);
     }
@@ -220,6 +226,10 @@ public class QuoteModule extends AbstractAnalyserTable
 	    // Return all cache's symbols
 	    return cache.getSymbols();
 	}
+    }
+
+    public void save() {
+
     }
 }
 

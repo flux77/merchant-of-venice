@@ -110,6 +110,8 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	double guess  = QuoteFunctions.sd(values,  
 					  1,
 					  values.length) / 2;
+
+	guess = QuoteFunctions.roundDouble(guess, 2);
 	
 	graphConstants.setPriceReversalThreshold(guess);
 	    
@@ -234,9 +236,10 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    
 	    String constantStr = (new Double(graphConstants.getSmoothingConstant())).toString();
 	    String val = JOptionPane.showInputDialog(null, "Enter Value", constantStr);
-
-	    graphConstants.setSmoothingConstant( (new Double(val)).doubleValue());
-
+	    
+	    if (val != null) {
+		graphConstants.setSmoothingConstant( (new Double(val)).doubleValue());
+	    }
 
 
 	    // FIXME: replace this kludge with proper redraw code
@@ -256,8 +259,10 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    String constantStr = (new Double(graphConstants.getPriceReversalThreshold())).toString();
 	    String val = JOptionPane.showInputDialog(null, "Enter Value", constantStr);
 	    
-	    graphConstants.setPriceReversalThreshold( (new Double(val)).doubleValue());
-	    
+	    if (val != null) {
+		graphConstants.setPriceReversalThreshold( (new Double(val)).doubleValue());
+	    }
+
 	    // FIXME: replace this kludge with proper redraw code
 	    if (graphExists(POINTANDFIGURE)) {
 		removeGraph(POINTANDFIGURE);

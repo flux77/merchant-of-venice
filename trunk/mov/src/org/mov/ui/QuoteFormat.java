@@ -18,13 +18,13 @@
 
 package org.mov.ui;
 
-import java.text.*;
-
-import org.mov.util.*;
+import java.text.NumberFormat;
 
 public class QuoteFormat implements Comparable {
 
     private double quote;
+
+    private static NumberFormat format = null;
 
     public QuoteFormat(double quote) {
         this.quote = quote;
@@ -37,12 +37,7 @@ public class QuoteFormat implements Comparable {
      * @return	the quote string
      */
     public static String quoteToString(double quote) {
-        NumberFormat format = NumberFormat.getInstance();
-        format.setMinimumIntegerDigits(1);
-        format.setMinimumFractionDigits(3);
-        format.setMaximumFractionDigits(3);
-        
-        return format.format((double)quote);
+        return getNumberFormat().format(quote);
     }
 
     public String toString() {
@@ -62,6 +57,19 @@ public class QuoteFormat implements Comparable {
             return 1;
         else
             return 0;
+    }
+
+    private static NumberFormat getNumberFormat() {
+        // Synchronisation cannot cause issues here. So this code
+        // isn't synchronised.
+        if(format == null) {
+            format = NumberFormat.getInstance();
+            format.setMinimumIntegerDigits(1);
+            format.setMinimumFractionDigits(3);
+            format.setMaximumFractionDigits(3);
+        }
+
+        return format;
     }
     
 }

@@ -103,7 +103,7 @@ public class GraphTools {
 				 double horizontalScale, double verticalScale,
 				 double bottomLineValue, List xRange) {
 	int x2, y1, y2;
-	int x1 = -1;
+//	int x1 = -1;    int halfbarWidth=(int)(0.309 * horizontalScale);//bryan    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
 	Double y;
 	double doubleValue;
 	Comparable x;
@@ -138,12 +138,12 @@ public class GraphTools {
 	    x2 = (int)(xoffset + horizontalScale * i);
 	    y1 = yoffset - scaleAndFitPoint(doubleValue,
 	    				    bottomLineValue, verticalScale);
-	
-	    if(x1 != -1)
-		g.fillRect(Math.min(x1, x2), Math.min(y1, y2),
-			   Math.abs(x2-x1) + 1, Math.abs(y2-y1));
-	
-	    x1 = x2 + 1;
+		g.fillRect( x2 +halfBlankWidth, Math.min(y1, y2),	    				halfbarWidth*2+1, Math.abs(y2-y1));
+//	    if(x1 != -1)//
+//		g.fillRect(Math.min(x1, x2), Math.min(y1, y2),//
+//			   Math.abs(x2-x1) + 1, Math.abs(y2-y1));//
+//	//
+//	    x1 = x2 + 1;
 
 	    i++;
 	}

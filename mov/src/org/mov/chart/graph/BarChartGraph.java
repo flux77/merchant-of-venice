@@ -71,6 +71,8 @@ public class BarChartGraph extends AbstractGraph {
 	Double dayLowY, dayHighY, dayCloseY, dayOpenY;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
+    int halfbarWidth=(int)(0.309 * horizontalScale);//bryan
+    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
 
 	while(iterator.hasNext()) {
 
@@ -116,19 +118,27 @@ public class BarChartGraph extends AbstractGraph {
 						verticalScale);
 		
 		// Draw bar
-		g.drawLine(xCoordinate, lowY, xCoordinate, highY);
-
+//		g.drawLine(xCoordinate, lowY, xCoordinate, highY);
+		g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, lowY, xCoordinate+halfbarWidth+1 +halfBlankWidth, highY);
 		// Draw perpendicular line indicating day close
-		g.drawLine(xCoordinate, closeY,
-			   (int)(xCoordinate + 0.2 * horizontalScale
-				 /*DAY_CLOSE_BAR_WIDTH * horizontalScale*/ ),
-			   closeY);
-
+//		g.drawLine(xCoordinate, closeY,
+//			   (int)(xCoordinate + 0.2 * horizontalScale
+//				 /*DAY_CLOSE_BAR_WIDTH * horizontalScale*/ ),
+//			   closeY);
+		g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, closeY,
+				xCoordinate+halfbarWidth*2+1 +halfBlankWidth
+					 /*DAY_CLOSE_BAR_WIDTH * horizontalScale*/ ,
+				   closeY);
 		// Draw perpendicular line indicating day open
-		g.drawLine(xCoordinate, openY,
-			   (int)(xCoordinate - 0.2 * horizontalScale
-				 /*DAY_CLOSE_BAR_WIDTH * horizontalScale*/),
-			   openY);
+//		g.drawLine(xCoordinate, openY,
+//			   (int)(xCoordinate - 0.2 * horizontalScale
+//				 /*DAY_CLOSE_BAR_WIDTH * horizontalScale*/),
+//			   openY);
+		g.drawLine(xCoordinate +halfBlankWidth , openY,
+				xCoordinate+halfbarWidth+1 +halfBlankWidth
+					 /*DAY_CLOSE_BAR_WIDTH * horizontalScale*/,
+				   openY);
+
 	    }
 	    i++;
 	}

@@ -386,7 +386,7 @@ public class DatabaseQuoteSource implements QuoteSource
             progress.setIndeterminate(true);
             Statement statement = connection.createStatement();	       
             ResultSet RS = statement.executeQuery("SELECT COUNT(*) FROM " + SHARE_TABLE_NAME + " " +
-                                                  "WHERE " + SYMBOL_FIELD +" = '" + symbol + "' ");
+                                                  "WHERE " + SYMBOL_FIELD +" = '" + symbol.toUpperCase() + "' ");
         
             int rows = 0;
             if (RS.next()) {
@@ -401,7 +401,8 @@ public class DatabaseQuoteSource implements QuoteSource
         
         Vector query = 
 	    executeQuery("SELECT * FROM " + SHARE_TABLE_NAME + " " +
-			 "WHERE " + SYMBOL_FIELD +" = '" + symbol + "' " +
+			 "WHERE " + SYMBOL_FIELD +" = '" + 
+			 symbol.toUpperCase() + "' " +
 			 "ORDER BY " + DATE_FIELD);
 	
 	return query;
@@ -431,7 +432,8 @@ public class DatabaseQuoteSource implements QuoteSource
 	    String symbol = (String)iterator.next();
 	    
 	    whereSymbolField = 
-		whereSymbolField.concat("SYMBOL ='" + symbol + "' ");
+		whereSymbolField.concat("SYMBOL ='" + symbol.toUpperCase() + 
+					"' ");
 	    if(iterator.hasNext()) {
 		whereSymbolField =
 		    whereSymbolField.concat("OR ");
@@ -635,7 +637,8 @@ public class DatabaseQuoteSource implements QuoteSource
 
 		// Add new quote
 		insertString.append("'" + dateString +		"', " +
-				    "'" + quote.getSymbol() +	"', " +
+				    "'" + quote.getSymbol().toUpperCase() + 
+				    "', " +
 				    "'" + quote.getDayOpen() +	"', " +
 				    "'" + quote.getDayClose() + "', " +
 				    "'" + quote.getDayHigh() +	"', " +

@@ -18,8 +18,12 @@ import org.mov.prefs.*;
 import org.mov.quote.*;
 import org.mov.ui.DesktopManager;
 
+/**
+ * The main menu of the application.
+ */
 public class MainMenu implements ActionListener, ContainerListener {
 
+    // All the menu items
     private JMenuItem fileImportQuotesMenuItem;
     private JMenuItem filePreferencesQuoteMenuItem;
     private JMenuItem fileExitMenuItem;
@@ -40,6 +44,12 @@ public class MainMenu implements ActionListener, ContainerListener {
     private JDesktopPane desktop;
     private JFrame frame;
 
+    /**
+     * Construct a new main menu and attach it to the given frame.
+     *
+     * @param	frame	the window frame
+     * @param	desktop	the desktop to lunch internal frames on
+     */
     public MainMenu(JFrame frame, JDesktopPane desktop) {
 
 	this.frame = frame;
@@ -213,6 +223,11 @@ public class MainMenu implements ActionListener, ContainerListener {
 	return menu;
     }
 
+    /**
+     * Called when a menu item is selected.
+     *
+     * @param	e	an action
+     */
     public void actionPerformed(final ActionEvent e) {
 
 	// Handle all menu actions in a separate thread so we dont

@@ -166,6 +166,20 @@ public class PointAndFigureGraph extends AbstractGraph {
 		
 		marker = (upmove) ? "X" : "O";
 		
+		/*Rules for generating PF state that when 
+		  price moves by greater than twice the box value
+		  the inteverning boxes are marked.
+		*/
+		
+		diff -= boxPriceScale;
+		while (diff  >= 0.0) {		    
+		    double tmp = (upmove) ? values[i] - boxPriceScale : values[i] + boxPriceScale;
+		    Double yTemp = new Double(tmp);
+		    yList.add(yTemp);
+		    diff -= boxPriceScale;
+		}
+		
+
 		Double yTemp = new Double(values[i]);
 		yList.add(yTemp);
 		

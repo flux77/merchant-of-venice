@@ -38,6 +38,8 @@ import java.util.Set;
  * Representation of a portfolio. A portfolio object contains several
  * accounts, accounts can be either {@link CashAccount} or
  * {@link ShareAccount}.
+ *
+ * @author Andrew Leppard
  */
 public class Portfolio implements Cloneable {
 
@@ -462,7 +464,7 @@ public class Portfolio implements Cloneable {
     }
 
     /**
-     * Get the cash value of the Portfolio on the latest day. See {@link #getValue()}.
+     * Get the cash value of the Portfolio on the latest day.
      *
      * @return	the value
      */
@@ -482,7 +484,7 @@ public class Portfolio implements Cloneable {
     }
 
     /**
-     * Get the share value of the Portfolio on the current day. See {@link #getValue()}.
+     * Get the share value of the Portfolio on the current day.
      *
      * @param	quoteBundle	the quote bundle
      * @param	date            the date

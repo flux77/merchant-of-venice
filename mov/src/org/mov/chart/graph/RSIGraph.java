@@ -18,27 +18,28 @@
 
 package org.mov.chart.graph;
 
-import java.awt.*;
-import java.util.HashMap;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.mov.chart.*;
-import org.mov.chart.source.*;
-import org.mov.util.*;
-import org.mov.parser.*;
-import org.mov.quote.*;
+import org.mov.chart.Graphable;
+import org.mov.chart.GraphTools;
+import org.mov.chart.source.GraphSource;
+import org.mov.quote.QuoteFunctions;
 
 /**
- * RSI graph.
+ * Grpah of the RSI (Relative Strength Indicator). See {@link QuoteFunctions#rsi}
+ * for more information about this indicator.
+ *
+ * @author Andrew Leppard
  */
 public class RSIGraph extends AbstractGraph {
 
     private Graphable RSI;
 
     /**
-     * Create a new standard deviation graph.
+     * Create a new RSI graph.
      *
      * @param	source	the source to create a standard deviation from
      * @param	period	the period of the standard deviation
@@ -113,7 +114,6 @@ public class RSIGraph extends AbstractGraph {
      * @return	the RSI graphable
      */
     public static Graphable createRSI(Graphable source, int period) {
-
 	Graphable RSI = new Graphable();
 
 	// Date set and value array will be in sync

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart;
@@ -45,8 +45,8 @@ import org.mov.ui.*;
  *	Graph graph = new LineGraph(dayClose);
  *
  *	ChartModule chart = new ChartModule(desktop);
- *	chart.add(graph, 0); 
- *	chart.redraw(); 
+ *	chart.add(graph, 0);
+ *	chart.redraw();
  *
  *	// Create a frame around the module and add to the desktop
  *	ModuleFrame frame = new ModuleFrame(chart, 0, 0, 400, 300);
@@ -56,7 +56,7 @@ import org.mov.ui.*;
  * <h2>Structure</h2>
  *
  * The chart module is made up of three core classes. These core classes
- * are: <code>ChartModule</chart>, <code>Chart</code> & 
+ * are: <code>ChartModule</chart>, <code>Chart</code> &
  * <code>BasicChartUI</code>.
  *
  * <p>
@@ -85,7 +85,7 @@ import org.mov.ui.*;
  * <code>ChartModule</chart>
  * <p>
  * This class handles the integration of the chart module with <i>Venice</i>.
- * It is the container class of the actual chart, and is responsible for 
+ * It is the container class of the actual chart, and is responsible for
  * laying out the chart widget and the toolbar in a frame. It also
  * provides the menu.
  * </li>
@@ -106,7 +106,7 @@ import org.mov.ui.*;
  * include buy/sell recommendations or any other data.
  *
  * <dt><i>Chart</i>
- * <dd>A chart represents the entire graphable area. The chart can 
+ * <dd>A chart represents the entire graphable area. The chart can
  * consist of several <i>Graph Levels</i>, each graph level may contain
  * several <i>Graphs</i>.
  *
@@ -125,8 +125,8 @@ import org.mov.ui.*;
  *
  * <dt><i>Graph Source</i>
  * <dd>Contains useful information that <i>Graphs</i> need to know so they
- * can graph particular data (such as quote data). This information includes 
- * the values to be graphed, a title, the axis types to use and any 
+ * can graph particular data (such as quote data). This information includes
+ * the values to be graphed, a title, the axis types to use and any
  * <i>Annotations</i> to display for the graph.
  * </dl>
  *
@@ -146,9 +146,9 @@ public class ChartModule extends JPanel implements Module,
     private JScrollPane scrollPane;
     private JMenuBar menuBar = new JMenuBar();
 
-    // Function Toolbar 
+    // Function Toolbar
     private JButton defaultZoom = null;
-    private JButton zoomIn = null;    
+    private JButton zoomIn = null;
 
     // Menus
     private JMenuItem addMenuItem = null;
@@ -176,7 +176,7 @@ public class ChartModule extends JPanel implements Module,
 
 	this.desktop = desktop;
 
-	propertySupport = new PropertyChangeSupport(this);       
+	propertySupport = new PropertyChangeSupport(this);
 
 	chart = new Chart();
 	chart.addMouseListener(this);
@@ -245,7 +245,7 @@ public class ChartModule extends JPanel implements Module,
     public void redraw() {
 	chart.resetBuffer();
 	chart.validate();
-	chart.repaint();       
+	chart.repaint();
     }
 
     // Inserts the menu such that all the menus are in alphabetical
@@ -259,7 +259,7 @@ public class ChartModule extends JPanel implements Module,
 	    JMenu currentMenu = menuBar.getMenu(i);
 	    // Should it go before this menu item? If so insert
 	    if(menu.getText().compareTo(currentMenu.getText()) <= 0) {
-		menuBar.add(menu, i); 
+		menuBar.add(menu, i);
 		menuBarInserted = true;
 		break;
 	    }
@@ -267,11 +267,11 @@ public class ChartModule extends JPanel implements Module,
 
 	// If we haven't inserted the menu bar yet then append it
 	if(menuBarInserted == false)
-	    menuBar.add(menu);	    
+	    menuBar.add(menu);	
 
 	// Send signal that our frame name has changed
 	propertySupport.
-	    firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1); 
+	    firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1);
     }
 
     /**
@@ -308,17 +308,17 @@ public class ChartModule extends JPanel implements Module,
 	while(iterator.hasNext()) {
 	    Symbol symbol = (Symbol)iterator.next();
 	    progress.show(Locale.getString("LOADING_QUOTES_FOR", symbol.toString()));
-	    
+	
 	    if (!thread.isInterrupted())
 		quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
-	    
+	
 	    if (!thread.isInterrupted())
-		dayClose = 
+		dayClose =
 		    new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
-	    
+	
 	    if (!thread.isInterrupted())
 		graph = new LineGraph(dayClose);
-	    
+	
 	    if (!thread.isInterrupted()) {
 
 		final Graph finalGraph = graph;
@@ -327,14 +327,14 @@ public class ChartModule extends JPanel implements Module,
 		// Invokes on dispatch thread
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-		    
+		
 			    add(finalGraph, finalQuoteBundle, 0);
 
 			    // This makes sure the menu updates OK
 			    getTopLevelAncestor().validate();
 			    getTopLevelAncestor().repaint();
 
-			    redraw();		  
+			    redraw();		
 
 			    // Only way I can seem to get the scrollpane
 			    // to handle if the viewport size has changed!
@@ -395,7 +395,12 @@ public class ChartModule extends JPanel implements Module,
 	addMenu(menu);
     }
 
-    /** 
+    public void addMarketIndicator(Graph graph) {
+        chart.add(graph, 0);
+        addMenu(new MarketIndicatorChartMenu(this, graph));
+    }
+
+    /**
      * Add the graph to the specified level. This is identical to
      * the add method except that it does not add a new menu for the
      * graph.
@@ -405,7 +410,7 @@ public class ChartModule extends JPanel implements Module,
      * @see	#add
      */
     public void append(Graph graph, int level) {
-	// Add graph to chart to given level, redraw chart but dont add it 
+	// Add graph to chart to given level, redraw chart but dont add it
 	// to menu as it is already there
 	chart.add(graph, level);
     }
@@ -419,7 +424,7 @@ public class ChartModule extends JPanel implements Module,
      * @see	#add
      */
     public void append(Graph graph) {
-	// Add graph at a new graph level, redraw chart but dont add graph to 
+	// Add graph at a new graph level, redraw chart but dont add graph to
 	// menu as it is already there
 	append(graph, chart.getLevels().size());
     }
@@ -446,12 +451,12 @@ public class ChartModule extends JPanel implements Module,
     }
 
     /**
-     * Remove all graphs with the given symbol from the chart. 
+     * Remove all graphs with the given symbol from the chart.
      *
      * @param name	The name of the graphs to remove
      */
     public void removeAll(String name) {
-      
+
 	// Construct vector of all graphs with the given name, then
 	// remove them one by one
 	Vector graphsToRemove = new Vector();
@@ -491,18 +496,18 @@ public class ChartModule extends JPanel implements Module,
 
 	// Send signal that our frame name has changed
 	propertySupport.
-	    firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1); 
+	    firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1);
 
         // If there are no graphs left then close the window
-        if(count() == 0) 
+        if(count() == 0)
 	    propertySupport.
 		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
     }
 
-    /** 
+    /**
      * Record whether the given graph should have its annotations
      * displayed or not. Annotations are little popup text notes that
-     * contain information about the graph, such as buy/sell suggestions. 
+     * contain information about the graph, such as buy/sell suggestions.
      *
      * @param	graph	the graph to change annotations for.
      * @param	enabled	set to true if the graph should handle annotations
@@ -548,7 +553,7 @@ public class ChartModule extends JPanel implements Module,
 	return this;
     }
 
-    public void mouseClicked(MouseEvent e) { 
+    public void mouseClicked(MouseEvent e) {
 	chart.clearHighlightedRegion();
 
         if(zoomIn != null)
@@ -559,14 +564,14 @@ public class ChartModule extends JPanel implements Module,
     public void mousePressed(MouseEvent e) {
 	Comparable x = chart.getXAtPoint(e.getX());
 
-	if(x != null) 
+	if(x != null)
 	    chart.setHighlightedStart(x);
     }
     public void mouseReleased(MouseEvent e) { }
     public void mouseDragged(MouseEvent e) {
 	Comparable x = chart.getXAtPoint(e.getX());
 
-	if(x != null) 
+	if(x != null)
 	    chart.setHighlightedEnd(x);
 
 	// can now zoom in!
@@ -608,7 +613,7 @@ public class ChartModule extends JPanel implements Module,
 
 	    Thread menuAction = new Thread() {
 		    public void run() {
-			SortedSet symbols = 
+			SortedSet symbols =
 			    SymbolListDialog.getSymbols(desktop, Locale.getString("ADD_GRAPH"));
 			// Did the user select anything?
 			if(symbols != null) {
@@ -621,7 +626,7 @@ public class ChartModule extends JPanel implements Module,
 			    while(iterator.hasNext()) {
 				Symbol symbol = (Symbol)iterator.next();
 
-				if(!isGraphing(symbol.toString())) 
+				if(!isGraphing(symbol.toString()))
 				    newSymbols.add(symbol);
 			    }
 
@@ -630,13 +635,13 @@ public class ChartModule extends JPanel implements Module,
 			}
 		    }
 		};
-	    
+	
 	    menuAction.start();
 	}
     }
 
     public JDesktopPane getDesktop() {
-	return desktop; 
+	return desktop;
     }
 
     /**

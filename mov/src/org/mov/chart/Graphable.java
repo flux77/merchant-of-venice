@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart;
@@ -37,6 +37,8 @@ import org.mov.util.*;
  * <pre>
  * Double squareOfThree = graphable.getY(new Double(3));
  * </pre>
+ *
+ * @author Andrew Leppard
  */
 public class Graphable {
 
@@ -62,10 +64,10 @@ public class Graphable {
         if(endX == null) {
             // Get last value
             Iterator iterator = map.keySet().iterator();
-            while(iterator.hasNext()) 
+            while(iterator.hasNext())
                 endX = (Comparable)iterator.next();
         }
-        
+
 	return endX;
     }
 
@@ -80,7 +82,7 @@ public class Graphable {
             Iterator iterator = map.keySet().iterator();
             assert iterator.hasNext();
             startX = (Comparable)iterator.next();
-        }        
+        }
 
 	return startX;
     }
@@ -108,7 +110,7 @@ public class Graphable {
     /**
      * Associate the given X value with the given Y value. This
      * function is used to "load" up the graphable with data.
-     * 
+     *
      * @param	x	the x value
      * @param	y	the associated y value
      */
@@ -121,21 +123,19 @@ public class Graphable {
     /**
      * Associate the given x value with the given character. This
      * function is used to "load" up the graphable with data.
-     * 
+     *
      * @param	x	the x value
-     * @param	y	the associated character
+     * @param	s	the associated character
      */
     public void putString(Comparable x, String s) {
 	charMap.put(x, (Object)s);
     }
 
-    
-
     /**
-     * Given an X range, inspect all the associated Y values and return the 
+     * Given an X range, inspect all the associated Y values and return the
      * highest.
      *
-     * @param	xRange	a <code>List</code> of <code>Comparable</code> 
+     * @param	xRange	a <code>List</code> of <code>Comparable</code>
      *			objects
      * @return	the highest Y value
      */
@@ -155,10 +155,10 @@ public class Graphable {
     }
 
     /**
-     * Given an X range, inspect all the associated Y values and return the 
+     * Given an X range, inspect all the associated Y values and return the
      * lowest.
      *
-     * @param	xRange	a <code>List</code> of <code>Comparable</code> 
+     * @param	xRange	a <code>List</code> of <code>Comparable</code>
      *			objects
      * @return	the lowest Y value
      */
@@ -202,7 +202,7 @@ public class Graphable {
 	int i = 0;
 
 	while(iterator.hasNext()) {
-	    value = (Double)iterator.next();	   
+	    value = (Double)iterator.next();	
 	    values[i++] = value.doubleValue();
 	}
 	

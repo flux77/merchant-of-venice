@@ -29,10 +29,11 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 
 import org.mov.main.*;
-import org.mov.util.*;
-import org.mov.table.*;
+import org.mov.parser.*;
 import org.mov.quote.*;
+import org.mov.table.*;
 import org.mov.ui.*;
+import org.mov.util.*;
 
 public class EquationsDialog extends JInternalFrame 
     implements ActionListener {
@@ -204,15 +205,46 @@ public class EquationsDialog extends JInternalFrame
 	equationComboBox.setEquationText(equationSlots[slot].equation);
     }
 
+    // Make sure the expression field is correct in each equation slot. If
+    // any of the equations do not parse then display an error dialog to
+    // the user.
+    private boolean parseEquations() {
+        Parser parser = new Parser();
+        boolean success = true;
+        int i = 0;
+
+        try {
+            for(i = 0; i < equationSlotCount; i++) {
+                String equationString = 
+                    equationSlots[i].equation;
+                
+                if(equationString != null && equationString.length() > 0) 
+                    equationSlots[i].expression = parser.parse(equationString);
+                else
+                    equationSlots[i].expression = null;
+            }
+        }
+        catch(ExpressionException e) {
+            JOptionPane.
+                showInternalMessageDialog(this, "Error parsing equation", 
+                                          e.getReason(),
+                                          JOptionPane.ERROR_MESSAGE);
+            success = false;
+        }
+
+        return success;
+    }
+
     public void actionPerformed(ActionEvent e) {
 
 	if(e.getSource() == okButton) {
 	    saveEquationSlot(currentEquationSlot);
 
-	    OKButtonPressed = true;
-	    dispose();
-	    isDone = true;
-
+            if(parseEquations()) {
+                OKButtonPressed = true;
+                dispose();
+                isDone = true;
+            }
 	}
 	else if(e.getSource() == cancelButton) {
 	    saveEquationSlot(currentEquationSlot);

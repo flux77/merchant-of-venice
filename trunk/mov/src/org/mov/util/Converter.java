@@ -6,6 +6,44 @@ import org.mov.portfolio.Stock;
 
 public class Converter {
 
+    /**
+     * Convert a number to a fixed length string of the given number of
+     * digits. E.g. converting 3 to a fixed 4 digit string yields "0003".
+     *
+     * @param	number	the number to convert into a string
+     * @param	digits	the fixed number of digits to output
+     * @return	the string
+     */
+    public static String toFixedString(int number, int digits) {
+	String string = Integer.toString(number);
+	String zero = new String("0");
+	
+	// Keep adding zeros at the front until its as big as digits
+	while(string.length() < digits) {
+	    string = zero.concat(string);
+	}
+	
+	return string;
+    }
+
+    /**
+     * Converts a two digit year to four digit year. The year 0 to 30
+     * are transformed to 2000 to 2030 respecitvely; the years 31 to 99 to 
+     * 1931 and 1999 respectively.
+     * 
+     * @param	year	a two digit year
+     * @return	a four digit year
+     */
+    public static int twoToFourDigitYear(int year) {
+	// Convert year from 2 digit to 4 digit
+	if(year > 30)
+	    year += 1900;
+	else
+	    year += 2000;
+
+	return year;
+    }
+
     public static Change changeToChange(float a, float b) {
 	double percent = 0.0;
 
@@ -24,35 +62,21 @@ public class Converter {
 	quote *= 1000;
 	quote = Math.round(quote);
 	quote /= 1000;
+
 	return new String(""+quote);
-	//	return Double.toString(quote);
     }
 
     public static String priceToString(float price) {
-
-	// Convert price from cents to amount in dollars
-	price /= 100;
-
 	int dollars = (int)Math.abs(price);
 	float cents = (price - dollars) * 100;
 
 	// Dollars or cents?
 	if(dollars > 0) {
 	    return "$" + Integer.toString(dollars) + "." + 
-		centsToString(cents);
+		Converter.toFixedString((int)cents, 2);
 	}
 	else
-	    return centsToString(cents) + "c";
-    }
-
-    private static String centsToString(float cents) {
-
-	String string = Integer.toString((int)cents);
-
-	if(string.length() < 2)
-	    string = "0" + string;
-
-	return string;
+	    return Converter.toFixedString((int)cents, 2) + "c";
     }
 
     // Converts a start and end date to a vector of all the trading
@@ -69,42 +93,6 @@ public class Converter {
 	    date.next(1);
 	}
 	return dates;
-    }
-
-    // Converts a line of text like: "AAA,010330,250,250,250,250,0"
-    // into stock quote class. 
-    // TODO: Needs to deal with other formats besides MetaStock
-    // TODO: Doesnt handle errors very well
-    // TODO: Be nice if it auto-detected format from file
-    public static Stock lineToQuote(String line) {
-	Stock stock = null;
-
-	if(line != null) {
-
-	    String[] quoteParts = line.split(",");
-	    if(quoteParts.length == 7) {
-
-		String symbol;
-		TradingDate date;
-		int volume;
-		float day_open;
-		float day_high;
-		float day_low;
-		float day_close;
-		int i = 0;
-
-		symbol = quoteParts[i++];
-		date = new TradingDate(quoteParts[i++]);
-		day_open = Float.parseFloat(quoteParts[i++]);
-		day_high = Float.parseFloat(quoteParts[i++]);
-		day_low = Float.parseFloat(quoteParts[i++]);
-		day_close = Float.parseFloat(quoteParts[i++]);
-		volume = Integer.parseInt(quoteParts[i++]);
-		stock = new Stock(symbol, date, volume, day_low, day_high,
-				  day_open, day_close);
-	    }	    
-	}
-	return stock;
     }
 }
 

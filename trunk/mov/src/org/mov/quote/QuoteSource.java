@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.quote;
@@ -27,17 +27,17 @@ import org.mov.util.*;
  * a database, a unique internal format or from the internet.
  */
 public interface QuoteSource {
-    /** 
-     * Returns the company name associated with the given symbol. 
-     * 
+    /**
+     * Returns the company name associated with the given symbol.
+     *
      * @param	symbol	the stock symbol
      * @return	the company name
      */
     public String getSymbolName(String symbol);
 
     /**
-     * Returns the symbol associated with the given company. 
-     * 
+     * Returns the symbol associated with the given company.
+     *
      * @param	symbol	a partial company name
      * @return	the company symbol
      */
@@ -66,27 +66,45 @@ public interface QuoteSource {
     public TradingDate getFirstDate();
 
     /**
-     * Return a vector of quotes for all quotes in the given quote range.
+     * Load the given quote range into the quote cache.
      *
      * @param	quoteRange	the range of quotes to load
-     * @return	a vector of stock quotes
      * @see Quote
-     * @see QuoteRange
+     * @see QuoteCache
      */
-    public Vector loadQuoteRange(QuoteRange quoteRange);
+    public void loadQuoteRange(QuoteRange quoteRange);
 
-    /** 
-     * Return all the dates which we have quotes for (SLOW).
+    /**
+     * Returns whether the source contains any quotes for the given date.
+     *
+     * @param date the date
+     * @return wehther the source contains the given date
+     */
+    public boolean containsDate(TradingDate date);
+
+    /**
+     * Return all the dates which we have quotes for.
      *
      * @return	a vector of dates
      */
-    public Vector getDates(); 
+    public Vector getDates();
 
     /**
-     * Is the given symbol a market index? 
+     * Is the given symbol a market index?
      *
      * @param	symbol to test
      * @return	yes or no
      */
     public boolean isMarketIndex(String symbol);
+
+    /**
+     * Return the advance/decline for the given date. This returns the number
+     * of all ordinary stocks that rose (day close > day open) - the number of all
+     * ordinary stocks that fell.
+     *
+     * @param date the date
+     * @exception throws MissingQuoteException if the date wasn't in the source
+     */
+    public int getAdvanceDecline(TradingDate date)
+        throws MissingQuoteException;
 }

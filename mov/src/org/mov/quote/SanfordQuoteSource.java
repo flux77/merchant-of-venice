@@ -8,6 +8,7 @@ import java.util.regex.*;
 
 import org.mov.util.*;
 import org.mov.portfolio.Stock;
+import org.mov.ui.DesktopManager;
 
 /**
  * Provides functionality to obtain stock quotes directly from Sanford's
@@ -78,7 +79,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    cookie = connection.getHeaderField("Set-Cookie");
 	}
 	catch(java.io.IOException io) {
-	    System.out.println("io exception" + io);
+	    DesktopManager.showErrorMessage("Can't connect to Sanford");
 	}
 
 	Progress.getInstance().close(owner);
@@ -149,7 +150,7 @@ public class SanfordQuoteSource implements QuoteSource {
 		reader.close();
 	    }
 	    catch(java.io.IOException io) {
-		System.out.println("io exception" + io);
+		DesktopManager.showErrorMessage("Error talking to Sanford");
 	    }
 
 	    Progress.getInstance().close(owner);	
@@ -282,7 +283,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    reader.close();	    
 	}
 	catch(java.io.IOException io) {
-	    System.out.println("io exception" + io);
+	    DesktopManager.showErrorMessage("Error talking to Sanford");
 	}
 
 	Progress.getInstance().close(owner);
@@ -383,7 +384,6 @@ public class SanfordQuoteSource implements QuoteSource {
 	// not implemented yet
 	return null;
     }
-
 }
 
 

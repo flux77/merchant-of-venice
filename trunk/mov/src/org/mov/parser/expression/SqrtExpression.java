@@ -90,4 +90,8 @@ public class SqrtExpression extends UnaryExpression {
     public int getType() {
         return get().getType();
     }
+
+    public Object clone() {
+        return new SqrtExpression((Expression)get().clone());
+    }
 }

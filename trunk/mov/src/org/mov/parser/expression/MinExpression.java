@@ -25,7 +25,16 @@ import org.mov.parser.*;
  * An expression which finds the minimum quote over a given trading period.
  */
 public class MinExpression extends QuoteExpression {
-    
+
+    /**
+     * Create a new minimum expression for the given <code>quote</code> kind,
+     * for the given number of <code>days</code> starting with 
+     * <code>lag</code> days away.
+     *
+     * @param	quote	the quote kind to find the minimum
+     * @param	days	the number of days to search
+     * @param	lag	the offset from the current day
+     */
     public MinExpression(Expression quote, Expression days,
 			 Expression lag) {
 	super(quote);
@@ -37,26 +46,16 @@ public class MinExpression extends QuoteExpression {
 	add(lag);
     }
 
-    /**
-     * Create a new minimum expression for the given <code>quote</code> kind,
-     * for the given number of <code>days</code> starting with 
-     * <code>lag</code> days away.
-     *
-     * @param	quote	the quote kind to find the minimum
-     * @param	days	the number of days to search
-     * @param	lag	the offset from the current day
-     */
     public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
 	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
 
-        if(days == 0)
-            throw new EvaluationException("Minimum value over 0 days");
+        if(days <= 0)
+            throw new EvaluationException("Range for min() needs to be >0");
 
-	int lastDay = day + (int)get(2).evaluate(variables, quoteBundle, symbol, day);
-
-	return min(quoteBundle, symbol, getQuoteKind(), days, lastDay);
+        int offset = (int)get(2).evaluate(variables, quoteBundle, symbol, day);
+	return min(quoteBundle, symbol, getQuoteKind(), days, day, offset);
     }
 
     public String toString() {
@@ -67,9 +66,9 @@ public class MinExpression extends QuoteExpression {
     }
 
     public int checkType() throws TypeMismatchException {
-
 	// First type must be quote, second and third types must be value
-	if(get(0).checkType() == QUOTE_TYPE &&
+	if((get(0).checkType() == FLOAT_QUOTE_TYPE ||
+            get(0).checkType() == INTEGER_QUOTE_TYPE) &&
 	   get(1).checkType() == INTEGER_TYPE &&
 	   get(2).checkType() == INTEGER_TYPE)
 	    return getType();
@@ -81,24 +80,15 @@ public class MinExpression extends QuoteExpression {
 	return 3;
     }
 
-    /** 
-     * Finds the minimum stock quote for a given symbol in a given range. 
-     *
-     * @param	quoteBundle	the quote bundle to read the quotes from.
-     * @param	symbol	the symbol to use.
-     * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
-     * @param	lastDay	fast access date offset in cache.
-     * @return	the minimum stock quote.
-     */
-    static public float min(QuoteBundle quoteBundle, Symbol symbol, 
-			    int quote, int days, int lastDay) {
+    private float min(QuoteBundle quoteBundle, Symbol symbol, 
+                      int quote, int days, int day, int offset)
+        throws EvaluationException {
 
 	float min = Float.MAX_VALUE;
-	float value;
 
-	for(int i = lastDay - days + 1; i <= lastDay; i++) {
+	for(int i = offset - days + 1; i <= offset; i++) {
             try {
-                value = quoteBundle.getQuote(symbol, quote, i);
+                float value = quoteBundle.getQuote(symbol, quote, day, i);
 
                 if(value < min)
                     min = value;

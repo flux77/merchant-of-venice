@@ -34,7 +34,7 @@ public class IfExpression extends TernaryExpression {
      * @param	arg1	the expression to be tested
      * @param	arg2	the expression to be executed if the test was 
      *			{@link #TRUE}
-     * @param	arg2	the expression to be executed if the test was 
+     * @param	arg3	the expression to be executed if the test was 
      *			{@link #FALSE}
      */
     public IfExpression(Expression arg1, 

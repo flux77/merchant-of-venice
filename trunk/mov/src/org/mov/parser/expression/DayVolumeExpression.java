@@ -44,10 +44,10 @@ public class DayVolumeExpression extends TerminalExpression {
     /**
      * Get the type of the expression.
      *
-     * @return {@link #QUOTE_TYPE}.
+     * @return {@link #INTEGER_QUOTE_TYPE}.
      */
     public int getType() {
-        return QUOTE_TYPE;
+        return INTEGER_QUOTE_TYPE;
     }
 
     public Object clone() {

@@ -51,12 +51,11 @@ public class MaxExpression extends QuoteExpression {
 
 	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
 
-        if(days == 0)
-            throw new EvaluationException("Maximum value over 0 days");
+        if(days <= 0)
+            throw new EvaluationException("Range for max() needs to be >0");
 
-	int lastDay = day + (int)get(2).evaluate(variables, quoteBundle, symbol, day);
-
-	return max(quoteBundle, symbol, getQuoteKind(), days, lastDay);
+        int offset = (int)get(2).evaluate(variables, quoteBundle, symbol, day);
+	return max(quoteBundle, symbol, getQuoteKind(), days, day, offset);
     }
 
     public String toString() {
@@ -67,9 +66,9 @@ public class MaxExpression extends QuoteExpression {
     }
 
     public int checkType() throws TypeMismatchException {
-
 	// First type must be quote, second and third types must be value
-	if(get(0).checkType() == QUOTE_TYPE &&
+	if((get(0).checkType() == FLOAT_QUOTE_TYPE ||
+            get(0).checkType() == INTEGER_QUOTE_TYPE) &&
 	   get(1).checkType() == INTEGER_TYPE &&
 	   get(2).checkType() == INTEGER_TYPE)
 	    return getType();
@@ -81,25 +80,16 @@ public class MaxExpression extends QuoteExpression {
 	return 3;
     }
 
-    /** 
-     * Finds the maximum stock quote for a given symbol in a given range. 
-     *
-     * @param	quoteBundle	the quote bundle to read the quotes from.
-     * @param	symbol	the symbol to use.
-     * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
-     * @param	lastDay	fast access date offset in cache.
-     * @return	the maximum stock quote.
-     */
-    static public float max(QuoteBundle quoteBundle, Symbol symbol, 
-			    int quote, int days, int lastDay) {
+    private float max(QuoteBundle quoteBundle, Symbol symbol, 
+                      int quote, int days, int day, int offset)
+        throws EvaluationException {
 
 	float max = 0.0F;
-	float value;
 	
-	for(int i = lastDay - days + 1; i <= lastDay; i++) {
+	for(int i = offset - days + 1; i <= offset; i++) {
 
             try {
-                value = quoteBundle.getQuote(symbol, quote, i);
+                float value = quoteBundle.getQuote(symbol, quote, day, i);
                 
                 if(value > max)
                     max = value;

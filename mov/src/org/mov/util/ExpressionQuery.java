@@ -67,7 +67,6 @@ public class ExpressionQuery {
 	Expression expression = null;
 	boolean invalidResponse;
 	String expressionString = defaultExpression;
-	Parser parser = new Parser();
 
 	do {
 	    // False unless shown otherwise
@@ -82,7 +81,7 @@ public class ExpressionQuery {
 	    if(expressionString != null && expressionString.length() > 0)
 
 		try {
-		    expression = parser.parse(expressionString);
+		    expression = Parser.parse(expressionString);
 		}
 		catch(ExpressionException e) {
 		    invalidResponse = true;

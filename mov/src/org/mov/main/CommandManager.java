@@ -672,12 +672,12 @@ public class CommandManager {
 				   "Andrew Leppard\n" +
 				   Locale.getString("SEE_LICENSE") + "\n\n" +
 
-                                   "Andrew Leppaprd (aleppard@picknow.com.au)\n" +
+                                   "Andrew Leppard (aleppard@picknow.com.au)\n" +
                                    "Daniel Makovec\n\n" +
 				
 				   Locale.getString("ADDITIONAL_CODE") + "\n\n" +
 
-                                   "Peter Fradley, Bryan Lin & Matthias St\366ckel."
+                                   "Peter Fradley, Bryan Lin, Alberto Nacher & Matthias St\366ckel."
 				   );
 
 

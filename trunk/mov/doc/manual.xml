@@ -790,7 +790,7 @@ value of -12 is 12, and the absolute value of 12 is 12.</para>
 
 <section name="Average">
 <para>The average function averages a series of stock quotes.</para>
-<para><code>avg(QUOTE, DAYS, [START_OFFSET])</code></para>
+<para><code>avg(QUOTE, DAYS[, START_OFFSET])</code></para>
 <para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where DAYS is the number of days to average.
 Where START_OFFSET is the most recent date to average, 0 means the current
@@ -801,10 +801,28 @@ trading date, -1 means the previous trading date, etc.</para>
 15 days, ending with yesterday.</para>
 </section>
 
+<section name="Bollinger Bands">
+<para>The bollinger bands are: bol_upper=avg+2sd, bol_lower=avg-2sd .</para>
+<para><code>bol_lower(QUOTE, DAYS[, START_OFFSET])</code></para>
+<para><code>bol_upper(QUOTE, DAYS[, START_OFFSET])</code></para>
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
+Where DAYS is the number of days to average.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</para>
+<para>Example:</para>
+<para><code>bol_upper(close, 26, -1)</code></para>
+<para>Returns the bollinger band value of the day close value for the current stock for the last
+26 days, ending with yesterday.</para>
+<para>The expression <code>bol_lower(close, 26, 0)</code> is the same as <code>bol_lower(close, 26)</code>
+similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+<para>The expression <code>bol_upper(close, 26, 0)</code> is the same as <code>bol_upper(close, 26)</code>
+similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+</section>
+
 <section name="Correlation">
 <para>The correlation function returns the correlation between two stock
 quotes.</para>
-<para><code>corr(SYMBOL, QUOTE, DAYS, [START_OFFSET])</code></para>
+<para><code>corr(SYMBOL, QUOTE, DAYS[, START_OFFSET])</code></para>
 <para>Where SYMBOL is the stock symbol. Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>,
 <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where DAYS is the number of days to correlate.
@@ -843,16 +861,22 @@ CBA over 30 days ending in yesterday.</para>
 <section name="Exponential Moving Average">
 <para>The exponential moving average function averages a series of stock quotes according to
 the following equation: EMA(current) = EMA(previous) + SMOOTHING_CONSTANT * (QUOTE - EMA(previous).</para>
-<para><code>ema(QUOTE, DAYS, SMOOTHING_CONSTANT, [START_OFFSET])</code></para>
+<para><code>ema(QUOTE, DAYS[, START_OFFSET][, SMOOTHING_CONSTANT])</code></para>
 <para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where DAYS is the number of days to average.
-Where SMOOTHING_CONSTANT is the smoothing constant.
 Where START_OFFSET is the most recent date to average, 0 means the current
-trading date, -1 means the previous trading date, etc.</para>
+trading date, -1 means the previous trading date, etc.
+Where SMOOTHING_CONSTANT is the smoothing constant.</para>
 <para>Example:</para>
 <para><code>ema(close, 26, 0.1, -1)</code></para>
 <para>Returns the average of the day close value for the current stock for the last
 26 days, ending with yesterday.</para>
+<para>The expression <code>ema(close, 26, 0, 0.1)</code> is the same as <code>ema(close, 26)</code>
+similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+<para>The expression <code>ema(close, 26, 0, 0.2)</code> is the same as <code>ema(close, 26, 0.2)</code>
+similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+<para>The expression <code>ema(close, 26, -1, 0.1)</code> is the same as <code>ema(close, 26, -1)</code>
+similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
 </section>
 
 <section name="For">
@@ -895,7 +919,7 @@ else {
 
 <section name="Lag">
 <para>The lag function returns a stock quote.</para>
-<para><code>lag(QUOTE, [OFFSET])</code></para>
+<para><code>lag(QUOTE[, OFFSET])</code></para>
 <para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where OFFSET is the date to retrieve the stock quote, 0 means the current
 trading date, -1 means the previous trading date, etc.</para>
@@ -903,12 +927,12 @@ trading date, -1 means the previous trading date, etc.</para>
 <para><code>lag(high, -5)</code></para>
 <para>Returns the day high value of the current stock, 5 days previous.</para>
 <para>The expression <code>lag(close, 0)</code> is the same as <code>lag(close)</code> and they can both be
-abbreviated to <code>close</code>; simillarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+abbreviated to <code>close</code>; similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
 </section>
 
 <section name="Minimum">
 <para>The minimum function finds the minimum of a series of stock quotes.</para>
-<para><code>min(QUOTE, DAYS, [START_OFFSET])</code></para>
+<para><code>min(QUOTE, DAYS[, START_OFFSET])</code></para>
 <para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where DAYS is the number of days to search.
 Where START_OFFSET is the most recent date to search, 0 means the current
@@ -921,7 +945,7 @@ trading date, -1 means the previous trading date, etc.</para>
 
 <section name="Maximum">
 <para>The maximum function finds the maximum of a series of stock quotes.</para>
-<para><code>max(QUOTE, DAYS, [START_OFFSET])</code></para>
+<para><code>max(QUOTE, DAYS[, START_OFFSET])</code></para>
 <para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where DAYS is the number of days to search.
 Where START_OFFSET is the most recent date to search, 0 means the current
@@ -932,12 +956,57 @@ trading date, -1 means the previous trading date, etc.</para>
 15 days, ending with yesterday.</para>
 </section>
 
+<section name="Moving Average Convergence Divergence">
+<para>The MACD is: MACD = 26 days EMA - 12 days EMA.</para>
+<para><code>macd(QUOTE[, START_OFFSET])</code></para>
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</para>
+<para>Example:</para>
+<para><code>macd(close, -1)</code></para>
+<para>Returns the macd value of the day close value for the current stock ending with yesterday.</para>
+<para>The expression <code>macd(close, 0)</code> is the same as <code>macd(close)</code>
+similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+<para>The expression <code>macd(close, 0)</code> is the same as <code>ema(close,26,0,0.1)-ema(close,12,0,0.1)</code>
+similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+</section>
+
+<section name="Momentum">
+<para>The momentum is: momentum(now)=quote(now)-quote(period deleyed).</para>
+<para><code>momentum(QUOTE, DAYS[, START_OFFSET])</code></para>
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
+Where DAYS is the number of days to delay.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</para>
+<para>Example:</para>
+<para><code>momentum(close, 26, -1)</code></para>
+<para>Returns the momentum value of the day close value for the current stock for the last
+26 days, ending with yesterday.</para>
+<para>The expression <code>momentum(close, 26, 0)</code> is the same as <code>momentum(close, 26)</code>
+similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+</section>
+
 <section name="Month">
 <para>The month function returns the current month.</para>
 <para><code>month()</code></para>
 <para>Example:</para>
 <para><code>month()</code></para>
 <para>Returns the current month, which will be 8, if it is August.</para>
+</section>
+
+<section name="On Balance Volume">
+<para>The OBV is the sum of volumes in the period, counted as positive if close is greater than open or
+as negative if open is greater then close.</para>
+<para><code>obv(DAYS[, START_OFFSET[, INITIAL_VALUE]])</code></para>
+<para>Where DAYS is the number of days to count over.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.
+Where INITIAL_VALUE is the initial value which counting from</para>
+<para>Example:</para>
+<para><code>obv(200, -1, 50000)</code></para>
+<para>Returns the obv value counted over the last
+200 days, ending with yesterday, starting with value 50000.</para>
+<para>The expression <code>obv(200)</code> is the same as <code>obv(200, 0, 50000)</code>.</para>
 </section>
 
 <section name="Percent">
@@ -951,7 +1020,7 @@ trading date, -1 means the previous trading date, etc.</para>
 
 <section name="Relative Strength Index">
 <para>This function calculates the Relative Strength Index (RSI) of the current stock.</para>
-<para><code>rsi([PERIOD, [START_OFFSET]])</code></para>
+<para><code>rsi([PERIOD[, START_OFFSET]])</code></para>
 <para>Where PERIOD is the period to apply the RSI.
 Where START_OFFSET is the most recent date to calculate, 0 means the current
 trading date, -1 means the previous trading date, etc.</para>
@@ -969,9 +1038,23 @@ trading date, -1 means the previous trading date, etc.</para>
 <para>Returns the square root of 144 which is 12.</para>
 </section>
 
+<section name="Standard Deviation">
+<para><code>sd(QUOTE, DAYS[, START_OFFSET])</code></para>
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
+Where DAYS is the number of days to average.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</para>
+<para>Example:</para>
+<para><code>sd(close, 26, -1)</code></para>
+<para>Returns the standard deviation value of the day close value for the current stock for the last
+26 days, ending with yesterday.</para>
+<para>The expression <code>sd(close, 26, 0)</code> is the same as <code>sd(close, 26)</code>
+similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+</section>
+
 <section name="Sum">
 <para>The sum function sums a series of stock quotes.</para>
-<para><code>sum(QUOTE, DAYS, [START_OFFSET])</code></para>
+<para><code>sum(QUOTE, DAYS[, START_OFFSET])</code></para>
 <para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where DAYS is the number of days to sum.
 Where START_OFFSET is the most recent date to sum, 0 means the current
@@ -1121,8 +1204,15 @@ if you prefer you can use the suggested equations instead, you can do that selec
 The equation gives to the system the value at which you buy or sell the stock the next day.
 The rules, in the Rules Page section, give you if you buy or sell the stock the next day,
 while the equations, in the Trade Value Page section, give you the fixed price at which you wish to buy or sell the stock the next day.
-So for example if you put 'open', you will buy or sell the stocks at open price the next day;
-if you put 'lag(open,-1)', you will buy or sell the stocks at a price equal to the open price of the day before and only if this price will be reached by the stock during the next day.</para>
+The combo box has the following selectable options:
+open value of tomorrow (in Gondola: open),
+close value (in Gondola: close),
+an average value between maximum and minimum values (in Gondola: (low+high)/2.0),
+an average value between open and close values (in Gondola: (open+close)/2.0),
+the minimum value (in Gondola: low),
+the maximum value (in Gondola: high).
+Pain attention to the 'open' key word: if you put 'open' alone, you will buy or sell the stocks at open price the next day;
+if you put 'lag(open,0)', you will buy or sell the stocks at a price equal to the open price of the day before and only if this price will be reached by the stock during the next day.</para>
 </section>
 </chapter>
 

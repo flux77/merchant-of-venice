@@ -342,11 +342,9 @@ public class MainMenu implements ActionListener, ModuleListener
 			frame.dispose();
 			return;
 		    }
-		    else if(menu == filePreferencesMenuItem) {
+		    else if(menu == filePreferencesMenuItem)
 			// Display preferences
-			((DesktopManager)(desktop.getDesktopManager()))
-			    .newFrame(new PreferencesModule(desktop), true, true);
-		    }
+			CommandManager.getInstance().openPreferences();
 		    
 		    // Table Menu
 		    else if(menu == quoteWatchScreenNewMenuItem)

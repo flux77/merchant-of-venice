@@ -6,6 +6,8 @@ import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
 
+/** Representation of a cash account in a portfolio.
+ */
 public class CashAccount implements Account {
 
     // Amount of cash available
@@ -13,6 +15,11 @@ public class CashAccount implements Account {
 
     private String name;
 
+    /**
+     * Create a new cash account.
+     *
+     * @param	name	the name of the new cash account
+     */
     public CashAccount(String name) {
 	this.name = name;
 	this.capital = 0.0F;

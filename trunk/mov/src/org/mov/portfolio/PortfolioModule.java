@@ -17,6 +17,11 @@ import org.mov.table.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
 
+/**
+ * Venice module for displaying a portfolio to the user. This module
+ * allows a user to view a portfolio and, manage the accounts and transactions
+ * in that portfolio.
+ */
 public class PortfolioModule extends JPanel implements Module,
 						       ActionListener {
 
@@ -29,6 +34,7 @@ public class PortfolioModule extends JPanel implements Module,
     private JMenuBar menuBar;
     private JMenuItem portfolioNewCashAccount;
     private JMenuItem portfolioNewShareAccount;
+    private JMenuItem portfolioGraph;
     private JMenuItem portfolioExport;
     private JMenuItem portfolioImport;
     private JMenuItem portfolioDelete;
@@ -37,9 +43,17 @@ public class PortfolioModule extends JPanel implements Module,
     private JMenuItem transactionNew;
     private JMenuItem transactionShowHistory;
 
-    // Set to true if weve deleted this portfolio
+    // Set to true if weve deleted this portfolio and shouldn't try
+    // to save it when we exit
     private boolean isDeleted = false;
 
+    /**
+     * Create a new portfolio module.
+     *
+     * @param	desktop	the current desktop
+     * @param	portfolio	the portfolio to display
+     * @param	cache	quote cache
+     */
     public PortfolioModule(JDesktopPane desktop, Portfolio portfolio, 
 			   QuoteCache cache) {
 
@@ -53,6 +67,7 @@ public class PortfolioModule extends JPanel implements Module,
 	layoutPortfolio();
     }
 
+    // create new menu for this module
     private void createMenu() {
 	menuBar = new JMenuBar();
 
@@ -64,6 +79,11 @@ public class PortfolioModule extends JPanel implements Module,
 	    portfolioNewShareAccount = 
 		MenuHelper.addMenuItem(this, portfolioMenu,
 				       "New Share Account");
+
+	    portfolioMenu.addSeparator();
+	    portfolioGraph =
+		MenuHelper.addMenuItem(this, portfolioMenu,
+				       "Graph");
 
 	    portfolioMenu.addSeparator();
 
@@ -101,29 +121,15 @@ public class PortfolioModule extends JPanel implements Module,
 	checkDisabledStatus();
     }
 
+    // You can only create transactions if youve got a cash account
     private void checkDisabledStatus() {
-	// You can only create transactions if youve got both
-	// a share and a cash account
-	Vector accounts = portfolio.getAccounts();
-	Iterator iterator = accounts.iterator();
+	boolean hasCashAccount = portfolio.hasAccount(Account.CASH_ACCOUNT);
 
-	boolean isCashAccount = false;
-	boolean isShareAccount = false;
-	
-	while(iterator.hasNext()) {
-	    Account account = (Account)iterator.next();
-	    if(account.getType() == Account.CASH_ACCOUNT)
-		isCashAccount = true;
-	    else
-		isShareAccount = true;
-	}
-
-	boolean isEnabled = (isCashAccount && isShareAccount? true : false);
-
-	transactionNew.setEnabled(isEnabled);
-	transactionShowHistory.setEnabled(isEnabled);
+	transactionNew.setEnabled(hasCashAccount);
+	transactionShowHistory.setEnabled(hasCashAccount);
     }
 
+    // Redraw and layout portfolio on screen
     private void layoutPortfolio() {
 
 	StockHoldingTable table = null;
@@ -184,6 +190,8 @@ public class PortfolioModule extends JPanel implements Module,
 	repaint();
     }
 
+    // Hack to get swing tables using the minimum amount of room needed
+    // instead of gobbling up extra room at the bottom
     private void restrictTableHeight(JScrollPane scrollPane, JTable table) {
 
 	int rows = table.getRowCount();
@@ -217,6 +225,8 @@ public class PortfolioModule extends JPanel implements Module,
 	scrollPane.setMinimumSize(minimumSize);
     }
 
+    // Add label in large letters to indicate either the share account
+    // name or "Summary"
     private void addLabel(String text) {
 	JLabel label = new JLabel(text);
 	label.setForeground(Color.BLACK);
@@ -240,8 +250,8 @@ public class PortfolioModule extends JPanel implements Module,
     }
 
     public void save() {
-
-	// Dont save it if the user just deleted it
+	// Dont save it if the user just deleted it otherwise save
+	// the portfolio state
 	if(!isDeleted) {
 	    PreferencesManager.savePortfolio(portfolio);
 	    MainMenu.getInstance().updatePortfolioMenu();
@@ -323,6 +333,9 @@ public class PortfolioModule extends JPanel implements Module,
 			propertySupport.
 			    firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
 		    }
+		    else if(e.getSource() == portfolioGraph) {
+			CommandManager.getInstance().graphPortfolio(portfolio);
+		    }
 		    else if(e.getSource() == portfolioDelete) {
 			deletePortfolio();
 		    }
@@ -341,12 +354,19 @@ public class PortfolioModule extends JPanel implements Module,
 		    else if(e.getSource() == transactionNew) {
 			newTransaction();
 		    }
+		    else if(e.getSource() == transactionShowHistory) {
+			TransactionModule history =
+			    new TransactionModule(portfolio);
+
+			((org.mov.ui.DesktopManager)(desktop.getDesktopManager())).newFrame(history);
+		    }
 		}
 	    };
 
 	menuAction.start();
     }
 
+    // Delete this portfolio
     private void deletePortfolio() {
 	JDesktopPane desktop =
 	    org.mov.ui.DesktopManager.getDesktop();
@@ -371,6 +391,7 @@ public class PortfolioModule extends JPanel implements Module,
 	}
     }
 
+    // Export this portfolio to a CSV file
     private void exportPortfolio() {
 	// Select file to export to
 	JFileChooser chooser = new JFileChooser();
@@ -406,6 +427,7 @@ public class PortfolioModule extends JPanel implements Module,
 	}
     }
 
+    // Import from a CSV file into this portfolio
     private void importPortfolio() {
 	// Select file to import from
 	JFileChooser chooser = new JFileChooser();
@@ -428,15 +450,8 @@ public class PortfolioModule extends JPanel implements Module,
 		    String[] parts = line.split(",");
 
 		    int i = 0;
-
-		    System.out.println("loading date: " +
-				       parts[0]);
-
 		    TradingDate date = new TradingDate(parts[i++],
 						       TradingDate.BRITISH);
-
-		    System.out.println("date was " +
-				       date.toString());
 
 		    int type = Transaction.stringToType(parts[i++]);
 		    float amount = Float.valueOf(parts[i++]).floatValue();
@@ -498,6 +513,7 @@ public class PortfolioModule extends JPanel implements Module,
 	checkDisabledStatus(); // enable transaction menu
     }
 
+    // Create a new cash account
     private void newCashAccount() {
 	TextDialog dialog = 
 	    new TextDialog(desktop, "Enter account name",
@@ -513,6 +529,7 @@ public class PortfolioModule extends JPanel implements Module,
 	checkDisabledStatus(); // enable transaction menu
     }
 
+    // Create a new share account
     private void newShareAccount() {
 	TextDialog dialog = 
 	    new TextDialog(desktop, "Enter account name",
@@ -528,6 +545,7 @@ public class PortfolioModule extends JPanel implements Module,
 	checkDisabledStatus(); // enable transaction menu
     }
 
+    // Create a new transaction
     private void newTransaction() {
 
 	JDesktopPane desktop = 

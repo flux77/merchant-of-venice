@@ -18,9 +18,15 @@
 
 package org.mov.parser.expression;
 
-import org.mov.util.*;
-import org.mov.parser.*;
-import org.mov.quote.*;
+import org.mov.parser.EvaluationException;
+import org.mov.parser.Expression;
+import org.mov.parser.TypeMismatchException;
+import org.mov.parser.Variables;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.Quote;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteFunctions;
+import org.mov.quote.Symbol;
 
 /**
  * An expression which returns a quote.
@@ -54,28 +60,12 @@ public class LagExpression extends BinaryExpression {
     }
 
     public String toString() {
-        boolean isLagZeroConstant = false;
+        Expression quoteExpression = getChild(0);
         Expression lagExpression = getChild(1);
 
-        if(lagExpression instanceof NumberExpression) {
-            try {
-                if ((int)lagExpression.evaluate(null, null, null, 0) == 0)
-                    isLagZeroConstant = true;
-            }
-            catch(EvaluationException e) {
-                // Can't happen
-                assert false;
-            }
-        }
-
-        // lag(X, 0) is abbreviated as X
-        if(isLagZeroConstant)
-            // E.g. close
-            return getChild(0).toString();
-        else
-            // E.g. lag(close, 12)
-            return new String("lag(" + getChild(0).toString() + ", " +
-                              getChild(1).toString() + ")");
+        return new String("lag(" +
+                          quoteExpression.toString() + ", " +
+                          lagExpression.toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {

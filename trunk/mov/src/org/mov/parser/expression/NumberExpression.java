@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.parser.expression;
@@ -25,7 +25,7 @@ import org.mov.parser.*;
 import org.mov.quote.*;
 
 /**
- * A representation of a value. 
+ * A representation of a value.
  */
 public class NumberExpression extends TerminalExpression {
 
@@ -95,6 +95,30 @@ public class NumberExpression extends TerminalExpression {
 
             if(expression.getValue() == getValue() &&
                expression.getType() == getType())
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns whether the given expression is a NumberExpression
+     * set to the given constant. This is a convenience method often
+     * called when printing functions to determine whether the print
+     * should print only an abbreviated form, e.g.
+     *
+     * rsi(45, 0) is printed as rsi().
+     *
+     * @param expression the expression to query.
+     * @param value the value to check
+     * @return <code>true<code> if the expression is a <code>NumberExpression</code>
+     *         with the given value.
+     */
+    public static boolean isConstant(Expression expression, int value) {
+        if(expression instanceof NumberExpression) {
+            NumberExpression numberExpression = (NumberExpression)expression;
+
+            if((int)numberExpression.getValue() == value)
                 return true;
         }
 

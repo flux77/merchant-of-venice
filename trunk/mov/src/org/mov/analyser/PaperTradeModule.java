@@ -12,6 +12,7 @@ import javax.swing.table.*;
 import org.mov.main.*;
 import org.mov.util.*;
 import org.mov.parser.*;
+import org.mov.prefs.*;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
@@ -47,6 +48,9 @@ public class PaperTradeModule extends JPanel implements Module,
 
 	//	createMenu();
 	layoutPaperTrade();
+
+	// Load GUI settings from preferences
+	load();
     }
 
     private void layoutPaperTrade() {
@@ -70,7 +74,7 @@ public class PaperTradeModule extends JPanel implements Module,
 	    c.anchor = GridBagConstraints.WEST;
 
 	    fromDateTextField = 
-		addTextRow(datePanel, "From Date", "", gridbag, c, 15);
+	    	addTextRow(datePanel, "From Date", "", gridbag, c, 15);
 	    toDateTextField = 
 		addTextRow(datePanel, "To Date", "", gridbag, c, 15);
 
@@ -177,8 +181,47 @@ public class PaperTradeModule extends JPanel implements Module,
 	return text;
     }
 
-    public void save() {
+    public void load() {
+	// Load last GUI settings from preferences
+	HashMap settings = PreferencesManager.loadLastPaperTradeSettings();
 
+	Iterator iterator = settings.keySet().iterator();
+
+	while(iterator.hasNext()) {
+	    String setting = (String)iterator.next();
+	    String value = (String)settings.get((Object)setting);
+
+	    if(setting.equals("from_date"))
+		fromDateTextField.setText(value);
+	    else if(setting.equals("to_date"))
+		toDateTextField.setText(value);
+
+	    else if(setting.equals("symbols"))
+		symbolsTextField.setText(value);
+	    else if(setting.equals("buy_rule"))
+		buyRuleTextField.setText(value);
+	    else if(setting.equals("sell_rule"))
+		sellRuleTextField.setText(value);
+	    else if(setting.equals("initial_capital"))
+		initialCapitalTextField.setText(value);
+	    else if(setting.equals("trade_cost"))
+		tradeCostTextField.setText(value);
+	}
+    }
+
+    public void save() {
+	// Save last GUI settings to preferences
+	HashMap settings = new HashMap();
+
+	settings.put("from_date", fromDateTextField.getText());
+	settings.put("to_date", toDateTextField.getText());
+	settings.put("symbols", symbolsTextField.getText());
+	settings.put("buy_rule", buyRuleTextField.getText());
+	settings.put("sell_rule", sellRuleTextField.getText());
+	settings.put("initial_capital", initialCapitalTextField.getText());
+	settings.put("trade_cost", tradeCostTextField.getText());
+
+	PreferencesManager.saveLastPaperTradeSettings(settings);
     }
 
     public String getTitle() {
@@ -409,7 +452,9 @@ public class PaperTradeModule extends JPanel implements Module,
 
 	    if (!Thread.currentThread().interrupted()) {
 		ProgressDialogManager.closeProgressDialog();
-		CommandManager.getInstance().graphPortfolio(portfolio);
+		CommandManager.getInstance().graphPortfolio(portfolio,
+							    fromDate,
+							    toDate);
 	    }
 
 	} catch (Exception e) {

@@ -13,10 +13,12 @@ import org.mov.chart.*;
 import org.mov.parser.*;
 import org.mov.table.*;
 import org.mov.portfolio.*;
+import org.mov.prefs.*;
 import org.mov.ui.InternalFrameHandler;
 
 public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 
+    private JMenuItem filePreferencesQuoteMenuItem;
     private JMenuItem fileExitMenuItem;
     private JMenuItem graphCommodityCodeMenuItem;
     private JMenuItem graphCommodityNameMenuItem;
@@ -32,9 +34,6 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
     private JMenuItem windowGridMenuItem;
 
     private JMenu windowMenu;
-
-    private TradingDate lastQuoteDay;
-
     private JDesktopPane desktop;
     private JFrame frame;
 
@@ -43,14 +42,20 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	this.frame = frame;
 	this.desktop = desktop;
 
-	// Get date of latest stock quotes in database
-	lastQuoteDay = Database.getInstance().getLatestQuoteDate();
-
 	JMenuBar menuBar = new JMenuBar();
 
 	// File 
 	{	   
 	    JMenu fileMenu = addMenu(menuBar, "File");
+
+	    // File -> Preferences
+	    JMenu filePreferences = addMenu(fileMenu, "Preferences");
+
+	    // File -> Preferences -> Stock Quote Source
+	    filePreferencesQuoteMenuItem = addMenuItem(filePreferences, 
+						       "Quote Source");
+
+	    fileMenu.addSeparator();
 
 	    // File -> Exit
 	    fileExitMenuItem = addMenuItem(fileMenu, "Exit");
@@ -169,6 +174,14 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	// They should all be menu actions
 	JMenuItem menu = (JMenuItem)e.getSource();
 
+	// Is it the file menu?
+	if(menu == fileExitMenuItem)
+	    System.exit(0);
+	else if(menu == filePreferencesQuoteMenuItem) {
+	    // Display preferences
+	    newFrame(new QuoteSourcePreferences(desktop));
+	}
+
 	// Is it a table menu?
 	if(menu == tableCommoditiesListAllMenuItem ||
 	   menu == tableCompanyListRuleMenuItem ||
@@ -188,21 +201,21 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 
 	// Is it a window handling function?
 	else if (menu == windowTileHorizontalMenuItem) {
-	    InternalFrameHandler.tileFrames(desktop, InternalFrameHandler.HORIZONTAL);
+	    InternalFrameHandler.tileFrames(desktop, 
+					    InternalFrameHandler.HORIZONTAL);
 	}
 	else if (menu == windowTileVerticalMenuItem) {
-	    InternalFrameHandler.tileFrames(desktop, InternalFrameHandler.VERTICAL);
+	    InternalFrameHandler.tileFrames(desktop, 
+					    InternalFrameHandler.VERTICAL);
 	}
 	else if (menu == windowCascadeMenuItem) {
-	    InternalFrameHandler.tileFrames(desktop, InternalFrameHandler.CASCADE);
+	    InternalFrameHandler.tileFrames(desktop, 
+					    InternalFrameHandler.CASCADE);
 	}
 	else if (menu == windowGridMenuItem) {
-	    InternalFrameHandler.tileFrames(desktop, InternalFrameHandler.ARRANGE);
+	    InternalFrameHandler.tileFrames(desktop, 
+					    InternalFrameHandler.ARRANGE);
 	}
-
-	// Exit?
-	else if(menu == fileExitMenuItem) 
-	    System.exit(0);
     }
 
     public void handleGraphMenuAction(JMenuItem menu) {
@@ -288,7 +301,9 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	if(!askedForExpression || expression != null) {
 
 	    // Create cache with stock quotes for this day
-	    QuoteCache cache = new QuoteCache(lastQuoteDay, searchRestriction);
+	    QuoteCache cache = 
+		new QuoteCache(Database.getInstance().getLatestQuoteDate(),
+			       searchRestriction);
 
 	    // Display table of quotes
 	    newFrame(new QuoteModule(desktop, cache, expression));

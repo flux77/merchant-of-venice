@@ -36,15 +36,27 @@ public class TradingDate implements Cloneable, Comparable {
 	this.month = month;
 	this.day = day;
     }
-    
+
     /**
-     * Create a new date from the given java.util.Date object.
+     * Create a new date from the given <code>java.util.Calendar</code> object.
+     *
+     * @param	calendar	calendar date to convert
+     */
+    public TradingDate(Calendar date) {
+	year = date.get(Calendar.YEAR);
+	month = date.get(Calendar.MONTH) + 1;
+	day = date.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
+     * Create a new date from the given <code>java.util.Date</code> object.
      *
      * @param	date	the date to convert
      */
     public TradingDate(Date date) {
 	GregorianCalendar gc = new GregorianCalendar();
 	gc.setTime(date);
+
 	this.year = gc.get(Calendar.YEAR);
 	this.month = gc.get(Calendar.MONTH) + 1;
 	this.day = gc.get(Calendar.DATE);
@@ -245,11 +257,13 @@ public class TradingDate implements Cloneable, Comparable {
     }
 
     /**
-     * Move the current date the specified number of trading days backward.
+     * Create a new date which is the specified number of trading days
+     * before this date.
      *
      * @param	days	the number of days to move
+     * @return	date which is <code>days</code> before the current one
      */
-    public void previous(int days) {
+    public TradingDate previous(int days) {
 
 	Calendar date = this.toCalendar();
 
@@ -262,34 +276,32 @@ public class TradingDate implements Cloneable, Comparable {
 		    date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
 	}
 
-	// Convert back
-	year = date.get(Calendar.YEAR);
-	month = date.get(Calendar.MONTH) + 1;
-	day = date.get(Calendar.DAY_OF_MONTH);
+	// Create new date
+	return new TradingDate(date);
     }
 
     /**
-     * Move the current date the specified number of trading days forward.
+     * Create a new date which is the specified number of trading days
+     * after this date.
      *
      * @param	days	the number of days to move
+     * @return	date which is <code>days</code> after the current one
      */
-    public void next(int days) {
+    public TradingDate next(int days) {
 
-	Calendar cal = this.toCalendar();
+	Calendar date = this.toCalendar();
 
 	for(int i = 0; i < days; i++) {
 
 	    // Add 1 day or more to skip weekends as necessary
 	    do {
-		cal.add(Calendar.DAY_OF_WEEK, 1);
-	    } while(cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
-		    cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
+		date.add(Calendar.DAY_OF_WEEK, 1);
+	    } while(date.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
+		    date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
 	}
 
-	// Convert back
-	year = cal.get(Calendar.YEAR);
-	month = cal.get(Calendar.MONTH) + 1;
-	day = cal.get(Calendar.DAY_OF_MONTH);
+	// Create new date
+	return new TradingDate(date);
     }
 
     /**

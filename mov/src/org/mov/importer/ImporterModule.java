@@ -352,7 +352,7 @@ public class ImporterModule extends JPanel
 		}
 
 		// Increment start date to go past last date in data source
-		startDate.next(1);
+		startDate = startDate.next(1);
 	    }
 
 	    else {
@@ -367,7 +367,7 @@ public class ImporterModule extends JPanel
 
 	    // End date is yesterday
 	    TradingDate endDate = new TradingDate();
-	    endDate.previous(1);
+	    endDate = endDate.previous(1);
 
 	    // Get vector of all trading dates inbetween
 	    dates = Converter.dateRangeToTradingDateVector(startDate,

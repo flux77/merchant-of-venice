@@ -106,11 +106,9 @@ public class MainMenu implements ActionListener, ModuleListener
      * @param	desktop	the desktop to lunch internal frames on
      */
     public static MainMenu getInstance(JFrame frame, 
-				       org.mov.ui.DesktopManager desktopManager, 
-				       JDesktopPane desktop) {
-	if(instance == null) {
-	    instance = new MainMenu(frame, desktopManager, desktop);
-	}
+				       org.mov.ui.DesktopManager desktopManager) {
+	if(instance == null)
+	    instance = new MainMenu(frame, desktopManager);
 	return instance;
     }
 
@@ -125,12 +123,10 @@ public class MainMenu implements ActionListener, ModuleListener
     }
 
     private MainMenu(JFrame frame, 
-		     org.mov.ui.DesktopManager desktopManager, 
-		     JDesktopPane desktop) {
-
+		     org.mov.ui.DesktopManager desktopManager) {
 	this.frame = frame;
-	this.desktop = desktop;
 	this.desktopManager = desktopManager;
+	this.desktop = desktopManager.getDesktop();
 
 	// Listens for modules being added, delete or having their names
 	// changed

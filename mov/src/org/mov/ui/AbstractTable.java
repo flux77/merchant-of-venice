@@ -26,6 +26,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
+import org.mov.quote.Symbol;
 import org.mov.util.*;
 import org.mov.ui.*;
 
@@ -151,6 +152,7 @@ public class AbstractTable extends SortedTable {
 	setDefaultRenderer(PriceFormat.class, new StockQuoteRenderer());
 	setDefaultRenderer(QuoteFormat.class, new StockQuoteRenderer());
         setDefaultRenderer(PointChangeFormat.class, new StockQuoteRenderer());
+        setDefaultRenderer(Symbol.class, new StockQuoteRenderer());
 
         // Set up number formatter for rendering ChangeFormat.java
         format = NumberFormat.getInstance();

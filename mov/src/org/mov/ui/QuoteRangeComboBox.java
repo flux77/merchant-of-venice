@@ -50,7 +50,9 @@ public class QuoteRangeComboBox extends JComboBox {
 	//setPrototypeDisplayValue("avg(day_close, 15, 15) > 121");
     }
     
-    public QuoteRange getQuoteRange() {
+    public QuoteRange getQuoteRange()
+        throws SymbolFormatException {
+        
         String text = getText();
         
         if(text.equals(ALL_ORDINARIES))
@@ -64,13 +66,13 @@ public class QuoteRangeComboBox extends JComboBox {
         else {
             // Convert the text string to a sorted set of symbol
             // strings and also check to see if they exist
-            SortedSet symbols = SymbolListDialog.checkSymbols(this, text);
+            SortedSet symbolSet = Symbol.toSortedSet(text);
 
             // If it returned empty there was an error...
-            if(symbols == null || symbols.size() == 0)
-                return null;
+            if(symbolSet.isEmpty())
+                throw new SymbolFormatException("Missing symbols.");
             else
-                return new QuoteRange(new Vector(symbols));
+                return new QuoteRange(new ArrayList(symbolSet));
         }
     }
 

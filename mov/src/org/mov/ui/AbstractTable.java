@@ -72,9 +72,10 @@ public class AbstractTable extends SortedTable {
 	    if(value instanceof Change) 
 		renderChangeComponent(table, value, isSelected,
 				      hasFocus, row, column); 
-	    else if(value instanceof Date) {
-		String text = 
-		    DateFormat.getDateInstance().format((Date)value);
+	    else if(value instanceof TradingDate) {
+		TradingDate date = (TradingDate)value;
+
+		String text = date.toString("d?/m?/yyyy");
 		textLabel.setText(text);
 		add(textLabel);
 	    }
@@ -142,6 +143,10 @@ public class AbstractTable extends SortedTable {
 	setDefaultRenderer(Double.class, 
 			   new StockQuoteRenderer());
 	setDefaultRenderer(Date.class, 
+			   new StockQuoteRenderer());
+	setDefaultRenderer(Float.class, 
+			   new StockQuoteRenderer());
+	setDefaultRenderer(TradingDate.class, 
 			   new StockQuoteRenderer());
     }
 

@@ -11,12 +11,17 @@ import org.mov.ui.*;
 import org.mov.quote.*;
 import org.mov.portfolio.*;
 
+/**
+ * The top level class which contains the main() function. This class builds 
+ * the outer frame and creates the desktop.
+ */
 public class Main extends JFrame implements WindowListener {
     
     private JDesktopPane desktop;
     private MainMenu menu;
 
-    public Main() {
+    // Go!
+    private Main() {
 	Preferences p = Preferences.userRoot().node("/display");
 	setSize(p.getInt("default_width", 800),
 		p.getInt("default_height", 600));
@@ -53,6 +58,10 @@ public class Main extends JFrame implements WindowListener {
     public void windowIconified(WindowEvent e) {}
     public void windowOpened(WindowEvent e) {}
 
+    /**
+     * Start the application. Currently the application ignores all 
+     * command line arguments.
+     */
     public static void main(String[] args) {
 	Main venice = new Main();
 

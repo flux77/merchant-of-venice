@@ -120,7 +120,6 @@ public class ImporterModule extends JPanel
 
 	    formatComboBox = new JComboBox();
 	    formatComboBox.addActionListener(this);
-	    formatComboBox.addItem("MetaStock");
 	    Vector formats = QuoteFilterList.getInstance().getList();
 	    Iterator iterator = formats.iterator();
 	    QuoteFilter filter;
@@ -129,8 +128,8 @@ public class ImporterModule extends JPanel
 	    while(iterator.hasNext()) {
 		filter = (QuoteFilter)iterator.next();
 		formatComboBox.addItem(filter.getName());
-		if(filter.getName().equals(selectedFilter))
-		    formatComboBox.setSelectedItem((Object)filter.getName());
+                if(filter.getName().equals(selectedFilter))
+                    formatComboBox.setSelectedItem((Object)filter.getName());
 	    }
 
 	    c.gridwidth = GridBagConstraints.REMAINDER;

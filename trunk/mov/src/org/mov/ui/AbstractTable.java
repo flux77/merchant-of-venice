@@ -22,7 +22,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.text.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -31,6 +32,23 @@ import org.mov.util.*;
 import org.mov.ui.*;
 
 public class AbstractTable extends SortedTable {
+
+    public class Column {
+        public int     number;
+        public String  fullName;
+        public String  shortName;
+        public Class   type;
+        public boolean isEnabled;
+
+        public Column(int number, String fullName, String shortName, Class type, 
+                      boolean isEnabled) {
+            this.number = number;
+            this.fullName = fullName;
+            this.shortName = shortName;
+            this.type = type;
+            this.isEnabled = isEnabled;
+        }
+    }
     
     // Default values for rendering table rows
     private static final Color backgroundColor = Color.white;
@@ -164,6 +182,35 @@ public class AbstractTable extends SortedTable {
     public void setModel(TableModel model) {
 	super.setModel(model);        
     }
+
+    protected void showColumns(List columns) {
+        for(Iterator iterator = columns.iterator(); iterator.hasNext();) {
+            Column column = (Column)iterator.next();
+
+            showColumn(column.number, column.isEnabled);
+        }
+    }
+
+    protected JMenu createShowColumnMenu(List columns) {
+        JMenu showColumnsMenu = new JMenu("Show Columns");
+
+        for(Iterator iterator = columns.iterator(); iterator.hasNext();) {
+            final Column column = (Column)iterator.next();
+
+            JCheckBoxMenuItem showMenuItem = 
+                MenuHelper.addCheckBoxMenuItem(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)e.getSource();
+                            showColumn(column.number, menuItem.getState());
+                        }
+                    }, showColumnsMenu, column.fullName);
+
+            showMenuItem.setState(column.isEnabled);
+        }
+
+        return showColumnsMenu;
+    }
+
 }
 
 

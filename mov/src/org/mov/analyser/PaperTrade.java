@@ -178,7 +178,7 @@ public class PaperTrade {
             variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
 
             try {
-                if(sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE)
+                if(sell.evaluate(new Variables(), quoteBundle, symbol, dateOffset) >= Expression.TRUE)
                     sell(environment, stockHolding, tradeCost, dateOffset + 1);
             }
             catch(MissingQuoteException e) {
@@ -219,7 +219,7 @@ public class PaperTrade {
                         variables.setValue("order", order);
 
                     try {
-                        if(buy.evaluate(variables, quoteBundle, symbol,
+                        if(buy.evaluate(new Variables(), quoteBundle, symbol,
                                         dateOffset) >= Expression.TRUE) {
 
                             // Did we have enough money to buy at least one share?

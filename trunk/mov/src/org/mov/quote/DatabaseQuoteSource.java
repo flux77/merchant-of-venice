@@ -417,6 +417,8 @@ public class DatabaseQuoteSource implements QuoteSource
 	if(checkConnection()) {
 	    try {
 		Statement statement = connection.createStatement();	
+                Thread monitor = cancelOnInterrupt(statement);
+                Thread thread = Thread.currentThread();
 		ResultSet RS = statement.executeQuery(SQLString);
 
 		// All this to find out how many rows in the result set
@@ -426,20 +428,25 @@ public class DatabaseQuoteSource implements QuoteSource
 		progress.setIndeterminate(false);
 		RS.beforeFirst();
 
-                QuoteCache quoteCache = QuoteCache.getInstance();
+                // Monitor thread is no longer needed
+                monitor.interrupt();
 
-		while (RS.next()) {
-                    quoteCache.load(new Quote(RS.getString(SYMBOL_FIELD).toLowerCase(),
-                                              new TradingDate(RS.getDate(DATE_FIELD)),
-                                              RS.getInt(DAY_VOLUME_FIELD),
-                                              RS.getFloat(DAY_LOW_FIELD),
-                                              RS.getFloat(DAY_HIGH_FIELD),
-                                              RS.getFloat(DAY_OPEN_FIELD),
-                                              RS.getFloat(DAY_CLOSE_FIELD)));
+                if(!thread.isInterrupted()) {
+                    QuoteCache quoteCache = QuoteCache.getInstance();
 
-                    // Update the progress bar per row
-                    progress.increment();
-                }
+                    while (RS.next()) {
+                        quoteCache.load(new Quote(RS.getString(SYMBOL_FIELD).toLowerCase(),
+                                                  new TradingDate(RS.getDate(DATE_FIELD)),
+                                                  RS.getInt(DAY_VOLUME_FIELD),
+                                                  RS.getFloat(DAY_LOW_FIELD),
+                                                  RS.getFloat(DAY_HIGH_FIELD),
+                                                  RS.getFloat(DAY_OPEN_FIELD),
+                                                  RS.getFloat(DAY_CLOSE_FIELD)));
+                        
+                        // Update the progress bar per row
+                        progress.increment();
+                    }
+                }                    
 
 		// Clean up after ourselves
 		RS.close();
@@ -453,6 +460,47 @@ public class DatabaseQuoteSource implements QuoteSource
 	}
 
         return false;
+    }
+
+    // This function creates a new thread that monitors the current thread
+    // for the interrupt call. If the current thread is interrupted it
+    // will cancel the given SQL statement. If cancelOnInterrupt() is called,
+    // once the SQL statement has finisehd, you should make sure the
+    // thread is terminated by calling "interrupt" on the returned thread.
+    private Thread cancelOnInterrupt(final Statement statement) {
+        final Thread sqlThread = Thread.currentThread();
+
+        Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    Thread currentThread = Thread.currentThread();
+
+                    while(true) {
+
+                        try {
+                            currentThread.sleep(1000); // 1s
+                        }
+                        catch(InterruptedException e) {
+                            break;
+                        }
+
+                        if(currentThread.isInterrupted())
+                            break;
+                        
+                        if(sqlThread.isInterrupted()) {
+                            try {
+                                statement.cancel();
+                            }
+                            catch(SQLException e) {
+                                // It's not a big deal if we can't cancel it
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
+
+        thread.start();
+        return thread;
     }
 
     // Creates an SQL statement that will return all the quotes in the given

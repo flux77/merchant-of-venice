@@ -2,6 +2,9 @@ package org.mov.parser;
 
 import org.mov.quote.*;
 
+/**
+ * An expression which finds the minimum quote over a given trading period.
+ */
 public class MinExpression extends QuoteExpression {
     
     public MinExpression(Expression quote, Expression days,
@@ -13,6 +16,15 @@ public class MinExpression extends QuoteExpression {
 	add(lag);
     }
 
+    /**
+     * Create a new minimum expression for the given <code>quote</code> kind,
+     * for the given number of <code>days</code> starting with 
+     * <code>lag</code> days away.
+     *
+     * @param	quote	the quote kind to find the minimum
+     * @param	days	the number of days to search
+     * @param	lag	the offset from the current day
+     */
     public float evaluate(QuoteCache cache, String symbol, int day) 
 	throws EvaluationException {
 

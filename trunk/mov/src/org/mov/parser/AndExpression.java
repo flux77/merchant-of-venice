@@ -3,6 +3,10 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which performs boolean <code>and</code> on two 
+ * sub-expressions.
+ */
 public class AndExpression extends LogicExpression {
 
     public AndExpression(Expression left, Expression right) {
@@ -14,9 +18,9 @@ public class AndExpression extends LogicExpression {
 
 	if(getLeft().evaluate(cache, symbol, day) >= TRUE_LEVEL &&
 	   getRight().evaluate(cache, symbol, day) >= TRUE_LEVEL)
-	    return 1.0F;
+	    return TRUE;
 	else
-	    return 0.0F;
+	    return FALSE;
     }
 
     public String toString() {

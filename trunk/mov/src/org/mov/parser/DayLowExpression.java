@@ -3,6 +3,9 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * A representation of the concept of <code>day low</code>.
+ */
 public class DayLowExpression extends TerminalExpression {
 
     public float evaluate(QuoteCache cache, String symbol, int day) {

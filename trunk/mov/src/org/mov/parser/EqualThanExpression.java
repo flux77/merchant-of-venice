@@ -3,6 +3,9 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which compares the two sub-expressions for equality.
+ */
 public class EqualThanExpression extends ComparisionExpression {
 
     public EqualThanExpression(Expression left, Expression right) {
@@ -14,9 +17,9 @@ public class EqualThanExpression extends ComparisionExpression {
 
 	if(getLeft().evaluate(cache, symbol, day) ==
 	   getRight().evaluate(cache, symbol, day))
-	    return 1.0F;
+	    return TRUE;
 	else
-	    return 0.0F;
+	    return FALSE;
     }
 
     public String toString() {

@@ -1,20 +1,63 @@
 package org.mov.parser;
 
+/**
+ * Create an executable expression from the given token and arguments.
+ */
 public class ExpressionFactory {
-    
+   
+    // Cannot create an instance of this class
+    private ExpressionFactory() {
+	// not possible
+    }
+
+    /**
+     * Create an executable terminal expression from the given token.
+     *
+     * @param	operation	the terminal expression, e.g. a number
+     * @return	an executable expression
+     */	
     public static Expression newExpression(Token operation) {
 	return ExpressionFactory.newExpression(operation, null, null, null);
     }
 
+    /**
+     * Create an executable unary expression from the given token and argument.
+     *
+     * @param	operation	the unary expression, e.g. 
+     *	"<code>not(X)</code>"
+     * @param	arg1		the first argument
+     * @return	an executable expression
+     */	
     public static Expression newExpression(Token operation, Expression arg1) {
 	return ExpressionFactory.newExpression(operation, arg1, null, null);
     }
 
+    /**
+     * Create an executable binary expression from the given token and 
+     * arguments.
+     *
+     * @param	operation	the binary expression, e.g. 
+     *	"<code>X and Y</code>"
+     * @param	arg1		the first argument
+     * @param	arg2		the second argument
+     * @return	an executable expression
+     */	
     public static Expression newExpression(Token operation, Expression arg1,
 					   Expression arg2) {
 	return ExpressionFactory.newExpression(operation, arg1, arg2, null);
     }
 
+    /**
+     * Create an executable ternary expression from the given token and 
+     * arguments.
+     *
+     * @param	operation	the ternary expression, e.g. 
+     *	"<code>if(X) { Y } else { Z }</code>"
+     * @param	arg1		the first argument
+     * @param	arg2		the second argument
+     * @param	arg3		the third argument
+     * @return	an executable expression
+     */	
     public static Expression newExpression(Token operation, Expression arg1,
 					   Expression arg2, Expression arg3) {
 

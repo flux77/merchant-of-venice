@@ -2,12 +2,27 @@ package org.mov.parser;
 
 // This class is used for the comparision expressons: >, <, =, <=, >=
 
+/**
+ * Abstract base class for the comparision expressions:
+ * <code>>, <, ==, !=, <=, >=</code>
+ */
 abstract public class ComparisionExpression extends BinaryExpression {
 
+    /**
+     * Create a new comparision expression with the given left and
+     * right arguments.
+     */
     public ComparisionExpression(Expression left, Expression right) {
 	super(left, right);
     }
 
+    /**
+     * Check the input arguments to the expression. They can be any type
+     * except {@link #BOOLEAN_TYPE} and {@link #QUOTE_TYPE} and
+     * they must match.
+     *
+     * @return	the type of the left expression
+     */
     public int checkType() throws TypeMismatchException {
 	// left & right types must be the same and not boolean or quote
 	int leftType = getLeft().checkType();

@@ -3,6 +3,10 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which performs boolean <code>not</code> on the 
+ * sub-expressions.
+ */
 public class NotExpression extends UnaryExpression {
 
     public NotExpression(Expression sub) {
@@ -12,10 +16,10 @@ public class NotExpression extends UnaryExpression {
     public float evaluate(QuoteCache cache, String symbol, int day) 
 	throws EvaluationException {
 
-	if(getSub().evaluate(cache, symbol, day) >= LogicExpression.TRUE_LEVEL)
-	    return 0.0F;
+	if(getSub().evaluate(cache, symbol, day) >= Expression.TRUE_LEVEL)
+	    return FALSE;
 	else
-	    return 1.0F;
+	    return TRUE;
     }
 
     public String toString() {

@@ -3,8 +3,21 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which represents the control flow of 
+ * <code>if (x) {y} else {z}</code>.
+ */
 public class IfExpression extends TernaryExpression {
 
+    /**
+     * Construct an <code>if</code> expression.
+     *
+     * @param	arg1	the expression to be tested
+     * @param	arg2	the expression to be executed if the test was 
+     *			{@link #TRUE}
+     * @param	arg2	the expression to be executed if the test was 
+     *			{@link #FALSE}
+     */
     public IfExpression(Expression arg1, 
 			Expression arg2,
 			Expression arg3) {
@@ -16,7 +29,7 @@ public class IfExpression extends TernaryExpression {
 
 	// if(...) then
 	if(getArg(0).evaluate(cache, symbol, day) 
-	   >= LogicExpression.TRUE_LEVEL)
+	   >= Expression.TRUE_LEVEL)
 	    return getArg(1).evaluate(cache, symbol, day);
 	// else
 	else
@@ -29,6 +42,13 @@ public class IfExpression extends TernaryExpression {
 			  getArg(2).toString() + "} ");
     }
 
+    /**
+     * Check the input arguments to the expression. The first argument
+     * must be {@link #BOOLEAN_TYPE}, the remaining arguments can be
+     * any type but must be the same.      
+     *
+     * @return	the type of the second and third arguments
+     */
     public int checkType() throws TypeMismatchException {
 	// if(arg0) { arg1 } else { arg2} 
 	// then type of arg1 should be the same of arg2

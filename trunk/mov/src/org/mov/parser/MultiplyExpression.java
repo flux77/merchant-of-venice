@@ -3,6 +3,9 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which multiplies two sub-expressions.
+ */
 public class MultiplyExpression extends ArithmeticExpression {
 
     public MultiplyExpression(Expression left, Expression right) {

@@ -3,6 +3,10 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which compares whether the first expression is greater than
+ * the second expression.
+ */
 public class GreaterThanExpression extends ComparisionExpression {
 
     public GreaterThanExpression(Expression left, Expression right) {
@@ -14,9 +18,9 @@ public class GreaterThanExpression extends ComparisionExpression {
 
 	if(getLeft().evaluate(cache, symbol, day) >
 	   getRight().evaluate(cache, symbol, day))
-	    return 1.0F;
+	    return TRUE;
 	else
-	    return 0.0F;
+	    return FALSE;
     }
 
     public String toString() {

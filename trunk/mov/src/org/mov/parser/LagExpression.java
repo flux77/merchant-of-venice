@@ -3,8 +3,18 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which returns a quote.
+ */
 public class LagExpression extends QuoteExpression {
-    
+   
+    /**
+     * Create a new average expression for the given <code>quote</code> kind,
+     * for <code>lag</code> days away.
+     *
+     * @param	quote	the quote kind to return
+     * @param	lag	the offset from the current day
+     */
     public LagExpression(Expression quote, Expression lag) {
 	super(quote);
 

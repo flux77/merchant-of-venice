@@ -2,8 +2,20 @@ package org.mov.parser;
 
 import org.mov.quote.*;
 
+/**
+ * An expression which finds the average quote over a given trading period.
+ */
 public class AvgExpression extends QuoteExpression {
-    
+   
+    /**
+     * Create a new average expression for the given <code>quote</code> kind,
+     * for the given number of <code>days</code> starting with 
+     * <code>lag</code> days away.
+     *
+     * @param	quote	the quote kind to average
+     * @param	days	the number of days to average over
+     * @param	lag	the offset from the current day
+     */
     public AvgExpression(Expression quote, Expression days,
 			 Expression lag) {
 	super(quote);

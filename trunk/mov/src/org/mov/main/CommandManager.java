@@ -233,10 +233,12 @@ public class CommandManager {
         ScriptQuoteBundle quoteBundle = null;
         QuoteModule table = null;
 
+        // If this fails it'll throw a thread interupted to cancel the operation
+        TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
+
         if (!thread.isInterrupted()) {
             QuoteRange quoteRange =
-                new QuoteRange(searchRestriction,
-                               QuoteSourceManager.getSource().getLastDate());
+                new QuoteRange(searchRestriction, lastDate);
             quoteBundle = new ScriptQuoteBundle(quoteRange);
         }
 

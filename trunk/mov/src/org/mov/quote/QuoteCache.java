@@ -61,10 +61,45 @@ public class QuoteCache {
     // Singleton instance of this class
     private static QuoteCache instance = null;
 
+    private class QuoteCacheQuote {
+        private int day_volume;
+        private float day_low;
+        private float day_high;
+        private float day_open;
+        private float day_close;
+
+        public QuoteCacheQuote(int day_volume, float day_low, float day_high,
+                               float day_open, float day_close) {
+            this.day_volume = day_volume;
+            this.day_low = day_low;
+            this.day_high = day_high;
+            this.day_open = day_open;
+            this.day_close = day_close;
+        }
+
+        public float getQuote(int quote) {
+            switch(quote) {
+            case(Quote.DAY_OPEN):
+                return day_open;
+            case(Quote.DAY_CLOSE):
+                return day_close;
+            case(Quote.DAY_LOW):
+                return day_low;
+            case(Quote.DAY_HIGH):
+                return day_high;
+            case(Quote.DAY_VOLUME):
+                return day_volume;
+            default:
+                assert false;
+                return 0.0F;
+            }
+        }
+    }
+
     // Class should only be constructed once by this class
     private QuoteCache() {
-        cache = Collections.synchronizedList(new ArrayList());
-        dates = Collections.synchronizedList(new ArrayList());
+        cache = new ArrayList();
+        dates = new ArrayList();
 
         TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
 
@@ -98,17 +133,16 @@ public class QuoteCache {
 	throws QuoteNotLoadedException {
 
 	// First get the hash map for the given date
-
 	HashMap symbols = getQuotesForDate(dateOffset);
 	assert symbols != null;
 
 	// Second get the quote for the given symbol on the given date
 
-	Quote quoteValue = (Quote)symbols.get(symbol);
-	if(quoteValue == null)
+	QuoteCacheQuote quote = (QuoteCacheQuote)symbols.get(symbol);
+	if(quote == null)
 	    throw new QuoteNotLoadedException();
 	
-	return quoteValue.getQuote(quoteType);
+	return quote.getQuote(quoteType);
     }
 
     /**
@@ -177,15 +211,25 @@ public class QuoteCache {
     /**
      * Load the given quote into the cache.
      *
-     * @param quote        quote to load
+     * @param symbol symbol of quote
+     * @param date   quote date
+     * @param day_volume day volume
+     * @param day_low day low
+     * @param day_high day high
+     * @param day_open day open
+     * @param day_close day close
      */
-    public void load(Quote quote) {
+    public synchronized void load(Symbol symbol, TradingDate date, int day_volume, float day_low,
+                                  float day_high, float day_open, float day_close) {
+
+        QuoteCacheQuote quote = new QuoteCacheQuote(day_volume, day_low, day_high,
+                                                    day_open, day_close);
 
         // Find the fast date offset for the quote
         int dateOffset;
 
         try {
-            dateOffset = dateToOffset(quote.getDate());
+            dateOffset = dateToOffset(date);
         }
         catch(WeekendDateException e) {
             // If the date falls on a weekend then skip it
@@ -208,9 +252,7 @@ public class QuoteCache {
 
         // Put stock in map and remove symbol and date to reduce memory
         // (they are our indices so we already know them)
-        Object previousQuote = quotesForDate.put(quote.getSymbol(), quote);
-        quote.setSymbol(null);
-        quote.setDate(null);
+        Object previousQuote = quotesForDate.put(symbol, quote);
 
         // If the quote wasn't already there then increase size counter
         if(previousQuote == null)
@@ -223,12 +265,11 @@ public class QuoteCache {
      * @param symbol the symbol of the quote to remove
      * @param dateOffset the fast access date offset of the quote to remove
      */
-    public void free(Symbol symbol, int dateOffset) {
+    public synchronized void free(Symbol symbol, int dateOffset) {
 
 	try {
-	    HashMap quotesForDate = getQuotesForDate(dateOffset);
-	
-	    Quote quote = (Quote)quotesForDate.remove(symbol);
+	    HashMap quotesForDate = getQuotesForDate(dateOffset);       
+	    Object quote = quotesForDate.remove(symbol);
 
 	    // If we actually deleted a quote, then reduce our quote counter.
 	    // We have to check that we actually did remove something from

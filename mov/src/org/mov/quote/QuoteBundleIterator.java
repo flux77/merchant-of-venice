@@ -37,7 +37,7 @@ public class QuoteBundleIterator implements Iterator {
     private QuoteBundle quoteBundle;
 
     private TradingDate nextDate;
-    private String nextSymbol;
+    private Symbol nextSymbol;
 
     private boolean isMore;
 
@@ -71,7 +71,7 @@ public class QuoteBundleIterator implements Iterator {
 
             // Is there anymore symbols for this date?
             if(symbolsIterator.hasNext())
-                nextSymbol = (String)symbolsIterator.next();
+                nextSymbol = (Symbol)symbolsIterator.next();
             
             // No, try the next date.. and the next date...
             else {
@@ -83,7 +83,7 @@ public class QuoteBundleIterator implements Iterator {
                     // Are there symbols in the cache?
                     if(symbols.size() > 0) {
                         symbolsIterator = symbols.iterator();
-                        nextSymbol = (String)symbolsIterator.next();
+                        nextSymbol = (Symbol)symbolsIterator.next();
                         break;
                     }
                     nextDate = nextDate.next(1);

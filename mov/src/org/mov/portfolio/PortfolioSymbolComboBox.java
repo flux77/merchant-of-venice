@@ -18,10 +18,11 @@
 
 package org.mov.portfolio;
 
-import java.util.*;
-import javax.swing.*;
+import java.util.Iterator;
+import java.util.List;
+import javax.swing.JComboBox;
 
-import org.mov.util.*;
+import org.mov.util.TradingDate;
 
 /**
  * A combo box which displays all the symbols traded in a portfolio. Currently
@@ -31,11 +32,11 @@ import org.mov.util.*;
  */
 public class PortfolioSymbolComboBox extends JComboBox
 {
-    Portfolio portfolio;
+    private Portfolio portfolio;
 
     /**
      * Creates a new combo box listing all the symbols held in the portfolio on
-     * the given date.
+     * the given date. The date is currently ignored.
      *
      * @param portfolio the portfolio
      * @param date the date
@@ -57,11 +58,7 @@ public class PortfolioSymbolComboBox extends JComboBox
 	removeAllItems();
 	
 	List symbols = portfolio.getSymbolsTraded();
-	Iterator iterator = symbols.iterator();
-	while(iterator.hasNext()) {
-            String symbol = (String)iterator.next();
-            symbol = symbol.toUpperCase();
-	    addItem(symbol);
-	}
+        for(Iterator iterator = symbols.iterator(); iterator.hasNext();) 
+            addItem(iterator.next());
     }
 }

@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.mov.analyser.gp.GPQuoteBundle;
 import org.mov.parser.EvaluationException;
-import org.mov.portfolio.PortfolioQuoteBundle;
 import org.mov.util.TradingDate;
 
 /** 
@@ -35,11 +34,11 @@ import org.mov.util.TradingDate;
  *
  * @see GPQuoteBundle
  * @see ScriptQuoteBundle
- * @see PortfolioQuoteBundle
  * @see Quote
  * @see QuoteRange
  * @see QuoteBundleCache
  * @see QuoteCache
+ * @see Symbol
  */
 public interface QuoteBundle {
 
@@ -53,7 +52,7 @@ public interface QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(String symbol, int quoteType, int dateOffset)
+    public float getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException;
 
     /** 
@@ -70,7 +69,7 @@ public interface QuoteBundle {
      * @return the quote
      * @exception EvaluationException if the script isn't allow access to the quote.
      */
-    public float getQuote(String symbol, int quoteType, int today, int offset)
+    public float getQuote(Symbol symbol, int quoteType, int today, int offset)
 	throws EvaluationException;
 
     /** 
@@ -83,7 +82,7 @@ public interface QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(String symbol, int quoteType, TradingDate date) 
+    public float getQuote(Symbol symbol, int quoteType, TradingDate date) 
 	throws MissingQuoteException;
 
     /**
@@ -94,7 +93,7 @@ public interface QuoteBundle {
      * @return  <code>true</code> if this symbol should be in the quote bundle, 
      *          <code>false</code> otherwise
      */
-    public boolean containsQuote(String symbol, int dateOffset);
+    public boolean containsQuote(Symbol symbol, int dateOffset);
 
     /**
      * Return whether the given quote should be in this quote bundle.
@@ -104,7 +103,7 @@ public interface QuoteBundle {
      * @return  <code>true</code> if this symbol should be in the quote bundle, 
      *          <code>false</code> otherwise
      */
-    public boolean containsQuote(String symbol, TradingDate date);
+    public boolean containsQuote(Symbol symbol, TradingDate date);
 
     /**
      * Return an iterator over this quote bundle. The iterator will return, in order,
@@ -134,7 +133,7 @@ public interface QuoteBundle {
      * 
      * @return the first symbol
      */
-    public String getFirstSymbol();
+    public Symbol getFirstSymbol();
 
     /**
      * Returns all the symbols in the quote bundle.

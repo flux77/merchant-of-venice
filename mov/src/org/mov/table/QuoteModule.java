@@ -135,7 +135,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	    "Day Close", "+/-", "Change", "Activity"};
 
 	private Class[] columnClasses = {
-	    String.class, TradingDate.class, Integer.class, QuoteFormat.class, QuoteFormat.class,
+	    Symbol.class, TradingDate.class, Integer.class, QuoteFormat.class, QuoteFormat.class,
 	    QuoteFormat.class, QuoteFormat.class, PointChangeFormat.class,
             ChangeFormat.class, Float.class};
 
@@ -192,7 +192,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
             switch(column) {
             case(SYMBOL_COLUMN):
-                return quote.getSymbol().toUpperCase();
+                return quote.getSymbol();
 
             case(DATE_COLUMN):
                 return quote.getDate();
@@ -408,11 +408,11 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             int row = rowAtPoint(point);
 
             // Get symbol at row
-            String symbol =
-                (String)getModel().getValueAt(row, SYMBOL_COLUMN);
+            Symbol symbol =
+                (Symbol)getModel().getValueAt(row, SYMBOL_COLUMN);
 
-            ArrayList symbols = new ArrayList();
-            symbols.add((Object)symbol.toLowerCase());
+            List symbols = new ArrayList();
+            symbols.add(symbol);
 
             CommandManager.getInstance().graphStockBySymbol(symbols);
         }
@@ -421,7 +421,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     // This function extracts all quotes from the quote bundle and returns
     // them as a list of Quotes.
     private List extractAllQuotes(ScriptQuoteBundle quoteBundle) {
-        ArrayList quotes = new ArrayList();
+        List quotes = new ArrayList();
         Iterator iterator = quoteBundle.iterator();
         TradingDate lastDate = quoteBundle.getLastDate();
 
@@ -466,7 +466,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             // Traverse all symbols on all dates
 	    while(iterator.hasNext()) {
                 Quote quote = (Quote)iterator.next();
-                String symbol = quote.getSymbol();
+                Symbol symbol = quote.getSymbol();
                 TradingDate date = quote.getDate();
                 int dateOffset = 0;
 
@@ -845,9 +845,9 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
-                String symbol = (String)model.getValueAt(selectedRows[i], SYMBOL_COLUMN);
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], SYMBOL_COLUMN);
 
-                symbols.add(symbol.toLowerCase());
+                symbols.add(symbol);
             }
 
             // Graph the highlighted symbols
@@ -859,12 +859,12 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 e.getSource() == tableSymbols) {
 
             int[] selectedRows = getSelectedRows();
-            ArrayList symbols = new ArrayList();
+            List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
-                String symbol = (String)model.getValueAt(selectedRows[i], SYMBOL_COLUMN);
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], SYMBOL_COLUMN);
 
-                symbols.add(symbol.toLowerCase());
+                symbols.add(symbol);
             }
 
             // Table the highlighted symbols

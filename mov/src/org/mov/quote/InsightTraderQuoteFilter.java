@@ -63,7 +63,16 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
 	    int i = 0;
 	    
 	    if(quoteParts.length == 7) {
-		String symbol = quoteParts[i++];
+                Symbol symbol = null;
+
+                try {
+                    symbol = new Symbol(quoteParts[i++]);
+                }
+                catch(SymbolFormatException e) {
+                    // Return null - couldn't parse quote
+                    return null;
+                }
+
 		TradingDate date = new TradingDate(quoteParts[i++],
 						   TradingDate.US);
 

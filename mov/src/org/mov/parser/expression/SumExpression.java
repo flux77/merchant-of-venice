@@ -24,6 +24,7 @@ import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
+import org.mov.quote.Symbol;
 
 /**
  * An expression which finds the sum of quotes over a given trading period.
@@ -50,7 +51,7 @@ public class SumExpression extends QuoteExpression {
 	add(lag);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 	
 	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
@@ -94,7 +95,7 @@ public class SumExpression extends QuoteExpression {
      * @param	lastDay	fast access date offset in cache.
      * @return	sum of stock quotes.
      */
-    static public float sum(QuoteBundle quoteBundle, String symbol, 
+    static public float sum(QuoteBundle quoteBundle, Symbol symbol, 
 			    int quote, int days, int lastDay) {
 	float sum = 0.0F;
 

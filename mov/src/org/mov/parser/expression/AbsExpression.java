@@ -23,6 +23,7 @@ import org.mov.parser.EvaluationException;
 import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
 import org.mov.quote.QuoteBundle;
+import org.mov.quote.Symbol;
 
 /**
  * An expression which calculates the absolute value of a number.
@@ -33,7 +34,7 @@ public class AbsExpression extends UnaryExpression {
         super(number);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
         float number = get().evaluate(variables, quoteBundle, symbol, day);

@@ -37,7 +37,7 @@ public class PercentExpression extends BinaryExpression {
 	super(left, right);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
         float value = getLeft().evaluate(variables, quoteBundle, symbol, day);

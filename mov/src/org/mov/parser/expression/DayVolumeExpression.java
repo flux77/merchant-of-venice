@@ -27,7 +27,7 @@ import org.mov.quote.*;
  */
 public class DayVolumeExpression extends TerminalExpression {
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) {
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) {
 	// shouldnt happen
         assert false;
         return 0.0F;

@@ -26,7 +26,7 @@ import org.mov.util.*;
  * Representation of a stock quote for a given stock on a given date.
  */
 public class Quote {
-    private String symbol;
+    private Symbol symbol;
     private TradingDate date;
     private int volume;
     private float day_low;
@@ -60,7 +60,7 @@ public class Quote {
      * @param	day_open	the opening quote on this date
      * @param	day_close	the closing quote on this date
      */
-    public Quote(String symbol, TradingDate date,
+    public Quote(Symbol symbol, TradingDate date,
 		 int volume, float day_low, float day_high,
 		 float day_open, float day_close) {
 
@@ -79,7 +79,7 @@ public class Quote {
      *
      * @return	the symbol
      */
-    public String getSymbol() {
+    public Symbol getSymbol() {
 	return symbol;
     }
 
@@ -142,11 +142,8 @@ public class Quote {
      *
      * @param	symbol	the stock symbol
      */
-    public void setSymbol(String symbol) {	
-	if(symbol != null)
-	    this.symbol = symbol.toLowerCase();
-	else
-	    this.symbol = null;
+    public void setSymbol(Symbol symbol) {	
+        this.symbol = symbol;
     }
 
     /**

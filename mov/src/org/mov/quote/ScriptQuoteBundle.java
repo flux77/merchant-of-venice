@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.mov.analyser.gp.GPQuoteBundle;
 import org.mov.parser.EvaluationException;
-import org.mov.portfolio.PortfolioQuoteBundle;
 import org.mov.util.TradingDate;
 
 /** 
@@ -53,11 +52,11 @@ import org.mov.util.TradingDate;
  *
  * @see QuoteBundle
  * @see GPQuoteBundle
- * @see PortfolioQuoteBundle
  * @see Quote
  * @see QuoteRange
  * @see QuoteBundleCache
  * @see QuoteCache
+ * @see Symbol
  */
 public class ScriptQuoteBundle implements QuoteBundle {
 
@@ -102,7 +101,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(String symbol, int quoteType, int dateOffset)
+    public float getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException {
      
 	float quote;
@@ -153,7 +152,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception EvaluationException if the script isn't allow access to the quote.
      */
-    public float getQuote(String symbol, int quoteType, int today, int offset)
+    public float getQuote(Symbol symbol, int quoteType, int today, int offset)
 	throws EvaluationException {
 
         try {
@@ -174,7 +173,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(String symbol, int quoteType, TradingDate date) 
+    public float getQuote(Symbol symbol, int quoteType, TradingDate date) 
 	throws MissingQuoteException {
 	
 	float quote;
@@ -197,7 +196,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return  <code>true</code> if this symbol should be in the quote bundle, 
      *          <code>false</code> otherwise
      */
-    public boolean containsQuote(String symbol, int dateOffset) {
+    public boolean containsQuote(Symbol symbol, int dateOffset) {
 
 	if(getQuoteRange().containsSymbol(symbol) && 
 	   dateOffset >= getFirstDateOffset() &&
@@ -215,7 +214,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return  <code>true</code> if this symbol should be in the quote bundle, 
      *          <code>false</code> otherwise
      */
-    public boolean containsQuote(String symbol, TradingDate date) {
+    public boolean containsQuote(Symbol symbol, TradingDate date) {
 
 	try {
 	    return containsQuote(symbol, quoteCache.dateToOffset(date));
@@ -263,13 +262,20 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * 
      * @return the first symbol
      */
-    public String getFirstSymbol() {
-        // This will fail if the first date in the bundle is on a public holiday or
-        // weekend. Thats why its so important to fix the start/end dates!
-    	List symbols = getSymbols(getFirstDate());
-    	
-    	assert symbols.size() > 0;
-    	return (String)symbols.get(0);
+    public Symbol getFirstSymbol() {
+        int dateOffset = getFirstDateOffset();
+
+        // Loop through each day looking for any symbols
+        while(dateOffset <= getLastDateOffset()) {
+            List symbols = getSymbols(dateOffset++);
+
+            if(symbols.size() > 0)
+                return (Symbol)symbols.get(0);
+        }
+
+        // If we got here there are no symbols in the bundle.
+        assert false;
+        return null;
     }
     
     // Returns all the symbols in the quote bundle between the two dates
@@ -290,7 +296,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	    // Weed out ones that aren't ours
 	    Iterator iterator = expectedSymbols.iterator();
 	    while(iterator.hasNext()) {
-		String symbol = (String)iterator.next();
+		Symbol symbol = (Symbol)iterator.next();
 
 		if(allSymbols.contains(symbol))
                     presentSymbols.add(symbol);
@@ -311,7 +317,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	    // Weed out ones that aren't ours
 	    Iterator iterator = symbols.iterator();
 	    while(iterator.hasNext()) {
-		String symbol = (String)iterator.next();
+		Symbol symbol = (Symbol)iterator.next();
 		
 		if(!QuoteSourceManager.getSource().isMarketIndex(symbol))
 		    ourSymbols.add(symbol);
@@ -329,7 +335,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	    // Weed out ones that aren't ours
 	    Iterator iterator = symbols.iterator();
 	    while(iterator.hasNext()) {
-		String symbol = (String)iterator.next();
+		Symbol symbol = (Symbol)iterator.next();
 		
 		if(QuoteSourceManager.getSource().isMarketIndex(symbol))
 		    ourSymbols.add(symbol);
@@ -507,7 +513,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception QuoteNotLoaded if the quote was not found
      */
-    private float tryReload(String symbol, int quoteType, int dateOffset) 
+    private float tryReload(Symbol symbol, int quoteType, int dateOffset) 
         throws QuoteNotLoadedException {
 
         // Perhaps our quote packet is not loaded - if so load
@@ -522,7 +528,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 
     // Try to expand the quote bundle so that it includes the current date.
     // Now reload the quote from the cache and return.
-    private float tryExpand(String symbol, int quoteType, int dateOffset) 
+    private float tryExpand(Symbol symbol, int quoteType, int dateOffset) 
         throws QuoteNotLoadedException {
 
         QuoteRange expandedQuoteRange = (QuoteRange)getQuoteRange().clone();

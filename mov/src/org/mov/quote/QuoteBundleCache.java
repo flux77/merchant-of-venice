@@ -38,6 +38,7 @@ import java.util.*;
  * @see Quote
  * @see QuoteBundle
  * @see QuoteCache
+ * @see Symbol
  */
 public class QuoteBundleCache {
 
@@ -191,7 +192,7 @@ public class QuoteBundleCache {
 
 	    while(iterator.hasNext()) {
 	    
-		String symbol = (String)iterator.next();
+		Symbol symbol = (Symbol)iterator.next();
 
 		if(!isQuoteUsedElsewhere(symbol, dateOffset))
 		    quoteCache.free(symbol, dateOffset);
@@ -209,7 +210,7 @@ public class QuoteBundleCache {
     // it contains the given symbol quote on the given date. The first one isn't
     // checked since that is the one that is about to be free'd and will always
     // contain the given quote.
-    private boolean isQuoteUsedElsewhere(String symbol, int dateOffset) {
+    private boolean isQuoteUsedElsewhere(Symbol symbol, int dateOffset) {
 	Iterator iterator = loadedQuoteBundles.iterator();
 
         // Don't check first quote bundle.

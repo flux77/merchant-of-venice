@@ -168,9 +168,9 @@ public class DatabaseQuoteSource implements QuoteSource
      * @param	symbol	the stock symbol.
      * @return	the company name.
      */
-    public String getSymbolName(String symbol) {
+    public String getSymbolName(Symbol symbol) {
 
-	String name = new String("");
+	String name = null;
 
 	if(checkConnection()) {        
 	    try {
@@ -179,7 +179,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		ResultSet RS = statement.executeQuery
 		    ("SELECT " + NAME_FIELD + " FROM " + LOOKUP_TABLE_NAME +
 		     " WHERE " + SYMBOL_FIELD + " = '"
-		     + symbol.toUpperCase() + "'");
+		     + symbol + "'");
 
 		// Import SQL data into vector
 		RS.next();
@@ -205,16 +205,16 @@ public class DatabaseQuoteSource implements QuoteSource
      * @param	symbol	a partial company name.
      * @return	the company symbol.
      */
-    public String getSymbol(String partialSymbolName) {
+    public Symbol getSymbol(String partialSymbolName) {
 
-	String symbol = new String("");
+	Symbol symbol = null;
 
 	if(checkConnection()) {
 	    try {
 		Statement statement = connection.createStatement();
 		
 		ResultSet RS = statement.executeQuery
-		    ("SELECT " + symbol.toUpperCase() +
+		    ("SELECT " + SYMBOL_FIELD + 
 		     " FROM " + LOOKUP_TABLE_NAME + " WHERE LOCATE(" +
 		     "UPPER('" + partialSymbolName + "'), " +
 		     NAME_FIELD + ") != 0");
@@ -223,10 +223,12 @@ public class DatabaseQuoteSource implements QuoteSource
 		RS.next();
 
 		// Get only entry which is the name
-		symbol = RS.getString(1);
-
-		if(symbol != null)
-		    symbol = symbol.toLowerCase();
+                try {
+                    symbol = new Symbol(RS.getString(1));
+                }
+                catch(SymbolFormatException e) {
+                    // Error in data. Ignore.
+                }
 
 		// Clean up after ourselves
 		RS.close();
@@ -246,7 +248,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * @param	symbol	the symbol we are searching for
      * @return	whether the symbol was found or not
      */
-    public boolean symbolExists(String symbol) {
+    public boolean symbolExists(Symbol symbol) {
         boolean symbolExists = false;
 
 	if(checkConnection()) {
@@ -259,7 +261,7 @@ public class DatabaseQuoteSource implements QuoteSource
                 String query =
                     new String("SELECT " + DATE_FIELD + " FROM " +
                                SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
-                               + symbol.toUpperCase() + "' " +
+                               + symbol + "' " +
                                "LIMIT 1");
 		ResultSet RS = statement.executeQuery(query);
 
@@ -376,12 +378,12 @@ public class DatabaseQuoteSource implements QuoteSource
      * @param	symbol to test
      * @return	yes or no
      */
-    public boolean isMarketIndex(String symbol) {
+    public boolean isMarketIndex(Symbol symbol) {
         // HACK. It needs to keep a table which maintains a flag
         // for whether a symbol is an index or not.
 	assert symbol != null;
 
-	if(symbol.length() == 3 && symbol.toUpperCase().charAt(0) == 'X')
+	if(symbol.length() == 3 && symbol.charAt(0) == 'X')
 	    return true;
 	else
 	    return false;
@@ -415,6 +417,8 @@ public class DatabaseQuoteSource implements QuoteSource
     private boolean executeSQLString(ProgressDialog progress, String SQLString) {
 
 	if(checkConnection()) {
+            String symbolString;
+
 	    try {
 		Statement statement = connection.createStatement();	
                 Thread monitor = cancelOnInterrupt(statement);
@@ -435,7 +439,9 @@ public class DatabaseQuoteSource implements QuoteSource
                     QuoteCache quoteCache = QuoteCache.getInstance();
 
                     while (RS.next()) {
-                        quoteCache.load(new Quote(RS.getString(SYMBOL_FIELD).toLowerCase(),
+                        symbolString = RS.getString(SYMBOL_FIELD);
+
+                        quoteCache.load(new Quote(new Symbol(symbolString),
                                                   new TradingDate(RS.getDate(DATE_FIELD)),
                                                   RS.getInt(DAY_VOLUME_FIELD),
                                                   RS.getFloat(DAY_LOW_FIELD),
@@ -453,10 +459,14 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
                 return true;
 	    }
-	    catch (SQLException e) {
+	    catch(SQLException e) {
                 DesktopManager.showErrorMessage("Error talking to database:\n" +
                                                 e.getMessage());
 	    }
+            catch(SymbolFormatException e2) {
+                DesktopManager.showErrorMessage("Database contains badly formatted quote symbol." +
+                                                e2.getReason());
+            }
 	}
 
         return false;
@@ -523,7 +533,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	    List symbols = quoteRange.getAllSymbols();
 
 	    if(symbols.size() == 1) {
-		String symbol = ((String)symbols.get(0)).toUpperCase();
+		Symbol symbol = (Symbol)symbols.get(0);
 
 		filterString =
 		    filterString.concat(SYMBOL_FIELD + " = '" + symbol + "' ");
@@ -535,7 +545,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		Iterator iterator = symbols.iterator();
 
 		while(iterator.hasNext()) {
-		    String symbol = ((String)iterator.next()).toUpperCase();
+		    Symbol symbol = (Symbol)iterator.next();
 
 		    filterString = filterString.concat("'" + symbol + "'");
 
@@ -738,13 +748,13 @@ public class DatabaseQuoteSource implements QuoteSource
                         insertString.append(", (");
 
                     // Add new quote
-                    insertString.append("'" + dateString                      + "', " +
-                                        "'" + quote.getSymbol().toUpperCase() + "', " +
-                                        "'" + quote.getDayOpen()              + "', " +
-                                        "'" + quote.getDayClose()             + "', " +
-                                        "'" + quote.getDayHigh()              + "', " +
-                                        "'" + quote.getDayLow()               + "', " +
-                                        "'" + quote.getVolume()               + "')");
+                    insertString.append("'" + dateString          + "', " +
+                                        "'" + quote.getSymbol()   + "', " +
+                                        "'" + quote.getDayOpen()  + "', " +
+                                        "'" + quote.getDayClose() + "', " +
+                                        "'" + quote.getDayHigh()  + "', " +
+                                        "'" + quote.getDayLow()   + "', " +
+                                        "'" + quote.getVolume()   + "')");
                 }
 
                 // Now insert day quote into database

@@ -21,6 +21,7 @@ package org.mov.parser.expression;
 import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
 import org.mov.quote.QuoteBundle;
+import org.mov.quote.Symbol;
 import org.mov.util.TradingDate;
 
 /**
@@ -34,7 +35,7 @@ public class DayOfWeekExpression extends TerminalExpression {
         // nothing to do
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) {
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) {
         TradingDate date = quoteBundle.offsetToDate(day);
         return date.getDayOfWeek();
     }

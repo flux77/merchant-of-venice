@@ -25,6 +25,7 @@ import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.quote.QuoteBundle;
+import org.mov.quote.Symbol;
 
 /**
  * A representation of a variable. 
@@ -42,7 +43,7 @@ public class VariableExpression extends TerminalExpression {
         this.type = type;
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
         throws EvaluationException {
 
         Variable variable = variables.get(name);

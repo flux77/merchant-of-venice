@@ -488,6 +488,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
 	}
 
+        /*
 	// Now convert list of symbols to string of comma separated
 	// company names
 	String title = new String("");
@@ -508,8 +509,10 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		title = 
 		    title.concat(companyName);
 	}
+        */
 
-	return title;
+	return new String("");
+
     }
 
     // Create a new vertical axis which is sized for the component

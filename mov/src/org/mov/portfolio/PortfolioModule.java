@@ -26,7 +26,21 @@ import java.text.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
+import javax.swing.ImageIcon;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.border.*;
 import javax.swing.table.*;
 
@@ -525,7 +539,8 @@ public class PortfolioModule extends JPanel implements Module,
 
 		    int type = Transaction.stringToType(parts[i++]);
 		    float amount = Float.valueOf(parts[i++]).floatValue();
-		    String symbol = parts[i++];
+		    Symbol symbol = new Symbol(parts[i++]);
+
 		    int shares = Integer.valueOf(parts[i++]).intValue();
 		    float tradeCost = Float.valueOf(parts[i++]).floatValue();
 		    String cashAccountName = parts[i++];
@@ -591,11 +606,14 @@ public class PortfolioModule extends JPanel implements Module,
 		    line = br.readLine();
 		}
 	    }
-	    catch(java.io.IOException e) {
-		org.mov.ui.DesktopManager.
-		    showErrorMessage("Error reading from file: " +
-				     fileName);
+	    catch(IOException e) {
+		DesktopManager.showErrorMessage("Error reading from file: " +
+                                                fileName);
 	    }
+            catch(SymbolFormatException e) {
+                DesktopManager.showErrorMessage("Error parsing symbol.\n" +
+                                                e.getReason());
+            }
 	}
 
 	redraw();

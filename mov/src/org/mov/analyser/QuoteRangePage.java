@@ -47,6 +47,7 @@ import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteRange;
 import org.mov.quote.QuoteSourceManager;
+import org.mov.quote.SymbolFormatException;
 import org.mov.quote.WeekendDateException;
 import org.mov.ui.EquationComboBox;
 import org.mov.ui.GridBagHelper;
@@ -189,11 +190,12 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	    return false;
         }
 
-        quoteRange = quoteRangeComboBox.getQuoteRange();
-        
-        if(quoteRange == null) {
+        try {
+            quoteRange = quoteRangeComboBox.getQuoteRange();
+        }
+        catch(SymbolFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "You need to specify which stocks to trade.",
+                                                  e.getReason(),
                                                   "Invalid quote range",
                                                   JOptionPane.ERROR_MESSAGE);
             return false;

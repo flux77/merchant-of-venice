@@ -305,7 +305,7 @@ public class ChartModule extends JPanel implements Module,
 	GraphSource dayClose = null;
 
 	while(iterator.hasNext()) {
-	    String symbol = (String)iterator.next();
+	    Symbol symbol = (Symbol)iterator.next();
 	    progress.show("Loading quotes for " + symbol);
 	    
 	    if (!thread.isInterrupted())

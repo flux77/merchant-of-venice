@@ -18,6 +18,7 @@
 
 package org.mov.portfolio;
 
+import org.mov.quote.Symbol;
 import org.mov.util.TradingDate;
 
 /**
@@ -27,7 +28,7 @@ import org.mov.util.TradingDate;
 public class StockHolding {
 
     // Stock held
-    private String symbol;
+    private Symbol symbol;
 
     // Number of shares of stock
     private int shares;
@@ -42,7 +43,7 @@ public class StockHolding {
      * @param	shares	the number of shares of that stock
      * @param   date    the date the shares were purchased
      */
-    public StockHolding(String symbol, int shares, TradingDate date) {
+    public StockHolding(Symbol symbol, int shares, TradingDate date) {
 	this.symbol = symbol;
 	this.shares = shares;
         this.date = date;
@@ -71,7 +72,7 @@ public class StockHolding {
      *
      * @return	symbol
      */
-    public String getSymbol() {
+    public Symbol getSymbol() {
 	return symbol;
     }
 

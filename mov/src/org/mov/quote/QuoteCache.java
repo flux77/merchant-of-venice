@@ -66,8 +66,7 @@ public class QuoteCache {
         cache = Collections.synchronizedList(new ArrayList());
         dates = Collections.synchronizedList(new ArrayList());
 
-        TradingDate lastDate = 
-            QuoteSourceManager.getSource().getLastDate();
+        TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
 
         if(lastDate != null)
             addDate(lastDate);
@@ -95,8 +94,7 @@ public class QuoteCache {
      * @return the quote
      * @exception QuoteNotLoadedException if the quote was not in the cache
      */
-    public float getQuote(String symbol, int quoteType,
-			  int dateOffset)
+    public float getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws QuoteNotLoadedException {
 
 	// First get the hash map for the given date
@@ -150,7 +148,7 @@ public class QuoteCache {
             List datesSymbols = getSymbols(date);
 
             for(Iterator iterator = datesSymbols.iterator(); iterator.hasNext();) {
-                String symbol = (String)iterator.next();
+                Symbol symbol = (Symbol)iterator.next();
 
                 symbols.put(symbol, symbol);
             }
@@ -225,7 +223,7 @@ public class QuoteCache {
      * @param symbol the symbol of the quote to remove
      * @param dateOffset the fast access date offset of the quote to remove
      */
-    public void free(String symbol, int dateOffset) {
+    public void free(Symbol symbol, int dateOffset) {
 
 	try {
 	    HashMap quotesForDate = getQuotesForDate(dateOffset);

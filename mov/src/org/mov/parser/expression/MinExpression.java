@@ -46,7 +46,7 @@ public class MinExpression extends QuoteExpression {
      * @param	days	the number of days to search
      * @param	lag	the offset from the current day
      */
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
 	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
@@ -90,7 +90,7 @@ public class MinExpression extends QuoteExpression {
      * @param	lastDay	fast access date offset in cache.
      * @return	the minimum stock quote.
      */
-    static public float min(QuoteBundle quoteBundle, String symbol, 
+    static public float min(QuoteBundle quoteBundle, Symbol symbol, 
 			    int quote, int days, int lastDay) {
 
 	float min = Float.MAX_VALUE;

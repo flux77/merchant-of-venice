@@ -34,7 +34,7 @@ public interface QuoteSource {
      * @param	symbol	the stock symbol
      * @return	the company name
      */
-    public String getSymbolName(String symbol);
+    public String getSymbolName(Symbol symbol);
 
     /**
      * Returns the symbol associated with the given company.
@@ -42,7 +42,7 @@ public interface QuoteSource {
      * @param	symbol	a partial company name
      * @return	the company symbol
      */
-    public String getSymbol(String partialSymbolName);
+    public Symbol getSymbol(String partialSymbolName);
 
     /**
      * Returns whether we have any quotes for the given symbol.
@@ -50,7 +50,7 @@ public interface QuoteSource {
      * @param	symbol	the symbol we are searching for
      * @return	whether the symbol was found or not
      */
-    public boolean symbolExists(String symbol);
+    public boolean symbolExists(Symbol symbol);
 
     /**
      * Return the latest date we have any stock quotes for.
@@ -97,7 +97,7 @@ public interface QuoteSource {
      * @param	symbol to test
      * @return	yes or no
      */
-    public boolean isMarketIndex(String symbol);
+    public boolean isMarketIndex(Symbol symbol);
 
     /**
      * Return the advance/decline for the given date. This returns the number

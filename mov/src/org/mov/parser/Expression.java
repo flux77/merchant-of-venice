@@ -80,7 +80,7 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
      *          operation such as divide by zero.
      */
     abstract public float evaluate(Variables variables, QuoteBundle quoteBundle, 
-                                   String symbol, int day)
+                                   Symbol symbol, int day)
 	throws EvaluationException;
 
     /**

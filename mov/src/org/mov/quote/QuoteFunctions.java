@@ -84,7 +84,7 @@ public class QuoteFunctions {
      * @param	lastDay	fast access date offset in cache.
      * @return  the RSI value
      */
-    static public float rsi(QuoteBundle quoteBundle, String symbol, 
+    static public float rsi(QuoteBundle quoteBundle, Symbol symbol, 
 			    int quote, int days, int lastDay) {
 	System.err.println("Entering RSI for symbol "+symbol);
 

@@ -56,7 +56,7 @@ public class StockHoldingTable extends AbstractTable {
 	    "Symbol", "Shares", "Day Close", "Mkt Value", "Change"};
 
 	private Class[] columnClasses = {
-	    String.class, Integer.class, QuoteFormat.class, PriceFormat.class,
+	    Symbol.class, Integer.class, QuoteFormat.class, PriceFormat.class,
 	    ChangeFormat.class}; 
 
 	private QuoteBundle quoteBundle;
@@ -95,7 +95,7 @@ public class StockHoldingTable extends AbstractTable {
 	    if(row >= getRowCount()) 
 		return "";
 	    
-	    String symbol = (String)symbols[row];
+	    Symbol symbol = (Symbol)symbols[row];
 	    
 	    StockHolding stockHolding = 
 		(StockHolding)stockHoldings.get(symbol);
@@ -106,11 +106,9 @@ public class StockHoldingTable extends AbstractTable {
 		return "";
             }
 
-	    symbol = symbol.toLowerCase();
-
             switch(column) {
             case(SYMBOL_COLUMN):
-                return symbol.toUpperCase();
+                return symbol;
                 
             case(SHARES_COLUMN):
                 return new Integer(stockHolding.getShares());
@@ -203,10 +201,10 @@ public class StockHoldingTable extends AbstractTable {
                             for(int i = 0; i < selectedRows.length; i++) {
                                 int row = getSortedRow(selectedRows[i]);
 
-                                String symbol = 
-                                    (String)getModel().getValueAt(row, SYMBOL_COLUMN);
+                                Symbol symbol = 
+                                    (Symbol)getModel().getValueAt(row, SYMBOL_COLUMN);
                                 
-                                symbols.add(symbol.toLowerCase());
+                                symbols.add(symbol);
                             }
                             
                             // Graph the highlighted symbols
@@ -229,10 +227,10 @@ public class StockHoldingTable extends AbstractTable {
                             for(int i = 0; i < selectedRows.length; i++) {
                                 int row = getSortedRow(selectedRows[i]);
                                 
-                                String symbol = 
-                                    (String)getModel().getValueAt(row, SYMBOL_COLUMN);
+                                Symbol symbol = 
+                                    (Symbol)getModel().getValueAt(row, SYMBOL_COLUMN);
                                 
-                                symbols.add(symbol.toLowerCase());
+                                symbols.add(symbol);
                             }
                             
                             // Table the highlighted symbols
@@ -253,12 +251,11 @@ public class StockHoldingTable extends AbstractTable {
             int row = rowAtPoint(point);
 			
             // Get symbol at row
-            String symbol = 
-                (String)getModel().getValueAt(row, SYMBOL_COLUMN);
-            symbol = symbol.toLowerCase();
+            Symbol symbol = 
+                (Symbol)getModel().getValueAt(row, SYMBOL_COLUMN);
             
             List symbols = new ArrayList();
-            symbols.add((Object)symbol);
+            symbols.add(symbol);
             
             CommandManager.getInstance().graphStockBySymbol(symbols);
         }

@@ -56,7 +56,7 @@ public class NumberExpression extends TerminalExpression {
         this.type = type;
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) {
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) {
 	return value;
     }
 

@@ -5,6 +5,12 @@ body, td, li, p {
 	font-size : 14;
 }
 
+h4 {
+	color: #3f5359;
+	font-size : 14;
+	text-align: left;
+}
+
 h3 {
 	color: #3f5359;
 	font-size : 16;
@@ -30,9 +36,7 @@ li, a {
 }
 
 a {
-/* Experimental Orange Links */
-/*	color: #cc7700; */
-	color: #3f5359; 
+	color: #cc7700; 
 }
 
 a:visited {

@@ -39,6 +39,8 @@ public class Quote {
     public static void flush() {
 	if(instance != null)
 	    instance.sourceInstance = null;
+
+	DatabaseLookup.flush();
     }
 
     private Quote() {

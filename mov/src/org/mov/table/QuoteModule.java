@@ -175,7 +175,7 @@ public class QuoteModule extends AbstractTable
 
 		// True for this stock? Then add it to the table
 		if(expression.evaluate(cache, symbol, 0) >=
-		   LogicExpression.TRUE_LEVEL)
+		   org.mov.parser.Expression.TRUE_LEVEL)
 		    extractedSymbols.add(symbol);
 
 		// Wait until weve done one evaluation since thats when the

@@ -49,8 +49,11 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
     /** An integer type that can contain any integer number. */
     public static final int INTEGER_TYPE = 2;
 
-    /** Represents a stock quote <b>type</b>: open, close, low, high */
-    public static final int QUOTE_TYPE = 3;
+    /** Represents a stock float quote <b>type</b>: open, close, low, high */
+    public static final int FLOAT_QUOTE_TYPE = 3;
+
+    /** Represents a stock integer quote <b>type</b>: volume */
+    public static final int INTEGER_QUOTE_TYPE = 4;
 
     /** Threshold level where a number is registered as <code>TRUE</code> */
     public final static float TRUE_LEVEL = 0.1F;
@@ -102,7 +105,8 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
      * Get the type of the expression.
      *
      * @return one of {@link #BOOLEAN_TYPE}, {@link #FLOAT_TYPE},
-     *         {@link #INTEGER_TYPE} or {@link #QUOTE_TYPE}.
+     *         {@link #INTEGER_TYPE}, {@link #FLOAT_QUOTE_TYPE} or
+     *         {@link #INTEGER_QUOTE_TYPE}.
      */
     abstract public int getType();
 
@@ -112,6 +116,13 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
      * @return	the required number of arguments
      */
     abstract public int getNeededChildren();
+
+    /**
+     * Sub-classes must have a clone method.
+     *
+     * @return clone of this object
+     */
+    abstract public Object clone();
 
     /**
      * Return the given argument.
@@ -246,7 +257,7 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
         int count = 0;
 
         assert(type == BOOLEAN_TYPE || type == FLOAT_TYPE || type == INTEGER_TYPE ||
-               type == QUOTE_TYPE);
+               type == FLOAT_QUOTE_TYPE || type == INTEGER_QUOTE_TYPE);
 
         if(getType() == type)
             count = 1;

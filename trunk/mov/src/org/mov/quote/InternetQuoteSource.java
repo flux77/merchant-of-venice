@@ -110,11 +110,14 @@ public class InternetQuoteSource implements QuoteSource
     
     // You can get all the stock quotes from the one URL
     private final static String[] sources = {
+//  History quotes, the day before today
 	"Yahoo",
 //	"http://table.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
 	"http://ichart.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
-
-	"YahooToday",//获取当日数据
+	
+//  Current day quotes	
+//	It seems that yahoo offer the current day and history quotes in separate URL.
+	"YahooToday", 
 	"http://finance.yahoo.com/d/quotes.csv" + YAHOOTODAY_FORMAT,
 
     };

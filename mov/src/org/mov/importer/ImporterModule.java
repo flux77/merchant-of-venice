@@ -50,8 +50,6 @@ public class ImporterModule extends JPanel
 
     // Importing into database
     private DatabaseQuoteSource databaseSource = null;
-    private Vector databaseDates = null;
-    private TradingDate latestDatabaseDate = null;
 
     /**
      * Create a new Importer Module.
@@ -425,7 +423,7 @@ public class ImporterModule extends JPanel
 					   owner);
 	    // Get the days quotes
 	    dayQuotes = 
-		source.getQuotesForDate(date, QuoteSource.ALL_COMMODITIES);
+		source.getQuotesForDate(date, QuoteSource.ALL_SYMBOLS);
 	    
 	    // file -> file 
 	    if(fromFiles.isSelected() && isToFiles) {
@@ -523,50 +521,7 @@ public class ImporterModule extends JPanel
 	if(databaseSource == null) 
 	    databaseSource = Quote.createDatabaseQuoteSource();
 
-	// Loading all the dates in the database to check for
-	// duplicate dates can take quite a while. Given the
-	// most frequent activity is importing new quote dates
-	// all we need is the check against the latest quote
-	// date. So use this and only load all the quote dates if
-	// necessary.
-	if(latestDatabaseDate == null) 
-	    latestDatabaseDate = databaseSource.getLatestQuoteDate();
-
-	// If the date we are importing is not after the latest quote date
-	// we will have to load all the dates in
-	if(!date.after(latestDatabaseDate) && databaseDates == null) 
-	    databaseDates = databaseSource.getDates();
-	    
-	// Dont import if the database already contains the date
-	if(date.after(latestDatabaseDate) ||
-	   !containsDate(databaseDates, date)) {
-	    databaseSource.importQuotes(databaseName, dayQuotes, date);
-
-	    if(databaseDates != null)
-		// We are keeping a list of dates in database - add it
-		// to that
-		databaseDates.add(date);
-	    else
-		// We are only keeping track of the latest date in database,
-		// new date is after
-		latestDatabaseDate = date;
-	}
-    }
-
-    // Return whether the given vector contains the given date
-    private boolean containsDate(Vector dates, TradingDate date) {
-	Iterator iterator = dates.iterator();
-	TradingDate traverseDate;
-
-	while(iterator.hasNext()) {
-	    traverseDate = (TradingDate)iterator.next();
-
-	    if(date.equals(traverseDate)) 
-		return true;
-	}
-	
-	// If we got here it wasnt found
-	return false;
+	databaseSource.importQuotes(databaseName, dayQuotes, date);
     }
 
     // Save the configuration on screen to the preferences file

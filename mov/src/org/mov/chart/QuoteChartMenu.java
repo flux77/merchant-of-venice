@@ -231,7 +231,9 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    //String val = dialog.showDialog();
 
 	    // Replace this with TextDialog 
-	    String val = JOptionPane.showInputDialog(null, "Enter Value");
+	    
+	    String constantStr = (new Double(graphConstants.getSmoothingConstant())).toString();
+	    String val = JOptionPane.showInputDialog(null, "Enter Value", constantStr);
 
 	    graphConstants.setSmoothingConstant( (new Double(val)).doubleValue());
 
@@ -250,7 +252,9 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	}
 	
 	else if (e.getSource() == priceThresholdMenuItem) {
-	    String val = JOptionPane.showInputDialog(null, "Enter Value");
+
+	    String constantStr = (new Double(graphConstants.getPriceReversalThreshold())).toString();
+	    String val = JOptionPane.showInputDialog(null, "Enter Value", constantStr);
 	    
 	    graphConstants.setPriceReversalThreshold( (new Double(val)).doubleValue());
 	    

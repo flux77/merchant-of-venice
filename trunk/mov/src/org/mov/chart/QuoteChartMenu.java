@@ -26,6 +26,7 @@ import javax.swing.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.util.Locale;
+import org.mov.util.TradingDate;
 import org.mov.quote.*;
 import org.mov.ui.*;
 
@@ -100,6 +101,25 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	graphConstantsMenu = new JMenu(Locale.getString("GRAPH_CONSTANTS"));
 	graphConstants = new GraphConstants();
 
+	// heuristic to guess a starting value for the box reversal value
+
+	Symbol symbol = quoteBundle.getFirstSymbol();
+	TradingDate td = quoteBundle.getFirstDate();
+	Double guess;
+
+	try {
+	    
+	    Double close = new Double(quoteBundle.getQuote(symbol, 1, td));
+	    guess = new Double(close.toString());
+	    
+	    graphConstants.setPriceReversalThreshold(guess.doubleValue());
+	}
+	
+	
+	catch(MissingQuoteException e) {
+	    
+	}
+	
 	this.add(graphMenu);
 	this.add(annotateMenu);
 	this.add(graphConstantsMenu);

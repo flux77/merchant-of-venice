@@ -18,6 +18,8 @@
 
 package org.mov.chart;
 
+// Module containing constants which determine shape for graphs. 
+
 public class GraphConstants {
 
     private double smoothingConstant;
@@ -25,6 +27,7 @@ public class GraphConstants {
 
     public GraphConstants()
     {
+
 	smoothingConstant = 0.1;
 	priceReversalThreshold = 0.05;
     }
@@ -48,7 +51,7 @@ public class GraphConstants {
     public void setPriceReversalThreshold(double val) {
 	assert val > 0;
 
-	priceReversalThreshold = 0;
+	priceReversalThreshold = val;
     }
 
 }

@@ -25,7 +25,7 @@ import org.mov.quote.Quote;
  * Create an executable expression from the given token and arguments.
  */
 public class ExpressionFactory {
-   
+
     // Cannot create an instance of this class
     private ExpressionFactory() {
 	// not possible
@@ -228,5 +228,28 @@ public class ExpressionFactory {
 
 	return expression;
     }
-
+    
+    // return null if an Expression can't be correctly generated from the input String
+    public static Expression newExpression(String inputExpressionString) {
+        Expression expression = null;
+        
+        // We need to specify the variables that are given to the expression
+        // expressions so they can be parsed properly.
+        Variables variables = new Variables();
+        variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        
+        if(inputExpressionString.length() == 0) {
+            expression = null;
+        } else {
+            try {
+                expression = Parser.parse(variables, inputExpressionString);
+            }
+            catch(ExpressionException e) {
+                expression = null;
+            }
+        }
+        return expression;
+    }
 }
+

@@ -18,12 +18,23 @@
 
 package org.mov.portfolio;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.mov.util.*;
-import org.mov.quote.*;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.Quote;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteCache;
+import org.mov.quote.Symbol;
+import org.mov.quote.WeekendDateException;
 
-/** Representation of a share account in a portfolio.
+/**
+ * Representation of a share account in a portfolio.
+ *
+ * @author Andrew Leppard
  */
 public class ShareAccount implements Account, Cloneable {
 
@@ -42,6 +53,11 @@ public class ShareAccount implements Account, Cloneable {
 	this.name = name;
     }
 
+    /**
+     * Create a clone of this account.
+     *
+     * @return the clone
+     */
     public Object clone() {
 	ShareAccount clonedShareAccount = new ShareAccount(getName());
 

@@ -143,7 +143,7 @@
     <copy file="${doc}/manual.txt" todir="${release}/venice-${VERSION}/doc"/>
     <copy file="${doc}/manual.html" todir="${release}/venice-${VERSION}/doc"/>
     <copy todir="${release}/venice-${VERSION}/build/src/"> 
-      <fileset dir="${src}" includes="**/*.java, **/*.png, **/*.gif"/>
+      <fileset dir="${src}" includes="**/*.java, **/*.png, **/*.gif, **/*.properties"/>
     </copy>
     <copy file="build.xml" todir="${release}/venice-${VERSION}/build/"/>
     <copy file="COPYING.txt" todir="${release}/venice-${VERSION}/"/>

@@ -4,7 +4,11 @@
 <property name="docs" value="${basedir}/docs"/>
 
 <target name="build">
-  <javac srcdir="${src}" includes="**/*.java"/>
+  <javac srcdir="${src}" 
+	 debug="on"
+	 optimize="on"
+	 source="1.4"
+         includes="**/*.java"/>
 </target>
 
 <target name="clean">
@@ -16,6 +20,7 @@
 <target name="docs">
   <javadoc packagenames="org.mov.*"
            sourcepath="${src}"
+	   source="1.4"
            destdir="${docs}"
 	   windowtitle="Venice">
     <header><![CDATA[<b>Venice</b>]]></header>
@@ -25,10 +30,11 @@
            
 </target>
 
-<target name="run">
+<target name="run" depends="build">
   <java classname="org.mov.main.Main" 
         dir="${src}"
         fork="yes">
+    <jvmarg value="-ea"/>
     <classpath>
       <pathelement path="${java.class.path}"/>
       <pathelement path="${src}"/>

@@ -46,7 +46,8 @@ public class MetaStockQuoteFilter implements QuoteFilter {
 	    
 	    if(quoteParts.length == 7) {
 		String symbol = quoteParts[i++];
-		TradingDate date = new TradingDate(quoteParts[i++]);
+		TradingDate date = new TradingDate(quoteParts[i++],
+						   TradingDate.BRITISH);
 		float day_open = Float.parseFloat(quoteParts[i++]);
 		float day_high = Float.parseFloat(quoteParts[i++]);
 		float day_low = Float.parseFloat(quoteParts[i++]);

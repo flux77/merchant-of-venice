@@ -47,7 +47,8 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
 	    
 	    if(quoteParts.length == 7) {
 		String symbol = quoteParts[i++];
-		TradingDate date = new TradingDate(quoteParts[i++]);
+		TradingDate date = new TradingDate(quoteParts[i++],
+						   TradingDate.US);
 
 		// Convert all prices from cents to dollars
 		float day_open = Float.parseFloat(quoteParts[i++]) / 100;

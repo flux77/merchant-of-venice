@@ -631,10 +631,10 @@ public class PortfolioModule extends JPanel implements Module,
 	if(accountName != null && accountName.length() > 0) {
 	    Account account = new CashAccount(accountName);
 	    portfolio.addAccount(account);
-	}
 
-	redraw();
-	checkMenuDisabledStatus(); // enable transaction menu
+            redraw();
+            checkMenuDisabledStatus(); // enable transaction menu
+	}
     }
 
     // Create a new share account
@@ -647,10 +647,10 @@ public class PortfolioModule extends JPanel implements Module,
 	if(accountName != null && accountName.length() > 0) {
 	    Account account = new ShareAccount(accountName);
 	    portfolio.addAccount(account);
+
+            redraw();
+            checkMenuDisabledStatus(); // enable transaction menu
 	}
-	
-	redraw();
-	checkMenuDisabledStatus(); // enable transaction menu
     }
 
     /**
@@ -663,12 +663,13 @@ public class PortfolioModule extends JPanel implements Module,
 	JDesktopPane desktop = 
 	    org.mov.ui.DesktopManager.getDesktop();
 	TransactionDialog dialog = new TransactionDialog(desktop, portfolio);
-	dialog.newTransaction();
 
-	// Layout this portfolio and also the transaction history table (if its open)
-	redraw();
-
-	if(historyFrame != null && !historyFrame.isClosed())
-	    historyModule.redraw();
+        // Update portfolio displayed if the user entered a new transaction
+        if(dialog.newTransaction()) {
+            redraw();
+            
+            if(historyFrame != null && !historyFrame.isClosed())
+                historyModule.redraw();
+        }
     }
 }

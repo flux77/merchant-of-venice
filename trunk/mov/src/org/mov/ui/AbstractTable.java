@@ -9,8 +9,8 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import org.liquid.misc.*;
-import org.liquid.table.*;
 import org.mov.util.*;
+import org.mov.ui.*;
 
 public class AbstractTable extends SortedTable {
     

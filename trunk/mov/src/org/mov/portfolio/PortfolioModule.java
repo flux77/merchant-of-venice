@@ -467,13 +467,12 @@ public class PortfolioModule extends JPanel implements Module,
     private void deletePortfolio() {
 	JDesktopPane desktop =
 	    org.mov.ui.DesktopManager.getDesktop();
+	ConfirmDialog dialog = new ConfirmDialog(desktop,
+				   Locale.getString("SURE_DELETE_PORTFOLIO"),
+				   Locale.getString("DELETE_PORTFOLIO"));
+	boolean option = dialog.showDialog();
 
-	int option = 
-	    JOptionPane.showInternalConfirmDialog(desktop,
-						  Locale.getString("SURE_DELETE_PORTFOLIO"),
-						  Locale.getString("DELETE_PORTFOLIO"),
-						  JOptionPane.YES_NO_OPTION);
-	if(option == JOptionPane.YES_OPTION) {
+	if(option) {
 	    PreferencesManager.deletePortfolio(portfolio.getName());
 
 	    MainMenu.getInstance().updatePortfolioMenu();

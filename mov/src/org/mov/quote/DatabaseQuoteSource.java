@@ -71,6 +71,18 @@ public class DatabaseQuoteSource implements QuoteSource
 			      "/"+db.get("dbname")+
 			      "?user="+db.get("username")+
 			      "&password="+db.get("password"));
+
+	    // How to get list of databases and tables in a database
+	    
+	    /*	    DatabaseMetaData meta = connection.getMetaData();
+	    ResultSet RS = meta.getTables("shares", null, "shares", null);
+	    	    ResultSet RS = meta.getCatalogs(); 
+
+	    while(RS.next()) {
+	    	System.out.println(RS.getString(1));
+	    }
+	    */
+
 	}
 	catch (SQLException E) {
 	    System.out.println(E.getMessage());
@@ -291,12 +303,24 @@ public class DatabaseQuoteSource implements QuoteSource
 				    TradingDate endDate, 
 				    int type) {
 
-	return executeQuery(selectAllString() + 
-			    whereClauseString() +  
-			    dateRangeString(startDate, endDate) +
-			    andString() + 
-			    restrictTypeString(type) +
-			    orderByDateString());
+	// This query might take a while
+	boolean owner = 
+	    Progress.getInstance().open("Loading quotes " + 
+					startDate.toShortString() + " to " +
+					endDate.toShortString(), 1);
+
+	Vector query =  executeQuery(selectAllString() + 
+				     whereClauseString() +  
+				     dateRangeString(startDate, endDate) +
+				     andString() + 
+				     restrictTypeString(type) +
+				     orderByDateString());
+	// A next right before a close is OK because we might not be the
+	// owner so it might not close straight away
+	Progress.getInstance().next();
+	Progress.getInstance().close(owner); 
+
+	return query;
     }
 
     /**
@@ -325,10 +349,22 @@ public class DatabaseQuoteSource implements QuoteSource
      * @see Stock
      */
     public Vector getQuotesForSymbol(String symbol) {
-	return executeQuery(selectAllString() +
-			    whereClauseString() + 
-			    specificSymbolString(symbol) +
-			    orderByDateString());
+
+	// This query might take a while
+	boolean owner = 
+	    Progress.getInstance().open("Loading quotes for " + symbol, 1);
+
+	Vector query =  executeQuery(selectAllString() +
+				     whereClauseString() + 
+				     specificSymbolString(symbol) +
+				     orderByDateString());
+	
+	// A next right before a close is OK because we might not be the
+	// owner so it might not close straight away
+	Progress.getInstance().next();
+	Progress.getInstance().close(owner); 
+
+	return query;
     }
 
     private String selectAllString() {
@@ -361,9 +397,12 @@ public class DatabaseQuoteSource implements QuoteSource
 	    return "LENGTH("+db.get("prices.symbol")+") = 3 " + andString() + 
 		"LEFT("+db.get("prices.symbol")+",1) != 'X' ";
 	
-	else
+	else if(type == INDICES)
 	    return "LENGTH("+db.get("prices.symbol")+") = 3 " + andString() + 
 		"LEFT("+db.get("prices.symbol")+", 1) = 'X' ";
+	else {
+	    return "";
+	}
     }
 
     private String specificSymbolString(String symbol) {

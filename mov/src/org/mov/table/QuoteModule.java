@@ -198,7 +198,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 return quote.getDate();
 		
             case(VOLUME_COLUMN):
-                return new Integer(quote.getVolume());
+                return new Integer(quote.getDayVolume());
 		
             case(DAY_LOW_COLUMN):
                 return new QuoteFormat(quote.getDayLow());
@@ -254,7 +254,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 // calculate "the most active stocks" or whether we even
                 // have enough data to do it. But this seems to be roughly
                 // right.
-                return new Float(quote.getDayHigh() * quote.getVolume());
+                return new Float(quote.getDayHigh() * quote.getDayVolume());
             }
             
             if(column >= EQUATION_COLUMN) {
@@ -489,7 +489,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	catch(EvaluationException e) {
 	    // Tell user expression didnt evaluate properly
 	    JOptionPane.
-		showInternalMessageDialog(org.mov.ui.DesktopManager.getDesktop(),
+		showInternalMessageDialog(DesktopManager.getDesktop(),
 					  e.getReason() + ": " +
 					  expression.toString(),
 					  "Error evaluating expression",

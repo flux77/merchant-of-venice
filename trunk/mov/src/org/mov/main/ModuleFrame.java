@@ -121,8 +121,8 @@ public class ModuleFrame extends JInternalFrame
 
 	// Should we centre the window or place in (0,0) ?
 	if(centre) {
-	    x = (desktop.getWidth() - preferred.width) / 2;
-	    y = (desktop.getHeight() - preferred.height) / 2;
+	    x = (desktop.getWidth() - width) / 2;
+	    y = (desktop.getHeight() - height) / 2;
 	}
 	else {
 	    x = 0;

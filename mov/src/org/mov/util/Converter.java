@@ -2,6 +2,8 @@ package org.mov.util;
 
 import java.util.*;
 
+import org.mov.portfolio.Stock;
+
 public class Converter {
 
     public static Change changeToChange(float a, float b) {
@@ -53,31 +55,6 @@ public class Converter {
 	return string;
     }
 
-    // Finds a date x trading days before the given date
-    // Deprecate - functionality in TradingDate class
-
-    /*
-    public static Date before(Date startDate, int days) {
-
-	// Convert to Calendar
-	GregorianCalendar date = new GregorianCalendar();
-	date.setTime(startDate);
-	
-	for(int i = 0; i < days; i++) {
-
-	    // Add 1 day or more to skip weekends as necessary
-	    do {
-		date.add(Calendar.DAY_OF_WEEK, 1);
-	    } while(date.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
-		    date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
-
-	}
-
-	// Convert back to date and return
-	return date.getTime();
-    }
-    */
-
     // Converts a start and end date to a vector of all the trading
     // dates inbetween (i.e. all days except saturdays and sundays).
     public static Vector dateRangeToTradingDateVector(TradingDate startDate,
@@ -92,6 +69,42 @@ public class Converter {
 	    date.next(1);
 	}
 	return dates;
+    }
+
+    // Converts a line of text like: "AAA,010330,250,250,250,250,0"
+    // into stock quote class. 
+    // TODO: Needs to deal with other formats besides MetaStock
+    // TODO: Doesnt handle errors very well
+    // TODO: Be nice if it auto-detected format from file
+    public static Stock lineToQuote(String line) {
+	Stock stock = null;
+
+	if(line != null) {
+
+	    String[] quoteParts = line.split(",");
+	    if(quoteParts.length == 7) {
+
+		String symbol;
+		TradingDate date;
+		int volume;
+		float day_open;
+		float day_high;
+		float day_low;
+		float day_close;
+		int i = 0;
+
+		symbol = quoteParts[i++];
+		date = new TradingDate(quoteParts[i++]);
+		day_open = Float.parseFloat(quoteParts[i++]);
+		day_high = Float.parseFloat(quoteParts[i++]);
+		day_low = Float.parseFloat(quoteParts[i++]);
+		day_close = Float.parseFloat(quoteParts[i++]);
+		volume = Integer.parseInt(quoteParts[i++]);
+		stock = new Stock(symbol, date, volume, day_low, day_high,
+				  day_open, day_close);
+	    }	    
+	}
+	return stock;
     }
 }
 

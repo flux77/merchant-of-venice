@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.portfolio;
@@ -96,7 +96,7 @@ public class PortfolioModule extends JPanel implements Module,
      * @param	portfolio	the portfolio to display
      * @param	quoteBundle	quote bundle
      */
-    public PortfolioModule(JDesktopPane desktop, Portfolio portfolio, 
+    public PortfolioModule(JDesktopPane desktop, Portfolio portfolio,
 			   QuoteBundle quoteBundle) {
 
 	this.desktop = desktop;
@@ -120,11 +120,11 @@ public class PortfolioModule extends JPanel implements Module,
 
 	    portfolioMenu.addSeparator();
 
-	    portfolioExport = 
+	    portfolioExport =
 		MenuHelper.addMenuItem(this, portfolioMenu,
 				       Locale.getString("EXPORT"));
 
-	    portfolioImport = 
+	    portfolioImport =
 		MenuHelper.addMenuItem(this, portfolioMenu,
 				       Locale.getString("IMPORT"));
 
@@ -132,37 +132,37 @@ public class PortfolioModule extends JPanel implements Module,
             // you can't delete or rename it.
             if(!portfolio.isTransient()) {
                 portfolioMenu.addSeparator();
-                
-                portfolioDelete = MenuHelper.addMenuItem(this, portfolioMenu, 
+
+                portfolioDelete = MenuHelper.addMenuItem(this, portfolioMenu,
                                                          Locale.getString("DELETE"));
 
-                portfolioRename = MenuHelper.addMenuItem(this, portfolioMenu, 
+                portfolioRename = MenuHelper.addMenuItem(this, portfolioMenu,
                                                          Locale.getString("RENAME"));
             }
 
             portfolioMenu.addSeparator();
 
-	    portfolioClose = MenuHelper.addMenuItem(this, portfolioMenu, 
+	    portfolioClose = MenuHelper.addMenuItem(this, portfolioMenu,
 						    Locale.getString("CLOSE"));
 	}
 
 	JMenu accountMenu = MenuHelper.addMenu(menuBar, Locale.getString("ACCOUNT"), 'A');
 	{
-	    accountNewCashAccount = 
+	    accountNewCashAccount =
 		MenuHelper.addMenuItem(this, accountMenu,
 				       Locale.getString("NEW_CASH_ACCOUNT"));
-	    accountNewShareAccount = 
+	    accountNewShareAccount =
 		MenuHelper.addMenuItem(this, accountMenu,
 				       Locale.getString("NEW_SHARE_ACCOUNT"));
 	}
 
-	JMenu transactionMenu = 
+	JMenu transactionMenu =
 	    MenuHelper.addMenu(menuBar, Locale.getString("TRANSACTION"), 'T');
 	{
-	    transactionNew = 
+	    transactionNew =
 		MenuHelper.addMenuItem(this, transactionMenu,
 				       Locale.getString("NEW"));
-	    transactionShowHistory = 
+	    transactionShowHistory =
 		MenuHelper.addMenuItem(this, transactionMenu,
 				       Locale.getString("SHOW_HISTORY"));
 	}
@@ -201,32 +201,32 @@ public class PortfolioModule extends JPanel implements Module,
 	    addLabel(Locale.getString("EMPTY"));
 	}
 	else {
-	    
+	
 	    Iterator iterator = accounts.iterator();
-	    
+	
 	    // First list share accounts
 	    while(iterator.hasNext()) {
 		Account account = (Account)iterator.next();
 		if(account instanceof ShareAccount) {
-		    
+		
 		    addLabel(account.getName());
-		    
+		
 		    // Add table of stock holdings for the portfolio
 		    ShareAccount shareAccount = (ShareAccount)account;
 		    table =
 			new StockHoldingTable(shareAccount.getStockHoldings(),
 					      quoteBundle);
-		    
+		
 		    scrolledTable = new JScrollPane(table);
 		    add(scrolledTable);
-		    
+		
 		    restrictTableHeight(scrolledTable, table);
 		}
 	    }
-	    
+	
 	    // Now add summary containing all accounts including total
 	    addLabel(Locale.getString("SUMMARY"));
-	    
+	
 	    accountTable =
 		new AccountTable(portfolio, quoteBundle);
 
@@ -234,7 +234,7 @@ public class PortfolioModule extends JPanel implements Module,
 	    add(scrolledTable);
 
 	    restrictTableHeight(scrolledTable, accountTable);
-	}	    
+	}	
 
 	add(Box.createVerticalGlue());
 
@@ -322,7 +322,7 @@ public class PortfolioModule extends JPanel implements Module,
     public void addModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
     }
-    
+
     /**
      * Remove a property change listener for module change events.
      *
@@ -331,7 +331,7 @@ public class PortfolioModule extends JPanel implements Module,
     public void removeModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
     }
-    
+
     /**
      * Return frame icon for table module.
      *
@@ -339,7 +339,7 @@ public class PortfolioModule extends JPanel implements Module,
      */
     public ImageIcon getFrameIcon() {
 	return null;
-    }    
+    }
 
     /**
      * Return displayed component for this module.
@@ -437,18 +437,21 @@ public class PortfolioModule extends JPanel implements Module,
 	    }
 	}
 	else {
-	    historyModule = 
+	    historyModule =
 		new TransactionModule(this, portfolio);
 	
-	    historyFrame = 
+	    historyFrame =
                 ((org.mov.ui.DesktopManager)(desktop.getDesktopManager())).newFrame(historyModule);
 	}
     }
 
     // Graph this portfolio
     private void graphPortfolio() {
-        // Can only graph if there are shares in the portfolio...
-        if(portfolio.getStartDate() == null) 
+        // Can only graph if:
+        // (1) There are shares in the portfolio...
+        // (2) We don't have new enough quotes.
+        if(portfolio.getStartDate() == null ||
+           portfolio.getStartDate().after(QuoteSourceManager.getSource().getLastDate()))
             DesktopManager.showErrorMessage(Locale.getString("NOTHING_TO_GRAPH"));
         else {
             // If this portfolio has been given to us from a paper trade we will
@@ -456,9 +459,9 @@ public class PortfolioModule extends JPanel implements Module,
             // We do a simple check to see if we can graph using that quote bundle:
             // If the quote bundle has quotes before or at the first trade in the
             // portfolio then we will use the quote bundle given.
-            if(quoteBundle.getFirstDate().compareTo(portfolio.getStartDate()) <= 0)             
+            if(quoteBundle.getFirstDate().compareTo(portfolio.getStartDate()) <= 0)
                 CommandManager.getInstance().graphPortfolio(portfolio, quoteBundle);
-            else 
+            else
                 CommandManager.getInstance().graphPortfolio(portfolio);
         }
     }
@@ -467,12 +470,13 @@ public class PortfolioModule extends JPanel implements Module,
     private void deletePortfolio() {
 	JDesktopPane desktop =
 	    org.mov.ui.DesktopManager.getDesktop();
+
 	ConfirmDialog dialog = new ConfirmDialog(desktop,
 				   Locale.getString("SURE_DELETE_PORTFOLIO"),
 				   Locale.getString("DELETE_PORTFOLIO"));
-	boolean option = dialog.showDialog();
+	boolean deletePortfolio = dialog.showDialog();
 
-	if(option) {
+	if(deletePortfolio) {
 	    PreferencesManager.deletePortfolio(portfolio.getName());
 
 	    MainMenu.getInstance().updatePortfolioMenu();
@@ -501,7 +505,7 @@ public class PortfolioModule extends JPanel implements Module,
 
         if(newPortfolioName != null && newPortfolioName.length() > 0 &&
            !newPortfolioName.equals(oldPortfolioName)) {
-            
+
             // Save the portfolio under the new name
             portfolio.setName(newPortfolioName);
 	    PreferencesManager.savePortfolio(portfolio);
@@ -511,7 +515,7 @@ public class PortfolioModule extends JPanel implements Module,
 
             // Update GUI
 	    MainMenu.getInstance().updatePortfolioMenu();
-            propertySupport.firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1); 
+            propertySupport.firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1);
         }
     }
 
@@ -608,7 +612,7 @@ public class PortfolioModule extends JPanel implements Module,
 			    portfolio.findAccountByName(cashAccountName);
 
 			// If its not found then create it
-			if(cashAccount == null) { 
+			if(cashAccount == null) {
 			    cashAccount = new CashAccount(cashAccountName);
 			    portfolio.addAccount(cashAccount);
 			}
@@ -620,7 +624,7 @@ public class PortfolioModule extends JPanel implements Module,
 			    portfolio.findAccountByName(cashAccountName2);
 
 			// If its not found then create it
-			if(cashAccount2 == null) { 
+			if(cashAccount2 == null) {
 			    cashAccount2 = new CashAccount(cashAccountName2);
 			    portfolio.addAccount(cashAccount2);
 			}
@@ -631,13 +635,13 @@ public class PortfolioModule extends JPanel implements Module,
 			    portfolio.findAccountByName(shareAccountName);
 
 			// If its not found then create it
-			if(shareAccount == null) { 
+			if(shareAccount == null) {
 			    shareAccount = new ShareAccount(shareAccountName);
 			    portfolio.addAccount(shareAccount);
 			}
 		    }
-		    
-		    Transaction transaction = 
+		
+		    Transaction transaction =
 			new Transaction(type, date, amount, symbol, shares,
 					tradeCost, cashAccount, cashAccount2, shareAccount);
 		    portfolio.addTransaction(transaction);
@@ -666,7 +670,7 @@ public class PortfolioModule extends JPanel implements Module,
 
     // Create a new cash account
     private void newCashAccount() {
-	TextDialog dialog = 
+	TextDialog dialog =
 	    new TextDialog(desktop, Locale.getString("ENTER_ACCOUNT_NAME"),
 			   Locale.getString("NEW_CASH_ACCOUNT"));
 
@@ -683,7 +687,7 @@ public class PortfolioModule extends JPanel implements Module,
 
     // Create a new share account
     private void newShareAccount() {
-	TextDialog dialog = 
+	TextDialog dialog =
 	    new TextDialog(desktop, Locale.getString("ENTER_ACCOUNT_NAME"),
 			   Locale.getString("NEW_SHARE_ACCOUNT"));
 	String accountName = dialog.showDialog();
@@ -704,14 +708,14 @@ public class PortfolioModule extends JPanel implements Module,
      * (if its open) to ensure everything is kept in-sync.
      */
     public void newTransaction() {
-	JDesktopPane desktop = 
+	JDesktopPane desktop =
 	    org.mov.ui.DesktopManager.getDesktop();
 	TransactionDialog dialog = new TransactionDialog(desktop, portfolio);
 
         // Update portfolio displayed if the user entered a new transaction
         if(dialog.newTransaction()) {
             redraw();
-            
+
             if(historyFrame != null && !historyFrame.isClosed())
                 historyModule.redraw();
         }

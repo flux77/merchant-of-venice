@@ -12,7 +12,7 @@ import java.util.regex.*;
  * date class than using the Calendar hierarchy. It also beats java.util.Date
  * by not using deprecated methods.
  */
-public class TradingDate {
+public class TradingDate implements Cloneable, Comparable {
 
     private int year;
     private int month;

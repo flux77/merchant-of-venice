@@ -1,6 +1,5 @@
 package org.mov.prefs;
 
-import org.liquid.list.*;
 import org.mov.ui.*;
 import org.mov.prefs.PreferencesManager;
 
@@ -87,7 +86,7 @@ public class EquationPage extends javax.swing.JPanel
         listPanel.setLayout(new java.awt.GridBagLayout());
         java.awt.GridBagConstraints gridBagConstraints1;
         
-        functionListModel = new org.liquid.list.SortedListModel();
+        functionListModel = new org.mov.ui.SortedListModel();
         functionList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         listScrollPane.setViewportView(functionList);
         

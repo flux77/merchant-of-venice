@@ -171,6 +171,24 @@ public class ExpressionFactory {
 	case(Token.VARIABLE_TOKEN):
 	    expression = new VariableExpression(token.getValueName(), token.getValueType());
 	    break;
+	case(Token.DAY_OF_WEEK_TOKEN):
+	    expression = new DayOfWeekExpression();
+	    break;
+	case(Token.DAY_OF_YEAR_TOKEN):
+	    expression = new DayOfYearExpression();
+	    break;
+	case(Token.DAY_TOKEN):
+	    expression = new DayExpression();
+	    break;
+	case(Token.MONTH_TOKEN):
+	    expression = new MonthExpression();
+	    break;
+	case(Token.YEAR_TOKEN):
+	    expression = new YearExpression();
+	    break;
+	case(Token.SUM_TOKEN):
+	    expression = new SumExpression(arg1, arg2, arg3);
+	    break;
         default:
             // No such token
             assert false;

@@ -44,10 +44,16 @@ import java.util.*;
  *            "min" "(" QUOTE "," EXPR "," EXPR ")" | 
  *            "max" "(" QUOTE "," EXPR "," EXPR ")" |
  *            "avg" "(" QUOTE "," EXPR "," EXPR ")" |
- *            "rsi" "(" EXPR "," EXPR ")" |
+ *            "sum" "(" QUOTE "," EXPR "," EXPR ")" |
+ *            "rsi" "(" EXPR "," EXPR ")" |y
  *            "not" "(" EXPR ")" |
  *            "percent" "(" EXPR "," EXPR ")" |
- *            "if"  "(" EXPR ")" "{" EXPR "}" "else" "{" EXPR "}"
+ *            "if"  "(" EXPR ")" "{" EXPR "}" "else" "{" EXPR "}" |
+ *            "dayofweek" "(" ")" |
+ *            "dayofyear" "(" ")" |
+ *            "day" "(" ")" |
+ *            "month" "(" ")" |
+ *            "year" "(" ")"
  * </pre>
  */
 public class Parser {
@@ -189,10 +195,16 @@ public class Parser {
 		tokens.match(Token.MIN_TOKEN) ||
 		tokens.match(Token.MAX_TOKEN) ||
 		tokens.match(Token.AVG_TOKEN) ||
+		tokens.match(Token.SUM_TOKEN) ||
 		tokens.match(Token.RSI_TOKEN) ||
 		tokens.match(Token.NOT_TOKEN) ||
 		tokens.match(Token.IF_TOKEN) ||
-		tokens.match(Token.PERCENT_TOKEN)) {
+		tokens.match(Token.PERCENT_TOKEN) ||
+		tokens.match(Token.DAY_OF_WEEK_TOKEN) ||
+		tokens.match(Token.DAY_OF_YEAR_TOKEN) ||
+		tokens.match(Token.DAY_TOKEN) ||
+		tokens.match(Token.MONTH_TOKEN) ||
+		tokens.match(Token.YEAR_TOKEN)) {
 	    expression = parseFunction(tokens);
 	}
 
@@ -289,53 +301,29 @@ public class Parser {
 
 	switch(function.getType()) {
 	case(Token.LAG_TOKEN):
-
+	case(Token.RSI_TOKEN):	  
+	case(Token.PERCENT_TOKEN): 
 	    arg1 = parseQuote(tokens);
 	    parseComma(tokens);
 	    arg2 = parseExpression(tokens);
 	    break;
 
 	case(Token.MIN_TOKEN):
-
-	    arg1 = parseQuote(tokens);
-	    parseComma(tokens);
-	    arg2 = parseExpression(tokens);
-	    parseComma(tokens);
-	    arg3 = parseExpression(tokens);	    
-	    break;
-	    
 	case(Token.MAX_TOKEN):
-	    
-	    arg1 = parseQuote(tokens);
-	    parseComma(tokens);
-	    arg2 = parseExpression(tokens);
-	    parseComma(tokens);
-	    arg3 = parseExpression(tokens);	    
-	    break;
-	
 	case(Token.AVG_TOKEN):
-	    
+	case(Token.SUM_TOKEN):
 	    arg1 = parseQuote(tokens);
 	    parseComma(tokens);
 	    arg2 = parseExpression(tokens);
 	    parseComma(tokens);
 	    arg3 = parseExpression(tokens);	    
-	    break;
-
-	case(Token.RSI_TOKEN):
-	    
-	    arg1 = parseExpression(tokens);
-	    parseComma(tokens);
-	    arg2 = parseExpression(tokens);	    
 	    break;
 
 	case(Token.NOT_TOKEN):
-
 	    arg1 = parseExpression(tokens);
 	    break;
 					       
-	case(Token.IF_TOKEN):
-	    
+	case(Token.IF_TOKEN):	   
 	    arg1 = parseExpression(tokens);
 	    parseRightParenthesis(tokens);
 	    parseLeftBrace(tokens);
@@ -347,12 +335,12 @@ public class Parser {
 	    parseRightBrace(tokens);				
 	    break;
 	    
-	case(Token.PERCENT_TOKEN):
-
-	    arg1 = parseExpression(tokens);
-	    parseComma(tokens);
-	    arg2 = parseExpression(tokens);
-	    break;
+        case(Token.DAY_OF_WEEK_TOKEN):
+        case(Token.DAY_OF_YEAR_TOKEN):
+        case(Token.DAY_TOKEN):
+        case(Token.MONTH_TOKEN):
+        case(Token.YEAR_TOKEN):
+            break;
 
 	default:
 	    throw new ParserException("expected function");

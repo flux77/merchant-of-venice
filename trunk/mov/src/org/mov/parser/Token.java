@@ -128,8 +128,26 @@ public class Token {
     /** Represents "<code>false</code>" symbol */
     public static final int FALSE_TOKEN = 33;	    
 
+    /** Represents "<code>dayofweek()</code> symbol */
+    public static final int DAY_OF_WEEK_TOKEN = 34;
+
+    /** Represents "<code>dayofyear()()</code> symbol */
+    public static final int DAY_OF_YEAR_TOKEN = 35;
+
+    /** Represents "<code>day()</code> symbol */
+    public static final int DAY_TOKEN = 36;
+
+    /** Represents "<code>month()</code> symbol */
+    public static final int MONTH_TOKEN = 37;
+
+    /** Represents "<code>year()</code> symbol */
+    public static final int YEAR_TOKEN = 38;
+
+    /** Represents "<code>sum</code>" symbol */
+    public static final int SUM_TOKEN = 39;        
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 34;
+    private static final int FIXED_LENGTH_TOKENS = 40;
 
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;       
@@ -201,6 +219,12 @@ public class Token {
 	tokenStrings[RSI_TOKEN]		       = "rsi";
 	tokenStrings[TRUE_TOKEN]	       = "true";
 	tokenStrings[FALSE_TOKEN]	       = "false";
+	tokenStrings[DAY_OF_WEEK_TOKEN]	       = "dayofweek";
+	tokenStrings[DAY_OF_YEAR_TOKEN]	       = "dayofyear";
+	tokenStrings[DAY_TOKEN]	               = "day";
+	tokenStrings[MONTH_TOKEN]	       = "month";
+	tokenStrings[YEAR_TOKEN]	       = "year";
+	tokenStrings[SUM_TOKEN]  	       = "sum";
 
 	boolean matched = false;
 

@@ -49,8 +49,6 @@ public class AbstractTable extends SortedTable {
     // Default values for rendering table rows
     private static final Color backgroundColor = Color.white;
     private static final Color alternativeBackgroundColor = new Color(237, 237, 237);   
-    private static final Color selectedBackgroundColor = Color.blue;   
-    private static final Color selectedForegroundColor = Color.white;
 
     // Images used for arrows representing when stock has gone up, down or is unchanged
     private String upImage = "org/mov/images/Up.png";
@@ -92,8 +90,8 @@ public class AbstractTable extends SortedTable {
 
 	    // Make each alternate row a different colour
 	    if(isSelected) {
-		setBackground(selectedBackgroundColor);
-		textLabel.setForeground(selectedForegroundColor);
+		setBackground(table.getSelectionBackground());
+		textLabel.setForeground(table.getSelectionForeground());
 	    } else {
 		setBackground(row % 2 != 0?
 			      backgroundColor:

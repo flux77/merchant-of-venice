@@ -11,8 +11,8 @@ import java.util.prefs.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import org.mov.main.AnalyserFrame;
-import org.mov.main.AnalyserModule;
+import org.mov.main.ModuleFrame;
+import org.mov.main.Module;
 
 /**
  * The preferences module for venice. This class provides the user
@@ -26,7 +26,7 @@ import org.mov.main.AnalyserModule;
  *				      PreferencesModule.QUOTE_SOURCE_PAGE);
  * 
  *	// Create a frame around the module and add to the desktop
- *	AnalyserFrame frame = new AnalyserFrame(chart, 0, 0, 400, 300);
+ *	ModuleFrame frame = new ModuleFrame(chart, 0, 0, 400, 300);
  *	desktop.add(frame);
  * </pre>
  *
@@ -34,7 +34,7 @@ import org.mov.main.AnalyserModule;
  */
 
 public class PreferencesModule extends JPanel
-    implements AnalyserModule, ActionListener {
+    implements Module, ActionListener {
 
     /**
      * Preferences page for retrieving stock quotes.
@@ -109,7 +109,7 @@ public class PreferencesModule extends JPanel
 
 	// ok or cancel button closes window
 	propertySupport.
-	    firePropertyChange(AnalyserFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
+	    firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
     }
 
     /**

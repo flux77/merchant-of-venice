@@ -3,6 +3,7 @@ package org.mov.portfolio;
 import java.util.*;
 
 import org.mov.util.*;
+import org.mov.parser.*;
 import org.mov.quote.*;
 
 /**
@@ -11,7 +12,8 @@ import org.mov.quote.*;
  * as name, type and value.
  */
 public interface Account {
-    /** Account is a cash account (bank account, cash management account etc). */
+    /** Account is a cash account (bank account, cash management account etc)
+     */
     public static final int CASH_ACCOUNT = 0;
 
     /** Account is a share trading account which contains a list of shares */
@@ -38,7 +40,9 @@ public interface Account {
      * @param	cache	the quote cache
      * @param	date	the date to calculate
      */
-    public float getValue(QuoteCache cache, TradingDate date);
+    public float getValue(QuoteCache cache, TradingDate date)
+	throws EvaluationException;
+
 
     /**
      * Perform a transaction on this account.
@@ -46,5 +50,10 @@ public interface Account {
      * @param	transaction	transaction to occur
      */
     public void transaction(Transaction transaction);
+
+    /**
+     * Remove all transactions from account.
+     */
+    public void removeAllTransactions();
 }
 

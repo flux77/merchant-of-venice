@@ -110,11 +110,11 @@ public class Graphable {
      * Given an X range, inspect all the associated Y values and return the 
      * highest.
      *
-     * @param	xRange	a <code>Vector</code> of <code>Comparable</code> 
+     * @param	xRange	a <code>List</code> of <code>Comparable</code> 
      *			objects
      * @return	the highest Y value
      */
-    public float getHighestY(Vector xRange) {
+    public float getHighestY(List xRange) {
 	Iterator iterator = xRange.iterator();
 	Float y = null;
 	Float highestY = new Float(Float.NEGATIVE_INFINITY);
@@ -133,11 +133,11 @@ public class Graphable {
      * Given an X range, inspect all the associated Y values and return the 
      * lowest.
      *
-     * @param	xRange	a <code>Vector</code> of <code>Comparable</code> 
+     * @param	xRange	a <code>List</code> of <code>Comparable</code> 
      *			objects
      * @return	the lowest Y value
      */
-    public float getLowestY(Vector xRange) {
+    public float getLowestY(List xRange) {
 	Iterator iterator = xRange.iterator();
 	Float y = null;
 	Float lowestY = new Float(Float.MAX_VALUE);

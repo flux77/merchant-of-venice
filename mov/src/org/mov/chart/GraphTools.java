@@ -18,8 +18,11 @@
 
 package org.mov.chart;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Graphics;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
@@ -30,7 +33,7 @@ public class GraphTools {
     public static void renderLine(Graphics g, Graphable source, 
 				  int xoffset, int yoffset,
 				  float horizontalScale, float verticalScale,
-				  float bottomLineValue, Vector xRange) {
+				  float bottomLineValue, List xRange) {
 	
 	int xCoordinate, yCoordinate;
 	int lastXCoordinate = -1 , lastYCoordinate = -1;
@@ -81,7 +84,7 @@ public class GraphTools {
     public static void renderBar(Graphics g, Graphable source, 
 				 int xoffset, int yoffset,
 				 float horizontalScale, float verticalScale,
-				 float bottomLineValue, Vector xRange) {
+				 float bottomLineValue, List xRange) {
 	int x2, y1, y2;
 	int x1 = -1;
 	Float y;

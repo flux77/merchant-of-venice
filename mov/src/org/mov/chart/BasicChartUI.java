@@ -195,8 +195,8 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
      * Return the tool tip text for the given x, y coordinates.
      *
      * @param	chart	the chart component
-     * @param	x	the x coordinate
-     * @param	y	the y coordinate
+     * @param	xCoordinate	the x coordinate
+     * @param	yCoordinate	the y coordinate
      */
     public String getToolTipText(Chart chart, int xCoordinate, 
 				 int yCoordinate) {

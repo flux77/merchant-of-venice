@@ -252,10 +252,10 @@ public class FileQuoteSource implements QuoteSource
      * Returns the symbol associated with the given company. Not
      * implemented for the file quote source.
      *
-     * @param	symbol	a partial company name.
+     * @param	partialCompanyName	a partial company name.
      * @return	always an empty string.
      */
-    public Symbol getSymbol(String partialSymbolName) {
+    public Symbol getSymbol(String partialCompanyName) {
 	return null;
     }
 
@@ -393,7 +393,6 @@ public class FileQuoteSource implements QuoteSource
             
             for(Iterator iterator = dates.iterator(); iterator.hasNext();) {
                 TradingDate date = (TradingDate)iterator.next();
-                Quote quote;
                 
                 // Load all quotes from the file
                 URL fileURL = getURLForDate(date);
@@ -402,8 +401,16 @@ public class FileQuoteSource implements QuoteSource
                     List quotes = getContainedQuotes(fileURL, quoteRange);
                                         
                     // Load quotes into cache
-                    for(Iterator quoteIterator = quotes.iterator(); quoteIterator.hasNext();) 
-                        quoteCache.load((Quote)quoteIterator.next());
+                    for(Iterator quoteIterator = quotes.iterator(); quoteIterator.hasNext();) {
+                        Quote quote = (Quote)quoteIterator.next();
+                        quoteCache.load(quote.getSymbol(),
+                                        quote.getDate(),
+                                        quote.getDayVolume(),
+                                        quote.getDayLow(),
+                                        quote.getDayHigh(),
+                                        quote.getDayOpen(),
+                                        quote.getDayClose());
+                    }
                 }
                 
                 if(thread.isInterrupted())
@@ -415,7 +422,7 @@ public class FileQuoteSource implements QuoteSource
             
             ProgressDialogManager.closeProgressDialog(progress);
             
-            return true;
+            return !thread.isInterrupted();
         }
         else
             return false;

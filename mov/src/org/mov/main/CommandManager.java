@@ -253,10 +253,8 @@ public class CommandManager {
                         quoteBundle = new ScriptQuoteBundle(quoteRange);
                     }
                     
-                    if(!thread.isInterrupted()) {
-                        getDesktopManager().newFrame(new PortfolioModule(desktop,
-                                                                         portfolio, quoteBundle));
-                    }
+                    if(!thread.isInterrupted())
+                        openPortfolio(portfolio, quoteBundle);
                 }
 
                 ProgressDialogManager.closeProgressDialog(progress);
@@ -264,6 +262,18 @@ public class CommandManager {
             });
 
         thread.start();
+    }
+
+    /**
+     * Display the portfolio to the user
+     *
+     * @param portfolio the portfolio
+     * @param quoteBundle fully loaded quote bundle
+     */
+    public void openPortfolio(final Portfolio portfolio,
+                              final QuoteBundle quoteBundle) {
+        getDesktopManager().newFrame(new PortfolioModule(desktop,
+                                                         portfolio, quoteBundle));
     }
 
     /**
@@ -330,6 +340,17 @@ public class CommandManager {
 	// Set the start and end dates to null - the other graph
 	// function will determine appropriate start and end dates
 	graphPortfolio(portfolio, null, null, null);
+    }
+
+    /**
+     * Graph the given portfolio.
+     *
+     * @param portfolio the portfolio
+     * @param quoteBundle fully loaded quote bundle
+     */
+    public void graphPortfolio(Portfolio portfolio,
+                               QuoteBundle quoteBundle) {
+        graphPortfolio(portfolio, quoteBundle, null, null);
     }
 
     /**

@@ -18,10 +18,12 @@
 
 package org.mov.analyser.gp;
 
+import java.lang.System;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.mov.analyser.GPGondolaSelection;
 import org.mov.analyser.OrderCache;
 
 import org.mov.parser.Expression;
@@ -46,6 +48,7 @@ public class GeneticProgramme {
     private Random random;
 
     private GPQuoteBundle quoteBundle;
+    private GPGondolaSelection GPGondolaSelection;
     private OrderCache orderCache;
     private TradingDate startDate;
     private TradingDate endDate;
@@ -57,6 +60,7 @@ public class GeneticProgramme {
     private int generation;
 
     public GeneticProgramme(GPQuoteBundle quoteBundle, 
+                            GPGondolaSelection GPGondolaSelection,
                             OrderCache orderCache,
                             TradingDate startDate,
                             TradingDate endDate,
@@ -64,10 +68,10 @@ public class GeneticProgramme {
                             Money stockValue,
                             int numberStocks,
                             Money tradeCost,
-                            int breedingPopulationSize, 
-                            int seed) {
+                            int breedingPopulationSize) {
 
         this.quoteBundle = quoteBundle;
+        this.GPGondolaSelection = GPGondolaSelection;
         this.orderCache = orderCache;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -79,12 +83,12 @@ public class GeneticProgramme {
 
         nextBreedingPopulation = new TreeMap();
         breedingPopulation = new TreeMap();
-        random = new Random(seed);
+        random = new Random(System.currentTimeMillis());
 
         // Create a mutator for the buy and sell rules. Buy rules shouldn't
         // use the "held" variable (buy rules won't be evaluated if held > 0).
-        buyRuleMutator = new Mutator(random, false, orderCache.isOrdered());
-        sellRuleMutator = new Mutator(random, true, orderCache.isOrdered());
+        buyRuleMutator = new Mutator(random, GPGondolaSelection, false, orderCache.isOrdered());
+        sellRuleMutator = new Mutator(random, GPGondolaSelection, true, orderCache.isOrdered());
 
         generation = 1;
     }

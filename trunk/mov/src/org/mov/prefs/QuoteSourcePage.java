@@ -62,6 +62,8 @@ import org.mov.util.Locale;
 /** 
  * Provides a preferences page to let the user modify the quote source.
  * The quote source can be from a database, files or from the internet.
+ *
+ * @author Andrew Leppard
  */
 public class QuoteSourcePage extends JPanel implements PreferencesPage
 {
@@ -71,7 +73,10 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     private JRadioButton useDatabase;
     private JComboBox databaseSoftware;
     private JTextField databaseHost;
-    private JTextField databasePort;
+
+    // This field needs to be initialised as it may be referenced
+    // before the widget is created.
+    private JTextField databasePort = null;
     private JTextField databaseUsername;
     private JPasswordField databasePassword;
     private JTextField databaseName;
@@ -94,6 +99,19 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 
     // Preferences
     private PreferencesManager.DatabasePreferences databasePreferences = null;
+
+    // Quote source enumeration
+    private final static int DATABASE = 0;
+    private final static int FILES = 0;
+    private final static int SAMPLES = 0;
+
+    // Database enumeration
+    private final static int MYSQL = 0;
+    private final static int POSTGRESQL = 1;
+
+    // Database default ports
+    private final static int MYSQL_DEFAULT_PORT = 3306;
+    private final static int POSTGRESQL_DEFAULT_PORT = 5432;
 
     /**
      * Create a new Quote Source Preferences page.
@@ -125,11 +143,11 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 
 	// Raise the select source's pane
         if(quoteSource == PreferencesManager.DATABASE)
-	    pane.setSelectedIndex(0);
+	    pane.setSelectedIndex(DATABASE);
 	else if(quoteSource == PreferencesManager.FILES)
-	    pane.setSelectedIndex(1);
+	    pane.setSelectedIndex(FILES);
 	else
-	    pane.setSelectedIndex(2);
+	    pane.setSelectedIndex(SAMPLES);
 
 	add(pane);
     }
@@ -164,9 +182,22 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         databaseSoftware.addItem(Locale.getString("MYSQL"));
         databaseSoftware.addItem(Locale.getString("POSTGRESQL"));
 	if(databasePreferences.software.equals("mysql"))
-	    databaseSoftware.setSelectedIndex(0);
+	    databaseSoftware.setSelectedIndex(MYSQL);
 	else
-	    databaseSoftware.setSelectedIndex(1);
+	    databaseSoftware.setSelectedIndex(POSTGRESQL);
+
+        // If the user changes the database, then update the port
+        // field to reflect the default port of the database.
+        databaseSoftware.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if(databasePort != null) {
+                        if(databaseSoftware.getSelectedIndex() == MYSQL)
+                            databasePort.setText(Integer.toString(MYSQL_DEFAULT_PORT));
+                        else
+                            databasePort.setText(Integer.toString(POSTGRESQL_DEFAULT_PORT));
+                    }
+                }
+            });
 
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(databaseSoftware, c);

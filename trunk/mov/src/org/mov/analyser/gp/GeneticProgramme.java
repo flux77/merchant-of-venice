@@ -204,8 +204,7 @@ public class GeneticProgramme {
                     // individual 'compete' to see if it gets to breed next round.
                     // If the individual is fit enough, it'll get a chance to breed.
                     competeForBreeding(individual, value);
-                    validIndividual = true;
-                    
+                    validIndividual = true;                    
                 }
                 catch(EvaluationException e) {
                     // If there is a problem running the equation then

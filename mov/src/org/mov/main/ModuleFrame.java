@@ -31,12 +31,13 @@ public class ModuleFrame extends JInternalFrame
     /**
      * Construct a new frame around the given module and display.
      *
-     * @param module The module to feed to the frame
-     * @param isPreferences	Is the frame a preferences frame that should
-     *				be centred and size honoured?
+     * @param	module The module to feed to the frame
+     * @param	centre	Should the frame be centred?
+     * @param	honourSize	Should we respect the frame's preferred
+     *				size or should we override it with the 
+     *				default?
      */
-    public ModuleFrame(Module module, 
-		       boolean isPreferences) {
+    public ModuleFrame(Module module, boolean centre, boolean honourSize) {
 
 	// Resizable, closable etc
 	super(module.getTitle(), true, true, true, true);
@@ -51,7 +52,7 @@ public class ModuleFrame extends JInternalFrame
 	else
 	    getContentPane().add(module.getComponent());
 
-	setSizeAndLocation(desktop, isPreferences);
+	setSizeAndLocation(desktop, centre, honourSize);
 
 	if(module.getJMenuBar() != null)
 	    setJMenuBar(module.getJMenuBar());
@@ -63,35 +64,34 @@ public class ModuleFrame extends JInternalFrame
 
 	// We want to notify module when it is closing so it can save data
 	addInternalFrameListener(this);
-        if (isPreferences) {
-            setResizable(false);
-            setMaximizable(false);
-        }
 	show();	
     }
 
     // Set the size and location of the new frame, taking care of out of
     // bounds frames.
     private void setSizeAndLocation(JDesktopPane desktop, 
-				    boolean isPreferences) {
+				    boolean centre, boolean honourSize) {
 	int x, y, width, height;
+	Dimension preferred = getPreferredSize();	    
 
-        Dimension preferred = getPreferredSize();	    
-
-        // Preference window is centred and custom size
-	if(isPreferences) {
-	    x = (desktop.getWidth() - preferred.width) / 2;
-	    y = (desktop.getHeight() - preferred.height) / 2;
+	// Should we respect the window's preferred size or override?
+	if(honourSize) {
 	    width = preferred.width;
 	    height = preferred.height;
 	}
+	else {
+	    width = DEFAULT_FRAME_WIDTH;
+	    height = DEFAULT_FRAME_HEIGHT;
+	}
 
-	// Main windows are set at (0, 0) and set to a fixed size
+	// Should we centre the window or place in (0,0) ?
+	if(centre) {
+	    x = (desktop.getWidth() - preferred.width) / 2;
+	    y = (desktop.getHeight() - preferred.height) / 2;
+	}
 	else {
 	    x = 0;
 	    y = 0;
-	    width = DEFAULT_FRAME_WIDTH;
-	    height = DEFAULT_FRAME_HEIGHT;
 	}
 
 	// Make sure new frame is within window bounds

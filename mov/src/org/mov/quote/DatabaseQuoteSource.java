@@ -15,6 +15,7 @@ import javax.swing.*;
 
 import org.mov.util.*;
 import org.mov.portfolio.*;
+import org.mov.ui.DesktopManager;
 
 /**
  * Provides functionality to obtain stock quotes from a database. This class
@@ -35,29 +36,45 @@ public class DatabaseQuoteSource implements QuoteSource
 
     // Buffer last trading date in database
     private TradingDate latestQuoteDate;
+
+    // When we are importing, first check to make sure the database is OK
+    private boolean readyForImport = false;
+
+    // Database internals
+    private final static String TABLE_NAME =		"shares";
+    private final static String SYMBOL_FIELD =		"symbol";
+    private final static String DATE_FIELD =		"date";
+    private final static String DAY_OPEN_FIELD =	"open";
+    private final static String DAY_CLOSE_FIELD =	"close";
+    private final static String DAY_HIGH_FIELD =	"high";
+    private final static String DAY_LOW_FIELD =		"low";
+    private final static String DAY_VOLUME_FIELD =	"volume";
+
+    private final static String DATE_INDEX_NAME =	"date_index";
+    private final static String SYMBOL_INDEX_NAME =	"symbol_index";
     
     /**
      * Creates a new quote source using the database information specified
      * in the user preferences.
      */
     public DatabaseQuoteSource() {
+
+	latestQuoteDate = null;
+
 	// Get driver
 	DatabaseLookup db = DatabaseLookup.getInstance();
 	try {
 	    // The newInstance() call is a work around for some
 	    // broken Java implementations
 	    Class.forName(db.get("driverclass")).newInstance(); 
-	    
+	 
+	    // connect to database
+	    connect();
+   
 	}
 	catch (Exception E) {
-	    System.err.println("Unable to load driver.");
-	    E.printStackTrace();
+	    DesktopManager.showErrorMessage("Unable to load MySQL driver");
 	}
-
-	latestQuoteDate = null;
-
-	// connect to database
-	connect();
     }
 
     private void connect() {
@@ -73,8 +90,7 @@ public class DatabaseQuoteSource implements QuoteSource
 			      "&password="+db.get("password"));
 	}
 	catch (SQLException E) {
-	    System.out.println(E.getMessage());
-	    System.exit(0);
+	    DesktopManager.showErrorMessage("Can't connect to database");
 	}
     }
 
@@ -86,7 +102,7 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public String getCompanyName(String symbol) {
 
-	String name = null;
+	String name = new String("");
 
 	if(connection != null) {
 	    try {
@@ -107,9 +123,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		System.out.println("SQLException: " + E.getMessage());
-		System.out.println("SQLState:     " + E.getSQLState());
-		System.out.println("VendorError:  " + E.getErrorCode());
+		// not a big deal if this fails
 	    }
 	}
 
@@ -124,7 +138,7 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public String getCompanySymbol(String partialCompanyName) {
 
-	String symbol = null;
+	String symbol = new String("");
 
 	if(connection != null) {
 	    try {
@@ -149,9 +163,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		System.out.println("SQLException: " + E.getMessage());
-		System.out.println("SQLState:     " + E.getSQLState());
-		System.out.println("VendorError:  " + E.getErrorCode());
+		// not a big deal if this fails
 	    }
 	}
 
@@ -186,9 +198,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		System.out.println("SQLException: " + E.getMessage());
-		System.out.println("SQLState:     " + E.getSQLState());
-		System.out.println("VendorError:  " + E.getErrorCode());
+		DesktopManager.showErrorMessage("Error talking to database");
 	    }
 	}
 
@@ -229,9 +239,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		System.out.println("SQLException: " + E.getMessage());
-		System.out.println("SQLState:     " + E.getSQLState());
-		System.out.println("VendorError:  " + E.getErrorCode());
+		DesktopManager.showErrorMessage("Error talking to database");
 	    }
 	}
 
@@ -268,9 +276,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		System.out.println("SQLException: " + E.getMessage());
-		System.out.println("SQLState:     " + E.getSQLState());
-		System.out.println("VendorError:  " + E.getErrorCode());
+		DesktopManager.showErrorMessage("Error talking to database");
 	    }
 	}
 
@@ -401,23 +407,150 @@ public class DatabaseQuoteSource implements QuoteSource
 	return "ORDER BY "+db.get("prices.date");
     }
 
+    private boolean createTable(String databaseName) {
 
-    public static void importQuotes(QuoteSource source, TradingDate date) {
-	System.out.println("importing " + date);
+	boolean success = false;
 
-	    // How to get list of databases and tables in a database
+	try {
+	    // 1. Create the table
+	    Statement statement = connection.createStatement();
+	    ResultSet RS = statement.executeQuery
+		("CREATE TABLE " + TABLE_NAME + " (" + 
+		 DATE_FIELD +		" DATE NOT NULL, "+ 
+		 SYMBOL_FIELD +		" CHAR(6) NOT NULL, "+
+		 DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, "+
+		 DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, "+
+		 DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, "+
+		 DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, "+
+		 DAY_VOLUME_FIELD +	" INT DEFAULT 0, "+
+		 "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
+
+	    // 2. Create a couple of indices to speed things up
+	    RS = statement.executeQuery
+		("CREATE INDEX " + DATE_INDEX_NAME + " ON " + TABLE_NAME + 
+		 " (" + DATE_FIELD + ")");
+	    RS = statement.executeQuery
+		("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " + TABLE_NAME + 
+		 " (" + SYMBOL_FIELD + ")");
+
+	    success = true;
+	}
+	catch (SQLException E) {
+	    DesktopManager.showErrorMessage("Error creating table");
+	}
+
+	return success;
 	    
-	    /*	    DatabaseMetaData meta = connection.getMetaData();
-	    ResultSet RS = meta.getTables("shares", null, "shares", null);
-	    	    ResultSet RS = meta.getCatalogs(); 
+    }
 
-	    while(RS.next()) {
-	    	System.out.println(RS.getString(1));
+    private boolean prepareForImport(String databaseName) {
+
+	boolean success = true;
+
+	try {
+	    DatabaseMetaData meta = connection.getMetaData();
+
+	    // 1. Check database exists
+	    {
+		ResultSet RS = meta.getCatalogs(); 
+		String traverseDatabaseName;
+		boolean foundDatabase = false;
+		
+		while(RS.next()) {
+		    traverseDatabaseName = RS.getString(1);
+		    
+		    if(traverseDatabaseName.equals(databaseName)) {
+			foundDatabase = true;
+			break;
+		    }
+		}
+		
+		if(!foundDatabase) {
+		    DesktopManager.showErrorMessage("Can't find " + 
+						    databaseName +
+						    " database");
+		    return false;
+		}
 	    }
-	    */
 
+	    // 2. Check table exists - if not create it
+	    {
+		ResultSet RS = 
+		    meta.getTables(databaseName, null, databaseName, null);
+		String traverseTables;
+		boolean foundTable = false;
 
+		while(RS.next()) {
+		    traverseTables = RS.getString(1);
+			
+		    if(traverseTables.equals(TABLE_NAME))
+			foundTable = true;
+		}
+		
+		// No table? Well have to go create it
+		if(!foundTable) 
+		    success = createTable(databaseName);
+	    }
 
+	}
+	catch (SQLException E) {
+	    DesktopManager.showErrorMessage("Error talking to database");
+	    return false;
+	}
+
+	// If we got here its all ready for importing
+	return success;
+    }
+
+    public void importQuotes(String databaseName, QuoteSource source, 
+			     TradingDate date) {
+
+	if(connection == null)
+	    return;
+
+	if(!readyForImport) 
+	    readyForImport = prepareForImport(databaseName);
+
+	if(readyForImport) {
+	    // Load quotes from source
+	    Vector quotes = source.getQuotesForDate(date, ALL_COMMODITIES);
+	    Iterator iterator = quotes.iterator();
+	    Stock stock;
+	    StringBuffer insertString = new StringBuffer();
+	    boolean firstQuote = true;
+
+	    // Build single query to insert stocks for a whole day into 
+	    // the table
+	    while(iterator.hasNext()) {
+		stock = (Stock)iterator.next();
+
+		if(firstQuote) {
+		    insertString.append("INSERT INTO " + TABLE_NAME + 
+					" VALUES (");
+		    firstQuote = false;
+		}
+		else
+		    insertString.append(", (");
+
+		// Add new quote
+		insertString.append("'" + stock.getDate() +	"', " +
+				    "'" + stock.getSymbol() + "', " +
+				    "'" + stock.getDayOpen() + "', " +
+				    "'" + stock.getDayClose() + "', " +
+				    "'" + stock.getDayHigh() + "', " +
+				    "'" + stock.getDayLow() + "', " +
+				    "'" + stock.getVolume() + "')");
+	    }
+
+	    // Now insert day quote into database
+	    try {
+		Statement statement = connection.createStatement();
+		ResultSet RS = statement.executeQuery(insertString.toString());
+	    }
+	    catch (SQLException E) {
+		DesktopManager.showErrorMessage("Error talking to database");
+	    }
+	}
     }
 
     /** 
@@ -426,8 +559,25 @@ public class DatabaseQuoteSource implements QuoteSource
      * @return	a vector of dates
      */
     public Vector getDates() {
-	// not implemented yet
-	return null;
+	Vector dates = new Vector();
+
+	try {
+	    // 1. Create the table
+	    Statement statement = connection.createStatement();
+	    ResultSet RS = statement.executeQuery
+		("SELECT DISTINCT(" + DATE_FIELD + ") FROM " +
+		 TABLE_NAME);
+
+	    while(RS.next()) {
+		dates.add(new TradingDate(RS.getDate(1)));
+	    }
+
+	}
+	catch (SQLException E) {
+	    DesktopManager.showErrorMessage("Error talking to database");
+	}
+
+	return dates;
     }
 }
 

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart;
@@ -51,7 +51,7 @@ public class Chart extends JComponent implements MouseListener {
     private Comparable endX;
     private Vector xRange;
 
-    // When highlighting the grap keep track of the start and end x 
+    // When highlighting the grap keep track of the start and end x
     private Comparable startHighlightedX;
     private Comparable endHighlightedX;
 
@@ -80,7 +80,7 @@ public class Chart extends JComponent implements MouseListener {
 	
 	while(levelsIterator.hasNext()) {
 
-	    Iterator graphIterator = 
+	    Iterator graphIterator =
 		((Vector)levelsIterator.next()).iterator();
 
 	    while(graphIterator.hasNext()) {	
@@ -104,7 +104,7 @@ public class Chart extends JComponent implements MouseListener {
 	// get x range iterators for all graphs
 	//
 	// while x range iterator for all graphs
-	//	get graph x range iterator 
+	//	get graph x range iterator
 	//
 	//	while graph x range iterator
 	//		get x value
@@ -135,7 +135,7 @@ public class Chart extends JComponent implements MouseListener {
 	    while(xRangeIterator.hasNext()) {
 		Comparable x = (Comparable)xRangeIterator.next();
 
-		if(x.compareTo(startX) < 0) 
+		if(x.compareTo(startX) < 0)
 		    continue;
 		else if(x.compareTo(endX) > 0)
 		    break;
@@ -181,9 +181,9 @@ public class Chart extends JComponent implements MouseListener {
 	while(iterator.hasNext()) {
 
 	    Iterator innerIterator = ((Vector)iterator.next()).iterator();
-	    
+	
 	    while(innerIterator.hasNext()) {	
-		x = 
+		x =
 		    ((Graph)innerIterator.next()).getStartX();
 		if(startX == null || x.compareTo(startX) < 0)
 		    startX = x;
@@ -202,10 +202,10 @@ public class Chart extends JComponent implements MouseListener {
 	while(iterator.hasNext()) {
 
 	    Iterator innerIterator = ((Vector)iterator.next()).iterator();
-	    
+	
 	    while(innerIterator.hasNext()) {	
 
-		x = 
+		x =
 		    ((Graph)innerIterator.next()).getEndX();
 
 		if(endX == null || x.compareTo(endX) > 0)
@@ -220,7 +220,7 @@ public class Chart extends JComponent implements MouseListener {
      * Set whether the given graph should display its annotations.
      *
      * @param	graph	the graph to modify
-     * @param	enabled	<code>true</code> to turn on graph annotations; 
+     * @param	enabled	<code>true</code> to turn on graph annotations;
      *			<code>false</code> to turn them off
      */
     public void handleAnnotation(Graph graph, boolean enabled) {
@@ -347,7 +347,7 @@ public class Chart extends JComponent implements MouseListener {
      *		a graph level. Each element in the <code>Vector</code>
      *		is another <code>Vector</code> containing the graphs at that
      *		level.
-     */ 
+     */
     public Vector getLevels() {
 	return levels;
     }
@@ -372,7 +372,7 @@ public class Chart extends JComponent implements MouseListener {
 	super.setUI(ui);
     }
 
-    /** 
+    /**
      * Resets the UI property to a value from the current look and feel.
      */
     public void updateUI() {
@@ -419,7 +419,7 @@ public class Chart extends JComponent implements MouseListener {
 
 	return super.contains(x, y);
     }
-    
+
     // Set the size of this component
     private void setSize() {
 	setMinimumSize(new Dimension(BasicChartUI.getMinimumWidth(this),
@@ -429,7 +429,7 @@ public class Chart extends JComponent implements MouseListener {
     }
 
     /**
-     * Returns a string that specifies the name of the l&f class that 
+     * Returns a string that specifies the name of the l&f class that
      * renders this component.
      *
      * @return String "ChartUI"
@@ -500,7 +500,7 @@ public class Chart extends JComponent implements MouseListener {
 	    endHighlightedX = temp;
 	}
 
-	// Recalculate x range 
+	// Recalculate x range
 	setXRange(startHighlightedX, endHighlightedX);
 	clearHighlightedRegion();
 	zoomedIn = true;
@@ -522,7 +522,7 @@ public class Chart extends JComponent implements MouseListener {
      * Reset the double buffer, forcing the graph to redraw.
      */
     public void resetBuffer() {
-	if(gui != null) 
+	if(gui != null)
 	    gui.resetBuffer();
 
 	setSize();
@@ -547,7 +547,7 @@ public class Chart extends JComponent implements MouseListener {
 	    while(graphIterator.hasNext()) {
 		Graph graph = (Graph)graphIterator.next();
 
-		symbols.addElement(graph.getName());
+		symbols.addElement(graph.getSourceName());
 	    }
 	}
 

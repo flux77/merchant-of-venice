@@ -20,6 +20,7 @@ package org.mov.chart.graph;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,34 +28,43 @@ import org.mov.chart.Graphable;
 import org.mov.chart.GraphTools;
 import org.mov.chart.source.GraphSource;
 import org.mov.quote.QuoteFunctions;
+import org.mov.util.Locale;
 
 /**
  * Grpah of the RSI (Relative Strength Indicator). See {@link QuoteFunctions#rsi}
  * for more information about this indicator.
  *
  * @author Andrew Leppard
+ * @see RSIGraphUI
  */
 public class RSIGraph extends AbstractGraph {
 
+    // RSI values ready to graph
     private Graphable RSI;
 
     /**
      * Create a new RSI graph.
      *
      * @param	source	the source to create a standard deviation from
-     * @param	period	the period of the standard deviation
      */
-    public RSIGraph(GraphSource source, int period) {
-	
-	super(source);
-
-	// create RSI
-	RSI = createRSI(source.getGraphable(), period);
+    public RSIGraph(GraphSource source) {
+        super(source);
+        setSettings(new HashMap());
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
 		       double bottomLineValue, List xRange) {
+
+        int overSold = RSIGraphUI.getOverSold(getSettings());
+        int overBought = RSIGraphUI.getOverBought(getSettings());
+
+        g.setColor(Color.BLACK);
+        GraphTools.renderHorizontalLine(g, overSold, xoffset, yoffset, horizontalScale,
+                                        verticalScale, bottomLineValue, xRange);
+        GraphTools.renderHorizontalLine(g, overBought, xoffset, yoffset, horizontalScale,
+                                        verticalScale, bottomLineValue, xRange);
+
 
 	g.setColor(colour);
 	GraphTools.renderLine(g, RSI, xoffset, yoffset,
@@ -79,25 +89,26 @@ public class RSIGraph extends AbstractGraph {
 
     // Override vertical axis
     public double[] getAcceptableMajorDeltas() {
-	double[] major = {0.1D,
-			 0.5D,
-			 1D,
-			 10D,
-			 100D};
+        double[] major = {0.1D,
+                          0.5D,
+                          1D,
+                          10D,
+                          100D};
+
 	return major;
     }
 
     // Override vertical axis
     public double[] getAcceptableMinorDeltas() {
 	double[] minor = {1D,
-			 2D,
-			 3D,
-			 4D,
-			 5D,
-			 6D,
-			 7D,
-			 8D,
-			 9D};
+                          2D,
+                          3D,
+                          4D,
+                          5D,
+                          6D,
+                          7D,
+                          8D,
+                          9D};
 	return minor;
     }
 
@@ -133,6 +144,39 @@ public class RSIGraph extends AbstractGraph {
 	}
 
 	return RSI;
+    }
+
+    /**
+     * Return the name of this graph.
+     *
+     * @return <code>RSI</code>
+     */
+    public String getName() {
+        return Locale.getString("RSI");
+    }
+
+    public boolean isPrimary() {
+        return false;
+    }
+
+    public void setSettings(HashMap settings) {
+        super.setSettings(settings);
+
+        // Retrieve values from hashmap
+        int period = RSIGraphUI.getPeriod(settings);
+
+	// create RSI
+	RSI = createRSI(getSource().getGraphable(), period);
+    }
+
+    /**
+     * Return the graph's user interface.
+     *
+     * @param settings the initial settings
+     * @return user interface
+     */
+    public GraphUI getUI(HashMap settings) {
+        return new RSIGraphUI(settings);
     }
 }
 

@@ -33,6 +33,7 @@ import javax.swing.JRadioButtonMenuItem;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.GraphSource;
 import org.mov.chart.source.OHLCVQuoteGraphSource;
+import org.mov.ui.DesktopManager;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.quote.Quote;
@@ -41,58 +42,40 @@ import org.mov.quote.QuoteFunctions;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.
- * The menu provides a series of options which allow the user
- * to graph related charts and indicators.
+ * This menu provides a series of options which allow the user to graph related
+ * charts and indicators.
+ *
+ * <p>If you have added a view or indicator graph to Venice, you'll need to
+ * add it to this menu. To add the graph, you'll need to make two changes.
+ * First add your graph to the <code>JMenu</code> which is created in
+ * <code>buildMenu</code>. Then add your graph to the factory method
+ * <code>newGraph</code>.
  *
  * @author Andrew Leppard
  */
-public class QuoteChartMenu extends JMenu implements ActionListener {
+public class QuoteChartMenu extends JMenu {
 
-    // Graphs
-    private static final String BAR_CHART          = Locale.getString("BAR_CHART");
-    private static final String BOLLINGER          = Locale.getString("BOLLINGER_BANDS");
-    private static final String CANDLE_STICK       = Locale.getString("CANDLE_STICK");
-    private static final String DAY_HIGH           = Locale.getString("DAY_HIGH");
-    private static final String DAY_LOW            = Locale.getString("DAY_LOW");
-    private static final String DAY_OPEN           = Locale.getString("DAY_OPEN");
-    private static final String DAY_VOLUME         = Locale.getString("VOLUME");
-    private static final String EXP_MOVING_AVERAGE = Locale.getString("EXP_MOVING_AVERAGE");
-    private static final String HIGH_LOW_BAR       = Locale.getString("HIGH_LOW_BAR");
-    private static final String LINE_CHART         = Locale.getString("LINE_CHART");
-    private static final String MOMENTUM           = Locale.getString("MOMENTUM");
-    private static final String MOVING_AVERAGE     = Locale.getString("MOVING_AVERAGE");
-    private static final String OBV	           = Locale.getString("OBV");
-    private static final String POINT_AND_FIGURE   = Locale.getString("POINT_AND_FIGURE");
-    private static final String RSI	           = Locale.getString("RSI");
-    private static final String STANDARD_DEVIATION = Locale.getString("STANDARD_DEVIATION");
-
-    private static final String PRICE_THRESHOLD    = Locale.getString("PRICE_THRESHOLD");
-    private static final String SMOOTHING_CONSTANT = Locale.getString("SMOOTHING_CONSTANT");
-
-    JMenu graphMenu;
-    JMenu annotateMenu;
-    JMenu graphConstantsMenu; // Not convinced this is the best way to allow
-                              // the constants to change
-
-    private JMenuItem removeMenu;
-    private JMenuItem smoothingConstantMenuItem;
-    private JMenuItem priceThresholdMenuItem;
-
+    // Graph's quotes
     private QuoteBundle quoteBundle;
-    private Graph graph;
+
+    // Charting module
     private ChartModule listener;
+
+    // Map of graph name to graph
     private HashMap map = new HashMap();
-    private HashMap annotateMap = new HashMap();
 
+    // Current view graph displayed
+    private Graph currentViewGraph = null;
 
-    private ButtonGroup viewButtonGroup = new ButtonGroup();
-    private Graph lastViewGraph = null;
+    // Name of menu / graph source
+    private String menuName = null;
 
-    //Constants
-    private double smoothingConstant = 0.1;
-    private double priceThreshold;
-
-    private GraphConstants graphConstants;
+    // Cached graph sources shared between indicators
+    private GraphSource dayOpenGraphSource = null;
+    private GraphSource dayHighGraphSource = null;
+    private GraphSource dayLowGraphSource = null;
+    private GraphSource dayCloseGraphSource = null;
+    private GraphSource dayVolumeGraphSource = null;
 
     /**
      * Create a new menu allowing the user to graph related graphs
@@ -100,388 +83,334 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
      * extracted from the graph.
      *
      * @param	listener	the chart module associated with the menu
+     * @param   quoteBundle     graph's quote data
      * @param	graph		the graph we are associated with
      */
-    public QuoteChartMenu(ChartModule listener, QuoteBundle quoteBundle,
+    public QuoteChartMenu(final ChartModule listener, QuoteBundle quoteBundle,
 			  Graph graph) {
-	
-
-	super(graph.getName());
+	super(graph.getSourceName());
+        menuName = graph.getSourceName();
 
 	this.quoteBundle = quoteBundle;
-	this.graph = graph;
 	this.listener = listener;
-	
-	// Create graph + annotation menus
-	graphMenu = new JMenu(Locale.getString("GRAPH"));
-	annotateMenu = new JMenu(Locale.getString("ANNOTATE"));
-	graphConstantsMenu = new JMenu(Locale.getString("GRAPH_CONSTANTS"));
-	graphConstants = new GraphConstants();
+        this.currentViewGraph = graph;
 
-	// heuristic to guess a starting value for the box reversal value
-	GraphSource source = getDayClose();
-	Graphable graphable = source.getGraphable();
-	double[] values = graphable.toArray();
-	
-	double guess  = QuoteFunctions.sd(values,
-					  1,
-					  values.length) / 2;
+        buildMenu();
+    }
 
-	guess = QuoteFunctions.roundDouble(guess, 2);
-	
-	graphConstants.setPriceReversalThreshold(guess);
-	
-		
-	this.add(graphMenu);
-	this.add(annotateMenu);
-	this.add(graphConstantsMenu);
+    /**
+     * Builds the menu.
+     */
+    private void buildMenu() {
+        // Graph main menus
+	JMenu graphMenu = new JMenu(Locale.getString("GRAPH"));
 
         // Add the view menu items. Usually the user will only want to display
-        // one of these at a time. So if they do, unslect the other members of
+        // one of these at a time. So if they do, unselect the other members of
         // the group.
-	addViewMenuItem(LINE_CHART, true); // Initially selected
-        addViewMenuItem(BAR_CHART, false);
-	addViewMenuItem(CANDLE_STICK, false);
-	addViewMenuItem(HIGH_LOW_BAR, false);
-	addViewMenuItem(POINT_AND_FIGURE, false);
-        lastViewGraph = graph;
+        ButtonGroup group = new ButtonGroup();
+	addViewMenuItem(graphMenu, group, Locale.getString("LINE_CHART"), true); // selected
+        addViewMenuItem(graphMenu, group, Locale.getString("BAR_CHART"), false);
+	addViewMenuItem(graphMenu, group, Locale.getString("CANDLE_STICK"), false);
+	addViewMenuItem(graphMenu, group, Locale.getString("HIGH_LOW_BAR"), false);
+        addViewMenuItem(graphMenu, group, Locale.getString("POINT_AND_FIGURE"), false);
 
         graphMenu.addSeparator();
 
 	// Add the indicator menu items. These indicators can be "stacked" anyway
         // the user wishes. For example, the user can display bollinger bands and
         // Moving Average in the same graph.
-	addMenuItem(BOLLINGER);
-	addMenuItem(DAY_OPEN);
-	addMenuItem(DAY_HIGH);
-	addMenuItem(DAY_LOW);
-	addMenuItem(DAY_VOLUME);
-	addMenuItem(MOMENTUM);
-	addMenuItem(MOVING_AVERAGE);
-	addMenuItem(EXP_MOVING_AVERAGE);
-	addMenuItem(OBV);
-        addMenuItem(RSI);
-	addMenuItem(STANDARD_DEVIATION);
-
-	// Add annotation menu items
-	addAnnotateMenuItem(MOVING_AVERAGE, Locale.getString("BUY_SELL"));
-		
-	// Add graph constant menu items
-	// Used to change the view of a graph where the constants
-	// relate to the data and thus are independent of the scale
-	// (e.g smoothing constant)
-	// FIXME maybe
-
-	smoothingConstantMenuItem = new JMenuItem(SMOOTHING_CONSTANT);
-	smoothingConstantMenuItem.addActionListener(this);
-	graphConstantsMenu.add(smoothingConstantMenuItem);
-	
-	priceThresholdMenuItem = new JMenuItem(PRICE_THRESHOLD);
-	priceThresholdMenuItem.addActionListener(this);
-	graphConstantsMenu.add(priceThresholdMenuItem);
+        addMenuItem(graphMenu, Locale.getString("BOLLINGER_BANDS"));
+        addMenuItem(graphMenu, Locale.getString("DAY_OPEN"));
+        addMenuItem(graphMenu, Locale.getString("DAY_HIGH"));
+	addMenuItem(graphMenu, Locale.getString("DAY_LOW"));
+	addMenuItem(graphMenu, Locale.getString("VOLUME"));
+	addMenuItem(graphMenu, Locale.getString("MOMENTUM"));
+	addMenuItem(graphMenu, Locale.getString("SIMPLE_MOVING_AVERAGE"));
+	addMenuItem(graphMenu, Locale.getString("EXP_MOVING_AVERAGE"));
+	addMenuItem(graphMenu, Locale.getString("OBV"));
+        addMenuItem(graphMenu, Locale.getString("RSI"));
+	addMenuItem(graphMenu, Locale.getString("STANDARD_DEVIATION"));
 
 	// Add all static menus
-	this.addSeparator();
-	removeMenu = new JMenuItem(Locale.getString("REMOVE"));
-	removeMenu.addActionListener(this);
+	JMenuItem removeMenu = new JMenuItem(Locale.getString("REMOVE"));
+	removeMenu.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    listener.removeAll(getName());
+
+                    // Redraw chart if there are other graphs left
+                    if(listener.count() > 0)
+                        listener.redraw();
+                }});
+
+        // Build menu items
+	this.add(graphMenu);
 	this.add(removeMenu);	
     }
 
-    private void addViewMenuItem(String label, boolean isSelected) {
+    /**
+     * Adds the view graph to the given menu. A view graph is a way of viewing
+     * the graph, a graph can be viewed as a high-low bar, or a line of the day
+     * close, or a candlestick graph etc. Typically the user wants to choose
+     * only one of these views at anyone time.
+     *
+     * @param menu the menu
+     * @param group menu buttom group
+     * @param label name of graph
+     * @param isSelected is this the initial view?
+     */
+    private void addViewMenuItem(JMenu menu, ButtonGroup group, String label,
+                                 boolean isSelected) {
         JRadioButtonMenuItem item = new JRadioButtonMenuItem(label);
-        viewButtonGroup.add(item);
+        group.add(item);
         item.setSelected(isSelected);
         item.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Graph graph;
-                    JRadioButtonMenuItem item = (JRadioButtonMenuItem)e.getSource();
-                    String label = item.getText();
+                    JRadioButtonMenuItem menuItem = (JRadioButtonMenuItem)e.getSource();
+                    String text = menuItem.getText();
 
                     // First remove last view graph displayed
-                    if(lastViewGraph != null)
-                        listener.remove(lastViewGraph);
+                    if(currentViewGraph != null)
+                        listener.remove(currentViewGraph);
 
-                    // Now add the new one
-                    if(label == POINT_AND_FIGURE)
-                        graph = new PointAndFigureGraph(getDayClose(), 20,
-                                                        graphConstants.getPriceReversalThreshold());
-                    else if(label == BAR_CHART)
-                        graph = new BarChartGraph(getDayOpen(), getDayLow(),
-                                                  getDayHigh(), getDayClose());
-                    else if(label == CANDLE_STICK)
-                        graph = new CandleStickGraph(getDayOpen(), getDayLow(),
-                                                     getDayHigh(), getDayClose());
-                    else if(label == HIGH_LOW_BAR)
-                        graph = new HighLowBarGraph(getDayLow(), getDayHigh(),
-                                                    getDayClose());
-                    else {
-                        assert(label == LINE_CHART);
-                        graph = new LineGraph(getDayClose());
-                    }
+                    graph = newGraph(text);
 
                     listener.append(graph, 0);
                     listener.redraw();
 
-                    lastViewGraph = graph;
+                    currentViewGraph = graph;
                 }});
 
-        graphMenu.add(item);
+        menu.add(item);
     }
 
-    // Add a graph menu item, e.g. "Day Close", "Bollinger Bands"
-    private void addMenuItem(String label) {
-
+    /**
+     * Adds the indicator graph to the given menu. An indicator graph is
+     * a graph that can be stacked with other indicators.
+     *
+     * @param menu the menu
+     * @param label name of graph
+     */
+    private void addMenuItem(JMenu menu, String label) {
 	// Add graph menu
 	JMenuItem item = new JCheckBoxMenuItem(label);
-	item.addActionListener(this);
-	graphMenu.add(item);
-    }
+        item.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    final JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)e.getSource();
+                    final String text = menuItem.getText();
 
-    // Add an annotate menu item, e.g. "Moving Average Buy/Sell"
-    private void addAnnotateMenuItem(String graphName, String annotation) {
-	JMenuItem item = new JCheckBoxMenuItem(graphName + " " + annotation);
-	item.addActionListener(this);
-	item.setEnabled(false);
-	annotateMenu.add(item);
-		
-	// Save reference to annotation
-	annotateMap.put((Object)graphName, item);		
+                    // If the menu is already selected then unselecting removes the
+                    // graph...
+                    if(!menuItem.getState())
+                        removeGraph(text);
+
+                    // ... otherwise it adds the graph
+                    else {
+                        // NOTE: the menu will be auto-checked which might mess things up!!!
+
+                        // Handle all action in a separate thread so we dont
+                        // hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+                        Thread thread = new Thread() {
+                                public void run() {
+                                    Graph graph = getGraph(text);
+                                    if (graph != null)
+                                        addGraph(graph);
+                                    else
+                                        menuItem.setSelected(false);
+                                }};
+
+                        thread.start();
+                    }}});
+
+	menu.add(item);
     }
 
     /**
-     * Return the graph name we are associated with
+     * Return the menu name / name of the object we are graphing
      *
-     * @return	the graph name
+     * @return	the menu name
      */
     public String getName() {
-        // Under Java 1.5 beta if I don't check against graph being NULL I get
-        // a NULL pointer exception. I don't understand why. This whole module
-        // will be upgraded soon so I am not too concerned.
-        if(graph != null)
-            return graph.getName();
-        else
-            return "";
+        return menuName;
     }
 
     /**
-     * This function is called when the user selects one of the menu
-     * items.
+     * Returns day open graph source for input to graph.
      *
-     * @param	e	the action performed
+     * @return graph souce
      */
-    public void actionPerformed(ActionEvent e) {
-	
-	// Check static menus first
-	if(e.getSource() == removeMenu) {
-	    listener.removeAll(getName());
-
-            // Only redraw if there are only graphs left
-            if(listener.count() > 0)
-                listener.redraw();
-	}
-	
-	else if (e.getSource() == smoothingConstantMenuItem) {	
-	
-	    //Put up a dialog requesting input
-
-	    //This doesn't work and I don't know why.
-	    //The dialog doesn't appear and the thread hangs
-	    //TextDialog dialog = new TextDialog(listener.getDesktop(), "Smoothing Constant", "Enter Value");
-
-	    //String val = dialog.showDialog();
-
-	    // Replace this with TextDialog
-	
-	    String constantStr = (new Double(graphConstants.getSmoothingConstant())).toString();
-	    String val = JOptionPane.showInputDialog(null, "Enter Value", constantStr);
-	
-	    if (val != null) {
-		graphConstants.setSmoothingConstant( (new Double(val)).doubleValue());
-	    }
-
-
-	    // FIXME: replace this kludge with proper redraw code
-	
-	    if (graphExists(EXP_MOVING_AVERAGE)) {
-		removeGraph(EXP_MOVING_AVERAGE);
-		addGraph(new ExpMovingAverageGraph(getDayClose(), 40, graphConstants.getSmoothingConstant()),
-			 EXP_MOVING_AVERAGE, 0);	
-		
-		
-	    }
-
-	}
-	
-	else if (e.getSource() == priceThresholdMenuItem) {
-
-	    String constantStr = (new Double(graphConstants.getPriceReversalThreshold())).toString();
-	    String val = JOptionPane.showInputDialog(null, "Enter Value", constantStr);
-	
-	    if (val != null) {
-		graphConstants.setPriceReversalThreshold( (new Double(val)).doubleValue());
-	    }
-
-	    // FIXME: replace this kludge with proper redraw code
-	    if (graphExists(POINT_AND_FIGURE)) {
-		removeGraph(POINT_AND_FIGURE);
-		addGraph(new PointAndFigureGraph(getDayClose(), 20,graphConstants.getPriceReversalThreshold()),
-			 POINT_AND_FIGURE);
-	    }
-	
-	}
-	
-
-	else {
-	    JCheckBoxMenuItem menu = (JCheckBoxMenuItem)e.getSource();
-	    String text = menu.getText();
-	
-	    // Check annotation menus first
-	    if(handleAnnotationMenu(text, menu));
-	
-	    // Handle removing graphs next
-	    else if(!menu.getState())
-		removeGraph(text);
-	
-	    // Ok looks like its adding a graph
-	    else if(text == BOLLINGER)
-		addGraph(new BollingerBandsGraph(getDayClose(), 20),
-			 BOLLINGER, 0);
-
-	    else if(text == DAY_HIGH)
-		addGraph(new LineGraph(getDayHigh()), DAY_HIGH, 0);
-	
-	    else if(text == DAY_LOW)
-		addGraph(new LineGraph(getDayLow()), DAY_LOW, 0);
-	
-	    else if(text == DAY_OPEN)
-		addGraph(new LineGraph(getDayOpen()), DAY_OPEN, 0);
-	
-	    else if(text == MOMENTUM)
-		addGraph(new MomentumGraph(getDayClose(), 10), MOMENTUM);
-	
-	    else if(text == MOVING_AVERAGE)
-		addGraph(new MovingAverageGraph(getDayClose(), 40),
-			 MOVING_AVERAGE, 0);
-
-	    else if(text == EXP_MOVING_AVERAGE)
-		addGraph(new ExpMovingAverageGraph(getDayClose(), 40, graphConstants.getSmoothingConstant()),
-			 EXP_MOVING_AVERAGE, 0);	
-
-	    else if(text == OBV)
-		addGraph(new OBVGraph(getDayOpen(), getDayClose(),
-				      getDayVolume(),
-				      50000.0D), OBV);
-	    else if(text == DAY_VOLUME)
-		addGraph(new BarGraph(getDayVolume()), DAY_VOLUME);
-
-            else if(text == RSI)
-                addGraph(new RSIGraph(getDayClose(), 14), RSI);
-
-	    else if(text == STANDARD_DEVIATION)
-		addGraph(new StandardDeviationGraph(getDayClose(), 20),
-			 STANDARD_DEVIATION);
-	}
-    }
-
-    // Returns a graph of the day open prices
     private GraphSource getDayOpen() {
-	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
+        if(dayOpenGraphSource == null)
+            dayOpenGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
+        return dayOpenGraphSource;
     }
 
-    // Returns a graph of the day high prices
+    /**
+     * Returns day high graph source for input to graph.
+     *
+     * @return graph souce
+     */
     private GraphSource getDayHigh() {
-	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_HIGH);
+        if(dayHighGraphSource == null)
+            dayHighGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_HIGH);
+        return dayHighGraphSource;
     }
 
-    // Returns a graph of the day low prices
+    /**
+     * Returns day low graph source for input to graph.
+     *
+     * @return graph souce
+     */
     private GraphSource getDayLow() {
-	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_LOW);
+        if(dayLowGraphSource == null)
+            dayLowGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_LOW);
+        return dayLowGraphSource;
     }
 
-    // Returns a graph of the day close prices
+    /**
+     * Returns day close graph source for input to graph.
+     *
+     * @return graph souce
+     */
     private GraphSource getDayClose() {
-	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+        if(dayCloseGraphSource == null)
+            dayCloseGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+        return dayCloseGraphSource;
     }
 
-    // Returns a graph of the day volume prices
+    /**
+     * Returns day volume graph source for input to graph.
+     *
+     * @return graph souce
+     */
     private GraphSource getDayVolume() {
-	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
+        if(dayVolumeGraphSource == null)
+            dayVolumeGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
+        return dayVolumeGraphSource;
     }
 
-    // Is annotation menu?
-    private boolean handleAnnotationMenu(String text,
-					 JCheckBoxMenuItem menu) {
-	boolean state = menu.getState();
-	Set set = annotateMap.keySet();
-	Iterator iterator = set.iterator();
-	String graphName;
+    /**
+     * Creates an instance of the graph that has the given localised name.
+     * Raises the graph's parameter user interface if it has one. Returns
+     * the graph or <code>null</code> if the user cancelled the operation.
+     *
+     * @param text localised name of graph
+     * @return the instance of that graph or <code>null</code> if the
+     *         operation was cancelled
+     */
+    private Graph getGraph(final String text) {
+        Graph graph = newGraph(text);
+        GraphUI graphUI = graph.getUI(new HashMap());
 
-	while(iterator.hasNext()) {
-	    graphName = (String)iterator.next();
-	
-	    // is it an annotation menu?
-	    Object object = annotateMap.get(graphName);
-	
-	    if(object == menu) {
-		// Turn on annotation for this graph
-		listener.handleAnnotation((Graph)map.get(graphName),
-					  state);		
-		listener.redraw();
-		return true;
-	    }
-	}	
+        if(graphUI != null) {
+            GraphSettingsDialog dialog =
+                new GraphSettingsDialog(graphUI, graph.getName());
 
-	return false;
+            int buttonPressed = dialog.showDialog();
+
+            if (buttonPressed == GraphSettingsDialog.ADD)
+                graph.setSettings(dialog.getSettings());
+            else
+                graph = null;
+        }
+
+        return graph;
     }
 
-    // Adds graph to chart
-    private void addGraph(Graph graph, String mapIdentifier) {
+    /**
+     * Adds graph to chart.
+     *
+     * @param graph the graph
+     */
+    private void addGraph(Graph graph) {
+        String mapIdentifier = graph.getName();
 	map.put(mapIdentifier, graph);
-	listener.append(graph);
+
+        if(graph.isPrimary())
+            listener.append(graph, 0);
+        else
+            listener.append(graph);
 	listener.redraw();
     }
 
-    // Same as above but add at specific index
-    private void addGraph(Graph graph, String mapIdentifier, int index) {
-
-	map.put(mapIdentifier, graph);
-	listener.append(graph, index);
-	listener.redraw();
-	
-	// Enable annotation menu (if there is one)
-	Object object = annotateMap.get(mapIdentifier);
-	
-	if(object != null) {
-	    JCheckBoxMenuItem item = (JCheckBoxMenuItem)object;
-	    item.setEnabled(true);		
-	}
-    }
-
-    // Return whether or not the graph has been drawn
-
-    private boolean graphExists(String mapIdentifier) {
-	Graph graph = (Graph)map.get(mapIdentifier);
-	
-	return true ? graph != null : false ;
-    }
-
-    // Removes graph from chart
+    /**
+     * Removes a graph from the chart.
+     *
+     * @param mapIdentifier name of graph
+     */
     private void removeGraph(String mapIdentifier) {
 	Graph graph = (Graph)map.get(mapIdentifier);
 	map.remove(mapIdentifier);
 	
-	// Remove graph and annotation
+	// Remove graph
 	listener.remove(graph);
-	listener.handleAnnotation(graph, false);
 	listener.redraw();
+    }
+
+    /**
+     * This method creates an instance of the graph that has the given
+     * localised name.
+     *
+     * @param text localised name of graph
+     * @return the instace of that graph
+     */
+    private Graph newGraph(String text) {
+        Graph graph;
+
+        if(text == Locale.getString("BAR_CHART"))
+            graph = new BarChartGraph(getDayOpen(), getDayLow(), getDayHigh(), getDayClose());
+
+        else if(text == Locale.getString("BOLLINGER_BANDS"))
+            graph = new BollingerBandsGraph(getDayClose());
+
+        else if(text == Locale.getString("CANDLE_STICK"))
+            graph = new CandleStickGraph(getDayOpen(), getDayLow(), getDayHigh(), getDayClose());
+
+        else if(text == Locale.getString("DAY_HIGH"))
+            graph = new LineGraph(getDayHigh(), text, true);
 	
-	// Disable annotation menu (if there is one)
-	Object object = annotateMap.get(mapIdentifier);
+        else if(text == Locale.getString("DAY_LOW"))
+            graph = new LineGraph(getDayLow(), text, true);
 	
-	if(object != null) {
-	    JCheckBoxMenuItem item = (JCheckBoxMenuItem)object;
-	    item.setEnabled(false); // disable check box	
-	    item.setSelected(false); // remove tick
-	}
+        else if(text == Locale.getString("DAY_OPEN"))
+            graph = new LineGraph(getDayOpen(), text, true);
+
+        else if(text == Locale.getString("VOLUME"))
+            graph = new BarGraph(getDayVolume(), text, false);
+	
+        else if(text == Locale.getString("EXP_MOVING_AVERAGE"))
+            graph = new ExpMovingAverageGraph(getDayClose(), 40, 0.1);
+
+        else if(text == Locale.getString("HIGH_LOW_BAR"))
+            graph = new HighLowBarGraph(getDayLow(), getDayHigh(), getDayClose());
+
+        else if(text == Locale.getString("MOMENTUM"))
+            graph = new MomentumGraph(getDayClose());
+	
+        else if(text == Locale.getString("OBV"))
+            graph = new OBVGraph(getDayOpen(), getDayClose(), getDayVolume());
+
+        else if(text == Locale.getString("POINT_AND_FIGURE"))
+            graph = new PointAndFigureGraph(getDayClose(), 20, 0.05);
+
+        else if(text == Locale.getString("RSI"))
+            graph = new RSIGraph(getDayClose());
+
+        else if(text == Locale.getString("SIMPLE_MOVING_AVERAGE"))
+            graph = new MovingAverageGraph(getDayClose());
+
+        else if(text == Locale.getString("STANDARD_DEVIATION"))
+            graph = new StandardDeviationGraph(getDayClose());
+
+        else {
+            assert(text == Locale.getString("LINE_CHART"));
+            graph = new LineGraph(getDayClose(), text, true);
+        }
+
+        // Make sure we did the right text -> graph mapping.
+        assert text == graph.getName();
+
+        return graph;
     }
 }

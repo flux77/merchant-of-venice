@@ -571,7 +571,9 @@ public class CommandManager {
             portfolioGraphSource =
                 new PortfolioGraphSource(portfolio, quoteBundle,
                                          PortfolioGraphSource.MARKET_VALUE);
-            graph = new LineGraph(portfolioGraphSource);
+            graph = new LineGraph(portfolioGraphSource,
+                                  Locale.getString("MARKET_VALUE"),
+                                  true);
             chart.add(graph, portfolio, quoteBundle, 0);
             chart.redraw();
             desktopManager.newFrame(chart);
@@ -795,7 +797,7 @@ public class CommandManager {
 
                 dayClose =
                     new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
-                graph = new LineGraph(dayClose);
+                graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
                 chart.add(graph, quoteBundle, 0);
                 chart.redraw();
 
@@ -845,7 +847,7 @@ public class CommandManager {
 
 	    dayClose =
 		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
-	    graph = new LineGraph(dayClose);
+	    graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
 	    chart.add(graph, quoteBundle, 0);
 	    chart.redraw();
 	

@@ -5,55 +5,53 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.graph;
 
-import java.awt.*;
-import java.lang.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.mov.chart.*;
-import org.mov.chart.source.*;
-import org.mov.util.*;
-import org.mov.parser.*;
-import org.mov.quote.*;
+import org.mov.chart.Graphable;
+import org.mov.chart.GraphTools;
+import org.mov.chart.source.GraphSource;
+import org.mov.util.Locale;
+import org.mov.quote.QuoteFunctions;
 
 /**
  * Momentum graph. This graph is used to show the direction that the
  * stock price is moving. The momentum for a given day is calculated
  * as the day close of today minus the day close of <i>period</i>
  * days ago.
+ *
+ * @author Andrew Leppard
+ * @see PeriodGraphUI
  */
 public class MomentumGraph extends AbstractGraph {
 
+    // Momentum values ready to graph
     private Graphable momentum;
-   
+
     /**
      * Create a new momentum graph.
      *
      * @param	source	the source to create a momentum graph from
-     * @param	period	the period of the momentum
      */
-    public MomentumGraph(GraphSource source, int period) {
-	
+    public MomentumGraph(GraphSource source) {
 	super(source);
-
-	// create momentum
-	momentum = createMomentum(source.getGraphable(),
-				  period);
+        setSettings(new HashMap());
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
@@ -61,7 +59,7 @@ public class MomentumGraph extends AbstractGraph {
 		       double bottomLineValue, List xRange) {
 
 	g.setColor(colour);
-	GraphTools.renderBar(g, momentum, xoffset, yoffset, 
+	GraphTools.renderBar(g, momentum, xoffset, yoffset,
 			     horizontalScale,
 			     verticalScale, bottomLineValue, xRange);
     }
@@ -97,7 +95,7 @@ public class MomentumGraph extends AbstractGraph {
 
     // Override vertical axis
     public double[] getAcceptableMinorDeltas() {
-	double[] minor = {1D, 
+	double[] minor = {1D,
 			 2D,
 			 3D,
 			 4D,
@@ -117,11 +115,11 @@ public class MomentumGraph extends AbstractGraph {
     /**
      * Create a momentum graphable.
      *
-     * @param	source	the input graph source 
+     * @param	source	the input graph source
      * @param	period	the desired period of the momentum graph
      * @return	the graphable containing averaged data from the source
      */
-    public static Graphable createMomentum(Graphable source, 
+    public static Graphable createMomentum(Graphable source,
 					   int period) {
 	Graphable momentum = new Graphable();
 
@@ -133,7 +131,7 @@ public class MomentumGraph extends AbstractGraph {
 
 	while(iterator.hasNext()) {
 	    Comparable x = (Comparable)iterator.next();
-	    double todaysMomentum = 
+	    double todaysMomentum =
 		values[i] - values[Math.max(1 + i - period, 0)];
 
 	    momentum.putY(x, new Double(todaysMomentum));
@@ -142,6 +140,40 @@ public class MomentumGraph extends AbstractGraph {
 	}
 
 	return momentum;
+    }
+
+    /**
+     * Return the name of this graph.
+     *
+     * @return <code>Momentum</code>
+     */
+    public String getName() {
+        return Locale.getString("MOMENTUM");
+    }
+
+    public boolean isPrimary() {
+        return false;
+    }
+
+    public void setSettings(HashMap settings) {
+        super.setSettings(settings);
+
+        // Retrieve period from settings hashmap
+        int period = PeriodGraphUI.getPeriod(settings);
+
+	// create momentum
+	momentum = createMomentum(getSource().getGraphable(),
+				  period);
+    }
+
+    /**
+     * Return the graph's user interface.
+     *
+     * @param settings the initial settings
+     * @return user interface
+     */
+    public GraphUI getUI(HashMap settings) {
+        return new PeriodGraphUI(settings);
     }
 }
 

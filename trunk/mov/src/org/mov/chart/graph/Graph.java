@@ -5,45 +5,50 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.graph;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.mov.chart.source.*;
-import org.mov.util.*;
-import org.mov.quote.*;
+import org.mov.chart.source.GraphSource;
 
-/** 
+/**
  * Provides a common interface to allow the charting module to support
  * a variety of graphs. Classes that implement this interface will
- * be able to render the graph onto the chart, provide axes information
- * and any annotations the graph may have. 
+ * be able to render the graph onto the chart and provide axes information.
+ * Each graph can have its own user interface to allow the user to set
+ * user-definable parameters.
+ *
+ * @author Andrew Leppard
+ * @see AbstractGraph
+ * @see GraphUI
+ * @see GraphSource
  */
 public interface Graph {
 
-    /** 
-     * Maximum distance between the mouse pointer and the graph which will 
-     * still make the tooltip come up 
+    /**
+     * Maximum distance between the mouse pointer and the graph which will
+     * still make the tooltip come up
      */
     public static int TOOL_TIP_BUFFER = 50;
 
     /**
      * Draw the graph.
-     * 
+     *
      * @param	g	the Graphics object to render to
      * @param	colour	the colour the graph should be rendered in; override
      *			this if the graph should be drawn in
@@ -53,15 +58,15 @@ public interface Graph {
      * @param	yoffset	the y offset in the graphics object where the graph
      *			starts
      * @param	horizontalScale	horizontal scale factor; use this to convert
-     *                  between X value in the <code>xRange</code> to a 
+     *                  between X value in the <code>xRange</code> to a
      *			cartesian coordinate x
      * @param	verticalScale	vertical scale factor; use this to convert
      *                  between Y value to a cartesian coordinate y
      * @param	bottomLineValue	the Y value of the lowest line in the graph
-     * @param	xRange	a <code>List</code> of <code>Comparable</code> 
+     * @param	xRange	a <code>List</code> of <code>Comparable</code>
      *			that contain the X values to plot
      */
-    public void render(Graphics g, Color colour, 
+    public void render(Graphics g, Color colour,
 		       int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
 		       double bottomLineValue, List xRange);
@@ -110,11 +115,20 @@ public interface Graph {
     public String getYLabel(double value);
 
     /**
-     * Return the name of the graph we are drawing.
+     * Return the name of the graph we are graphing, e.g.
+     * <code>Simple Moving Average</code>.
      *
      * @return	the name of the graph
      */
     public String getName();
+
+    /**
+     * Return the name of the source data that we are graphing, e.g.
+     * <code>CBA</code>.
+     *
+     * @return the name of the source
+     */
+    public String getSourceName();
 
     /**
      * Return the Y value for the given X value.
@@ -172,25 +186,49 @@ public interface Graph {
      *
      * @return	an array of doubles representing the minor deltas
      * @see	#getAcceptableMajorDeltas
-     */ 
+     */
     public double[] getAcceptableMinorDeltas();
 
     /**
-     * Return the annotations for this graph or <code>null</code> if it
-     * does not have any. The annotations should be in a map of X values
-     * to <code>String</code> values.
+     * Return the graph's current settings. Each graph must contain
+     * its user definable settings in a hashmap. If a graph does not
+     * have any user definable settings, then it can just return
+     * an empty hashmap here.
      *
-     * @return	map of annotations
+     * @return settings
      */
-    public HashMap getAnnotations();
+    public HashMap getSettings();
 
     /**
-     * Return if this graph has any annotations.
+     * Set the graph's user definable settings.
      *
-     * @return	<code>true</code> if this graph has annotations;
-     *		<code>false</code> otherwise
+     * @param settings the new settings
      */
-    public boolean hasAnnotations();
+    public void setSettings(HashMap settings);
+
+    /**
+     * Return the graph's user interface to allow the user to
+     * modify its settings. Pass the initial settings or an
+     * empty hashmap to use the graph's default settings.
+     * If the graph does not have any user-definable settings, then
+     * it should not have a user interface and should return
+     * <code>null</code> here.
+     *
+     * @param settings initial settings
+     * @return user interface or <code>null</code>
+     */
+    public GraphUI getUI(HashMap settings);
+
+    /**
+     * Return whether the graph is a <i>primary</i> graph. Primary
+     * graphs will appear together in the top chart. <i>Secondary</i>
+     * graphs appear in their own charts which are added below.
+     * The day close graph is primary; while the day close graph is
+     * secondary.
+     *
+     * @return <code>true</code> if the graph is a primary graph
+     */
+    public boolean isPrimary();
 }
 
 

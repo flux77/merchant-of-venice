@@ -70,6 +70,8 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     // Parsed data
     private QuoteRange quoteRange;
     private Expression orderByEquation;
+    private TradingDate startDate;
+    private TradingDate endDate;
 
     public QuoteRangePage(JDesktopPane desktop) {
         this.desktop = desktop;
@@ -129,10 +131,10 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     public boolean parse() {
         quoteRange = null;
 
-	TradingDate startDate = new TradingDate(startDateTextField.getText(),
-                                               TradingDate.BRITISH);
-	TradingDate endDate = new TradingDate(endDateTextField.getText(),
-                                             TradingDate.BRITISH);
+	startDate = new TradingDate(startDateTextField.getText(),
+                                    TradingDate.BRITISH);
+	endDate = new TradingDate(endDateTextField.getText(),
+                                  TradingDate.BRITISH);
 
 	if(startDate.getYear() == 0 || endDate.getYear() == 0) {
             JOptionPane.showInternalMessageDialog(desktop, 
@@ -228,6 +230,14 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 
     public QuoteRange getQuoteRange() {
         return quoteRange;
+    }
+
+    public TradingDate getStartDate() {
+        return startDate;
+    }
+
+    public TradingDate getEndDate() {
+        return endDate;
     }
 
     public OrderComparator getOrderComparator(QuoteBundle quoteBundle) {
@@ -350,10 +360,6 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             orderByKeyComboBox.addItem("Day Close Increasing");
             orderByKeyComboBox.addItem("Change Decreasing");
             orderByKeyComboBox.addItem("Change Increasing");
-            orderByKeyComboBox.addActionListener(new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {                        
-                        checkDisabledStatus();
-                    }});
 
             c.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(orderByKeyComboBox, c);
@@ -364,6 +370,11 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	    c.anchor = GridBagConstraints.WEST;
 
             orderByEquationButton = new JRadioButton("By Equation");
+            orderByEquationButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {                        
+                        checkDisabledStatus();
+                    }});
+
             buttonGroup.add(orderByEquationButton);
 
             c.gridwidth = 1;
@@ -382,7 +393,6 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 
     private void checkDisabledStatus() {
         orderByKeyComboBox.setEnabled(orderByKeyButton.isSelected());
-        orderByEquationComboBox.setEnabled(orderByEquationButton.isSelected());
-        
+        orderByEquationComboBox.setEnabled(orderByEquationButton.isSelected());        
     }
 }

@@ -30,8 +30,8 @@ import javax.swing.plaf.*;
 public class ProgressBarUI extends javax.swing.plaf.ProgressBarUI implements ImageObserver,
                                                                              ActionListener {
 
-    private static final Color backgroundColour = new Color(199, 208, 217);
-    private static final Color foregroundColour = new Color(101, 118, 135);
+    private static final Color foregroundColour = new Color(111, 131, 137);
+    private static final Color backgroundColour = new Color(238, 241, 238);
 
     private static final int STRIPE_SIZE = 11;
 

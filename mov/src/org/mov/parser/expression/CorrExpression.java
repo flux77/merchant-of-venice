@@ -71,7 +71,7 @@ public class CorrExpression extends QuaternaryExpression {
             correlatedSymbol = Symbol.find(correlatedSymbolString);
         }
         catch(SymbolFormatException e) {
-            throw new EvaluationException(e.getReason());
+            throw new EvaluationException(e.getMessage());
         }
 
         // Calculate and return the correleation

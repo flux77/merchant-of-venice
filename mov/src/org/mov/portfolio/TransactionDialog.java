@@ -836,7 +836,7 @@ public class TransactionDialog extends JInternalFrame
                 symbol = Symbol.toSymbol(symbolTextField.getText());
             }
             catch(SymbolFormatException e) {
-                symbolParseError = e.getReason();
+                symbolParseError = e.getMessage();
             }
 	}
 
@@ -888,7 +888,7 @@ public class TransactionDialog extends JInternalFrame
 
         // Can't parse money field?
         catch(MoneyFormatException e) {
-            String message = new String(Locale.getString("CANT_PARSE_NUMBER",
+            String message = new String(Locale.getString("ERROR_PARSING_NUMBER",
 							 e.getReason()));
 	    JOptionPane.showInternalMessageDialog(desktop, 
 						  message,

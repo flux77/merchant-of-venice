@@ -45,6 +45,7 @@ public class MainMenu implements ActionListener, ModuleListener
     private JMenuItem fileImportPreferencesMenuItem;
     private JMenuItem fileImportQuotesMenuItem;
     private JMenuItem fileExportPreferencesMenuItem;
+    private JMenuItem fileExportQuotesMenuItem;
     private JMenuItem filePreferencesMenuItem;
     private JMenuItem fileExitMenuItem;
     
@@ -162,10 +163,13 @@ public class MainMenu implements ActionListener, ModuleListener
             MenuHelper.addMenuItem(this, fileImportMenu, Locale.getString("QUOTES"));
         // File -> Export
         fileExportMenu = MenuHelper.addMenu(fileMenu, Locale.getString("EXPORT"), 'E');
-         // File -> Export -> Preferences
+        // File -> Export -> Preferences
         fileExportPreferencesMenuItem =
             MenuHelper.addMenuItem(this, fileExportMenu, Locale.getString("PREFERENCES"));
-       // File -> Preferences
+        // File -> Export -> Quotes
+        fileExportQuotesMenuItem =
+            MenuHelper.addMenuItem(this, fileExportMenu, Locale.getString("QUOTES"));
+        // File -> Preferences
         filePreferencesMenuItem = MenuHelper.addMenuItem(this, fileMenu,
                 Locale.getString("PREFERENCES"), 'R');
         fileMenu.addSeparator();
@@ -405,6 +409,9 @@ public class MainMenu implements ActionListener, ModuleListener
                 }
                 else if(menu == fileExportPreferencesMenuItem) {
                     CommandManager.getInstance().exportPreferences();
+                }
+                else if(menu == fileExportQuotesMenuItem) {
+                    CommandManager.getInstance().exportQuotes();
                 }
                 else if(menu == fileImportQuotesMenuItem) {
                     CommandManager.getInstance().importQuotes();

@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import org.mov.macro.MacroManager;
 import org.mov.prefs.PreferencesManager;
+import org.mov.quote.QuoteSourceManager;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
 import org.mov.util.Locale;
@@ -123,6 +124,9 @@ public class Main extends JFrame {
 	// Call save() on each module so they can save their
 	// preferences data
 	desktopManager.save();
+
+        // Shutdown the database if necessary
+        QuoteSourceManager.shutdown();
 
 	dispose();	
 	System.exit(0);

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import org.mov.importer.ImporterModule;
 import org.mov.prefs.PreferencesManager;
 
 /**
@@ -38,6 +37,16 @@ import org.mov.prefs.PreferencesManager;
  */
 public class QuoteSourceFactory {
     
+    /**
+     * Create an internal database quote source.
+     *
+     * @return the database quote source
+     */
+    public static DatabaseQuoteSource createInternalQuoteSource() {
+        String fileName = PreferencesManager.loadInternalFileName();
+        return new DatabaseQuoteSource(fileName);
+    }
+
     /**
      * Create a file quote source directly using the in-built sample files
      * as the quotes.
@@ -98,10 +107,10 @@ public class QuoteSourceFactory {
             else
                 assert false;
         }
-        
+
         return new FileQuoteSource("EzyChart", fileURLs);
     }
-    
+
     /**
      * Create a database quote source directly using the user preferences.
      *
@@ -125,18 +134,4 @@ public class QuoteSourceFactory {
                                        prefs.username, 
                                        prefs.password);
     }
-    
-    /**
-     * Create a file quote source directly using the user preferences.
-     *
-     * @return	the file quote source 
-     */
-    public static FileQuoteSource createFileQuoteSource() {
-        // Get file format from preferences
-        Preferences p = PreferencesManager.getUserNode("/quote_source/files");
-        
-        return new FileQuoteSource(p.get("format", "MetaStock"),
-                                   ImporterModule.getFileURLList());
-    }
-    
 }

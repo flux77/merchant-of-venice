@@ -245,7 +245,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         }
         catch(SymbolFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop,
-                                                  e.getReason(),
+                                                  e.getMessage(),
                                                   Locale.getString("INVALID_QUOTE_RANGE_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
             return false;

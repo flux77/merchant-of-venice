@@ -18,7 +18,7 @@
 
 package org.mov.ui;
 
-import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -30,12 +30,14 @@ import org.mov.util.Locale;
  *
  * Firstly it allows for default text to be placed in the text input field, secondly it
  * allows the user to press return to exit the dialog.
+ *
+ * @author Daniel Makovec
  */
 public class TextDialog implements ActionListener
 {
     String option;
-    JButton OKButton, CancelButton;
-    JTextField DataTextField;
+    JButton OKButton, cancelButton;
+    JTextField textField;
     JDialog textDialog;
     JInternalFrame textFrame;
     JPanel optionPanel;
@@ -72,26 +74,26 @@ public class TextDialog implements ActionListener
 			   String defaultText) 
     {
 	OKButton = new JButton(Locale.getString("OK"));
-	CancelButton = new JButton(Locale.getString("CANCEL"));
-	DataTextField = new JTextField();
-	DataTextField.setText(defaultText);
+	cancelButton = new JButton(Locale.getString("CANCEL"));
+	textField = new JTextField();
+	textField.setText(defaultText);
 
-	JPanel panel = new JPanel();
-	JLabel label = new JLabel(message);	    
+	JLabel label = new JLabel(message);
 
-	BorderLayout layout = new BorderLayout();
-	layout.setHgap(50);
-	layout.setVgap(5);
+        // Make sure the label and text field are aligned
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        textField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-	panel.setLayout(layout);
-	panel.add(label, BorderLayout.NORTH);
-	panel.add(DataTextField, BorderLayout.CENTER);
+        Box box = Box.createVerticalBox();
+        box.add(label);
+        box.add(Box.createVerticalStrut(5));
+        box.add(textField);
 
 	OKButton.addActionListener (this);
-	CancelButton.addActionListener (this);
+	cancelButton.addActionListener (this);
 
-	Object options[] = {OKButton, CancelButton};
-	JOptionPane optionPane = new JOptionPane(panel,
+	Object options[] = {OKButton, cancelButton};
+	JOptionPane optionPane = new JOptionPane(box,
 						 JOptionPane.QUESTION_MESSAGE,
 						 JOptionPane.OK_CANCEL_OPTION,
 						 null, options, null);
@@ -127,10 +129,10 @@ public class TextDialog implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
 	if (e.getSource () == OKButton) {
-	    option = DataTextField.getText();
+	    option = textField.getText();
 	    isDone = true;
 	}
-	else if (e.getSource () == CancelButton) {
+	else if (e.getSource () == cancelButton) {
 	    option = null;
 	    isDone = true;
 	}

@@ -20,6 +20,7 @@ package org.mov.quote;
 
 import java.text.NumberFormat;
 
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 
@@ -31,6 +32,8 @@ import org.mov.util.TradingDateFormatException;
  * <pre>
  * XXX,19990715,1.73,1.82,1.71,1.81,3648921
  * </pre>
+ *
+ * @author Andrew Leppard
  */
 public class MetaStockQuoteFilter implements QuoteFilter {
 
@@ -59,8 +62,9 @@ public class MetaStockQuoteFilter implements QuoteFilter {
      *
      * @param	quoteLine	a single line of text containing a quote
      * @return	the stock quote
+     * @exception QuoteFormatException if the quote could not be parsed
      */
-    public Quote toQuote(String quoteLine) {
+    public Quote toQuote(String quoteLine) throws QuoteFormatException {
 	Quote quote = null;
 
 	if(quoteLine != null) {
@@ -74,19 +78,16 @@ public class MetaStockQuoteFilter implements QuoteFilter {
                     symbol = Symbol.find(quoteParts[i++]);
                 }
                 catch(SymbolFormatException e) {
-                    // Return null - couldn't parse quote
-                    return null;
+                    throw new QuoteFormatException(e.getMessage());
                 }
 
 		TradingDate date = null;
 
                 try {
-                    date = new TradingDate(quoteParts[i++],
-                                           TradingDate.BRITISH);
+                    date = new TradingDate(quoteParts[i++], TradingDate.BRITISH);
                 }
                 catch(TradingDateFormatException e) {
-                    return null;
-                    // Return null - couldn't parse quote
+                    throw new QuoteFormatException(e.getMessage());
                 }
 
                 try {
@@ -99,9 +100,12 @@ public class MetaStockQuoteFilter implements QuoteFilter {
                                       day_open, day_close);
                 } 
                 catch(NumberFormatException e) {
-                    // Return null - couldn't parse quote
+                    throw new QuoteFormatException(Locale.getString("ERROR_PARSING_NUMBER",
+                                                                    quoteParts[i - 1]));
                 }
-	    }	    
+	    }
+            else
+                throw new QuoteFormatException(Locale.getString("WRONG_FIELD_COUNT"));
 	}
 	return quote;
     }

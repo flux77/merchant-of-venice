@@ -38,7 +38,11 @@ public class QuoteSourceManager {
     
     // Singleton instance of QuoteSource class
     private static QuoteSource sourceInstance = null;
-    
+
+    private QuoteSourceManager() {
+        // declared here so constructor is not public
+    }
+        
     /**
      * Set the quote source to be the given quote source. This function was
      * written for import. During import we set the quote source to be the
@@ -48,6 +52,9 @@ public class QuoteSourceManager {
      * @param source the new quote source
      */
     public static void setSource(QuoteSource source) {
+        if(sourceInstance != null)
+            sourceInstance.shutdown();
+
         sourceInstance = source;
     }
     
@@ -56,23 +63,35 @@ public class QuoteSourceManager {
      * reference and create new instance. 
      */
     public static void flush() {
-        sourceInstance = null;
+        if(sourceInstance != null) {
+            sourceInstance.shutdown();
+            sourceInstance = null;
+        }
     }
     
-    private QuoteSourceManager() {
-        // declared here so constructor is not public
+    /**
+     * Shutdown the quote source. Some quote sources require a shut down operation
+     * to ensure that they are properly closed.
+     */
+    public static void shutdown() {
+        if(sourceInstance != null)
+            sourceInstance.shutdown();
     }
-    
-    // Creates and returns singleton instance of quote source which
-    // user has selected in the Preferences->Quote Source page.
+
+    /** 
+     * Creates and returns singleton instance of quote source which
+     * user has selected in the Preferences->Quote Source page.
+     *
+     * @return quote source
+     */
     public static synchronized QuoteSource getSource() {
         if(sourceInstance == null) {
             int quoteSource = PreferencesManager.getQuoteSource();
             
-            if(quoteSource == PreferencesManager.FILES)
-                sourceInstance = QuoteSourceFactory.createFileQuoteSource();
-            else if(quoteSource == PreferencesManager.DATABASE)
+            if(quoteSource == PreferencesManager.DATABASE)
                 sourceInstance = QuoteSourceFactory.createDatabaseQuoteSource();
+            else if(quoteSource == PreferencesManager.INTERNAL)
+                sourceInstance = QuoteSourceFactory.createInternalQuoteSource();
             else {
                 assert quoteSource == PreferencesManager.SAMPLES;
                 sourceInstance = QuoteSourceFactory.createSamplesQuoteSource();

@@ -18,6 +18,7 @@
 
 package org.mov.quote;
 
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 
@@ -30,6 +31,8 @@ import org.mov.util.TradingDateFormatException;
  * <pre>
  * XXX 07/15/99 173 182 171 181 36489
  * </pre>
+ *
+ * @author Andrew Leppard
  */
 public class InsightTraderQuoteFilter implements QuoteFilter {
 
@@ -55,8 +58,9 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
      *
      * @param	quoteLine	a single line of text containing a quote
      * @return	the stock quote
+     * @exception QuoteFormatException if the quote could not be parsed
      */
-    public Quote toQuote(String quoteLine) {
+    public Quote toQuote(String quoteLine) throws QuoteFormatException {
 	Quote quote = null;
 
 	if(quoteLine != null) {
@@ -70,8 +74,7 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
                     symbol = Symbol.find(quoteParts[i++]);
                 }
                 catch(SymbolFormatException e) {
-                    // Return null - couldn't parse quote
-                    return null;
+                    throw new QuoteFormatException(e.getMessage());
                 }
 
 		TradingDate date = null;
@@ -81,8 +84,7 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
                                            TradingDate.US);
                 }
                 catch(TradingDateFormatException e) {
-                    return null;
-                    // Return null - couldn't parse quote
+                    throw new QuoteFormatException(e.getMessage());
                 }
 
 		// Convert all prices from cents to dollars
@@ -98,9 +100,13 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
                                       day_open, day_close);
                 } 
                 catch(NumberFormatException e) {
-                    // Return null - couldn't parse quote
+                    throw new QuoteFormatException(Locale.getString("ERROR_PARSING_NUMBER",
+                                                                    quoteParts[i - 1]));
                 }
 	    }	    
+            else
+                throw new QuoteFormatException(Locale.getString("WRONG_FIELD_COUNT"));
+                                                                
 	}
 	return quote;
     }

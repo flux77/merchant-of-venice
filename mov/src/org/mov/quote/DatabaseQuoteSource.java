@@ -51,29 +51,38 @@ import org.mov.util.TradingDate;
  *      }
  * </pre>
  *
+ * @author Andrew Leppard
  * @see Quote
  * @see QuoteRange
  * @see QuoteBundle
  */
 public class DatabaseQuoteSource implements QuoteSource
 {
-    private Connection connection;
+    private Connection connection = null;
     private boolean checkedTables = false;
 
     // Buffer first and last trading date in database
-    private TradingDate firstDate;
-    private TradingDate lastDate;
+    private TradingDate firstDate = null;
+    private TradingDate lastDate = null;
 
     // Database Software
 
     /** MySQL Database. */
-    public final static int MYSQL      = 0;
+    public final static int MYSQL       = 0;
 
     /** PostgreSQL Database. */
-    public final static int POSTGRESQL = 1;
+    public final static int POSTGRESQL  = 1;
 
     /** Hypersonic SQL Database. */
     public final static int HSQLDB      = 2;
+
+    // Mode
+
+    /** Internal database. */
+    public final static int INTERNAL = 0;
+
+    /** External database. */
+    public final static int EXTERNAL = 1;
 
     // MySQL driver info
     private final static String MYSQL_DRIVER_NAME = "mysql";
@@ -85,7 +94,6 @@ public class DatabaseQuoteSource implements QuoteSource
     private final static String POSTGRESQL_DRIVER      = "org.postgresql.Driver";
 
     // Hypersonic SQL driver info
-    private final static String HSQLDB_DRIVER_NAME = "hsqldb:hsql";
     private final static String HSQLDB_DRIVER      = "org.hsqldb.jdbcDriver";
 
     // Shares table
@@ -106,17 +114,26 @@ public class DatabaseQuoteSource implements QuoteSource
     private final static String LOOKUP_TABLE_NAME = "lookup";
     private final static String NAME_FIELD        = "name";
 
-    // Connection details
+    // Database details
+    private int mode;
     private int software;
+
+    // Fields for external mode
     private String host;
     private String port;
     private String database;
     private String username;
     private String password;
 
+    // Fields for internal mode
+    private String fileName;
+
+    // Fields for samples mode
+    private QuoteFilter filter;
+    private List fileURLs;
+
     /**
-     * Creates a new quote source using the database information specified
-     * in the user preferences.
+     * Creates a new quote source to connect to an external database.
      *
      * @param   software        the database software, either {@link #MYSQL},
      *                          {@link #POSTGRESQL} or {@link #HSQLDB}.
@@ -130,16 +147,25 @@ public class DatabaseQuoteSource implements QuoteSource
 			       String database, String username, String password) {
 	assert software == MYSQL || software == POSTGRESQL || software == HSQLDB;
 
-        connection = null;
-        firstDate = null;
-	lastDate = null;
-
+        this.mode = EXTERNAL;
 	this.software = software;
         this.host = host;
         this.port = port;
         this.database = database;
         this.username = username;
         this.password = password;
+    }
+
+    /**
+     * Create a new quote source to connect to an internal database stored in
+     * the given file.
+     *
+     * @param fileName name of database file
+     */
+    public DatabaseQuoteSource(String fileName) {
+        mode = INTERNAL;
+        software = HSQLDB;
+        this.fileName = fileName;
     }
 
     // Get the driver and connect to the database. Return FALSE if failed.
@@ -206,28 +232,38 @@ public class DatabaseQuoteSource implements QuoteSource
 
     // Connect to a Hypersonic database
     private boolean connectHSQLDB() {
+        boolean success = false;
+
 	// Get driver
 	try {
 	    Class.forName(HSQLDB_DRIVER).newInstance();
 
+            // We can operate the HSQLDB mode in one of three different wayys.
+            // Construct connection string depending on mode
+            String connectionURL;
+
+            if(mode == INTERNAL)
+                connectionURL = new String("jdbc:hsqldb:file:/" + fileName);
+            else {
+                assert mode == EXTERNAL;
+                connectionURL = new String("jdbc:hsqldb:hsql://"+ host + ":" + port + "/"+ database);
+            }
+
             try {
-                connection =
-                    DriverManager.getConnection("jdbc:" + HSQLDB_DRIVER_NAME + "://"+ host +
-                                                ":" + port +
-                                                "/"+ database);
-                return true;
+                connection = DriverManager.getConnection(connectionURL, "sa", "");
+                success = true;
             }
             catch (SQLException e) {
                 DesktopManager.showErrorMessage(Locale.getString("ERROR_CONNECTING_TO_DATABASE",
                                                                  e.getMessage()));
-                return false;
             }
 	}
 	catch (Exception e) {
 	    // Couldn't find the driver!
 	    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_HSQLDB_DRIVER"));
-	    return false;
 	}    
+
+        return success;
     }
 
     // Connect to the database
@@ -545,7 +581,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	    }
             catch(SymbolFormatException e2) {
                 DesktopManager.showErrorMessage(Locale.getString("DATABASE_BADLY_FORMATTED_SYMBOL",
-								 e2.getReason()));
+								 e2.getMessage()));
             }
 	}
 
@@ -710,7 +746,7 @@ public class DatabaseQuoteSource implements QuoteSource
 				    SYMBOL_FIELD +		" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
 				    ") NOT NULL, " +
 				    NAME_FIELD +		" VARCHAR(100), " +
-				    "PRIMARY KEY(" + SYMBOL_FIELD + "))");
+                                    "PRIMARY KEY(" + SYMBOL_FIELD + "))");
 
 	    success = true;
 	}
@@ -808,18 +844,55 @@ public class DatabaseQuoteSource implements QuoteSource
     /**
      * Import quotes into the database.
      *
-     * @param	databaseName	the name of the database
-     * @param	quoteBundle	bundle of quotes to import
-     * @param	date		the date for the day quotes
+     * @param quotes list of quotes to import
+     * @return the number of quotes imported
      */
-    public void importQuotes(String databaseName, QuoteBundle quoteBundle,
-			     TradingDate date) {
-        if(checkConnection()) {
-            if(software == HSQLDB)
-                importQuoteMultipleStatements(databaseName, quoteBundle, date);
-            else
-                importQuoteSingleStatement(databaseName, quoteBundle, date);
+    public int importQuotes(List quotes) {
+        int quotesImported = 0;
+
+        if(quotes.size() > 0 && checkConnection()) {
+
+            // Query the database to see which of these quotes is present
+            List existingQuotes = findMatchingQuotes(quotes);
+
+            // Remove duplicates
+            List newQuotes = new ArrayList();
+            for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
+                Quote quote = (Quote)iterator.next();
+
+                if(!containsQuote(existingQuotes, quote))
+                    newQuotes.add(quote);
+            }
+
+            if(newQuotes.size() > 0) {
+                if(software == HSQLDB)
+                    quotesImported = importQuoteMultipleStatements(newQuotes);
+                else
+                    quotesImported = importQuoteSingleStatement(newQuotes);
+            }
         }
+
+        return quotesImported;
+    }
+
+    /**
+     * Searches the list of quotes for the given quote. A match only
+     * requires the symbol and date fields to match.
+     *
+     * @param quotes the list of quotes to search
+     * @param quote the quote to search for
+     * @return <code>true</code> if the quote is in the list, <code>false</code> otherwise
+     */
+    private boolean containsQuote(List quotes, Quote quote) {
+        for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
+            Quote containedQuote = (Quote)iterator.next();
+
+            if(containedQuote.getSymbol().equals(quote.getSymbol()) &&
+               containedQuote.getDate().equals(quote.getDate()))
+                return true;
+        }
+
+        return false;
     }
 
     /**
@@ -827,49 +900,42 @@ public class DatabaseQuoteSource implements QuoteSource
      * each row. Use this function when the database does not support
      * multi-row inserts.
      *
-     * @param	databaseName	the name of the database
-     * @param	quoteBundle	bundle of quotes to import
-     * @param	date		the date for the day quotes
+     * @param	quotes list of quotes to import
+     * @return the number of quotes imported
      */
-    private void importQuoteMultipleStatements(String databaseName, QuoteBundle quoteBundle,
-                                               TradingDate date) {
-        String dateString = date.toString();
-        
-        // Get a list of all the symbols for the given date that are
-        // already in the database
-        List existingSymbols = getSymbols(date);
-        
-        // Build single query to insert stocks for a whole day into
-        // the table
-        Iterator iterator = quoteBundle.iterator();
+    private int importQuoteMultipleStatements(List quotes) {
+        int quotesImported = 0;
+
+        // Iterate through the quotes and import them one-by-one.
+        Iterator iterator = quotes.iterator();
         
         try {
             while(iterator.hasNext()) {
                 Quote quote = (Quote)iterator.next();
                 
-                // Don't import quotes that are already in the database
-                if(!existingSymbols.contains(quote.getSymbol())) {
-                    String insertQuery = new String("INSERT INTO " + SHARE_TABLE_NAME +
-                                                    " VALUES (" +
-                                                    "'" + dateString           + "', " +
-                                                    "'" + quote.getSymbol()    + "', " +
-                                                    "'" + quote.getDayOpen()   + "', " +
-                                                    "'" + quote.getDayClose()  + "', " +
-                                                    "'" + quote.getDayHigh()   + "', " +
-                                                    "'" + quote.getDayLow()    + "', " +
-                                                    "'" + quote.getDayVolume() + 
-                                                    "')");
-                    
-                    // Now insert the quote into database
-                    Statement statement = connection.createStatement();
-                    statement.executeUpdate(insertQuery);
-                }
+                String insertQuery = new String("INSERT INTO " + SHARE_TABLE_NAME +
+                                                " VALUES (" +
+                                                "'" + quote.getDate()      + "', " +
+                                                "'" + quote.getSymbol()    + "', " +
+                                                "'" + quote.getDayOpen()   + "', " +
+                                                "'" + quote.getDayClose()  + "', " +
+                                                "'" + quote.getDayHigh()   + "', " +
+                                                "'" + quote.getDayLow()    + "', " +
+                                                "'" + quote.getDayVolume() + 
+                                                "')");
+                
+                // Now insert the quote into database
+                Statement statement = connection.createStatement();
+                statement.executeUpdate(insertQuery);
+                quotesImported++;
             }
         }
         catch (SQLException e) {
             DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
                                                              e.getMessage()));
         }
+
+        return quotesImported;
     }
 
     /**
@@ -877,59 +943,47 @@ public class DatabaseQuoteSource implements QuoteSource
      * all rows. Use this function when the database supports
      * multi-row inserts.
      *
-     * @param	databaseName	the name of the database
-     * @param	quoteBundle	bundle of quotes to import
-     * @param	date		the date for the day quotes
+     * @param	quotes list of quotes to import
+     * @return the number of quotes imported
      */
-    private void importQuoteSingleStatement(String databaseName, QuoteBundle quoteBundle,
-                                            TradingDate date) {
+    private int importQuoteSingleStatement(List quotes) {
+        int quotesImported = 0;
         StringBuffer insertString = new StringBuffer();
         boolean firstQuote = true;
-        String dateString = date.toString();
-
-        // Get a list of all the symbols for the given date that are
-        // already in the database
-        List existingSymbols = getSymbols(date);
         
         // Build single query to insert stocks for a whole day into
-        // the table
-        Iterator iterator = quoteBundle.iterator();
-        
-        while(iterator.hasNext()) {
+        for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
             Quote quote = (Quote)iterator.next();
             
-            // Don't import quotes that are already in the database
-            if(!existingSymbols.contains(quote.getSymbol())) {
-                if(firstQuote) {
-                    insertString.append("INSERT INTO " + SHARE_TABLE_NAME +
-                                        " VALUES (");
-                    firstQuote = false;
-                }
-                else
-                    insertString.append(", (");
-                
-                // Add new quote
-                insertString.append("'" + dateString          + "', " +
-                                    "'" + quote.getSymbol()   + "', " +
-                                    "'" + quote.getDayOpen()  + "', " +
-                                    "'" + quote.getDayClose() + "', " +
-                                    "'" + quote.getDayHigh()  + "', " +
-                                    "'" + quote.getDayLow()   + "', " +
-                                    "'" + quote.getDayVolume()   + "')");
+            if(firstQuote) {
+                insertString.append("INSERT INTO " + SHARE_TABLE_NAME +
+                                    " VALUES (");
+                firstQuote = false;
             }
+            else
+                insertString.append(", (");
+            
+            // Add new quote
+            insertString.append("'" + quote.getDate()      + "', " +
+                                "'" + quote.getSymbol()    + "', " +
+                                "'" + quote.getDayOpen()   + "', " +
+                                "'" + quote.getDayClose()  + "', " +
+                                "'" + quote.getDayHigh()   + "', " +
+                                "'" + quote.getDayLow()    + "', " +
+                                "'" + quote.getDayVolume() + "')");
         }
         
-        // Now insert day quote into database - if we had any quotes!
-        if(!firstQuote) {
-            try {
-                Statement statement = connection.createStatement();
-                statement.executeUpdate(insertString.toString());
-            }
-            catch (SQLException e) {
-                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-                                                                 e.getMessage()));
-            }
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(insertString.toString());
+            quotesImported = quotes.size();
         }
+        catch (SQLException e) {
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                             e.getMessage()));
+        }
+
+        return quotesImported;
     }
 
     /**
@@ -971,7 +1025,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * Return all the dates which we have quotes for. REALLY SLOW.
      *
      * @return	a list of dates
-     */
+     */    
     public List getDates() {
 	List dates = new ArrayList();
 
@@ -1095,35 +1149,155 @@ public class DatabaseQuoteSource implements QuoteSource
         }
     }
 
-    // Retrieve a list of all the symbols on a given date
-    private List getSymbols(TradingDate date) {
-	List symbols = new ArrayList();
-
-	if(checkConnection()) {
-
-	    // Since this is part of import, don't bother with the progress dialog
-
-	    try {
-		Statement statement = connection.createStatement();
-		ResultSet RS = statement.executeQuery("SELECT " + SYMBOL_FIELD + " FROM " +
-						      SHARE_TABLE_NAME + " WHERE " +
-						      DATE_FIELD + " = '" + date + "'");
-		
-		try {
-		    while(RS.next())
-			symbols.add(Symbol.find(RS.getString(1)));
-		}
-		catch(SymbolFormatException e) {
-		    // need to build an error message
-		}
-	    }						   
-            catch (SQLException e) {
-		DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-								 e.getMessage()));
+    /**
+     * Shutdown the database. Only used for the internal database.
+     */
+    public void shutdown() {
+        // We only need to shutdown the internal HYSQLDB database
+        if(software == HSQLDB && mode == INTERNAL && checkConnection()) {
+            try {
+                Statement statement = connection.createStatement();
+                ResultSet RS = statement.executeQuery("SHUTDOWN");
+                RS.close();
+                statement.close();
             }
-	}
+            catch(SQLException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                                 e.getMessage()));
+            }
+        }
+    }
 
-	return symbols;
+    /**
+     * The database is very slow at taking an arbitrary list of symbol and date pairs
+     * and finding whether they exist in the database. This is unfortuante because
+     * we need this functionality so we don't try to import quotes that are already
+     * in the database. If we try to import a quote that is already present, we
+     * get a constraint violation error. We can't just ignore this error because
+     * we can't tell errors apart and we don't want to ignore all import errors.
+     * <p>
+     * This function examines the list of quotes and optimises the query for returning
+     * matching quotes. This basically works by seeing if all the quotes are on
+     * the same date or have the same symbol.
+     * <p>
+     * CAUTION: This function will return all matches, but it may return some false ones too.
+     * The SQL query returned will only return the symbol and date fields.
+     * Don't call this function if the quote list is empty.
+     *
+     * @param quotes the quote list.
+     * @return SQL query statement
+     */
+    private String buildMatchingQuoteQuery(List quotes) {
+        boolean sameSymbol = true;
+        boolean sameDate = true;
+        Symbol symbol = null;
+        TradingDate date = null;
+        TradingDate startDate = null;
+        TradingDate endDate = null;
+
+        // This function should only be called if there are any quotes to match
+        assert quotes.size() > 0;
+
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("SELECT " + SYMBOL_FIELD + "," + DATE_FIELD + " FROM " +
+                      SHARE_TABLE_NAME + " WHERE ");
+        
+        // Check if all the quotes have the same symbol or fall on the same date.
+        for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
+            Quote quote = (Quote)iterator.next();
+
+            if(symbol == null || date == null) {
+                symbol = quote.getSymbol();
+                startDate = endDate = date = quote.getDate();
+            }
+            else {
+                if(!symbol.equals(quote.getSymbol()))
+                    sameSymbol = false;
+                if(!date.equals(quote.getDate()))
+                    sameDate = false;
+
+                // Keep a track of the date range in case we do a symbol query, as if
+                // they are importing a single symbol, we don't want to pull in every date
+                // to check!
+                if(quote.getDate().before(startDate))
+                    startDate = quote.getDate();
+                if(quote.getDate().after(endDate))
+                    endDate = quote.getDate();
+            }
+        }
+
+        // 1. All quotes have the same symbol.
+        if(sameSymbol)
+            buffer.append(SYMBOL_FIELD + " = '" + symbol.toString() + "' AND " +
+                          DATE_FIELD + " >= '" + startDate + "' AND " +
+                          DATE_FIELD + " <= '" + endDate + "' ");
+
+        // 2. All quotes are on the same date.
+        else if(sameDate)
+            buffer.append(DATE_FIELD + " = '" + date.toString() + "'");
+
+        // 3. The quotes contain a mixture of symbols and dates. Bite the bullet
+        // and do a slow SQL query which checks each one individually.
+        else {
+            for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
+                Quote quote = (Quote)iterator.next();
+                buffer.append("(" + SYMBOL_FIELD + " = '" + quote.getSymbol() + "' AND " +
+                              DATE_FIELD + " = '" + quote.getDate() + "')");
+                if(iterator.hasNext())
+                    buffer.append(" OR ");
+            }
+        }
+
+        return buffer.toString();
+    }
+
+    /**
+     * Return a list of all the quotes in the database that match the input list.
+     * This function is used during import to find out which quotes are already
+     * in the database.
+     * <p>
+     * CAUTION: This function will return all matches, but it may return some false ones too.
+     * The SQL query returned will only return the symbol and date fields.
+     *
+     * @param quotes quotes to query
+     * @return matching quotes
+     */
+    private List findMatchingQuotes(List quotes) {
+        List matchingQuotes = new ArrayList();
+        
+	if(checkConnection() && quotes.size() > 0) {
+            // Since this is part of import, don't bother with progress dialog
+            try {
+                // Construct query from list
+                Statement statement = connection.createStatement();
+                String query = buildMatchingQuoteQuery(quotes);
+                ResultSet RS = statement.executeQuery(query);
+
+                // Retrieve matching quotes
+                while(RS.next()) {
+                    try {
+                        matchingQuotes.add(new Quote(Symbol.find(RS.getString(SYMBOL_FIELD)),
+                                                     new TradingDate(RS.getDate(DATE_FIELD)),
+                                                     0, 0.0, 0.0, 0.0, 0.0));
+                    }
+                    catch(SymbolFormatException e) {
+                        // This can't happen because we are only matching already known
+                        // valid symbols.
+                        assert false;
+                    }
+                }
+
+                // Clean up after ourselves
+                RS.close();
+                statement.close();
+            }
+            catch(SQLException e2) {
+		DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								 e2.getMessage()));
+            }
+        }
+
+        return matchingQuotes;
     }
 
     /**

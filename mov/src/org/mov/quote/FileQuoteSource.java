@@ -102,12 +102,13 @@ public class FileQuoteSource implements QuoteSource
         // Keep reading each line until we find a valid quote and then
         // return its date
         while(line != null) {
-            Quote quote = filter.toQuote(line);
-
-            if(quote != null) 
+            try {
+                Quote quote = filter.toQuote(line);
                 return quote.getDate();
-            else
+            }
+            catch(QuoteFormatException e) {
                 line = br.readLine();
+            }
         }
 
         // Couldn't find a legal quote...
@@ -130,11 +131,8 @@ public class FileQuoteSource implements QuoteSource
 	    line = br.readLine();
 
 	    while(line != null) {
-		Quote quote = filter.toQuote(line);
-
-                // Legal quote?
-                if(quote != null) {
-                    assert quote.getSymbol() != null;
+                try {
+                    Quote quote = filter.toQuote(line);
 
                     // Is this one of the ones we are looking for?
                     if(quoteRange.containsSymbol(quote.getSymbol())) {
@@ -146,6 +144,10 @@ public class FileQuoteSource implements QuoteSource
                            quotes.containsAll(quoteRange.getAllSymbols()))
                             break;
                     }
+                }
+                catch(QuoteFormatException e) {
+                    // This is only used for the sample quotes - and they should be valid.
+                    assert false;
                 }
 
                 line = br.readLine();
@@ -485,5 +487,9 @@ public class FileQuoteSource implements QuoteSource
         }
         else
             return 0;
+    }
+
+    public void shutdown() {
+        // nothing to do
     }
 }

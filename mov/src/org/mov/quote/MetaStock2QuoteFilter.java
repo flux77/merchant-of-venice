@@ -33,6 +33,8 @@ import org.mov.util.TradingDateFormatException;
  * <pre>
  * XXX,19990715,1.73,1.82,1.71,1.81,36489
  * </pre>
+ *
+ * @author Andrew Leppard
  */
 public class MetaStock2QuoteFilter implements QuoteFilter {
 
@@ -61,8 +63,9 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
      *
      * @param	quoteLine	a single line of text containing a quote
      * @return	the stock quote
+     * @exception QuoteFormatException if the quote could not be parsed
      */
-    public Quote toQuote(String quoteLine) {
+    public Quote toQuote(String quoteLine) throws QuoteFormatException {
 	Quote quote = null;
 
 	if(quoteLine != null) {
@@ -76,8 +79,7 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
                     symbol = Symbol.find(quoteParts[i++]);
                 }
                 catch(SymbolFormatException e) {
-                    // Return null - couldn't parse quote
-                    return null;
+                    throw new QuoteFormatException(e.getMessage());
                 }
 
 		TradingDate date = null;
@@ -87,8 +89,7 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
                                            TradingDate.BRITISH);
                 }
                 catch(TradingDateFormatException e) {
-                    return null;
-                    // Return null - couldn't parse quote
+                    throw new QuoteFormatException(e.getMessage());
                 }
 
                 try {
@@ -103,9 +104,12 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
                                       day_open, day_close);
                 } 
                 catch(NumberFormatException e) {
-                    // Return null - couldn't parse quote
+                    throw new QuoteFormatException(Locale.getString("ERROR_PARSING_NUMBER",
+                                                                    quoteParts[i - 1]));
                 }
 	    }	    
+            else
+                throw new QuoteFormatException(Locale.getString("WRONG_FIELD_COUNT"));
 	}
 	return quote;
     }

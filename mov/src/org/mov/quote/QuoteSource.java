@@ -26,8 +26,11 @@ import org.mov.util.TradingDate;
  * Provides a generic interface in which we can query stock quotes from
  * multiple sources. The source could either be directly from files,
  * a database, a unique internal format or from the internet.
+ *
+ * @author Andrew Leppard
  */
 public interface QuoteSource {
+
     /**
      * Returns the company name associated with the given symbol.
      *
@@ -109,4 +112,9 @@ public interface QuoteSource {
      */
     public int getAdvanceDecline(TradingDate date)
         throws MissingQuoteException;
+
+    /**
+     * Shutdown the quote source.
+     */
+    public void shutdown();
 }

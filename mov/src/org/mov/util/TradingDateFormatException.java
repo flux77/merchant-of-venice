@@ -32,6 +32,7 @@ public class TradingDateFormatException extends Throwable {
      * @param date the date being parsed.
      */
     public TradingDateFormatException(String date) {
+        super(Locale.getString("ERROR_PARSING_DATE", date));
         this.date = date;
     }
 

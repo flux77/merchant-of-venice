@@ -340,7 +340,7 @@ public class CommandManager {
      */
     public void paperTrade() {
 	PaperTradeModule module = new PaperTradeModule(desktop);
-	desktopManager.newFrame(module, true, true);
+	desktopManager.newFrame(module, true, false);
     }
 
     /**
@@ -348,7 +348,7 @@ public class CommandManager {
      */
     public void gp() {
 	GPModule module = new GPModule(desktop);
-	desktopManager.newFrame(module, true, true);
+	desktopManager.newFrame(module, true, false);
     }
 
     /**

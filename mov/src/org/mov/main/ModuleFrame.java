@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.main;
@@ -54,16 +54,17 @@ public class ModuleFrame extends JInternalFrame
      * @param	module The module to feed to the frame
      * @param	centre	Should the frame be centred?
      * @param	honourSize	Should we respect the frame's preferred
-     *				size or should we override it with the 
+     *				size or should we override it with the
      *				default?
+     * @param   resizable       Is the frame allowed to be resized?
      */
-    public ModuleFrame(DesktopManager desktopManager, 
-		       Module module, boolean centre, boolean honourSize) {
+    public ModuleFrame(DesktopManager desktopManager, Module module, boolean centre,
+                       boolean honourSize, boolean resizable) {
 
-	super(module.getTitle(), 
-	      honourSize? false : true, // resizable
+	super(module.getTitle(),
+	      resizable? true : false, // resizable
 	      true,   // closable
-	      honourSize? false : true, // maximisable
+	      resizable? true : false, // maximisable
 	      true);  // iconifiable
 
 	this.module = module;
@@ -72,7 +73,7 @@ public class ModuleFrame extends JInternalFrame
 	JDesktopPane desktop = DesktopManager.getDesktop();
 
 	// Module can be enclosed in scroll pane if it desires to be
-	if(module.encloseInScrollPane()) 
+	if(module.encloseInScrollPane())
 	    getContentPane().add(new JScrollPane(module.getComponent()));
 	else
 	    getContentPane().add(module.getComponent());
@@ -101,13 +102,13 @@ public class ModuleFrame extends JInternalFrame
      * @param frame the frame to size
      * @param desktop the desktop
      * @param centre whether the frame should be centred?
-     * @param honourSize whether we should honour the frame's preferred size 
+     * @param honourSize whether we should honour the frame's preferred size
      */
     public static void setSizeAndLocation(JInternalFrame frame,
-                                          JDesktopPane desktop, 
+                                          JDesktopPane desktop,
                                           boolean centre, boolean honourSize) {
 	int x, y, width, height;
-	Dimension preferred = frame.getPreferredSize();	    
+	Dimension preferred = frame.getPreferredSize();	
 
 	// Should we respect the window's preferred size or override?
 	if(honourSize) {
@@ -134,7 +135,7 @@ public class ModuleFrame extends JInternalFrame
 	    x = desktop.getWidth() - width;
 	if(y > desktop.getHeight())
 	    y = desktop.getWidth() - height;
-	if(x < 0) 
+	if(x < 0)
 	    x = 0;
 	if(y < 0)
 	    y = 0;
@@ -156,8 +157,8 @@ public class ModuleFrame extends JInternalFrame
 	return module;
     }
 
-    /** 
-     * Standard property change handler that listens for a WINDOW_CLOSE event 
+    /**
+     * Standard property change handler that listens for a WINDOW_CLOSE event
      */
     public void propertyChange(PropertyChangeEvent event) {
 	String property = event.getPropertyName();
@@ -178,7 +179,7 @@ public class ModuleFrame extends JInternalFrame
 
     /* Make sure the internal modules saves its information before destroying it
      */
-    public void internalFrameClosed(InternalFrameEvent e) { 
+    public void internalFrameClosed(InternalFrameEvent e) {
 	module.save();
 
 	// Update menu containing list of windows
@@ -195,7 +196,7 @@ public class ModuleFrame extends JInternalFrame
     public void internalFrameOpened(InternalFrameEvent e) { }
 
 
-    
+
 }
 
 

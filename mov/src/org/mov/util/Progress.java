@@ -179,8 +179,9 @@ public class Progress {
 	    // If the progress window is already up, a sub-progress can
 	    // ONLY display its message if the parent process has a 0/1
 	    // status.
-	    if(maximum > 1)
+	    if(this.maximum <= 1) {
 		set(message, maximum);
+	    }
 
 	    return false;
 	}

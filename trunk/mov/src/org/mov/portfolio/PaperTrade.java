@@ -5,6 +5,9 @@ package org.mov.main;
 // TODO: need to optimise so if we are doing non GA-trading it doesnt load
 // in all the data at once (this way we can trade all stocks over all data
 // without running out of mem)
+//
+// TODO: Also we know have a "Portfolio" which can contain a share and
+// a cash account so this class does not need to play with both
 
 import java.util.*;
 

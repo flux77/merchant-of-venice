@@ -8,41 +8,36 @@ import org.mov.quote.*;
 
 public class CashAccount implements Account {
 
-    // Types of transactions to a cash account
-
-    // transfer to another account (e.g. to buy shares)
-    private static final int TRANSFER = 0; 
-   
-    // withdrawl or deposit to external account
-    private static final int WITHDRAWL_DEPOSIT = 1;
-
-    // interest
-    private static final int INTEREST = 2;
-
-    // fee
-    private static final int FEE = 3;
-
-    // History of transactions
-    private Vector transactions = new Vector();
-
     // Amount of cash available
     private float capital;
 
     private String name;
 
-    public CashAccount(String name, float capital) {
+    public CashAccount(String name) {
 	this.name = name;
-	this.capital = capital;
+	this.capital = 0.0F;
     }
 
-    public void transaction(TradingDate date, int transaction, int amount) {
+    public void transaction(Transaction transaction) {
 
-	// Add record of transaction
-	transactions.add(new Transaction((TradingDate)date.clone(),
-					 transaction, amount));
+	int type = transaction.getType();
 
 	// Update value of account
-	capital += amount;
+	if(type == Transaction.WITHDRAWAL ||
+	   type == Transaction.FEE) {
+	    capital -= transaction.getAmount();
+	}
+	else if(type == Transaction.DEPOSIT ||
+		type == Transaction.INTEREST ||
+		type == Transaction.DIVIDEND) {
+	    capital += transaction.getAmount();
+	}
+	else if(type == Transaction.ACCUMULATE) {
+	    capital -= (transaction.getAmount() + transaction.getTradeCost());
+	}
+	else if(type == Transaction.REDUCE) {
+	    capital += (transaction.getAmount() - transaction.getTradeCost());
+	}
     }
 
     public String getName() {
@@ -53,4 +48,7 @@ public class CashAccount implements Account {
 	return capital;
     }
 
+    public int getType() {
+	return Account.CASH_ACCOUNT;
+    }
 }

@@ -1,3 +1,7 @@
+/*
+
+// TODO: Deprecate - use Transaction.java class instead
+
 package org.mov.portfolio;
 
 import java.util.*;
@@ -48,3 +52,4 @@ public class Trade {
 
 }
 
+*/

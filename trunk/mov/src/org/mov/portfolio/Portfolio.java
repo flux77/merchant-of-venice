@@ -1,71 +1,81 @@
-/*
-
-package org.mov.main;
-
-// This code has been deprecated. The new class should just be a vector
-// of accounts.
+package org.mov.portfolio;
 
 import java.util.*;
 
 public class Portfolio {
 
-    private HashMap stockHoldings;
     private String name;
 
+    Vector accounts = new Vector();
+    Vector transactions = new Vector();
+
     public Portfolio(String name) {
-	stockHoldings = new HashMap();
 	this.name = name;
-    }
-
-    public void trade(int trade, String symbol, int shares) {
-	
-	// Get current holding in this stock
-	StockHolding stockHolding = (StockHolding)stockHoldings.get(symbol);
-
-	switch(trade) {
-	case(Trade.BUY):
-
-	    // Do we already own the stock? If so accumulate
-	    if(stockHolding != null)
-		stockHolding.accumulate(shares);
-	    else // otherwise add new stock to portfolio
-		stockHoldings.put((Object)symbol, new StockHolding(symbol,
-								   shares));
-
-	    break;
-	    
-	case(Trade.SELL):
-
-	    // ignore trying to sell stock we dont own
-	    if(stockHolding != null) {
-		stockHolding.reduce(shares);
-
-		// do we have any left? if not remove stock holding from
-		// holdings
-		if(stockHolding.getShares() <= 0)
-		    stockHoldings.remove(stockHolding);
-	    }
-
-	    break;
-	}
     }
 
     public String getName() {
 	return name;
     }
 
-    public StockHolding get(String symbol) {
-	return (StockHolding)stockHoldings.get(symbol);
+    public void addAccount(Account account) {
+	accounts.add(account);
     }
 
-    public Set keySet() {
-	return stockHoldings.keySet();
+    public void addTransactions(Vector transactions) {
+
+	// Sort transactions by date
+	ArrayList list = new ArrayList((Collection)transactions);
+	Collections.sort(list);
+
+	// Add them in one by one
+	Iterator iterator = list.iterator();
+
+	while(iterator.hasNext()) {
+	    Transaction transaction = (Transaction)iterator.next();
+
+	    addTransaction(transaction);
+	}
     }
 
-    public int size() {
-	return stockHoldings.size();
+    public void addTransaction(Transaction transaction) {
+
+	// Record history of transactions
+	transactions.add(transaction);
+
+	// Now update accounts
+	Iterator iterator = accounts.iterator();
+
+	while(iterator.hasNext()) {
+	    Account account = (Account)iterator.next();
+
+	    // Is this account involved in the transaction? If it
+	    // it is we'll need to update it
+	    if(account == transaction.getCashAccount() ||
+	       account == transaction.getShareAccount()) {
+		account.transaction(transaction);
+	    }
+	}
     }
+
+    public Vector getAccounts() {
+	return accounts;
+    }
+
+    public Account findAccountByName(String name) {
+	Iterator iterator = accounts.iterator();
+
+	while(iterator.hasNext()) {
+	    Account account = (Account)iterator.next();
+
+	    if(account.getName().equals(name)) 
+		return account;
+	}
+
+	return null;
+    }
+
+    public Vector getTransactions() {
+	return transactions;
+    }
+
 }
-
-
-*/

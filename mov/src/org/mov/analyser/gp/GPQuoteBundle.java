@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.analyser.gp;
@@ -44,7 +44,7 @@ public class GPQuoteBundle implements QuoteBundle {
         earliestDateOffset = getFirstDateOffset() - window;
     }
 
-    /** 
+    /**
      * Get a stock quote. If the stock is earlier than the first date in the bundle, the
      * bundle will be expand to include the new date given.
      *
@@ -61,7 +61,7 @@ public class GPQuoteBundle implements QuoteBundle {
         return quoteBundle.getQuote(symbol, quoteType, dateOffset);
     }
 
-    /** 
+    /**
      * Get a stock quote. This function has been primarily created for Gondola
      * scripts. It passes in the current date and the date offset so that
      * specialised QuoteBundle implementations such as {@link GPQuoteBundle} can prevent the GP
@@ -77,7 +77,7 @@ public class GPQuoteBundle implements QuoteBundle {
      */
     public double getQuote(Symbol symbol, int quoteType, int today, int offset)
 	throws EvaluationException, MissingQuoteException {
-        
+
         // Trying to access a future quote?
         if(offset > 0)
             throw EvaluationException.futureDate();
@@ -91,8 +91,8 @@ public class GPQuoteBundle implements QuoteBundle {
             return quoteBundle.getQuote(symbol, quoteType, today + offset);
     }
 
-    /** 
-     * Get a stock quote. 
+    /**
+     * Get a stock quote.
      *
      * @param symbol  the stock symbol
      * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
@@ -101,10 +101,19 @@ public class GPQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public double getQuote(Symbol symbol, int quoteType, TradingDate date) 
+    public double getQuote(Symbol symbol, int quoteType, TradingDate date)
         throws MissingQuoteException {
-        assert false;
-        return 0.0D;
+
+	double quote;
+
+	try {
+	    quote = getQuote(symbol, quoteType, QuoteCache.getInstance().dateToOffset(date));
+	}
+	catch(WeekendDateException e) {
+	    throw MissingQuoteException.getInstance();
+	}
+
+	return quote;
     }
 
     /**
@@ -112,7 +121,7 @@ public class GPQuoteBundle implements QuoteBundle {
      *
      * @param symbol    the symbol
      * @param dateOffset fast access date offset, see {@link QuoteCache}
-     * @return  <code>true</code> if this symbol should be in the quote bundle, 
+     * @return  <code>true</code> if this symbol should be in the quote bundle,
      *          <code>false</code> otherwise
      */
     public boolean containsQuote(Symbol symbol, int dateOffset) {
@@ -124,7 +133,7 @@ public class GPQuoteBundle implements QuoteBundle {
      *
      * @param symbol    the symbol
      * @param date      the date
-     * @return  <code>true</code> if this symbol should be in the quote bundle, 
+     * @return  <code>true</code> if this symbol should be in the quote bundle,
      *          <code>false</code> otherwise
      */
     public boolean containsQuote(Symbol symbol, TradingDate date) {
@@ -161,8 +170,8 @@ public class GPQuoteBundle implements QuoteBundle {
     }
 
     /**
-     * Return the first symbol in the quote bundle. 
-     * 
+     * Return the first symbol in the quote bundle.
+     *
      * @return the first symbol
      */
     public Symbol getFirstSymbol() {
@@ -250,7 +259,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * @param date the date
      * @return fast access date offset, see {@link QuoteCache}
      */
-    public int dateToOffset(TradingDate date) 
+    public int dateToOffset(TradingDate date)
         throws WeekendDateException {
         return quoteBundle.dateToOffset(date);
     }

@@ -2,7 +2,6 @@ package org.mov.quote;
 
 import java.util.*;
 
-import org.mov.portfolio.Stock;
 import org.mov.util.TradingDate;
 
 /**
@@ -13,7 +12,7 @@ import org.mov.util.TradingDate;
  * <pre>
  * QuoteFilter filter = 
  *	QuoteFilterList.getInstance().getFilter("Insight Trader")
- * Stock stock = filter.filter("XXX 07/15/99 173 182 171 181 36489");
+ * Quote quote = filter.filter("XXX 07/15/99 173 182 171 181 36489");
  * </pre>
  * OR
  * <pre>
@@ -108,9 +107,9 @@ public class QuoteFilterList {
 	Vector list = filters.getList();
 	Iterator iterator = list.iterator();
 	QuoteFilter filter;
-	Stock quote = new Stock("AAA", new TradingDate(), 10000,
+	Quote quote = new Quote("AAA", new TradingDate(), 10000,
 				10.00F, 20.00F, 30.00F, 40.00F);
-	Stock filteredQuote;
+	Quote filteredQuote;
 	String filteredString;
 
 	// For each filter, convert the quote to text then back to

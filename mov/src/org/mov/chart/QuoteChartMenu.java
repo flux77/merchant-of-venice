@@ -8,7 +8,6 @@ import javax.swing.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.quote.*;
 
 /**
@@ -149,15 +148,15 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    // Create these now so we dont have to create them in 
 	    // 10 different places. We might not use them but hey.
 	    GraphSource dayOpen = 
-		new OHLCVQuoteGraphSource(cache, Token.DAY_OPEN_TOKEN);
+		new OHLCVQuoteGraphSource(cache, Quote.DAY_OPEN);
 	    GraphSource dayHigh = 
-		new OHLCVQuoteGraphSource(cache, Token.DAY_HIGH_TOKEN);
+		new OHLCVQuoteGraphSource(cache, Quote.DAY_HIGH);
 	    GraphSource dayLow = 
-		new OHLCVQuoteGraphSource(cache, Token.DAY_LOW_TOKEN);
+		new OHLCVQuoteGraphSource(cache, Quote.DAY_LOW);
 	    GraphSource dayClose = 
-		new OHLCVQuoteGraphSource(cache, Token.DAY_CLOSE_TOKEN);
+		new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
 	    GraphSource dayVolume = 
-		new OHLCVQuoteGraphSource(cache, Token.DAY_VOLUME_TOKEN);
+		new OHLCVQuoteGraphSource(cache, Quote.DAY_VOLUME);
 	    
 	    // Check annotation menus first
 	    if(handleAnnotationMenu(text, menu.getState()));

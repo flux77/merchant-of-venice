@@ -3,7 +3,6 @@ package org.mov.quote;
 import java.util.*;
 
 import org.mov.util.*;
-import org.mov.portfolio.Stock;
 
 /**
  * Provides a generic interface in which we can query stock quotes from
@@ -74,7 +73,7 @@ public interface QuoteSource {
      * @param	endDate		the end of the date range (inclusive)
      * @param	type		the type of the search
      * @return	a vector of stock quotes
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForDates(TradingDate startDate, 
 				    TradingDate endDate, 
@@ -87,7 +86,7 @@ public interface QuoteSource {
      * @param	date	the date to return quotes for
      * @param	type	the type of the search
      * @return	a vector of stock quotes
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForDate(TradingDate date, int type);
 
@@ -97,7 +96,7 @@ public interface QuoteSource {
      *
      * @param	symbol	the symbol to query
      * @return	a vector of stock quotes
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForSymbol(String symbol);
 

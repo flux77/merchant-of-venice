@@ -87,18 +87,18 @@ public class StockHoldingTable extends AbstractTable {
 		    
 		case(DAY_CLOSE_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Token.DAY_CLOSE_TOKEN, date));
+			(cache.getQuote(symbol, Quote.DAY_CLOSE, date));
 		    
 		case(MARKET_VALUE_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Token.DAY_CLOSE_TOKEN, date) *
+			(cache.getQuote(symbol, Quote.DAY_CLOSE, date) *
 			 stockHolding.getShares());
 		    
 		case(CHANGE_COLUMN):
 		    return 
 			Converter.changeToChange
-			(cache.getQuote(symbol, Token.DAY_OPEN_TOKEN, date),
-			 cache.getQuote(symbol, Token.DAY_CLOSE_TOKEN, date));
+			(cache.getQuote(symbol, Quote.DAY_OPEN, date),
+			 cache.getQuote(symbol, Quote.DAY_CLOSE, date));
 		}
 	    }
 	    catch(EvaluationException e) {
@@ -115,20 +115,4 @@ public class StockHoldingTable extends AbstractTable {
     public StockHoldingTable(HashMap stockHoldings, QuoteCache cache) {
 	setModel(new Model(stockHoldings, cache));
     }
-
-    //    public Dimension getPreferredSize() {
-    //	return getMinimumSize();
-    //}
-
-    //public Dimension getMaximumSize() {
-    //	return getMinimumSize();
-    //}
-
-//      public boolean getScrollableTracksViewportHeight() {
-//  	boolean force = super.getScrollableTracksViewportHeight();
-
-//  	System.out.println("viewport height force " + force);
-
-//  	return true;
-    //    }
 }

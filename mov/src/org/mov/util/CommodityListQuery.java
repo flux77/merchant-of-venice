@@ -48,7 +48,7 @@ public class CommodityListQuery {
 	    // Parse what the user inputed
 	    if(company != null) {
 		String symbol = 
-		    Quote.getSource().getCompanySymbol(company);
+		    QuoteSourceManager.getSource().getCompanySymbol(company);
 		
 		// Not recognised?
 		if(symbol == null) {
@@ -122,7 +122,7 @@ public class CommodityListQuery {
 		    symbol = (String)iterator.next();
 		    
 		    // See if company exists
-		    if(!Quote.getSource().symbolExists(symbol)) {
+		    if(!QuoteSourceManager.getSource().symbolExists(symbol)) {
 			
 			// Add to list of companies we don't know
 			if(unknownCompanies.length() > 0)

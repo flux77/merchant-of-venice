@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.*;
 
 import org.mov.util.*;
-import org.mov.portfolio.*;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -43,9 +42,9 @@ public class FileQuoteSource implements QuoteSource
 	TradingDate date = null;
 	FileReader fr = new FileReader(fileName);
 	BufferedReader br = new BufferedReader(fr);
-	Stock stock = filter.toQuote(br.readLine());
-	if(stock != null)
-	    date = stock.getDate();
+	Quote quote = filter.toQuote(br.readLine());
+	if(quote != null)
+	    date = quote.getDate();
 	br.close();
 
 	return date;
@@ -53,9 +52,9 @@ public class FileQuoteSource implements QuoteSource
 
     // Given a name of a file and a stock symbol, return the quote for
     // that stock in the given file
-    private Stock getContainedStock(String fileName, String symbol) {
+    private Quote getContainedQuote(String fileName, String symbol) {
 
-	Stock stock = null;
+	Quote quote = null;
 	String line;
 	boolean found = false;
 
@@ -66,9 +65,9 @@ public class FileQuoteSource implements QuoteSource
 
 	    while(line != null && !found) {
 
-		stock = filter.toQuote(line);
+		quote = filter.toQuote(line);
 	    
-		if(stock != null && stock.getSymbol().equals(symbol)) 
+		if(quote != null && quote.getSymbol().equals(symbol)) 
 		    found = true;
 		else
 		    line = br.readLine();
@@ -81,27 +80,27 @@ public class FileQuoteSource implements QuoteSource
 	} 
 
 	if(found)
-	    return stock;
+	    return quote;
 	else
 	    return null;
     }
 
     // Is the given stock the same as the type given?
-    private boolean isType(Stock stock, int type) {
+    private boolean isType(Quote quote, int type) {
 	boolean match = false;
 
 	if(type == INDICES) {
-	    if(stock.getSymbol().startsWith("x"))
+	    if(quote.getSymbol().startsWith("x"))
 		match = true;
 	}
 	else if(type == COMPANIES_AND_FUNDS) {
-	    if(stock.getSymbol().length() == 3 &&
-	       !stock.getSymbol().startsWith("x"))
+	    if(quote.getSymbol().length() == 3 &&
+	       !quote.getSymbol().startsWith("x"))
 		match = true;
 	    
 	}
 	else if(type == ALL_COMMODITIES) {
-	    if(!stock.getSymbol().startsWith("x"))
+	    if(!quote.getSymbol().startsWith("x"))
 		match = true;
 	}
 	else // ALL_SYMBOLS
@@ -212,7 +211,7 @@ public class FileQuoteSource implements QuoteSource
 	Set dates = dateToFile.keySet();
 	Iterator iterator = dates.iterator();
 	TradingDate date;
-	Stock stock;
+	Quote quote;
 
 	// All checks are done in lower case no matter what case the
 	// file format is in
@@ -220,9 +219,9 @@ public class FileQuoteSource implements QuoteSource
 	
 	while(iterator.hasNext()) {
 	    date = (TradingDate)iterator.next();
-	    stock = getContainedStock((String)dateToFile.get(date),
+	    quote = getContainedQuote((String)dateToFile.get(date),
 				      symbol);
-	    if(stock != null)
+	    if(quote != null)
 		return true; // found!
 	}
 
@@ -246,7 +245,7 @@ public class FileQuoteSource implements QuoteSource
      * @param	endDate		the end of the date range (inclusive).
      * @param	type		the type of the search.
      * @return	a vector of stock quotes.
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForDates(TradingDate startDate, 
 				    TradingDate endDate, 
@@ -293,13 +292,13 @@ public class FileQuoteSource implements QuoteSource
      * @param	date	the date to return quotes for.
      * @param	type	the type of the search.
      * @return	a vector of stock quotes.
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForDate(TradingDate date, int type) {
 	Vector quotes = new Vector();
 	String fileName = getFileForDate(date);
 	String line;	
-	Stock stock;
+	Quote quote;
 
 	try {
 	    FileReader fr = new FileReader(fileName);
@@ -307,10 +306,10 @@ public class FileQuoteSource implements QuoteSource
 	    line = br.readLine();
 
 	    while(line != null) {
-		stock = filter.toQuote(line);
+		quote = filter.toQuote(line);
 
-		if(stock != null && isType(stock, type)) 
-		    quotes.add((Object)stock);
+		if(quote != null && isType(quote, type)) 
+		    quotes.add((Object)quote);
 
 		line = br.readLine();
 	    }
@@ -330,7 +329,7 @@ public class FileQuoteSource implements QuoteSource
      * @param	symbol	the symbol to query.
      * @param   progress the progress dialog to display progress with
      * @return	a vector of stock quotes.
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForSymbol(String symbol) {
 	// Get list of dates available and sort them
@@ -341,7 +340,7 @@ public class FileQuoteSource implements QuoteSource
 	Iterator iterator = dates.iterator();
 	Vector quotes = new Vector();
 	TradingDate date = null;
-	Stock stock = null;
+	Quote quote = null;
 
 	// This query might take a while
         ProgressDialog p = ProgressDialogManager.getProgressDialog();
@@ -355,10 +354,10 @@ public class FileQuoteSource implements QuoteSource
 	while(iterator.hasNext()) {
 	    date = (TradingDate)iterator.next();
 
-	    stock = getContainedStock(getFileForDate(date),
+	    quote = getContainedQuote(getFileForDate(date),
 				      symbol);
-	    if(stock != null) 
-		quotes.add(stock);
+	    if(quote != null) 
+		quotes.add(quote);
 
 	    p.increment();
 	}

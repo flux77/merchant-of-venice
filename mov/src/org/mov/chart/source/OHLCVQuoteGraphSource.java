@@ -26,7 +26,9 @@ public class OHLCVQuoteGraphSource implements GraphSource {
      * quote type.
      *
      * @param	cache	the cache containing stock quotes
-     * @param	quote	day open, close, high, low or volume
+     * @param	quote	the quote kind, one of: {@link Quote#DAY_OPEN}, 
+     * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH} or 
+     * {@link Quote#DAY_LOW}
      */
     public OHLCVQuoteGraphSource(QuoteCache cache, int quote) {
 	this.quote = quote;
@@ -78,7 +80,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 
 	try {
 	
-	    if(quote == Token.DAY_VOLUME_TOKEN) {
+	    if(quote == Quote.DAY_VOLUME) {
 		return
 		    new String("<html>" +
 			       symbol.toUpperCase() + 
@@ -87,7 +89,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 			       "<p>" +
 			       Math.round(cache.
 					  getQuote(symbol, 
-						   Token.DAY_VOLUME_TOKEN, 
+						   Quote.DAY_VOLUME, 
 						   date)) +
 			       "</html>");
 	    }
@@ -100,17 +102,17 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 			       "<p>" +
 			       "<font color=red>" + 
 			       cache.getQuote(symbol, 
-					      Token.DAY_LOW_TOKEN, date) +
+					      Quote.DAY_LOW, date) +
 			       " </font>" +
 			       "<font color=green>" + 
 			       cache.getQuote(symbol, 
-					      Token.DAY_HIGH_TOKEN, date) + 
+					      Quote.DAY_HIGH, date) + 
 			       " </font>" +
 			       cache.getQuote(symbol, 
-					      Token.DAY_OPEN_TOKEN, date) +
+					      Quote.DAY_OPEN, date) +
 			       " " + 
 			       cache.getQuote(symbol, 
-					      Token.DAY_CLOSE_TOKEN, date) +
+					      Quote.DAY_CLOSE, date) +
 			       "</html>");
 	    }
 	}
@@ -121,7 +123,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
     }
 
     public String getYLabel(float value) {
-	if(quote == Token.DAY_VOLUME_TOKEN) {
+	if(quote == Quote.DAY_VOLUME) {
 	    final float BILLION = 1000000000F;
 	    final float MILLION = 1000000F;
 	    String extension = "";
@@ -144,7 +146,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 
     public float[] getAcceptableMajorDeltas() {
 
-	if(quote == Token.DAY_VOLUME_TOKEN) {
+	if(quote == Quote.DAY_VOLUME) {
 	    float[] major = {10F,
 			     100F,
 			     1000F, // 1T
@@ -170,7 +172,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
     }
 
     public float[] getAcceptableMinorDeltas() {
-	if(quote == Token.DAY_VOLUME_TOKEN) {
+	if(quote == Quote.DAY_VOLUME) {
 	    float[] minor = {1F, 1.5F, 2F, 2.5F, 3F, 4F, 5F, 6F, 8F};
 	    return minor;
 	}

@@ -481,7 +481,8 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    if(title.length() != 0) 
 		title = title.concat(", ");
 
-	    companyName = Quote.getSource().getCompanyName(symbol);
+	    companyName = 
+		QuoteSourceManager.getSource().getCompanyName(symbol);
 
 	    if(companyName != null)
 		title = 

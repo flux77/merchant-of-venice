@@ -12,7 +12,6 @@ import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.main.*;
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.quote.*;
 
 /**
@@ -21,7 +20,7 @@ import org.mov.quote.*;
  * Example:
  * <pre>
  *	QuoteCache cache = new QuoteCache(symbol);
- *	GraphSource dayClose = new OHLCVQuoteGraphSource(cache, Token.DAY_CLOSE_TOKEN);
+ *	GraphSource dayClose = new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
  *	Graph graph = new LineGraph(dayClose);
  *
  *	ChartModule chart = new ChartModule(desktop);

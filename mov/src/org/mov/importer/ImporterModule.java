@@ -3,7 +3,6 @@ package org.mov.importer;
 import org.mov.main.ModuleFrame;
 import org.mov.main.Module;
 import org.mov.util.*;
-import org.mov.portfolio.*;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.*;
 import org.mov.ui.*;
@@ -334,7 +333,7 @@ public class ImporterModule extends JPanel
 	    if(start.equals("Latest Quotes")) {
 		if(toDatabase.isSelected()) {
 		    QuoteSource databaseSource = 
-			Quote.createDatabaseQuoteSource();
+			QuoteSourceManager.createDatabaseQuoteSource();
 		    startDate = databaseSource.getLatestQuoteDate();
 		}
 
@@ -342,7 +341,7 @@ public class ImporterModule extends JPanel
 		   
 		    TradingDate fileStartDate;
 		    QuoteSource fileQuoteSource = 
-			Quote.createFileQuoteSource();
+			QuoteSourceManager.createFileQuoteSource();
 
 		    fileStartDate = fileQuoteSource.getLatestQuoteDate();
 
@@ -374,12 +373,12 @@ public class ImporterModule extends JPanel
 	    dates = Converter.dateRangeToTradingDateVector(startDate,
 							   endDate);
 
-	    source = Quote.createInternetQuoteSource();
+	    source = QuoteSourceManager.createInternetQuoteSource();
 	}
 
 	// Or database
 	else {
-	    source = Quote.createDatabaseQuoteSource();
+	    source = QuoteSourceManager.createDatabaseQuoteSource();
 
 	    // Export all dates in database
 	    dates = source.getDates(); 
@@ -446,7 +445,7 @@ public class ImporterModule extends JPanel
 	
 	// This makes sure the next query uses the new imported 
 	// quotes
-	Quote.flush();	
+	QuoteSourceManager.flush();	
 
 	ProgressDialogManager.closeProgressDialog();
     }
@@ -493,10 +492,10 @@ public class ImporterModule extends JPanel
  
 	    // Iterate through stocks printing them to file
 	    Iterator iterator = dayQuotes.iterator();
-	    Stock quote;
+	    Quote quote;
 
 	    while(iterator.hasNext()) {
-		quote = (Stock)iterator.next();
+		quote = (Quote)iterator.next();
 		out.println(filter.toString(quote));
 	    }
 	    out.close();
@@ -518,7 +517,7 @@ public class ImporterModule extends JPanel
 	String databaseName = p.get("dbname", "shares");
 
 	if(databaseSource == null) 
-	    databaseSource = Quote.createDatabaseQuoteSource();
+	    databaseSource = QuoteSourceManager.createDatabaseQuoteSource();
 
 	databaseSource.importQuotes(databaseName, dayQuotes, date);
     }

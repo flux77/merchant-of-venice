@@ -14,7 +14,6 @@ import java.util.*;
 
 import org.mov.util.*;
 import org.mov.parser.*;
-import org.mov.portfolio.*;
 
 /**
  * Caches quote references in a fast access, small memory footprint
@@ -30,10 +29,10 @@ import org.mov.portfolio.*;
  * Example to load in all commodoties on the latest date and cache:
  * <pre>
  *	QuoteCache cache = 
- *		new QuoteCache(Quote.getSource().getLatestQuoteDate(),
+ *		new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
  *			       QuoteSource.ALL_COMMODITIES);
- *	float cbaDayOpen = cache.getQuote("CBA", Token.DAY_OPEN_TOKEN,
- *				Quote.getSource().getLatestQuoteDate());
+ *	float cbaDayOpen = cache.getQuote("CBA", Quote.DAY_OPEN,
+ *				QuoteSourceManager.getSource().getLatestQuoteDate());
  * </pre>
  *
  * @see QuoteSource
@@ -72,7 +71,7 @@ public class QuoteCache {
      */
     public QuoteCache(String symbol) {
         multipleStocks = false;
-        load(Quote.getSource().getQuotesForSymbol(symbol));
+        load(QuoteSourceManager.getSource().getQuotesForSymbol(symbol));
     }
 
     /**
@@ -84,7 +83,7 @@ public class QuoteCache {
      */
     public QuoteCache(TradingDate date, int searchRestriction) {
 	this.multipleStocks = true;
-        load(Quote.getSource().getQuotesForDate(date, searchRestriction));
+        load(QuoteSourceManager.getSource().getQuotesForDate(date, searchRestriction));
     }
 
     /**
@@ -105,11 +104,11 @@ public class QuoteCache {
 	    HashMap quotesForDate = (HashMap)cache.elementAt(-date);
 
 	    // Get stock for this symbol at this date
-	    Stock stock = (Stock)quotesForDate.get(symbol);
+	    Quote stockQuote = (Quote)quotesForDate.get(symbol);
 
 	    // No stock? no value
-	    if(stock != null) 
-		return stock.getQuote(quote);
+	    if(stockQuote != null) 
+		return stockQuote.getQuote(quote);
 	    else
 		return 0.0F;
 	}
@@ -319,8 +318,8 @@ public class QuoteCache {
 	start.previous(1 + date - getNumberDays());
 
 	// Load data from database and load it into cache
-	load(Quote.getSource().getQuotesForDates(start, end,
-						 searchRestriction));
+	load(QuoteSourceManager.getSource().getQuotesForDates(start, end,
+							      searchRestriction));
 
     }
 
@@ -337,12 +336,12 @@ public class QuoteCache {
 	while(quotes.size() > 0) {
 
 	    // Process newest date first (quotes is ordered oldest to newest)
-	    Stock stock = (Stock)quotes.remove(quotes.size() - 1);
+	    Quote quote = (Quote)quotes.remove(quotes.size() - 1);
 
 	    // If its a new date, create a new HashMap for this date in
 	    // the vector
-	    if(lastDate == null || lastDate.compareTo(stock.getDate()) != 0) {
-		lastDate = stock.getDate(); // new date
+	    if(lastDate == null || lastDate.compareTo(quote.getDate()) != 0) {
+		lastDate = quote.getDate(); // new date
 		dates.add(lastDate); // add date to cache
 		cache.add(map = new HashMap());
 	    }
@@ -357,13 +356,13 @@ public class QuoteCache {
 	    }
 
 	    // Add symbol to our set if its not there already
-	    if(!symbols.contains(stock.getSymbol())) 
-		symbols.add(stock.getSymbol());
+	    if(!symbols.contains(quote.getSymbol())) 
+		symbols.add(quote.getSymbol());
 
 	    // Put stock in map and remove symbol and date to reduce memory
-	    map.put(stock.getSymbol(), stock);
-	    stock.setSymbol(null);
-	    stock.setDate(null);
+	    map.put(quote.getSymbol(), quote);
+	    quote.setSymbol(null);
+	    quote.setDate(null);
 	}
 
 	// Trim all vectors etc to needed size

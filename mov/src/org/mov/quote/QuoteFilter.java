@@ -1,7 +1,5 @@
 package org.mov.quote;
 
-import org.mov.portfolio.Stock;
-
 /**
  * Provides an interface for converting to/from a text string containing a 
  * single quote from/to the internal stock quote object. 
@@ -24,7 +22,7 @@ public interface QuoteFilter {
      * @param	quoteList	a single line of text containing a quote.
      * @return	the stock quote
      */
-    public Stock toQuote(String quoteLine);
+    public Quote toQuote(String quoteLine);
 
     /**
      * Convert the given stock quote to a string line.
@@ -32,5 +30,5 @@ public interface QuoteFilter {
      * @param	quote	a stock quote
      * @return	string version of the quote
      */
-    public String toString(Stock quote);
+    public String toString(Quote quote);
 }

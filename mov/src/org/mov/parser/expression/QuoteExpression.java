@@ -2,6 +2,7 @@ package org.mov.parser.expression;
 
 import org.mov.util.*;
 import org.mov.parser.*;
+import org.mov.quote.*;
 
 /**
  * Abstract base class for expressions dealing with quotes:
@@ -29,15 +30,15 @@ abstract public class QuoteExpression extends Expression {
 	quoteType = PRICE_TYPE;
 
 	if(quote instanceof DayOpenExpression)
-	    quoteKind = Token.DAY_OPEN_TOKEN;
+	    quoteKind = Quote.DAY_OPEN;
 	else if(quote instanceof DayCloseExpression)
-	    quoteKind = Token.DAY_CLOSE_TOKEN;
+	    quoteKind = Quote.DAY_CLOSE;
 	else if(quote instanceof DayLowExpression)
-	    quoteKind = Token.DAY_LOW_TOKEN;
+	    quoteKind = Quote.DAY_LOW;
 	else if(quote instanceof DayHighExpression)
-	    quoteKind = Token.DAY_HIGH_TOKEN;
+	    quoteKind = Quote.DAY_HIGH;
 	else {
-	    quoteKind = Token.DAY_VOLUME_TOKEN;
+	    quoteKind = Quote.DAY_VOLUME;
 	    quoteType = VOLUME_TYPE;
 	}
     }
@@ -45,9 +46,9 @@ abstract public class QuoteExpression extends Expression {
     /**
      * Get the quote kind. 
      *
-     * @return	the quote kind, one of: {@link Token#DAY_OPEN_TOKEN}, 
-     * {@link Token#DAY_CLOSE_TOKEN}, {@link Token#DAY_HIGH_TOKEN} or 
-     * {@link Token#DAY_LOW_TOKEN}
+     * @return	the quote kind, one of: {@link Quote#DAY_OPEN}, 
+     * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH} or 
+     * {@link Quote#DAY_LOW}
      */
     protected int getQuoteKind() {
 	return quoteKind;

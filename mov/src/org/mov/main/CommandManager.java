@@ -8,12 +8,9 @@ import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.util.*;
 import org.mov.parser.Expression;
-import org.mov.parser.Token;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
-import org.mov.quote.Quote;
-import org.mov.quote.QuoteCache;
-import org.mov.quote.QuoteSource;
+import org.mov.quote.*;
 import org.mov.table.QuoteModule;
 import org.mov.importer.ImporterModule;
 import org.mov.ui.*;
@@ -195,8 +192,8 @@ public class CommandManager {
             QuoteModule table = null;
 
             if (!thread.isInterrupted())
-                cache = new QuoteCache(Quote.getSource().getLatestQuoteDate(),
-                                                  searchRestriction);
+                cache = new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
+				       searchRestriction);
 
             if (!thread.isInterrupted())
                 table = new QuoteModule(cache, expression);
@@ -212,7 +209,7 @@ public class CommandManager {
 	Portfolio portfolio = PreferencesManager.loadPortfolio(portfolioName);
 
 	QuoteCache cache = 
-	    new QuoteCache(Quote.getSource().getLatestQuoteDate(),
+	    new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
 			   QuoteSource.ALL_COMMODITIES);
 	
 	((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, cache));
@@ -233,7 +230,7 @@ public class CommandManager {
 	    MainMenu.getInstance().updatePortfolioMenu();
 	    
 	    QuoteCache cache = 
-		new QuoteCache(Quote.getSource().getLatestQuoteDate(),
+		new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
 			       QuoteSource.ALL_COMMODITIES);
 
 	    ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, cache));
@@ -311,7 +308,7 @@ public class CommandManager {
 
                     if (!thread.isInterrupted())
                         dayClose = 
-                            new OHLCVQuoteGraphSource(cache, Token.DAY_CLOSE_TOKEN);
+                            new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
 
                     if (!thread.isInterrupted())
                         graph = new LineGraph(dayClose);

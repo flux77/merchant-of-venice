@@ -18,6 +18,7 @@
 
 package org.mov.main;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.lang.*;
 import java.util.*;
@@ -48,9 +49,12 @@ public class CommandManager {
     // The desktop that any window operations will be performed on
     private JDesktopPane desktop;
 
+    // Is the about dialog showing?
+    private boolean isAboutDialogUp;
+
     // Class should only be constructed once by this class
     private CommandManager() {
-        // nothing to do
+        isAboutDialogUp = false;
     }
 
     /**
@@ -517,6 +521,24 @@ public class CommandManager {
                 getDesktopManager().newFrame(chart);
 
             ProgressDialogManager.closeProgressDialog(progress);
+        }
+    }
+
+    /**
+     * Opens the about dialog box.
+     */
+    public void openAboutDialog() {
+        if(!isAboutDialogUp) {
+            isAboutDialogUp = true;
+            String aboutMessage = ("Merchant of Venice 0.1alpha *pre-release*\n\n"+
+                                   "Andrew Leppaprd (aleppard@picknow.com.au)\n" +
+                                   "Daniel Makovec\n\n" +
+                                   "Copyright (C) 2003, Andrew Leppard\n" +
+                                   "See COPYING.txt for license terms.");
+            
+            JOptionPane.showInternalMessageDialog(desktop, aboutMessage, "About Venice",
+                                                  JOptionPane.PLAIN_MESSAGE);
+            isAboutDialogUp = false;
         }
     }
 

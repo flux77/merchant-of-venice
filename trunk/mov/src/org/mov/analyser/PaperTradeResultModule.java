@@ -75,6 +75,8 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     private JMenuItem graphMenuItem;
     private JMenuItem viewBuyRuleMenuItem;
     private JMenuItem viewSellRuleMenuItem;
+    private JMenuItem storeBuyRuleMenuItem;
+    private JMenuItem storeSellRuleMenuItem;
     private JMenuItem removeMenuItem;
     private JMenuItem removeAllMenuItem;
 
@@ -260,6 +262,22 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     }});
             menu.add(popupViewSellRuleMenuItem);
 
+            JMenuItem popupStoreBuyRuleMenuItem = new JMenuItem("Store Buy Rule");
+            popupStoreBuyRuleMenuItem.setEnabled(getSelectedRowCount() == 1);
+            popupStoreBuyRuleMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        storeBuyRule();
+                    }});
+            menu.add(popupStoreBuyRuleMenuItem);
+
+            JMenuItem popupStoreSellRuleMenuItem = new JMenuItem("Store Sell Rule");
+            popupStoreSellRuleMenuItem.setEnabled(getSelectedRowCount() == 1);
+            popupStoreSellRuleMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        storeSellRule();
+                    }});
+            menu.add(popupStoreSellRuleMenuItem);
+
             menu.addSeparator();
 
             JMenuItem popupRemoveMenuItem = new JMenuItem("Remove");
@@ -334,6 +352,44 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
         }
     }
 
+    // Allows the user to remember the buy rule
+    private void storeBuyRule() {
+        // Get result at row
+        int row = getSelectedRow();
+
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            final PaperTradeResult result = model.getResult(row);
+
+            Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        ExpressionEditorDialog.showAddDialog("Store Buy Rule", 
+							     result.getBuyRule());
+                    }});
+            
+            thread.start();
+        }
+    }
+
+    // Allows the user to remember the sell rule
+    private void storeSellRule() {
+        // Get result at row
+        int row = getSelectedRow();
+
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            final PaperTradeResult result = model.getResult(row);
+
+            Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        ExpressionEditorDialog.showAddDialog("Store Sell Rule", 
+							     result.getSellRule());
+                    }});
+            
+            thread.start();
+        }
+    }
+
     // Opens first selected result
     private void openSelectedResult() {
         // Get result at row
@@ -384,6 +440,8 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
         graphMenuItem.setEnabled(numberOfSelectedRows == 1);
         viewBuyRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         viewSellRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
+        storeBuyRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
+        storeSellRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         removeMenuItem.setEnabled(numberOfSelectedRows >= 1);
         removeAllMenuItem.setEnabled(model.getRowCount() > 0);
     }
@@ -423,6 +481,20 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     viewSellRule();
                 }});
         resultMenu.add(viewSellRuleMenuItem);
+
+        storeBuyRuleMenuItem = new JMenuItem("Store Buy Rule");        
+        storeBuyRuleMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    storeBuyRule();
+                }});
+        resultMenu.add(storeBuyRuleMenuItem);
+
+        storeSellRuleMenuItem = new JMenuItem("Store Sell Rule");        
+        storeSellRuleMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    storeSellRule();
+                }});
+        resultMenu.add(storeSellRuleMenuItem);
 
 	resultMenu.addSeparator();
 

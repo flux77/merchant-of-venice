@@ -71,19 +71,19 @@ public class ExpressionFactory {
      * Create an executable ternary expression from the given token and 
      * arguments.
      *
-     * @param	operation	the ternary expression, e.g. 
+     * @param	token	the ternary expression, e.g. 
      *	"<code>if(X) { Y } else { Z }</code>"
      * @param	arg1		the first argument
      * @param	arg2		the second argument
      * @param	arg3		the third argument
      * @return	an executable expression
      */	
-    public static Expression newExpression(Token operation, Expression arg1,
+    public static Expression newExpression(Token token, Expression arg1,
 					   Expression arg2, Expression arg3) {
 
 	Expression expression = null;
 
-	switch(operation.getType()) {
+	switch(token.getType()) {
 	case(Token.AND_TOKEN):
 	    expression = new AndExpression(arg1, arg2);
 	    break;
@@ -117,8 +117,6 @@ public class ExpressionFactory {
 	case(Token.DIVIDE_TOKEN):
 	    expression = new DivideExpression(arg1, arg2);
 	    break;
-	case(Token.HELD_TOKEN):
-	    break;
 	case(Token.DAY_OPEN_TOKEN):
 	    expression = new DayOpenExpression();
 	    break;
@@ -133,9 +131,6 @@ public class ExpressionFactory {
 	    break;
 	case(Token.DAY_VOLUME_TOKEN):
 	    expression = new DayVolumeExpression();
-	    break;
-	case(Token.NUMBER_TOKEN):
-	    expression = new NumberExpression(operation.getValue());
 	    break;
 	case(Token.LAG_TOKEN):
 	    expression = new LagExpression(arg1, arg2);
@@ -158,19 +153,28 @@ public class ExpressionFactory {
 	case(Token.IF_TOKEN):
 	    expression = new IfExpression(arg1, arg2, arg3);
 	    break;
-	case(Token.AGE_TOKEN):
-	    break;
 	case(Token.PERCENT_TOKEN):
 	    expression = new PercentExpression(arg1, arg2);
 	    break;
 	case(Token.NOT_EQUAL_TOKEN):
 	    expression = new NotEqualExpression(arg1, arg2);
 	    break;
+        case(Token.TRUE_TOKEN):
+            expression = new NumberExpression(Expression.TRUE, Expression.BOOLEAN_TYPE);
+            break;
+        case(Token.FALSE_TOKEN):
+            expression = new NumberExpression(Expression.FALSE, Expression.BOOLEAN_TYPE);
+            break;
+	case(Token.NUMBER_TOKEN):
+	    expression = new NumberExpression(token.getValue(), token.getValueType());
+	    break;
+	case(Token.VARIABLE_TOKEN):
+	    expression = new VariableExpression(token.getValueName(), token.getValueType());
+	    break;
+        default:
+            // No such token
+            assert false;
 	}
-
-	if(expression == null)
-	    System.out.println("not implemented yet");
-
 
 	return expression;
     }

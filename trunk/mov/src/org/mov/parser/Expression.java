@@ -38,26 +38,23 @@ import org.mov.quote.*;
  * classes.
  * Those classes would however be contained by this class.
  */
-public abstract class Expression extends DefaultMutableTreeNode {
+public abstract class Expression extends DefaultMutableTreeNode implements Cloneable {
 
     /** A boolean type that can contain either <code>1</code> or 
 	<code>0</code> */
     public static final int BOOLEAN_TYPE = 0;
 
-    /** A floating point value type */
-    public static final int VALUE_TYPE = 1;
+    /** A float type that can contain any number. */
+    public static final int FLOAT_TYPE = 1;
 
-    /** Represents stock volume value */
-    public static final int VOLUME_TYPE = 2;
-
-    /** Represents a stock quote <b>value</b>: open, close, low, high */
-    public static final int PRICE_TYPE = 3;
+    /** An integer type that can contain any integer number. */
+    public static final int INTEGER_TYPE = 2;
 
     /** Represents a stock quote <b>type</b>: open, close, low, high */
-    public static final int QUOTE_TYPE = 4;
+    public static final int QUOTE_TYPE = 3;
 
     /** Threshold level where a number is registered as <code>TRUE</code> */
-    public final static float TRUE_LEVEL = 0.0001F;
+    public final static float TRUE_LEVEL = 0.1F;
 
     /** <code>Value of TRUE</code> */
     public final static float TRUE = 1.0F;
@@ -73,46 +70,9 @@ public abstract class Expression extends DefaultMutableTreeNode {
     }
 
     /**
-     * Compares whether the two types are equivelent. This performs
-     * type overloading in the <i>Gondola</i> language. The following
-     * types can be converted into each other without causing a type
-     * mismatch:
-     * <p>
-     * <table>
-     * <tr>
-     * <tr><td><code>VALUE_TYPE</code></td><td>Can be converted into 
-     *		<code>VOLUME_TYPE</code> or <code>PRICE_TYPE</code>.
-     * <tr><td><code>VOLUME_TYPE</code></td><td>Can be converted into 
-     *		<code>VALUE_TYPE</code>.
-     * <tr><td><code>PRICE_TYPE</code></td><td>Can be converted into 
-     *		<code>VALUE_TYPE</code>.
-     * </tr>
-     * </table>
-     *
-     * @param	type1	a type
-     * @param	type2	another type
-     * @return	if the two types are equivelant
-     */
-    protected boolean equivelantTypes(int type1, int type2) {
-
-	// Types are equivelant iff:
-	// A They are the same
-	// B The left type is VALUE_TYPE, the right either volume or price
-	// C The right type is VALUE_TYPE, the left either volume or price
-
-	if((type1 == type2) || // A
-	   (type1 == VALUE_TYPE && (type2 == VOLUME_TYPE ||
-				    type2 == PRICE_TYPE)) || // B
-	   (type2 == VALUE_TYPE && (type1 == VOLUME_TYPE ||
-				    type1 == PRICE_TYPE))) // C
-	    return true;
-	else
-	    return false;
-    }
-
-    /**
      * Evaluates the given expression and returns the result.
      *
+     * @param   variables       variable storage area for expression
      * @param	quoteBundle	the quote bundle containing quote data to use
      * @param	symbol	the current symbol
      * @param	day	current date in cache fast access format
@@ -120,7 +80,8 @@ public abstract class Expression extends DefaultMutableTreeNode {
      * @throws	EvaluationException if the expression tries to access
      *		dates outside of the cache
      */
-    abstract public float evaluate(QuoteBundle quoteBundle, String symbol, int day)
+    abstract public float evaluate(Variables variables, QuoteBundle quoteBundle, 
+                                   String symbol, int day)
 	throws EvaluationException;
 
     /**
@@ -139,12 +100,60 @@ public abstract class Expression extends DefaultMutableTreeNode {
     abstract public int checkType() throws TypeMismatchException;
 
     /**
+     * Get the type of the expression.
+     *
+     * @return one of {@link BOOLEAN_TYPE}, {@link FLOAT_TYPE},
+     *         {@link INTEGER_TYPE} or {@link QUOTE_TYPE}.
+     */
+    abstract public int getType();
+
+    /**
      * Return the number of children (arguments) that this expression
      * needs.
      *
      * @return	the required number of arguments
      */
     abstract public int getNeededChildren();
+
+    /** 
+     * Count the number of nodes in the tree.
+     *
+     * @return number of nodes or 1 if this is a terminal node
+     */
+    public int size() {
+        int count = 1;
+
+        for(int i = 0; i < getChildCount(); i++) {
+            Expression childExpression = (Expression)getChildAt(i);
+
+            count += childExpression.size();
+        }
+
+        return count;
+    }
+
+    /**
+     * Count the number of nodes in the tree with the given type.
+     *
+     * @return number of nodes in the tree with the given type.
+     */
+    public int size(int type) {
+        int count = 0;
+
+        assert(type == BOOLEAN_TYPE || type == FLOAT_TYPE || type == INTEGER_TYPE ||
+               type == QUOTE_TYPE);
+
+        if(getType() == type)
+            count = 1;
+
+        for(int i = 0; i < getChildCount(); i++) {
+            Expression childExpression = (Expression)getChildAt(i);
+
+            count += childExpression.size(type);
+        }
+
+        return count;
+    }
 }
 
 

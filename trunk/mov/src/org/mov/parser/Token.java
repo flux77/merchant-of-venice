@@ -18,6 +18,9 @@
 
 package org.mov.parser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * A representation of any token in the <i>Gondola</i> language.
  */
@@ -80,62 +83,71 @@ public class Token {
     /** Represents "<code>avg</code>" symbol */
     public static final int AVG_TOKEN = 18;        
 
-    /** Represents "<code>held</code>" symbol */
-    public static final int HELD_TOKEN = 19;        
-
     /** Represents "<code>day_open</code>" symbol */
-    public static final int DAY_OPEN_TOKEN = 20;    
+    public static final int DAY_OPEN_TOKEN = 19;    
 
     /** Represents "<code>day_close</code>" symbol */
-    public static final int DAY_CLOSE_TOKEN = 21;   
+    public static final int DAY_CLOSE_TOKEN = 20;   
 
     /** Represents "<code>day_low</code>" symbol */
-    public static final int DAY_LOW_TOKEN = 22;     
+    public static final int DAY_LOW_TOKEN = 21;     
 
     /** Represents "<code>day_high</code>" symbol */
-    public static final int DAY_HIGH_TOKEN = 23;    
+    public static final int DAY_HIGH_TOKEN = 22;    
 
     /** Represents "<code>day_volume</code>" symbol */
-    public static final int DAY_VOLUME_TOKEN = 24;  
+    public static final int DAY_VOLUME_TOKEN = 23;  
 
     /** Represents "<code>if</code>" symbol */
-    public static final int IF_TOKEN = 25;         
+    public static final int IF_TOKEN = 24;         
 
     /** Represents "<code>{</code>" symbol */
-    public static final int LEFT_BRACE_TOKEN = 26; 
+    public static final int LEFT_BRACE_TOKEN = 25; 
 
     /** Represents "<code>}</code>" symbol */
-    public static final int RIGHT_BRACE_TOKEN = 27;
+    public static final int RIGHT_BRACE_TOKEN = 26;
 
     /** Represents "<code>.</code>" symbol */
-    public static final int FULLSTOP_TOKEN = 28;   
+    public static final int FULLSTOP_TOKEN = 27;   
 
     /** Represents "<code>else</code>" symbol */
-    public static final int ELSE_TOKEN = 29;       
-
-    /** Represents "<code>age</code>" symbol */
-    public static final int AGE_TOKEN = 30;        
+    public static final int ELSE_TOKEN = 28;       
 
     /** Represents "<code>percent</code>" symbol */
-    public static final int PERCENT_TOKEN = 31;    
+    public static final int PERCENT_TOKEN = 29;    
 
     /** Represents "<code>!=</code>" symbol */
-    public static final int NOT_EQUAL_TOKEN = 32;   
+    public static final int NOT_EQUAL_TOKEN = 30;   
 
     /** Represents "<code>rsi</code>" symbol */
-    public static final int RSI_TOKEN = 33;	    
+    public static final int RSI_TOKEN = 31;	    
+
+    /** Represents "<code>true</code>" symbol */
+    public static final int TRUE_TOKEN = 32;	    
+
+    /** Represents "<code>false</code>" symbol */
+    public static final int FALSE_TOKEN = 33;	    
 
     // Number of fixed length tokens, i.e. the ones above ^^
     private static final int FIXED_LENGTH_TOKENS = 34;
 
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;       
+
+    /** Represents a variable */
+    public static final int VARIABLE_TOKEN = 101;       
     
     // Token type (e.g. PERCENT_TOKEN, FULLSTOP_TOKEN etc)
     private int type;
 
     // For NUMBER_TOKEN - the actual number
     private float value; 
+
+    // For VARIABLE_TOKEN - the variable name 
+    private String valueName;
+
+    // For NUMBER_TOKEN or VARIABLE_TOKEN - the value's type
+    private int valueType;
     
     /**
      * Perform lexical analysis on the given string. Extract the first
@@ -143,11 +155,13 @@ public class Token {
      * to represent this symbol then return the given string sans the
      * extracted symbol.
      *
+     * @param   variables variables that will be assumed to be defined
+     *                    for the equation
      * @param	token	the token to use to represent the first symbol found
      * @param	string	the string to extract the first symbol from
      * @return	the string minus the first symbol
      */
-    public static String stringToToken(Token token, String string) 
+    public static String stringToToken(Variables variables, Token token, String string) 
 	throws ParserException {
 
 	String[] tokenStrings = new String[FIXED_LENGTH_TOKENS];
@@ -168,7 +182,6 @@ public class Token {
 	tokenStrings[AND_TOKEN]                = "and";
 	tokenStrings[NOT_TOKEN]                = "not";
 	tokenStrings[COMMA_TOKEN]              = ",";
-	tokenStrings[HELD_TOKEN]               = "held";
 	tokenStrings[LAG_TOKEN]                = "lag";
 	tokenStrings[MIN_TOKEN]                = "min";
 	tokenStrings[MAX_TOKEN]                = "max";
@@ -183,19 +196,27 @@ public class Token {
 	tokenStrings[RIGHT_BRACE_TOKEN]        = "}";
 	tokenStrings[FULLSTOP_TOKEN]           = ".";
 	tokenStrings[ELSE_TOKEN]               = "else";
-	tokenStrings[AGE_TOKEN]                = "age";
 	tokenStrings[PERCENT_TOKEN]            = "percent";
 	tokenStrings[NOT_EQUAL_TOKEN]          = "!=";
 	tokenStrings[RSI_TOKEN]		       = "rsi";
+	tokenStrings[TRUE_TOKEN]	       = "true";
+	tokenStrings[FALSE_TOKEN]	       = "false";
 
 	boolean matched = false;
 
-	// First check to see if its a number 
+        // Is it a float or an integer number?
 	if(Character.isDigit(string.charAt(0))) {
 	    float value = 0.0F;
 	    String numberString = new String();
 
+            // Any values are considered to be integers, unless we find a decimal
+            // point.
+            int valueType = Expression.INTEGER_TYPE;
+
 	    do {
+                if(string.charAt(0) == '.')
+                    valueType = Expression.FLOAT_TYPE;
+
 		numberString = numberString.concat(string.substring(0, 1));
 		string = string.substring(1);
 	    } while(string.length() > 0 && 
@@ -212,9 +233,12 @@ public class Token {
 
 	    token.setType(Token.NUMBER_TOKEN);
 	    token.setValue(value);
+            token.setValueType(valueType);
 
 	    matched = true;
 	}
+
+        // Go through our token list
 	else 
 	    for(int i = 0; !matched && i < tokenStrings.length; i++)
 		if(tokenStrings[i] != null && 
@@ -227,8 +251,23 @@ public class Token {
 		    matched = true;
 		}
 	
-	if(!matched)
-	    throw new ParserException("unknown symbol");
+	if(!matched) {
+            // Maybe it's a variable? Greedily extract possible variable name
+            Pattern pattern = Pattern.compile("^[a-aA-z][a-zA-Z0-9]*");
+            Matcher matcher = pattern.matcher(string);
+            String possibleVariableName = matcher.group();
+
+            if(variables.contains(possibleVariableName)) {
+                string = string.substring(possibleVariableName.length());
+                matched = true;
+
+                token.setType(Token.VARIABLE_TOKEN);
+                token.setValueName(possibleVariableName);
+                token.setValueType(variables.getType(possibleVariableName));
+            }
+            else
+                throw new ParserException("unknown symbol");
+        }
 
 	return string;
     }
@@ -239,6 +278,9 @@ public class Token {
     public Token() {
 	type = 0;
 	value = 0;
+
+        valueName = null;
+        valueType = 0;
     }
 
     /**
@@ -265,22 +307,52 @@ public class Token {
      * @return	the value.
      */
     public float getValue() {
+        assert getType() == NUMBER_TOKEN;
 	return value;
     }
 
     /**
-     * For number tokens, negate the value.
+     * For variable token, get the name.
+     *
+     * @return the name.
      */
-    public void negate() {
-	value = -value;
+    public String getValueName() {
+        assert getType() == VARIABLE_TOKEN;
+        return valueName;
     }
 
     /**
-     * For number tokens, set the value.
+     * For {@link #VARIABLE_TOKEN} or {@link #NUMBER_TOKEN} get the type.
      *
-     * @param	value	the value.
+     * @return the type.
      */
-    public void setValue(float value) {
+    public int getValueType() {
+        assert getType() == VARIABLE_TOKEN || getType() == NUMBER_TOKEN;
+        return valueType;
+    }
+
+    /** 
+     * For {@link #NUMBER_TOKEN}, negate the value.
+     */
+    public void negate() {
+        assert getType() == NUMBER_TOKEN;
+	value = -value;
+    }
+
+    // For variable tokens, set the variable name
+    private void setValueName(String valueName) {
+        assert getType() == VARIABLE_TOKEN;
+        this.valueName = valueName;
+    }
+
+    // For variable or number tokens, set the value type
+    private void setValueType(int valueType) {
+        this.valueType = valueType;
+    }
+
+    // For number tokens, set the value.
+    private void setValue(float value) {
+        assert getType() == NUMBER_TOKEN;
 	this.value = value;
     }
 }

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.quote;
@@ -37,9 +37,9 @@ import org.mov.util.*;
  * access date offset. The fast access date offset is used when lots of quotes have
  * to be queried as fast as possible.
  * <p>
- * The latest date in the cache has an offset of 0. The previous trading date 
- * (i.e. not a weekend) has offset -1, the previous one to that -2 etc. 
- * You can convert to and from fast access dates using {@link #dateToOffset} and 
+ * The latest date in the cache has an offset of 0. The previous trading date
+ * (i.e. not a weekend) has offset -1, the previous one to that -2 etc.
+ * You can convert to and from fast access dates using {@link #dateToOffset} and
  * {@link #offsetToDate}.
  *
  * @see Quote
@@ -48,7 +48,7 @@ import org.mov.util.*;
  */
 public class QuoteCache {
 
-    // Cache is organised by a vector of hashmaps, each hashmap 
+    // Cache is organised by a vector of hashmaps, each hashmap
     // corresponds to a trading day. The hashmap's keys are stock symbols.
     private Vector cache = new Vector();
 
@@ -80,7 +80,7 @@ public class QuoteCache {
         return instance;
     }
 
-    /** 
+    /**
      * Get a quote from the cache.
      *
      * @param symbol    the symbol to load
@@ -90,8 +90,8 @@ public class QuoteCache {
      * @return the quote
      * @exception QuoteNotLoadedException if the quote was not in the cache
      */
-    public float getQuote(String symbol, int quoteType, 
-			  int dateOffset) 
+    public float getQuote(String symbol, int quoteType,
+			  int dateOffset)
 	throws QuoteNotLoadedException {
 
 	// First get the hash map for the given date
@@ -102,11 +102,11 @@ public class QuoteCache {
 	// Second get the quote for the given symbol on the given date
 
 	Quote quoteValue = (Quote)symbols.get(symbol);
-	if(quoteValue == null) 
+	if(quoteValue == null)
 	    throw new QuoteNotLoadedException();
 	
 	return quoteValue.getQuote(quoteType);
-    }    
+    }
 
     /**
      * Return all the symbols in the cache on the given date.
@@ -115,8 +115,7 @@ public class QuoteCache {
      * @return list of symbols
      */
     public Vector getSymbols(int dateOffset) {
-	
-	HashMap quotesForDate;
+        HashMap quotesForDate;
 
 	try {
 	    quotesForDate = getQuotesForDate(dateOffset);
@@ -129,7 +128,7 @@ public class QuoteCache {
 	return new Vector(quotesForDate.keySet());
     }
 
-    /** 
+    /**
      * Return all the symbols in the cache between the given date range
      * (inclusive).
      *
@@ -142,11 +141,10 @@ public class QuoteCache {
 
         // Go through each day, collecting symbols. We put them all in
         // a hashmap to quickly weed out the numerous duplicates.
-        for(int date = firstDateOffset; date < lastDateOffset; date++) {
+        for(int date = firstDateOffset; date <= lastDateOffset; date++) {
             Vector datesSymbols = getSymbols(date);
-            Iterator iterator = datesSymbols.iterator();
 
-            while(iterator.hasNext()) {
+            for(Iterator iterator = datesSymbols.iterator(); iterator.hasNext();) {
                 String symbol = (String)iterator.next();
 
                 symbols.put(symbol, symbol);
@@ -157,7 +155,7 @@ public class QuoteCache {
     }
 
     // Returns a HashMap containing quotes for that date
-    private HashMap getQuotesForDate(int dateOffset) 
+    private HashMap getQuotesForDate(int dateOffset)
 	throws QuoteNotLoadedException {
 
 	assert dateOffset <= 0;
@@ -174,67 +172,47 @@ public class QuoteCache {
     }
 
     /**
-     * Load all the quotes specified by the given quote range into the cache.
+     * Load the given quote into the cache.
      *
-     * @param quoteRange        quote range to load
+     * @param quote        quote to load
      */
-    public void load(QuoteRange quoteRange) {
+    public void load(Quote quote) {
 
-	// Load quote into memory
-	Vector quotes = 
-	    QuoteSourceManager.getSource().loadQuoteRange(quoteRange);
-	
-	// Insert each row of quotes into our cache
-        Iterator iterator = quotes.iterator();
+        // Find the fast date offset for the quote
+        int dateOffset;
 
-        while(iterator.hasNext()) {
-
-            // Get next quote loaded from database
-
-            Quote quote = (Quote)iterator.next();
-            int dateOffset;
-
-	    try {
-		dateOffset = dateToOffset(quote.getDate());
-	    }
-	    catch(WeekendDateException e) {
-		// Shouldn't have a quote for a weekend date!
-		assert false;
-		break;
-	    }
-
-            // Get hash of quotes for that date
-
-            HashMap quotesForDate;
-
-	    try {
-		quotesForDate = getQuotesForDate(dateOffset);
-	    }
-	    catch(QuoteNotLoadedException e) {
-		// The dateToOffset() call above should have expanded
-		// the quote range so this shouldn't happen
-		assert false;
-
-		quotesForDate = new HashMap(0);
-	    }
-
-            // Put stock in map and remove symbol and date to reduce memory
-            // (they are our indices so we already know them)
-            Object previousQuote = quotesForDate.put(quote.getSymbol(), quote);
-            quote.setSymbol(null);
-            quote.setDate(null);
-
-            // If the quote wasn't already there then increase size counter
-            if(previousQuote == null)
-                size++;
-            
-            // Remove quote from vector to reduce memory
-            iterator.remove();
+        try {
+            dateOffset = dateToOffset(quote.getDate());
+        }
+        catch(WeekendDateException e) {
+            // Shouldn't have a quote for a weekend date!
+            assert false;
+            return;
         }
 
-        // Trim vectors so we don't take up more size than needed
-        cache.trimToSize();
-        dates.trimToSize();
+        // Get hash of quotes for that date
+        HashMap quotesForDate;
+
+        try {
+            quotesForDate = getQuotesForDate(dateOffset);
+        }
+        catch(QuoteNotLoadedException e) {
+            // The dateToOffset() call above should have expanded
+            // the quote range so this shouldn't happen
+            assert false;
+
+            quotesForDate = new HashMap(0);
+        }
+
+        // Put stock in map and remove symbol and date to reduce memory
+        // (they are our indices so we already know them)
+        Object previousQuote = quotesForDate.put(quote.getSymbol(), quote);
+        quote.setSymbol(null);
+        quote.setDate(null);
+
+        // If the quote wasn't already there then increase size counter
+        if(previousQuote == null)
+            size++;
     }
 
     /**
@@ -247,7 +225,7 @@ public class QuoteCache {
 
 	try {
 	    HashMap quotesForDate = getQuotesForDate(dateOffset);
-	    
+	
 	    Quote quote = (Quote)quotesForDate.remove(symbol);
 
 	    // If we actually deleted a quote, then reduce our quote counter.
@@ -255,7 +233,7 @@ public class QuoteCache {
 	    // the cache, so that our size count is correct. Its OK for the caller
             // to try to delete a quote that's not in the cache - if it wasn't
             // then the quote bundles would have to keep track of holidays etc...
-	    if(quote != null) 
+	    if(quote != null)
 		size--;
 
 	    assert size >= 0;
@@ -276,10 +254,10 @@ public class QuoteCache {
      * @exception WeekendDateException if the date is on a weekend (there are no
      *            fast access date offsets for weekend dates)
      */
-    public int dateToOffset(TradingDate date) 
+    public int dateToOffset(TradingDate date)
 	throws WeekendDateException {
 
-        TradingDateComparator comparator = 
+        TradingDateComparator comparator =
             new TradingDateComparator(TradingDateComparator.BACKWARDS);
 
 	int dateOffset = -Collections.binarySearch(dates, date, comparator);
@@ -306,7 +284,7 @@ public class QuoteCache {
      * @return the date
      */
     public TradingDate offsetToDate(int dateOffset) {
-    
+
 	assert dateOffset <= 0;
 
 	// If the date isn't in the cache then expand it
@@ -348,9 +326,9 @@ public class QuoteCache {
     // Add one day to cache
     private void addDate(TradingDate date) {
 	
-	// Create a map with 0 initial capacity. I.e. we create an empty one            
+	// Create a map with 0 initial capacity. I.e. we create an empty one
 	// because we might not even use it
-	HashMap map = new HashMap(0);           
+	HashMap map = new HashMap(0);
 	cache.add(map);
 	dates.add(date);	
     }
@@ -368,6 +346,6 @@ public class QuoteCache {
 	    addDate(firstDate);
         }
     }
-} 
+}
 
 

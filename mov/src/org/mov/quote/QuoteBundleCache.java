@@ -131,8 +131,8 @@ public class QuoteBundleCache {
         }
         
         if(quoteRange != null) { 
-            // Load it in (if there are any quotes to load)		
-            quoteCache.load(quoteRange);
+            // Load the quote range into the quote cache
+            QuoteSourceManager.getSource().loadQuoteRange(quoteRange);
             
             // If the quote cache has too many quotes then keep
             // freeing the oldest bundle

@@ -77,7 +77,7 @@ public class AveragePaperTradeResult implements PaperTradeResult {
     }
 
     public String getSellRule() {
-        return buyRule;
+        return sellRule;
     }
 
     public float getTradeCost() {

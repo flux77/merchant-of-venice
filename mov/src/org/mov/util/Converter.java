@@ -2,6 +2,7 @@ package org.mov.util;
 
 import java.io.File;
 import java.lang.*;
+import java.text.*;
 import java.util.*;
 
 import org.mov.quote.*;
@@ -46,24 +47,6 @@ public class Converter {
 	    string = zero.concat(string);
 	}
 	return string;
-    }
-
-    /**
-     * Converts a two digit year to four digit year. The year 0 to 30
-     * are transformed to 2000 to 2030 respecitvely; the years 31 to 99 to 
-     * 1931 and 1999 respectively.
-     * 
-     * @param	year	a two digit year
-     * @return	a four digit year
-     */
-    public static int twoToFourDigitYear(int year) {
-	// Convert year from 2 digit to 4 digit
-	if(year > 30)
-	    year += 1900;
-	else
-	    year += 2000;
-
-	return year;
     }
 
     /**
@@ -145,14 +128,44 @@ public class Converter {
 	TradingDate date = (TradingDate)startDate.clone();
 
 	while(!date.after(endDate)) {
-
-	    System.out.println("loop date " + date);
-
 	    dates.add(date);
 	    date = date.next(1);
 	}
 
 	return dates;
+    }
+
+    /** Convert space separated list into vector of compay symbols
+     * e.g "CBA WBC TLS" -> [CBA, TLS, WBC].
+     *
+     * @param	string	list of symbols
+     * @return	a sorted set of each symbol in string
+     */
+    public static SortedSet stringToSortedSet(String string) {
+	int space;
+	Vector vector = new Vector();
+	boolean endOfString = false;
+
+	if(string.length() > 0) {
+	    while(!endOfString) {
+		space = string.indexOf(" ");
+		
+		if(space == -1) {
+		    vector.add(string);
+		    endOfString = true;
+		}
+		else {
+		    vector.add(new String(string.substring(0, space)));
+		    string = string.substring(space+1);
+		}
+	    }
+	}
+	
+	// Sort vector
+	TreeSet sortedSet = new TreeSet(Collator.getInstance());
+	sortedSet.addAll(vector);
+	
+	return sortedSet;
     }
 }
 

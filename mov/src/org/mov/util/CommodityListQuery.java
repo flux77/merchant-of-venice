@@ -1,7 +1,6 @@
 package org.mov.util;
 
 import java.awt.*;
-import java.text.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -115,7 +114,7 @@ public class CommodityListQuery {
 	    if(companies != null) {
 		
 		// Convert string to sorted set
-		companySet = stringToSortedSet(companies);
+		companySet = Converter.stringToSortedSet(companies);
 		Iterator iterator = companySet.iterator();
 		
 		while(iterator.hasNext()) {
@@ -164,34 +163,6 @@ public class CommodityListQuery {
 	    return null;
 
 	return companySet;
-    }
-
-    // Convert space separated list into vector of compay symbols
-    // e.g "CBA WBC TLS" -> [CBA, TLS, WBC]. This should probably be
-    // in the Converter class.
-    private static SortedSet stringToSortedSet(String string) {
-	int space;
-	Vector vector = new Vector();
-	boolean endOfString = false;
-	
-	while(!endOfString) {
-	    space = string.indexOf(" ");
-	    
-	    if(space == -1) {
-		vector.add(string);
-		endOfString = true;
-	    }
-	    else {
-		vector.add(new String(string.substring(0, space)));
-		string = string.substring(space+1);
-	    }
-	}
-	
-	// Sort vector
-	TreeSet sortedSet = new TreeSet(Collator.getInstance());
-	sortedSet.addAll(vector);
-	
-	return sortedSet;
     }
 }
 

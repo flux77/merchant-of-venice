@@ -40,8 +40,7 @@ import org.mov.quote.*;
  */
 public abstract class Expression extends DefaultMutableTreeNode implements Cloneable {
 
-    /** A boolean type that can contain either <code>1</code> or 
-	<code>0</code> */
+    /** A boolean type that can be either {@link #TRUE} or {@link #FALSE}. */
     public static final int BOOLEAN_TYPE = 0;
 
     /** A float type that can contain any number. */
@@ -102,8 +101,8 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
     /**
      * Get the type of the expression.
      *
-     * @return one of {@link BOOLEAN_TYPE}, {@link FLOAT_TYPE},
-     *         {@link INTEGER_TYPE} or {@link QUOTE_TYPE}.
+     * @return one of {@link #BOOLEAN_TYPE}, {@link #FLOAT_TYPE},
+     *         {@link #INTEGER_TYPE} or {@link #QUOTE_TYPE}.
      */
     abstract public int getType();
 

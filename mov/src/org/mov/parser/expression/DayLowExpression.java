@@ -44,7 +44,7 @@ public class DayLowExpression extends TerminalExpression {
     /**
      * Get the type of the expression.
      *
-     * @return {@link QUOTE_TYPE}.
+     * @return {@link #QUOTE_TYPE}.
      */
     public int getType() {
         return QUOTE_TYPE;

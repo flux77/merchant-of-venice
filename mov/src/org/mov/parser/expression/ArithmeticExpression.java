@@ -56,7 +56,7 @@ abstract public class ArithmeticExpression extends BinaryExpression {
     /**
      * Get the type of the expression.
      *
-     * @return either {@link FLOAT_TYPE} or {@link INTEGER_TYPE}.
+     * @return either {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
     public int getType() {
         assert getLeft().getType() == getRight().getType();

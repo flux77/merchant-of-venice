@@ -55,7 +55,7 @@ abstract public class ComparisionExpression extends BinaryExpression {
     /**
      * Get the type of the expression.
      *
-     * @return {@link BOOLEAN_TYPE}.
+     * @return {@link #BOOLEAN_TYPE}.
      */
     public int getType() {
         return BOOLEAN_TYPE;

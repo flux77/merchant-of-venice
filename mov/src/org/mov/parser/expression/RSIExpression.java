@@ -68,7 +68,7 @@ public class RSIExpression extends Expression {
     /**
      * Get the type of the expression.
      *
-     * @return {@link FLOAT_TYPE}.
+     * @return {@link #FLOAT_TYPE}.
      */
     public int getType() {
         return FLOAT_TYPE;

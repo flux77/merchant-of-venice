@@ -50,7 +50,7 @@ public class PercentExpression extends BinaryExpression {
     }
 
     /** 
-     * Either argument can be {@link INTEGER_TYPE} or {@link FLOAT_TYPE}.
+     * Either argument can be {@link #INTEGER_TYPE} or {@link #FLOAT_TYPE}.
      *
      * @return	the left argument type
      * @throws	TypeMismatchException if the expression has incorrect types
@@ -70,7 +70,7 @@ public class PercentExpression extends BinaryExpression {
     /**
      * Get the type of the expression.
      *
-     * @return {@link FLOAT_TYPE} or {@link INTEGER_TYPE}.
+     * @return {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
     public int getType() {
         return getLeft().getType();

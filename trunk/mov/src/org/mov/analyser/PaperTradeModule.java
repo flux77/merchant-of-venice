@@ -32,8 +32,8 @@ public class PaperTradeModule extends JPanel implements Module,
     private JTextField aRangeTextField;
     private JTextField bRangeTextField;
     private JTextField cRangeTextField;
-    private JTextField buyRuleTextField;
-    private JTextField sellRuleTextField;
+    private EquationComboBox buyRuleEquationComboBox;
+    private EquationComboBox sellRuleEquationComboBox;
     private JTextField initialCapitalTextField;
     private JTextField tradeCostTextField;
 
@@ -155,10 +155,10 @@ public class PaperTradeModule extends JPanel implements Module,
 		addTextRow(equationPanel, "Range $C: 1 to", "", 
 			   gridbag, c, 3);
 
-	    buyRuleTextField = 
-		addTextRow(equationPanel, "Buy Rule", "", gridbag, c, 18);
-	    sellRuleTextField = 
-		addTextRow(equationPanel, "Sell Rule", "", gridbag, c, 18);
+	    buyRuleEquationComboBox = 
+		addEquationRow(equationPanel, "Buy Rule", "", gridbag, c);
+	    sellRuleEquationComboBox = 
+		addEquationRow(equationPanel, "Sell Rule", "", gridbag, c);
 	    
 	    paperTradeOptions.add(equationPanel);
 
@@ -220,6 +220,25 @@ public class PaperTradeModule extends JPanel implements Module,
 	return text;
     }
 
+    // Helper method which adds a new text field in a new row to the given 
+    // grid bag layout.
+    private EquationComboBox addEquationRow(JPanel panel, String field, 
+					    String value,
+					    GridBagLayout gridbag,
+					    GridBagConstraints c) {
+	JLabel label = new JLabel(field);
+	c.gridwidth = 1;
+	gridbag.setConstraints(label, c);
+	panel.add(label);
+
+	EquationComboBox comboBox = new EquationComboBox(value);
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(comboBox, c);
+	panel.add(comboBox);
+
+	return comboBox;
+    }
+
     public void load() {
 	// Load last GUI settings from preferences
 	HashMap settings = PreferencesManager.loadLastPaperTradeSettings();
@@ -238,9 +257,9 @@ public class PaperTradeModule extends JPanel implements Module,
 	    else if(setting.equals("symbols"))
 		symbolsTextField.setText(value);
 	    else if(setting.equals("buy_rule"))
-		buyRuleTextField.setText(value);
+		buyRuleEquationComboBox.setEquationText(value);
 	    else if(setting.equals("sell_rule"))
-		sellRuleTextField.setText(value);
+		sellRuleEquationComboBox.setEquationText(value);
 	    else if(setting.equals("initial_capital"))
 		initialCapitalTextField.setText(value);
 	    else if(setting.equals("trade_cost"))
@@ -255,8 +274,8 @@ public class PaperTradeModule extends JPanel implements Module,
 	settings.put("from_date", fromDateTextField.getText());
 	settings.put("to_date", toDateTextField.getText());
 	settings.put("symbols", symbolsTextField.getText());
-	settings.put("buy_rule", buyRuleTextField.getText());
-	settings.put("sell_rule", sellRuleTextField.getText());
+	settings.put("buy_rule", buyRuleEquationComboBox.getEquationText());
+	settings.put("sell_rule", sellRuleEquationComboBox.getEquationText());
 	settings.put("initial_capital", initialCapitalTextField.getText());
 	settings.put("trade_cost", tradeCostTextField.getText());
 
@@ -369,8 +388,8 @@ public class PaperTradeModule extends JPanel implements Module,
 
 	Parser parser = new Parser();
 	
-	buyRuleString = buyRuleTextField.getText();
-	sellRuleString = sellRuleTextField.getText();
+	buyRuleString = buyRuleEquationComboBox.getEquationText();
+	sellRuleString = sellRuleEquationComboBox.getEquationText();
 
 	// Create copies so we can remove $A, $B, $C - they aren't needed
 	// for parsing. We only want to check the equation is OK so set
@@ -496,7 +515,6 @@ public class PaperTradeModule extends JPanel implements Module,
 		    Expression buyRule = null;
 		    Expression sellRule = null;
 
-		    System.out.println("equation " + equationNumber);		   
 		    // Put in $A, $B, $C substitutes
 		    String buyRuleStringCopy = new String(buyRuleString);
 		    String sellRuleStringCopy = new String(sellRuleString);
@@ -599,7 +617,18 @@ public class PaperTradeModule extends JPanel implements Module,
 			resultsFrame = 
 			    CommandManager.getInstance().newPaperTradeResultTable();
 		    }
-		    
+		    else {
+			resultsFrame.toFront();
+			
+			try {
+			    resultsFrame.setIcon(false);
+			    resultsFrame.setSelected(true);
+			}
+			catch(java.beans.PropertyVetoException e) {
+			    assert false;
+			}
+		    }
+
 		    // Send result to result table for display
 		    PaperTradeResultModule resultsModule = 
 			(PaperTradeResultModule)resultsFrame.getModule();

@@ -41,8 +41,10 @@ import org.mov.quote.*;
 public class MainMenu implements ActionListener, ModuleListener
 {
     // All the menu items
-    private JMenuItem fileImportQuotesMenuItem;
     private JMenuItem filePortfolioNewMenuItem;
+    private JMenuItem fileImportPreferencesMenuItem;
+    private JMenuItem fileImportQuotesMenuItem;
+    private JMenuItem fileExportPreferencesMenuItem;
     private JMenuItem filePreferencesMenuItem;
     private JMenuItem fileExitMenuItem;
     
@@ -64,6 +66,7 @@ public class MainMenu implements ActionListener, ModuleListener
     
     private JMenuItem analysisPaperTradeMenuItem;
     private JMenuItem analysisGPMenuItem;
+    private JMenuItem analysisGAMenuItem;
     
     private JMenuItem windowTileHorizontalMenuItem;
     private JMenuItem windowTileVerticalMenuItem;
@@ -78,6 +81,8 @@ public class MainMenu implements ActionListener, ModuleListener
     private JMenu helpMenu;
     private JMenu windowMenu;
     private JMenu filePortfolioMenu;
+    private JMenu fileImportMenu;
+    private JMenu fileExportMenu;
     private JMenu graphPortfolioMenu;
     private JMenu tablePortfolioMenu;
     private JMenu quoteWatchScreenMenu;
@@ -148,9 +153,19 @@ public class MainMenu implements ActionListener, ModuleListener
         fileMenu.addSeparator();
         
         // File -> Import
-        fileImportQuotesMenuItem = MenuHelper.addMenuItem(this, fileMenu,
-                Locale.getString("IMPORT_QUOTES"), 'I');
-        // File -> Preferences
+        fileImportMenu = MenuHelper.addMenu(fileMenu, Locale.getString("IMPORT"), 'I');
+        // File -> Import -> Preferences
+        fileImportPreferencesMenuItem =
+            MenuHelper.addMenuItem(this, fileImportMenu, Locale.getString("PREFERENCES"));
+        // File -> Import -> Quotes
+        fileImportQuotesMenuItem =
+            MenuHelper.addMenuItem(this, fileImportMenu, Locale.getString("QUOTES"));
+        // File -> Export
+        fileExportMenu = MenuHelper.addMenu(fileMenu, Locale.getString("EXPORT"), 'E');
+         // File -> Export -> Preferences
+        fileExportPreferencesMenuItem =
+            MenuHelper.addMenuItem(this, fileExportMenu, Locale.getString("PREFERENCES"));
+       // File -> Preferences
         filePreferencesMenuItem = MenuHelper.addMenuItem(this, fileMenu,
                 Locale.getString("PREFERENCES"), 'R');
         fileMenu.addSeparator();
@@ -279,6 +294,10 @@ public class MainMenu implements ActionListener, ModuleListener
             MenuHelper.addMenuItem(this, analysisMenu,
                     Locale.getString("GP"));
         
+        analysisGAMenuItem =
+            MenuHelper.addMenuItem(this, analysisMenu,
+                    Locale.getString("GA"));
+        
         /**********************************************
          * Window
          **********************************************/
@@ -381,6 +400,12 @@ public class MainMenu implements ActionListener, ModuleListener
                     CommandManager.getInstance().openPreferences(PreferencesModule.MACROS_PAGE);
 
                 // File Menu
+                else if(menu == fileImportPreferencesMenuItem) {
+                    CommandManager.getInstance().importPreferences();
+                }
+                else if(menu == fileExportPreferencesMenuItem) {
+                    CommandManager.getInstance().exportPreferences();
+                }
                 else if(menu == fileImportQuotesMenuItem) {
                     CommandManager.getInstance().importQuotes();
                 }
@@ -473,6 +498,8 @@ public class MainMenu implements ActionListener, ModuleListener
                     CommandManager.getInstance().paperTrade();
                 else if (menu == analysisGPMenuItem)
                     CommandManager.getInstance().gp();
+                else if (menu == analysisGAMenuItem)
+                    CommandManager.getInstance().ga();
                 
                 // Window Menu
                 else if (menu == windowTileHorizontalMenuItem)

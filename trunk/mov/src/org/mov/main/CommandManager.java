@@ -28,6 +28,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
+import org.mov.analyser.GAModule;
+import org.mov.analyser.GAResultModule;
 import org.mov.analyser.GPPageInitialPopulation;
 import org.mov.analyser.GPModule;
 import org.mov.analyser.GPResultModule;
@@ -55,6 +57,7 @@ import org.mov.table.QuoteModule;
 import org.mov.table.WatchScreen;
 import org.mov.table.WatchScreenModule;
 import org.mov.importer.ImporterModule;
+import org.mov.importer.PreferencesXML;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
 import org.mov.ui.ProgressDialog;
@@ -358,6 +361,14 @@ public class CommandManager {
     }
 
     /**
+     * Open up a new genetic algorithm module.
+     */
+    public void ga() {
+	GAModule module = new GAModule(desktop);
+	desktopManager.newFrame(module, true, true, true);
+    }
+
+    /**
      * Open up a result table that will display a summary of results
      * from paper trading.
      *
@@ -376,6 +387,17 @@ public class CommandManager {
      */
     public ModuleFrame newGPResultTable(GPPageInitialPopulation  GPPageInitialPopulation) {
 	GPResultModule results = new GPResultModule(GPPageInitialPopulation);
+	return desktopManager.newFrame(results);
+    }
+
+    /**
+     * Open up a result table that will display a summary of results
+     * from genetic algorithm.
+     *
+     * @return	frame containing genetic algorithm results
+     */
+    public ModuleFrame newGAResultTable() {
+	GAResultModule results = new GAResultModule();
 	return desktopManager.newFrame(results);
     }
 
@@ -918,6 +940,24 @@ public class CommandManager {
         HelpModule helpModule = new HelpModule(desktop);
 
         desktopManager.newFrame(helpModule, false, false, true);
+    }
+
+    /**
+     * Displays an import file dialog that allows the user to import
+     * preferences into the application from an XML file.
+     */
+    public void importPreferences() {
+	PreferencesXML prefs = new PreferencesXML(desktop);
+        prefs.importPreferences();
+    }
+
+    /**
+     * Displays an import file dialog that allows the user to export
+     * preferences from the application into an XML file.
+     */
+    public void exportPreferences() {
+	PreferencesXML prefs = new PreferencesXML(desktop);
+        prefs.exportPreferences();
     }
 
     /**

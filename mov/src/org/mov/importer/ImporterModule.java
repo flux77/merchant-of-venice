@@ -422,7 +422,11 @@ public class ImporterModule extends JPanel
 
 	boolean isToFiles = toFiles.isSelected() && toFiles.isEnabled();
 	boolean isToDatabase = toDatabase.isSelected() && toDatabase.isEnabled();
-	
+
+        // Set the application quote's source to be the quotes we are about
+        // to import
+        QuoteSourceManager.setSource(source);
+
 	// Import a day at a time
         for(Iterator iterator = dateRange.iterator(); iterator.hasNext();) {
 	    TradingDate date = (TradingDate)iterator.next();
@@ -432,10 +436,14 @@ public class ImporterModule extends JPanel
 
                 progress.setNote("Importing " + date.toString("d?/m?/yyyy"));
 
-                // Load quotes into cache then get them into a bundle
-                QuoteRange quoteRange = new QuoteRange(QuoteRange.ALL_SYMBOLS, date);
-                source.loadQuoteRange(quoteRange);
-                QuoteBundle quoteBundle = new QuoteBundle(quoteRange);
+                // Load the next day's quotes to import - but only if we are
+                // importing to/from the database, otherwise there's no point since
+                // we would only copy the file name. 
+                QuoteBundle quoteBundle = null;
+
+                if(isToDatabase || fromDatabase.isSelected())
+                    quoteBundle = 
+                        new QuoteBundle(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
 
                 // file -> file
                 if(fromFiles.isSelected() && isToFiles) {
@@ -461,9 +469,9 @@ public class ImporterModule extends JPanel
 
             progress.increment();
 	}
-	
-	// This makes sure the next query uses the new imported
-	// quotes
+
+        // Now remove our temporary quote source and let the next access
+        // to the quote source access the user's preferred quote source.
 	QuoteSourceManager.flush();	
 
 	ProgressDialogManager.closeProgressDialog(progress);	

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.analyser;
@@ -47,6 +47,7 @@ import org.mov.ui.Column;
 import org.mov.ui.ChangeFormat;
 import org.mov.ui.ExpressionEditorDialog;
 import org.mov.ui.MenuHelper;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
@@ -122,40 +123,40 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 	}
 
 	public Object getValueAt(int row, int column) {
-	    if(row >= getRowCount()) 
+	    if(row >= getRowCount())
 		return "";
 
-	    PaperTradeResult result = 
+	    PaperTradeResult result =
 		(PaperTradeResult)results.get(row);
 
-	    if(column == START_DATE_COLUMN) 
+	    if(column == START_DATE_COLUMN)
 		return result.getStartDate();
 
-	    else if(column == END_DATE_COLUMN) 
+	    else if(column == END_DATE_COLUMN)
 		return result.getEndDate();
 
-	    else if(column == SYMBOLS_COLUMN) 
+	    else if(column == SYMBOLS_COLUMN)
 		return result.getSymbols();
 
-	    else if(column == BUY_RULE_COLUMN) 
+	    else if(column == BUY_RULE_COLUMN)
 		return result.getBuyRule();
 
-	    else if(column == SELL_RULE_COLUMN) 
+	    else if(column == SELL_RULE_COLUMN)
 		return result.getSellRule();
 
-	    else if(column == A_COLUMN) 
+	    else if(column == A_COLUMN)
 		return new Integer(result.getA());
 
-	    else if(column == B_COLUMN) 
+	    else if(column == B_COLUMN)
 		return new Integer(result.getB());
 
-	    else if(column == C_COLUMN) 
+	    else if(column == C_COLUMN)
 		return new Integer(result.getC());
 
 	    else if(column == TRADE_COST_COLUMN)
 		return result.getTradeCost();
 
-	    else if(column == NUMBER_OF_TRADES_COLUMN) 
+	    else if(column == NUMBER_OF_TRADES_COLUMN)
                 return new Integer(result.getNumberTrades());
 
 	    else if(column == FINAL_CAPITAL_COLUMN)
@@ -176,28 +177,66 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
     public PaperTradeResultModule() {
         List columns = new ArrayList();
-        columns.add(new Column(START_DATE_COLUMN, "Start Date", "Start Date", 
-                               TradingDate.class, Column.VISIBLE));
-        columns.add(new Column(END_DATE_COLUMN, "End Date", "End Date", 
-                               TradingDate.class, Column.VISIBLE));
-        columns.add(new Column(SYMBOLS_COLUMN, "Symbols", "Symbols", String.class, 
+        columns.add(new Column(START_DATE_COLUMN,
+                               Locale.getString("START_DATE"),
+                               Locale.getString("START_DATE_COLUMN_HEADER"),
+                               TradingDate.class,
                                Column.VISIBLE));
-        columns.add(new Column(BUY_RULE_COLUMN, "Buy Rule", "Buy Rule", String.class, 
+        columns.add(new Column(END_DATE_COLUMN,
+                               Locale.getString("END_DATE"),
+                               Locale.getString("END_DATE_COLUMN_HEADER"),
+                               TradingDate.class,
                                Column.VISIBLE));
-        columns.add(new Column(SELL_RULE_COLUMN, "Sell Rule", "Sell Rule", String.class, 
+        columns.add(new Column(SYMBOLS_COLUMN,
+                               Locale.getString("SYMBOLS"),
+                               Locale.getString("SYMBOLS_COLUMN_HEADER"),
+                               String.class,
                                Column.VISIBLE));
-        columns.add(new Column(A_COLUMN, "A", "A", Integer.class, Column.HIDDEN));
-        columns.add(new Column(B_COLUMN, "B", "B", Integer.class, Column.HIDDEN));
-        columns.add(new Column(C_COLUMN, "C", "C", Integer.class, Column.HIDDEN));
-        columns.add(new Column(TRADE_COST_COLUMN, "Trade Cost", "Trade Cost", 
+        columns.add(new Column(BUY_RULE_COLUMN,
+                               Locale.getString("BUY_RULE"),
+                               Locale.getString("BUY_RULE_COLUMN_HEADER"),
+                               String.class,
+                               Column.VISIBLE));
+        columns.add(new Column(SELL_RULE_COLUMN,
+                               Locale.getString("SELL_RULE"),
+                               Locale.getString("SELL_RULE_COLUMN_HEADER"),
+                               String.class,
+                               Column.VISIBLE));
+        columns.add(new Column(A_COLUMN,
+                               "A",
+                               "A",
+                               Integer.class,
+                               Column.HIDDEN));
+        columns.add(new Column(B_COLUMN,
+                               "B",
+                               "B",
+                               Integer.class,
+                               Column.HIDDEN));
+        columns.add(new Column(C_COLUMN,
+                               "C",
+                               "C",
+                               Integer.class,
+                               Column.HIDDEN));
+        columns.add(new Column(TRADE_COST_COLUMN,
+                               Locale.getString("TRADE_COST"),
+                               Locale.getString("TRADE_COST_COLUMN_HEADER"),
                                Money.class, Column.HIDDEN));
-        columns.add(new Column(NUMBER_OF_TRADES_COLUMN, "Number of Trades", "No. Trades", 
-                               Integer.class, Column.HIDDEN));
-        columns.add(new Column(INITIAL_CAPITAL_COLUMN, "Initial Capital", "Initial Capital", 
+        columns.add(new Column(NUMBER_OF_TRADES_COLUMN,
+                               Locale.getString("NUMBER_TRADES"),
+                               Locale.getString("NUMBER_TRADES_COLUMN_HEADER"),
+                               Integer.class,
+                               Column.HIDDEN));
+        columns.add(new Column(INITIAL_CAPITAL_COLUMN,
+                               Locale.getString("INITIAL_CAPITAL"),
+                               Locale.getString("INITIAL_CAPITAL_COLUMN_HEADER"),
                                Money.class, Column.VISIBLE));
-        columns.add(new Column(FINAL_CAPITAL_COLUMN, "Final Capital", "Final Capital", 
+        columns.add(new Column(FINAL_CAPITAL_COLUMN,
+                               Locale.getString("FINAL_CAPITAL"),
+                               Locale.getString("FINAL_CAPITAL_COLUMN_HEADER"),
                                Money.class, Column.HIDDEN));
-        columns.add(new Column(PERCENT_RETURN_COLUMN, "Return", "Return", 
+        columns.add(new Column(PERCENT_RETURN_COLUMN,
+                               Locale.getString("PERCENT_RETURN"),
+                               Locale.getString("PERCENT_RETURN_COLUMN_HEADER"),
                                ChangeFormat.class, Column.VISIBLE));
 
 	model = new Model(columns);
@@ -209,7 +248,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
 	addMenu();
 
-        // If the user clicks on the table trap it. 
+        // If the user clicks on the table trap it.
 	addMouseListener(new MouseAdapter() {
 		public void mouseClicked(MouseEvent evt) {
                     handleMouseClicked(evt);
@@ -228,7 +267,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
         if(event.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu menu = new JPopupMenu();
 
-            JMenuItem popupOpenMenuItem = new JMenuItem("Open");
+            JMenuItem popupOpenMenuItem = new JMenuItem(Locale.getString("OPEN"));
             popupOpenMenuItem.setEnabled(getSelectedRowCount() == 1);
             popupOpenMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -236,7 +275,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     }});
             menu.add(popupOpenMenuItem);
 
-            JMenuItem popupGraphMenuItem = new JMenuItem("Graph");
+            JMenuItem popupGraphMenuItem = new JMenuItem(Locale.getString("GRAPH"));
             popupGraphMenuItem.setEnabled(getSelectedRowCount() == 1);
             popupGraphMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -246,7 +285,8 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
             menu.addSeparator();
 
-            JMenuItem popupViewBuyRuleMenuItem = new JMenuItem("View Buy Rule");
+            JMenuItem popupViewBuyRuleMenuItem =
+                new JMenuItem(Locale.getString("VIEW_BUY_RULE"));
             popupViewBuyRuleMenuItem.setEnabled(getSelectedRowCount() == 1);
             popupViewBuyRuleMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -254,7 +294,8 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     }});
             menu.add(popupViewBuyRuleMenuItem);
 
-            JMenuItem popupViewSellRuleMenuItem = new JMenuItem("View Sell Rule");
+            JMenuItem popupViewSellRuleMenuItem =
+                new JMenuItem(Locale.getString("VIEW_SELL_RULE"));
             popupViewSellRuleMenuItem.setEnabled(getSelectedRowCount() == 1);
             popupViewSellRuleMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -262,7 +303,8 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     }});
             menu.add(popupViewSellRuleMenuItem);
 
-            JMenuItem popupStoreBuyRuleMenuItem = new JMenuItem("Store Buy Rule");
+            JMenuItem popupStoreBuyRuleMenuItem =
+                new JMenuItem(Locale.getString("STORE_BUY_RULE"));
             popupStoreBuyRuleMenuItem.setEnabled(getSelectedRowCount() == 1);
             popupStoreBuyRuleMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -270,7 +312,8 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     }});
             menu.add(popupStoreBuyRuleMenuItem);
 
-            JMenuItem popupStoreSellRuleMenuItem = new JMenuItem("Store Sell Rule");
+            JMenuItem popupStoreSellRuleMenuItem =
+                new JMenuItem(Locale.getString("STORE_SELL_RULE"));
             popupStoreSellRuleMenuItem.setEnabled(getSelectedRowCount() == 1);
             popupStoreSellRuleMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -280,7 +323,8 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
             menu.addSeparator();
 
-            JMenuItem popupRemoveMenuItem = new JMenuItem("Remove");
+            JMenuItem popupRemoveMenuItem =
+                new JMenuItem(Locale.getString("REMOVE"));
             popupRemoveMenuItem.setEnabled(getSelectedRowCount() >= 1);
             popupRemoveMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -306,7 +350,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
             PaperTradeResult result = model.getResult(row);
-        
+
             CommandManager.getInstance().graphPortfolio(result.getPortfolio(),
                                                         result.getQuoteBundle(),
                                                         result.getStartDate(),
@@ -325,10 +369,10 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {
-                        ExpressionEditorDialog.showViewDialog("View Buy Rule", 
+                        ExpressionEditorDialog.showViewDialog(Locale.getString("VIEW_BUY_RULE"),
                                                               result.getBuyRule());
                     }});
-            
+
             thread.start();
         }
     }
@@ -344,10 +388,10 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {
-                        ExpressionEditorDialog.showViewDialog("View Sell Rule", 
+                        ExpressionEditorDialog.showViewDialog(Locale.getString("VIEW_SELL_RULE"),
                                                               result.getSellRule());
                     }});
-            
+
             thread.start();
         }
     }
@@ -363,10 +407,10 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {
-                        ExpressionEditorDialog.showAddDialog("Store Buy Rule", 
+                        ExpressionEditorDialog.showAddDialog(Locale.getString("STORE_BUY_RULE"),
 							     result.getBuyRule());
                     }});
-            
+
             thread.start();
         }
     }
@@ -382,10 +426,10 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {
-                        ExpressionEditorDialog.showAddDialog("Store Sell Rule", 
+                        ExpressionEditorDialog.showAddDialog(Locale.getString("STORE_SELL_RULE"),
 							     result.getSellRule());
                     }});
-            
+
             thread.start();
         }
     }
@@ -398,7 +442,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
             PaperTradeResult result = model.getResult(row);
-            
+
             CommandManager.getInstance().openPortfolio(result.getPortfolio(),
                                                        result.getQuoteBundle());
         }
@@ -410,7 +454,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
         // Get selected rows and put them in order from highest to lowest
         int[] rows = getSelectedRows();
         List rowIntegers = new ArrayList();
-        for(int i = 0; i < rows.length; i++) 
+        for(int i = 0; i < rows.length; i++)
             rowIntegers.add(new Integer(rows[i]));
 
         List sortedRows = new ArrayList(rowIntegers);
@@ -450,46 +494,46 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     private void addMenu() {
 	menuBar = new JMenuBar();
 
-	JMenu resultMenu = MenuHelper.addMenu(menuBar, "Result");
+	JMenu resultMenu = MenuHelper.addMenu(menuBar, Locale.getString("RESULT"));
 
-	openMenuItem = new JMenuItem("Open");        
+	openMenuItem = new JMenuItem(Locale.getString("OPEN"));
         openMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     openSelectedResult();
                 }});
         resultMenu.add(openMenuItem);
-        
-        graphMenuItem = new JMenuItem("Graph");        
+
+        graphMenuItem = new JMenuItem(Locale.getString("GRAPH"));
         graphMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     graphSelectedResult();
                 }});
         resultMenu.add(graphMenuItem);
-       
+
 	resultMenu.addSeparator();
 
-        viewBuyRuleMenuItem = new JMenuItem("View Buy Rule");        
+        viewBuyRuleMenuItem = new JMenuItem(Locale.getString("VIEW_BUY_RULE"));
         viewBuyRuleMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     viewBuyRule();
                 }});
         resultMenu.add(viewBuyRuleMenuItem);
 
-        viewSellRuleMenuItem = new JMenuItem("View Sell Rule");        
+        viewSellRuleMenuItem = new JMenuItem(Locale.getString("VIEW_SELL_RULE"));
         viewSellRuleMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     viewSellRule();
                 }});
         resultMenu.add(viewSellRuleMenuItem);
 
-        storeBuyRuleMenuItem = new JMenuItem("Store Buy Rule");        
+        storeBuyRuleMenuItem = new JMenuItem(Locale.getString("STORE_BUY_RULE"));
         storeBuyRuleMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     storeBuyRule();
                 }});
         resultMenu.add(storeBuyRuleMenuItem);
 
-        storeSellRuleMenuItem = new JMenuItem("Store Sell Rule");        
+        storeSellRuleMenuItem = new JMenuItem(Locale.getString("STORE_SELL_RULE"));
         storeSellRuleMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     storeSellRule();
@@ -498,7 +542,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
 	resultMenu.addSeparator();
 
-        removeMenuItem = new JMenuItem("Remove");        
+        removeMenuItem = new JMenuItem(Locale.getString("REMOVE"));
         removeMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     removeSelectedResults();
@@ -506,7 +550,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                 }});
         resultMenu.add(removeMenuItem);
 
-        removeAllMenuItem = new JMenuItem("Remove All");        
+        removeAllMenuItem = new JMenuItem(Locale.getString("REMOVE_ALL"));
         removeAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     model.removeAllResults();
@@ -521,12 +565,12 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
 	resultMenu.addSeparator();
 
-        JMenuItem  resultCloseMenuItem = new JMenuItem("Close");
+        JMenuItem  resultCloseMenuItem = new JMenuItem(Locale.getString("CLOSE"));
         openMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     // When we close, free all the results to reduce memory
                     model.removeAllResults();
-                    
+
                     propertySupport.
                         firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
                 }});
@@ -556,20 +600,20 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     }
 
     public String getTitle() {
-	return "Paper Trade Results";
+	return Locale.getString("PAPER_TRADE_RESULTS_TITLE");
     }
 
     public void addModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
     }
-    
+
     public void removeModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
     }
 
     public ImageIcon getFrameIcon() {
 	return null;
-    }    
+    }
 
     public JComponent getComponent() {
 	return this;

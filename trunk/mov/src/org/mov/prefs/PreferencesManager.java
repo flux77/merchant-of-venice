@@ -294,7 +294,7 @@ public class PreferencesManager {
     /**
      * Save the watch screen.
      *
-     * @param watchScreeen the watch screen.
+     * @param watchScreen the watch screen.
      */
     public static void saveWatchScreen(WatchScreen watchScreen) {
         Preferences p = getUserNode("/watchscreens/" + watchScreen.getName());

@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
-import org.mov.util.*;
+import org.mov.util.Locale;
 
 public class GraphTools {
 
@@ -179,12 +179,12 @@ public class GraphTools {
 		// Buy
 		if(graph1Y.compareTo(graph2Y) > 0 &&
 		   lastGraph1Y.compareTo(lastGraph2Y) <= 0)
-		    annotations.put((Object)x, "Buy");
+		    annotations.put((Object)x, Locale.getString("BUY"));
 		
 		// Sell
 		else if(graph1Y.compareTo(graph2Y) < 0 &&
                         lastGraph1Y.compareTo(lastGraph2Y) >= 0)
-		    annotations.put((Object)x, "Sell");
+		    annotations.put((Object)x, Locale.getString("SELL"));
 	    }
 
 	    if(graph1Y != null && graph2Y != null) {

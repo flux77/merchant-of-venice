@@ -27,6 +27,7 @@ import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
+import org.mov.util.Locale;
 
 /**
  * A representation of an expression to set and return the value of a variable.
@@ -59,10 +60,12 @@ public class SetVariableExpression extends UnaryExpression {
 		return value;
 	    }
 	    else
-		throw new EvaluationException("variable '" + name + "' is a constant");
+		throw new EvaluationException(Locale.getString("VARIABLE_IS_CONSTANT_ERROR",
+                                                               name));
 	}
 	else
-            throw new EvaluationException("variable '" + name + "' is not defined");
+            throw new EvaluationException(Locale.getString("VARIABLE_NOT_DEFINED_ERROR",
+                                                           name));
     }
 
     public String toString() {

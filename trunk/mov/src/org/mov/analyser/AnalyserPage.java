@@ -25,4 +25,5 @@ public interface AnalyserPage {
     public void load(String key);
     public boolean parse();
     public JComponent getComponent();
+    public String getTitle();
 }

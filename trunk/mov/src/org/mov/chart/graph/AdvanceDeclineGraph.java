@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.mov.chart.Graphable;
 import org.mov.chart.GraphTools;
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteSourceManager;
@@ -122,7 +123,7 @@ public class AdvanceDeclineGraph implements Graph {
      * @return	<code>Advance/Decline</code>
      */
     public String getName() {
-	return "Advance/Decline";
+	return Locale.getString("ADVANCE_DECLINE");
     }
 
     /**
@@ -226,7 +227,7 @@ public class AdvanceDeclineGraph implements Graph {
 	progress.setMaximum(dates.size());
 	progress.setProgress(0);
         progress.setMaster(true);
-	progress.show("Calculating advance/decline");
+	progress.show(Locale.getString("CALCULATING_ADVANCE_DECLINE"));
 
 	int cumulativeAdvanceDecline = START_VALUE;
 

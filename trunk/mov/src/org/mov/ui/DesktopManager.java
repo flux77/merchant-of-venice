@@ -30,6 +30,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import org.mov.main.*;
+import org.mov.util.Locale;
 
 /**
  * This class manages activities to do with internal frames on the desktop
@@ -186,7 +187,7 @@ public class DesktopManager
                 
                 JOptionPane.showInternalMessageDialog(desktop_instance,
                                                       multiLineMessage,
-                                                      "Venice problem!",
+                                                      Locale.getString("VENICE_PROBLEM_TITLE"),
                                                       JOptionPane.WARNING_MESSAGE);
             }
         });
@@ -217,7 +218,7 @@ public class DesktopManager
                 
                 JOptionPane.showInternalMessageDialog(desktop_instance,
                                                       multiLineMessage,
-                                                      "Venice problem!",
+                                                      Locale.getString("VENICE_PROBLEM_TITLE"),
                                                       JOptionPane.ERROR_MESSAGE);
             }
         });

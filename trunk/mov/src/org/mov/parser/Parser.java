@@ -26,6 +26,7 @@ import org.mov.parser.expression.NumberExpression;
 import org.mov.parser.expression.DefineVariableExpression;
 import org.mov.parser.expression.GetVariableExpression;
 import org.mov.parser.expression.SetVariableExpression;
+import org.mov.util.Locale;
 
 /**
  * Parse a string into an executable expression. This class acts as
@@ -100,7 +101,7 @@ public class Parser {
 
 	// There should be no more tokens
 	if(tokens.size() > 0)
-	    throw new ParserException("extraneous text at end of expression");
+	    throw new ParserException(Locale.getString("EXTRANEOUS_TEXT_ERROR"));
 
 	// Check for type mismatch
 	expression.checkType();
@@ -154,8 +155,8 @@ public class Parser {
 	    subExpressions.add(parseSubExpression(variables, tokens));	    
 
 	if(subExpressions.size() == 0)
-	    throw new ParserException("empty equation");
-	else
+	    throw new ParserException(Locale.getString("EMPTY_EQUATION_ERROR"));
+        else
 	    return new ClauseExpression(subExpressions);
     }
 
@@ -174,7 +175,7 @@ public class Parser {
 
 		// If there are no more symbols then we are mising the matching "}"
 		if(tokens.size() == 0)
-		    throw new ParserException("missing right brace");
+		    throw new ParserException(Locale.getString("MISSING_RIGHT_BRACE_ERROR"));
 
 		// Keep parsing sub-expressions until we find the matching "}"
 		if(tokens.match(Token.RIGHT_BRACE_TOKEN)) {
@@ -317,7 +318,7 @@ public class Parser {
 	    expression = parseDefineVariable(variables, tokens);
 
 	else
-	    throw new ParserException("unexpected symbol");
+	    throw new ParserException(Locale.getString("UNEXPECTED_SYMBOL_ERROR"));
 
 	return expression;
     }
@@ -332,15 +333,16 @@ public class Parser {
 
 	// Make sure the variable is defined
 	if(variable == null)
-	    throw new ParserException("unknown identifier '" + token.getVariableName() + "'");
+	    throw new ParserException(Locale.getString("UNKNOWN_IDENTIFIER_ERROR",
+                                                       token.getVariableName()));
 
 	else if(tokens.match(Token.SET_TOKEN)) {
 	    tokens.pop();	  
 
 	    // Make sure we aren't trying to set a constant
 	    if(variable.isConstant())
-		throw new ParserException("variable '" + token.getVariableName() + 
-					  "' is a constant");
+		throw new ParserException(Locale.getString("VARIABLE_IS_CONSTANT_ERROR",
+                                                           token.getVariableName()));
 
 	    Expression value = parseSubExpression(variables, tokens);
 	    return new SetVariableExpression(token.getVariableName(), variable.getType(),
@@ -375,14 +377,14 @@ public class Parser {
 	else if(token.getType() == Token.INTEGER_TOKEN)
 	    type = Expression.INTEGER_TYPE;
 	else
-	    throw new ParserException("expecting variable type");
+	    throw new ParserException(Locale.getString("EXPECTED_VARIABLE_TYPE_ERROR"));
 	
 	// Parse the name
 	token = tokens.pop();
 	if(token.getType() == Token.VARIABLE_TOKEN)
 	    name = token.getVariableName();
 	else
-	    throw new ParserException("illegal variable name");
+	    throw new ParserException(Locale.getString("ILLEGAL_VARIABLE_NAME_ERROR"));
 	
 	// Parse the initial value (if any)
 	if(tokens.match(Token.SET_TOKEN)) {
@@ -394,8 +396,8 @@ public class Parser {
 
 	// Check the variable isn't already defined
 	if(variables.contains(name))
-	    throw new ParserException("variable '" + name + "' is already defined");
-
+	    throw new ParserException(Locale.getString("VARIABLE_DEFINED_ERROR", name));
+                                                      
 	// Add variable
 	variables.add(name, type, isConstant);
 	return new DefineVariableExpression(name, type, isConstant, value);
@@ -416,7 +418,7 @@ public class Parser {
 	    expression = ExpressionFactory.newExpression(quote);
 	    break;
 	default:
-	    throw new ParserException("expected quote type");
+	    throw new ParserException(Locale.getString("EXPECTED_QUOTE_TYPE_ERROR"));
 	}
 
 	return expression;
@@ -445,7 +447,7 @@ public class Parser {
                 return ExpressionFactory.newExpression(number);	    
             }
             else
-                throw new ParserException("expected number");
+                throw new ParserException(Locale.getString("EXPECTED_NUMBER_ERROR"));
         }
     }
 
@@ -553,41 +555,41 @@ public class Parser {
 
     private static void parseComma(Variables variables, TokenStack tokens) throws ParserException {
 	if(!tokens.pop(Token.COMMA_TOKEN))
-	    throw new ParserException("expected comma");
+	    throw new ParserException(Locale.getString("EXPECTED_COMMA_ERROR"));
     }
 
     private static void parseLeftParenthesis(Variables variables, TokenStack tokens) 
 	throws ParserException {
 	if(!tokens.pop(Token.LEFT_PARENTHESIS_TOKEN))
-	    throw new ParserException("expected left parenthesis");
+	    throw new ParserException(Locale.getString("EXPECTED_LEFT_PARENTHESIS_ERROR"));
     }
 
     private static void parseRightParenthesis(Variables variables, TokenStack tokens) 
 	throws ParserException {
 	if(!tokens.pop(Token.RIGHT_PARENTHESIS_TOKEN))
-	    throw new ParserException("missing right parenthesis");
+	    throw new ParserException(Locale.getString("MISSING_RIGHT_PARENTHESIS_ERROR"));
     }
 
     private static void parseLeftBrace(Variables variables, TokenStack tokens) 
 	throws ParserException {
 	if(!tokens.pop(Token.LEFT_BRACE_TOKEN))
-	    throw new ParserException("expected left brace");
+	    throw new ParserException(Locale.getString("EXPECTED_LEFT_BRACE_ERROR"));
     }
 
     private static void parseRightBrace(Variables variables, TokenStack tokens) 
 	throws ParserException {
 
 	if(!tokens.pop(Token.RIGHT_BRACE_TOKEN))
-	    throw new ParserException("missing right brace");
+	    throw new ParserException(Locale.getString("MISSING_RIGHT_BRACE_ERROR"));
     }
 
     private static void parseElse(Variables variables, TokenStack tokens) throws ParserException {
 	if(!tokens.pop(Token.ELSE_TOKEN))
-	    throw new ParserException("expected 'else'");
+	    throw new ParserException(Locale.getString("EXPECTED_ELSE_ERROR"));
     }
 
     private static void parseSemicolon(Variables variables, TokenStack tokens) throws ParserException {
 	if(!tokens.pop(Token.SEMICOLON_TOKEN))
-	    throw new ParserException("expected semicolon");
+	    throw new ParserException(Locale.getString("EXPECTED_SEMICOLON_ERROR"));
     }
 }

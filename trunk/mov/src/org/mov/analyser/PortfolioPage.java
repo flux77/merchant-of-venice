@@ -40,6 +40,7 @@ import javax.swing.JTextField;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.GridBagHelper;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 
 public class PortfolioPage extends JPanel implements AnalyserPage {
@@ -146,41 +147,41 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 	}
 	catch(NumberFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Invalid number '" +
-                                                  e.getMessage() + "'",
-                                                  "Invalid number",
+                                                  Locale.getString("ERROR_PARSING_NUMBER",
+                                                                   e.getMessage()),
+                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
 	}
 
 	if(initialCapital.isLessThanEqual(Money.ZERO)) {
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Cannot trade without some initial capital.",
-                                                  "Invalid number",
+                                                  Locale.getString("NO_CAPITAL_ERROR"),
+                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
 	}
 
         if(mode == NUMBER_STOCKS_MODE && numberStocks <= 0) {
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Portfolio must have at least one stock.",
-                                                  "Invalid number",
+                                                  Locale.getString("EMPTY_PORTFOLIO_ERROR"),
+                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
 
         if(mode == STOCK_VALUE_MODE && stockValue.isLessThanEqual(Money.ZERO)) {
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Stocks must have a value.",
-                                                  "Invalid number",
+                                                  Locale.getString("STOCK_VALUE_ERROR"),
+                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
 
         if(tradeCost.isLessThan(Money.ZERO)) {
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Trade cost can't be negative.",
-                                                  "Invalid number",
+                                                  Locale.getString("INVALID_TRADE_COST_ERROR"),
+                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
@@ -190,6 +191,10 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 
     public JComponent getComponent() {
         return this;
+    }
+
+    public String getTitle() {
+        return Locale.getString("PORTFOLIO_PAGE_TITLE");
     }
 
     public Money getInitialCapital() {
@@ -227,7 +232,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 
         // Portfolio panel
         {
-            TitledBorder portfolioTitled = new TitledBorder("Portfolio");
+            TitledBorder portfolioTitled = new TitledBorder(Locale.getString("PORTFOLIO"));
             JPanel panel = new JPanel();
             panel.setBorder(portfolioTitled);
             panel.setLayout(new BorderLayout());
@@ -242,10 +247,12 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             c.anchor = GridBagConstraints.WEST;
             
             initialCapitalTextField = 
-                GridBagHelper.addTextRow(innerPanel, "Initial Capital", "", gridbag, c, 
+                GridBagHelper.addTextRow(innerPanel, Locale.getString("INITIAL_CAPITAL"), "", 
+                                         gridbag, c, 
                                          10);
             tradeCostTextField =
-                GridBagHelper.addTextRow(innerPanel, "Trade Cost", "", gridbag, c, 5);
+                GridBagHelper.addTextRow(innerPanel, Locale.getString("TRADE_COST"), "", 
+                                         gridbag, c, 5);
 
             panel.add(innerPanel, BorderLayout.NORTH);
             add(panel);
@@ -253,7 +260,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 
         // How many stocks
         {
-            TitledBorder portfolioTitled = new TitledBorder("How many stocks?");
+            TitledBorder portfolioTitled = new TitledBorder(Locale.getString("HOW_MANY_STOCKS"));
             JPanel panel = new JPanel();
             panel.setBorder(portfolioTitled);
             panel.setLayout(new BorderLayout());
@@ -268,7 +275,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             c.ipadx = 5;
             c.anchor = GridBagConstraints.WEST;
             
-            numberStocksButton = new JRadioButton("Number of Stocks");
+            numberStocksButton = new JRadioButton(Locale.getString("NUMBER_OF_STOCKS"));
             numberStocksButton.setSelected(true);
             numberStocksButton.addActionListener(new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
@@ -290,7 +297,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             c.ipadx = 5;
             c.anchor = GridBagConstraints.WEST;
             
-            stockValueButton = new JRadioButton("Stock Value");
+            stockValueButton = new JRadioButton(Locale.getString("STOCK_VALUE"));
             stockValueButton.setSelected(true);
             stockValueButton.addActionListener(new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {

@@ -49,6 +49,7 @@ import org.mov.prefs.PreferencesManager;
 import org.mov.quote.ScriptQuoteBundle;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
@@ -89,17 +90,17 @@ public class PaperTradeModule extends JPanel implements Module {
 
         tabbedPane = new JTabbedPane();
         quoteRangePage = new QuoteRangePage(desktop);
-        tabbedPane.addTab("Range", quoteRangePage.getComponent());
+        tabbedPane.addTab(quoteRangePage.getTitle(), quoteRangePage.getComponent());
 
         rulesPage = new RulesPage(desktop);
-        tabbedPane.addTab("Rules", rulesPage.getComponent());
+        tabbedPane.addTab(rulesPage.getTitle(), rulesPage.getComponent());
 
         portfolioPage = new PortfolioPage(desktop);
-        tabbedPane.addTab("Portfolio", portfolioPage.getComponent());
+        tabbedPane.addTab(portfolioPage.getTitle(), portfolioPage.getComponent());
 
 	// Run, close buttons
 	JPanel buttonPanel = new JPanel();
-	JButton runButton = new JButton("Run");
+	JButton runButton = new JButton(Locale.getString("RUN"));
         runButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     // Run paper trade
@@ -108,7 +109,7 @@ public class PaperTradeModule extends JPanel implements Module {
             });
 	buttonPanel.add(runButton);
 
-	JButton closeButton = new JButton("Close");
+	JButton closeButton = new JButton(Locale.getString("CLOSE"));
 	closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     // Tell frame we want to close
@@ -139,7 +140,7 @@ public class PaperTradeModule extends JPanel implements Module {
     }
 
     public String getTitle() {
-	return "Paper Trade";
+	return Locale.getString("PAPER_TRADE");
     }
 
     /**
@@ -257,8 +258,8 @@ public class PaperTradeModule extends JPanel implements Module {
         Portfolio portfolio;
 
         if(mode == PortfolioPage.STOCK_VALUE_MODE) {
-            portfolio = PaperTrade.paperTrade("Paper Trade of " +
-                                              quoteRangeDescription,
+            portfolio = PaperTrade.paperTrade(Locale.getString("PAPER_TRADE_OF",
+                                                               quoteRangeDescription),
                                               quoteBundle,
                                               variables,
                                               orderCache,
@@ -272,8 +273,8 @@ public class PaperTradeModule extends JPanel implements Module {
         }
         else {
             assert portfolioPage.getMode() == PortfolioPage.NUMBER_STOCKS_MODE;
-            portfolio = PaperTrade.paperTrade("Paper Trade of " +
-                                              quoteRangeDescription,
+            portfolio = PaperTrade.paperTrade(Locale.getString("PAPER_TRADE_OF",
+                                                               quoteRangeDescription),
                                               quoteBundle,
                                               variables,
                                               orderCache,
@@ -288,7 +289,7 @@ public class PaperTradeModule extends JPanel implements Module {
 
         // Running the equation means we might need to load in
         // more quotes so the note may have changed...
-        progress.setNote("Paper Trading...");
+        progress.setNote(Locale.getString("PAPER_TRADING"));
         progress.increment();
 
         return new PaperTradeResult(portfolio,
@@ -308,7 +309,7 @@ public class PaperTradeModule extends JPanel implements Module {
 
         Thread thread = Thread.currentThread();
         progress.setIndeterminate(true);
-        progress.show("Paper Trade");
+        progress.show(Locale.getString("PAPER_TRADE"));
 
         // Get a copy of the values in the GUI, so that if the user changes
         // them, it won't screw up the paper trade.
@@ -339,7 +340,7 @@ public class PaperTradeModule extends JPanel implements Module {
         progress.setIndeterminate(false);
         progress.setMaximum(numberEquations);
         progress.setProgress(0);
-        progress.setNote("Paper Trading...");
+        progress.setNote(Locale.getString("PAPER_TRADING"));
         progress.setMaster(true);
 
         // Iterate through all possible paper trade equations
@@ -417,8 +418,8 @@ public class PaperTradeModule extends JPanel implements Module {
             progress = null;
 
             JOptionPane.showInternalMessageDialog(desktop,
-                                                  e.getReason() + ".",
-                                                  "Error executing paper trade",
+                                                  e.getReason(),
+                                                  Locale.getString("ERROR_EVALUATING_EQUATION"),
                                                   JOptionPane.ERROR_MESSAGE);
 
             return null;

@@ -27,6 +27,7 @@ import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
+import org.mov.util.Locale;
 
 /**
  * A representation of a variable definition.
@@ -62,7 +63,7 @@ public class DefineVariableExpression extends UnaryExpression {
 	    return value;
 	}
 	else
-            throw new EvaluationException("variable '" + getName() + "' is already defined");
+            throw new EvaluationException(Locale.getString("VARIABLE_DEFINED_ERROR", getName()));
     }
 
     public String toString() {

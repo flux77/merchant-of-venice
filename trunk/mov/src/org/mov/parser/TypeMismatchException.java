@@ -18,6 +18,8 @@
 
 package org.mov.parser;
 
+import org.mov.util.Locale;
+
 /**
  * An exception which is thrown when there is a type mismatch error
  * when executing an expression. A type mismatch error is when
@@ -32,7 +34,7 @@ public class TypeMismatchException extends ExpressionException {
      * Create a new type mistmatch exception.
      */
     public TypeMismatchException() {
-	super("type mismatch");
+	super(Locale.getString("TYPE_MISMATCH_ERROR"));
     }
 
 }

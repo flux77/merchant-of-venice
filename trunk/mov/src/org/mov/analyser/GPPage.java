@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.analyser;
@@ -39,6 +39,7 @@ import javax.swing.JTextField;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.GridBagHelper;
+import org.mov.util.Locale;
 
 public class GPPage extends JPanel implements AnalyserPage {
 
@@ -59,21 +60,21 @@ public class GPPage extends JPanel implements AnalyserPage {
     public GPPage(JDesktopPane desktop) {
         this.desktop = desktop;
 
-        layoutPage();        
+        layoutPage();
     }
 
     public void load(String key) {
         // Load last GUI settings from preferences
-	HashMap settings = 
+	HashMap settings =
             PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
-                          
+
 	Iterator iterator = settings.keySet().iterator();
-                              
+
 	while(iterator.hasNext()) {
 	    String setting = (String)iterator.next();
 	    String value = (String)settings.get((Object)setting);
 
-            if(setting.equals("generations")) 
+            if(setting.equals("generations"))
                 generationsTextField.setText(value);
             else if(setting.equals("population"))
                 populationTextField.setText(value);
@@ -106,66 +107,66 @@ public class GPPage extends JPanel implements AnalyserPage {
 
         try {
 	    if(!generationsTextField.getText().equals(""))
-		generations = 
+		generations =
 		    Integer.parseInt(generationsTextField.getText());
 
 	    if(!populationTextField.getText().equals(""))
-		population = 
+		population =
 		    Integer.parseInt(populationTextField.getText());
-	    	   
+	    	
 	    if(!breedingPopulationTextField.getText().equals(""))
-		breedingPopulation = 
+		breedingPopulation =
 		    Integer.parseInt(breedingPopulationTextField.getText());
 
 	    if(!displayPopulationTextField.getText().equals(""))
-		displayPopulation = 
+		displayPopulation =
 		    Integer.parseInt(displayPopulationTextField.getText());
 	}
 	catch(NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Invalid number '" +
-                                                  e.getMessage() + "'",
-                                                  "Invalid number",
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("ERROR_PARSING_NUMBER",
+                                                                   e.getMessage()),
+                                                  Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
 	}
 
         if(displayPopulation > breedingPopulation) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Display population must be smaller or equal to breeding population.",
-                                                  "Invalid number",
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("DISPLAY_POPULATION_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
 
         if(generations <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "You need at least one generation.",
-                                                  "Invalid number",
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("NO_GENERATION_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
 
         if(population <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "You need at least one individual in the population.",
-                                                  "Invalid number",
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("NO_INDIVIDUAL_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
 
         if(breedingPopulation <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "You need at least one individual in the breeding population.",
-                                                  "Invalid number",
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("NO_BREEDING_INDIVIDUAL_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
 
         if(displayPopulation <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "You need at least one individual in the display population.",
-                                                  "Invalid number",
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("NO_DISPLAY_INDIVIDUAL_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
@@ -175,6 +176,10 @@ public class GPPage extends JPanel implements AnalyserPage {
 
     public JComponent getComponent() {
         return this;
+    }
+
+    public String getTitle() {
+        return Locale.getString("GP_PAGE_SHORT_TITLE");
     }
 
     public int getGenerations() {
@@ -196,7 +201,7 @@ public class GPPage extends JPanel implements AnalyserPage {
     private void layoutPage() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        TitledBorder titledBorder = new TitledBorder("Genetic Programming");
+        TitledBorder titledBorder = new TitledBorder(Locale.getString("GP_PAGE_TITLE"));
         JPanel panel = new JPanel();
         panel.setBorder(titledBorder);
         panel.setLayout(new BorderLayout());
@@ -205,23 +210,30 @@ public class GPPage extends JPanel implements AnalyserPage {
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         innerPanel.setLayout(gridbag);
-        
+
         c.weightx = 1.0;
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
-        
-        generationsTextField = 
-            GridBagHelper.addTextRow(innerPanel, "Generations", "", gridbag, c, 
+
+        generationsTextField =
+            GridBagHelper.addTextRow(innerPanel, Locale.getString("GENERATIONS"), "",
+                                     gridbag, c,
                                      5);
-        populationTextField = 
-            GridBagHelper.addTextRow(innerPanel, "Population", "", gridbag, c, 
+        populationTextField =
+            GridBagHelper.addTextRow(innerPanel,
+                                     Locale.getString("POPULATION"), "",
+                                     gridbag, c,
                                      10);
         breedingPopulationTextField =
-            GridBagHelper.addTextRow(innerPanel, "Breeding Population", "", gridbag, c, 7);
+            GridBagHelper.addTextRow(innerPanel,
+                                     Locale.getString("BREEDING_POPULATION"), "",
+                                     gridbag, c, 7);
 
         displayPopulationTextField =
-            GridBagHelper.addTextRow(innerPanel, "Display Population", "", gridbag, c, 7);
-        
+            GridBagHelper.addTextRow(innerPanel,
+                                     Locale.getString("DISPLAY_POPULATION"), "",
+                                     gridbag, c, 7);
+
         panel.add(innerPanel, BorderLayout.NORTH);
         add(panel);
     }

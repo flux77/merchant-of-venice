@@ -1,0 +1,50 @@
+/* Style sheet for Venice Web Page */
+
+body, td, li, p {
+	font-family : Verdana,Arial,Helvetica,"MS Sans Serif";
+	font-size : 14;
+}
+
+h3 {
+	color: #3f5359;
+	font-size : 16;
+	text-align: left;
+}
+
+h2 {
+	color: #3f5359;
+	font-size : 18;
+	text-align: left;
+}
+
+h1 {
+	color: #eef1ee;
+	font-weight: normal;
+	font-size : 24;
+	margin: 0;
+}
+
+li, a {
+	color: #3f5359;
+	text-align: left;
+}
+
+a {
+/* Experimental Orange Links */
+/*	color: #cc7700; */
+	color: #3f5359; 
+}
+
+a:visited {
+	color: #1f1319; 
+}
+
+a:active {
+	color: #cc7700; 
+}
+
+li {
+	padding-bottom: 1pt;
+	padding-top: 0pt;
+}
+

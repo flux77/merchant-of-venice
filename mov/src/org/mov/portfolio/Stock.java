@@ -84,4 +84,12 @@ public class Stock {
 	    throw new EvaluationException("unknown quote type");
 	}
     }
+
+    public String toString() {
+	return new String(getSymbol() + ", " + getDate() + ", " +
+			  getDayOpen() + ", " + getDayHigh() + ", " + 
+			  getDayLow() + ", " + getDayClose() + ", " + 
+			  getVolume());
+			   
+    }
 }

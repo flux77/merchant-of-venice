@@ -41,6 +41,17 @@ public class DesktopManager
 	setDesktop(desktop);
     }
 
+    /**
+     * Show a simple error message to the user.
+     *
+     * @param	message	the error message to display
+     */
+    public static void showErrorMessage(String message) {
+	JOptionPane.showInternalMessageDialog(desktop_instance,
+					      message, 
+					      message,
+					      JOptionPane.ERROR_MESSAGE);
+    }
 
     // method to tile open windows in various styles:  
     //    HORIZONTAL = horizontal tiling  

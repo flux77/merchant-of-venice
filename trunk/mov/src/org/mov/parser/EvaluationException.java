@@ -56,6 +56,10 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException AVG_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("AVG_RANGE_ERROR"));
 
+    /** An exception which is thrown on an invalid ema() range. */
+    public static EvaluationException EMA_RANGE_EXCEPTION =
+        new EvaluationException(Locale.getString("EMA_RANGE_ERROR"));
+
     /** An exception which is thrown on an invalid max() range. */
     public static EvaluationException MAX_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("MAX_RANGE_ERROR"));
@@ -89,6 +93,10 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException LAG_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("LAG_OFFSET_ERROR"));
 
+    /** An exception which is thrown on an invalid ema() offset. */
+    public static EvaluationException EMA_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("EMA_OFFSET_ERROR"));
+
     /** An exception which is thrown on an invalid max() offset. */
     public static EvaluationException MAX_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("MAX_OFFSET_ERROR"));
@@ -104,6 +112,10 @@ public class EvaluationException extends ExpressionException {
     /** An exception which is thrown on an invalid corr() offset. */
     public static EvaluationException CORR_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("CORR_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid ema() smoothing constant. */
+    public static EvaluationException EMA_SMOOTHING_EXCEPTION =
+        new EvaluationException(Locale.getString("EMA_SMOOTHING_ERROR"));
 
     /**
      * Create a new evaluation exception with the given error reason.

@@ -221,6 +221,9 @@ public class ExpressionFactory {
         case(Token.CORR_TOKEN):
             expression = new CorrExpression(arg1, arg2, arg3, arg4);
             break;
+        case(Token.EMA_TOKEN):
+            expression = new EMAExpression(arg1, arg2, arg3, arg4);
+            break;
         default:
             // No such token
             assert false;

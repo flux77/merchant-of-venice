@@ -18,6 +18,7 @@
 
 package org.mov.analyser;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -62,10 +63,17 @@ public class PaperTrade {
     // Generic name to call all the share accounts in all generated portfolios
     private final static String SHARE_ACCOUNT_NAME = Locale.getString("SHARE_ACCOUNT");
     
+    // tip() format for output numbers
+    public final static String format = "0.00000#";
+    public final static DecimalFormat decimalFormat = new DecimalFormat(format);
+    public final static int STOCKS_PER_LINES = 5;
+    
     // Information to get the next day trading prices
     private static String[] symbolStock;
     private static boolean[] buyRule;
     private static boolean[] sellRule;
+    private static double[] buyValue;
+    private static double[] sellValue;
 
     // Since this process uses so many temporary variables, it makes sense
     // grouping them all together.
@@ -168,6 +176,7 @@ public class PaperTrade {
                              Variables variables,
                              StockHolding stockHolding,
                              Money tradeCost,
+                             double sellPrice,
                              int day)
 	throws EvaluationException, MissingQuoteException {
 
@@ -178,9 +187,10 @@ public class PaperTrade {
 	    int shares = stockHolding.getShares();
             Symbol symbol = stockHolding.getSymbol();
 
-            // How much are they worth? We sell at the user defined price.
-            Expression tradeValueSellExpression = ExpressionFactory.newExpression(environment.tradeValueSell);
-            double sellPrice = tradeValueSellExpression.evaluate(variables, environment.quoteBundle, symbol, day);
+            // If the sellPrice is zero, buy at open price.
+            if (sellPrice==0) {
+                sellPrice = environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day);
+            }
             // If the wished price is lower than the maximum of the day,
             // your stocks will be sold.
             // It simulates an order of selling at fixed price (sellPrice).
@@ -215,11 +225,14 @@ public class PaperTrade {
                                Symbol symbol,
                                Money amount,				
                                Money tradeCost,
+                               double buyPrice,
                                int day)
 	throws EvaluationException, MissingQuoteException {
 
-        Expression tradeValueBuyExpression = ExpressionFactory.newExpression(environment.tradeValueBuy);
-        double buyPrice = tradeValueBuyExpression.evaluate(variables, environment.quoteBundle, symbol, day);
+        // If the buyPrice is zero, buy at open price.
+        if (buyPrice==0) {
+            buyPrice = environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day);
+        }
         // If the wished price is greater than the minimum of the day,
         // your stocks will be bought.
         // It simulates an order of buying at fixed price (buyPrice).
@@ -298,7 +311,19 @@ public class PaperTrade {
                 // If you want to buy the stock, do not sell it.
                 if(!(buy.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE)) {
                     if(sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE) {
-                        sell(environment, variables, stockHolding, tradeCost, dateOffset + 1);
+                        // calculate the price wanted by user trade value expression
+                        // to sell the stock (tradeValueWanted).
+                        // If trade value expression is 'open', then
+                        // set tradeValueWanted = 0 and sell at open price.
+                        double tradeValueWanted = 0;
+                        if(environment.tradeValueSell.compareTo("open")!=0) {
+                            Expression tradeValueSellExpression = ExpressionFactory.newExpression(environment.tradeValueSell);
+                            tradeValueWanted = tradeValueSellExpression.evaluate(variables, environment.quoteBundle, symbol, dateOffset);
+                        }
+
+                        // Did we have enough money to buy at least one share?
+                        // Will the stock reach the price wanted (tradeValueWanted)?
+                        sell(environment, variables, stockHolding, tradeCost, tradeValueWanted, dateOffset + 1);
                     }
                 }
             }
@@ -360,9 +385,20 @@ public class PaperTrade {
                         if(buy.evaluate(variables, quoteBundle, symbol,
                                         dateOffset) >= Expression.TRUE) {
 
+                            // calculate the price wanted by user trade value expression
+                            // to buy the stock (tradeValueWanted).
+                            // If trade value expression is 'open', then
+                            // set tradeValueWanted = 0 and buy at open price.
+                            double tradeValueWanted = 0;
+                            if(environment.tradeValueBuy.compareTo("open")!=0) {
+                                Expression tradeValueBuyExpression = ExpressionFactory.newExpression(environment.tradeValueBuy);
+                                tradeValueWanted = tradeValueBuyExpression.evaluate(variables, environment.quoteBundle, symbol, dateOffset);
+                            }
+                            
                             // Did we have enough money to buy at least one share?
+                            // Will the stock reach the price wanted (tradeValueWanted)?
                             if(buy(environment, variables, symbol, stockValue,  tradeCost,
-                                   dateOffset + 1)) {
+                                   tradeValueWanted, dateOffset + 1)) {
 
                                 // If there is no more money left, don't even look at the
                                 // other stocks
@@ -471,8 +507,8 @@ public class PaperTrade {
             dateOffset++;
         }
 
-        setTip(environment, quoteBundle, variables, buy, sell, dateOffset-1, tradeCost,
-                  orderCache.getTodaySymbols(dateOffset-1), orderCache);
+        setTip(environment, quoteBundle, variables, buy, sell, dateOffset, tradeCost,
+                  orderCache.getTodaySymbols(dateOffset), orderCache);
         
         return environment.portfolio;
     }
@@ -552,8 +588,8 @@ public class PaperTrade {
             dateOffset++;
         }
 
-        setTip(environment, quoteBundle, variables, buy, sell, dateOffset-1, tradeCost,
-                  orderCache.getTodaySymbols(dateOffset-1), orderCache);
+        setTip(environment, quoteBundle, variables, buy, sell, dateOffset, tradeCost,
+                  orderCache.getTodaySymbols(dateOffset), orderCache);
         
         return environment.portfolio;
     }
@@ -574,6 +610,8 @@ public class PaperTrade {
         symbolStock = new String[symbols.size()];
         buyRule = new boolean[symbols.size()];
         sellRule = new boolean[symbols.size()];
+        buyValue = new double[symbols.size()];
+        sellValue = new double[symbols.size()];
         
         setSellTip(environment, quoteBundle, variables, sell, dateOffset,
                     tradeCost, symbols, orderCache);
@@ -629,8 +667,19 @@ public class PaperTrade {
             try {
                 // Get if the stock must be sold
                 sellRule[index] = (sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE);
-            }
+                        
+                // calculate the price wanted by user trade value expression
+                // to sell the stock (tradeValueWanted).
+                // If trade value expression is 'open', then
+                // set the price to zero (sell at open price).
+                sellValue[index] = 0;
+                if(environment.tradeValueSell.compareTo("open")!=0) {
+                    Expression tradeValueSellExpression = ExpressionFactory.newExpression(environment.tradeValueSell);
+                    sellValue[index] = tradeValueSellExpression.evaluate(variables, environment.quoteBundle, symbol, dateOffset);
+                }
+           }
             catch(EvaluationException e) {
+                // do nothing
             }
             finally {
                 index++;
@@ -677,8 +726,18 @@ public class PaperTrade {
                 //    buyRule[index] = false;
                 //}
 
-           }
+                // calculate the price wanted by user trade value expression
+                // to buy the stock (tradeValueWanted).
+                // If trade value expression is 'open', then
+                // set this price to zero (buy at open price).
+                buyValue[index] = 0;
+                if(environment.tradeValueBuy.compareTo("open")!=0) {
+                    Expression tradeValueBuyExpression = ExpressionFactory.newExpression(environment.tradeValueBuy);
+                    buyValue[index] = tradeValueBuyExpression.evaluate(variables, environment.quoteBundle, symbol, dateOffset);
+                }
+          }
             catch(EvaluationException e) {
+                // do nothing
             }
             finally {
                 index++;
@@ -698,40 +757,52 @@ public class PaperTrade {
      */
     public static String getTip() {
         StringBuffer retValue = new StringBuffer();
-        boolean first = true;
+        int found = 0;
         
         retValue.append(Locale.getString("BUY_STOCKS"));
         
         for (int i=0; i<symbolStock.length; i++) {
 
             if (buyRule[i]) {
-                if (first) {
-                    retValue.append(" " + symbolStock[i]);
-                    first = false;
+                if (found%STOCKS_PER_LINES==0) {
+                    retValue.append("\n");
                 } else {
-                    retValue.append(", " + symbolStock[i]);
+                    retValue.append(", ");
                 }
+                
+                retValue.append(symbolStock[i]);
+                
+                if (buyValue[i]!=0)
+                    retValue.append(" (@ " + decimalFormat.format(buyValue[i]) + ")");
+                
+                found++;
             }
-
+            
         }
         
-        retValue.append("\n");
+        retValue.append("\n\n");
 
-        first = true;
+        found = 0;
         retValue.append(Locale.getString("SELL_STOCKS"));
             
         for (int i=0; i<symbolStock.length; i++) {
             
             if (sellRule[i]) {
-                if (first) {
-                    retValue.append(" " + symbolStock[i]);
-                    first = false;
+                if (found%STOCKS_PER_LINES==0) {
+                    retValue.append("\n");
                 } else {
-                    retValue.append(", " + symbolStock[i]);
+                    retValue.append(", ");
                 }
-            }
+                
+                retValue.append(symbolStock[i]);
+                
+                if (sellValue[i]!=0)
+                    retValue.append("(@ " + decimalFormat.format(sellValue[i]) + ")");
+                
+                found++;
+           }
             
-        }
+       }
         
         retValue.append("\n");
         

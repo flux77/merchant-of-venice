@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.ui;
@@ -35,9 +35,9 @@ import org.mov.util.Locale;
 /**
  * This class manages activities to do with internal frames on the desktop
  */
-public class DesktopManager 
+public class DesktopManager
     extends javax.swing.DefaultDesktopManager
-    implements java.io.Serializable {  
+    implements java.io.Serializable {
 
     static private int DEFAULT_FRAME_WIDTH = 450;
     static private int DEFAULT_FRAME_HEIGHT = 375;
@@ -46,7 +46,7 @@ public class DesktopManager
     public static final int HORIZONTAL = 0;
 
     /** Tile windows vertically */
-    public static final int VERTICAL   = 1;                      
+    public static final int VERTICAL   = 1;
 
     /** Cascade windows, resizing based on desktop size */
     public static final int CASCADE    = 2;
@@ -150,7 +150,7 @@ public class DesktopManager
 
     /**
      * Inform all the module listneres that this module has been renamed.
-     * 
+     *
      * @param module that has been renamed.
      */
     public void fireModuleRenamed(Module module) {
@@ -184,18 +184,18 @@ public class DesktopManager
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 String multiLineMessage = breakUpMessage(message);
-                
+
                 JOptionPane.showInternalMessageDialog(desktop_instance,
                                                       multiLineMessage,
                                                       Locale.getString("VENICE_PROBLEM_TITLE"),
                                                       JOptionPane.WARNING_MESSAGE);
             }
         });
-        thread.start();            
+        thread.start();
     }
 
     /**
-     * Show a simple error message to the user. This will also 
+     * Show a simple error message to the user. This will also
      * cancel the current thread if the progress dialog is up.
      *
      * @param	message	the error message to display
@@ -207,7 +207,7 @@ public class DesktopManager
         // tell them whether the task was interrupted because the user clicked
         // cancel OR there was an error. So I don't need lots of specific
         // error handling code.
-        if(ProgressDialogManager.isProgressDialogUp()) 
+        if(ProgressDialogManager.isProgressDialogUp())
             Thread.currentThread().interrupt();
 
         // Now show the dialog in a new thread. This way our dialog isn't
@@ -215,14 +215,14 @@ public class DesktopManager
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 String multiLineMessage = breakUpMessage(message);
-                
+
                 JOptionPane.showInternalMessageDialog(desktop_instance,
                                                       multiLineMessage,
                                                       Locale.getString("VENICE_PROBLEM_TITLE"),
                                                       JOptionPane.ERROR_MESSAGE);
             }
         });
-        thread.start();            
+        thread.start();
     }
 
     // Break up a single line message into multiple line messages ready
@@ -231,28 +231,28 @@ public class DesktopManager
         // If message is a one really long line, break it up
         StringTokenizer tokeniser = new StringTokenizer(message, " \n", true);
         String multiLineMessage = "";
-        
+
         // This isn't hard and fast but a rough maximum.
         final int MAX_LINE_LENGTH = 40;
         int lineLength = 0;
-        
+
         while(tokeniser.hasMoreTokens()) {
             String token = tokeniser.nextToken();
-            
+
             // If the token is a newline, the line length is now 0
             if(token.equals("\n"))
                 lineLength = 0;
-            
+
             // Are we about due for anothe rnew line?
                 if(lineLength > MAX_LINE_LENGTH) {
                     multiLineMessage = multiLineMessage.concat("\n");
                     lineLength = 0;
                 }
-            
+
             // Don't add spaces at the start of a line!
             if(lineLength > 0 || !token.equals(" "))
                 multiLineMessage = multiLineMessage.concat(token);
-            
+
             // Don't count "\n" as a string length
             if(!token.equals("\n"))
                 lineLength += token.length();
@@ -267,7 +267,7 @@ public class DesktopManager
      * @param style one of {@link #HORIZONTAL}, {@link #VERTICAL}, {@link #CASCADE}
      *              or {@link #ARRANGE}
      */
-    public static void tileFrames(int style){    
+    public static void tileFrames(int style){
 	Dimension deskDim = desktop_instance.getSize();
 	int deskWidth = deskDim.width;
 	int deskHeight = deskDim.height;
@@ -286,18 +286,18 @@ public class DesktopManager
 	for (int i =0; i< frameCount; i++) {
 
 	    // Only layout frames that are visible, arent icons and
-	    // aren't resizble. Non resizable frames should be left alone as 
+	    // aren't resizble. Non resizable frames should be left alone as
 	    // they will always be centred and generally take little screen
 	    // room and get in the way of the frames the user wants to see
 	    if (frames[i].isVisible() && !frames[i].isIcon() &&
 		frames[i].isResizable()) {
 		frameVec.addElement(frames[i]);
 		frameCounter++;
-	    }      
-	    else if(frames[i].isIcon()) 
+	    }
+	    else if(frames[i].isIcon())
 		areIcons=true;
-	}    
-	if(areIcons) 
+	}
+	if(areIcons)
 	    deskHeight = deskHeight - 50;
 	switch(style){
 	case(HORIZONTAL):
@@ -308,46 +308,46 @@ public class DesktopManager
 		temp.reshape(xpos, ypos, frameWidth, frameHeight);
 		ypos = ypos+frameHeight;
 		temp.moveToFront();
-	    }        
+	    }
 	    break;
 
-	case(VERTICAL): 
+	case(VERTICAL):
 	    for (int i=0; i<frameCounter; i++){
 		JInternalFrame temp = (JInternalFrame) frameVec.elementAt(i);
 		frameWidth = (int)(deskWidth/frameCounter);
 		frameHeight = deskHeight;
-		if (temp.isResizable()) 
+		if (temp.isResizable())
 		    temp.reshape(xpos, ypos, frameWidth, frameHeight);
-		else 
+		else
 		    temp.setLocation(xpos,ypos);
 		xpos = xpos+frameWidth;
 		temp.moveToFront();
-	    }        
+	    }
 	    break;
 	case(CASCADE):
 	    for (int i=0; i<frameCounter; i++){
 		JInternalFrame temp = (JInternalFrame) frameVec.elementAt(i);
 		frameWidth =  (int)(deskWidth*scale);
 		frameHeight = (int)(deskHeight*scale);
-		if (temp.isResizable()) 
+		if (temp.isResizable())
 		    temp.reshape(xpos, ypos, frameWidth, frameHeight);
-		else 
+		else
 		    temp.setLocation(xpos,ypos);
 		temp.moveToFront();
 		xpos=xpos+spacer;
 		ypos=ypos+spacer;
-		if((xpos+frameWidth>deskWidth)||(ypos+frameHeight>deskHeight-50)){ 
+		if((xpos+frameWidth>deskWidth)||(ypos+frameHeight>deskHeight-50)){
 		    xpos=0;
 		    ypos=0;
-		}        
+		}
 	    }
 	    break;
 	case(ARRANGE):
 	    int row=new Long(Math.round(Math.sqrt(new Integer(frameCounter).doubleValue()))).intValue();
-	    if(row==0) 
+	    if(row==0)
 		break;
 	    int col=frameCounter/row;
-	    if (col ==0) 
+	    if (col ==0)
 		break;
 	    int rem=frameCounter%row;
 	    int rowCount=1;
@@ -356,38 +356,38 @@ public class DesktopManager
 	    for (int i=0; i<frameCounter; i++){
 		JInternalFrame temp = (JInternalFrame) frameVec.elementAt(i);
 		if(rowCount<=row-rem) {
-		    if (temp.isResizable()) 
+		    if (temp.isResizable())
 			temp.reshape(xpos,ypos,frameWidth,frameHeight);
-		    else 
+		    else
 			temp.setLocation(xpos,ypos);
-		    if(xpos+10<deskWidth-frameWidth) 
+		    if(xpos+10<deskWidth-frameWidth)
 			xpos=xpos+frameWidth;
-		    else { 
+		    else {
 			ypos=ypos+frameHeight;
 			xpos=0;
 			rowCount++;
-		    }          
-		}          
-		else 
+		    }
+		}
+		else
 		    {
 			frameWidth = (int)deskWidth/(col+1);
-			if (temp.isResizable()) 
+			if (temp.isResizable())
 			    temp.reshape(xpos,ypos,frameWidth,frameHeight);
-			else 
+			else
 			    temp.setLocation(xpos,ypos);
-			if(xpos+10<deskWidth-frameWidth) 
+			if(xpos+10<deskWidth-frameWidth)
 			    xpos=xpos+frameWidth;
-			else { 
+			else {
 			    ypos=ypos+frameHeight;
 			    xpos=0;
-			}          
+			}
 		    }
 	    }
 	    break;
 	default:
 	    break;
-	}  
-    }  
+	}
+    }
 
     /**
      * Minimises all windows that are iconifiable.
@@ -396,13 +396,13 @@ public class DesktopManager
 	JInternalFrame[] openWindows = desktop_instance.getAllFrames();
 	for (int i=0; i<openWindows.length; i++)
 	    if(openWindows[i].isIconifiable()) {
-		try { 
+		try {
 		    openWindows[i].setIcon(true);
-		}          
-		catch (java.beans.PropertyVetoException pve) { 
+		}
+		catch (java.beans.PropertyVetoException pve) {
 		    pve.printStackTrace();
-		}        
-	    } 
+		}
+	    }
     }
 
     /**
@@ -414,32 +414,32 @@ public class DesktopManager
 	    if(openWindows[i].isIcon())
 		try {
 		    openWindows[i].setIcon(false);
-		}      
-		catch (java.beans.PropertyVetoException pve) { 
+		}
+		catch (java.beans.PropertyVetoException pve) {
 		    pve.printStackTrace();
-		}    
-	} 
-    }  
+		}
+	}
+    }
 
     /**
      * Closes all open windows.
      */
     public static void closeAllWindows() {
 	JInternalFrame[] openWindows = desktop_instance.getAllFrames();
-	for (int i=0; i<openWindows.length; i++) { 
+	for (int i=0; i<openWindows.length; i++) {
 	    openWindows[i].dispose();
-	}  
-    }  
-    
+	}
+    }
+
     /**
      * Display a new frame upon the current desktop. Frame will be
      * displayed at (0,0) and not centred.
-     * 
+     *
      * @param module the module to render in the frame
      * @return	module frame
      */
     public ModuleFrame newFrame(Module module) {
-	return newFrame(module, false, false);
+       return newFrame(module, false, false, true);
     }
 
     /**
@@ -448,12 +448,13 @@ public class DesktopManager
      * @param module the module to render in the frame
      * @param centre should the frame be centred?
      * @param honourSize should we honour the frame's preferred size?
+     * @param resizable  is the frame allowed to be resized?
      * @return	module frame
      */
-    public ModuleFrame newFrame(Module module, boolean centre, 
-				boolean honourSize) {
+    public ModuleFrame newFrame(Module module, boolean centre,
+				boolean honourSize, boolean resizable) {
 
-	ModuleFrame frame = new ModuleFrame(this, module, centre, honourSize);
+        ModuleFrame frame = new ModuleFrame(this, module, centre, honourSize, resizable);
 	desktop_instance.add(frame);
 	
 	try {
@@ -463,7 +464,7 @@ public class DesktopManager
 	    // ignore
 	}
 	
-	frame.moveToFront();		    
+	frame.moveToFront();		
 
 	fireModuleAdded(module);
 

@@ -340,7 +340,7 @@ public class CommandManager {
      */
     public void paperTrade() {
 	PaperTradeModule module = new PaperTradeModule(desktop);
-	desktopManager.newFrame(module, true, false);
+	desktopManager.newFrame(module, true, true, true);
     }
 
     /**
@@ -348,7 +348,7 @@ public class CommandManager {
      */
     public void gp() {
 	GPModule module = new GPModule(desktop);
-	desktopManager.newFrame(module, true, false);
+	desktopManager.newFrame(module, true, true, true);
     }
 
     /**
@@ -452,7 +452,8 @@ public class CommandManager {
 	    if(!wakeIfPresent(preferencesModuleFrame)) {
 		PreferencesModule preferencesModule = new PreferencesModule(desktop);
 
-		preferencesModuleFrame = desktopManager.newFrame(preferencesModule, true, false);
+		preferencesModuleFrame =
+                   desktopManager.newFrame(preferencesModule, true, false, true);
 	    }
 	}
     }
@@ -468,7 +469,8 @@ public class CommandManager {
 	    if(!wakeIfPresent(preferencesModuleFrame)) {
 		PreferencesModule preferencesModule = new PreferencesModule(desktop, page);
 
-		preferencesModuleFrame = desktopManager.newFrame(preferencesModule, true, false);
+		preferencesModuleFrame =
+                   desktopManager.newFrame(preferencesModule, true, false, true);
 	    }
 	}
     }
@@ -907,7 +909,7 @@ public class CommandManager {
 	// correctness.
         HelpModule helpModule = new HelpModule(desktop);
 
-        desktopManager.newFrame(helpModule, false, false);
+        desktopManager.newFrame(helpModule, false, false, true);
     }
 
     /**
@@ -920,7 +922,7 @@ public class CommandManager {
 	    if(!wakeIfPresent(importModuleFrame)) {
 		ImporterModule importerModule = new ImporterModule(desktop);
 		
-		importModuleFrame = desktopManager.newFrame(importerModule, true, true);
+		importModuleFrame = desktopManager.newFrame(importerModule, true, true, false);
 	    }
 	}
     }

@@ -54,12 +54,12 @@ import org.mov.util.Locale;
  * TYPE              = "boolean" | "float" | "int"
  * VARIABLE          = [["const"] [TYPE]] VARIABLE_NAME ["=" SUB_EXPR]
  * QUOTE             = "open" | "close" | "low" | "high" | "volume"
- * FUNCTION          = "lag" "(" QUOTE "," SUB_EXPR ")" |
- *                     "min" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
- *                     "max" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
- *                     "avg" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
- *                     "sum" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
- *                     "rsi" "(" SUB_EXPR "," SUB_EXPR ")" |
+ * FUNCTION          = "lag" "(" QUOTE ["," SUB_EXPR] ")" |
+ *                     "min" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "max" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "avg" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "sum" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "rsi" "(" [SUB_EXPR ["," SUB_EXPR]] ")" |
  *                     "not" "(" SUB_EXPR ")" |
  *                     "percent" "(" SUB_EXPR "," SUB_EXPR ")" |
  *                     "dayofweek" "(" ")" |
@@ -478,8 +478,15 @@ public class Parser {
 	switch(function.getType()) {
 	case(Token.LAG_TOKEN):
 	    arg1 = parseQuote(variables, tokens);
-	    parseComma(variables, tokens);
-	    arg2 = parseSubExpression(variables, tokens);
+
+            // Parse optional offset argument
+            if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		parseComma(variables, tokens);
+		arg2 = parseSubExpression(variables, tokens);
+	    }
+	    else
+		arg3 = new NumberExpression(0);
+
 	    break;
 
 	case(Token.MIN_TOKEN):
@@ -489,8 +496,15 @@ public class Parser {
 	    arg1 = parseQuote(variables, tokens);
 	    parseComma(variables, tokens);
 	    arg2 = parseSubExpression(variables, tokens);
-	    parseComma(variables, tokens);
-	    arg3 = parseSubExpression(variables, tokens);	
+
+            // Parse optional offset argument
+            if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		parseComma(variables, tokens);
+		arg3 = parseSubExpression(variables, tokens);	
+	    }
+	    else
+		arg3 = new NumberExpression(0);
+
 	    break;
 
 	case(Token.RSI_TOKEN):	

@@ -96,7 +96,7 @@ public class DatabaseQuoteSource implements QuoteSource
      *
      * @param	host	the host location of the database
      * @param	port	the port of the database
-     * @param	datbase	the name of the database
+     * @param	database	the name of the database
      * @param	username	the user login
      * @param	password	the password for the login
      */
@@ -202,10 +202,10 @@ public class DatabaseQuoteSource implements QuoteSource
     /**
      * Returns the symbol associated with the given company.
      *
-     * @param	symbol	a partial company name.
+     * @param	partialCompanyName a partial company name.
      * @return	the company symbol.
      */
-    public Symbol getSymbol(String partialSymbolName) {
+    public Symbol getSymbol(String partialCompanyName) {
 
 	Symbol symbol = null;
 
@@ -216,7 +216,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		ResultSet RS = statement.executeQuery
 		    ("SELECT " + SYMBOL_FIELD + 
 		     " FROM " + LOOKUP_TABLE_NAME + " WHERE LOCATE(" +
-		     "UPPER('" + partialSymbolName + "'), " +
+		     "UPPER('" + partialCompanyName + "'), " +
 		     NAME_FIELD + ") != 0");
 
 		// Import SQL data into vector
@@ -417,8 +417,6 @@ public class DatabaseQuoteSource implements QuoteSource
     private boolean executeSQLString(ProgressDialog progress, String SQLString) {
 
 	if(checkConnection()) {
-            String symbolString;
-
 	    try {
 		Statement statement = connection.createStatement();	
                 Thread monitor = cancelOnInterrupt(statement);
@@ -439,15 +437,13 @@ public class DatabaseQuoteSource implements QuoteSource
                     QuoteCache quoteCache = QuoteCache.getInstance();
 
                     while (RS.next()) {
-                        symbolString = RS.getString(SYMBOL_FIELD);
-
-                        quoteCache.load(new Quote(new Symbol(symbolString),
-                                                  new TradingDate(RS.getDate(DATE_FIELD)),
-                                                  RS.getInt(DAY_VOLUME_FIELD),
-                                                  RS.getFloat(DAY_LOW_FIELD),
-                                                  RS.getFloat(DAY_HIGH_FIELD),
-                                                  RS.getFloat(DAY_OPEN_FIELD),
-                                                  RS.getFloat(DAY_CLOSE_FIELD)));
+                        quoteCache.load(SymbolRegistry.find(RS.getString(SYMBOL_FIELD)),
+                                        new TradingDate(RS.getDate(DATE_FIELD)),
+                                        RS.getInt(DAY_VOLUME_FIELD),
+                                        RS.getFloat(DAY_LOW_FIELD),
+                                        RS.getFloat(DAY_HIGH_FIELD),
+                                        RS.getFloat(DAY_OPEN_FIELD),
+                                        RS.getFloat(DAY_CLOSE_FIELD));
                         
                         // Update the progress bar per row
                         progress.increment();
@@ -457,7 +453,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		// Clean up after ourselves
 		RS.close();
 		statement.close();
-                return true;
+                return !thread.isInterrupted();
 	    }
 	    catch(SQLException e) {
                 DesktopManager.showErrorMessage("Error talking to database:\n" +
@@ -754,7 +750,7 @@ public class DatabaseQuoteSource implements QuoteSource
                                         "'" + quote.getDayClose() + "', " +
                                         "'" + quote.getDayHigh()  + "', " +
                                         "'" + quote.getDayLow()   + "', " +
-                                        "'" + quote.getVolume()   + "')");
+                                        "'" + quote.getDayVolume()   + "')");
                 }
 
                 // Now insert day quote into database

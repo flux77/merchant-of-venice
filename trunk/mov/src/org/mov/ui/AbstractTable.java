@@ -185,7 +185,7 @@ public class AbstractTable extends SortedTable {
         for(int i = 0; i < model.getColumnCount(); i++) {
             Column column = model.getColumn(i);
 
-            showColumn(column.number, column.getVisible() == Column.VISIBLE);
+            showColumn(column.getNumber(), column.getVisible() == Column.VISIBLE);
         }
     }
 
@@ -212,9 +212,9 @@ public class AbstractTable extends SortedTable {
                     MenuHelper.addCheckBoxMenuItem(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)e.getSource();
-                                showColumn(column.number, menuItem.getState());
+                                showColumn(column.getNumber(), menuItem.getState());
                             }
-                        }, showColumnsMenu, column.fullName);
+                        }, showColumnsMenu, column.getFullName());
                 
                 showMenuItem.setState(column.getVisible() == Column.VISIBLE);
                 

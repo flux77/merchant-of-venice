@@ -83,19 +83,19 @@ public class Token {
     /** Represents "<code>avg</code>" symbol */
     public static final int AVG_TOKEN = 18;        
 
-    /** Represents "<code>day_open</code>" symbol */
+    /** Represents "<code>open</code>" symbol */
     public static final int DAY_OPEN_TOKEN = 19;    
 
-    /** Represents "<code>day_close</code>" symbol */
+    /** Represents "<code>close</code>" symbol */
     public static final int DAY_CLOSE_TOKEN = 20;   
 
-    /** Represents "<code>day_low</code>" symbol */
+    /** Represents "<code>low</code>" symbol */
     public static final int DAY_LOW_TOKEN = 21;     
 
-    /** Represents "<code>day_high</code>" symbol */
+    /** Represents "<code>high</code>" symbol */
     public static final int DAY_HIGH_TOKEN = 22;    
 
-    /** Represents "<code>day_volume</code>" symbol */
+    /** Represents "<code>volume</code>" symbol */
     public static final int DAY_VOLUME_TOKEN = 23;  
 
     /** Represents "<code>if</code>" symbol */
@@ -128,19 +128,19 @@ public class Token {
     /** Represents "<code>false</code>" symbol */
     public static final int FALSE_TOKEN = 33;	    
 
-    /** Represents "<code>dayofweek()</code> symbol */
+    /** Represents "<code>dayofweek()</code>" symbol */
     public static final int DAY_OF_WEEK_TOKEN = 34;
 
-    /** Represents "<code>dayofyear()()</code> symbol */
+    /** Represents "<code>dayofyear()</code>" symbol */
     public static final int DAY_OF_YEAR_TOKEN = 35;
 
-    /** Represents "<code>day()</code> symbol */
+    /** Represents "<code>day()</code>" symbol */
     public static final int DAY_TOKEN = 36;
 
-    /** Represents "<code>month()</code> symbol */
+    /** Represents "<code>month()</code>" symbol */
     public static final int MONTH_TOKEN = 37;
 
-    /** Represents "<code>year()</code> symbol */
+    /** Represents "<code>year()</code>" symbol */
     public static final int YEAR_TOKEN = 38;
 
     /** Represents "<code>sum</code>" symbol */

@@ -63,6 +63,16 @@ public class Parser {
         // class should not be instantiated
     }
 
+    /**
+     * Parse the given string into an executable expression. The first
+     * argument allows you to parse any predefined variables which are
+     * available to the expression.
+     *
+     * @param variables any predefined variables.
+     * @param string the string to parse.
+     * @return the parsed expression.
+     * @exception ExpressionException if there was an error parsing the expression.
+     */
     public static Expression parse(Variables variables, String string)
         throws ExpressionException {
 
@@ -79,6 +89,13 @@ public class Parser {
 	return expression;
     }
 
+    /**
+     * Parse the given string into an executable expression.
+     *
+     * @param string the string to parse.
+     * @return the parsed expression.
+     * @exception ExpressionException if there was an error parsing the expression.
+     */
     public static Expression parse(String string) throws ExpressionException
     {
         return parse(new Variables(), string);

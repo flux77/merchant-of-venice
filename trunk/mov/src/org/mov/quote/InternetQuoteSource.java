@@ -33,6 +33,11 @@ import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
 
+/**
+ * Provides functionality to obtain stock quotes from the internet. The entire
+ * quote sourcce interface has not been implemented so this source is only
+ * suitable for importing the quotes, rather than accessing them directly.
+ */
 public class InternetQuoteSource implements QuoteSource
 {
     // The following symbols will be replaced by the quote, date range we are after:
@@ -43,10 +48,6 @@ public class InternetQuoteSource implements QuoteSource
     private final static String END_DAY     = "_ED_";
     private final static String END_MONTH   = "_EM_";
     private final static String END_YEAR    = "_EY_";
-
-    // Exchange identifiers
-    public final static int NYSE_NASDAQ = 0;
-    public final static int FTSE        = 1;
 
     // Each Yahoo site uses the same URL formatting. So we define it once here.
     private final static String YAHOO_FORMAT = ("?s=" + SYMBOL + "&a=" + START_MONTH + 
@@ -93,6 +94,13 @@ public class InternetQuoteSource implements QuoteSource
     private TradingDate startDate;
     private TradingDate endDate;
 
+    /**
+     * Create a new quote source from the given exchange between the given dates.
+     *
+     * @param exchange the exchange.
+     * @param startDate the start date.
+     * @param endDate the end date.
+     */
     public InternetQuoteSource(int exchange, TradingDate startDate, TradingDate endDate) {
         assert exchange < numberExchanges;
 

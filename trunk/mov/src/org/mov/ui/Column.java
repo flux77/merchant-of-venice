@@ -19,18 +19,22 @@
 package org.mov.ui;
 
 public class Column {
-    public int number;
-    public String fullName;
-    public String shortName;
-    public Class type;
-    public int visible;
+    private int number;
+    private String fullName;
+    private String shortName;
+    private Class type;
+    private int visible;
 
+    /** The column is currently hidden. */
     public final static int HIDDEN = 0;
+
+    /** The column is currently visible. */
     public final static int VISIBLE = 1;
+
+    /** The column is always hidden. */
     public final static int ALWAYS_HIDDEN = 2;
 
-    public Column(int number, String fullName, String shortName, Class type, 
-                  int visible) {
+    public Column(int number, String fullName, String shortName, Class type, int visible) {
         this.number = number;
         this.fullName = fullName;
         this.shortName = shortName;

@@ -50,6 +50,10 @@ import org.mov.parser.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
 
+/**
+ * Venice module for displaying a table of stock quotes. This module allows a user
+ * to display a table of specific stock quotes on specific days.
+ */
 public class QuoteModule extends AbstractTable implements Module, ActionListener {
 
     // Main menu items
@@ -87,7 +91,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     //DragSourceListener dragSourceListener;
 
     /**
-     * Create a new table that lists all the quotes in the given quote bundle.
+     * Create a new module that lists all the quotes in the given quote bundle.
      *
      * @param quoteBundle quotes to table
      * @param singleDate if this is set to true then only display the quotes
@@ -100,7 +104,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     }
 
     /**
-     * Create a new table that only lists the quotes in the given bundle where
+     * Create a new module that only lists the quotes in the given bundle where
      * the filter equation returns true. Set the <code>singleDate</code> flag
      * if you want to display a single day's trading - and don't want to display
      * the quotes from the bundle that may appear from executing some equations.

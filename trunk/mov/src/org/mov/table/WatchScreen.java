@@ -23,38 +23,82 @@ import java.util.List;
 
 import org.mov.quote.Symbol;
 
+/** 
+ * Representation of a watch screen. A watch screen contains a list of
+ * stock symbols that the user has grouped together to monitor. Each watch
+ * screen also has its own name.
+ *
+ * @see Symbol
+ */
 public class WatchScreen {
 
     private String name;
     private List symbols;
     
+    /**
+     * Create a new watch screen with the given name.
+     *
+     * @param name the name of the watch screen.
+     */
     public WatchScreen(String name) {
         this.name = name;
         symbols = new ArrayList();
     }
 
+    /**
+     * Get the name of the watcch screen.
+     *
+     * @return the name of the watch screen.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Set the name of the watch screen to the new name.
+     *
+     * @param name the new name of the watch screen.
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Return the list of stock symbols in this watch screen.
+     *
+     * @return list of symbols
+     * @see Symbol
+     */
     public List getSymbols() {
         return symbols;
     }
 
+    /**
+     * Add a symbol to this watcch screen.
+     *
+     * @param symbol the symbol to add.
+     */
     public void addSymbol(Symbol symbol) {
         if(!symbols.contains(symbol))
             symbols.add(symbol);
     }
 
+    /**
+     * Remove the given symbol from this watch screen.
+     *
+     * @param symbol the symbol to remove.
+     */
     public void removeSymbol(Symbol symbol) {
         boolean wasRemoved = symbols.remove(symbol);
         assert wasRemoved;
     }
 
+    /**
+     * Remove all the given symbols from this watch screen.
+     *
+     * @param symbols the list of symbols to remove.
+     * @see Symbol
+     */
     public void removeAllSymbols(List symbols) {
         boolean wasRemoved = this.symbols.removeAll(symbols);
         assert wasRemoved;

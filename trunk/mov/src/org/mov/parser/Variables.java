@@ -20,22 +20,48 @@ package org.mov.parser;
 
 import java.util.HashMap;
 
+/**
+ * A collection of variables.
+ */
 public class Variables {
 
-    public HashMap variables;
+    // Mapping between names and variables
+    private HashMap variables;
 
+    /**
+     * Create a new empty collection of variables.
+     */
     public Variables() {
         variables = new HashMap();
     }
 
+    /**
+     * Return whether the collection contains the given variable.
+     *
+     * @param name the name of the variable o query.
+     */
     public boolean contains(String name) {
         return variables.containsKey(name);
     }
 
+    /**
+     * Add a new variable. The variable will be initialised to zero
+     * if numeric or FALSE if boolean.
+     *
+     * @param name the name of the variable.
+     * @param type the type of the variable.
+     */
     public void add(String name, int type) {
         add(name, type, 0.0D);
     }
 
+    /**
+     * Add a new variable.
+     *
+     * @param name the name of the variable.
+     * @param type the type of the variable.
+     * @param value the initial value.
+     */
     public void add(String name, int type, double value) {
         if(!variables.containsKey(name)) {
             Variable variable = new Variable(name, type, value);
@@ -45,6 +71,13 @@ public class Variables {
             assert false;
     }
 
+    /**
+     * Add a new variable.
+     *
+     * @param name the name of the variable.
+     * @param type the type of the variable.
+     * @param value the initial value.
+     */
     public void add(String name, int type, int value) {
         if(!variables.containsKey(name)) {
             Variable variable = new Variable(name, type, value);
@@ -54,6 +87,12 @@ public class Variables {
             assert false;
     }
 
+    /**
+     * Set the value of the given variable.
+     *
+     * @param name the name of the variable.
+     * @param value the new value of the variable.
+     */
     public void setValue(String name, double value) {
         Variable variable = get(name);
 
@@ -63,6 +102,12 @@ public class Variables {
             assert false;
     }
 
+    /**
+     * Set the value of the given variable.
+     *
+     * @param name the name of the variable.
+     * @param value the new value of the variable.
+     */
     public void setValue(String name, int value) {
         Variable variable = get(name);
 
@@ -72,6 +117,12 @@ public class Variables {
             assert false;
     }
 
+    /**
+     * Get the value of the variable.
+     *
+     * @param name the name of the variable.
+     * @return the variable's value.
+     */
     public double getValue(String name) {
         Variable variable = get(name);
 
@@ -83,6 +134,12 @@ public class Variables {
         }
     }
 
+    /**
+     * Get the type of the variable.
+     *
+     * @param name the name of the variable.
+     * @return the variable's type.
+     */
     public int getType(String name) {
         Variable variable = get(name);
 
@@ -94,6 +151,12 @@ public class Variables {
         }
     }
 
+    /**
+     * Get the variable of the given name.
+     *
+     * @param name the name of the variable.
+     * @return the variable.
+     */
     public Variable get(String name) {
         return (Variable)variables.get(name);
     }

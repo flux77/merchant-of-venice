@@ -18,10 +18,24 @@
 
 package org.mov.prefs;
 
+/**
+ * A representation of an equation that can be referenced by name. A stored equation
+ * is saved in the Preferences data so that the user does not have to re-type the
+ * equation.
+ */
 public class StoredEquation {
+    /** Name of the stored equation. */
     public String name;
+
+    /** The stored equation. */
     public String equation;
 
+    /**
+     * Create a new stored equation.
+     *
+     * @param name the name of the equation.
+     * @param equation the equation to store.
+     */
     public StoredEquation(String name, String equation) {
 	this.name = name;
 	this.equation = equation;

@@ -18,10 +18,20 @@
 
 package org.mov.util;
 
+/**
+ * An exception which is raised when there is a problem parsing a moeny
+ * field.
+ */
 public class MoneyFormatException extends Throwable {
 
+    // Reason for exception
     private String reason = null;
 
+    /**
+     * Create a new money format exception.
+     *
+     * @param reason for the exception.
+     */
     public MoneyFormatException(String reason) {
         this.reason = reason;
     }

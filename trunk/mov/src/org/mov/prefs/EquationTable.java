@@ -28,11 +28,16 @@ import org.mov.ui.Column;
 import org.mov.ui.EquationComboBox;
 import org.mov.ui.ExpressionEditorDialog;
 
+/**
+ * The table in the Equation Preferences page that lists stored equations.
+ */
 public class EquationTable extends AbstractTable {
-    public static final int NAME_COLUMN = 0;
-    public static final int EQUATION_COLUMN = 1;
+    private static final int NAME_COLUMN = 0;
+    private static final int EQUATION_COLUMN = 1;
 
     private Model model;
+
+    // Current list of stored equations in the table
     private List storedEquations;
 
     private class Model extends AbstractTableModel {
@@ -60,6 +65,10 @@ public class EquationTable extends AbstractTable {
 	}
     }
 
+    /**
+     * Create a new equation table. The equation table will be initially populated from
+     * the current stored equations.
+     */
     public EquationTable() {
 	List columns = new ArrayList();
 	columns.add(new Column(NAME_COLUMN, "Name", "Name", String.class, Column.VISIBLE));
@@ -73,6 +82,9 @@ public class EquationTable extends AbstractTable {
 	showColumns(model);
     }
 
+    /** 
+     * Display a dialog asking the user to enter a new stored equation.
+     */
     public void add() {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
@@ -90,6 +102,11 @@ public class EquationTable extends AbstractTable {
 	thread.start();
     }
 
+    /** 
+     * Display a dialog allowing the user to edit the stored equation.
+     *
+     * @param row the row of the stored equation to edit.
+     */
     public void edit(int row) {
 	if(row >= 0 && row < storedEquations.size()) {
 	    final StoredEquation storedEquation = (StoredEquation)storedEquations.get(row);
@@ -107,6 +124,9 @@ public class EquationTable extends AbstractTable {
 	}
     }
 
+    /**
+     * Delete the stored equations in the given rows.
+     */
     public void delete(int[] rows) {
 	// Remove the last row first, then the second to last, etc...
 	Arrays.sort(rows);
@@ -123,6 +143,10 @@ public class EquationTable extends AbstractTable {
 	repaint();
     }
     
+    /**
+     * Replace the stored equations in preferences with the stored equations in
+     * this table. Make sure everything is in-sync with the new equations.
+     */
     public void save() {
 	PreferencesManager.saveStoredEquations(storedEquations);
 	EquationComboBox.updateEquations();

@@ -20,71 +20,108 @@ package org.mov.analyser.gp;
 
 import java.util.Iterator;
 import java.util.Random;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.TreeMap;
+
+import org.mov.analyser.OrderComparator;
 
 import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
-
 import org.mov.quote.QuoteBundle;
+import org.mov.util.TradingDate;
 
 public class GeneticProgramme {
+    // TODO: Chance of breeding should be related to size,value somehow?
+    // i.e. the smaller, richer should breed more often?
+    // need some sort of negative for being massive. 
 
-    private final int MIN_DEPTH = 3;
-    private final int MAX_DEPTH = 15;
+    private final int MIN_SIZE = 12;
+    private final int MAX_SIZE = 48;
 
     private int breedingPopulationSize;
-    private SortedSet breedingPopulation;
-    private SortedSet nextBreedingPopulation;
-    private Mutator mutator;
+    private TreeMap breedingPopulation;
+    private TreeMap nextBreedingPopulation;
+    private Mutator buyRuleMutator;
+    private Mutator sellRuleMutator;
     private Random random;
+
     private GPQuoteBundle quoteBundle;
+    private OrderComparator orderComparator;
+    private TradingDate startDate;
+    private TradingDate endDate;
+    private float initialCapital;
+    private float stockValue;
+    private int numberStocks;
+    private float tradeCost;
 
     private int generation;
 
-    public GeneticProgramme(GPQuoteBundle quoteBundle, int breedingPopulationSize, int seed) {
-        this.breedingPopulationSize = breedingPopulationSize;
-        this.quoteBundle = quoteBundle;
+    public GeneticProgramme(GPQuoteBundle quoteBundle, 
+                            OrderComparator orderComparator,
+                            TradingDate startDate,
+                            TradingDate endDate,
+                            float initialCapital,
+                            float stockValue,
+                            int numberStocks,
+                            float tradeCost,
+                            int breedingPopulationSize, 
+                            int seed) {
 
-        nextBreedingPopulation = new TreeSet();
-        breedingPopulation = new TreeSet();
+        this.quoteBundle = quoteBundle;
+        this.orderComparator = orderComparator;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.initialCapital = initialCapital;
+        this.stockValue = stockValue;
+        this.numberStocks = numberStocks;
+        this.tradeCost = tradeCost;
+        this.breedingPopulationSize = breedingPopulationSize;
+
+        nextBreedingPopulation = new TreeMap();
+        breedingPopulation = new TreeMap();
         random = new Random(seed);
-        mutator = new Mutator(random);
+
+        // Create a mutator for the buy and sell rules. Buy rules shouldn't
+        // use the "held" variable (buy rules won't be evaluated if held > 0).
+        // Only use the "order" variable if the user has applied any ordering
+        // to the data.
+        buyRuleMutator = new Mutator(random, false, orderComparator != null);
+        sellRuleMutator = new Mutator(random, true, orderComparator != null);
 
         generation = 1;
     }
 
-    public boolean nextIndividual() {
-        Individual individual = createIndividual();
+    public void nextIndividual() {
+        boolean validIndividual = false;
 
-        if(individual.isValid(MIN_DEPTH, MAX_DEPTH)) {
-            try {
-                float newIndividualValue = individual.paperTrade(quoteBundle);
-                
-                // If we got here the paper trade was successful - add the
-                // individual if it is fit enough to go into the current
-                // breeding population
-                if(nextBreedingPopulation.size() < breedingPopulationSize) 
-                    nextBreedingPopulation.add(individual);
-                
-                else {
-                    Individual weakestBreedingIndividual = 
-                        (Individual)nextBreedingPopulation.last();
+        // Loop until we create a valid individual that paper trades OK
+        while(!validIndividual) {
+            Individual individual = createIndividual();
+
+            if(individual.isValid(MIN_SIZE, MAX_SIZE)) {
+                try {
+                    float value =
+                        individual.paperTrade(quoteBundle,
+                                              orderComparator,
+                                              startDate,
+                                              endDate,
+                                              initialCapital,
+                                              stockValue,
+                                              numberStocks,
+                                              tradeCost);
                     
-                    if(newIndividualValue > weakestBreedingIndividual.getValue()) {
-                        nextBreedingPopulation.remove(weakestBreedingIndividual);
-                        nextBreedingPopulation.add(individual);
-                    }
+                    // If we got here the paper trade was successful. Now let the
+                    // individual 'compete' to see if it gets to breed next round.
+                    // If the individual is fit enough, it'll get a chance to breed.
+                    competeForBreeding(individual, value);
+                    validIndividual = true;
+                    
                 }
-                return true;
-            }
-            catch(EvaluationException e) {
-                // If there is a problem running the equation then
-                // it dies off naturally!
+                catch(EvaluationException e) {
+                    // If there is a problem running the equation then
+                    // it dies off naturally!
+                }
             }
         }
-
-        return false;
     }
 
     public int nextGeneration() {
@@ -92,15 +129,14 @@ public class GeneticProgramme {
         // individuals from last generation. We also leave "nextBreedingPopulation"
         // the same - to ensure that the next population's strongest individuals
         // will be at least as good as the previous ones.
-        breedingPopulation = new TreeSet(nextBreedingPopulation);
-
+        breedingPopulation = new TreeMap(nextBreedingPopulation);
         return ++generation;
     }
 
     public Individual getBreedingIndividual(int index) {
         assert index < breedingPopulation.size();
 
-        for(Iterator iterator = breedingPopulation.iterator(); iterator.hasNext();) {
+        for(Iterator iterator = breedingPopulation.values().iterator(); iterator.hasNext();) {
             Individual individual = (Individual)iterator.next();
 
             if(index == 0)
@@ -113,19 +149,59 @@ public class GeneticProgramme {
         return null;
     }
 
+    public int getActualBreedingPopulation() {
+        return breedingPopulation.size();
+    }
+
     private Individual createIndividual() {
         if(generation == 1) 
-            // Create a new random individual
-            return new Individual(mutator);
+            return new Individual(buyRuleMutator, sellRuleMutator);
         else {
             // Otherwise breed two parent individuals
-            int motherIndex = random.nextInt(breedingPopulationSize);
-            int fatherIndex = random.nextInt(breedingPopulationSize);
-            
+            int motherIndex = random.nextInt(breedingPopulation.size());
+            int fatherIndex = random.nextInt(breedingPopulation.size());
+
             Individual mother = getBreedingIndividual(motherIndex);
             Individual father = getBreedingIndividual(fatherIndex);
+
+            return new Individual(random, buyRuleMutator, sellRuleMutator, mother, father);
+        }
+    }
+
+    private void competeForBreeding(Individual individual, float value) {
+        // If the individual made a loss or broke even, then we are just going to get 
+        // rubbish if we breed from it, so even if it is the best we've seen so far, it
+        // gets ignored.
+        if(value > initialCapital) {
+            // If there is another individual with exactly the same value -
+            // we assume it made the same trades. Replace this individual
+            // ONLY if the new individual is smaller. This puts a small
+            // pressure for equations to be as tight as possible.
+            Individual sameTradeIndividual = 
+                (Individual)nextBreedingPopulation.get(new Float(value));
+
+            if(sameTradeIndividual != null) {
+                if(individual.getTotalEquationSize() < 
+                   sameTradeIndividual.getTotalEquationSize())
+                    nextBreedingPopulation.put(new Float(value), individual);
+            }
+
+            // Our individual is a unique butterfly. It'll get in only if the
+            // breeding population isn't full yet, or it is better than an
+            // existing individual.
+            else {
+                if(nextBreedingPopulation.size() < breedingPopulationSize) 
+                    nextBreedingPopulation.put(new Float(value), individual);
             
-            return new Individual(random, mutator, mother, father);
+                else {
+                    Float weakestValue = (Float)nextBreedingPopulation.firstKey();
+
+                    if(value > weakestValue.floatValue()) {
+                        nextBreedingPopulation.remove(weakestValue);
+                        nextBreedingPopulation.put(new Float(value), individual);
+                    }
+                }
+            }
         }
     }
 }

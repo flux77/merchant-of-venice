@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.analyser.gp;
@@ -38,9 +38,13 @@ public class Mutator {
     private final static int MODIFICATION_MUTATION_PERCENT = 70;
 
     private Random random;
+    private boolean allowHeld;
+    private boolean allowOrder;
 
-    public Mutator(Random random) {
+    public Mutator(Random random, boolean allowHeld, boolean allowOrder) {
         this.random = random;
+        this.allowHeld = allowHeld;
+        this.allowOrder = allowOrder;
     }
 
     public Expression createRandom(int type) {
@@ -50,7 +54,6 @@ public class Mutator {
     // hmm i think the mutate is going to want better percent controls on the
     // terminal/non-terminal relationship?
     public Expression createRandom(Expression model, int type, int level) {
-
         assert level > 0;
 
         // Work out percent chance of non-terminate symbol
@@ -61,7 +64,7 @@ public class Mutator {
         // the boolean terminal expressions TRUE or FALSE because our
         // simplification code will just simplify it out of existence,
         // e.g. "and or a" would just become "a".
-        if(type == Expression.BOOLEAN_TYPE || branchPercent > percent) 
+        if(type == Expression.BOOLEAN_TYPE || branchPercent > percent)
             return createRandomNonTerminal(model, type, level + 1);
         else
             return createRandomTerminal(type);
@@ -72,7 +75,6 @@ public class Mutator {
     }
 
     public Expression createRandomNonTerminal(Expression model, int type, int level) {
-
         assert level > 0;
 
         if(type == Expression.BOOLEAN_TYPE)
@@ -83,8 +85,9 @@ public class Mutator {
             return createRandomNonTerminalInteger(model, level);
         else {
             // Quote types are all terminal!
-            assert type == Expression.QUOTE_TYPE;
-            return createRandomTerminal(Expression.QUOTE_TYPE);
+            assert(type == Expression.FLOAT_QUOTE_TYPE ||
+                   type == Expression.INTEGER_QUOTE_TYPE);
+            return createRandomTerminal(type);
         }
     }
 
@@ -94,7 +97,7 @@ public class Mutator {
         switch(type) {
         case Expression.BOOLEAN_TYPE:
             randomNumber = random.nextInt(2);
-            
+
             if(randomNumber == 0)
                 return new NumberExpression(true);
             else {
@@ -106,26 +109,47 @@ public class Mutator {
             return new NumberExpression(50 - random.nextFloat() * 100);
 
         case Expression.INTEGER_TYPE:
-            randomNumber = random.nextInt(7);
 
-            if(randomNumber == 0)
+            // Give it a 50/50 that it will generate an ordinary number
+            if(random.nextBoolean())
                 return new NumberExpression(50 - random.nextInt(100));
-            else if(randomNumber == 1)
-                return new DayExpression();
-            else if(randomNumber == 2)
-                return new DayOfWeekExpression();
-            else if(randomNumber == 3)
-                return new DayOfYearExpression();
-            else if(randomNumber == 4)
-                return new MonthExpression();
-            else if(randomNumber == 5)
-                return new VariableExpression("order", Expression.INTEGER_TYPE);
+
+            // Otherwise generate some special values
             else {
-                assert randomNumber == 6;
-                return new VariableExpression("held", Expression.INTEGER_TYPE);
+                // We don't generate DayOfYearExpression() or MonthExpression()
+                // because it would make it easy for the GP to hook onto specific dates
+                // where the market is low. By removing these it forces the GP
+                // to use the stock data to generate buy/sell decisions.
+                int numberRandomSymbols = 4;
+
+                if(!allowHeld)
+                    numberRandomSymbols--;
+                if(!allowOrder)
+                    numberRandomSymbols--;
+
+                randomNumber = random.nextInt(numberRandomSymbols);
+
+                if(randomNumber == 0)
+                    return new DayExpression();
+                else if(randomNumber == 1)
+                    return new DayOfWeekExpression();
+                else {
+                    if(allowOrder && allowHeld) {
+                        if(randomNumber == 2)
+                            return new VariableExpression("held", Expression.INTEGER_TYPE);
+                        else
+                            return new VariableExpression("order", Expression.INTEGER_TYPE);
+                    }
+                    else if(allowHeld)
+                        return new VariableExpression("held", Expression.INTEGER_TYPE);
+                    else {
+                        assert allowOrder;
+                        return new VariableExpression("order", Expression.INTEGER_TYPE);
+                    }
+                }
             }
 
-        case Expression.QUOTE_TYPE:
+        case Expression.FLOAT_QUOTE_TYPE:
             randomNumber = random.nextInt(4);
 
             if(randomNumber == 0)
@@ -138,6 +162,10 @@ public class Mutator {
                 assert randomNumber == 3;
                 return new DayCloseExpression();
             }
+
+        case Expression.INTEGER_QUOTE_TYPE:
+            return new DayVolumeExpression();
+
         default:
             assert false;
             return null;
@@ -151,32 +179,32 @@ public class Mutator {
             return new NotExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE));
         }
         else if(randomNumber == 1) {
-            Expression first = getChild(model, level, 0); 
+            Expression first = getChild(model, level, 0);
             return new EqualThanExpression(first,
                                            getChild(model, level, 1, first.getType()));
         }
         else if(randomNumber == 2) {
-            Expression first = getChild(model, level, 0); 
+            Expression first = getChild(model, level, 0);
             return new GreaterThanEqualExpression(first,
                                                   getChild(model, level, 1, first.getType()));
         }
         else if(randomNumber == 3) {
-            Expression first = getChild(model, level, 0); 
+            Expression first = getChild(model, level, 0);
             return new GreaterThanExpression(first,
                                              getChild(model, level, 1, first.getType()));
         }
         else if(randomNumber == 4) {
-            Expression first = getChild(model, level, 0); 
+            Expression first = getChild(model, level, 0);
             return new LessThanEqualExpression(first,
                                                getChild(model, level, 1, first.getType()));
         }
         else if(randomNumber == 5) {
-            Expression first = getChild(model, level, 0); 
+            Expression first = getChild(model, level, 0);
             return new LessThanExpression(first,
                                           getChild(model, level, 1, first.getType()));
         }
         else if(randomNumber == 6) {
-            Expression first = getChild(model, level, 0); 
+            Expression first = getChild(model, level, 0);
             return new NotEqualExpression(first,
                                           getChild(model, level, 1, first.getType()));
         }
@@ -198,10 +226,10 @@ public class Mutator {
         // just modifying the number's value rather than replacing it
         // with a random expressions. This helps keep the equation size down and
         // favours trying different values.
-        if(model != null && 
+        if(model != null &&
            model instanceof NumberExpression &&
            FAVOUR_NUMBER_PERCENT > random.nextInt(100)) {
-            
+
             NumberExpression numberExpression = (NumberExpression)model;
             int step = random.nextInt(6);
             float value = (float)Math.pow(10.0F, (double)step);
@@ -213,12 +241,12 @@ public class Mutator {
             return numberExpression;
         }
 
-        if(randomNumber == 0) 
-            return createRandomTerminal(Expression.FLOAT_TYPE);        
-        else if(randomNumber == 1) 
+        if(randomNumber == 0)
+            return createRandomTerminal(Expression.FLOAT_TYPE);
+        else if(randomNumber == 1)
             return new AddExpression(getChild(model, level, 0, Expression.FLOAT_TYPE),
                                      getChild(model, level, 1, Expression.FLOAT_TYPE));
-        else if(randomNumber == 2) 
+        else if(randomNumber == 2)
             return new SubtractExpression(getChild(model, level, 0, Expression.FLOAT_TYPE),
                                           getChild(model, level, 1, Expression.FLOAT_TYPE));
         else if(randomNumber == 3)
@@ -235,18 +263,18 @@ public class Mutator {
                                     getChild(model, level, 1, Expression.FLOAT_TYPE),
                                     getChild(model, level, 2, Expression.FLOAT_TYPE));
         else if(randomNumber == 7)
-            return new LagExpression(createRandomTerminal(Expression.QUOTE_TYPE),
+            return new LagExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE));
         else if(randomNumber == 8)
-            return new MinExpression(createRandomTerminal(Expression.QUOTE_TYPE),
+            return new MinExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
         else if(randomNumber == 9)
-            return new MaxExpression(createRandomTerminal(Expression.QUOTE_TYPE),
+            return new MaxExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
         else if(randomNumber == 10)
-            return new SumExpression(createRandomTerminal(Expression.QUOTE_TYPE),
+            return new SumExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
         else if(randomNumber == 11)
@@ -256,7 +284,7 @@ public class Mutator {
             return new AbsExpression(getChild(model, level, 0, Expression.FLOAT_TYPE));
         else {
             assert randomNumber == 13;
-            return new AvgExpression(createRandomTerminal(Expression.QUOTE_TYPE),
+            return new AvgExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
         }
@@ -269,10 +297,10 @@ public class Mutator {
         // just modifying the number's value rather than replacing it
         // with a random expressions. This helps keep the equation size down and
         // favours trying different values.
-        if(model != null && 
+        if(model != null &&
            model instanceof NumberExpression &&
            FAVOUR_NUMBER_PERCENT > random.nextInt(100)) {
-            
+
             NumberExpression numberExpression = (NumberExpression)model;
             int step = random.nextInt(6);
             float value = (float)Math.pow(10.0, (double)step);
@@ -284,12 +312,12 @@ public class Mutator {
             return numberExpression;
         }
 
-        if(randomNumber == 0) 
-            return createRandomTerminal(Expression.INTEGER_TYPE);        
-        else if(randomNumber == 1) 
+        if(randomNumber == 0)
+            return createRandomTerminal(Expression.INTEGER_TYPE);
+        else if(randomNumber == 1)
             return new AddExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE));
-        else if(randomNumber == 2) 
+        else if(randomNumber == 2)
             return new SubtractExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
                                           getChild(model, level, 1, Expression.INTEGER_TYPE));
         else if(randomNumber == 3)
@@ -338,7 +366,7 @@ public class Mutator {
         // Case 1: The expression doesn't have this many children or
         // it has a child here but it is a different type. So create
         // a new argument.
-        if(model == null || 
+        if(model == null ||
            arg >= model.getNeededChildren() ||
            model.get(arg).getType() != type) {
             return createRandom(null, type, level);
@@ -355,7 +383,7 @@ public class Mutator {
         // Case 1: The expression doesn't have this many children or
         // it has a child here but it is a different type. So create
         // a new argument.
-        if(model == null || 
+        if(model == null ||
            arg >= model.getNeededChildren() ||
            (model.get(arg).getType() != Expression.FLOAT_TYPE &&
             model.get(arg).getType() != Expression.INTEGER_TYPE)) {
@@ -381,14 +409,14 @@ public class Mutator {
 
         for(Enumeration enumeration = expression.breadthFirstEnumeration();
             enumeration.hasMoreElements();) {
-            
+
             randomSite = (Expression)enumeration.nextElement();
-            
+
             // Return if this is the xth random element
             if(randomNumber-- <= 0)
                 break;
         }
-        
+
         assert randomSite != null;
 
         return randomSite;
@@ -404,7 +432,7 @@ public class Mutator {
 
             for(Enumeration enumeration = expression.breadthFirstEnumeration();
                 enumeration.hasMoreElements();) {
-                
+
                 randomSite = (Expression)enumeration.nextElement();
 
                 // Return if this is the xth random element of the
@@ -415,16 +443,16 @@ public class Mutator {
             }
             assert randomSite != null;
         }
-        
+
         return randomSite;
     }
 
     public Expression delete(Expression root, Expression destination) {
-        return insert(root, destination, 
+        return insert(root, destination,
                       createRandomTerminal(destination.getType()));
     }
 
-    public Expression insert(Expression root, Expression destination, 
+    public Expression insert(Expression root, Expression destination,
                              Expression source) {
 
         Expression parent = (Expression)destination.getParent();
@@ -438,7 +466,7 @@ public class Mutator {
             int childNumber = parent.getIndex(destination);
             parent.remove(childNumber);
             parent.insert(source, childNumber);
-            assert parent.getNeededChildren() == parent.getChildCount();           
+            assert parent.getNeededChildren() == parent.getChildCount();
             return root;
         }
     }
@@ -451,25 +479,24 @@ public class Mutator {
         else
             return insert(root, destination, newExpression);
     }
-    
+
     public Expression mutate(Expression expression) {
         return mutate(expression, MUTATION_PERCENT);
     }
 
     public Expression mutate(Expression expression, int percent) {
-
         // Mutations do not always occur. Use the given percent to work
         // out whether one should occur.
         if(percent < random.nextInt(100))
             return expression;
 
         // Mutate
-        if(INSERTION_MUTATION_PERCENT > percent) 
+        if(INSERTION_MUTATION_PERCENT > percent)
             expression = mutateByInsertion(expression);
         else {
             percent -= INSERTION_MUTATION_PERCENT;
 
-            if(DELETION_MUTATION_PERCENT > percent) 
+            if(DELETION_MUTATION_PERCENT > percent)
                 expression = mutateByDeletion(expression);
             else {
                 percent -= DELETION_MUTATION_PERCENT;

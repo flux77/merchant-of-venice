@@ -46,9 +46,9 @@ public class HelpModule extends JPanel implements Module {
     private String homeImage = "toolbarButtonGraphics/navigation/Home24.gif";
 
     // ToolBar buttons
-    JButton backButton;
-    JButton forwardButton;
-    JButton upButton;
+    JButton backButton = null;
+    JButton forwardButton = null;
+    JButton upButton = null;
 
     // Menu 
     private JMenuBar menuBar;
@@ -279,10 +279,14 @@ public class HelpModule extends JPanel implements Module {
     // go back/forward
     private void checkDisabledStatus() {
         backMenuItem.setEnabled(positionInStack > 0);
-        backButton.setEnabled(positionInStack > 0);
+
+        if(backButton != null)
+            backButton.setEnabled(positionInStack > 0);
 
         forwardMenuItem.setEnabled(positionInStack < (visitedPages.size() - 1));
-        forwardButton.setEnabled(positionInStack < (visitedPages.size() - 1));
+
+        if(forwardButton != null)
+            forwardButton.setEnabled(positionInStack < (visitedPages.size() - 1));
     }
 
     // Go to the last page visited

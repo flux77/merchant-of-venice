@@ -76,8 +76,8 @@ public class GPPageInitialPopulation extends JPanel {
     private int mutations;
     
     public GPPageInitialPopulation(JDesktopPane desktop,
-    String titledBorderText,
-    Dimension preferredSize) {
+                                    String titledBorderText,
+                                    Dimension preferredSize) {
         
         this.desktop = desktop;
         this.GPPageInitialPopulationModule = new GPPageInitialPopulationModule(desktop);
@@ -148,10 +148,15 @@ public class GPPageInitialPopulation extends JPanel {
             returnValue = false;
         }
         
-        // Parse all the values in the GPPageInitialPopulationModule
-        // so that we know if the table with initial population rules is OK or not.
-        if (!GPPageInitialPopulationModule.parse())
-            returnValue = false;
+        // If we have maximum percent for random population,
+        // we don't have to check for the table,
+        // because the values on the table are of initial population
+        // and we do not need them.
+        if (perc[PERCENT_RANDOM]!=PERCENT_INT)
+            // Parse all the values in the GPPageInitialPopulationModule
+            // so that we know if the table with initial population rules is OK or not.
+            if (!GPPageInitialPopulationModule.parse())
+                returnValue = false;
         
         return returnValue;
     }
@@ -314,7 +319,6 @@ public class GPPageInitialPopulation extends JPanel {
     }
     
     private boolean isTotalOK() {
-        // We should consider the absence of held and order -> totalIntegerModified
         long total = 0;
         int totalLength = perc.length;
         for (int i=0; (i<totalLength); i++)
@@ -329,6 +333,17 @@ public class GPPageInitialPopulation extends JPanel {
         }
         return true;
     }
+    
+    private void setDefaultValues() {
+        // Default values means GP works with random initial population
+        perc[PERCENT_RANDOM] = PERCENT_INT;
+        perc[PERCENT_INIT_POP] = 0;
+        
+        setTexts();
+        validate();
+        repaint();
+    }
+
     
     private void setGraphic(String titledBorderText, Dimension preferredSize) {
         
@@ -353,6 +368,14 @@ public class GPPageInitialPopulation extends JPanel {
                 GPPageInitialPopulationModule.fitAll();
                 // Fit the percent values for random or not
                 fitAll();
+            }
+        });
+        
+        JButton defaultButton = new JButton(Locale.getString("DEFAULT"));
+        defaultButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                // Set the values to default, so the GP will work with random generation only
+                setDefaultValues();
             }
         });
         
@@ -387,7 +410,12 @@ public class GPPageInitialPopulation extends JPanel {
         this.add(upDownScrollPane);
         this.add(innerPanel);
         fitAllButton.setAlignmentX(CENTER_ALIGNMENT);
+        defaultButton.setAlignmentX(CENTER_ALIGNMENT);
         this.add(fitAllButton);
+        this.add(defaultButton);
+        
+        // Put the default values so that random initial population is the default behaviour
+        this.setDefaultValues();
     }
     
 }

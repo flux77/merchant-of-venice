@@ -237,7 +237,7 @@ public class PaperTradeModule extends JPanel implements Module {
                                   rulesPage.getBuyRule(),
                                   rulesPage.getSellRule(),
                                   portfolioPage.getInitialCapital(),
-                                  portfolioPage.getValuePerStock(),
+                                  portfolioPage.getStockValue(),
                                   portfolioPage.getTradeCost());
 
         // Running the equation means we might need to load in
@@ -394,9 +394,11 @@ public class PaperTradeModule extends JPanel implements Module {
         
         // If multiple stock portfolio is enabled we only do a single run.
         // Otherwise we do a run for each symbol in the quote bundle.
-        int runsPerEquation = (portfolioPage.isMultipleStockPortfolio()?
+        /*        int runsPerEquation = (portfolioPage.isMultipleStockPortfolio()?
                                1 :
                                symbols.size());
+        */
+        int runsPerEquation = 1;
 
         progress.setIndeterminate(false);
         progress.setMaximum(numberEquations * runsPerEquation);

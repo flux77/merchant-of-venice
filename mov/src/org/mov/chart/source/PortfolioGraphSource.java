@@ -69,8 +69,7 @@ public class PortfolioGraphSource implements GraphSource {
 
 	// Create a copy of the portfolio without the transactions
 	Portfolio temporaryPortfolio = (Portfolio)portfolio.clone();
-	Vector transactions =
-	    (Vector)temporaryPortfolio.getTransactions().clone();
+	List transactions = new ArrayList(temporaryPortfolio.getTransactions());
 	Iterator transactionIterator = transactions.iterator();
 	Transaction transaction = (Transaction)transactionIterator.next();
 

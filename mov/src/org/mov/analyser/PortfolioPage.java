@@ -29,12 +29,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
+import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.mov.prefs.PreferencesManager;
@@ -45,16 +46,19 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
     private JDesktopPane desktop;
 
     // Swing components
-    private JCheckBox multipleStockCheckBox;
-    private JTextField valuePerStockTextField;
+    private JRadioButton numberStocksButton;
+    private JTextField numberStocksTextField;
+    private JRadioButton stockValueButton;
+    private JTextField stockValueTextField;
     private JTextField initialCapitalTextField;
     private JTextField tradeCostTextField;
 
     // Parsed input
-    private boolean isMultipleStockPortfolio;
-    private float valuePerStock;
     private float initialCapital;
     private float tradeCost;
+    private boolean isNumberStocks;
+    private int numberStocks;
+    private float stockValue;
 
     public PortfolioPage(JDesktopPane desktop) {
         this.desktop = desktop;
@@ -74,44 +78,50 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 	    String setting = (String)iterator.next();
 	    String value = (String)settings.get((Object)setting);
 
-            if(setting.equals("is_multiple_stock")) 
-                multipleStockCheckBox.setSelected(value.equals("1"));
-            else if(setting.equals("percent_per_stock"))
-                valuePerStockTextField.setText(value);
+            if(setting.equals("number_stocks")) {
+                numberStocksTextField.setText(value);
+            }
+            else if(setting.equals("stock_value"))
+                stockValueTextField.setText(value);            
+            else if(setting.equals("is_number_stocks")) {
+                if(value.equals("number_stocks"))
+                    numberStocksButton.setSelected(true);
+                else
+                    stockValueButton.setSelected(true);
+            }
 	    else if(setting.equals("initial_capital"))
 		initialCapitalTextField.setText(value);
 	    else if(setting.equals("trade_cost"))
 		tradeCostTextField.setText(value);
-            else
-                assert false;
         }
-
-        checkDisabledStatus();
     }
 
     public void save(String key) {
         HashMap settings = new HashMap();
-
-        settings.put("is_multiple_stock", multipleStockCheckBox.isSelected()? "1" : "0");
-	settings.put("percent_per_stock", valuePerStockTextField.getText());
+        settings.put("is_number_stocks", (numberStocksButton.isSelected()?
+                                          "number_stocks" : "stock_value"));
+        settings.put("number_stocks", numberStocksTextField.getText());
+        settings.put("stock_value", stockValueTextField.getText());
 	settings.put("initial_capital", initialCapitalTextField.getText());
 	settings.put("trade_cost", tradeCostTextField.getText());
-
         PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
                                                     settings);
     }
 
     public boolean parse() {
-        valuePerStock = 0.0F;
+        isNumberStocks = true;
+        numberStocks = 0;
+        stockValue = 0.0F;
 	initialCapital = 0.0F;
 	tradeCost = 0.0F;
 
-        isMultipleStockPortfolio = multipleStockCheckBox.isSelected();
+        //        isMultipleStockPortfolio = multipleStockCheckBox.isSelected();
 
 	try {
-	    if(!valuePerStockTextField.getText().equals(""))
+            /*	    if(!valuePerStockTextField.getText().equals(""))
 		valuePerStock = 
 		    Float.parseFloat(valuePerStockTextField.getText());
+            */
 
 	    if(!initialCapitalTextField.getText().equals(""))
 		initialCapital = 
@@ -145,10 +155,6 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
         return this;
     }
 
-    public float getValuePerStock() {
-        return valuePerStock;
-    }
-
     public float getInitialCapital() {
         return initialCapital;
     }
@@ -157,52 +163,96 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
         return tradeCost;
     }
 
-    public boolean isMultipleStockPortfolio() {
-        return isMultipleStockPortfolio;
+    public boolean isNumberStocks() {
+        return isNumberStocks;
+    }
+
+    public float getStockValue() {
+        return stockValue;
+    }
+
+    public int getNumberStocks() {
+        return numberStocks;
     }
 
     private void layoutPage() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        TitledBorder portfolioTitled = new TitledBorder("Portfolio");
-        JPanel panel = new JPanel();
-        panel.setBorder(portfolioTitled);
-        panel.setLayout(new BorderLayout());
+        // Portfolio panel
+        {
+            TitledBorder portfolioTitled = new TitledBorder("Portfolio");
+            JPanel panel = new JPanel();
+            panel.setBorder(portfolioTitled);
+            panel.setLayout(new BorderLayout());
+            
+            JPanel innerPanel = new JPanel();
+            GridBagLayout gridbag = new GridBagLayout();
+            GridBagConstraints c = new GridBagConstraints();
+            innerPanel.setLayout(gridbag);
+            
+            c.weightx = 1.0;
+            c.ipadx = 5;
+            c.anchor = GridBagConstraints.WEST;
+            
+            initialCapitalTextField = 
+                GridBagHelper.addTextRow(innerPanel, "Initial Capital", "", gridbag, c, 
+                                         10);
+            tradeCostTextField =
+                GridBagHelper.addTextRow(innerPanel, "Trade Cost", "", gridbag, c, 5);
 
-        JPanel innerPanel = new JPanel();
-        GridBagLayout gridbag = new GridBagLayout();
-        GridBagConstraints c = new GridBagConstraints();
-        innerPanel.setLayout(gridbag);
-        
-        c.weightx = 1.0;
-        c.ipadx = 5;
-        c.anchor = GridBagConstraints.WEST;
-        
-        multipleStockCheckBox = 
-            GridBagHelper.addCheckBoxRow(innerPanel, "Multiple Stock Portfolio",
-                                         false, gridbag, c);
-        multipleStockCheckBox.addActionListener(new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    checkDisabledStatus();
-                }
-            });
-        valuePerStockTextField = 
-            GridBagHelper.addTextRow(innerPanel, "Value Per Stock", "", gridbag, c, 
-                                     8);
-        initialCapitalTextField = 
-            GridBagHelper.addTextRow(innerPanel, "Initial Capital", "", gridbag, c, 
-                                     10);
-        tradeCostTextField =
-            GridBagHelper.addTextRow(innerPanel, "Trade Cost", "", gridbag, c, 5);
-        
-        panel.add(innerPanel, BorderLayout.NORTH);
-        add(panel);
+            panel.add(innerPanel, BorderLayout.NORTH);
+            add(panel);
+        }
+
+        // How many stocks
+        {
+            TitledBorder portfolioTitled = new TitledBorder("How many stocks?");
+            JPanel panel = new JPanel();
+            panel.setBorder(portfolioTitled);
+            panel.setLayout(new BorderLayout());
+            
+            JPanel innerPanel = new JPanel();
+            GridBagLayout gridbag = new GridBagLayout();
+            GridBagConstraints c = new GridBagConstraints();
+            innerPanel.setLayout(gridbag);
+            
+            ButtonGroup buttonGroup = new ButtonGroup();
+            c.weightx = 1.0;
+            c.ipadx = 5;
+            c.anchor = GridBagConstraints.WEST;
+            
+            numberStocksButton = new JRadioButton("Number Stocks");
+            numberStocksButton.setSelected(true);
+            buttonGroup.add(numberStocksButton);
+            
+            c.gridwidth = 1;
+            gridbag.setConstraints(numberStocksButton, c);
+            innerPanel.add(numberStocksButton);
+            
+            numberStocksTextField = new JTextField("", 5);
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            gridbag.setConstraints(numberStocksTextField, c);
+            innerPanel.add(numberStocksTextField);
+            
+            c.weightx = 1.0;
+            c.ipadx = 5;
+            c.anchor = GridBagConstraints.WEST;
+            
+            stockValueButton = new JRadioButton("Stock Value");
+            stockValueButton.setSelected(true);
+            buttonGroup.add(stockValueButton);
+            
+            c.gridwidth = 1;
+            gridbag.setConstraints(stockValueButton, c);
+            innerPanel.add(stockValueButton);
+            
+            stockValueTextField = new JTextField("", 10);
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            gridbag.setConstraints(stockValueTextField, c);
+            innerPanel.add(stockValueTextField);
+            
+            panel.add(innerPanel, BorderLayout.NORTH);
+            add(panel);
+        }
     }
-
-    private void checkDisabledStatus() {
-        boolean isMultipleStockEnabled = multipleStockCheckBox.isSelected();
-
-        valuePerStockTextField.setEnabled(isMultipleStockEnabled);
-    }
-
 }

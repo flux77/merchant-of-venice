@@ -18,10 +18,11 @@
 
 package org.mov.main;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.lang.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
@@ -117,7 +118,7 @@ public class CommandManager {
         thread.start();
     }
     
-    public void tableStocks(final Vector symbols) {
+    public void tableStocks(final List symbols) {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
                     SortedSet symbolsCopy;
@@ -182,7 +183,7 @@ public class CommandManager {
 
             if(type == QuoteRange.GIVEN_SYMBOLS) {
                 quoteRange =
-                    new QuoteRange(new Vector(symbols));
+                    new QuoteRange(new ArrayList(symbols));
                 singleDate = false;
             }
             else {
@@ -360,7 +361,7 @@ public class CommandManager {
 
         if(endDate == null)
             endDate = QuoteSourceManager.getSource().getLastDate();		
-        Vector symbols = portfolio.getSymbolsTraded();
+        List symbols = portfolio.getSymbolsTraded();
 
         // Only need to load from quote bundle if there are any stocks
         // in the portfolio
@@ -533,7 +534,9 @@ public class CommandManager {
         getDesktopManager().newFrame(helpModule, false, false);
     }
 
-    /** Shows a dialog and imports quotes into Venice */
+    /** 
+     * Shows a dialog and imports quotes into Venice 
+     */
     public void importQuotes() {
         getDesktopManager().newFrame(new ImporterModule(desktop), true, true);
     }

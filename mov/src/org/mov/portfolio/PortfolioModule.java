@@ -23,7 +23,9 @@ import java.awt.event.*;
 import java.beans.*;
 import java.io.*;
 import java.text.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -167,7 +169,7 @@ public class PortfolioModule extends JPanel implements Module,
 
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-	Vector accounts = portfolio.getAccounts();
+        List accounts = portfolio.getAccounts();
 
 	// If the portfolio is empty display a label saying "Empty"
 	// otherwise display the portfolio
@@ -456,7 +458,7 @@ public class PortfolioModule extends JPanel implements Module,
 		PrintWriter out = new PrintWriter(new BufferedWriter(fileOut));
 		
 		// Iterate through transactions printing one each on every line
-		Vector transactions = portfolio.getTransactions();
+		List transactions = portfolio.getTransactions();
 		Iterator iterator = transactions.iterator();
 
 		while(iterator.hasNext()) {

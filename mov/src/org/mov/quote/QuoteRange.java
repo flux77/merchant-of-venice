@@ -18,9 +18,11 @@
 
 package org.mov.quote;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.mov.util.*;
+import org.mov.util.TradingDate;
 
 /**
  * This class represents a way of describing a range or a set of quotes. A range of
@@ -72,7 +74,7 @@ public class QuoteRange implements Cloneable {
     private TradingDate lastDate;	
 
     // Only one of these two should be set
-    private Vector symbols = null;
+    private List symbols = null;
 
     // ALL_ORDINARIES, ALL_SYMBOLS, MARKET_INDICES or GIVEN_SYMBOLS
     private int type = 0;
@@ -83,8 +85,8 @@ public class QuoteRange implements Cloneable {
      *
      * @param symbols   list of symbols
      */
-    public QuoteRange(Vector symbols) {
-	this.symbols = new Vector(symbols);
+    public QuoteRange(List symbols) {
+	this.symbols = new ArrayList(symbols);
 	this.type = GIVEN_SYMBOLS;
 	this.firstDate = null;
 	this.lastDate = null;
@@ -100,9 +102,9 @@ public class QuoteRange implements Cloneable {
      * @param firstDate earliest date
      * @param lsatDate  latest date
      */
-    public QuoteRange(Vector symbols, TradingDate firstDate,
+    public QuoteRange(List symbols, TradingDate firstDate,
 		      TradingDate lastDate) {
-	this.symbols = new Vector(symbols);
+	this.symbols = new ArrayList(symbols);
 	this.type = GIVEN_SYMBOLS;
 	this.firstDate = firstDate;
 	this.lastDate = lastDate;
@@ -116,8 +118,8 @@ public class QuoteRange implements Cloneable {
      * @param symbols   list of symbols
      * @param date      the date
      */
-    public QuoteRange(Vector symbols, TradingDate date) {
-	this.symbols = new Vector(symbols);
+    public QuoteRange(List symbols, TradingDate date) {
+	this.symbols = new ArrayList(symbols);
 	this.type = GIVEN_SYMBOLS;
 	this.firstDate = date;
 	this.lastDate = date;
@@ -132,7 +134,7 @@ public class QuoteRange implements Cloneable {
      * @param   symbol  the symbol
      */
     public QuoteRange(String symbol) {
-	this.symbols = new Vector();
+	this.symbols = new ArrayList();
 	symbols.add(symbol);
 
 	this.type = GIVEN_SYMBOLS;
@@ -150,7 +152,7 @@ public class QuoteRange implements Cloneable {
      */
     public QuoteRange(String symbol, TradingDate firstDate,
 		      TradingDate lastDate) {
-	this.symbols = new Vector();
+	this.symbols = new ArrayList();
 	symbols.add(symbol);
 
 	this.type = GIVEN_SYMBOLS;
@@ -235,7 +237,7 @@ public class QuoteRange implements Cloneable {
      *
      * @return a list of symbols
      */
-    public Vector getAllSymbols() {
+    public List getAllSymbols() {
 
 	assert type == GIVEN_SYMBOLS && symbols != null;
 	return symbols;
@@ -328,7 +330,7 @@ public class QuoteRange implements Cloneable {
      * @return  <code>true</code> if all the symbols are in the quote range, <code>false</code>
      *          otherwise
      */
-    public boolean containsAllSymbols(Vector containedSymbols) {
+    public boolean containsAllSymbols(List containedSymbols) {
 
 	assert containedSymbols != null && containedSymbols.size() > 0;
 

@@ -23,7 +23,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,12 +30,10 @@ import java.util.prefs.Preferences;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -46,21 +43,17 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
-import org.mov.importer.ImporterModule;
 import org.mov.ui.GridBagHelper;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.DatabaseQuoteSource;
-import org.mov.quote.QuoteFilter;
-import org.mov.quote.QuoteFilterList;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.util.Locale;
 
 /** 
  * Provides a preferences page to let the user modify the quote source.
- * The quote source can be from a database, files or from the internet.
+ * The quote source can be from a database (internal or external) or
+ * sample quotes.
  *
  * @author Andrew Leppard
  */
@@ -73,19 +66,16 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     private JComboBox databaseSoftware;
     private JTextField databaseHost;
 
+    // Wigets from internal pane
+    private JRadioButton useInternal;
+    private JTextField internalFileNameTextField;
+
     // This field needs to be initialised as it may be referenced
     // before the widget is created.
     private JTextField databasePort = null;
     private JTextField databaseUsername;
     private JPasswordField databasePassword;
     private JTextField databaseName;
-
-    // Widgets from file pane
-    private JRadioButton useFiles;
-    private DefaultListModel fileListModel;
-    private JButton addFiles;
-    private JButton deleteFiles;
-    private JComboBox formatComboBox;
 
     // Widgets from internet pane
     private JRadioButton useInternet;
@@ -100,9 +90,9 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     private PreferencesManager.DatabasePreferences databasePreferences = null;
 
     // Quote source enumeration
-    private final static int DATABASE = 0;
-    private final static int FILES = 1;
-    private final static int SAMPLES = 2;
+    private final static int SAMPLES = 0;
+    private final static int INTERNAL = 1;
+    private final static int DATABASE = 2;
 
     // Database default ports
     private final static int MYSQL_DEFAULT_PORT = 3306;
@@ -128,24 +118,62 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	// Put all "use this option" radio buttons into group
 	ButtonGroup buttonGroup = new ButtonGroup();
 	
-        // Add a pane for each quote source the user can select
-        pane.addTab(Locale.getString("DATABASE"), 
-		    createDatabasePanel(quoteSource, buttonGroup));
-        pane.addTab(Locale.getString("FILES"), 
-		    createFilesPanel(quoteSource, buttonGroup));
-        //        pane.addTab("Internet", createInternetPanel(quoteSource, buttonGroup));
+        // Add a pane for each quote source the user can select.
+        // These should be added in the same order as DATABASE, INTERNAL, etc.
         pane.addTab(Locale.getString("SAMPLES"), 
 		    createSamplesPanel(quoteSource, buttonGroup));
+        pane.addTab(Locale.getString("INTERNAL"),
+                    createInternalPanel(quoteSource, buttonGroup));
+        pane.addTab(Locale.getString("DATABASE"), 
+		    createDatabasePanel(quoteSource, buttonGroup));
 
 	// Raise the select source's pane
-        if(quoteSource == PreferencesManager.DATABASE)
+        if(quoteSource == PreferencesManager.INTERNAL)
+	    pane.setSelectedIndex(INTERNAL);
+        else if(quoteSource == PreferencesManager.DATABASE)
 	    pane.setSelectedIndex(DATABASE);
-	else if(quoteSource == PreferencesManager.FILES)
-	    pane.setSelectedIndex(FILES);
 	else
 	    pane.setSelectedIndex(SAMPLES);
 
 	add(pane);
+    }
+
+    private JPanel createInternalPanel(int quoteSource, ButtonGroup buttonGroup) {
+        String internalFileName = PreferencesManager.loadInternalFileName();
+
+        useInternal = new JRadioButton(Locale.getString("USE_INTERNAL"), true);
+	buttonGroup.add(useInternal);
+
+	useInternal.setSelected(quoteSource == PreferencesManager.INTERNAL);
+        
+        TitledBorder titled = new TitledBorder(Locale.getString("INTERNAL_PREFERENCES"));
+        JPanel preferencesPanel = new JPanel();
+        preferencesPanel.setBorder(titled);
+        preferencesPanel.setLayout(new BorderLayout()); 
+        JPanel borderPanel = new JPanel();
+        
+        GridBagLayout gridbag = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
+        borderPanel.setLayout(gridbag);
+        
+        c.weightx = 1.0;
+        c.ipadx = 5;
+        c.anchor = GridBagConstraints.WEST;
+        
+        // File to store database
+        internalFileNameTextField = GridBagHelper.addTextRow(borderPanel, 
+                                                             Locale.getString("FILE"), 
+                                                             internalFileName,
+                                                             gridbag, c, 15);
+        
+        preferencesPanel.add(borderPanel, BorderLayout.NORTH);
+        
+        JPanel outerPanel = new JPanel();
+        outerPanel.setLayout(new BorderLayout());
+        outerPanel.add(useInternal, BorderLayout.NORTH);
+        outerPanel.add(preferencesPanel, BorderLayout.CENTER);
+        
+        return outerPanel;
     }
 
     private JPanel createDatabasePanel(int quoteSource, ButtonGroup buttonGroup) {
@@ -262,122 +290,6 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         return database;
     }
 
-    private JPanel createFilesPanel(int quoteSource, ButtonGroup buttonGroup) {
-        Preferences p = PreferencesManager.getUserNode("/quote_source/files");
-
-        useFiles = new JRadioButton(Locale.getString("USE_FILES"), true);
-	buttonGroup.add(useFiles);
-
-	useFiles.setSelected(quoteSource == PreferencesManager.FILES);
-        
-        TitledBorder titled = new TitledBorder(Locale.getString("FILE_PREFERENCES"));
-        JPanel filePreferences = new JPanel();
-        filePreferences.setBorder(titled);
-        filePreferences.setLayout(new BorderLayout());
-        
-        String selectedFilter = p.get("format", "MetaStock");
-        Box box = Box.createHorizontalBox();
-        formatComboBox = new JComboBox();
-        List formats = QuoteFilterList.getInstance().getList();
-
-        for(Iterator iterator = formats.iterator(); iterator.hasNext();) {
-            QuoteFilter filter = (QuoteFilter)iterator.next();
-            formatComboBox.addItem(filter.getName());
-            if(filter.getName().equals(selectedFilter))
-                formatComboBox.setSelectedItem((Object)filter.getName());
-        }
-        
-        box.add(new JLabel(Locale.getString("FORMAT")));
-        box.add(Box.createHorizontalStrut(5));
-        box.add(formatComboBox);
-        
-        filePreferences.add(box, BorderLayout.NORTH);
-        
-        final JList fileList = new JList();
-        fileListModel = new DefaultListModel();
-        fileList.setModel(fileListModel);
-        fileList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    // If the user has selected an element in the file list
-                    // then enable the delete button
-                    deleteFiles.setEnabled(true);
-                }
-            });
-        filePreferences.add(new JScrollPane(fileList), 
-                            BorderLayout.CENTER);
-        
-        // Add files from prefs
-        List fileListStrings = ImporterModule.getFileList();
-        for(Iterator iterator = fileListStrings.iterator(); iterator.hasNext();) {
-            String fileName = (String)iterator.next();
-            fileListModel.addElement(fileName);
-        }
-        
-        // Add, Delete buttons
-        JPanel buttonPanel = new JPanel();
-        addFiles = new JButton(Locale.getString("ADD"));
-        addFiles.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    // Get files user wants to import
-                    JFileChooser chooser;
-                    String lastDirectory = PreferencesManager.loadDirectoryLocation("importer");
-
-                    if(lastDirectory != null)
-                        chooser = new JFileChooser(lastDirectory);
-                    else
-                        chooser = new JFileChooser();
-
-                    chooser.setMultiSelectionEnabled(true);
-                    int action = chooser.showOpenDialog(desktop);
-                    
-                    if(action == JFileChooser.APPROVE_OPTION) {
-                        // Remember directory
-                        lastDirectory = chooser.getCurrentDirectory().getAbsolutePath();
-                        PreferencesManager.saveDirectoryLocation("importer",lastDirectory);
-
-                        // Add files to file list
-                        File files[] = chooser.getSelectedFiles();
-                        String fileName;
-                        
-                        for(int i = 0; i < files.length; i++) {
-                            fileName = files[i].getPath();
-                            
-                            if(!fileListModel.contains((Object)fileName))
-                                fileListModel.addElement((Object)fileName);
-                        }
-                    }
-                }
-            });
-        deleteFiles = new JButton(Locale.getString("REMOVE"));
-        deleteFiles.setEnabled(false);
-        deleteFiles.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    // Get selected files from list
-                    Object[] selected = fileList.getSelectedValues();
-                    
-                    // Remove all elements from list
-                    for(int i = 0; i < selected.length; i++) {
-                        fileListModel.removeElement(selected[i]);
-                    }
-                    
-                    // Disable delete button after delete since nothing will be
-                    // highlighted
-                    deleteFiles.setEnabled(false);
-                }
-                });
-        
-        buttonPanel.add(addFiles);
-        buttonPanel.add(deleteFiles);
-        
-        JPanel files = new JPanel();
-        files.setLayout(new BorderLayout());
-        files.add(useFiles, BorderLayout.NORTH);
-        files.add(filePreferences, BorderLayout.CENTER);
-        files.add(buttonPanel, BorderLayout.SOUTH);
-        
-        return files;
-    }
-
     private JPanel createSamplesPanel(int quoteSource, ButtonGroup buttonGroup) {
         useSamples = new JRadioButton(Locale.getString("USE_SAMPLES"), true);
         buttonGroup.add(useSamples);
@@ -403,13 +315,18 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	// Save quote source preferences
 	int quoteSource;
 
-	if(useDatabase.isSelected())
+	if(useInternal.isSelected())
+	    quoteSource = PreferencesManager.INTERNAL;
+	else if(useDatabase.isSelected())
 	    quoteSource = PreferencesManager.DATABASE;
-	else if(useFiles.isSelected())
-	    quoteSource = PreferencesManager.FILES;
 	else
 	    quoteSource = PreferencesManager.SAMPLES;
 	PreferencesManager.setQuoteSource(quoteSource);
+
+        // Save internal preferences
+        {
+            PreferencesManager.saveInternalFileName(internalFileNameTextField.getText());
+        }
 
 	// Save database preferences
 	{
@@ -428,20 +345,6 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    databasePreferences.database = databaseName.getText();
 
 	    PreferencesManager.saveDatabaseSettings(databasePreferences);
-	}
-
-	// Save file preferences
-	{
-	    Preferences p = PreferencesManager.getUserNode("/quote_source/files");
-
-	    p.put("format", (String)formatComboBox.getSelectedItem());
-
-	    // Extract list of files from list
-	    List fileList = new ArrayList();
-	    for(int i = 0; i < fileListModel.getSize(); i++)
-		fileList.add((String)fileListModel.elementAt(i));
-
-	    ImporterModule.putFileList(fileList);
 	}
 
 	// This makes the next query use our new settings

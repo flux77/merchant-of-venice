@@ -63,9 +63,11 @@ public class Progress {
     private JInternalFrame frame = null;
     private JProgressBar progress = null;
     private JLabel label = null;
+    private int maximum;
 
     // Prevent public construction
     private Progress() {
+	// nothing to do
     }
 
     /**
@@ -129,7 +131,7 @@ public class Progress {
      * @return	whether we have ownership of the window or not.
      */
     public boolean open() {
-	return open("", 0);
+	return open("Waiting",  1);
     }
 
     /**
@@ -151,6 +153,8 @@ public class Progress {
 	    progress = 
 		new JProgressBar(JProgressBar.HORIZONTAL, 0, maximum);
 	    label = new JLabel(message);	    
+
+	    this.maximum = maximum;
 	    	    
 	    JPanel panel = new JPanel();
 	    panel.setLayout(new BorderLayout());
@@ -172,7 +176,11 @@ public class Progress {
 	    return true;
 	}
 	else {
-	    set(message, maximum);
+	    // If the progress window is already up, a sub-progress can
+	    // ONLY display its message if the parent process has a 0/1
+	    // status.
+	    if(maximum <= 1)
+		set(message, maximum);
 
 	    return false;
 	}

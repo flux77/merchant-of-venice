@@ -46,48 +46,48 @@ public class QuoteSourceFactory {
      */
     public static FileQuoteSource createSamplesQuoteSource() {
         String[] fileNames = {"org/mov/quote/samples/01-12-86.txt",
-                "org/mov/quote/samples/02-12-86.txt",
-                "org/mov/quote/samples/03-11-86.txt",
-                "org/mov/quote/samples/03-12-86.txt",
-                "org/mov/quote/samples/04-11-86.txt",
-                "org/mov/quote/samples/04-12-86.txt",
-                "org/mov/quote/samples/05-11-86.txt",
-                "org/mov/quote/samples/05-12-86.txt",
-                "org/mov/quote/samples/06-11-86.txt",
-                "org/mov/quote/samples/07-11-86.txt",
-                "org/mov/quote/samples/08-12-86.txt",
-                "org/mov/quote/samples/09-12-86.txt",
-                "org/mov/quote/samples/10-11-86.txt",
-                "org/mov/quote/samples/10-12-86.txt",
-                "org/mov/quote/samples/11-11-86.txt",
-                "org/mov/quote/samples/11-12-86.txt",
-                "org/mov/quote/samples/12-11-86.txt",
-                "org/mov/quote/samples/12-12-86.txt",
-                "org/mov/quote/samples/13-11-86.txt",
-                "org/mov/quote/samples/14-11-86.txt",
-                "org/mov/quote/samples/15-12-86.txt",
-                "org/mov/quote/samples/16-12-86.txt",
-                "org/mov/quote/samples/17-11-86.txt",
-                "org/mov/quote/samples/17-12-86.txt",
-                "org/mov/quote/samples/18-11-86.txt",
-                "org/mov/quote/samples/18-12-86.txt",
-                "org/mov/quote/samples/19-11-86.txt",
-                "org/mov/quote/samples/19-12-86.txt",
-                "org/mov/quote/samples/20-11-86.txt",
-                "org/mov/quote/samples/21-11-86.txt",
-                "org/mov/quote/samples/22-12-86.txt",
-                "org/mov/quote/samples/23-12-86.txt",
-                "org/mov/quote/samples/24-11-86.txt",
-                "org/mov/quote/samples/24-12-86.txt",
-                "org/mov/quote/samples/25-11-86.txt",
-                "org/mov/quote/samples/25-12-86.txt",
-                "org/mov/quote/samples/26-11-86.txt",
-                "org/mov/quote/samples/26-12-86.txt",
-                "org/mov/quote/samples/27-11-86.txt",
-                "org/mov/quote/samples/28-11-86.txt",
-                "org/mov/quote/samples/29-12-86.txt",
-                "org/mov/quote/samples/30-12-86.txt",
-        "org/mov/quote/samples/31-12-86.txt"};
+                              "org/mov/quote/samples/02-12-86.txt",
+                              "org/mov/quote/samples/03-11-86.txt",
+                              "org/mov/quote/samples/03-12-86.txt",
+                              "org/mov/quote/samples/04-11-86.txt",
+                              "org/mov/quote/samples/04-12-86.txt",
+                              "org/mov/quote/samples/05-11-86.txt",
+                              "org/mov/quote/samples/05-12-86.txt",
+                              "org/mov/quote/samples/06-11-86.txt",
+                              "org/mov/quote/samples/07-11-86.txt",
+                              "org/mov/quote/samples/08-12-86.txt",
+                              "org/mov/quote/samples/09-12-86.txt",
+                              "org/mov/quote/samples/10-11-86.txt",
+                              "org/mov/quote/samples/10-12-86.txt",
+                              "org/mov/quote/samples/11-11-86.txt",
+                              "org/mov/quote/samples/11-12-86.txt",
+                              "org/mov/quote/samples/12-11-86.txt",
+                              "org/mov/quote/samples/12-12-86.txt",
+                              "org/mov/quote/samples/13-11-86.txt",
+                              "org/mov/quote/samples/14-11-86.txt",
+                              "org/mov/quote/samples/15-12-86.txt",
+                              "org/mov/quote/samples/16-12-86.txt",
+                              "org/mov/quote/samples/17-11-86.txt",
+                              "org/mov/quote/samples/17-12-86.txt",
+                              "org/mov/quote/samples/18-11-86.txt",
+                              "org/mov/quote/samples/18-12-86.txt",
+                              "org/mov/quote/samples/19-11-86.txt",
+                              "org/mov/quote/samples/19-12-86.txt",
+                              "org/mov/quote/samples/20-11-86.txt",
+                              "org/mov/quote/samples/21-11-86.txt",
+                              "org/mov/quote/samples/22-12-86.txt",
+                              "org/mov/quote/samples/23-12-86.txt",
+                              "org/mov/quote/samples/24-11-86.txt",
+                              "org/mov/quote/samples/24-12-86.txt",
+                              "org/mov/quote/samples/25-11-86.txt",
+                              "org/mov/quote/samples/25-12-86.txt",
+                              "org/mov/quote/samples/26-11-86.txt",
+                              "org/mov/quote/samples/26-12-86.txt",
+                              "org/mov/quote/samples/27-11-86.txt",
+                              "org/mov/quote/samples/28-11-86.txt",
+                              "org/mov/quote/samples/29-12-86.txt",
+                              "org/mov/quote/samples/30-12-86.txt",
+                              "org/mov/quote/samples/31-12-86.txt"};
         
         List fileURLs = new ArrayList();
         for(int i = 0; i < fileNames.length; i++) {
@@ -113,15 +113,17 @@ public class QuoteSourceFactory {
         
         if(prefs.software.equals("mysql"))
             software = DatabaseQuoteSource.MYSQL;
-        else
+        else if(prefs.software.equals("postgresql"))
             software = DatabaseQuoteSource.POSTGRESQL;
-        
+        else
+            software = DatabaseQuoteSource.HSQLDB;
+
         return new DatabaseQuoteSource(software, 
-                prefs.host, 
-                prefs.port, 
-                prefs.database, 
-                prefs.username, 
-                prefs.password);
+                                       prefs.host, 
+                                       prefs.port, 
+                                       prefs.database, 
+                                       prefs.username, 
+                                       prefs.password);
     }
     
     /**
@@ -134,7 +136,7 @@ public class QuoteSourceFactory {
         Preferences p = PreferencesManager.getUserNode("/quote_source/files");
         
         return new FileQuoteSource(p.get("format", "MetaStock"),
-                ImporterModule.getFileURLList());
+                                   ImporterModule.getFileURLList());
     }
     
 }

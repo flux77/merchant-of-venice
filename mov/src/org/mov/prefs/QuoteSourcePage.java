@@ -52,6 +52,7 @@ import javax.swing.event.ListSelectionListener;
 import org.mov.importer.ImporterModule;
 import org.mov.ui.GridBagHelper;
 import org.mov.prefs.PreferencesManager;
+import org.mov.quote.DatabaseQuoteSource;
 import org.mov.quote.QuoteFilter;
 import org.mov.quote.QuoteFilterList;
 import org.mov.quote.QuoteSourceManager;
@@ -100,16 +101,13 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 
     // Quote source enumeration
     private final static int DATABASE = 0;
-    private final static int FILES = 0;
-    private final static int SAMPLES = 0;
-
-    // Database enumeration
-    private final static int MYSQL = 0;
-    private final static int POSTGRESQL = 1;
+    private final static int FILES = 1;
+    private final static int SAMPLES = 2;
 
     // Database default ports
     private final static int MYSQL_DEFAULT_PORT = 3306;
     private final static int POSTGRESQL_DEFAULT_PORT = 5432;
+    private final static int HSQLDB_DEFAULT_PORT = 9001;
 
     /**
      * Create a new Quote Source Preferences page.
@@ -179,20 +177,39 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         databaseSoftware = new JComboBox();
         databaseSoftware.addItem(Locale.getString("MYSQL"));
         databaseSoftware.addItem(Locale.getString("POSTGRESQL"));
+        databaseSoftware.addItem(Locale.getString("HSQLDB"));
 	if(databasePreferences.software.equals("mysql"))
-	    databaseSoftware.setSelectedIndex(MYSQL);
-	else
-	    databaseSoftware.setSelectedIndex(POSTGRESQL);
+	    databaseSoftware.setSelectedIndex(DatabaseQuoteSource.MYSQL);
+	else if(databasePreferences.software.equals("postgresql"))
+	    databaseSoftware.setSelectedIndex(DatabaseQuoteSource.POSTGRESQL);
+        else
+	    databaseSoftware.setSelectedIndex(DatabaseQuoteSource.HSQLDB);
 
-        // If the user changes the database, then update the port
+        // If the user changes the database....
         // field to reflect the default port of the database.
         databaseSoftware.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if(databasePort != null) {
-                        if(databaseSoftware.getSelectedIndex() == MYSQL)
+                    if(databasePort != null && databaseUsername != null &&
+                       databasePassword != null) {
+
+                        // ... then update the port
+                        if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.MYSQL)
                             databasePort.setText(Integer.toString(MYSQL_DEFAULT_PORT));
-                        else
+                        else if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.POSTGRESQL)
                             databasePort.setText(Integer.toString(POSTGRESQL_DEFAULT_PORT));
+                        else
+                            databasePort.setText(Integer.toString(HSQLDB_DEFAULT_PORT));
+
+                        // And enable/disable the username and password fields if applicable
+                        if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.HSQLDB) {
+                            // Hypesonic SQL does not accept the username password fields
+                            databaseUsername.setEnabled(false);
+                            databasePassword.setEnabled(false);
+                        }
+                        else {
+                            databaseUsername.setEnabled(true);
+                            databasePassword.setEnabled(true);                            
+                        }
                     }
                 }
             });
@@ -224,6 +241,12 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                                                         databasePreferences.password, 
                                                         gridbag, c, 15);
         
+        // Hypesonic SQL does not accept the username password fields
+        if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.HSQLDB) {
+            databaseUsername.setEnabled(false);
+            databasePassword.setEnabled(false);
+        }
+
         // Database Name
         databaseName = GridBagHelper.addTextRow(borderPanel, 
 						Locale.getString("DATABASE_NAME"), 
@@ -393,8 +416,10 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    String software = (String)databaseSoftware.getSelectedItem();
 	    if(software.equals(Locale.getString("MYSQL")))
 		databasePreferences.software = "mysql";
-	    else
+	    else if(software.equals(Locale.getString("POSTGRESQL")))
 		databasePreferences.software = "postgresql";
+            else
+		databasePreferences.software = "hsql";
 
 	    databasePreferences.host = databaseHost.getText();
 	    databasePreferences.port = databasePort.getText();

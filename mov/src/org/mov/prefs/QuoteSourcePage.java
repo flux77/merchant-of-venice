@@ -396,7 +396,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    if(software.equals(Locale.getString("MYSQL")))
 		databasePreferences.software = "mysql";
 	    else
-		databasePreferences.software = "postresql";
+		databasePreferences.software = "postgresql";
 
 	    databasePreferences.host = databaseHost.getText();
 	    databasePreferences.port = databasePort.getText();

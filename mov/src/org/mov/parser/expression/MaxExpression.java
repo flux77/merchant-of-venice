@@ -28,6 +28,8 @@ import org.mov.quote.Symbol;
 
 /**
  * An expression which finds the maximum quote over a given trading period.
+ *
+ * @author Andrew Leppard
  */
 public class MaxExpression extends TernaryExpression {
     
@@ -37,8 +39,7 @@ public class MaxExpression extends TernaryExpression {
      * <code>lag</code> days away.
      *
      * @param	quote	the quote kind to find the maximum
-
-    * @param	days	the number of days to search
+     * @param	days	the number of days to search
      * @param	lag	the offset from the current day
      */
     public MaxExpression(Expression quote, Expression days,
@@ -49,14 +50,13 @@ public class MaxExpression extends TernaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-
         int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-
         if(days <= 0)
-            throw EvaluationException.rangeForMax();
-
+            throw EvaluationException.MAX_RANGE_EXCEPTION;
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        if (offset > 0)
+           throw EvaluationException.MAX_OFFSET_EXCEPTION;
         
 	return max(quoteBundle, symbol, quoteKind, days, day, offset);
     }

@@ -7,6 +7,7 @@ Changes for Venice, 0.5 alpha 14/Jan/2005
 
 * Updates to Genetic Programming:
   - Can now specify window size in days.
+  - Can now specify the buy/sell stock price (Alberto Nacher).
 
 * Internationalisation:
   - Can now specify the language to use in preferences (Alberto Nacher).
@@ -16,8 +17,16 @@ Changes for Venice, 0.5 alpha 14/Jan/2005
   - Added proxy authentication support (Bryan Lin).
 
 * Bug Fixes:
-  - Replaced an assert with error handling when the user specifies
+  - Paper trade and GP no longer sell, then buy back, the same stock on the
+    same day (Alberto Nacher).
+  - Fixed bugs preventing PostgreSQL support from working.
+  - Venice no longer complains about not being able to find database tables
+    if you try to load quotes before you have imported any.
+  - Gondola. Venice now properly displays an error if the user specifies
     something other than a string when a string type is expected.
+  - Gondola. Venice now properly displays an error if the user specifies
+    a positive date offset in any function that accepts a date offset,
+    e.g. lag(), avg(), min() etc.
 
 Changes for Venice, 0.4 alpha 14/Aug/2004
 ==========================================

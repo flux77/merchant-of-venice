@@ -45,6 +45,7 @@ import org.mov.util.TradingDateComparator;
  * You can convert to and from fast access dates using {@link #dateToOffset} and
  * {@link #offsetToDate}.
  *
+ * @author Andrew Leppard
  * @see Quote
  * @see QuoteBundle
  * @see QuoteBundleCache

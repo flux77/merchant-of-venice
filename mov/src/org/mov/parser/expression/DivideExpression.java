@@ -24,6 +24,8 @@ import org.mov.quote.*;
 
 /**
  * An expression which divides two sub-expressions.
+ *
+ * @author Andrew Leppard
  */
 public class DivideExpression extends ArithmeticExpression {
 
@@ -39,7 +41,7 @@ public class DivideExpression extends ArithmeticExpression {
 	if(right != 0.0D)
 	    return getChild(0).evaluate(variables, quoteBundle, symbol, day) / right;
 	else
-            throw EvaluationException.divideByZero();
+            throw EvaluationException.DIVIDE_BY_ZERO_EXCEPTION;
     }
 
     public Expression simplify() {

@@ -1,5 +1,7 @@
 package org.mov.chart;
 
+import org.mov.chart.graph.*;
+
 import java.awt.*;
 import java.util.*;
 
@@ -86,9 +88,8 @@ public class VerticalAxis {
 		topLineValue = bottomLineValue + (horizontalLines - 1) * 
 		    valueDelta;
 
-		if(valueDelta > exactWorth && topLineValue > highest)
+		if(valueDelta > exactWorth && topLineValue > highest) 
 		    return;
-
 	    }	    
 	}
 

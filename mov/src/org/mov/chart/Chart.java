@@ -6,6 +6,8 @@ import java.beans.*;
 import java.util.*;
 import javax.swing.*;
 
+import org.mov.chart.graph.*;
+import org.mov.chart.source.*;
 import org.mov.util.*;
 
 public class Chart extends JComponent implements MouseListener {
@@ -41,7 +43,7 @@ public class Chart extends JComponent implements MouseListener {
 	updateUI();
     }
 
-    public void fixDates(TradingDate startDate, TradingDate endDate) {
+    private void setDates(TradingDate startDate, TradingDate endDate) {
 
 	// Dont do anything if the start and end date are
 	// still the same
@@ -143,7 +145,7 @@ public class Chart extends JComponent implements MouseListener {
 	// If we are not zoomed in, make sure we are displaying the
 	// dates of the new graph (if any new dates)
 	if(!zoomedIn)
-	    fixDates(calculateStartDate(), calculateEndDate());
+	    setDates(calculateStartDate(), calculateEndDate());
     }
 
     public void remove(Graph graph) {
@@ -177,7 +179,7 @@ public class Chart extends JComponent implements MouseListener {
 			// that doesnt exist yet - but dont do this if
 			// we are zoomed in.
 			if(!zoomedIn)
-			    fixDates(calculateStartDate(), calculateEndDate());
+			    setDates(calculateStartDate(), calculateEndDate());
 
 		    }
 		    return;
@@ -276,7 +278,7 @@ public class Chart extends JComponent implements MouseListener {
 	}
 
 	// Recalculate dates 
-	fixDates(startHighlightedDate, endHighlightedDate);
+	setDates(startHighlightedDate, endHighlightedDate);
 	clearHighlightedRegion();
 	zoomedIn = true;
 	resetBuffer();
@@ -285,7 +287,7 @@ public class Chart extends JComponent implements MouseListener {
     public void zoomToDefaultRegion() {
 
 	// Recalculate dates and lowest, highest values
-	fixDates(calculateStartDate(), calculateEndDate());
+	setDates(calculateStartDate(), calculateEndDate());
 	zoomedIn = false;
 	resetBuffer();
     }
@@ -301,14 +303,15 @@ public class Chart extends JComponent implements MouseListener {
 	Iterator levelIterator = levels.iterator();
 	Iterator graphIterator;
 	Vector graphs;
-	String title = "";
+	String title = "Graph of ";
 
 	while(levelIterator.hasNext()) {
 	    graphs = (Vector)levelIterator.next();
 	    graphIterator = graphs.iterator();
 
 	    while(graphIterator.hasNext()) {
-		title += ((Graph)graphIterator.next()).getName();
+		title += 
+		    ((Graph)graphIterator.next()).getName().toUpperCase();
 
 		if(graphIterator.hasNext())
 		    title += ", ";

@@ -8,8 +8,11 @@ import java.text.*;
 import java.util.*;
 import javax.swing.*;
 
+import org.mov.chart.graph.*;
+import org.mov.chart.source.*;
 import org.mov.main.*;
 import org.mov.util.*;
+import org.mov.parser.*;
 import org.mov.quote.*;
 
 /**
@@ -17,6 +20,10 @@ import org.mov.quote.*;
  * used to draw any of the required charts.
  * Example:
  * <pre>
+ *	QuoteCache cache = new QuoteCache(symbol);
+ *	GraphSource dayClose = new OHLCVQuoteGraphSource(cache, Token.DAY_CLOSE_TOKEN);
+ *	Graph graph = new LineGraph(dayClose);
+ *
  *	ChartModule chart = new ChartModule(desktop);
  *	chart.add(graph, 0); 
  *	chart.redraw(); 
@@ -25,6 +32,83 @@ import org.mov.quote.*;
  *	ModuleFrame frame = new ModuleFrame(chart, 0, 0, 400, 300);
  *	desktop.add(frame);
  * </pre>
+ *
+ * <h2>Structure</h2>
+ *
+ * The chart module is made up of three core classes. These core classes
+ * are: <code>ChartModule</chart>, <code>Chart</code> & 
+ * <code>BasicChartUI</code>.
+ *
+ * <p>
+ * <ul>
+ *
+ * <li>
+ * <code>BasicChartUI</chart>
+ * <p>
+ * This class provides the sizing and drawing code to draw graphs.
+ * Given a set of graph levels it will arrange the graphs in the display,
+ * calculate the size of each graph and for each graph level draw each
+ * graph at that level. It will also create and manage the graph axes.
+ * </li>
+
+ * <li>
+ * <code>Chart</chart>
+ * <p>
+ * This class is a new Swing widget which allows charting of graphs.
+ * The actual code in this class is responsible for extending java swing's
+ * <code>JComponent</code> class. It provides the code to allow the
+ * user to select and unselect a portion of the chart and also
+ * manages graph annotations via tooltips.
+ * </li>
+ *
+ * <li>
+ * <code>ChartModule</chart>
+ * <p>
+ * This class handles the integration of the chart module with <i>Venice</i>.
+ * It is the container class of the actual chart, and is responsible for 
+ * laying out the chart widget and the toolbar in a frame. It also
+ * provides the menu.
+ * </li>
+ *
+ * </ul>
+ *
+ * <p>
+ *
+ * <h2>Glossary</h2>
+ *
+ * The charting module uses a variety of phrases which have special meaning:
+ * <p>
+ * <dl compact>
+ *
+ * <dt><i>Annotations</i>
+ * <dd>These appear on the graph as little yellow notes indicating
+ * <i>Graph</i> specific information to the user. This information may
+ * include buy/sell recommendations or any other data.
+ *
+ * <dt><i>Chart</i>
+ * <dd>A chart represents the entire graphable area. The chart can 
+ * consist of several <i>Graph Levels</i>, each graph level may contain
+ * several <i>Graphs</i>.
+ *
+ * <dt><i>Graph</i>
+ * <dd>A graph represents a specific type of graph to display, for example
+ * a <i>Line Graph</i>, a <i>Bar Graph</i>, a <i>Moving Average Graph</i>
+ * etc. These graphs can then be used to display different things to the
+ * user, for example the <i>Bar Graph</i> can be used to graph a stock's
+ * volume. A <i>Line Graph</i> can be used to graph a stock's day close.
+ *
+ * <dt><i>Graph Level</i>
+ * <dd>For each chart there can be several <i>levels</i> of graph, these
+ * levels are displayed vertical one on top of the other. The top level
+ * may contain several stock's day close graphs. The bottom levels typically
+ * contain indicators such as volume or RSI.
+ *
+ * <dt><i>Graph Source</i>
+ * <dd>Contains useful information that <i>Graphs</i> need to know so they
+ * can graph particular data (such as quote data). This information includes 
+ * the values to be graphed, a title, the axis types to use and any 
+ * <i>Annotations</i> to display for the graph.
+ * </dl>
  *
  * @see Graph
  */
@@ -101,6 +185,20 @@ public class ChartModule extends JPanel implements Module,
 	add(scrollPane, BorderLayout.CENTER);
     }
 
+    /*
+    public void show() {
+	System.out.println("show!");
+
+	JScrollBar horizontal = scrollPane.getHorizontalScrollBar();
+	System.out.println("maximum is " + horizontal.getMaximum());
+	horizontal.setValue(horizontal.getMaximum());
+
+	super.show();
+    }
+    */
+
+    // Adds the toolbar that gives the user the options to zoom in and out
+    // of the chart
     private void addFunctionToolBar() {
 	JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
 
@@ -131,41 +229,39 @@ public class ChartModule extends JPanel implements Module,
     }
 
     /**
-     * Add a new graph at the specific index. The chart is made up of
-     * a series of rows of graphs. The index specifies which row to 
-     * place the graph in
+     * Add a new graph to the specified level. Add new menu for graph.
      *
-     * @param	graph	the new graph to add. 
-     * @param	index	graph row to add the new graph.
+     * @param	graph	the new graph to add
+     * @param	level	graph level to add the new graph
      */
-    public void add(Graph graph, int index) {
+    public void add(Graph graph, QuoteCache cache, int level) {
 
 	// Add graph to chart
-	chart.add(graph, index);
+	chart.add(graph, level);
 
-	// Add menu for company
-	Menu menu = new Menu(this, graph);
+	// Currently only support quotes - so add menu for quote
+	QuoteChartMenu menu = new QuoteChartMenu(this, cache, graph);
 	menus.add(menu);
 	menuBar.add(menu);
     }
 
     /** 
-     * Add the graph at the specified index. This is identical to
+     * Add the graph to the specified level. This is identical to
      * the add method except that it does not add a new menu for the
      * graph.
      *
-     * @param	graph	The new graph to add.
-     * @param	index	Offset from the top of the display.
+     * @param	graph	The new graph to add
+     * @param	level	graph level to add the new graph
      * @see	#add
      */
-    public void append(Graph graph, int index) {
-	// Add graph to chart at given index, redraw chart but dont add it 
+    public void append(Graph graph, int level) {
+	// Add graph to chart to given level, redraw chart but dont add it 
 	// to menu as it is already there
-	chart.add(graph, index);
+	chart.add(graph, level);
     }
 
     /**
-     * Create a new row and add the graph. This is identical to the
+     * Create a new level and add the graph. This is identical to the
      * add method except that it does not add a new menu for the
      * graph.
      *
@@ -173,7 +269,7 @@ public class ChartModule extends JPanel implements Module,
      * @see	#add
      */
     public void append(Graph graph) {
-	// Add graph to chart at new index, redraw chart but dont add it to 
+	// Add graph at a new graph level, redraw chart but dont add graph to 
 	// menu as it is already there
 	append(graph, chart.getLevels().size());
     }
@@ -194,7 +290,7 @@ public class ChartModule extends JPanel implements Module,
      * Remove all graphs with the given symbol from the chart. Or will
      * do when its implemented.
      *
-     * @param symbol	The symbol of the graphs to remove.
+     * @param symbol	The symbol of the graphs to remove
      */
     public void removeAll(String symbol) {
 
@@ -402,219 +498,6 @@ public class ChartModule extends JPanel implements Module,
      * the window is being closed.
      */
     public void save() { }
-
-    private class Menu extends JMenu implements ActionListener {
-
-	// Graphs
-	private static final String DAY_HIGH       = "Day High";
-	private static final String DAY_LOW        = "Day Low";
-	private static final String DAY_OPEN       = "Day Open";
-	private static final String HIGH_LOW_BAR   = "High Low Bar";
-	private static final String MACD           = "MACD";
-	private static final String MOVING_AVERAGE = "Moving Average";
-	private static final String VOLUME         = "Volume";
-
-	// HashMap of graphs to their annotations if any
-	private HashMap graphMap = new HashMap();
-
-	private JMenuItem removeMenu;
-	
-	private QuoteCache cache;
-	private Graph graph;
-	private ChartModule listener;
-	private HashMap map = new HashMap();
-	private HashMap annotateMap = new HashMap();
-
-	public Menu(ChartModule listener, Graph graph) {
-	    super(graph.getSymbol().toUpperCase());
-
-	    // Order not important - will be added to menu in
-	    // alphabetical order
-	    graphMap.put((Object)DAY_HIGH,	null);
-	    graphMap.put((Object)DAY_LOW,	null);
-	    graphMap.put((Object)DAY_OPEN,	null);
-	    graphMap.put((Object)HIGH_LOW_BAR,	null);
-	    graphMap.put((Object)MACD,		"Buy/Sell");
-	    graphMap.put((Object)MOVING_AVERAGE, "Buy/Sell");
-	    graphMap.put((Object)VOLUME,	null);
-
-	    cache = graph.getCache();    
-	    this.graph = graph;
-	    this.listener = listener;
-
-	    // Create graph + annotation menus
-	    JMenu graphMenu = new JMenu("Graph");
-	    JMenu annotateMenu = new JMenu("Annotate");
-	    this.add(graphMenu);
-	    this.add(annotateMenu);
-
-	    // Get list of graphs in alphabetical order
-	    TreeSet set = new TreeSet(Collator.getInstance());
-	    set.addAll(graphMap.keySet());
-
-	    Iterator iterator = set.iterator();
-	    String graphName;
-	    JCheckBoxMenuItem item;
-	    Object object;
-
-	    while(iterator.hasNext()) {
-		graphName = (String)iterator.next();
-		
-		// Add graph menu
-		item = new JCheckBoxMenuItem(graphName);
-		item.addActionListener(this);
-		graphMenu.add(item);
-
-		// Add annotation menu
-		object = graphMap.get(graphName);
-
-		if(object != null) {
-		    item = new JCheckBoxMenuItem(graphName + " " + 
-						 (String)object);
-		    item.addActionListener(this);
-		    item.setEnabled(false);
-		    annotateMenu.add(item);
-
-		    // Save reference to annotation
-		    annotateMap.put((Object)graphName, item);		    
-		}
-	    }
-
-	    // Add all static menus
-	    this.addSeparator();
-	    removeMenu = new JMenuItem("Remove");
-	    removeMenu.addActionListener(this);
-	    this.add(removeMenu);	    
-	}
-
-	public String getSymbol() {
-	    return graph.getSymbol();
-	}
-
-	public void actionPerformed(ActionEvent e) {
-
-	    // Check static menus first
-	    if(e.getSource() == removeMenu) {
-		listener.removeAll(getSymbol());
-		listener.redraw();
-	    }
-
-	    // Otherwise check dynamic menus
-	    else {
-		JCheckBoxMenuItem menu = (JCheckBoxMenuItem)e.getSource();
-		String text = menu.getText();
-		
-		// Check annotation menus first
-		if(handleAnnotationMenu(text, menu.getState()));
-		    
-		// Handle removing graphs next
-		else if(!menu.getState())
-		    removeGraph(text);
-
-		// Ok looks like its adding a graph
-		else if(text == DAY_HIGH)
-		    addGraph(new LineGraph(new DayHighGraphDataSource(cache)),
-			     DAY_HIGH, 0);
-
-		else if(text == DAY_LOW)
-		    addGraph(new LineGraph(new DayLowGraphDataSource(cache)),
-			     DAY_LOW, 0);
-
-		else if(text == DAY_OPEN)
-		    addGraph(new LineGraph(new DayOpenGraphDataSource(cache)),
-			     DAY_OPEN, 0);
-
-		else if(text == HIGH_LOW_BAR)
-		    addGraph(new HighLowBarGraph
-			(
-			 new DayLowGraphDataSource(cache),
-			 new DayHighGraphDataSource(cache),
-			 new DayCloseGraphDataSource(cache)
-			     ),	HIGH_LOW_BAR, 0);
-		
-		else if(text == MACD)
-		    // 1 1 2 3 5 8 13 21 34 55
-		    addGraph(new MACDGraph(new DayCloseGraphDataSource(cache),
-					   13, 34), MACD, 0);
-
-		else if(text == MOVING_AVERAGE)
-		    addGraph(new MovingAverageGraph(new 
-			DayCloseGraphDataSource(cache), 40), 
-			     MOVING_AVERAGE, 0);
-
-		else if(text == VOLUME)
-		    addGraph(new BarGraph(new DayVolumeGraphDataSource(cache)),
-			     VOLUME);
-
-	    }
-	}
-
-	// Is annotation menu?
-	private boolean handleAnnotationMenu(String text, boolean state) {
-	    Set set = graphMap.keySet();
-	    Iterator iterator = set.iterator();
-	    String graphName;
-	    String annotationName;
-
-	    while(iterator.hasNext()) {
-		graphName = (String)iterator.next();
-		annotationName = graphName + " " +  graphMap.get(graphName);
-		
-		// is it an annotation menu?
-		if(annotationName.equals(text)) {
-
-		    // Turn on annotation for this graph
-		    listener.handleAnnotation((Graph)map.get(graphName),
-					      state);		   
-		    listener.redraw();
-		    return true;
-		}
-	    }	    
-	    return false;
-	}
-
-	// Adds graph to chart
-	private void addGraph(Graph graph, String mapIdentifier) {
-	    map.put(mapIdentifier, graph); 
-	    listener.append(graph);
-	    listener.redraw();
-	}
-	
-	// Same as above but add at specific index
-	private void addGraph(Graph graph, String mapIdentifier, int index) {
-	    map.put(mapIdentifier, graph); 
-	    listener.append(graph, index);
-	    listener.redraw();
-
-	    // Enable annotation menu (if there is one)
-	    Object object = annotateMap.get(mapIdentifier);
-	    
-	    if(object != null) {
-		JCheckBoxMenuItem item = (JCheckBoxMenuItem)object;
-		item.setEnabled(true);		   
-	    }
-	}
-
-	// Removes graph from chart
-	private void removeGraph(String mapIdentifier) {
-	    Graph graph = (Graph)map.get(mapIdentifier);
-	    map.remove(mapIdentifier);
-
-	    // Remove graph and annotation
-	    listener.remove(graph);
-	    listener.handleAnnotation(graph, false);
-	    listener.redraw();
-
-	    // Disable annotation menu (if there is one)
-	    Object object = annotateMap.get(mapIdentifier);
-	    
-	    if(object != null) {
-		JCheckBoxMenuItem item = (JCheckBoxMenuItem)object;
-		item.setEnabled(false);	// disable check box	   
-		item.setSelected(false); // remove tick
-	    }
-	}
-    }
 }
 
 

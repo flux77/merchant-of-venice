@@ -8,6 +8,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.plaf.*;
 
+import org.mov.chart.graph.*;
+import org.mov.chart.source.*;
 import org.mov.util.*;
 import org.mov.quote.*;
 
@@ -390,7 +392,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	Iterator iterator = graphs.iterator();
 
 	while(iterator.hasNext()) {
-	    symbol = ((Graph)iterator.next()).getSymbol();
+	    symbol = ((Graph)iterator.next()).getName();
 
 	    // add it if its not already in our list of symbols
 	    symbolsIterator = symbols.iterator();
@@ -723,7 +725,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		while(graphsIterator.hasNext()) {
 		    // Get symbol
 		    graph = (Graph)graphsIterator.next();
-		    symbol = graph.getSymbol();
+		    symbol = graph.getName();
 		    
 		    // Add mapping between symbol and colour if it doesnt
 		    // exist yet
@@ -744,7 +746,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	if(colourMap == null)
 	    calculateColourMap(chart);
 
-	Color colour = (Color)colourMap.get(graph.getSymbol());
+	Color colour = (Color)colourMap.get(graph.getName());
 	    
 	if(colour != null)
 	    return colour;

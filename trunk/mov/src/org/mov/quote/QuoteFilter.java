@@ -37,7 +37,7 @@ public interface QuoteFilter {
      * Parse the given text string and returns the stock quote or null
      * if it did not contain a valid quote.
      *
-     * @param	quoteList	a single line of text containing a quote.
+     * @param	quoteLine	a single line of text containing a quote.
      * @return	the stock quote
      */
     public Quote toQuote(String quoteLine);

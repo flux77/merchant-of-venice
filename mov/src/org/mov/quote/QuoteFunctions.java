@@ -3,64 +3,18 @@ package org.mov.quote;
 import org.mov.parser.*;
 
 /**
- * Provides a simple set of mathematical functions that can be performed
- * on a series of stock quotes. 
+ * Interim class containing statistical functions to be performed on
+ * stock quotes. This class will eventually be
+ * broken up so that each stat gets put into its own class, e.g.
+ * average.java, RSI.java etc. They will then be put into the stats package.
+ * The gondola language will be made so that it can turn any stat
+ * class into a function.
  */
 public class QuoteFunctions {
     
     /** 
-     * Finds the minimum stock quote for a given symbol in a given range. 
+     * Deprecated. Move to avg2.
      *
-     * @param	cache	the quote cache to read the quotes from.
-     * @param	symbol	the symbol to use.
-     * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
-     * @param	lastDay	fast access date offset in cache.
-     * @return	the minimum stock quote.
-     */
-    static public float min(QuoteCache cache, String symbol, 
-			    int quote, int days, int lastDay) 
-	throws EvaluationException {
-
-	float min = Float.MAX_VALUE;
-	float value;
-
-	for(int i = lastDay - days + 1; i <= lastDay; i++) {
-	    value = cache.getQuote(symbol, quote, i);
-
-	    if(value < min)
-		min = value;
-	}
-
-	return min;
-    }
-
-    /** 
-     * Finds the maximum stock quote for a given symbol in a given range. 
-     *
-     * @param	cache	the quote cache to read the quotes from.
-     * @param	symbol	the symbol to use.
-     * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
-     * @param	lastDay	fast access date offset in cache.
-     * @return	the maximum stock quote.
-     */
-    static public float max(QuoteCache cache, String symbol, 
-			    int quote, int days, int lastDay)
-	throws EvaluationException {
-
-	float max = Float.MIN_VALUE;
-	float value;
-	
-	for(int i = lastDay - days + 1; i <= lastDay; i++) {
-	    value = cache.getQuote(symbol, quote, i);
-
-	    if(value > max)
-		max = value;
-	}
-
-	return max;
-    }
-
-    /** 
      * Average the stock quotes for a given symbol in a given range. 
      *
      * @param	cache	the quote cache to read the quotes from.
@@ -84,6 +38,24 @@ public class QuoteFunctions {
 
 	return avg;
     }
+
+    // start inclusive, end exclusive
+    static public float avg2(float[] values, int start, int end) {
+	float avg = 0;
+	int days = end - start;
+
+	// Sum quotes
+	for(int i = start; i < end; i++) {
+	    avg += values[i];
+	}
+
+	// Average
+	avg /= days;
+
+	return avg;
+    }
+
+
 
     /**
      * RSI algorithm 

@@ -293,7 +293,9 @@ public class PointAndFigureGraph extends AbstractGraph {
 	    
 	    diff = (i <= 1)  ? 0 : (values[i] - prev);
 	    
-	    prev = values[i];
+	    if (diff >= boxValue) {
+		prev = values[i];
+	    }
 	    
 	    i++;
 	    

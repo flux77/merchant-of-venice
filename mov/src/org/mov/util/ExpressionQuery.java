@@ -57,7 +57,8 @@ public class ExpressionQuery {
      *
      * @param	parent	the parent desktop
      * @param	title	the title of the dialog
-     * @param	default	default expression string
+     * @param   prompt  the prompt
+     * @param	defaultExpression	default expression string
      * @return	the expression the user entered or <code>null</code>
      * if the user cancelled the dialog
      */

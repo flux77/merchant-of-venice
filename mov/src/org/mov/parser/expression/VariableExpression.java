@@ -47,10 +47,11 @@ public class VariableExpression extends TerminalExpression {
         throws EvaluationException {
 
         Variable variable = variables.get(name);
-        assert variable.getType() == type;
 
-        if(variable != null)
+        if(variable != null) {
+            assert variable.getType() == type;
             return variables.getValue(name);
+        }
         else
             throw new EvaluationException("variable \"" + name + "\" is not defined");
     }

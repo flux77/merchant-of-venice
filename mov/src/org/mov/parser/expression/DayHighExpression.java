@@ -44,10 +44,10 @@ public class DayHighExpression extends TerminalExpression {
     /**
      * Get the type of the expression.
      *
-     * @return {@link #QUOTE_TYPE}
+     * @return {@link #FLOAT_QUOTE_TYPE}
      */
     public int getType() {
-        return QUOTE_TYPE;
+        return FLOAT_QUOTE_TYPE;
     }
 
     public Object clone() {

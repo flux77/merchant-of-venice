@@ -48,16 +48,13 @@ public class LagExpression extends QuoteExpression {
 
         int lag = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
 
-	try {
-	    return quoteBundle.getQuote(symbol, getQuoteKind(), day + lag);
-	}
-	catch(MissingQuoteException e) {
-	    // TO BE UPDATED. This means if we can't find a quote we assume its
-	    // 0. This works if the stock has been taken off the list otherwise
-	    // it might produce weird results if a single day for a single stock is
-	    // missing.
-	    return 0.0F;
-	}
+        try {
+            return quoteBundle.getQuote(symbol, getQuoteKind(), day, lag);
+        }
+        catch(MissingQuoteException e) {
+            // What should I do in this case?
+            return 0.0F;
+        }
     }
 
     public String toString() {
@@ -68,7 +65,8 @@ public class LagExpression extends QuoteExpression {
     public int checkType() throws TypeMismatchException {
 
 	// Left type must be quote and right type must be number type
-	if(get(0).checkType() == QUOTE_TYPE &&
+	if((get(0).checkType() == FLOAT_QUOTE_TYPE ||
+            get(0).checkType() == INTEGER_QUOTE_TYPE) &&
 	   get(1).checkType() == INTEGER_TYPE)
 	    return getType();
 	else

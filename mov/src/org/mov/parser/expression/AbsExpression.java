@@ -71,13 +71,20 @@ public class AbsExpression extends UnaryExpression {
                 return new NumberExpression(evaluate(null, null, null, 0), getType());
             }
             catch(EvaluationException e) {
-                // abs() should never through EvaluationException
+                // abs() should never raise EvaluationException
                 assert false;
                 return this;
             }
         }
         else
             return this;
+
+        // abs(x * x)
+        // abs(abs()) simplification.
+        // abs(sqrt()) simplification.
+        // sqrt(x * x) == abs(x).
+        // abs(day()) 
+        // etc...
     }
 
     /**
@@ -87,5 +94,9 @@ public class AbsExpression extends UnaryExpression {
      */
     public int getType() {
         return get().getType();
+    }
+
+    public Object clone() {
+        return new AbsExpression((Expression)get().clone());
     }
 }

@@ -387,9 +387,12 @@ public class SanfordQuoteSource implements QuoteSource {
 		match = true;
 	    
 	}
-	else // ALL_COMMODITIES
+	else if(type == ALL_COMMODITIES) {
 	    if(!stock.getSymbol().startsWith("x"))
 		match = true;
+	}
+	else // ALL_SYMBOLS
+	    match = true;
 
 	return match;
     }

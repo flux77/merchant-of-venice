@@ -32,6 +32,9 @@ public interface QuoteSource {
     /** Indicates a single symbol. */
     public static final int SINGLE_SYMBOL = 3;
 
+    /** Everything */
+    public static final int ALL_SYMBOLS = 4;
+
     /** 
      * Returns the company name associated with the given symbol. 
      * 

@@ -58,9 +58,12 @@ public class DatabaseQuoteSource implements QuoteSource
     private final static String SYMBOL_INDEX_NAME =	"symbol_index";
     
     // Info table
-    private final static String INFO_TABLE_NAME =     	"info";
+    private final static String LOOKUP_TABLE_NAME =    	"lookup";
     private final static String NAME_FIELD =		"name";
 
+    // Keep list of dates in database when importing
+    private Vector allDates = null;
+    
     /**
      * Creates a new quote source using the database information specified
      * in the user preferences.
@@ -124,7 +127,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		Statement statement = connection.createStatement();
 		
 		ResultSet RS = statement.executeQuery
-		    ("SELECT " + NAME_FIELD + " FROM " + INFO_TABLE_NAME + 
+		    ("SELECT " + NAME_FIELD + " FROM " + LOOKUP_TABLE_NAME + 
 		     " WHERE " + SYMBOL_FIELD + " = '"
 		     + symbol.toUpperCase() + "'");
 
@@ -162,7 +165,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		
 		ResultSet RS = statement.executeQuery
 		    ("SELECT " + symbol.toUpperCase() + 
-		     " FROM " + INFO_TABLE_NAME + " WHERE LOCATE(" +
+		     " FROM " + LOOKUP_TABLE_NAME + " WHERE LOCATE(" +
 		     "UPPER('" + partialCompanyName + "'), " +
 		     NAME_FIELD + ") != 0");
 
@@ -324,9 +327,7 @@ public class DatabaseQuoteSource implements QuoteSource
 					endDate.toShortString(), 1);
 
 	Vector query =  executeQuery(selectAllString() + 
-				     whereClauseString() +  
 				     dateRangeString(startDate, endDate) +
-				     andString() + 
 				     restrictTypeString(type) +
 				     orderByDateString());
 	// A next right before a close is OK because we might not be the
@@ -348,9 +349,7 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public Vector getQuotesForDate(TradingDate date, int type) {
 	return executeQuery(selectAllString() + 
-			    whereClauseString() +
 			    dateString(date) +
-			    andString() + 
 			    restrictTypeString(type));
     }
 
@@ -369,7 +368,6 @@ public class DatabaseQuoteSource implements QuoteSource
 	    Progress.getInstance().open("Loading quotes for " + symbol, 1);
 
 	Vector query =  executeQuery(selectAllString() +
-				     whereClauseString() + 
 				     specificSymbolString(symbol) +
 				     orderByDateString());
 	
@@ -385,34 +383,26 @@ public class DatabaseQuoteSource implements QuoteSource
 	return "SELECT * FROM " + SHARE_TABLE_NAME;
     }
 
-    private String whereClauseString() {
-	return " WHERE ";
-    }
-
     private String dateRangeString(TradingDate startDate,
 				   TradingDate endDate) {
-	return DATE_FIELD +" >= '" + startDate + "' " + andString() + 
+	return " WHERE " + DATE_FIELD +" >= '" + startDate + "' AND " +
 	    DATE_FIELD +" <= '" + endDate + "' ";
     }
 
     private String dateString(TradingDate date) {
-	return DATE_FIELD +" = '" + date + "' ";
-    }
-
-    private String andString() {
-	return "AND ";
+	return " WHERE " + DATE_FIELD +" = '" + date + "' ";
     }
 
     private String restrictTypeString(int type) {
 	if(type == ALL_COMMODITIES)
-	    return "LEFT(" + SYMBOL_FIELD + ", 1) != 'X' ";
+	    return " AND LEFT(" + SYMBOL_FIELD + ", 1) != 'X' ";
     
 	else if(type == COMPANIES_AND_FUNDS)
-	    return "LENGTH(" + SYMBOL_FIELD + ") = 3 " + andString() + 
+	    return " AND LENGTH(" + SYMBOL_FIELD + ") = 3 AND " + 
 		"LEFT(" + SYMBOL_FIELD + ",1) != 'X' ";
 	
 	else if(type == INDICES)
-	    return "LENGTH(" + SYMBOL_FIELD + ") = 3 " + andString() + 
+	    return " AND LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
 		"LEFT(" + SYMBOL_FIELD + ", 1) = 'X' ";
 	else {
 	    return "";
@@ -420,11 +410,11 @@ public class DatabaseQuoteSource implements QuoteSource
     }
 
     private String specificSymbolString(String symbol) {
-	return SYMBOL_FIELD +" = '" + symbol + "' ";
+	return " WHERE " + SYMBOL_FIELD +" = '" + symbol + "' ";
     }
 
     private String orderByDateString() {
-	return "ORDER BY " + DATE_FIELD;
+	return " ORDER BY " + DATE_FIELD;
     }
 
     private boolean createTable(String databaseName) {
@@ -432,17 +422,17 @@ public class DatabaseQuoteSource implements QuoteSource
 	boolean success = false;
 
 	try {
-	    // 1. Create the table
+	    // 1. Create the shares table
 	    Statement statement = connection.createStatement();
 	    ResultSet RS = statement.executeQuery
 		("CREATE TABLE " + SHARE_TABLE_NAME + " (" + 
-		 DATE_FIELD +		" DATE NOT NULL, "+ 
-		 SYMBOL_FIELD +		" CHAR(6) NOT NULL, "+
-		 DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, "+
-		 DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, "+
-		 DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, "+
-		 DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, "+
-		 DAY_VOLUME_FIELD +	" INT DEFAULT 0, "+
+		 DATE_FIELD +		" DATE NOT NULL, " + 
+		 SYMBOL_FIELD +		" CHAR(6) NOT NULL, " +
+		 DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, " +
+		 DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
+		 DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
+		 DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, " +
+		 DAY_VOLUME_FIELD +	" INT DEFAULT 0, " +
 		 "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
 
 	    // 2. Create a couple of indices to speed things up
@@ -452,6 +442,13 @@ public class DatabaseQuoteSource implements QuoteSource
 	    RS = statement.executeQuery
 		("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " + 
 		 SHARE_TABLE_NAME + " (" + SYMBOL_FIELD + ")");
+
+	    // 3. Create the lookup table
+	    RS = statement.executeQuery
+		("CREATE TABLE " + LOOKUP_TABLE_NAME + " (" +
+		 SYMBOL_FIELD +		" CHAR(6) NOT NULL, " +
+		 NAME_FIELD +		" VARCHAR(100), " +
+		 "PRIMARY KEY(" + SYMBOL_FIELD + "))");
 
 	    success = true;
 	}
@@ -531,6 +528,10 @@ public class DatabaseQuoteSource implements QuoteSource
 	if(!readyForImport) 
 	    readyForImport = prepareForImport(databaseName);
 
+	// Dont import a date thats already there
+	if(databaseContainsDate(date))
+	    return;
+	
 	if(readyForImport) {
 	    Iterator iterator = dayQuotes.iterator();
 	    Stock stock;
@@ -570,6 +571,56 @@ public class DatabaseQuoteSource implements QuoteSource
 		DesktopManager.showErrorMessage("Error talking to database");
 	    }
 	}
+    }
+
+    // Return whether the database contains the given date. If it does
+    // it will return true, otherwise it will add the date to its internal
+    // list and return false.
+    private boolean databaseContainsDate(TradingDate date) {
+
+	// Make sure latest quote date is loaded
+	getLatestQuoteDate();
+	
+	// Already got it?
+	if(latestQuoteDate != null && date.equals(latestQuoteDate))
+	    return true;
+	
+	// If the date isnt after the above, well have to load all the
+	// dates to check
+	if(latestQuoteDate != null && !date.after(latestQuoteDate)) {
+	    if(allDates == null) 
+		allDates = getDates();
+	    
+	    // Don't import if the database already contains the date
+	    if(containsDate(allDates, date))
+		return true;
+	    
+	    // No database doesnt contain the date! Update our
+	    // reference of what dates are in the database
+	    if(allDates != null)
+		allDates.add(date);
+	    if(latestQuoteDate.before(date))
+		latestQuoteDate = date;
+	}
+	
+	// Dont have date
+	return false;
+    }
+
+    // Return whether the given vector contains the given date
+    private boolean containsDate(Vector dates, TradingDate date) {
+	Iterator iterator = dates.iterator();
+	TradingDate traverseDate;
+
+	while(iterator.hasNext()) {
+	    traverseDate = (TradingDate)iterator.next();
+
+	    if(date.equals(traverseDate)) 
+		return true;
+	}
+	
+	// If we got here it wasnt found
+	return false;
     }
 
     /** 

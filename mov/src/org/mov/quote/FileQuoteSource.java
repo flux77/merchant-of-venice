@@ -95,9 +95,12 @@ public class FileQuoteSource implements QuoteSource
 		match = true;
 	    
 	}
-	else // ALL_COMMODITIES
+	else if(type == ALL_COMMODITIES) {
 	    if(!stock.getSymbol().startsWith("x"))
 		match = true;
+	}
+	else // ALL_SYMBOLS
+	    match = true;
 
 	return match;
     }
@@ -312,7 +315,6 @@ public class FileQuoteSource implements QuoteSource
 	} catch (java.io.IOException ioe) {
 	    DesktopManager.showErrorMessage("Can't load " + fileName);
 	} 
-
 	return quotes;
     }
 

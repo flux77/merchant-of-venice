@@ -38,6 +38,54 @@ public class AddExpression extends ArithmeticExpression {
 	    getRight().evaluate(variables, quoteBundle, symbol, day);
     }
 
+    public Expression simplify() {
+        // First perform arithmetic simplifications
+        Expression simplified = super.simplify();
+
+        if(simplified == this) {
+            NumberExpression left = (getLeft() instanceof NumberExpression? 
+                                     (NumberExpression)getLeft() : null);
+            NumberExpression right = (getRight() instanceof NumberExpression? 
+                                      (NumberExpression)getRight() : null);
+
+            // 0+a -> a.
+            if(left != null && left.equals(0.0F))
+                return getRight();
+
+            // a+0 -> a.
+            else if(right != null && right.equals(0.0F))
+                return getLeft();
+
+            // a+a -> 2*a. This doesn't seem like a simplification but
+            // remember a could be a complicated expression like:
+            // (lag(day_close, 0) * lag(day_open, 0))
+            else if(getLeft().equals(getRight()))
+                return new MultiplyExpression(new NumberExpression(2.0F, getLeft().getType()),
+                                              getLeft());
+        }
+        return simplified;
+    }
+
+    public boolean equals(Object object) {
+
+        // Are they both add expressions?
+        if(object instanceof AddExpression) {
+            AddExpression expression = (AddExpression)object;
+
+            // (x+y) == (x+y)
+            if(getLeft().equals(expression.getLeft()) &&
+               getRight().equals(expression.getRight()))
+                return true;
+
+            // (x+y) == (y+x)
+            if(getLeft().equals(expression.getRight()) &&
+               getRight().equals(expression.getLeft()))
+                return true;
+        }
+    
+        return false;
+    }
+
     public String toString() {
 	return super.toString("+");
     }

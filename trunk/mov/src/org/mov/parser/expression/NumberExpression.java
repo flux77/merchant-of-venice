@@ -31,7 +31,27 @@ public class NumberExpression extends TerminalExpression {
     private float value;
     private int type;
 
+    private final static float EPSILON = 0.001F;
+
+    public NumberExpression(boolean value) {
+        this.value = value? TRUE: FALSE;
+        this.type = BOOLEAN_TYPE;
+    }
+
+    public NumberExpression(float value) {
+        this.value = value;
+        this.type = FLOAT_TYPE;
+    }
+
+    public NumberExpression(int value) {
+        this.value = (float)value;
+        this.type = INTEGER_TYPE;
+    }
+
     public NumberExpression(float value, int type) {
+        assert(type == Expression.BOOLEAN_TYPE || type == Expression.FLOAT_TYPE ||
+               type == Expression.INTEGER_TYPE);
+
 	this.value = value;
         this.type = type;
     }
@@ -60,6 +80,40 @@ public class NumberExpression extends TerminalExpression {
 
     public int checkType() throws TypeMismatchException {
 	return getType();
+    }
+
+    public boolean equals(float value) {
+        return (Math.abs(this.value - value) < EPSILON);
+    }
+
+    public boolean equals(Object object) {
+        if(object instanceof NumberExpression) {
+            NumberExpression expression = (NumberExpression)object;
+
+            if(expression.getValue() == getValue() &&
+               expression.getType() == getType())
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the value of the number.
+     *
+     * @return value
+     */
+    public float getValue() {
+        return value;
+    }
+
+    /**
+     * Set the value of the number.
+     *
+     * @param value the new value
+     */
+    public void setValue(float value) {
+        this.value = value;
     }
 
     /**

@@ -40,8 +40,30 @@ public class PercentExpression extends BinaryExpression {
     public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	return getLeft().evaluate(variables, quoteBundle, symbol, day) *
-	    (getRight().evaluate(variables, quoteBundle, symbol, day) / 100);
+        float value = getLeft().evaluate(variables, quoteBundle, symbol, day);
+        float percent = getRight().evaluate(variables, quoteBundle, symbol, day);
+	return value * percent / 100;
+    }
+
+    public Expression simplify() {
+        // First simplify all the child arguments
+        super.simplify();
+
+        // If both the child arguments are constant we can precompute.
+        if(getLeft() instanceof NumberExpression &&
+           getRight() instanceof NumberExpression) {
+            try {
+                return new NumberExpression(evaluate(null, null, null, 0),
+                                            getType());
+            }
+            catch(EvaluationException e) {
+                // Shouldn't happen
+                assert false;
+                return this;
+            }
+        }
+        else
+            return this;
     }
 
     public String toString() {

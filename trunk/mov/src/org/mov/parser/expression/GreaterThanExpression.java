@@ -42,6 +42,19 @@ public class GreaterThanExpression extends ComparisionExpression {
 	    return FALSE;
     }
 
+    public Expression simplify() {
+        // First perform comparision simplifications
+        Expression simplified = super.simplify();
+
+        // If we haven't simplified the whole expression away and
+        // the left and right arguments are the same expression
+        // then the comparision must be false.
+        if(simplified == this && getLeft().equals(getRight()))
+            return new NumberExpression(false);
+        else
+            return simplified;
+    }
+
     public String toString() {
 	return super.toString(">");
     }

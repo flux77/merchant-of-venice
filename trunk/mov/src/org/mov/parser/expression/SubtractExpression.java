@@ -38,6 +38,27 @@ public class SubtractExpression extends ArithmeticExpression {
 	    getRight().evaluate(variables, quoteBundle, symbol, day);
     }
 
+    public Expression simplify() {
+        // First perform arithmetic simplifications
+        Expression simplified = super.simplify();
+
+        if(simplified == this) {
+            NumberExpression left = (getLeft() instanceof NumberExpression? 
+                                     (NumberExpression)getLeft() : null);
+            NumberExpression right = (getRight() instanceof NumberExpression? 
+                                      (NumberExpression)getRight() : null);
+
+            // a-0 -> a.
+            if(right != null && right.equals(0.0F))
+                return getLeft();
+
+            // a-a -> 0.
+            else if(getLeft().equals(getRight()))
+                return new NumberExpression(0.0F, getType());
+        }
+        return simplified;
+    }
+
     public String toString() {
 	return super.toString("-");
     }

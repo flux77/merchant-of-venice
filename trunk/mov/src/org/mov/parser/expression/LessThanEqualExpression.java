@@ -42,6 +42,19 @@ public class LessThanEqualExpression extends ComparisionExpression {
 	    return FALSE;
     }
 
+    public Expression simplify() {
+        // First perform comparision simplifications
+        Expression simplified = super.simplify();
+
+        // If we haven't simplified the whole expression away and
+        // the left and right arguments are the same expression
+        // then the comparision must be true.
+        if(simplified == this && getLeft().equals(getRight()))
+            return new NumberExpression(true);
+        else
+            return simplified;
+    }
+
     public String toString() {
 	return super.toString("<=");
     }

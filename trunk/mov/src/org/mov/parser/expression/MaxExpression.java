@@ -39,6 +39,8 @@ public class MaxExpression extends QuoteExpression {
 			 Expression lag) {
 	super(quote);
 
+        assert quote != null && days != null && lag != null;
+
 	add(quote);
 	add(days);
 	add(lag);
@@ -47,25 +49,29 @@ public class MaxExpression extends QuoteExpression {
     public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	int days = (int)getArg(1).evaluate(variables, quoteBundle, symbol, day);
-	int lastDay = day + (int)getArg(2).evaluate(variables, quoteBundle, symbol, day);
+	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
+
+        if(days == 0)
+            throw new EvaluationException("Maximum value over 0 days");
+
+	int lastDay = day + (int)get(2).evaluate(variables, quoteBundle, symbol, day);
 
 	return max(quoteBundle, symbol, getQuoteKind(), days, lastDay);
     }
 
     public String toString() {
 	return new String("max(" + 
-			  getArg(0).toString() + ", " +
-			  getArg(1).toString() + ", " +
-			  getArg(2).toString() + ")");
+			  get(0).toString() + ", " +
+			  get(1).toString() + ", " +
+			  get(2).toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {
 
 	// First type must be quote, second and third types must be value
-	if(getArg(0).checkType() == QUOTE_TYPE &&
-	   getArg(1).checkType() == INTEGER_TYPE &&
-	   getArg(2).checkType() == INTEGER_TYPE)
+	if(get(0).checkType() == QUOTE_TYPE &&
+	   get(1).checkType() == INTEGER_TYPE &&
+	   get(2).checkType() == INTEGER_TYPE)
 	    return getType();
 	else
 	    throw new TypeMismatchException();
@@ -107,8 +113,8 @@ public class MaxExpression extends QuoteExpression {
     }
 
     public Object clone() {
-        return new MaxExpression((Expression)getArg(0).clone(), 
-                                 (Expression)getArg(1).clone(),
-                                 (Expression)getArg(2).clone());
+        return new MaxExpression((Expression)get(0).clone(), 
+                                 (Expression)get(1).clone(),
+                                 (Expression)get(2).clone());
     }
 }

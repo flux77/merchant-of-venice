@@ -38,6 +38,55 @@ public class MultiplyExpression extends ArithmeticExpression {
 	    getRight().evaluate(variables, quoteBundle, symbol, day);
     }
 
+    public Expression simplify() {
+        // First perform arithmetic simplifications
+        Expression simplified = super.simplify();
+
+        if(simplified == this) {
+            NumberExpression left = (getLeft() instanceof NumberExpression? 
+                                     (NumberExpression)getLeft() : null);
+            NumberExpression right = (getRight() instanceof NumberExpression? 
+                                      (NumberExpression)getRight() : null);
+
+            // 0*a -> 0.
+            if(left != null && left.equals(0.0F))
+                return new NumberExpression(0.0F, getType());
+
+            // a*0 -> 0.
+            else if(right != null && right.equals(0.0F))
+                return new NumberExpression(0.0F, getType());
+
+            // 1*a -> a.
+            else if(left != null && left.equals(1.0F))
+                return getRight();
+
+            // a*1 -> a.
+            else if(right != null && right.equals(1.0F))
+                return getLeft();
+        }
+        return simplified;
+    }
+
+    public boolean equals(Object object) {
+
+        // Are they both multiply expressions?
+        if(object instanceof MultiplyExpression) {
+            MultiplyExpression expression = (MultiplyExpression)object;
+
+            // (x*y) == (x*y)
+            if(getLeft().equals(expression.getLeft()) &&
+               getRight().equals(expression.getRight()))
+                return true;
+
+            // (x*y) == (y*x)
+            if(getLeft().equals(expression.getRight()) &&
+               getRight().equals(expression.getLeft()))
+                return true;
+        }
+    
+        return false;
+    }
+
     public String toString() {
 	return super.toString("*");
     }

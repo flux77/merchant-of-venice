@@ -28,26 +28,74 @@ import org.mov.quote.*;
  */
 public class NotExpression extends UnaryExpression {
 
-    public NotExpression(Expression sub) {
-	super(sub);
+    public NotExpression(Expression arg) {
+	super(arg);
     }
 
     public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	if(getSub().evaluate(variables, quoteBundle, symbol, day) >= Expression.TRUE_LEVEL)
+	if(get().evaluate(variables, quoteBundle, symbol, day) >= Expression.TRUE_LEVEL)
 	    return FALSE;
 	else
 	    return TRUE;
     }
 
+    public Expression simplify() {
+        // First simplify all the child arguments
+        super.simplify();
+
+        // If the child argument is a number expression we can precompute
+        if(get() instanceof NumberExpression) {
+            try {
+                return new NumberExpression(evaluate(null, null, null, 0), BOOLEAN_TYPE);
+            }
+            catch(EvaluationException e) {
+                // Shouldn't happen
+                assert false;
+                return this;
+            }
+        }
+        // If the child argument is a logic expression then we can reverse it.
+
+        // not(x == y) -> x != y
+        else if(get() instanceof EqualThanExpression) 
+            return new NotEqualExpression(get().get(0), get().get(1));
+
+        // not(x != y) -> x == y
+        else if(get() instanceof NotEqualExpression) 
+            return new EqualThanExpression(get().get(0), get().get(1));
+
+        // not(x < y) -> x >= y
+        else if(get() instanceof LessThanExpression) 
+            return new GreaterThanEqualExpression(get().get(0), get().get(1));
+
+        // not(x > y) -> x <= y
+        else if(get() instanceof GreaterThanExpression) 
+            return new LessThanEqualExpression(get().get(0), get().get(1));
+
+        // not(x <= y) -> x > y
+        else if(get() instanceof LessThanEqualExpression) 
+            return new GreaterThanExpression(get().get(0), get().get(1));
+
+        // not(x >= y) -> x < y
+        else if(get() instanceof GreaterThanEqualExpression) 
+            return new LessThanExpression(get().get(0), get().get(1));
+
+        // not(not(x)) -> x
+        else if(get() instanceof NotExpression)
+            return get().get(0);
+        else
+            return this;
+    }
+
     public String toString() {
-	return new String("not(" + getSub().toString() + ")");
+	return new String("not(" + get().toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {
 	// sub type must be boolean
-	if(getSub().checkType() == BOOLEAN_TYPE)
+	if(get().checkType() == BOOLEAN_TYPE)
 	    return BOOLEAN_TYPE;
 	else
 	    throw new TypeMismatchException();
@@ -63,6 +111,6 @@ public class NotExpression extends UnaryExpression {
     }
 
     public Object clone() {
-        return new NotExpression((Expression)getSub().clone());
+        return new NotExpression((Expression)get().clone());
     }
 }

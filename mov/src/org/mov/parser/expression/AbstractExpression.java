@@ -95,7 +95,7 @@ public abstract class AbstractExpression implements Expression {
      * method uses reference equality rather than using the equals
      * method.
      *
-     * @param expression the child expression to locate
+     * @param child the child expression to locate
      * @return index of the child expression or <code>-1</code> if it could
      *              not be found
      */

@@ -26,6 +26,7 @@ import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 
 /**
  * Dialog for querying the user for a date.
@@ -93,10 +94,10 @@ public class TradingDateDialog {
         int dateOffset;
 
         // Try and convert the date text into a date object
-        date = new TradingDate(dateText, TradingDate.BRITISH);
-        
-        // If the date didn't parse it sets all the fields to 0
-        if(date.getYear() == 0) {
+        try {
+            date = new TradingDate(dateText, TradingDate.BRITISH);
+        }
+        catch(TradingDateFormatException e) {
             JOptionPane.showInternalMessageDialog(parent, 
                                                   "Can't parse date '" + dateText + "'",
                                                   "Invalid Trading Date",

@@ -23,12 +23,15 @@ import org.mov.quote.Quote;
 
 /**
  * Create an executable expression from the given token and arguments.
+ *
+ * @author Andrew Leppard
  */
 public class ExpressionFactory {
 
     // Cannot create an instance of this class
     private ExpressionFactory() {
-	// not possible
+        // not possible
+        assert false;
     }
 
     /**
@@ -224,6 +227,9 @@ public class ExpressionFactory {
         case(Token.EMA_TOKEN):
             expression = new EMAExpression(arg1, arg2, arg3, arg4);
             break;
+	case(Token.SD_TOKEN):
+	    expression = new StandardDeviationExpression(arg1, arg2, arg3);
+	    break;
         default:
             // No such token
             assert false;

@@ -72,6 +72,10 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException RSI_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("RSI_RANGE_ERROR"));
 
+    /** An exception which is thrown on an invalid sd() range. */
+    public static EvaluationException SD_RANGE_EXCEPTION =
+        new EvaluationException(Locale.getString("SD_RANGE_ERROR"));
+
     /** An exception which is thrown on an invalid lag() range. */
     public static EvaluationException LAG_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("LAG_RANGE_ERROR"));
@@ -108,6 +112,10 @@ public class EvaluationException extends ExpressionException {
     /** An exception which is thrown on an invalid rsi() offset. */
     public static EvaluationException RSI_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("RSI_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid sd() offset. */
+    public static EvaluationException SD_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("SD_OFFSET_ERROR"));
 
     /** An exception which is thrown on an invalid corr() offset. */
     public static EvaluationException CORR_OFFSET_EXCEPTION =

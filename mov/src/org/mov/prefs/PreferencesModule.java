@@ -108,12 +108,18 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
 	pageListModel = new DefaultListModel();
 	pages = new Vector();
 
+	JPanel buttonPanel = new JPanel();
+	okButton = new JButton(Locale.getString("OK"));
+	okButton.addActionListener(this);
+	cancelButton = new JButton(Locale.getString("CANCEL"));
+	cancelButton.addActionListener(this);
+        
 	addPage(new EquationPage(desktop));
 	addPage(new LanguagePage(desktop));
         addPage(new ProxyPage(desktop));
 	addPage(new QuoteSourcePage(desktop));	
 	addPage(new TuningPage(desktop));
-	addPage(new WindowPreferencePage(desktop));
+	addPage(new WindowPreferencePage(desktop, this.cancelButton));
 
 	pageList = new JList(pageListModel);
 
@@ -135,11 +141,6 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
 				   activePage.getComponent()),
 	    BorderLayout.CENTER);
 
-	JPanel buttonPanel = new JPanel();
-	okButton = new JButton(Locale.getString("OK"));
-	okButton.addActionListener(this);
-	cancelButton = new JButton(Locale.getString("CANCEL"));
-	cancelButton.addActionListener(this);
 	buttonPanel.add(okButton);
 	buttonPanel.add(cancelButton);
   

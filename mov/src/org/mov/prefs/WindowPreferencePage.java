@@ -60,6 +60,7 @@ public class WindowPreferencePage extends JPanel implements PreferencesPage {
     private JTextField pathTextField = null;
     private JButton loadButton = null;
     private JButton saveButton = null;
+    private JButton cancelButton = null;
     
     /* XML Filter File. */
     public class XMLFilter extends FileFilter {
@@ -109,8 +110,9 @@ public class WindowPreferencePage extends JPanel implements PreferencesPage {
      *
      * @param	desktop	the parent desktop.
      */
-    public WindowPreferencePage(JDesktopPane desktop) {
+    public WindowPreferencePage(JDesktopPane desktop, JButton cancelButton) {
 	this.desktop = desktop;
+        this.cancelButton = cancelButton;
 	
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	
@@ -165,6 +167,9 @@ public class WindowPreferencePage extends JPanel implements PreferencesPage {
                                 new FileInputStream(file));
                             PreferencesManager.importPreferences(inputStream);
                             inputStream.close();
+                            // 'Cancel' button is clicked, so that the new preferences
+                            // cannot be overwritten by the old ones.
+                            clickCancel();
                         } catch (IOException ex) {
                             JOptionPane.showInternalMessageDialog(desktop,
                                                                   Locale.getString("ERROR_READING_FROM_FILE"),
@@ -239,6 +244,10 @@ public class WindowPreferencePage extends JPanel implements PreferencesPage {
 	return windowPreferencePanel;
     }
     
+    private void clickCancel() {
+	this.cancelButton.doClick();
+    }                               
+ 
     public String getTitle() {
 	return Locale.getString("WINDOW_PREFERENCE_PAGE_TITLE");
     }

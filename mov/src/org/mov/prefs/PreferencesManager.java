@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
-
+import org.mov.ui.DesktopManager;
 
 import org.mov.portfolio.Account;
 import org.mov.portfolio.CashAccount;
@@ -773,6 +773,8 @@ public class PreferencesManager {
 	    windowPreferencePreferences.path != null) {
 	    prefs.put("path", windowPreferencePreferences.path);
 	    prefs.put("file", windowPreferencePreferences.XMLfile);
+	} else {
+	    DesktopManager.showWarningMessage("Window preferences file not set.");   
 	}
     }
 

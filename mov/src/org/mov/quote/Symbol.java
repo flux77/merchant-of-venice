@@ -69,12 +69,12 @@ public class Symbol implements Cloneable, Comparable {
         else if(string.length() < MINIMUM_SYMBOL_LENGTH)
             throw new SymbolFormatException("Symbol '" + string + "' is too short.");
 
-        // A symbol can only contain letters and a full stop. Check that it doesn't
-        // contain anything else.
+        // A symbol can only contain letters. Yahoo finance adds in full stops and
+        // carots. So support them.
         for(int i = 0; i < string.length(); i++) {
             char letter = string.charAt(i);
 
-            if(!Character.isLetter(letter) && letter != '.')
+            if(!Character.isLetter(letter) && letter != '.' && letter != '^')
                 throw new SymbolFormatException("Symbol '" + string + "' contains non-" +
                                                 "alphabetical characters.");
         }

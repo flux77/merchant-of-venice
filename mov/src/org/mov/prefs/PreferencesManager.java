@@ -766,8 +766,14 @@ public class PreferencesManager {
      */
     public static void saveWindowPreferenceSettings(WindowPreferencePreferences windowPreferencePreferences) {
 	Preferences prefs = getUserNode("/window_preference");
-	prefs.put("path", windowPreferencePreferences.path);
-	prefs.put("file", windowPreferencePreferences.XMLfile);
+      	
+	// Replace this check with a dialog saying the 
+	// path hasn't been set. 
+	if (windowPreferencePreferences.path != null &&
+	    windowPreferencePreferences.path != null) {
+	    prefs.put("path", windowPreferencePreferences.path);
+	    prefs.put("file", windowPreferencePreferences.XMLfile);
+	}
     }
 
     /**

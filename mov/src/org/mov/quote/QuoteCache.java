@@ -300,9 +300,22 @@ public class QuoteCache {
 	return size;
     }
 
-    // Get oldest date in cache
-    private TradingDate getFirstDate() {
+    /**
+     * Get the oldest date in the cache.
+     *
+     * @return the oldest date in cache
+     */
+    public TradingDate getFirstDate() {
         return (TradingDate)dates.get(dates.size() - 1);
+    }
+
+    /**
+     * Get the fast access offset of the oldest date in the cache.
+     *
+     * @return the fast access offset of oldest date in cache
+     */
+    public int getFirstDateOffset() {
+        return -(dates.size() - 1);
     }
 
     // Add one day to cache

@@ -66,10 +66,22 @@ public class DatabaseQuoteSource implements QuoteSource
     // When we are importing, first check to make sure the database is OK
     private boolean readyForImport = false;
 
+    // Database Software
+
+    /** MySQL Database. */
+    public final static int MYSQL      = 0;
+
+    /** PostgreSQL Database. */
+    public final static int POSTGRESQL = 1;
+
     // MySQL driver info
-    private final static String DRIVER_NAME       = "mysql";
+    private final static String MYSQL_DRIVER_NAME = "mysql";
     private final static String MM_MYSQL_DRIVER   = "org.gjt.mm.mysql.Driver";
     private final static String MYSQL_DRIVER      = "com.mysql.jdbc.Driver";
+
+    // PostgreSQL driver info
+    private final static String POSTGRESQL_DRIVER_NAME = "postgresql";
+    private final static String POSTGRESQL_DRIVER      = "org.postgresql.Driver";
 
     // Shares table
     private final static String SHARE_TABLE_NAME  = "shares";
@@ -90,6 +102,7 @@ public class DatabaseQuoteSource implements QuoteSource
     private final static String NAME_FIELD        = "name";
 
     // Connection details
+    private int software;
     private String host;
     private String port;
     private String database;
@@ -100,19 +113,23 @@ public class DatabaseQuoteSource implements QuoteSource
      * Creates a new quote source using the database information specified
      * in the user preferences.
      *
+     * @param   software        the database software, either {@link #MYSQL} or
+     *                          {@link #POSTGRESQL}.
      * @param	host	the host location of the database
      * @param	port	the port of the database
      * @param	database	the name of the database
      * @param	username	the user login
      * @param	password	the password for the login
      */
-    public DatabaseQuoteSource(String host, String port, String database,
-			       String username, String password) {
+    public DatabaseQuoteSource(int software, String host, String port, 
+			       String database, String username, String password) {
+	assert software == MYSQL || software == POSTGRESQL;
 
         connection = null;
         firstDate = null;
 	lastDate = null;
 
+	this.software = software;
         this.host = host;
         this.port = port;
         this.database = database;
@@ -127,6 +144,16 @@ public class DatabaseQuoteSource implements QuoteSource
         if(connection != null)
             return true;
 
+	else if(software == MYSQL)
+	    return connectMySQL();
+	else {
+	    assert software == POSTGRESQL;
+	    return connectPostgreSQL();
+	}
+    }
+    
+    // Connect to a MySQL database
+    private boolean connectMySQL() {
 	// Get driver
 	try {
             // Try MM MySql driver first as if anything it seems a little
@@ -149,11 +176,34 @@ public class DatabaseQuoteSource implements QuoteSource
 	}
     }
 
+    // Connect to a PostgreSQL database
+    private boolean connectPostgreSQL() {
+	// Get driver
+	try {
+	    Class.forName(POSTGRESQL_DRIVER).newInstance();
+            return connect();
+	}
+	catch (Exception e) {
+	    // Couldn't find the driver!
+	    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_POSTGRESQL_DRIVER"));
+	    return false;
+	}
+    }
+
     // Connect to the database
     private boolean connect() {
 	try {
+	    String driverName;
+
+	    if(software == MYSQL)
+		driverName = MYSQL_DRIVER_NAME;
+	    else {
+		assert software == POSTGRESQL;
+		driverName = POSTGRESQL_DRIVER_NAME;
+	    }
+
 	    connection =
-		DriverManager.getConnection("jdbc:" + DRIVER_NAME +"://"+ host +
+		DriverManager.getConnection("jdbc:" + driverName +"://"+ host +
 					    ":" + port +
 					    "/"+ database +
 					    "?user=" + username +

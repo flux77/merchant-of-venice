@@ -62,9 +62,11 @@
     <delete file="venice.jar"/>
     <delete dir="${api}"/>
     <delete file="${doc}/manual.html"/>
-    <delete file="${doc}/manual.text"/>
+    <delete file="${doc}/manual.txt"/>
     <delete dir="${release}"/>
-    <delete file="${help}/*.html"/>
+    <delete>
+      <fileset dir="${help}" includes="*.html"/>
+    </delete>
     <delete file="${help}/index.xml"/>
     <delete file="${web}/web.tar"/>
     <delete file="${web}/web.tar.gz"/>

@@ -471,8 +471,8 @@ public class PaperTrade {
             dateOffset++;
         }
 
-        setTip(environment, quoteBundle, variables, buy, sell, dateOffset, tradeCost,
-                  orderCache.getTodaySymbols(dateOffset), orderCache);
+        setTip(environment, quoteBundle, variables, buy, sell, dateOffset-1, tradeCost,
+                  orderCache.getTodaySymbols(dateOffset-1), orderCache);
         
         return environment.portfolio;
     }
@@ -552,8 +552,8 @@ public class PaperTrade {
             dateOffset++;
         }
 
-        setTip(environment, quoteBundle, variables, buy, sell, dateOffset, tradeCost,
-                  orderCache.getTodaySymbols(dateOffset), orderCache);
+        setTip(environment, quoteBundle, variables, buy, sell, dateOffset-1, tradeCost,
+                  orderCache.getTodaySymbols(dateOffset-1), orderCache);
         
         return environment.portfolio;
     }

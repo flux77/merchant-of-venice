@@ -38,9 +38,10 @@ public class QuoteModule extends AbstractTable
     private JCheckBoxMenuItem showDayOpenColumn;
     private JCheckBoxMenuItem showDayCloseColumn;
     private JCheckBoxMenuItem showChangeColumn;
-    private JCheckBoxMenuItem[] showEquationColumns =
+    private JCheckBoxMenuItem[] showEquationSlots =
 	new JCheckBoxMenuItem[EQUATION_COLUMNS];
 
+    private JMenuItem applyEquations;
     private JMenuItem sortByMostActive;
     private JMenuItem tableClose;
     
@@ -48,8 +49,25 @@ public class QuoteModule extends AbstractTable
     private QuoteCache cache;
     private Object[] symbols;
     private org.mov.parser.Expression expression = null;
+
+    private Model model;
     
-    class Model extends AbstractTableModel {
+    public class EquationSlot {
+	String columnName;
+	String equation;
+
+	public Object clone() {
+	    EquationSlot clone = new EquationSlot();
+	    clone.columnName = new String(columnName);
+	    clone.equation = new String(equation);
+
+	    return clone;
+	}
+    }
+
+    private EquationSlot[] equationSlots;
+
+    private class Model extends AbstractTableModel {
 	private String[] headers = {
 	    "Symbol", "Volume", "Day Low", "Day High", "Day Open", 
 	    "Day Close", "Change", "Activity"};
@@ -61,15 +79,22 @@ public class QuoteModule extends AbstractTable
 	private TradingDate date = null;
 	private QuoteCache cache;
 	private Object[] symbols;
-    
-	public Model(QuoteCache cache, Object[] symbols) {
+	private EquationSlot[] equationSlots;
+
+	public Model(QuoteCache cache, Object[] symbols,
+		     EquationSlot[] equationSlots) {
 	    this.cache = cache;
 	    this.symbols = symbols;
-	    
+	    this.equationSlots = equationSlots;
+
 	    // Pull first date from cache
 	    Iterator iterator = cache.dateIterator(0);
 	    if(iterator.hasNext())
 		date = (TradingDate)iterator.next();
+	}
+
+	public void setEquationSlots(EquationSlot[] equationSlots) {
+	    this.equationSlots = equationSlots;
 	}
 	
 	public int getRowCount() {
@@ -84,7 +109,7 @@ public class QuoteModule extends AbstractTable
 	    if(c < headers.length) 
 		return headers[c];
 	    else
-		return new String("Eqn. " + (c + 1 - headers.length));
+		return equationSlots[c - headers.length].columnName;
 	}
 
 	public Class getColumnClass(int c) {
@@ -167,9 +192,21 @@ public class QuoteModule extends AbstractTable
 	    symbols = cache.getSymbols();
 
 	propertySupport = new PropertyChangeSupport(this);
-	setModel(new Model(this.cache, symbols), ACTIVITY_COLUMN, SORT_UP);
 
+	// Set up equation slots
+	equationSlots = new EquationSlot[EQUATION_COLUMNS];
+
+	for(int i = 0; i < EQUATION_COLUMNS; i++) {
+	    equationSlots[i] = new EquationSlot();
+	    equationSlots[i].columnName = new String("Eqn. " + (i + 1));
+	    equationSlots[i].equation = new String();
+	}
+
+	model = new Model(this.cache, symbols, equationSlots);
+	setModel(model, ACTIVITY_COLUMN, SORT_UP);
 	addMenu();
+
+	model.addTableModelListener(this);
 
 	// Set menu items to hide equation slots
 	for(int i = 0; i < EQUATION_COLUMNS; i++) {
@@ -285,7 +322,7 @@ public class QuoteModule extends AbstractTable
 
 	    // Set menu items to hide equation slots
 	    for(int i = 0; i < EQUATION_COLUMNS; i++) {
-		showEquationColumns[i] = 
+		showEquationSlots[i] = 
 		    MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 						   "Equation Slot " + (i + 1));
 	    }
@@ -302,6 +339,10 @@ public class QuoteModule extends AbstractTable
        
 	tableMenu.addSeparator();
 
+	applyEquations =
+	    MenuHelper.addMenuItem(this, tableMenu,
+				   "Apply Equations");
+
 	sortByMostActive = 
 	    MenuHelper.addMenuItem(this, tableMenu,
 				   "Sort by Most Active");
@@ -311,13 +352,62 @@ public class QuoteModule extends AbstractTable
 	tableClose = MenuHelper.addMenuItem(this, tableMenu,
 					    "Close");	
     }
+    
+    private void applyEquations() {
+	// Handle all action in a separate thread so we dont
+	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+	Thread thread = new Thread() {
+
+		public void run() {
+		    
+		    JDesktopPane desktop =
+			org.mov.ui.DesktopManager.getDesktop();
+
+		    final EquationsDialog dialog = 
+			new EquationsDialog(desktop,
+					    EQUATION_COLUMNS);
+
+		    // Did the user modify the equation slots?
+		    if(dialog.showDialog(equationSlots)) {
+
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+
+				    equationSlots = dialog.getEquationSlots();
+				    
+				    model.setEquationSlots(equationSlots);
+
+				    // Make sure all columns with an equation
+				    // are visible and all without are not. 
+				    // Also update check box menus
+				    for(int i = 0; i < EQUATION_COLUMNS; i++) {
+					boolean containsEquation = false;
+					
+					if(equationSlots[i].equation.length() >
+					   0)
+					    containsEquation = true;
+					
+					showColumn(EQUATION_SLOT_COLUMN + i, 
+						   containsEquation);
+					
+					showEquationSlots[i].setState(containsEquation);
+				    }
+				    
+				}});
+			
+		    }
+		}
+	    };
+
+	thread.start();
+    }
 
     public void save() {
 
     }
 
     public String getTitle() {
-	return "Quotes";
+	return "Quotes for " + cache.getStartDate().toString("dd/mm/yyyy");
     }
 
     /**
@@ -384,6 +474,10 @@ public class QuoteModule extends AbstractTable
 	    propertySupport.
 		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
 	}
+
+	else if(e.getSource() == applyEquations) {
+	    applyEquations();
+	}
 	
 	else if(e.getSource() == sortByMostActive) {
 	    setColumnSortStatus(ACTIVITY_COLUMN, SORT_UP);
@@ -422,7 +516,7 @@ public class QuoteModule extends AbstractTable
 	    // Otherwise its an equation slot column
 	    else {
 		for(int i = 0; i < EQUATION_COLUMNS; i++) {
-		    if(menuItem == showEquationColumns[i]) {
+		    if(menuItem == showEquationSlots[i]) {
 			column = EQUATION_SLOT_COLUMN + i;
 		    }
 		}

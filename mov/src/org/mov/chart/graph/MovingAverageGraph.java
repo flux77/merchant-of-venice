@@ -134,9 +134,9 @@ public class MovingAverageGraph extends AbstractGraph {
 	while(iterator.hasNext()) {
 	    Comparable x = (Comparable)iterator.next();
 
-	    average = QuoteFunctions.avg2(values,  
-					  i - Math.min(period - 1, i),
-					  i + 1);
+	    average = QuoteFunctions.avg(values,  
+                                         i - Math.min(period - 1, i),
+                                         i + 1);
 	    i++;
 
 	    movingAverage.putY(x, new Float(average));

@@ -69,9 +69,9 @@ public class BollingerBandsGraph extends AbstractGraph {
 	    sd = QuoteFunctions.sd(values,  
 				   i - Math.min(period - 1, i),
 				   i + 1);
-	    average = QuoteFunctions.avg2(values,  
-					  i - Math.min(period - 1, i),
-					  i + 1);
+	    average = QuoteFunctions.avg(values,  
+                                         i - Math.min(period - 1, i),
+                                         i + 1);
 
 	    upperBand.putY(x, new Float(average + 2 * sd));
 	    lowerBand.putY(x, new Float(average - 2 * sd));

@@ -21,7 +21,9 @@ package org.mov.quote;
 import java.util.Iterator;
 import java.util.List;
 
+import org.mov.analyser.gp.GPQuoteBundle;
 import org.mov.parser.EvaluationException;
+import org.mov.portfolio.PortfolioQuoteBundle;
 import org.mov.util.TradingDate;
 
 /** 

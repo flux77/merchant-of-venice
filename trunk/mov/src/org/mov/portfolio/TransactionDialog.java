@@ -23,7 +23,9 @@ import java.awt.event.*;
 import java.beans.*;
 import java.lang.*;
 import java.text.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -186,7 +188,7 @@ public class TransactionDialog extends JInternalFrame
 
     // Get combo box listing cash accounts
     private JComboBox getCashAccountComboBox() {
-	Vector accounts = portfolio.getAccounts();
+	List accounts = portfolio.getAccounts();
 	Iterator iterator = accounts.iterator();
 
 	cashAccountComboBox = new JComboBox();
@@ -205,7 +207,7 @@ public class TransactionDialog extends JInternalFrame
 
     // Get second combo box listing cash accounts
     private JComboBox getCashAccountComboBox2() {
-	Vector accounts = portfolio.getAccounts();
+	List accounts = portfolio.getAccounts();
 	Iterator iterator = accounts.iterator();
 
 	cashAccountComboBox2 = new JComboBox();
@@ -230,7 +232,7 @@ public class TransactionDialog extends JInternalFrame
 
     // Get combo box listing share accounts
     private JComboBox getShareAccountComboBox() {
-	Vector accounts = portfolio.getAccounts();
+	List accounts = portfolio.getAccounts();
 	Iterator iterator = accounts.iterator();
 
 	shareAccountComboBox = new JComboBox();
@@ -647,7 +649,7 @@ public class TransactionDialog extends JInternalFrame
 	// To the user pressed the OK button then add the transaction. To do this remove all 
 	// the old transactions and then re-add them with the new one.
 	if(okButtonPressed) {
-	    Vector transactions = (Vector)portfolio.getTransactions().clone();
+	    List transactions = new ArrayList(portfolio.getTransactions());
 
 	    // Remove old transaction from list
 	    Iterator iterator = transactions.iterator();

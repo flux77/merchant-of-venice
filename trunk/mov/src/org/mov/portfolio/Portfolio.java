@@ -18,10 +18,16 @@
 
 package org.mov.portfolio;
 
-import org.mov.util.*;
-import org.mov.quote.*;
+import org.mov.util.TradingDate;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.QuoteBundle;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /** 
  * Representation of a portfolio. A portfolio object contains several
@@ -34,10 +40,10 @@ public class Portfolio implements Cloneable {
     private String name;
 
     // List of accounts
-    Vector accounts = new Vector();
+    List accounts = new ArrayList();
 
     // Transaction history
-    Vector transactions = new Vector();
+    List transactions = new ArrayList();
 
     /**
      * Create a new empty portfolio.
@@ -69,13 +75,13 @@ public class Portfolio implements Cloneable {
     /**
      * Record multiple transactions on the portfolio. 
      *
-     * @param	transactions	a vector of transactions
+     * @param	transactions	a list of transactions
      * @see	Transaction
      */
-    public void addTransactions(Vector transactions) {
+    public void addTransactions(List transactions) {
 
 	// Sort transactions by date
-	ArrayList list = new ArrayList((Collection)transactions);
+	List list = new ArrayList(transactions);
 	Collections.sort(list);
 
 	// Add them in one by one
@@ -101,9 +107,9 @@ public class Portfolio implements Cloneable {
 	// order to prevent things like selling stock before we have bought it.
 
 	if(countTransactions() > 0 && 
-	   ((Transaction)transactions.lastElement()).compareTo(transaction) > 0) {
+	   ((Transaction)transactions.get(transactions.size() - 1)).compareTo(transaction) > 0) {
 
-	    Vector allTransactions = (Vector)transactions.clone();
+	    List allTransactions = new ArrayList(transactions);
 	    allTransactions.add(transaction);
 
 	    removeAllTransactions();
@@ -203,7 +209,7 @@ public class Portfolio implements Cloneable {
      *
      * @return	accounts
      */
-    public Vector getAccounts() {
+    public List getAccounts() {
 	return accounts;
     }
 
@@ -255,7 +261,7 @@ public class Portfolio implements Cloneable {
      */
     public TradingDate getStartDate() {
 	if(transactions.size() > 0) {
-	    Transaction transaction = (Transaction)transactions.firstElement();
+	    Transaction transaction = (Transaction)transactions.get(0);
 
 	    return transaction.getDate();
 	}
@@ -269,7 +275,7 @@ public class Portfolio implements Cloneable {
      *
      * @return	symbols traded
      */
-    public Vector getSymbolsTraded() {
+    public List getSymbolsTraded() {
 	Set symbolsTraded = new HashSet();
 	Iterator iterator = transactions.iterator();
 
@@ -279,7 +285,7 @@ public class Portfolio implements Cloneable {
 		symbolsTraded.add(transaction.getSymbol().toLowerCase());
 	}
 
-	return new Vector(symbolsTraded);
+	return new ArrayList(symbolsTraded);
     }
 
     /**
@@ -315,7 +321,7 @@ public class Portfolio implements Cloneable {
      * @param	transaction history
      * @see	Transaction
      */
-    public Vector getTransactions() {
+    public List getTransactions() {
 	return transactions;
     }
 
@@ -323,7 +329,7 @@ public class Portfolio implements Cloneable {
      * Remove all transactions from portfolio.
      */
     public void removeAllTransactions() {
-	transactions.removeAllElements();
+	transactions.clear();
 
 	// A portfolio with no transactions has no value or stock so 
 	// remove them from accounts

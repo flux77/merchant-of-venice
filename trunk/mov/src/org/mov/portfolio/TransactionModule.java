@@ -22,7 +22,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.text.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -73,19 +75,19 @@ public class TransactionModule extends AbstractTable implements Module,
 	    TradingDate.class, String.class, PriceFormat.class, PriceFormat.class
 	};
 
-	private Vector transactions;
+	private List transactions;
 
-	public Model(Vector transactions) {
+	public Model(List transactions) {
 	    this.transactions = transactions;
 	}
 
-	public void setTransactions(Vector transactions) {
+	public void setTransactions(List transactions) {
 	    this.transactions = transactions;
 	    fireTableDataChanged();
 	}
 
 	public Transaction getTransactionAtRow(int row) {
-	    return (Transaction)transactions.elementAt(row);
+	    return (Transaction)transactions.get(row);
 	}
 
 	public int getRowCount() {
@@ -109,7 +111,7 @@ public class TransactionModule extends AbstractTable implements Module,
 	    if(row >= getRowCount()) 
 		return "";
 	    
-	    Transaction transaction = (Transaction)transactions.elementAt(row);
+	    Transaction transaction = (Transaction)transactions.get(row);
 	    int type = transaction.getType();
 	    
 	    switch(column) {
@@ -420,7 +422,7 @@ public class TransactionModule extends AbstractTable implements Module,
     }
 
     // Delete the given transaction(s)
-    private void deleteTransactions(final Vector deleteTransactions) {
+    private void deleteTransactions(final List deleteTransactions) {
 	JDesktopPane desktop =
 	    org.mov.ui.DesktopManager.getDesktop();
 	
@@ -436,7 +438,7 @@ public class TransactionModule extends AbstractTable implements Module,
 		    public void run() {
 
 			// Delete transactions
-			Vector transactions = (Vector)portfolio.getTransactions().clone();
+			List transactions = new ArrayList(portfolio.getTransactions());
 			
 			// Remove deleted transactions from the list
 			Iterator iterator = transactions.iterator();
@@ -505,7 +507,7 @@ public class TransactionModule extends AbstractTable implements Module,
                              e.getSource() == popupTransactionDelete)) {
 
 			int[] selectedRows = getSelectedRows();
-			Vector transactions = new Vector();
+			List transactions = new ArrayList();
 
 			for(int i = 0; i < selectedRows.length; i++) {
 			    transactions.add(model.getTransactionAtRow(selectedRows[i]));
@@ -519,9 +521,8 @@ public class TransactionModule extends AbstractTable implements Module,
 			    firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
 		    }
 
-		    else {
+		    else 
 			assert false;
-		    }
 		}
 	    };
 

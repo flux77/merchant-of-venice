@@ -58,7 +58,7 @@ public class BasicPaperTradeResult implements PaperTradeResult {
     }
 
     public String getSymbols() {
-        Vector symbolsTraded = getPortfolio().getSymbolsTraded();
+        List symbolsTraded = getPortfolio().getSymbolsTraded();
         
         String string = new String();
         Iterator iterator = symbolsTraded.iterator();

@@ -219,7 +219,7 @@ public class PreferencesManager {
 	    }
 
 	    // Load transactions
-	    Vector transactions = new Vector();
+	    List transactions = new ArrayList();
 
 	    String[] transactionNumbers = 
 		p.node("transactions").childrenNames();
@@ -291,7 +291,7 @@ public class PreferencesManager {
 	}
 
 	// Save accounts
-	Vector accounts = portfolio.getAccounts();
+	List accounts = portfolio.getAccounts();
 	Iterator iterator = accounts.iterator();
 
 	while(iterator.hasNext()) {
@@ -308,7 +308,7 @@ public class PreferencesManager {
 	}       
 
 	// Save transactions
-	Vector transactions = portfolio.getTransactions();
+	List transactions = portfolio.getTransactions();
 	iterator = transactions.iterator();
 	int i = 0; // Store transactions as node 0, 1, 2 etc
 

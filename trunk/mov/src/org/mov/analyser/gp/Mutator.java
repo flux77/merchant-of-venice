@@ -106,14 +106,22 @@ public class Mutator {
             return new NumberExpression(50 - random.nextFloat() * 100);
 
         case Expression.INTEGER_TYPE:
-            randomNumber = random.nextInt(3);
+            randomNumber = random.nextInt(7);
 
             if(randomNumber == 0)
                 return new NumberExpression(50 - random.nextInt(100));
             else if(randomNumber == 1)
+                return new DayExpression();
+            else if(randomNumber == 2)
+                return new DayOfWeekExpression();
+            else if(randomNumber == 3)
+                return new DayOfYearExpression();
+            else if(randomNumber == 4)
+                return new MonthExpression();
+            else if(randomNumber == 5)
                 return new VariableExpression("order", Expression.INTEGER_TYPE);
             else {
-                assert randomNumber == 2;
+                assert randomNumber == 6;
                 return new VariableExpression("held", Expression.INTEGER_TYPE);
             }
 
@@ -184,7 +192,7 @@ public class Mutator {
     }
 
     private Expression createRandomNonTerminalFloat(Expression model, int level) {
-        int randomNumber = random.nextInt(11);
+        int randomNumber = random.nextInt(14);
 
         // If we are mutating an existing number expression then favour
         // just modifying the number's value rather than replacing it
@@ -237,8 +245,17 @@ public class Mutator {
             return new MaxExpression(createRandomTerminal(Expression.QUOTE_TYPE),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
+        else if(randomNumber == 10)
+            return new SumExpression(createRandomTerminal(Expression.QUOTE_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
+        else if(randomNumber == 11)
+            return new SqrtExpression(getChild(model, level, 0, Expression.FLOAT_TYPE));
+
+        else if(randomNumber == 12)
+            return new AbsExpression(getChild(model, level, 0, Expression.FLOAT_TYPE));
         else {
-            assert randomNumber == 10;
+            assert randomNumber == 13;
             return new AvgExpression(createRandomTerminal(Expression.QUOTE_TYPE),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
@@ -246,7 +263,7 @@ public class Mutator {
     }
 
     private Expression createRandomNonTerminalInteger(Expression model, int level) {
-        int randomNumber = random.nextInt(11);
+        int randomNumber = random.nextInt(14);
 
         // If we are mutating an existing number expression then favour
         // just modifying the number's value rather than replacing it
@@ -299,8 +316,17 @@ public class Mutator {
             return new MaxExpression(new DayVolumeExpression(),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
+        else if(randomNumber == 10)
+            return new SumExpression(new DayVolumeExpression(),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
+        else if(randomNumber == 11)
+            return new SqrtExpression(getChild(model, level, 0, Expression.INTEGER_TYPE));
+
+        else if(randomNumber == 12)
+            return new AbsExpression(getChild(model, level, 0, Expression.INTEGER_TYPE));
         else {
-            assert randomNumber == 10;
+            assert randomNumber == 13;
             return new AvgExpression(new DayVolumeExpression(),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));

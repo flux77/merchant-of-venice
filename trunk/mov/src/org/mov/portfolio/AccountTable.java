@@ -22,7 +22,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.text.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -113,7 +114,7 @@ public class AccountTable extends AbstractTable {
 		    
 		case(VALUE_COLUMN):
 		    // Sum values of all accounts
-		    Vector accounts = portfolio.getAccounts();
+		    List accounts = portfolio.getAccounts();
 		    Iterator iterator = accounts.iterator();
 		    float value = 0;
 		    

@@ -56,7 +56,7 @@ public class PortfolioSymbolComboBox extends JComboBox
     public void setDate(TradingDate date) {
 	removeAllItems();
 	
-	Vector symbols = portfolio.getSymbolsTraded();
+	List symbols = portfolio.getSymbolsTraded();
 	Iterator iterator = symbols.iterator();
 	while(iterator.hasNext()) {
             String symbol = (String)iterator.next();

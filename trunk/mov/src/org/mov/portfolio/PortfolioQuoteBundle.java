@@ -18,14 +18,19 @@
 
 package org.mov.portfolio;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.mov.analyser.gp.GPQuoteBundle;
 import org.mov.parser.EvaluationException;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.WeekendDateException;
+import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteBundleCache;
 import org.mov.quote.QuoteBundleIterator;
+import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteRange;
 import org.mov.util.TradingDate;
 
@@ -154,7 +159,7 @@ public class PortfolioQuoteBundle implements QuoteBundle {
      * @return the first symbol
      */
     public String getFirstSymbol() {
-        return quoteBundle.getFirstSymbol();
+        return portfolio.getName();
     }
 
     /**
@@ -163,7 +168,10 @@ public class PortfolioQuoteBundle implements QuoteBundle {
      * @return all symbols
      */
     public List getAllSymbols() {
-        return quoteBundle.getAllSymbols();
+        List symbols = new ArrayList();
+        symbols.add(portfolio.getName());
+
+        return symbols;
     }
 
     /**
@@ -173,7 +181,7 @@ public class PortfolioQuoteBundle implements QuoteBundle {
      * @return all symbols
      */
     public List getSymbols(int dateOffset) {	
-        return quoteBundle.getSymbols(dateOffset);
+        return getAllSymbols();
     }
 
     /**
@@ -183,7 +191,7 @@ public class PortfolioQuoteBundle implements QuoteBundle {
      * @return all symbols
      */
     public List getSymbols(TradingDate date) {
-        return quoteBundle.getSymbols(date);
+        return getAllSymbols();
     }
 
     /**
@@ -249,7 +257,7 @@ public class PortfolioQuoteBundle implements QuoteBundle {
      * to call this when they are done. 
      */
     public void free() {
-	quoteBundle.free();
+	assert false;
     }    
 }
 

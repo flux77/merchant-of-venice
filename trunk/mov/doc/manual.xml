@@ -180,7 +180,7 @@ a software driver from them too. Their software driver is available at
 http://www.mysql.com/downloads/api-jdbc-stable.html. Venice also supports
 a software driver called <highlight>mm.mysql</highlight> which is available
 from http://sourceforge.net/projects/mmmysql. Both are good, get either,
-although I use the later. See documentation in MySQL and the driver for how to
+although I use the latter. See documentation in MySQL and the driver for how to
 set all this up. Once MySQL is set up you'll need to create a database for
 Venice, call the database <highlight>shares</highlight>.</para>
 

@@ -128,6 +128,25 @@ public class Stock {
     }
 
     /**
+     * Compare the two stock quotes for equality.
+     *
+     * @param	quote	the quote to compare against
+     * @return	<code>1</code> if they are equal; <code>0</code> otherwise
+     */
+    public boolean equals(Stock quote) {
+	if(getSymbol().equals(quote.getSymbol()) &&
+	   getDate().equals(quote.getDate()) &&
+	   getDayLow() == quote.getDayLow() &&
+	   getDayHigh() == quote.getDayHigh() &&
+	   getDayOpen() == quote.getDayOpen() &&
+	   getDayClose() == quote.getDayClose() &&
+	   getVolume() == quote.getVolume())
+	    return true;
+	else
+	    return false;
+    }
+
+    /**
      * Get a single quote.
      *
      * @param	quote	the quote type

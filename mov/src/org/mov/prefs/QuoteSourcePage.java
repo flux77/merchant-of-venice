@@ -104,8 +104,6 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	Preferences p = PreferencesManager.getUserNode("/quote_source");
 	String quoteSource = p.get("source", "samples");
 
-        setBorder(new TitledBorder(getTitle()));
-
 	// Tab Pane
 	JTabbedPane pane = new JTabbedPane(JTabbedPane.TOP);
 	// Put all "use this option" radio buttons into group
@@ -287,7 +285,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                     }
                 }
             });
-        deleteFiles = new JButton("Delete");
+        deleteFiles = new JButton("Remove");
         deleteFiles.setEnabled(false);
         deleteFiles.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {

@@ -26,7 +26,6 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
 
 import org.mov.quote.QuoteCache;
 import org.mov.ui.GridBagHelper;
@@ -40,7 +39,6 @@ public class TuningPage extends JPanel implements PreferencesPage
 	this.desktop = desktop;
 
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(new TitledBorder(getTitle()));
 
         add(createQuotesPanel());
     }

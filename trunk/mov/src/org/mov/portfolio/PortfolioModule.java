@@ -428,7 +428,7 @@ public class PortfolioModule extends JPanel implements Module,
     }
 
     // Show the transaction history table
-    public void showTransactionHistory() {
+    private void showTransactionHistory() {
 
 	// If we have already created it - then just open it
 	if(historyFrame != null && !historyFrame.isClosed()) {
@@ -475,7 +475,7 @@ public class PortfolioModule extends JPanel implements Module,
     /**
      * Display a table of the value of the portfolio over time.
      */
-    private void tablePortfolio() {
+    public void tablePortfolio() {
         // If this portfolio has been given to us from a paper trade we will
         // also get a fully loaded quote bundle ready for tabling.
         // We do a simple check to see if we can table using that quote bundle:

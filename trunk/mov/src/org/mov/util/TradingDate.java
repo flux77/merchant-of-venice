@@ -123,7 +123,7 @@ public class TradingDate implements Cloneable, Comparable {
 		}
 
 		if(year < 100) {
-		    year = Converter.twoToFourDigitYear(year);
+		    year = twoToFourDigitYear(year);
 		}
 
 		// Swap day and month around if expecting US dates
@@ -141,7 +141,7 @@ public class TradingDate implements Cloneable, Comparable {
 		month = Integer.parseInt(date.substring(2, 4));
 		day = Integer.parseInt(date.substring(4, 6));
 		
-		year = Converter.twoToFourDigitYear(year);
+		year = twoToFourDigitYear(year);
 	    }
 	    
 	    // YYYYMMDD
@@ -456,6 +456,24 @@ public class TradingDate implements Cloneable, Comparable {
     public Calendar toCalendar() {
 	// Convert from our month of 1-12 to theirs of 0-11
 	return new GregorianCalendar(getYear(), getMonth() - 1, getDay());
+    }
+
+    /**
+     * Converts a two digit year to four digit year. The year 0 to 30
+     * are transformed to 2000 to 2030 respecitvely; the years 31 to 99 to 
+     * 1931 and 1999 respectively.
+     * 
+     * @param	year	a two digit year
+     * @return	a four digit year
+     */
+    public static int twoToFourDigitYear(int year) {
+	// Convert year from 2 digit to 4 digit
+	if(year > 30)
+	    year += 1900;
+	else
+	    year += 2000;
+
+	return year;
     }
 }
 

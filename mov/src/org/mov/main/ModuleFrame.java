@@ -127,8 +127,18 @@ public class ModuleFrame extends JInternalFrame
     public void propertyChange(PropertyChangeEvent event) {
 	String property = event.getPropertyName();
 
+	System.out.println("property change");
+
 	if(property.equals(WINDOW_CLOSE_PROPERTY))
 	    dispose();
+	else if(property.equals(TITLEBAR_CHANGED_PROPERTY)) {
+	    System.out.println("title change: " +
+			       module.getTitle());
+
+
+	    setTitle(module.getTitle());
+
+	}
     }
 
 

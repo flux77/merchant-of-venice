@@ -626,7 +626,7 @@ public class TransactionDialog extends JInternalFrame
     /**
      * Display a dialog letting the user edit an existing transaction.
      *
-     * @param	transaction	transaction to edit
+     * @param	oldTransaction	transaction to edit
      * @return	whether the OK button was pressed
      */
     public boolean editTransaction(Transaction oldTransaction) {

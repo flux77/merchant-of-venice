@@ -132,8 +132,23 @@ public class CommandManager {
 
                     if(symbols == null)
                         symbolsCopy = SymbolListDialog.getSymbols(desktop, title);
-                    else
+
+                    else {
                         symbolsCopy = new TreeSet(symbols);
+
+                        for(Iterator iterator = symbolsCopy.iterator(); iterator.hasNext();) {
+                            Symbol symbol = (Symbol)iterator.next();
+
+                            if(!QuoteSourceManager.getSource().symbolExists(symbol)) {
+                                JOptionPane.showInternalMessageDialog(desktop,
+                                                                      Locale.getString("NO_QUOTES_SYMBOL",
+                                                                                       symbol.toString()),
+                                                                      Locale.getString("INVALID_SYMBOL_LIST"),
+                                                                      JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                        }
+                    }
 
                     if(symbolsCopy != null && symbolsCopy.size() > 0)
                         tableStocks(title, QuoteRange.GIVEN_SYMBOLS, null, symbolsCopy, null);
@@ -145,7 +160,7 @@ public class CommandManager {
     public void tableStocksByDate(final int type) {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
-		    
+		
                     String title = new String(Locale.getString("LIST_IT_BY_DATE",
 							       QuoteRange.getDescription(type)));
                     TradingDate date = TradingDateDialog.getDate(desktop,
@@ -335,7 +350,7 @@ public class CommandManager {
 
         if(watchScreenName != null && watchScreenName.length() > 0) {
             WatchScreen watchScreen = new WatchScreen(watchScreenName);
-            
+
 	    // Save watch screen so we can update the menu
 	    PreferencesManager.saveWatchScreen(watchScreen);
 	    MainMenu.getInstance().updateWatchScreenMenu();
@@ -351,8 +366,8 @@ public class CommandManager {
      * @param watchScreenName the name of the watch screen
      */
     public void openWatchScreen(String watchScreenName) {
-        WatchScreen watchScreen = 
-            PreferencesManager.loadWatchScreen(watchScreenName);       
+        WatchScreen watchScreen =
+            PreferencesManager.loadWatchScreen(watchScreenName);
         openWatchScreen(watchScreen);
     }
 
@@ -542,11 +557,27 @@ public class CommandManager {
                     SortedSet symbolsCopy;
 
                     if(symbols == null)
-                        symbolsCopy = 
+                        symbolsCopy =
 			    SymbolListDialog.getSymbols(desktop,
 							Locale.getString("GRAPH_BY_SYMBOLS"));
-                    else
+                    else {
+                        // If we were given the list of symbols - then check each one exists
+                        // before trying to graph it. Abort if any are not found.
                         symbolsCopy = new TreeSet(symbols);
+
+                        for(Iterator iterator = symbolsCopy.iterator(); iterator.hasNext();) {
+                            Symbol symbol = (Symbol)iterator.next();
+
+                            if(!QuoteSourceManager.getSource().symbolExists(symbol)) {
+                                JOptionPane.showInternalMessageDialog(desktop,
+                                                                      Locale.getString("NO_QUOTES_SYMBOL",
+                                                                                       symbol.toString()),
+                                                                      Locale.getString("INVALID_SYMBOL_LIST"),
+                                                                      JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                        }
+                    }
 
                     graphStock(symbolsCopy);
                 }
@@ -643,9 +674,9 @@ public class CommandManager {
 
                                    "Andrew Leppaprd (aleppard@picknow.com.au)\n" +
                                    "Daniel Makovec\n\n" +
-				   
+				
 				   Locale.getString("ADDITIONAL_CODE") + "\n\n" +
-                                   
+
                                    "Peter Fradley, Bryan Lin & Matthias St\366ckel."
 				   );
 

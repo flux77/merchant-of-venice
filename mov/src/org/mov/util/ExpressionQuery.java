@@ -5,8 +5,26 @@ import javax.swing.*;
 
 import org.mov.parser.*;
 
+/**
+ * A dialog used for querying the user for an expression string.
+ */
 public class ExpressionQuery {
 
+    private ExpressionQuery() {
+	// Cannot instantiate this class
+    }
+
+    /**
+     * Open a new <code>ExpressionQuery</code> dialog. Ask the user to
+     * enter an expression string. Parse this string and check for validity,
+     * if the string is not valid the user will be asked to enter a valid
+     * string. 
+     *
+     * @param	parent	the parent desktop
+     * @param	title	the title of the dialog
+     * @return	the expression the user entered; parsed or <code>null</code>
+     * if the user cancelled the dialog
+     */
     public static Expression getExpression(JDesktopPane parent, String title,
 					   String prompt) {
 	

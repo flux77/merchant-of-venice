@@ -1,10 +1,12 @@
 package org.mov.prefs;
 
+import org.liquid.list.*;
+import org.mov.ui.*;
+import org.mov.prefs.PreferencesManager;
+
 import java.awt.event.*;
 import java.util.prefs.Preferences;
 import javax.swing.*;
-import org.liquid.list.*;
-import org.mov.prefs.PreferencesManager;
 
 /*
  * EquationPage.java
@@ -211,6 +213,7 @@ public class EquationPage extends javax.swing.JPanel
         if (current_selection != -1)
             prefs.remove(""+functionListModel.getElementAt(current_selection));
         prefs.put(nameText.getText(), detailText.getText());
+	EquationComboBox.updateEquations();
 
         initFunctionList();
 
@@ -242,6 +245,8 @@ public class EquationPage extends javax.swing.JPanel
                                                   JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) 
         {
             prefs.remove(""+functionListModel.getElementAt(current_selection));
+	    EquationComboBox.updateEquations();
+
             current_selection = -1;
             nameText.setText("");
             detailText.setText("");

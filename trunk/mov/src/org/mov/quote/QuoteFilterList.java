@@ -1,0 +1,98 @@
+package org.mov.quote;
+
+import java.util.*;
+
+/**
+ * Provides a list of quote filters available to us. This class is used
+ * as a single point of reference to find and use all of the available
+ * quote filters. 
+ * Example:
+ * <pre>
+ * QuoteFilter filter = 
+ *	QuoteFilterList.getInstance().getFilter("Insight Trader")
+ * Stock stock = filter.filter("XXX 07/15/99 173 182 171 181 36489");
+ * </pre>
+ * OR
+ * <pre>
+ * Vector filters = QuoteFilterList.getInstance().getList();
+ * </pre>
+ */
+public class QuoteFilterList {
+
+    private static QuoteFilterList instance = null;
+
+    private Vector filters;
+
+    // Creates new instance of the filter list - registers all available
+    // filters.
+    private QuoteFilterList() {
+	filters = new Vector();
+
+	filters.add(new MetaStockQuoteFilter());
+	filters.add(new MetaStock2QuoteFilter());
+	filters.add(new EzyChartQuoteFilter());
+	filters.add(new InsightTraderQuoteFilter());
+    }
+
+    /**
+     * Return instance of filter given its name. 
+     *
+     * @param	filterName	the registered name of the filter.
+     * @return	instance of the filter.
+     */
+    public QuoteFilter getFilter(String filterName) {
+	Iterator iterator = filters.iterator();
+	QuoteFilter filter;
+
+	while(iterator.hasNext()) {
+	    filter = (QuoteFilter)iterator.next();
+
+	    if(filter.getName().equals(filterName))
+		return filter;
+	}
+	
+	// String did not match any filter! Default to first
+	return (QuoteFilter)filters.firstElement();
+    }
+
+    /**
+     * Get the singleton instance of this class.
+     *
+     * @return	the singleton instance.
+     */
+    public static QuoteFilterList getInstance() {
+	if(instance == null) {
+	    instance = new QuoteFilterList();
+	}
+	return instance;
+    }
+
+    /**
+     * Get a vector of available filter classes.
+     *
+     * @return	vector of classes implementing QuoteFilter.
+     */
+    public Vector getList() {
+	return filters;
+    }
+
+    /**
+     * Is the given filter name a valid filter?
+     *
+     * @param	filterName	the name of the possible filter.
+     * @return	true if the name is a valid filter.
+     */
+    public boolean isFilter(String filterName) {
+	Iterator iterator = getList().iterator();
+	QuoteFilter filter;
+
+	while(iterator.hasNext()) {
+	    filter = (QuoteFilter)iterator.next();
+
+	    if(filter.getName().equals(filterName))
+		return true;
+	}
+
+	return false;
+    }
+}

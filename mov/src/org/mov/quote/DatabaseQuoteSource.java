@@ -1,12 +1,5 @@
 package org.mov.quote;
 
-// ye gods this is getting to be a mess - clean up
-// theres two types of queries here - queries returning a table of quotes
-// or queries returning a single date. 
-//
-// buffer table containing quotes for the latest date as this is accessed
-// quite a bit.
-
 import java.lang.*;
 import java.sql.*;
 import java.util.*;
@@ -193,8 +186,8 @@ public class DatabaseQuoteSource implements QuoteSource
     /**
      * Returns whether we have any quotes for the given symbol.
      *
-     * @param	symbol	the symbol we are searching for.
-     * @return	whether the symbol was found or not.
+     * @param	symbol	the symbol we are searching for
+     * @return	whether the symbol was found or not
      */
     public boolean symbolExists(String symbol) {
 	java.util.Date date = null;
@@ -203,10 +196,14 @@ public class DatabaseQuoteSource implements QuoteSource
 	    try {
 		Statement statement = connection.createStatement();
 		
+		// Return the first date found matching the given symbol.
+		// If no dates are found - the symbol is unknown to us.
+		// This should take << 1s
 		ResultSet RS = statement.executeQuery
-		    ("SELECT MIN(" + DATE_FIELD + ") FROM " + 
+		    ("SELECT " + DATE_FIELD + " FROM " + 
 		     SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
-		     + symbol.toUpperCase() + "'");
+		     + symbol.toUpperCase() + "' " +
+		     "LIMIT 1");
 
 		// Import SQL data into vector
 		RS.next();
@@ -273,6 +270,8 @@ public class DatabaseQuoteSource implements QuoteSource
 	    return null;
     }
 
+    // Execute the given query and return the results as a vector of
+    // stock quotes
     private Vector executeQuery(String query) {
 	Vector table = new Vector();
 
@@ -326,10 +325,13 @@ public class DatabaseQuoteSource implements QuoteSource
 					startDate.toShortString() + " to " +
 					endDate.toShortString(), 1);
 
-	Vector query =  executeQuery(selectAllString() + 
-				     dateRangeString(startDate, endDate) +
-				     restrictTypeString(type) +
-				     orderByDateString());
+	Vector query = 
+	    executeQuery("SELECT * FROM " + SHARE_TABLE_NAME +
+			 " WHERE " + DATE_FIELD +" >= '" + startDate + 
+			 "' AND " + DATE_FIELD +" <= '" + endDate + "' " + 
+			 restrictTypeString(type) +
+			 " ORDER BY " + DATE_FIELD);
+
 	// A next right before a close is OK because we might not be the
 	// owner so it might not close straight away
 	Progress.getInstance().next();
@@ -348,9 +350,8 @@ public class DatabaseQuoteSource implements QuoteSource
      * @see Stock
      */
     public Vector getQuotesForDate(TradingDate date, int type) {
-	return executeQuery(selectAllString() + 
-			    dateString(date) +
-			    restrictTypeString(type));
+	return executeQuery("SELECT * FROM " + SHARE_TABLE_NAME + " " +
+			    "WHERE " + DATE_FIELD +" = '" + date );
     }
 
     /**
@@ -367,9 +368,10 @@ public class DatabaseQuoteSource implements QuoteSource
 	boolean owner = 
 	    Progress.getInstance().open("Loading quotes for " + symbol, 1);
 
-	Vector query =  executeQuery(selectAllString() +
-				     specificSymbolString(symbol) +
-				     orderByDateString());
+	Vector query = 
+	    executeQuery("SELECT * FROM " + SHARE_TABLE_NAME + " " +
+			 "WHERE " + SYMBOL_FIELD +" = '" + symbol + "' " +
+			 "ORDER BY " + DATE_FIELD);
 	
 	// A next right before a close is OK because we might not be the
 	// owner so it might not close straight away
@@ -379,20 +381,8 @@ public class DatabaseQuoteSource implements QuoteSource
 	return query;
     }
 
-    private String selectAllString() {
-	return "SELECT * FROM " + SHARE_TABLE_NAME;
-    }
-
-    private String dateRangeString(TradingDate startDate,
-				   TradingDate endDate) {
-	return " WHERE " + DATE_FIELD +" >= '" + startDate + "' AND " +
-	    DATE_FIELD +" <= '" + endDate + "' ";
-    }
-
-    private String dateString(TradingDate date) {
-	return " WHERE " + DATE_FIELD +" = '" + date + "' ";
-    }
-
+    // Generate SQL construct the restrict query for types of quotes
+    // e.g. indices, commodoties, all quotes etc
     private String restrictTypeString(int type) {
 	if(type == ALL_COMMODITIES)
 	    return " AND LEFT(" + SYMBOL_FIELD + ", 1) != 'X' ";
@@ -409,14 +399,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	}
     }
 
-    private String specificSymbolString(String symbol) {
-	return " WHERE " + SYMBOL_FIELD +" = '" + symbol + "' ";
-    }
-
-    private String orderByDateString() {
-	return " ORDER BY " + DATE_FIELD;
-    }
-
+    // Creates database tables
     private boolean createTable(String databaseName) {
 
 	boolean success = false;
@@ -460,6 +443,8 @@ public class DatabaseQuoteSource implements QuoteSource
 	    
     }
 
+    // Make sure database and tables exist before doing import, if
+    // the database or tables do not exist then create them
     private boolean prepareForImport(String databaseName) {
 
 	boolean success = true;
@@ -519,6 +504,13 @@ public class DatabaseQuoteSource implements QuoteSource
 	return success;
     }
 
+    /**
+     * Import quotes into the database.
+     *
+     * @param	databaseName	the name of the database
+     * @param	dayQuotes	a vector of quotes on a given day to import
+     * @param	date		the date for the day quotes
+     */
     public void importQuotes(String databaseName, Vector dayQuotes,
 			     TradingDate date) {
 

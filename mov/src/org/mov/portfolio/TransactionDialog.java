@@ -16,6 +16,17 @@ import org.mov.table.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
 
+/**
+ * A dialog for letting the user add a new Transaction.
+ * <pre>
+ * TransactionDialog dialog = new TransactionDialog(desktop, portfolio);
+ *
+ * // Let user create a new transaction and add it to the portfolio
+ * dialog.newTransaction()
+ * </pre>
+ *
+ * @see Transaction
+ */
 public class TransactionDialog extends JInternalFrame 
     implements ActionListener {
 
@@ -41,6 +52,12 @@ public class TransactionDialog extends JInternalFrame
 
     private boolean isDone = false;
 
+    /**
+     * Create a new transaction dialog.
+     *
+     * @param	desktop	the current desktop
+     * @param	portfolio	portfolio to add new transaction
+     */
     public TransactionDialog(JDesktopPane desktop, Portfolio portfolio) {
 	super("New Transaction");
 
@@ -67,14 +84,26 @@ public class TransactionDialog extends JInternalFrame
 	mainPanel.add(typeLabel);
 
 	typeComboBox = new JComboBox();
-	typeComboBox.addItem("Accumulate");
-	typeComboBox.addItem("Deposit");
-	typeComboBox.addItem("Dividend");
-	typeComboBox.addItem("Dividend (DRP)");
-	typeComboBox.addItem("Fee");
-	typeComboBox.addItem("Interest");
-	typeComboBox.addItem("Reduce");
-	typeComboBox.addItem("Withdrawal");
+
+	// If the portfolio only has a cash account then dont display
+	// the share transactions
+	if(portfolio.hasAccount(Account.SHARE_ACCOUNT)) {
+	    typeComboBox.addItem("Accumulate");
+	    typeComboBox.addItem("Deposit");
+	    typeComboBox.addItem("Dividend");
+	    typeComboBox.addItem("Dividend (DRP)");
+	    typeComboBox.addItem("Fee");
+	    typeComboBox.addItem("Interest");
+	    typeComboBox.addItem("Reduce");
+	    typeComboBox.addItem("Withdrawal");
+	}
+	else {
+	    typeComboBox.addItem("Deposit");
+	    typeComboBox.addItem("Fee");
+	    typeComboBox.addItem("Interest");
+	    typeComboBox.addItem("Withdrawal");
+	}
+
 	typeComboBox.addActionListener(this);
 
 	c.gridwidth = GridBagConstraints.REMAINDER;
@@ -96,15 +125,20 @@ public class TransactionDialog extends JInternalFrame
 	buttonPanel.add(cancelButton);
   
 	getContentPane().add(mainPanel, BorderLayout.NORTH);
-	transactionPanel = getTradePanel();
-	getContentPane().add(transactionPanel, BorderLayout.CENTER);
-
 
 	getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
 	setFrameSize();
+
+	if(portfolio.hasAccount(Account.SHARE_ACCOUNT))
+	    transactionPanel = getTradePanel();
+	else
+	    transactionPanel = getCashPanel();
+
+	getContentPane().add(transactionPanel, BorderLayout.CENTER);
     }
 
+    // Get combo box listing cash accounts
     private JComboBox getCashAccountComboBox() {
 	Vector accounts = portfolio.getAccounts();
 	Iterator iterator = accounts.iterator();
@@ -122,6 +156,7 @@ public class TransactionDialog extends JInternalFrame
 	return cashAccountComboBox; 
     }
 
+    // Get combo box listing share accounts
     private JComboBox getShareAccountComboBox() {
 	Vector accounts = portfolio.getAccounts();
 	Iterator iterator = accounts.iterator();
@@ -138,6 +173,7 @@ public class TransactionDialog extends JInternalFrame
 	return shareAccountComboBox; 
     }
 
+    // Get panel displayed when user enters a dividend transaction
     private JPanel getDividendPanel() {
 	JPanel borderPanel = new JPanel();
 	TitledBorder titled = new TitledBorder("Dividend");
@@ -186,6 +222,7 @@ public class TransactionDialog extends JInternalFrame
 	return borderPanel;
     }
 
+    // Get panel displayed when user enters a dividend DRP transaction
     private JPanel getDividendDRPPanel() {
 	JPanel borderPanel = new JPanel();
 	TitledBorder titled = new TitledBorder("Dividend (DRP)");
@@ -223,6 +260,7 @@ public class TransactionDialog extends JInternalFrame
 	return borderPanel;
     }
 
+    // Get panel displayed when user enters a share transaction
     private JPanel getTradePanel() {
 	JPanel borderPanel = new JPanel();
 	TitledBorder titled = new TitledBorder("Share Transaction");
@@ -277,6 +315,7 @@ public class TransactionDialog extends JInternalFrame
 	return borderPanel;
     }
 
+    // Get panel displayed when user enters a cash transaction
     private JPanel getCashPanel() {
 	JPanel borderPanel = new JPanel();
 	TitledBorder titled = new TitledBorder("Cash Transaction");
@@ -333,7 +372,8 @@ public class TransactionDialog extends JInternalFrame
 
     private Dimension getPreferredSizeWithPanel(JPanel panel) {
 
-	getContentPane().remove(transactionPanel);
+	if(transactionPanel != null) 
+	    getContentPane().remove(transactionPanel);
 	getContentPane().add(panel, BorderLayout.CENTER);
 	transactionPanel = panel;
 
@@ -369,6 +409,10 @@ public class TransactionDialog extends JInternalFrame
 	setBounds(x, y, width, height);
     }
 
+    /**
+     * Display a dialog letting the user enter a new transaction.
+     * Add the transaction to the portfolio.
+     */
     public void newTransaction() {
 
 	desktop.add(this);
@@ -433,7 +477,9 @@ public class TransactionDialog extends JInternalFrame
 	}
 
     }	
-    
+
+    // Take transaction details from GUI, verify and create a
+    // Transaction
     private Transaction buildTransaction() {
 	Transaction transaction = null;
 

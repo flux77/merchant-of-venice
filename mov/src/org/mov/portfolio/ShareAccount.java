@@ -6,6 +6,8 @@ import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
 
+/** Representation of a share account in a portfolio.
+ */
 public class ShareAccount implements Account {
     
     // Current stock holdings
@@ -14,6 +16,11 @@ public class ShareAccount implements Account {
     // Name of share portfolio
     private String name;
 
+    /**
+     * Create a new share account.
+     *
+     * @param	name	the name of the new share account
+     */
     public ShareAccount(String name) {
 	this.name = name;
     }
@@ -78,10 +85,22 @@ public class ShareAccount implements Account {
 	}
     }
 
+    /**
+     * Return the stock holding for a given symbol.
+     *
+     * @param	symbol	the stock symbol
+     * @return	stock holding for the symbol or <code>null</code> if we
+     *		do not own any
+     */
     public StockHolding get(String symbol) {
 	return (StockHolding)stockHoldings.get(symbol);
     }
 
+    /**
+     * Return all the stock holdings for this share account.
+     *
+     * @return	all stock holdings
+     */
     public HashMap getStockHoldings() {
 	return stockHoldings;
     }
@@ -90,6 +109,11 @@ public class ShareAccount implements Account {
 	return Account.SHARE_ACCOUNT;
     }
 
+    /**
+     * Return the number of stock holdings in this share account.
+     *
+     * @return	number of stocks ownwed
+     */
     public int size() {
 	return stockHoldings.size();
     }

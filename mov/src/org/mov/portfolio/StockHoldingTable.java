@@ -13,6 +13,13 @@ import org.mov.parser.*;
 import org.mov.table.*;
 import org.mov.quote.*;
 
+/**
+ * Display stock holdings in a swing table for a ShareAccount. This table
+ * will display a row for each stock held, givings its symbol, number of
+ * shares held, current day close value, current market value and its
+ * change in today's trading.
+ * @see ShareAccount
+ */
 public class StockHoldingTable extends AbstractTable {
 
     class Model extends AbstractTableModel {
@@ -112,6 +119,12 @@ public class StockHoldingTable extends AbstractTable {
 	}
     }
 
+    /**
+     * Create a new stock holding table.
+     *
+     * @param	stockHoldings	stock holdings for ShareAccount
+     * @param	cache		quote cache
+     */
     public StockHoldingTable(HashMap stockHoldings, QuoteCache cache) {
 	setModel(new Model(stockHoldings, cache));
     }

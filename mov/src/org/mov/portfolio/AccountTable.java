@@ -13,6 +13,12 @@ import org.mov.table.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
 
+/**
+ * Display an account summary in a swing table for a portfolio. The table
+ * will display a row for each account, giving its name and its current
+ * value.
+ * @see Portfolio
+ */
 public class AccountTable extends AbstractTable {
 
     class Model extends AbstractTableModel {
@@ -106,6 +112,13 @@ public class AccountTable extends AbstractTable {
 	}
     }
 
+    /**
+     * Create a new account table.
+     *
+     * @param	portfolio	the portfolio to create an account summary
+     *				table for
+     * @param	cache		quote cache
+     */
     public AccountTable(Portfolio portfolio, QuoteCache cache) {
 	setModel(new Model(portfolio, cache));
     }

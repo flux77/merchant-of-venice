@@ -51,7 +51,7 @@ public class PreferencesModule extends JPanel
     /**
      * Create a new Preference Module.
      *
-     * @param	desktop	the parent desktop.
+     * @param	desktop	the parent desktop
      * @param	initialPage	the initial page to display, so far we only
      *				support 
      */

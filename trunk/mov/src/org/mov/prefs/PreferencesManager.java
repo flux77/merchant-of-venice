@@ -300,6 +300,14 @@ public class PreferencesManager {
         Preferences p = getUserNode("/watchscreens/" + watchScreen.getName());
 	p.put("name", watchScreen.getName());
 
+        // Clear old symbols
+        try {
+        	p.node("symbols").removeNode();
+        }
+        catch(BackingStoreException e) {
+        		// don't care
+        }
+
         // Save watched symbols
         List symbols = watchScreen.getSymbols();
 

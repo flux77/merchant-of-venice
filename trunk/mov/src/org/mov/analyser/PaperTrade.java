@@ -63,10 +63,11 @@ public class PaperTrade {
     private final static String SHARE_ACCOUNT_NAME = Locale.getString("SHARE_ACCOUNT");
     
     // Information to get the next day trading prices
-    private static boolean buyRule = false;
-    private static boolean sellRule = false;
-    private static double buyCost = Double.NaN;
-    private static double sellCost = Double.NaN;
+    private static String[] symbolStock;
+    private static boolean[] buyRule;
+    private static boolean[] sellRule;
+    private static double[] buyCost;
+    private static double[] sellCost;
 
     // Since this process uses so many temporary variables, it makes sense
     // grouping them all together.
@@ -567,11 +568,21 @@ public class PaperTrade {
         variables.setValue("held", 0);
 
         int order = 0;
-
+        
+        symbolStock = new String[symbols.size()];
+        buyRule = new boolean[symbols.size()];
+        sellRule = new boolean[symbols.size()];
+        buyCost = new double[symbols.size()];
+        sellCost = new double[symbols.size()];
+        
+        int index = 0;
+        
         // Iterate through stocks available today - should we buy or sell any of it?
         for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
             Symbol symbol = (Symbol)iterator.next();
 
+            symbolStock[index] = new String(symbol.get());
+            
             // Skip if we already own it
             if(!environment.shareAccount.isHolding(symbol)) {
 
@@ -580,19 +591,21 @@ public class PaperTrade {
                     variables.setValue("order", order);
 
                 try {
-                    if(buy.evaluate(variables, quoteBundle, symbol,
-                                    dateOffset) >= Expression.TRUE) {
-
-                        // Did we have enough money to buy at least one share?
-                        buyRule = (buy.evaluate(variables, quoteBundle, symbol,
-                                    dateOffset+1) >= Expression.TRUE);
-                        // price to buy
-                        Expression tradeCostBuyExpression = ExpressionFactory.newExpression(environment.tradeCostBuy);
-                        buyCost = tradeCostBuyExpression.evaluate(variables, quoteBundle, symbol, dateOffset+2);
-                    }
+                    // Did we have enough money to buy at least one share?
+                    buyRule[index] = (buy.evaluate(variables, quoteBundle, symbol,
+                                dateOffset) >= Expression.TRUE);
+                    // price to buy
+                    Expression tradeCostBuyExpression = ExpressionFactory.newExpression(environment.tradeCostBuy);
+                    buyCost[index] = tradeCostBuyExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
                 }
                 catch(EvaluationException e) {
-                    buyCost = 0.0D;
+                    buyCost[index] = 0.0D;
+                }
+                catch(java.lang.ArrayIndexOutOfBoundsException ex) {
+                    buyCost[index] = 0.0D;
+                }
+                finally {
+                    index++;
                 }
             }
 
@@ -603,6 +616,8 @@ public class PaperTrade {
         // Iterate through our stock holdings and see if we should sell any
         List stockHoldings = new ArrayList(environment.shareAccount.getStockHoldings().values());
 
+        index = 0;
+        
         for(Iterator iterator = stockHoldings.iterator(); iterator.hasNext();) {
             StockHolding stockHolding = (StockHolding)iterator.next();
             Symbol symbol = stockHolding.getSymbol();
@@ -621,13 +636,19 @@ public class PaperTrade {
             variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
 
             try {
-                sellRule = (sell.evaluate(variables, quoteBundle, symbol, dateOffset+1) >= Expression.TRUE);
+                sellRule[index] = (sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE);
                 // price to sell.
                 Expression tradeCostSellExpression = ExpressionFactory.newExpression(environment.tradeCostSell);
-                sellCost = tradeCostSellExpression.evaluate(variables, quoteBundle, symbol, dateOffset+2);
+                sellCost[index] = tradeCostSellExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
             }
             catch(EvaluationException e) {
-                sellCost = 0.0D;
+                sellCost[index] = 0.0D;
+            }
+            catch(java.lang.ArrayIndexOutOfBoundsException ex) {
+                buyCost[index] = 0.0D;
+            }
+            finally {
+                index++;
             }
         }
     }
@@ -643,26 +664,36 @@ public class PaperTrade {
     public static String getTip() {
         StringBuffer retValue = new StringBuffer();
         
-        if (buyRule) {
-            if (buyCost==0.0D) {
-                retValue.append(Locale.getString("BUY_OPEN"));
+        for (int i=0; i<symbolStock.length; i++) {
+
+            retValue.append(symbolStock[i] + " --> ");
+            
+            if (buyRule[i]) {
+                if (buyCost[i]==0.0D) {
+                    retValue.append(Locale.getString("BUY_OPEN"));
+                } else {
+                    retValue.append(Locale.getString("BUY_FIXED_PRICE", Double.toString(buyCost[i])));
+                }
             } else {
-                retValue.append(Locale.getString("BUY_FIXED_PRICE", Double.toString(buyCost)));
+                retValue.append(Locale.getString("BUY_NOT"));
             }
-        } else {
-            retValue.append(Locale.getString("BUY_NOT"));
-        }
-        
-        retValue.append("\n");
-        
-        if (sellRule) {
-            if (sellCost==0.0D) {
-                retValue.append(Locale.getString("SELL_OPEN"));
+
+            retValue.append("\n");
+
+            retValue.append(symbolStock[i] + " --> ");
+            
+            if (sellRule[i]) {
+                if (sellCost[i]==0.0D) {
+                    retValue.append(Locale.getString("SELL_OPEN"));
+                } else {
+                    retValue.append(Locale.getString("SELL_FIXED_PRICE", Double.toString(sellCost[i])));
+                }
             } else {
-                retValue.append(Locale.getString("SELL_FIXED_PRICE", Double.toString(sellCost)));
+                retValue.append(Locale.getString("SELL_NOT"));
             }
-        } else {
-            retValue.append(Locale.getString("SELL_NOT"));
+            
+            retValue.append("\n");
+
         }
         
         return retValue.toString();

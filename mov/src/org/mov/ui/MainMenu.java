@@ -35,12 +35,12 @@ public class MainMenu
     private JMenuItem graphCommodityNameMenuItem;
     private JMenuItem graphMarketAdvanceDeclineMenuItem;
 
-    private JMenuItem tableCompanyListAllMenuItem;
-    private JMenuItem tableCompanyListRuleMenuItem;
-    private JMenuItem tableIndicesListAllMenuItem;
-    private JMenuItem tableIndicesListRuleMenuItem;
-    private JMenuItem tableCommoditiesListAllMenuItem;
-    private JMenuItem tableCommoditiesListRuleMenuItem;
+    private JMenuItem quoteCompanyListAllMenuItem;
+    private JMenuItem quoteCompanyListRuleMenuItem;
+    private JMenuItem quoteIndicesListAllMenuItem;
+    private JMenuItem quoteIndicesListRuleMenuItem;
+    private JMenuItem quoteCommoditiesListAllMenuItem;
+    private JMenuItem quoteCommoditiesListRuleMenuItem;
 
     private JMenuItem analysisPaperTradeMenuItem;
 
@@ -128,48 +128,48 @@ public class MainMenu
 	    fileExitMenuItem = MenuHelper.addMenuItem(this, fileMenu, "Exit", 'Q');
 	}
 
-	// Table
+	// Quote
 	{
-	    JMenu tableMenu = MenuHelper.addMenu(menuBar, "Table", 'T');
+	    JMenu quoteMenu = MenuHelper.addMenu(menuBar, "Quote", 'Q');
 	    
-	    // Table -> Companies + Funds
-	    JMenu tableMenuCompany = MenuHelper.addMenu(tableMenu, 
+	    // Quote -> Companies + Funds
+	    JMenu quoteMenuCompany = MenuHelper.addMenu(quoteMenu, 
 							"Companies + Funds",
 					     'C');
 
-	    // Table -> Companies + Funds -> List all
-	    tableCompanyListAllMenuItem = 
-		MenuHelper.addMenuItem(this, tableMenuCompany, "List all");
+	    // Quote -> Companies + Funds -> List all
+	    quoteCompanyListAllMenuItem = 
+		MenuHelper.addMenuItem(this, quoteMenuCompany, "List all");
 
-	    // Table -> Companies + Funds -> List by rule
-	    tableCompanyListRuleMenuItem = 
-		MenuHelper.addMenuItem(this, tableMenuCompany, "List by rule");
+	    // Quote -> Companies + Funds -> List by rule
+	    quoteCompanyListRuleMenuItem = 
+		MenuHelper.addMenuItem(this, quoteMenuCompany, "List by rule");
 	    
-	    // Table -> Indices
-	    JMenu tableMenuIndices = MenuHelper.addMenu(tableMenu, 
+	    // Quote -> Indices
+	    JMenu quoteMenuIndices = MenuHelper.addMenu(quoteMenu, 
 							"Indices", 'I');
 
-	    // Table -> Indices -> List All
-	    tableIndicesListAllMenuItem = 
-		MenuHelper.addMenuItem(this, tableMenuIndices, "List all");
+	    // Quote -> Indices -> List All
+	    quoteIndicesListAllMenuItem = 
+		MenuHelper.addMenuItem(this, quoteMenuIndices, "List all");
 
-	    // Table -> Indices -> List by Rule
-	    tableIndicesListRuleMenuItem = 
-		MenuHelper.addMenuItem(this, tableMenuIndices, "List by rule");
+	    // Quote -> Indices -> List by Rule
+	    quoteIndicesListRuleMenuItem = 
+		MenuHelper.addMenuItem(this, quoteMenuIndices, "List by rule");
 	    
-	    // Table -> All Commodities
-	    JMenu tableMenuCommodities = MenuHelper.addMenu(tableMenu, 
+	    // Quote -> All Commodities
+	    JMenu quoteMenuCommodities = MenuHelper.addMenu(quoteMenu, 
 							    "All Commodities",
 							    'A');
 
-	    // Table -> All Commodities -> List All
-	    tableCommoditiesListAllMenuItem = 
-		MenuHelper.addMenuItem(this, tableMenuCommodities, 
+	    // Quote -> All Commodities -> List All
+	    quoteCommoditiesListAllMenuItem = 
+		MenuHelper.addMenuItem(this, quoteMenuCommodities, 
 				       "List all", 'L');
 
-	    // Table -> All Commodities -> List by Rule
-	    tableCommoditiesListRuleMenuItem = 
-		MenuHelper.addMenuItem(this, tableMenuCommodities, 
+	    // Quote -> All Commodities -> List by Rule
+	    quoteCommoditiesListRuleMenuItem = 
+		MenuHelper.addMenuItem(this, quoteMenuCommodities, 
 				       "List by rule",'B');
 	}
 	
@@ -251,6 +251,9 @@ public class MainMenu
 		public void run() {
 		    // They should all be menu actions
 		    JMenuItem menu = (JMenuItem)e.getSource();
+
+		    // Perhaps user selected a module from the window menu?
+		    Component c = (Component)menuItemToModuleHash.get(menu);
 		    
 		    // File Menu ********************************************************************************
 		    if(menu == fileImportQuotesMenuItem) {
@@ -263,7 +266,6 @@ public class MainMenu
 		    else if(portfolioHash.get(menu) != null) {
 			String portfolioName =
 			    (String)portfolioHash.get(menu);
-
 			CommandManager.getInstance().openPortfolio(portfolioName);
 		    }
 
@@ -278,19 +280,19 @@ public class MainMenu
 			    .newFrame(new PreferencesModule(desktop), true, true);
 		    }
 		    
-		    // Table Menu *******************************************************************************
-		    else if(menu == tableCommoditiesListAllMenuItem)
-			CommandManager.getInstance().tableListCommoditiesAll();
-		    else if (menu == tableCommoditiesListRuleMenuItem)
-			CommandManager.getInstance().tableListCommoditiesByRule();
-		    else if(menu == tableCompanyListAllMenuItem)
-			CommandManager.getInstance().tableListCompanyNamesAll();
-		    else if (menu == tableCompanyListRuleMenuItem)
-			CommandManager.getInstance().tableListCompanyNamesByRule();
-		    else if (menu == tableIndicesListAllMenuItem)
-			CommandManager.getInstance().tableListIndicesAll();
-		    else if (menu == tableIndicesListRuleMenuItem)
-			CommandManager.getInstance().tableListIndicesByRule();
+		    // Quote Menu *******************************************************************************
+		    else if(menu == quoteCommoditiesListAllMenuItem)
+			CommandManager.getInstance().quoteListCommoditiesAll();
+		    else if (menu == quoteCommoditiesListRuleMenuItem)
+			CommandManager.getInstance().quoteListCommoditiesByRule();
+		    else if(menu == quoteCompanyListAllMenuItem)
+			CommandManager.getInstance().quoteListCompanyNamesAll();
+		    else if (menu == quoteCompanyListRuleMenuItem)
+			CommandManager.getInstance().quoteListCompanyNamesByRule();
+		    else if (menu == quoteIndicesListAllMenuItem)
+			CommandManager.getInstance().quoteListIndicesAll();
+		    else if (menu == quoteIndicesListRuleMenuItem)
+			CommandManager.getInstance().quoteListIndicesByRule();
 		    
 		    // Graph Menu *******************************************************************************
 		    else if (menu == graphCommodityCodeMenuItem) 
@@ -327,8 +329,7 @@ public class MainMenu
 			CommandManager.getInstance().tileFramesArrange();
 
 		    // Maybe its a window ??
-		    Component c = (Component)menuItemToModuleHash.get(menu);
-		    if(c != null) {
+		    else if(c != null) {
 			JInternalFrame f = null;
 			if (menu.getText().substring(0,1).equals("(")) {
 			    JInternalFrame.JDesktopIcon icon = (JInternalFrame.JDesktopIcon)c;
@@ -342,8 +343,10 @@ public class MainMenu
 			    desktop.setSelectedFrame(f);
 			    f.setSelected(true);
 			    f.toFront();
-			} catch (PropertyVetoException exception) {}
+			} catch (PropertyVetoException exception) {}			
 		    }
+		    else 
+			assert false;
 		}
 	    };
 	
@@ -424,7 +427,8 @@ public class MainMenu
 
 	// Portfolio menu off of file has the ability to create a new
 	// portfolio
-	MenuHelper.addMenuItem(this, filePortfolioMenu, "New Portfolio");
+	filePortfolioNewMenuItem = 
+	    MenuHelper.addMenuItem(this, filePortfolioMenu, "New Portfolio");
 
 	if(PreferencesManager.getPortfolioNames().length > 0) {
 	    filePortfolioMenu.addSeparator();

@@ -141,14 +141,17 @@ public class Converter {
     public static Vector dateRangeToTradingDateVector(TradingDate startDate,
 						      TradingDate endDate) {
 	Vector dates = new Vector();
+
 	TradingDate date = (TradingDate)startDate.clone();
 
-	while(endDate.compareTo(date) >= 0) {
-	    // Add copy of date
-	    dates.add((TradingDate)date.clone());
-	    // Go to next trading date
-	    date.next(1);
+	while(!date.after(endDate)) {
+
+	    System.out.println("loop date " + date);
+
+	    dates.add(date);
+	    date = date.next(1);
 	}
+
 	return dates;
     }
 }

@@ -324,12 +324,11 @@ public class QuoteCache {
 
 	// Calculate end date we have to load from - which is one before
 	// current start date
-	TradingDate end = (TradingDate)getStartDate().clone();
-	end.previous(1);
+	TradingDate end = getStartDate().previous(1);
 
 	// Calculate start date we have to load to
-	TradingDate start = (TradingDate)getStartDate().clone();
-	start.previous(1 + date - getNumberDays());
+	TradingDate start = getStartDate().previous(1 + date - 
+						    getNumberDays());
 
 	// Load data from database and load it into cache
 	load(QuoteSourceManager.getSource().getQuotesForDates(start, end,

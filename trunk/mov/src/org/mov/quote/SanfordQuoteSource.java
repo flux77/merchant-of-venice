@@ -198,7 +198,7 @@ public class SanfordQuoteSource implements QuoteSource {
 
 	// Get and return last trading day
 	TradingDate date = new TradingDate();
-	date.previous(1);
+	date = date.previous(1);
 
 	return date;
     }
@@ -362,7 +362,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    // the app downloads say 2 years instead of by default the whole
 	    // thing
 	    TradingDate startDate = new TradingDate(); // today
-	    startDate.previous(365*2); // about two years	    
+	    startDate = startDate.previous(365*2); // about two years	    
 	    writer.print("ASXCode=" + symbol + "&" +
 			 "StartDate=" + startDate.toString("dd/mm/yy"));
 	    writer.close();

@@ -60,7 +60,7 @@ public class AccountTable extends AbstractTable {
 		catch(EvaluationException e) {
 		    // If we do its cause its a public holiday and we
 		    // can't get quotes for our stocks. So go back a day
-		    date.previous(1);
+		    date = date.previous(1);
 		}
 	    }
 	}

@@ -61,6 +61,12 @@ public class PaperTrade {
 
     // Generic name to call all the share accounts in all generated portfolios
     private final static String SHARE_ACCOUNT_NAME = Locale.getString("SHARE_ACCOUNT");
+    
+    // Information to get the next day trading prices
+    private static boolean buyRule = false;
+    private static boolean sellRule = false;
+    private static double buyCost = Double.NaN;
+    private static double sellCost = Double.NaN;
 
     // Since this process uses so many temporary variables, it makes sense
     // grouping them all together.
@@ -86,14 +92,12 @@ public class PaperTrade {
 
         // Last date of paper trading
         public int endDateOffset;
-
-        // The rule according to which the stock is bought
-        // If none is set, open price is the common behaviour
-        public String buySystemRule = "lag(open,0)";
-
-        // The rule according to which the stock is sold
-        // If none is set, open price is the common behaviour
-        public String sellSystemRule = "lag(open,0)";
+        
+        // The rule getting the buy price
+        private String tradeCostBuy;
+        
+        // The rule getting the sell price
+        private String tradeCostSell;
 
         /**
          * Create a new environment for paper trading.
@@ -109,17 +113,15 @@ public class PaperTrade {
                            TradingDate startDate,
                            TradingDate endDate,
                            Money capital,
-                           String buySystemRule,
-                           String sellSystemRule) {
+                           String tradeCostBuy,
+                           String tradeCostSell) {
 
             this.quoteBundle = quoteBundle;
             this.quoteCache = QuoteCache.getInstance();
             
-            if ((buySystemRule!="") && (sellSystemRule!="")) {
-                this.buySystemRule = buySystemRule;
-                this.sellSystemRule = sellSystemRule;
-            }
-
+            this.tradeCostBuy = tradeCostBuy;
+            this.tradeCostSell = tradeCostSell;
+            
             // First set up a new (transient) portfolio
             portfolio = new Portfolio(portfolioName, true);
 
@@ -178,12 +180,13 @@ public class PaperTrade {
             Symbol symbol = stockHolding.getSymbol();
 
             // How much are they worth? We sell at the user defined price.
-            Expression sellSystemRuleExpression = ExpressionFactory.newExpression(environment.sellSystemRule);
-            double sellPrice = sellSystemRuleExpression.evaluate(variables, environment.quoteBundle, symbol, day);
+            Expression tradeCostSellExpression = ExpressionFactory.newExpression(environment.tradeCostSell);
+            double sellPrice = tradeCostSellExpression.evaluate(variables, environment.quoteBundle, symbol, day);
             // If the wished price is lower than the maximum of the day,
             // your stocks will be sold.
             // It simulates an order of selling at fixed price (sellPrice).
             if (sellPrice<=environment.quoteBundle.getQuote(symbol, Quote.DAY_HIGH, day)) {
+                sellCost = sellPrice;
                 Money amount =
                     new Money(shares * sellPrice);
                 TradingDate date = environment.quoteBundle.offsetToDate(day);
@@ -217,13 +220,14 @@ public class PaperTrade {
                                int day)
 	throws EvaluationException, MissingQuoteException {
 
-        Expression buySystemRuleExpression = ExpressionFactory.newExpression(environment.buySystemRule);
-        double buyPrice = buySystemRuleExpression.evaluate(variables, environment.quoteBundle, symbol, day);
+        Expression tradeCostBuyExpression = ExpressionFactory.newExpression(environment.tradeCostBuy);
+        double buyPrice = tradeCostBuyExpression.evaluate(variables, environment.quoteBundle, symbol, day);
         // If the wished price is greater than the minimum of the day,
         // your stocks will be bought.
         // It simulates an order of buying at fixed price (buyPrice).
         if (buyPrice>=environment.quoteBundle.getQuote(symbol, Quote.DAY_LOW, day)) {
-	
+            
+            buyCost = buyPrice;
             // Calculate maximum number of shares we can buy with the given amount
             double sharePrice = buyPrice;
             int shares = (int)Math.floor(amount.doubleValue() / sharePrice);
@@ -293,8 +297,13 @@ public class PaperTrade {
             variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
 
             try {
-                if(sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE)
+                sellRule = false;
+                sellCost = Double.NaN;
+
+                if(sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE) {
+                    sellRule = true;
                     sell(environment, variables, stockHolding, tradeCost, dateOffset + 1);
+                }
             }
             catch(MissingQuoteException e) {
                 // ignore and move on
@@ -351,9 +360,13 @@ public class PaperTrade {
                         variables.setValue("order", order);
 
                     try {
+                        buyRule = false;
+                        buyCost = Double.NaN;
+
                         if(buy.evaluate(variables, quoteBundle, symbol,
                                         dateOffset) >= Expression.TRUE) {
 
+                            buyRule = true;
                             // Did we have enough money to buy at least one share?
                             if(buy(environment, variables, symbol, stockValue,  tradeCost,
                                    dateOffset + 1)) {
@@ -428,8 +441,8 @@ public class PaperTrade {
 				       Money capital,
                                        Money stockValue,
 				       Money tradeCost,
-                                       String buySystemRule,
-                                       String sellSystemRule)
+                                       String tradeCostBuy,
+                                       String tradeCostSell)
         throws EvaluationException {
 
         // Set up environment for paper trading
@@ -439,8 +452,8 @@ public class PaperTrade {
                                                              startDate,
                                                              endDate,
                                                              capital,
-                                                             buySystemRule,
-                                                             sellSystemRule);
+                                                             tradeCostBuy,
+                                                             tradeCostSell);
         int dateOffset = environment.startDateOffset;
 
         if(orderCache.isOrdered() && !variables.contains("order"))
@@ -497,8 +510,8 @@ public class PaperTrade {
 				       Money capital,
                                        int numberStocks,
 				       Money tradeCost,
-                                       String buySystemRule,
-                                       String sellSystemRule)
+                                       String tradeCostBuy,
+                                       String tradeCostSell)
         throws EvaluationException {
 
         // Set up environment for paper trading
@@ -508,8 +521,8 @@ public class PaperTrade {
                                                              startDate,
                                                              endDate,
                                                              capital,
-                                                             buySystemRule,
-                                                             sellSystemRule);
+                                                             tradeCostBuy,
+                                                             tradeCostSell);
         int dateOffset = environment.startDateOffset;
 
         if(orderCache.isOrdered() && !variables.contains("order"))
@@ -544,5 +557,41 @@ public class PaperTrade {
         }
 
         return environment.portfolio;
+    }
+
+    /**
+     * Return a string representing the tip for next day trading.
+     * The method can be called after a paperTrade one, so doing
+     * it obtains a tip for next day trading, where next is the date
+     * folowing the end date of the trading period of paperTrade.
+     *
+     * @return the string representing the tip.
+     */
+    public static String getTip() {
+        StringBuffer retValue = new StringBuffer();
+        
+        if (buyRule) {
+            if (buyCost==Double.NaN) {
+                retValue.append(Locale.getString("BUY_OPEN"));
+            } else {
+                retValue.append(Locale.getString("BUY_FIXED_PRICE", Double.toString(buyCost)));
+            }
+        } else {
+            retValue.append(Locale.getString("BUY_NOT"));
+        }
+        
+        retValue.append("\n");
+        
+        if (sellRule) {
+            if (sellCost==Double.NaN) {
+                retValue.append(Locale.getString("SELL_OPEN"));
+            } else {
+                retValue.append(Locale.getString("SELL_FIXED_PRICE", Double.toString(sellCost)));
+            }
+        } else {
+            retValue.append(Locale.getString("SELL_NOT"));
+        }
+        
+        return retValue.toString();
     }
 }

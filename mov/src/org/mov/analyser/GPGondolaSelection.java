@@ -58,13 +58,13 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
                                         // where the market is low. By removing these it forces the GP
                                         // to use the stock data to generate buy/sell decisions.
                                0, 0, 1250, 1250, 1250, 1250};
-        String[] defaultTextFieldValuesIntegers = {Locale.getString("PERC_ORDINARY_NUMBER_TEXT_FIELD"),
-                                           Locale.getString("PERC_DAY_OF_YEAR_EXPRESSION_TEXT_FIELD"),
-                                           Locale.getString("PERC_MONTH_EXPRESSION_TEXT_FIELD"),
-                                           Locale.getString("PERC_DAY_EXPRESSION_TEXT_FIELD"),
-                                           Locale.getString("PERC_DAY_OF_WEEK_EXPRESSION_TEXT_FIELD"),
-                                           Locale.getString("PERC_HELD_TEXT_FIELD"),
-                                           Locale.getString("PERC_ORDER_TEXT_FIELD")
+        String[] defaultTextFieldValuesIntegers = {Locale.getString("PERCENTAGE_ORDINARY_NUMBER"),
+                                           Locale.getString("PERCENTAGE_FUNCTIONS", "dayofyear()"),
+                                           Locale.getString("PERCENTAGE_FUNCTIONS", "month()"),
+                                           Locale.getString("PERCENTAGE_FUNCTIONS", "day()"),
+                                           Locale.getString("PERCENTAGE_FUNCTIONS", "dayofweek()"),
+                                           Locale.getString("PERCENTAGE_FUNCTIONS", "held"),
+                                           Locale.getString("PERCENTAGE_FUNCTIONS", "order")
         };
         GPGondolaSelectionPanel[0] = new GPGondolaSelectionPanel(7,
                                 desktop,
@@ -75,8 +75,8 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
 
         // Float or Integer
         int[] defaultValuesFloatInteger = {5000, 5000};
-        String[] defaultTextFieldValuesFloatInteger = {Locale.getString("PERC_FLOAT_TEXT_FIELD"),
-                                  Locale.getString("PERC_INTEGER_TEXT_FIELD")
+        String[] defaultTextFieldValuesFloatInteger = {Locale.getString("PERCENTAGE_FUNCTIONS", "open, low, high, close"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "volume")
         };
         GPGondolaSelectionPanel[1] = new GPGondolaSelectionPanel(2,
                                 desktop,
@@ -86,10 +86,10 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
 
         // Float Quote
         int[] defaultValuesFloatQuote = {2500, 2500, 2500, 2500};
-        String[] defaultTextFieldValuesFloatQuote = {Locale.getString("PERC_OPEN_TEXT_FIELD"),
-                                  Locale.getString("PERC_LOW_TEXT_FIELD"),
-                                  Locale.getString("PERC_HIGH_TEXT_FIELD"),
-                                  Locale.getString("PERC_CLOSE_TEXT_FIELD")
+        String[] defaultTextFieldValuesFloatQuote = {Locale.getString("PERCENTAGE_FUNCTIONS", "open"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "low"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "high"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "close")
         };
         GPGondolaSelectionPanel[2] = new GPGondolaSelectionPanel(4,
                                 desktop,
@@ -99,15 +99,15 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
 
         // Boolean
         int[] defaultValuesBoolean = {1112, 1111, 1111, 1111, 1111, 1111, 1111, 1111, 1111};
-        String[] defaultTextFieldValuesBoolean = {Locale.getString("PERC_NOT_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_EQUAL_THAN_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_GREATER_THAN_EQUAL_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_GREATER_THAN_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_LESS_THAN_EQUAL_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_LESS_THAN_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_NOT_EQUAL_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_AND_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_OR_EXPRESSION_TEXT_FIELD")
+        String[] defaultTextFieldValuesBoolean = {Locale.getString("PERCENTAGE_FUNCTIONS", "not"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "="),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", ">="),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", ">"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "<="),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "<"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "!="),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "and"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "or")
         };
         GPGondolaSelectionPanel[3] = new GPGondolaSelectionPanel(9,
                                 desktop,
@@ -116,20 +116,20 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
                                 Locale.getString("GP_GONDOLA_SELECTION_TITLE_BOOLEAN_LONG"));
         // Expression
         int[] defaultValuesExpression = {715, 714, 714, 714, 714, 714, 714, 714, 715, 715, 714, 714, 714, 715};
-        String[] defaultTextFieldValuesExpression = {Locale.getString("PERC_CREATE_RANDOM_TERMINAL_TEXT_FIELD"),
-                                  Locale.getString("PERC_ADD_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_SUBTRACT_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_MULTIPLY_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_DIVIDE_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_PERCENT_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_IF_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_LAG_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_MIN_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_MAX_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_SUM_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_SQRT_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_ABS_EXPRESSION_TEXT_FIELD"),
-                                  Locale.getString("PERC_AVG_EXPRESSION_TEXT_FIELD")
+        String[] defaultTextFieldValuesExpression = {Locale.getString("PERCENTAGE_TERMINAL"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "+"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "-"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "*"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "/"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "percent()"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "if(){}else{}"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "lag()"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "min()"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "max()"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "sum()"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "sqrt()"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "abs()"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "avg()")
         };
         GPGondolaSelectionPanel[4] = new GPGondolaSelectionPanel(14,
                                 desktop,

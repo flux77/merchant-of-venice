@@ -56,6 +56,7 @@ public class GPModule extends JPanel implements Module {
     private GPPage GPPage;
     private GPPageInitialPopulation GPPageInitialPopulation;
     private GPGondolaSelection GPGondolaSelection;
+    private TradeValuePage tradeValuePage;
     
    
     public GPModule(JDesktopPane desktop) {
@@ -78,17 +79,20 @@ public class GPModule extends JPanel implements Module {
         portfolioPage = new PortfolioPage(desktop);
         tabbedPane.addTab(portfolioPage.getTitle(), portfolioPage.getComponent());
         
+        tradeValuePage = new TradeValuePage(desktop);
+        tabbedPane.addTab(tradeValuePage.getTitle(), tradeValuePage.getComponent());
+        
         // Get the max height
         double maxHeight = quoteRangePage.getPreferredSize().getHeight();
         if (portfolioPage.getPreferredSize().getHeight()>maxHeight)
             maxHeight = portfolioPage.getPreferredSize().getHeight();
+        if (tradeValuePage.getPreferredSize().getHeight()>maxHeight)
+            maxHeight = tradeValuePage.getPreferredSize().getHeight();
         
         GPPage = new GPPage(desktop, maxHeight);
         tabbedPane.addTab(GPPage.getTitle(), GPPage.getComponent());
         
         // Get the max height
-        if (portfolioPage.getPreferredSize().getHeight()>maxHeight)
-            maxHeight = portfolioPage.getPreferredSize().getHeight();
         if (GPPage.getPreferredSize().getHeight()>maxHeight)
             maxHeight = GPPage.getPreferredSize().getHeight();
         
@@ -96,16 +100,13 @@ public class GPModule extends JPanel implements Module {
         tabbedPane.addTab(GPPageInitialPopulation.getTitle(), GPPageInitialPopulation.getComponent());
         
         // Get the max height
-        if (portfolioPage.getPreferredSize().getHeight()>maxHeight)
-            maxHeight = portfolioPage.getPreferredSize().getHeight();
-        if (GPPage.getPreferredSize().getHeight()>maxHeight)
-            maxHeight = GPPage.getPreferredSize().getHeight();
         if (GPPageInitialPopulation.getPreferredSize().getHeight()>maxHeight)
             maxHeight = GPPageInitialPopulation.getPreferredSize().getHeight();
         
         GPGondolaSelection = new GPGondolaSelection(desktop, maxHeight);
         tabbedPane.addTab(GPGondolaSelection.getTitle(), GPGondolaSelection.getComponent());
         
+
         // Run, close buttons
         JPanel buttonPanel = new JPanel();
         JButton runButton = new JButton(Locale.getString("RUN"));
@@ -136,6 +137,7 @@ public class GPModule extends JPanel implements Module {
     public void load() {
         quoteRangePage.load(getClass().getName());
         portfolioPage.load(getClass().getName());
+        tradeValuePage.load(getClass().getName());
         GPPage.load(getClass().getName());
         GPPageInitialPopulation.load(getClass().getName());
         GPGondolaSelection.load(getClass().getName());
@@ -144,6 +146,7 @@ public class GPModule extends JPanel implements Module {
     public void save() {
         quoteRangePage.save(getClass().getName());
         portfolioPage.save(getClass().getName());
+        tradeValuePage.save(getClass().getName());
         GPPage.save(getClass().getName());
         GPPageInitialPopulation.save(getClass().getName());
         GPGondolaSelection.save(getClass().getName());
@@ -206,6 +209,10 @@ public class GPModule extends JPanel implements Module {
             tabbedPane.setSelectedComponent(portfolioPage.getComponent());
             return false;
         }
+        else if(!tradeValuePage.parse()) {
+            tabbedPane.setSelectedComponent(tradeValuePage.getComponent());
+            return false;
+        }
         else if(!GPPage.parse()) {
             tabbedPane.setSelectedComponent(GPPage.getComponent());
             return false;
@@ -242,6 +249,8 @@ public class GPModule extends JPanel implements Module {
         int numberStocks = portfolioPage.getNumberStocks();
         // number of mutations to be applied to the rules defined in Initial Population Section
         int mutations = GPPageInitialPopulation.getMutations();
+        String tradeCostBuy = tradeValuePage.getTradeCostBuy();
+        String tradeCostSell = tradeValuePage.getTradeCostSell();
         
         // quote bundle needs to load 30 days before quote range.
         GPQuoteBundle quoteBundle =
@@ -268,7 +277,9 @@ public class GPModule extends JPanel implements Module {
                                     stockValue,
                                     numberStocks,
                                     tradeCost,
-                                    breedingPopulation);
+                                    breedingPopulation,
+                                    tradeCostBuy,
+                                    tradeCostSell);
             
             for(int generation = 1; generation <= numberGenerations; generation++) {
                 if(thread.isInterrupted())
@@ -280,13 +291,16 @@ public class GPModule extends JPanel implements Module {
                 // breeding population size or if the breeding population size
                 // is too small. The breeding population size can only be too
                 // small for the first generation.
+                int actualBreedingPopulation = geneticProgramme.getNextBreedingPopulationSize();
                 while(individual < population ||
-                        geneticProgramme.getNextBreedingPopulationSize() < breedingPopulation) {
+                        actualBreedingPopulation < breedingPopulation) {
                     if(thread.isInterrupted())
                         break;
                     
-                    // "Generation x of y"
-                    progress.setNote(Locale.getString("GENERATION_OF", generation,
+                    // "Generation x of y (%)"
+                    progress.setNote(Locale.getString("GENERATION_OF",
+                                                        (new Double((100.0D*actualBreedingPopulation)/breedingPopulation)).intValue(),
+                                                        generation,
                                                         numberGenerations));
                     
                     // If we are looping only to increase the breeding population size
@@ -322,6 +336,7 @@ public class GPModule extends JPanel implements Module {
                     }
                     
                     individual++;
+                    actualBreedingPopulation = geneticProgramme.getNextBreedingPopulationSize();
                 }
                 
                 geneticProgramme.nextGeneration();

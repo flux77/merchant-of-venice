@@ -262,7 +262,7 @@ By default Venice keeps up to about 100,000 quotes in memory at one time.
 On this page you can view the number of quotes Venice is currently
 caching and set the maximum amount. From time to time, Venice may need
 to go a little higher than this amount.</para>
-</chapter></chapter>
+</chapter>
 
 <chapter name="Windows Preferences">
 <para>You can load from or save to an XML file the whole Venice preferences.</para>
@@ -285,6 +285,7 @@ possible default configurations.
 <item>You can import preferences in another working copy of Venice.
 </item>
 </list>
+</chapter>
 
 <chapter name="Language">
 <para>You can change the default language and use a different Venice localization.
@@ -302,6 +303,7 @@ If your language is not localized in Venice, English is choosen as default.</par
 
 <para>When you change the localization language, you should restart Venice,
 so that all menus are refreshed.</para>
+</chapter></chapter>
 
 <chapter name="Importing Quotes">
 <para>Before you import quotes, you'll need to decide whether Venice will read the

@@ -368,6 +368,56 @@ public class QuoteRange implements Cloneable {
 	}
     }
 
+    /** 
+     * Creates a string representation of the quote range without referring
+     * to the dates.
+     *
+     * @return string representation, e.g. "All Ordinaries"
+     */
+    public String getDescription() {
+
+        // If the type is a list of symbols, we can do better than just
+        // saying "Given Symbols".
+        if(getType() == GIVEN_SYMBOLS) {
+            String string = "";
+
+            Iterator iterator = getAllSymbols().iterator();
+
+            while(iterator.hasNext()) {
+                String symbol = (String)iterator.next();
+
+                string = string.concat(symbol.toUpperCase());
+                
+                if(iterator.hasNext()) 
+                    string = string.concat(", ");
+            }
+            
+            return string;
+        }
+        else
+            return getDescription(getType());
+    }
+
+    /**
+     * Creates a string representation of the given quote range type.
+     *
+     * @param type the type, one of {@link #ALL_ORDINARIES}, {@link #ALL_SYMBOLS},
+     *             {@link #MARKET_INDICES} or {@link #GIVEN_SYMBOLS}
+     * @return string representation, e.g. "All Ordinaries"
+     */
+    public static String getDescription(int type) {
+        if(type == ALL_SYMBOLS) 
+            return "All Symbols";
+        else if(type == GIVEN_SYMBOLS) 
+            return "Given Sybmols";
+        else if(type == ALL_ORDINARIES)
+            return "All Ordinaries";
+        else {
+            assert type == MARKET_INDICES;
+            return "Market Indices";
+        }
+    }
+
     /**
      * Create a string representation of the quote range. This is for debugging
      * purposes.
@@ -376,33 +426,8 @@ public class QuoteRange implements Cloneable {
      */
     public String toString() {
 
-        String string = new String();
-
-        // What type?
-        if(type == ALL_SYMBOLS) {
-            string = string.concat("All symbols");
-        }
-        
-        else if(type == GIVEN_SYMBOLS) {
-            Iterator iterator = getAllSymbols().iterator();
-
-            while(iterator.hasNext()) {
-                string = string.concat(((String)iterator.next()));
-                
-                if(iterator.hasNext()) 
-                    string = string.concat(", ");
-            }
-        }
-
-        else if(type == ALL_ORDINARIES) {
-            string = string.concat("All Ordinaries");
-        }
-        
-        else {
-            assert type == MARKET_INDICES;
-
-            string = string.concat("Market Indices");
-        }
+        // Get basic description
+        String string = getDescription();
 
         // Between what dates?
         if(getFirstDate() == null) 

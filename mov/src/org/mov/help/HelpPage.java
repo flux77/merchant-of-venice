@@ -28,6 +28,8 @@ import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 
+import org.mov.util.Locale;
+
 /**
  * This package defines a single help page that can be viewed by the
  * {@link HelpModule} help browser. The help page is actually a node in a tree
@@ -126,24 +128,31 @@ public class HelpPage extends DefaultMutableTreeNode {
             StringBuffer stringBuffer = new StringBuffer();
 
             // Read file
-            try {
-                InputStreamReader isr = new InputStreamReader(fileURL.openStream());
-                BufferedReader br = new BufferedReader(isr);		
+	    if (fileURL != null) {
+		try {
+		    InputStream is = fileURL.openStream();
+		    InputStreamReader isr = new InputStreamReader(fileURL.openStream());
+		    BufferedReader br = new BufferedReader(isr);		
                 
-                // ... one line at a time
-                String line = br.readLine();
+		    // ... one line at a time
+		    String line = br.readLine();
+		    
+		    while(line != null) {
+			stringBuffer = stringBuffer.append(line);
+			line = br.readLine();                
+		    }
                 
-                while(line != null) {
-                    stringBuffer = stringBuffer.append(line);
-                    line = br.readLine();                
-                }
-                
-                br.close();
-            }
-            catch(java.io.IOException e) {
-                text = "<html><h2>Sorry, help page is missing!</h2></html>";
-                return;
-            }
+		    br.close();		    
+		}
+		catch(java.io.IOException e) {
+		    text = Locale.getString("ERROR_LOADING_HELP_PAGE");
+		    return;
+		}
+	    }
+	    else {
+		text = Locale.getString("HELP_PAGE_NOT_FOUND");
+		return;
+	    }
             
             text = stringBuffer.toString();
             isLoaded = true;
@@ -161,14 +170,14 @@ public class HelpPage extends DefaultMutableTreeNode {
         Document document = loadIndexDocument();
 
         if(document != null) {
-            index = new HelpPage("Venice");
+            index = new HelpPage(Locale.getString("VENICE_SHORT"));
             Element root = document.getDocumentElement();
             
             buildIndex(index, root);
         }
 
         if(index == null)
-            index = new HelpPage("Error loading index!");
+            index = new HelpPage(Locale.getString("ERROR_LOADING_INDEX"));
 
         return index;
     }

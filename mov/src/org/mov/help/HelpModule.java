@@ -30,6 +30,7 @@ import javax.swing.text.*;
 import javax.swing.tree.*;
 
 import org.mov.main.*;
+import org.mov.util.Locale;
 
 /**
  * This module provides a help browser for Venice. It allows traveresal of a tree
@@ -154,9 +155,9 @@ public class HelpModule extends JPanel implements Module {
     private void addMenuBar() {
         menuBar = new JMenuBar();
 
-        JMenu helpMenu = new JMenu("Help");
+        JMenu helpMenu = new JMenu(Locale.getString("HELP"));
 
-        JMenuItem closeMenuItem = new JMenuItem("Close");
+        JMenuItem closeMenuItem = new JMenuItem(Locale.getString("CLOSE"));
         closeMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     propertySupport.firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
@@ -164,8 +165,8 @@ public class HelpModule extends JPanel implements Module {
             });
         helpMenu.add(closeMenuItem);
 
-        JMenu goMenu = new JMenu("Go");
-        backMenuItem = new JMenuItem("Back");
+        JMenu goMenu = new JMenu(Locale.getString("GO"));
+        backMenuItem = new JMenuItem(Locale.getString("BACK"));
         backMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     back();
@@ -173,7 +174,7 @@ public class HelpModule extends JPanel implements Module {
             });
         goMenu.add(backMenuItem);
 
-        forwardMenuItem = new JMenuItem("Forward");
+        forwardMenuItem = new JMenuItem(Locale.getString("FORWARD"));
         forwardMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     forward();
@@ -181,7 +182,7 @@ public class HelpModule extends JPanel implements Module {
             });
         goMenu.add(forwardMenuItem);
 
-        JMenuItem homeMenuItem = new JMenuItem("Home");
+        JMenuItem homeMenuItem = new JMenuItem(Locale.getString("HOME"));
         homeMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     home();
@@ -336,7 +337,7 @@ public class HelpModule extends JPanel implements Module {
      * @return	the window title
      */
     public String getTitle() {
-	return "Help";
+	return Locale.getString("HELP");
     }
 
     /**

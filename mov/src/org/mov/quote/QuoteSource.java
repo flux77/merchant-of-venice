@@ -39,10 +39,10 @@ public interface QuoteSource {
     /**
      * Returns the symbol associated with the given company.
      *
-     * @param	symbol	a partial company name
+     * @param	partialCompanyName	a partial company name
      * @return	the company symbol
      */
-    public Symbol getSymbol(String partialSymbolName);
+    public Symbol getSymbol(String partialCompanyName);
 
     /**
      * Returns whether we have any quotes for the given symbol.

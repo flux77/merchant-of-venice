@@ -56,7 +56,7 @@ public class ChangeFormat implements Comparable {
     /**
      * Compare two change objects.
      *
-     * @param	change	change object to compare to
+     * @param	object	change object to compare to
      * @return	the value <code>0</code> if the change objects are equal;
      * <code>1</code> if this change object is after the specified change
      * object or

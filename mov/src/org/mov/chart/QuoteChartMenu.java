@@ -28,11 +28,11 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
     private static final String MOVING_AVERAGE = "Moving Average";
     private static final String OBV	       = "OBV";
     private static final String STANDARD_DEVIATION = "Standard Deviation";
-    private static final String VOLUME         = "Volume";
+    private static final String DAY_VOLUME     = "Volume";
     
-    // HashMap of graphs to their annotations if any
-    private HashMap graphMap = new HashMap();
-    
+    JMenu graphMenu;
+    JMenu annotateMenu;
+
     private JMenuItem removeMenu;
     
     private QuoteCache cache;
@@ -52,69 +52,61 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
     public QuoteChartMenu(ChartModule listener, QuoteCache cache,
 			  Graph graph) {
 
-	super(graph.getName().toUpperCase());
-	
-	// Order not important - will be added to menu in
-	// alphabetical order
-	graphMap.put((Object)BOLLINGER,	null);
-	graphMap.put((Object)DAY_HIGH,	null);
-	graphMap.put((Object)DAY_LOW,	null);
-	graphMap.put((Object)DAY_OPEN,	null);
-	graphMap.put((Object)HIGH_LOW_BAR,	null);
-	graphMap.put((Object)MACD,		"Buy/Sell");
-	graphMap.put((Object)MOMENTUM,		null);
-	graphMap.put((Object)MOVING_AVERAGE, "Buy/Sell");
-	graphMap.put((Object)OBV,		null);
-	graphMap.put((Object)STANDARD_DEVIATION,	null);
-	graphMap.put((Object)VOLUME,	null);
+	super(graph.getName());
 	
 	this.cache = cache; 
 	this.graph = graph;
 	this.listener = listener;
 	
 	// Create graph + annotation menus
-	JMenu graphMenu = new JMenu("Graph");
-	JMenu annotateMenu = new JMenu("Annotate");
+	graphMenu = new JMenu("Graph");
+	annotateMenu = new JMenu("Annotate");
 	this.add(graphMenu);
 	this.add(annotateMenu);
+
+	// Add graph menu items
+	addMenuItem(DAY_OPEN);
+	addMenuItem(DAY_HIGH);
+	addMenuItem(DAY_LOW);
+	addMenuItem(DAY_VOLUME);
+	graphMenu.addSeparator();
 	
-	// Get list of graphs in alphabetical order
-	TreeSet set = new TreeSet(Collator.getInstance());
-	set.addAll(graphMap.keySet());
-	
-	Iterator iterator = set.iterator();
-	String graphName;
-	JCheckBoxMenuItem item;
-	Object object;
-	
-	while(iterator.hasNext()) {
-	    graphName = (String)iterator.next();
-	    
-	    // Add graph menu
-	    item = new JCheckBoxMenuItem(graphName);
-	    item.addActionListener(this);
-	    graphMenu.add(item);
-	    
-	    // Add annotation menu
-	    object = graphMap.get(graphName);
-	    
-	    if(object != null) {
-		item = new JCheckBoxMenuItem(graphName + " " + 
-					     (String)object);
-		item.addActionListener(this);
-		item.setEnabled(false);
-		annotateMenu.add(item);
-		
-		// Save reference to annotation
-		annotateMap.put((Object)graphName, item);		    
-	    }
-	}
-	
+	addMenuItem(BOLLINGER);
+	addMenuItem(HIGH_LOW_BAR);
+	addMenuItem(MACD);
+	addMenuItem(MOMENTUM);
+	addMenuItem(MOVING_AVERAGE);
+	addMenuItem(OBV);
+	addMenuItem(STANDARD_DEVIATION);
+
+	// Add annotation menu items
+	addAnnotateMenuItem(MACD, "Buy/Sell");
+	addAnnotateMenuItem(MOVING_AVERAGE, "Buy/Sell");
+
 	// Add all static menus
 	this.addSeparator();
 	removeMenu = new JMenuItem("Remove");
 	removeMenu.addActionListener(this);
 	this.add(removeMenu);	    
+    }
+
+    // Add a graph menu item, e.g. "Day Close", "Bollinger Bands"
+    private void addMenuItem(String label) {
+	// Add graph menu
+	JMenuItem item = new JCheckBoxMenuItem(label);
+	item.addActionListener(this);
+	graphMenu.add(item);
+    }
+
+    // Add an annotate menu item, e.g. "Moving Average Buy/Sell"
+    private void addAnnotateMenuItem(String graphName, String annotation) {
+	JMenuItem item = new JCheckBoxMenuItem(graphName + " " + annotation);
+	item.addActionListener(this);
+	item.setEnabled(false);
+	annotateMenu.add(item);
+		
+	// Save reference to annotation
+	annotateMap.put((Object)graphName, item);		    
     }
 
     /**
@@ -145,21 +137,8 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    JCheckBoxMenuItem menu = (JCheckBoxMenuItem)e.getSource();
 	    String text = menu.getText();
 	    
-	    // Create these now so we dont have to create them in 
-	    // 10 different places. We might not use them but hey.
-	    GraphSource dayOpen = 
-		new OHLCVQuoteGraphSource(cache, Quote.DAY_OPEN);
-	    GraphSource dayHigh = 
-		new OHLCVQuoteGraphSource(cache, Quote.DAY_HIGH);
-	    GraphSource dayLow = 
-		new OHLCVQuoteGraphSource(cache, Quote.DAY_LOW);
-	    GraphSource dayClose = 
-		new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
-	    GraphSource dayVolume = 
-		new OHLCVQuoteGraphSource(cache, Quote.DAY_VOLUME);
-	    
 	    // Check annotation menus first
-	    if(handleAnnotationMenu(text, menu.getState()));
+	    if(handleAnnotationMenu(text, menu));
 	    
 	    // Handle removing graphs next
 	    else if(!menu.getState())
@@ -167,65 +146,94 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    
 	    // Ok looks like its adding a graph
 	    else if(text == BOLLINGER) 
-		addGraph(new BollingerBandsGraph(dayClose, 20), 
+		addGraph(new BollingerBandsGraph(getDayClose(), 20), 
 			 BOLLINGER, 0);
 
 	    else if(text == DAY_HIGH) 
-		addGraph(new LineGraph(dayHigh), DAY_HIGH, 0);
+		addGraph(new LineGraph(getDayHigh()), DAY_HIGH, 0);
 	    
 	    else if(text == DAY_LOW) 
-		addGraph(new LineGraph(dayLow), DAY_LOW, 0);
+		addGraph(new LineGraph(getDayLow()), DAY_LOW, 0);
 	    
 	    else if(text == DAY_OPEN) 
-		addGraph(new LineGraph(dayOpen), DAY_OPEN, 0);
+		addGraph(new LineGraph(getDayOpen()), DAY_OPEN, 0);
 	    
 	    else if(text == HIGH_LOW_BAR) 
-		addGraph(new HighLowBarGraph(dayLow, dayHigh, dayClose),
+		addGraph(new HighLowBarGraph(getDayLow(), getDayHigh(), 
+					     getDayClose()),
 			 HIGH_LOW_BAR, 0);
 	    else if(text == MACD)
 		// 1 1 2 3 5 8 13 21 34 55
-		addGraph(new MACDGraph(dayClose, 13, 34), MACD, 0);
+		addGraph(new MACDGraph(getDayClose(), 13, 34), MACD, 0);
 
 	    else if(text == MOMENTUM) 
-		addGraph(new MomentumGraph(dayClose, 10), MOMENTUM);
+		addGraph(new MomentumGraph(getDayClose(), 10), MOMENTUM);
 	    
 	    else if(text == MOVING_AVERAGE) 
-		addGraph(new MovingAverageGraph(dayClose, 40), 
+		addGraph(new MovingAverageGraph(getDayClose(), 40), 
 			 MOVING_AVERAGE, 0);
 
 	    else if(text == OBV) 
-		addGraph(new OBVGraph(dayOpen, dayClose, dayVolume, 
+		addGraph(new OBVGraph(getDayOpen(), getDayClose(), 
+				      getDayVolume(), 
 				      50000.0F), OBV);
-	    else if(text == VOLUME) 
-		addGraph(new BarGraph(dayVolume), VOLUME);
+	    else if(text == DAY_VOLUME) 
+		addGraph(new BarGraph(getDayVolume()), DAY_VOLUME);
 
 	    else if(text == STANDARD_DEVIATION) 
-		addGraph(new StandardDeviationGraph(dayClose, 20), 
+		addGraph(new StandardDeviationGraph(getDayClose(), 20), 
 			 STANDARD_DEVIATION);
 	}
     }
+
+    // Returns a graph of the day open prices
+    private GraphSource getDayOpen() {
+	return new OHLCVQuoteGraphSource(cache, Quote.DAY_OPEN);
+    }
+
+    // Returns a graph of the day high prices
+    private GraphSource getDayHigh() {
+	return new OHLCVQuoteGraphSource(cache, Quote.DAY_HIGH);
+    }
+
+    // Returns a graph of the day low prices
+    private GraphSource getDayLow() {
+	return new OHLCVQuoteGraphSource(cache, Quote.DAY_LOW);
+    }
+
+    // Returns a graph of the day close prices
+    private GraphSource getDayClose() {
+	return new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
+    }
+
+    // Returns a graph of the day volume prices
+    private GraphSource getDayVolume() {
+	return new OHLCVQuoteGraphSource(cache, Quote.DAY_VOLUME);
+    }
     
     // Is annotation menu?
-    private boolean handleAnnotationMenu(String text, boolean state) {
-	Set set = graphMap.keySet();
+    private boolean handleAnnotationMenu(String text, 
+					 JCheckBoxMenuItem menu) {
+	boolean state = menu.getState();
+	Set set = annotateMap.keySet();
 	Iterator iterator = set.iterator();
 	String graphName;
-	String annotationName;
-	
+
 	while(iterator.hasNext()) {
 	    graphName = (String)iterator.next();
-	    annotationName = graphName + " " +  graphMap.get(graphName);
 	    
 	    // is it an annotation menu?
-	    if(annotationName.equals(text)) {
-		
+	    Object object = annotateMap.get(graphName);
+	    
+	    if(object == menu) {
 		// Turn on annotation for this graph
 		listener.handleAnnotation((Graph)map.get(graphName),
 					  state);		   
 		listener.redraw();
 		return true;
 	    }
-	}	    
+	}	
+
 	return false;
     }
     
@@ -266,7 +274,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	
 	if(object != null) {
 	    JCheckBoxMenuItem item = (JCheckBoxMenuItem)object;
-	    item.setEnabled(false);	// disable check box	   
+	    item.setEnabled(false); // disable check box	   
 	    item.setSelected(false); // remove tick
 	}
     }

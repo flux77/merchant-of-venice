@@ -190,38 +190,41 @@ public class DatabaseQuoteSource implements QuoteSource
 
     // Connect to the database
     private boolean connect() {
-		try {
-		    // Resolve the classname
-		    Class.forName(driver);
-	
-	        // We can operate the HSQLDB mode in one of three different wayys.
+        try {
+            // Resolve the classname
+            Class.forName(driver);
+            
+            // We can operate the HSQLDB mode in one of three different wayys.
             // Construct connection string depending on mode
             String connectionURL = null;
-	        
-		    // Set up the conection
-		    if (mode == INTERNAL && software.equals(HSQLDB_SOFTWARE)) 
-		        connectionURL = new String("jdbc:hsqldb:file:/" + fileName);
-		    else {
-		        connectionURL = new String("jdbc:" + software +"://"+ host +
-			         					   ":" + port +
-			        					   "/"+ database);
-			    if (username != null)
-			    	connectionURL += new String("?user=" + username +
-			        					   		"&password=" + password);
+	    
+            // Set up the conection
+            if (mode == INTERNAL && software.equals(HSQLDB_SOFTWARE)) 
+                connectionURL = new String("jdbc:hsqldb:file:/" + fileName);
+            else {
+                connectionURL = new String("jdbc:" + software +"://"+ host +
+                                           ":" + port +
+                                           "/"+ database);
+                if (username != null)
+                    connectionURL += new String("?user=" + username +
+                                                "&password=" + password);
             }
-			DriverManager.getConnection(connectionURL);
-		} catch (ClassNotFoundException e) {
-		    // Couldn't find the driver!
-		    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_DATABASE_DRIVER", driver, software));
-		    return false;
-		}
-		catch (SQLException e) {
-		    DesktopManager.showErrorMessage(Locale.getString("ERROR_CONNECTING_TO_DATABASE",
-		            						e.getMessage()));
-	            return false;
-		}
-		return true;
 
+            connection = DriverManager.getConnection(connectionURL);
+
+        } catch (ClassNotFoundException e) {
+            // Couldn't find the driver!
+            DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_DATABASE_DRIVER", 
+                                                             driver, software));
+            return false;
+        }
+        catch (SQLException e) {
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_CONNECTING_TO_DATABASE",
+                                                             e.getMessage()));
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -320,7 +323,6 @@ public class DatabaseQuoteSource implements QuoteSource
 		// Return the first date found matching the given symbol.
 		// If no dates are found - the symbol is unknown to us.
 		// This should take << 1s
-
 		String query = buildSymbolPresentQuery(symbol);
 
 		ResultSet RS = statement.executeQuery(query);
@@ -565,179 +567,179 @@ public class DatabaseQuoteSource implements QuoteSource
     // Creates an SQL statement that will return all the quotes in the given
     // quote range.
     private String buildSQLString(QuoteRange quoteRange) {
-		//
-		// 1. Create select line
-		//
+        //
+        // 1. Create select line
+        //
 	
-		String queryString = "SELECT * FROM " + SHARE_TABLE_NAME + " WHERE ";
+        String queryString = "SELECT * FROM " + SHARE_TABLE_NAME + " WHERE ";
 	
-		//
-		// 2. Filter select by symbols we are looking for
-		//
+        //
+        // 2. Filter select by symbols we are looking for
+        //
 	
-		String filterString = new String("");
+        String filterString = new String("");
 	
-		if(quoteRange.getType() == QuoteRange.GIVEN_SYMBOLS) {
-		    List symbols = quoteRange.getAllSymbols();
-	
-		    if(symbols.size() == 1) {
-			Symbol symbol = (Symbol)symbols.get(0);
-	
-			filterString =
-			    filterString.concat(SYMBOL_FIELD + " = '" + symbol + "' ");
-		    }
-		    else {
-				assert symbols.size() > 1;
+        if(quoteRange.getType() == QuoteRange.GIVEN_SYMBOLS) {
+            List symbols = quoteRange.getAllSymbols();
+            
+            if(symbols.size() == 1) {
+                Symbol symbol = (Symbol)symbols.get(0);
+                
+                filterString =
+                    filterString.concat(SYMBOL_FIELD + " = '" + symbol + "' ");
+            }
+            else {
+                assert symbols.size() > 1;
+                
+                filterString = filterString.concat(SYMBOL_FIELD + " IN (");
+                Iterator iterator = symbols.iterator();
+                
+                while(iterator.hasNext()) {
+                    Symbol symbol = (Symbol)iterator.next();
+                    
+                    filterString = filterString.concat("'" + symbol + "'");
+                    
+                    if(iterator.hasNext())
+                        filterString = filterString.concat(", ");
+                }
 		
-				filterString = filterString.concat(SYMBOL_FIELD + " IN (");
-				Iterator iterator = symbols.iterator();
-		
-				while(iterator.hasNext()) {
-				    Symbol symbol = (Symbol)iterator.next();
-		
-				    filterString = filterString.concat("'" + symbol + "'");
-		
-				    if(iterator.hasNext())
-					filterString = filterString.concat(", ");
-				}
-		
-				filterString = filterString.concat(") ");
-		    }
-		}
-		else if(quoteRange.getType() == QuoteRange.ALL_SYMBOLS) {
-		    // nothing to do
-		}
-		else if(quoteRange.getType() == QuoteRange.ALL_ORDINARIES) {
-		    filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
-	                                               left(SYMBOL_FIELD, 1) + " != 'X' ");
-		}
-		else {
-		    assert quoteRange.getType() == QuoteRange.MARKET_INDICES;
+                filterString = filterString.concat(") ");
+            }
+        }
+        else if(quoteRange.getType() == QuoteRange.ALL_SYMBOLS) {
+            // nothing to do
+        }
+        else if(quoteRange.getType() == QuoteRange.ALL_ORDINARIES) {
+            filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
+                                               left(SYMBOL_FIELD, 1) + " != 'X' ");
+        }
+        else {
+            assert quoteRange.getType() == QuoteRange.MARKET_INDICES;
+            
+            filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
+                                               left(SYMBOL_FIELD, 1) + " = 'X' ");
+        }
 	
-		    filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
-	                                               left(SYMBOL_FIELD, 1) + " = 'X' ");
-		}
+        //
+        // 3. Filter select by date range
+        //
 	
-		//
-		// 3. Filter select by date range
-		//
-		
-		// No dates in quote range, mean load quotes for all dates in the database
-		if(quoteRange.getFirstDate() == null) {
-		    // nothing to do
-		}
+        // No dates in quote range, mean load quotes for all dates in the database
+        if(quoteRange.getFirstDate() == null) {
+            // nothing to do
+        }
 	
-		// If they are the same its only one day
-		else if(quoteRange.getFirstDate().equals(quoteRange.getLastDate())) {
-		    if(filterString.length() > 0)
-		        filterString = filterString.concat("AND ");
+        // If they are the same its only one day
+        else if(quoteRange.getFirstDate().equals(quoteRange.getLastDate())) {
+            if(filterString.length() > 0)
+                filterString = filterString.concat("AND ");
+            
+            filterString =	filterString.concat(DATE_FIELD + " = '" + quoteRange.getFirstDate() + "' ");
+        }
 	
-		    filterString =	filterString.concat(DATE_FIELD + " = '" + quoteRange.getFirstDate() + "' ");
-		}
+        // Otherwise check within a range of dates
+        else {
+            if(filterString.length() > 0)
+                filterString = filterString.concat("AND ");
+            
+            filterString = filterString.concat(DATE_FIELD + " >= '" + quoteRange.getFirstDate() + "' AND " +
+                                               DATE_FIELD + " <= '" + quoteRange.getLastDate() + "' ");
+        }
 	
-		// Otherwise check within a range of dates
-		else {
-		    if(filterString.length() > 0)
-		        filterString = filterString.concat("AND ");
-	
-		    filterString = filterString.concat(DATE_FIELD + " >= '" + quoteRange.getFirstDate() + "' AND " +
-					    DATE_FIELD + " <= '" + quoteRange.getLastDate() + "' ");
-		}
-	
-		return queryString.concat(filterString);
+        return queryString.concat(filterString);
     }
-	
+    
     // Creates database tables
     private boolean createTables() {
-		boolean success = false;
+        boolean success = false;
 	
-		try {
-		    // 1. Create the shares table
-		    Statement statement = connection.createStatement();
-		    statement.executeUpdate("CREATE TABLE " + SHARE_TABLE_NAME + " (" +
-					    DATE_FIELD +	" DATE NOT NULL, " +
-					    SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
-					    ") NOT NULL, " +
-					    DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, " +
-					    DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
-					    DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
-					    DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, " +
-					    DAY_VOLUME_FIELD +	" INT DEFAULT 0, " +
-					    "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
-	
-		    // 2. Create a couple of indices to speed things up
-		    statement.executeUpdate("CREATE INDEX " + DATE_INDEX_NAME + " ON " +
-					    SHARE_TABLE_NAME + " (" + DATE_FIELD + ")");
-		    statement.executeUpdate("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " +
-					    SHARE_TABLE_NAME + " (" + SYMBOL_FIELD + ")");
-	
-		    // 3. Create the lookup table
-		    statement.executeUpdate("CREATE TABLE " + LOOKUP_TABLE_NAME + " (" +
-		            				SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
-		            				") NOT NULL, " +
-		            				NAME_FIELD +	" VARCHAR(100), " +
-	                                "PRIMARY KEY(" + SYMBOL_FIELD + "))");
-	
-		    success = true;
-		}
-		catch (SQLException e) {
+        try {
+            // 1. Create the shares table
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("CREATE TABLE " + SHARE_TABLE_NAME + " (" +
+                                    DATE_FIELD +	" DATE NOT NULL, " +
+                                    SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
+                                    ") NOT NULL, " +
+                                    DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, " +
+                                    DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
+                                    DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
+                                    DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, " +
+                                    DAY_VOLUME_FIELD +	" INT DEFAULT 0, " +
+                                    "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
+            
+            // 2. Create a couple of indices to speed things up
+            statement.executeUpdate("CREATE INDEX " + DATE_INDEX_NAME + " ON " +
+                                    SHARE_TABLE_NAME + " (" + DATE_FIELD + ")");
+            statement.executeUpdate("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " +
+                                    SHARE_TABLE_NAME + " (" + SYMBOL_FIELD + ")");
+            
+            // 3. Create the lookup table
+            statement.executeUpdate("CREATE TABLE " + LOOKUP_TABLE_NAME + " (" +
+                                    SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
+                                    ") NOT NULL, " +
+                                    NAME_FIELD +	" VARCHAR(100), " +
+                                    "PRIMARY KEY(" + SYMBOL_FIELD + "))");
+            
+            success = true;
+        }
+        catch (SQLException e) {
             // Since hypersonic won't let us check if the table is already created,
             // we need to ignore the inevitable error about the table already being present.
             if(software != HSQLDB_SOFTWARE)
-         	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-							     e.getMessage()));
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                                 e.getMessage()));
             else
                 success = true;
-
-		}
+            
+        }
 	
-		return success;	
-	}
-	
-	private boolean checkDatabase() {
-		boolean success = true;
-	
-	        // Skip this check for hypersonic - it doesn't support it
-	        if(software != HSQLDB_SOFTWARE) {
-	            try {
-	                DatabaseMetaData meta = connection.getMetaData();
-	                
-	                // Check database exists
-	                {
-	                    ResultSet RS = meta.getCatalogs();
-	                    String traverseDatabaseName;
-	                    boolean foundDatabase = false;
-	                    
-	                    while(RS.next()) {
-	                        traverseDatabaseName = RS.getString(1);
-	                        
-	                        if(traverseDatabaseName.equals(database)) {
-	                            foundDatabase = true;
-	                            break;
-	                        }
-	                    }
-	                    
-	                    if(!foundDatabase) {
-	                        DesktopManager.showErrorMessage(Locale.getString("CANT_FIND_DATABASE",
-	                                                                         database));
-	                        return false;
-	                    }
-	                }
-	            }
-	            catch (SQLException e) {
-	                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-	                                                                 e.getMessage()));
-	                return false;
-	            }
-	        }
-	
-		// If we got here the database is available
-		return success;
+        return success;	
     }
-
+    
+    private boolean checkDatabase() {
+        boolean success = true;
+	
+        // Skip this check for hypersonic - it doesn't support it
+        if(software != HSQLDB_SOFTWARE) {
+            try {
+                DatabaseMetaData meta = connection.getMetaData();
+	        
+                // Check database exists
+                {
+                    ResultSet RS = meta.getCatalogs();
+                    String traverseDatabaseName;
+                    boolean foundDatabase = false;
+	            
+                    while(RS.next()) {
+                        traverseDatabaseName = RS.getString(1);
+	                
+                        if(traverseDatabaseName.equals(database)) {
+                            foundDatabase = true;
+                            break;
+                        }
+                    }
+	            
+                    if(!foundDatabase) {
+                        DesktopManager.showErrorMessage(Locale.getString("CANT_FIND_DATABASE",
+                                                                         database));
+                        return false;
+                    }
+                }
+            }
+            catch (SQLException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                                 e.getMessage()));
+                return false;
+            }
+        }
+	
+        // If we got here the database is available
+        return success;
+    }
+    
     private boolean checkTables() {
         boolean success = false;
-
+        
         try {
             boolean foundTable = false;
 

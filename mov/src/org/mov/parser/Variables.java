@@ -45,7 +45,25 @@ public class Variables {
             assert false;
     }
 
+    public void add(String name, int type, int value) {
+        if(!variables.containsKey(name)) {
+            Variable variable = new Variable(name, type, value);
+            variables.put(name, variable);
+        }
+        else
+            assert false;
+    }
+
     public void setValue(String name, float value) {
+        Variable variable = get(name);
+
+        if(variable != null)
+            variable.setValue(value);
+        else
+            assert false;
+    }
+
+    public void setValue(String name, int value) {
         Variable variable = get(name);
 
         if(variable != null)

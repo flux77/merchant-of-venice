@@ -282,6 +282,10 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	highlightRegion(g, (Chart)c, height);
     }
 
+    public BufferedImage getImage() {
+	return image;
+    }
+
     // Repaint the component and recalculate everything
     private void bufferedPaint(Graphics g, Chart chart,
 			       int width, int height) {

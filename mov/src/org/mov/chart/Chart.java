@@ -23,6 +23,7 @@ import java.awt.event.*;
 import java.text.*;
 import java.util.*;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 
 import org.mov.chart.graph.*;
 import org.mov.util.Locale;
@@ -580,6 +581,11 @@ public class Chart extends JComponent implements MouseListener {
     }
     public void mousePressed(MouseEvent e) {}
     public void mouseReleased(MouseEvent e) {}
+
+
+    public BufferedImage getImage() {
+	return gui.getImage();
+    }
 
 }
 

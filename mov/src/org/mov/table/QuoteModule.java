@@ -198,16 +198,17 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
         // Left double click on the table - graph stock
         else if(event.getButton() == MouseEvent.BUTTON1 && event.getClickCount() == 2) {
-
-            int row = rowAtPoint(point);
-
-            // Get symbol at row
-            Symbol symbol =
-                (Symbol)getModel().getValueAt(row, QuoteModel.SYMBOL_COLUMN);
-
+            int[] selectedRows = getSelectedRows();
             List symbols = new ArrayList();
-            symbols.add(symbol);
+            for(int i = 0; i < selectedRows.length; i++) {
+                Symbol symbol
+                    = (Symbol)model.getValueAt(selectedRows[i],
+                                               
+                                               QuoteModel.SYMBOL_COLUMN);
+                symbols.add(symbol);
+            }
 
+            // Graph the highlighted symbols
             CommandManager.getInstance().graphStockBySymbol(symbols);
         }
     }

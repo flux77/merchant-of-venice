@@ -6,6 +6,7 @@ import java.beans.*;
 import java.text.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.table.*;
 
 import org.mov.main.*;
@@ -13,14 +14,28 @@ import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
 import org.mov.table.*;
+import org.mov.ui.*;
 
 /** 
  * Venice module for displaying a portfolio's transaction history to
  * the user.
  */
-public class TransactionModule extends AbstractTable
-    implements Module {
+public class TransactionModule extends AbstractTable implements Module,
+								ActionListener {
+
+    // Menu items
+    private JMenuBar menuBar;
     
+    private JMenuItem transactionNew;
+    private JMenuItem transactionEdit;
+    private JMenuItem transactionDelete;
+    private JMenuItem transactionClose;
+
+    private PropertyChangeSupport propertySupport;
+    private PortfolioModule portfolioModule;
+    private Portfolio portfolio;
+    private Model model;
+
     class Model extends AbstractTableModel {
 
 	private static final int DATE_COLUMN = 0;
@@ -40,6 +55,15 @@ public class TransactionModule extends AbstractTable
 
 	public Model(Vector transactions) {
 	    this.transactions = transactions;
+	}
+
+	public void setTransactions(Vector transactions) {
+	    this.transactions = transactions;
+	    fireTableDataChanged();
+	}
+
+	public Transaction getTransactionAtRow(int row) {
+	    return (Transaction)transactions.elementAt(row);
 	}
 
 	public int getRowCount() {
@@ -149,21 +173,98 @@ public class TransactionModule extends AbstractTable
 	return transactionString;
     }
 
-    private PropertyChangeSupport propertySupport;
-    private Portfolio portfolio;
-
     /**
      * Create a new transaction module from the given portfolio.
      *
      * @param	portfolio	portfolio to display transaction history
      */
-    public TransactionModule(Portfolio portfolio) {
+    public TransactionModule(final PortfolioModule portfolioModule, 
+			     final Portfolio portfolio) {
+
+	this.portfolioModule = portfolioModule;
 	this.portfolio = portfolio;
 
 	propertySupport = new PropertyChangeSupport(this);
 
-	setModel(new Model(portfolio.getTransactions()));
+	model = new Model(portfolio.getTransactions());
+	setModel(model);
+
+	// If the user double clicks on a row then edit that transaction
+	addMouseListener(new MouseAdapter() {
+
+		public void mouseClicked(MouseEvent evt) {
+		    
+		    Point point = evt.getPoint();
+		    if (evt.getClickCount() == 2) {
+
+			int row = getUnsortedRow(rowAtPoint(point));
+			
+			// Get transaction at row
+			Transaction transaction = 
+			    model.getTransactionAtRow(row);
+
+			editTransaction(transaction);
+		    }
+		}
+	    });
+
+	// Listen for changes in selection so we can update the menus
+	getSelectionModel().addListSelectionListener(new ListSelectionListener() {		
+
+		public void valueChanged(ListSelectionEvent e) {
+		    checkMenuDisabledStatus();
+		}
+
+	});
+
+	createMenu();
     }
+
+    // Create new menu for this module
+    private void createMenu() {
+	menuBar = new JMenuBar();
+
+	JMenu transactionMenu = MenuHelper.addMenu(menuBar, "Transaction", 'T');
+	{
+	    transactionNew =
+		MenuHelper.addMenuItem(this, transactionMenu,
+				       "New");
+
+	    transactionEdit =
+		MenuHelper.addMenuItem(this, transactionMenu,
+				       "Edit");
+
+	    transactionDelete =
+		MenuHelper.addMenuItem(this, transactionMenu,
+				       "Delete");
+
+	    transactionMenu.addSeparator();
+
+	    transactionClose =
+		MenuHelper.addMenuItem(this, transactionMenu,
+				       "Close");
+	}
+
+	checkMenuDisabledStatus();
+    }
+
+    // Edit & Delete menu items are only enabled when items are selected in the table.
+    private void checkMenuDisabledStatus() {
+	int numberOfSelectedRows = getSelectedRowCount();
+
+	transactionEdit.setEnabled(numberOfSelectedRows == 1? true : false);
+	transactionDelete.setEnabled(numberOfSelectedRows > 0? true : false);
+    }
+
+    /**
+     * Redraw and redisplay table
+     */
+    public void redraw() {
+	resort();
+	revalidate();
+	repaint();
+    }
+
 
     public void save() {
 	// nothing to save
@@ -215,7 +316,7 @@ public class TransactionModule extends AbstractTable
      * @return	the menu bar.
      */
     public JMenuBar getJMenuBar() {
-	return null;
+	return menuBar;
     }
 
     /**
@@ -225,5 +326,143 @@ public class TransactionModule extends AbstractTable
      */
     public boolean encloseInScrollPane() {
 	return true;
+    }
+
+    // Edit the given transaction
+    private void editTransaction(final Transaction transaction) {
+		       
+	// Handle action in a separate thread so we dont
+	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+	Thread showEditDialog = new Thread() {
+
+		public void run() {
+		    JDesktopPane desktop = 
+			org.mov.ui.DesktopManager.getDesktop();
+		    TransactionDialog dialog = 
+			new TransactionDialog(desktop, portfolio);
+		    
+		    if(dialog.editTransaction(transaction)) {
+
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+
+				    // If the transaction was changed then redraw the table
+				    model.setTransactions(portfolio.getTransactions());
+
+				    // Update the table and the portfolio window
+				    redraw();
+				    portfolioModule.redraw();
+				}});
+		    }
+		}
+	    };
+	
+	showEditDialog.start();
+    }
+
+    // Delete the given transaction(s)
+    private void deleteTransactions(final Vector deleteTransactions) {
+	JDesktopPane desktop =
+	    org.mov.ui.DesktopManager.getDesktop();
+	
+	int option = 
+	    JOptionPane.showInternalConfirmDialog(desktop,
+						  "Are you sure you wish to delete the selected transactions?",
+						  "Delete Transactions",
+						  JOptionPane.YES_NO_OPTION,
+						  JOptionPane.WARNING_MESSAGE);
+	if(option == JOptionPane.YES_OPTION) {
+	    // Update display
+	    SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+
+			// Delete transactions
+			Vector transactions = (Vector)portfolio.getTransactions().clone();
+			
+			// Remove deleted transactions from the list
+			Iterator iterator = transactions.iterator();
+			while(iterator.hasNext()) {
+			    Transaction traverseTransaction = (Transaction)iterator.next();
+			    
+			    if(deleteTransactions.contains(traverseTransaction))
+				iterator.remove();
+			}
+
+			// Remove and re-add transactions to portfolio
+			portfolio.removeAllTransactions();
+			portfolio.addTransactions(transactions);
+
+			// If the transaction was changed then redraw the table
+			model.setTransactions(portfolio.getTransactions());
+			
+			// Update the table and the portfolio window
+			redraw();
+			portfolioModule.redraw();
+
+			// Selected elements no longer exist so remove them
+			clearSelection();
+		    }});	    
+	}
+    }
+
+    // Create a new transaction
+    private void newTransaction() {
+	JDesktopPane desktop = 
+	    org.mov.ui.DesktopManager.getDesktop();
+	TransactionDialog dialog = new TransactionDialog(desktop, portfolio);
+	dialog.newTransaction();
+
+	// Update the table and the portfolio window
+	redraw();
+	portfolioModule.redraw();
+    }
+
+
+    /**
+     * Handle widget events.
+     *
+     * @param	e	action event
+     */
+    public void actionPerformed(final ActionEvent e) {
+
+	// Handle all menu actions in a separate thread so we dont
+	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+	Thread menuAction = new Thread() {
+
+		public void run() {
+		    if(e.getSource() == transactionNew) {
+			newTransaction();
+		    }
+
+		    else if(e.getSource() == transactionEdit) {
+			Transaction transaction =
+			    model.getTransactionAtRow(getSelectedRow());
+			
+			editTransaction(transaction);
+		    }
+
+		    else if(e.getSource() == transactionDelete) {
+			int[] selectedRows = getSelectedRows();
+			Vector transactions = new Vector();
+
+			for(int i = 0; i < selectedRows.length; i++) {
+			    transactions.add(model.getTransactionAtRow(selectedRows[i]));
+			}
+			    
+			deleteTransactions(transactions);
+		    }
+
+		    else if(e.getSource() == transactionClose) {
+			propertySupport.
+			    firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
+		    }
+
+		    else {
+			assert false;
+		    }
+		}
+	    };
+
+	menuAction.start();
     }
 }

@@ -37,26 +37,21 @@ import org.mov.quote.QuoteFunctions;
  * a <b>Buy</b> or <b>Sell</b> recommendation.
  *
  * @author Mark Hummel
+ * @see ExpMovingAverageGraphUI
  */
 public class ExpMovingAverageGraph extends AbstractGraph {
 
+    // Moving average values ready to graph
     private Graphable movingAverage;
-    private double smoothingConstant;
 
     /**
-     * Create a new simple moving average graph.
+     * Create a new exponentially smoothed moving average graph.
      *
      * @param	source	the source to create a moving average from
-     * @param	period	the period of the moving average
      */
-    public ExpMovingAverageGraph(GraphSource source, int period, double smoothingConstant) {
-
+    public ExpMovingAverageGraph(GraphSource source) {
 	super(source);	
-
-	this.smoothingConstant = smoothingConstant;
-
-	// Create moving average graphable
-	movingAverage = createMovingAverage(source.getGraphable(), period, smoothingConstant);
+        setSettings(new HashMap());
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
@@ -132,6 +127,30 @@ public class ExpMovingAverageGraph extends AbstractGraph {
 
     public boolean isPrimary() {
         return true;
+    }
+
+    public void setSettings(HashMap settings) {
+        super.setSettings(settings);
+
+        // Retrieve settings from hashmap
+        int period = ExpMovingAverageGraphUI.getPeriod(settings);
+        double smoothingConstant =
+            ExpMovingAverageGraphUI.getSmoothingConstant(settings);
+
+	// Create moving average graphable
+	movingAverage = createMovingAverage(getSource().getGraphable(),
+                                            period,
+                                            smoothingConstant);
+    }
+
+    /**
+     * Return the graph's user interface.
+     *
+     * @param settings the initial settings
+     * @return user interface
+     */
+    public GraphUI getUI(HashMap settings) {
+        return new ExpMovingAverageGraphUI(settings);
     }
 }
 

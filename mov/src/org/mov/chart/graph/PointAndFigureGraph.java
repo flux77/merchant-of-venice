@@ -39,29 +39,21 @@ import org.mov.util.Locale;
  * such that price difference met the price scale.
  *
  * @author Mark Hummel
+ * @see PointAndFigureGraphUI
  */
 public class PointAndFigureGraph extends AbstractGraph {
 
+    // Point and Figure ready to graph
     private PFGraphable pointAndFigure;
-    private GraphSource source;
-    private HashMap annotations;
-
-    private double priceScale;
 
     /**
      * Create a new point and figure graph.
      *
      * @param	source	the source to create the point and figure from
-     * @param	period	the period of the graph
-      */
-    public PointAndFigureGraph(GraphSource source, int period, double priceScale) {
-
+     */
+    public PointAndFigureGraph(GraphSource source) {
 	super(source);
-
-	this.priceScale = priceScale;
-	
-	// Create point and figure graphable
-	pointAndFigure = createPointAndFigureGraph(source.getGraphable(), period,priceScale);
+        setSettings(new HashMap());
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
@@ -73,51 +65,6 @@ public class PointAndFigureGraph extends AbstractGraph {
 	GraphTools.renderChar(g, pointAndFigure, xoffset, yoffset,
 			      horizontalScale,
 			      verticalScale, bottomLineValue, xRange);
-    }
-
-    public String getToolTipText(Comparable x, int y, int yoffset,
-				 double verticalScale,
-				 double bottomLineValue)
-    {
-
-	/*
-	Double yCoord = getY(x);
-
-	int yOfGraph = yoffset -
-	    GraphTools.scaleAndFitPoint(yCoord.doubleValue(),
-					bottomLineValue, verticalScale);
-
-	*/
-
-	// Its our graph *only* if its within 5 pixels	
-	/*
-	if(Math.abs(y - yOfGraph) < Graph.TOOL_TIP_BUFFER) {
-	    return getSource().getToolTipText(x);
-	}	
-	*/
-	
-	return null;
-    }
-
-
-
-    /**
-     * Return annotations containing buy/sell recommendations based on
-     * when the moving average crosses its source.
-     *
-     * @return	annotations
-     */
-    public HashMap getAnnotations() {
-	return annotations;
-    }
-
-    /**
-     * Return that we support annotations.
-     *
-     * @return	<code>true</code>
-     */
-    public boolean hasAnnotations() {
-	return true;
     }
 
     // Highest Y value is in the moving average graph
@@ -140,20 +87,24 @@ public class PointAndFigureGraph extends AbstractGraph {
     }
 
     /**
-     * Creates a new moving average based on the given data source.
+     * Creates a new poing and figure graphable based on the given data source.
+     *
+     * <p>Rules of Point and Figure:
+     *
+     * <ul>
+     * <li><code>X</code> = Upmoves, <code>O</code> = DownMoves</li>
+     * <li>Stay in the same column until price changes direction, and then move one column
+     *    to the right.</li>
+     * <li>Plot only prices which meet the price scale. A plot is marked regardless
+     *    of the direction. If a direction change occurs, the affect is to move the
+     *    column one to the right.</li>
+     * </ul>
      *
      * @param	source	the graph source to average
-     * @param	period	the desired period of the averaged data
      * @return	the graphable containing averaged data from the source
      */
-
-    /* Rules of PandF:
-       1. X = Upmoves, O = DownMoves
-       2. Stay in same col until price changes direction, and then move one col to the right.
-       3. Plot only prices which meet the price scale. A plot is marked regardless of the direction. If a direction change occurs, the affect is to move the column one to the right.
-    */
-
-    public static PFGraphable createPointAndFigureGraph(Graphable source, int period, double priceScale) {
+    public static PFGraphable createPointAndFigureGraph(Graphable source,
+                                                        double priceScale) {
 	PFGraphable pointAndFigure = new PFGraphable();
 
 	// Date set and value array will be in sync
@@ -224,6 +175,45 @@ public class PointAndFigureGraph extends AbstractGraph {
 
     public boolean isPrimary() {
         return true;
+    }
+
+    /**
+     * Calculates default price scale based on graph source.
+     *
+     * @return default price scale
+     */
+    private double calculateDefaultPriceScale() {
+        double defaultPriceScale;
+
+        // Heuristic for a starting value for the default price scale
+        Graphable graphable = getSource().getGraphable();
+        double[] values = graphable.toArray();
+        defaultPriceScale = QuoteFunctions.sd(values, 1, values.length) / 2;
+        defaultPriceScale = QuoteFunctions.roundDouble(defaultPriceScale, 2);
+        return defaultPriceScale;
+    }
+
+    public void setSettings(HashMap settings) {
+        super.setSettings(settings);
+
+        // Calculate default price scale from data
+        double defaultPriceScale = calculateDefaultPriceScale();
+
+        // Retrieve values from hashmap
+        double priceScale = PointAndFigureGraphUI.getPriceScale(settings, defaultPriceScale);
+
+	// Create point and figure graphable
+	pointAndFigure = createPointAndFigureGraph(getSource().getGraphable(), priceScale);
+    }
+
+    /**
+     * Return the graph's user interface.
+     *
+     * @param settings the initial settings
+     * @return user interface
+     */
+    public GraphUI getUI(HashMap settings) {
+        return new PointAndFigureGraphUI(settings, calculateDefaultPriceScale());
     }
 }
 

@@ -233,9 +233,9 @@ public class ChartModule extends JPanel implements Module,
     }
 
     /**
-     * Returns the window title.
+     * Return the window title.
      *
-     * @return	the window title.
+     * @return	the window title
      */
     public String getTitle() {
 	return chart.getTitle();
@@ -382,7 +382,7 @@ public class ChartModule extends JPanel implements Module,
     /**
      * Return frame icon for chart module.
      *
-     * @return	the frame icon.
+     * @return	the frame icon
      */
     public ImageIcon getFrameIcon() {
 	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/GraphIcon.gif"));
@@ -398,7 +398,8 @@ public class ChartModule extends JPanel implements Module,
     }
 
     /**
-     * Tell chart to save any current state data.
+     * Tell module to save any current state data / preferences data because
+     * the window is being closed.
      */
     public void save() { }
 

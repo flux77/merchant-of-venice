@@ -11,6 +11,23 @@ import javax.swing.*;
 import org.mov.main.*;
 import org.mov.util.*;
 
+/**
+ * The charting module for venice. This class provides the user interface
+ * used to draw any of the required charts.
+ * Example:
+ * <pre>
+ *	AnalyserChart chart = new AnalyserChart(desktop);
+ *	chart.add(graph, 0); 
+ *	chart.redraw(); 
+ *
+ *	// Create a frame around the module and add to the desktop
+ *	AnalyserFrame frame = new AnalyserFrame(chart, 0, 0, 400, 300);
+ *	desktop.add(frame);
+ * </pre>
+ *
+ * @see Graph
+ */
+
 public class AnalyserChart extends JPanel implements AnalyserModule,
 						     MouseListener,
 						     MouseMotionListener,
@@ -42,6 +59,11 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
 
     private JDesktopPane desktop;
 
+    /**
+     * Create a new AnalyserChart.
+     *
+     * @param	desktop	the parent desktop.
+     */
     public AnalyserChart(JDesktopPane desktop) {
 
 	this.desktop = desktop;
@@ -99,11 +121,22 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
 	add(toolBar, BorderLayout.WEST);
     }
 
+    /**
+     * Redraw the current display.
+     */
     public void redraw() {
 	chart.resetBuffer();
 	chart.repaint();       
     }
 
+    /**
+     * Add a new graph at the specific index. The chart is made up of
+     * a series of rows of graphs. The index specifies which row to 
+     * place the graph in
+     *
+     * @param	graph	the new graph to add. 
+     * @param	index	graph row to add the new graph.
+     */
     public void add(Graph graph, int index) {
 
 	// Add graph to chart
@@ -115,25 +148,53 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
 	menuBar.add(menu);
     }
 
+    /** 
+     * Add the graph at the specified index. This is identical to
+     * the add method except that it does not add a new menu for the
+     * graph.
+     *
+     * @param	graph	The new graph to add.
+     * @param	index	Offset from the top of the display.
+     * @see	#add
+     */
     public void append(Graph graph, int index) {
 	// Add graph to chart at given index, redraw chart but dont add it 
 	// to menu as it is already there
 	chart.add(graph, index);
     }
 
+    /**
+     * Create a new row and add the graph. This is identical to the
+     * add method except that it does not add a new menu for the
+     * graph.
+     *
+     * @param	graph	the new graph to add.
+     * @see	#add
+     */
     public void append(Graph graph) {
 	// Add graph to chart at new index, redraw chart but dont add it to 
 	// menu as it is already there
 	append(graph, chart.getLevels().size());
     }
 
+    /**
+     * Remove the graph from the chart. Currently does not remove the
+     * menu for the appropriate symbol. Probably should.
+     *
+     * @param	graph	the graph to remove.
+     */
     public void remove(Graph graph) {
 	// Remove graph from chart, redraw chart and dont remove any
 	// menus
 	chart.remove(graph);
     }
 
-    // Removes all graphs with the given symbol
+    /**
+     * Remove all graphs with the given symbol from the chart. Or will
+     * do when its implemented.
+     *
+     * @param symbol	The symbol of the graphs to remove.
+     */
     public void removeAll(String symbol) {
 
 	/*
@@ -157,35 +218,84 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
 	redraw();
     }
 
-    // Record whether the given graph should have its annotations
-    // displayed or not
+    /** 
+     * Record whether the given graph should have its annotations
+     * displayed or not. Annotations are little popup text notes that
+     * contain information about the graph, such as buy/sell suggestions. 
+     *
+     * @param	graph	the graph to change annotations for.
+     * @param	enabled	set to true if the graph should handle annotations
+     *			false otherwise.	
+     */
     public void handleAnnotation(Graph graph, boolean enabled) {
 	chart.handleAnnotation(graph, enabled);
     }
 
+    /**
+     * Returns the window title.
+     *
+     * @return	the window title.
+     */
     public String getTitle() {
 	return chart.getTitle();
     }
 
+    /**
+     * Add a property change listener for module change events.
+     *
+     * @param	listener	listener
+     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
     }
 
+    /**
+     * Remove a property change listener for module change events.
+     *
+     * @param	listener	listener
+     */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
     }
 
+    /**
+     * Return displayed component for this module.
+     *
+     * @return the component to display.
+     */
     public JComponent getComponent() {
 	return this;
     }
 
+    /**
+     * Called when a mouse click event is received. 
+     *
+     * @param	e	mouse event
+     */
     public void mouseClicked(MouseEvent e) { 
 	chart.clearHighlightedRegion();
 	zoomIn.setEnabled(zoomInEnabled = false);
     }
+
+    /**
+     * Called when a mouse enter event is received. 
+     *
+     * @param	e	mouse event
+     */
     public void mouseEntered(MouseEvent e) {}
+
+    /**
+     * Called when a mouse exit event is received. 
+     *
+     * @param	e	mouse event
+     */
     public void mouseExited(MouseEvent e) {}
 
+    /**
+     * Called when a mouse press event is received. 
+     *
+     * @param	e	mouse event
+     */
     public void mousePressed(MouseEvent e) {
 	TradingDate date = chart.getDateAtPoint(e.getX());
 
@@ -193,8 +303,18 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
 	    chart.setHighlightedRegionStart(date);
     }
 
+    /**
+     * Called when a mouse release event is received. 
+     *
+     * @param	e	mouse event
+     */
     public void mouseReleased(MouseEvent e) { }
 
+    /**
+     * Called when a mouse drag event is received. 
+     *
+     * @param	e	mouse event
+     */
     public void mouseDragged(MouseEvent e) {
 	TradingDate date = chart.getDateAtPoint(e.getX());
 
@@ -205,8 +325,18 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
 	zoomIn.setEnabled(zoomInEnabled = true);
     }
 
+    /**
+     * Called when a mouse move event is received. 
+     *
+     * @param	e	mouse event
+     */
     public void mouseMoved(MouseEvent e) {}
 
+    /**
+     * Handle widget events.
+     *
+     * @param	e	action event
+     */
     public void actionPerformed(ActionEvent e) {
 
 	if(e.getSource() == zoomIn) {
@@ -239,19 +369,34 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
 
     }
 
+    /**
+     * Return menu bar for chart module.
+     *
+     * @return	the menu bar.
+     */
     public JMenuBar getJMenuBar() {
 	return menuBar;
     }
 
+    /**
+     * Return frame icon for chart module.
+     *
+     * @return	the frame icon.
+     */
     public ImageIcon getFrameIcon() {
 	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/GraphIcon.gif"));
     }
 
+    /**
+     * Return whether the module should be enclosed in a scroll pane.
+     *
+     * @return	enclose module in scroll bar
+     */
     public boolean encloseInScrollPane() {
 	return false;
     }
 
-    public class Menu extends JMenu implements ActionListener {
+    private class Menu extends JMenu implements ActionListener {
 
 	// Graphs
 	private static final String DAY_HIGH       = "Day High";

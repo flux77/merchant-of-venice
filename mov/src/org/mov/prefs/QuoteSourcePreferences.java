@@ -380,6 +380,5 @@ public class QuoteSourcePreferences extends JPanel
 
 	// This makes the next query use our new settings
 	Quote.flush();
-
     }
 }

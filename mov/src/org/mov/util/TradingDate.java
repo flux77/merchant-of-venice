@@ -18,8 +18,13 @@
 
 package org.mov.util;
 
-import java.util.*;
-import java.util.regex.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A replacement date for java.util.Date, java.util.Calendar & 
@@ -262,8 +267,7 @@ public class TradingDate implements Cloneable, Comparable {
      * @return	a clone of this date
      */
     public Object clone() {
-	return (Object)(new TradingDate(getYear(), getMonth(), 
-					getDay()));
+	return (Object)(new TradingDate(getYear(), getMonth(), getDay()));
     }
 
     /**
@@ -449,14 +453,15 @@ public class TradingDate implements Cloneable, Comparable {
      */
     public static String monthToText(int month) {
 	String months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-			   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-	
+			   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};	
 	month--;
 
 	if(month < months.length && month >= 0)
 	    return months[month];
-	else
+	else {
+            assert false;
 	    return "Dec";
+        }
     }
 
     /**
@@ -487,6 +492,8 @@ public class TradingDate implements Cloneable, Comparable {
      * @return	a four digit year
      */
     public static int twoToFourDigitYear(int year) {
+        assert year >= 0 && year < 100;
+
 	// Convert year from 2 digit to 4 digit
 	if(year > 30)
 	    year += 1900;
@@ -494,6 +501,30 @@ public class TradingDate implements Cloneable, Comparable {
 	    year += 2000;
 
 	return year;
+    }
+
+    /**
+     * Convert a start and end date to a list of all the trading
+     * dates inbetween which do not fall on weekends.
+     *
+     * @param	startDate	the start date of the range
+     * @param	endDate		the end date of the range
+     * @return	a list of all the trading dates inbetween
+     */
+    public static List dateRangeToList(TradingDate startDate,
+                                       TradingDate endDate) {
+        assert(startDate != null && endDate != null &&
+               startDate.compareTo(endDate) <= 0);
+
+	List dates = new ArrayList();
+	TradingDate date = (TradingDate)startDate.clone();
+
+	while(!date.after(endDate)) {
+	    dates.add(date);
+	    date = date.next(1);
+	}
+
+	return dates;
     }
 }
 

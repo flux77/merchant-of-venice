@@ -4,6 +4,8 @@ import java.awt.*;
 import java.beans.*;
 import javax.swing.*;
 
+import org.liquid.misc.ProgressBar;
+
 /** 
  * Singleton progress window for displaying task progress to the user.
  * <p>
@@ -61,7 +63,7 @@ public class Progress {
 
     private JDesktopPane desktop = null;
     private JInternalFrame frame = null;
-    private JProgressBar progress = null;
+    private ProgressBar progress = null;
     private JLabel label = null;
     private int maximum;
 
@@ -151,7 +153,7 @@ public class Progress {
 
 	if(frame == null) {
 	    progress = 
-		new JProgressBar(JProgressBar.HORIZONTAL, 0, maximum);
+		new ProgressBar(0, maximum);
 	    label = new JLabel(message);	    
 
 	    this.maximum = maximum;
@@ -195,6 +197,7 @@ public class Progress {
     public void close(boolean owner) {
 	if(owner && frame != null) {
 	    try {
+		progress.completed();
 		frame.setClosed(true);
 		frame = null;
 	    }

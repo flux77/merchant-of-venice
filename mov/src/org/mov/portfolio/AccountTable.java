@@ -25,6 +25,7 @@ import java.util.List;
 import org.mov.ui.AbstractTable;
 import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.quote.MissingQuoteException;
@@ -92,7 +93,7 @@ public class AccountTable extends AbstractTable {
 	    else {
 		switch(column) {
 		case(ACCOUNT_COLUMN):
-		    return "Total";
+		    return Locale.getString("TOTAL");
 		    
 		case(VALUE_COLUMN):
 		    // Sum values of all accounts
@@ -128,8 +129,14 @@ public class AccountTable extends AbstractTable {
      */
     public AccountTable(Portfolio portfolio, QuoteBundle quoteBundle) {
         List columns = new ArrayList();
-        columns.add(new Column(ACCOUNT_COLUMN, "Account", "Account", String.class, Column.VISIBLE));
-        columns.add(new Column(VALUE_COLUMN, "Value", "Value", Money.class, Column.VISIBLE));
+        columns.add(new Column(ACCOUNT_COLUMN, 
+			       Locale.getString("ACCOUNT"), 
+			       Locale.getString("ACCOUNT_COLUMN_HEADER"), 
+			       String.class, Column.VISIBLE));
+        columns.add(new Column(VALUE_COLUMN, 
+			       Locale.getString("VALUE"), 
+			       Locale.getString("VALUE_COLUMN_HEADER"), 
+			       Money.class, Column.VISIBLE));
 
 	setModel(new Model(columns, portfolio, quoteBundle));
     }

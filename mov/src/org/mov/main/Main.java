@@ -21,14 +21,15 @@ package org.mov.main;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import java.util.prefs.Preferences;
 import javax.swing.JDesktopPane;
 import javax.swing.UIManager;
 import javax.swing.JFrame;
+
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
+import org.mov.util.Locale;
 
 /**
  * The top level class which contains the main() function. This class builds 
@@ -41,16 +42,14 @@ public class Main extends JFrame {
 
     private static Main venice;
 
-    // Release date and version information
-
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.2a";
+    public static String SHORT_VERSION = "0.29a";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION  = "0.2 alpha";
+    public static String LONG_VERSION  = "0.29 alpha";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE  = "24/Aug/2003";
+    public static String RELEASE_DATE  = "17/Jan/2004";
 
     /**
      * Get the main frame for the current application
@@ -63,13 +62,15 @@ public class Main extends JFrame {
     // Go!
     private Main() {
         // Display a brief copyright message
-        String title = "Merchant of Venice, " + LONG_VERSION + " / " + RELEASE_DATE;
+        String title = (Locale.getString("VENICE_LONG") + ", " + LONG_VERSION + " / " +
+			RELEASE_DATE);
         System.out.println(title);
         for(int i = 0; i < title.length(); i++)
             System.out.print("-");
         System.out.println("");
-        System.out.println("Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)");
-        System.out.println("See COPYING.txt for license terms.");
+        System.out.println(Locale.getString("COPYRIGHT", "2003") + ", " +
+			   "Andrew Leppard (aleppard@picknowl.com.au)");
+        System.out.println(Locale.getString("SEE_LICENSE"));
 
 	Preferences p = PreferencesManager.getUserNode("/display");
 	setSize(p.getInt("default_width", 800),
@@ -77,7 +78,7 @@ public class Main extends JFrame {
 	setLocation(p.getInt("default_x", 0),
 		    p.getInt("default_y", 0));
 
-	setTitle("Venice " + SHORT_VERSION);
+	setTitle(Locale.getString("VENICE_SHORT") + " " + SHORT_VERSION);
 
 	desktop = new JDesktopPane();
 	desktopManager = new org.mov.ui.DesktopManager(desktop);

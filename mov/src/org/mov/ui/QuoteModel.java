@@ -28,6 +28,7 @@ import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
+import org.mov.util.Locale;
 
 public class QuoteModel extends AbstractTableModel {
     private QuoteBundle quoteBundle;
@@ -57,25 +58,45 @@ public class QuoteModel extends AbstractTableModel {
         this.quotes = quotes;
 
         List columns = new ArrayList();
-        columns.add(new Column(SYMBOL_COLUMN, "Symbol", "Symbol",
-                               Symbol.class, displaySymbol));
-        columns.add(new Column(DATE_COLUMN, "Date", "Date",
+        columns.add(new Column(SYMBOL_COLUMN, 
+			       Locale.getString("SYMBOL"),
+			       Locale.getString("SYMBOL_COLUMN_HEADER"),
+			       Symbol.class, displaySymbol));
+        columns.add(new Column(DATE_COLUMN, 
+			       Locale.getString("DATE"), 
+			       Locale.getString("DATE_COLUMN_HEADER"),
                                Symbol.class, displayDate));
-        columns.add(new Column(VOLUME_COLUMN, "Volume", "Volume",
+        columns.add(new Column(VOLUME_COLUMN, 
+			       Locale.getString("VOLUME"), 
+			       Locale.getString("VOLUME_COLUMN_HEADER"),
                                Integer.class, Column.VISIBLE));
-        columns.add(new Column(DAY_LOW_COLUMN, "Day Low", "Day Low",
+        columns.add(new Column(DAY_LOW_COLUMN, 
+			       Locale.getString("DAY_LOW"), 
+			       Locale.getString("DAY_LOW_COLUMN_HEADER"),
                                QuoteFormat.class, Column.VISIBLE));
-        columns.add(new Column(DAY_HIGH_COLUMN, "Day High", "Day High",
+        columns.add(new Column(DAY_HIGH_COLUMN, 
+			       Locale.getString("DAY_HIGH"), 
+			       Locale.getString("DAY_HIGH_COLUMN_HEADER"),
                                QuoteFormat.class, Column.VISIBLE));
-        columns.add(new Column(DAY_OPEN_COLUMN, "Day Open", "Day Open",
+        columns.add(new Column(DAY_OPEN_COLUMN, 
+			       Locale.getString("DAY_OPEN"), 
+			       Locale.getString("DAY_OPEN_COLUMN_HEADER"),
                                QuoteFormat.class, Column.VISIBLE));
-        columns.add(new Column(DAY_CLOSE_COLUMN, "Day Close", "Day Close",
+        columns.add(new Column(DAY_CLOSE_COLUMN, 
+			       Locale.getString("DAY_CLOSE"), 
+			       Locale.getString("DAY_CLOSE_COLUMN_HEADER"),
                                QuoteFormat.class, Column.VISIBLE));
-        columns.add(new Column(POINT_CHANGE_COLUMN, "Point Change", "+/-",
+        columns.add(new Column(POINT_CHANGE_COLUMN, 
+			       Locale.getString("POINT_CHANGE"),
+			       Locale.getString("POINT_CHANGE_COLUMN_HEADER"),
                                PointChangeFormat.class, Column.HIDDEN));
-        columns.add(new Column(PERCENT_CHANGE_COLUMN, "Percent Change", "Change",
-                               ChangeFormat.class, Column.VISIBLE));
-        columns.add(new Column(ACTIVITY_COLUMN, "Activity", "Act",
+        columns.add(new Column(PERCENT_CHANGE_COLUMN, 
+			       Locale.getString("PERCENT_CHANGE"), 
+			       Locale.getString("PERCENT_CHANGE_COLUMN_HEADER"),
+			       ChangeFormat.class, Column.VISIBLE));
+	columns.add(new Column(ACTIVITY_COLUMN, 
+			       Locale.getString("ACTIVITY"), 
+			       Locale.getString("ACTIVITY_COLUMN_HEADER"),
                                Integer.class, Column.ALWAYS_HIDDEN));
         setColumns(columns);
 
@@ -191,7 +212,7 @@ public class QuoteModel extends AbstractTableModel {
         Thread thread = Thread.currentThread();
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setIndeterminate(true);
-        progress.show("Applying Equations");
+        progress.show(Locale.getString("APPLYING_EQUATIONS"));
 
         this.equationColumns = equationColumns;
 
@@ -231,7 +252,7 @@ public class QuoteModel extends AbstractTableModel {
                 public void run() {
                     JOptionPane.showInternalMessageDialog(DesktopManager.getDesktop(),
                                                           message + ".",
-                                                          "Error evaluating equations",
+                                                          Locale.getString("ERROR_EVALUATING_EQUATIONS"),
                                                           JOptionPane.ERROR_MESSAGE);
                 }
             });
@@ -242,8 +263,9 @@ public class QuoteModel extends AbstractTableModel {
 
         for(int i = 0; i < equationColumns.length; i++)
             equationColumns[i] = new EquationColumn(columnNumber++, 
-                                                    "Equation " + (i + 1),
-                                                    "Eqn." + (i + 1),
+						    Locale.getString("EQUATION_NUMBER", (i + 1)),
+						    Locale.getString("EQUATION_COLUMN_HEADER", 
+								     (i + 1)),
                                                     Column.HIDDEN,
                                                     "",
                                                     null);

@@ -41,6 +41,7 @@ import javax.swing.table.TableCellRenderer;
 import org.mov.parser.EvaluationException;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
@@ -192,7 +193,7 @@ public class AbstractTable extends SortedTable {
     protected JMenu createShowColumnMenu(AbstractTableModel model) {
         boolean foundEquationColumn = false;
 
-        JMenu showColumnsMenu = new JMenu("Show Columns");
+        JMenu showColumnsMenu = new JMenu(Locale.getString("SHOW_COLUMNS"));
         showEquationColumnMenuItems = new ArrayList();
 
         for(int i = 0; i < model.getColumnCount(); i++) {

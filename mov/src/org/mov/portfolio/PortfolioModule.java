@@ -45,7 +45,10 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 
 import org.mov.main.*;
-import org.mov.util.*;
+import org.mov.util.Locale;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 import org.mov.prefs.*;
 import org.mov.table.*;
 import org.mov.quote.*;
@@ -109,22 +112,21 @@ public class PortfolioModule extends JPanel implements Module,
     // create new menu for this module
     private void createMenu() {
 	menuBar = new JMenuBar();
-
-	JMenu portfolioMenu = MenuHelper.addMenu(menuBar, "Portfolio", 'P');
+	JMenu portfolioMenu = MenuHelper.addMenu(menuBar, Locale.getString("PORTFOLIO"), 'P');
 	{
 	    portfolioGraph =
 		MenuHelper.addMenuItem(this, portfolioMenu,
-				       "Graph");
+				       Locale.getString("GRAPH"));
 
 	    portfolioMenu.addSeparator();
 
 	    portfolioExport = 
 		MenuHelper.addMenuItem(this, portfolioMenu,
-				       "Export");
+				       Locale.getString("EXPORT"));
 
 	    portfolioImport = 
 		MenuHelper.addMenuItem(this, portfolioMenu,
-				       "Import");
+				       Locale.getString("IMPORT"));
 
             // If the portfolio is transient it won't be saved anyway - so
             // you can't delete or rename it.
@@ -132,37 +134,37 @@ public class PortfolioModule extends JPanel implements Module,
                 portfolioMenu.addSeparator();
                 
                 portfolioDelete = MenuHelper.addMenuItem(this, portfolioMenu, 
-                                                         "Delete");
+                                                         Locale.getString("DELETE"));
 
                 portfolioRename = MenuHelper.addMenuItem(this, portfolioMenu, 
-                                                         "Rename");
+                                                         Locale.getString("RENAME"));
             }
 
             portfolioMenu.addSeparator();
 
 	    portfolioClose = MenuHelper.addMenuItem(this, portfolioMenu, 
-						    "Close");
+						    Locale.getString("CLOSE"));
 	}
 
-	JMenu accountMenu = MenuHelper.addMenu(menuBar, "Account", 'A');
+	JMenu accountMenu = MenuHelper.addMenu(menuBar, Locale.getString("ACCOUNT"), 'A');
 	{
 	    accountNewCashAccount = 
 		MenuHelper.addMenuItem(this, accountMenu,
-				       "New Cash Account");
+				       Locale.getString("NEW_CASH_ACCOUNT"));
 	    accountNewShareAccount = 
 		MenuHelper.addMenuItem(this, accountMenu,
-				       "New Share Account");
+				       Locale.getString("NEW_SHARE_ACCOUNT"));
 	}
 
 	JMenu transactionMenu = 
-	    MenuHelper.addMenu(menuBar, "Transaction", 'T');
+	    MenuHelper.addMenu(menuBar, Locale.getString("TRANSACTION"), 'T');
 	{
 	    transactionNew = 
 		MenuHelper.addMenuItem(this, transactionMenu,
-				       "New");
+				       Locale.getString("NEW"));
 	    transactionShowHistory = 
 		MenuHelper.addMenuItem(this, transactionMenu,
-				       "Show History");
+				       Locale.getString("SHOW_HISTORY"));
 	}
 
 	// Make sure appropriate menus are enabled or disabled
@@ -196,7 +198,7 @@ public class PortfolioModule extends JPanel implements Module,
 	// If the portfolio is empty display a label saying "Empty"
 	// otherwise display the portfolio
 	if(accounts.size() == 0) {
-	    addLabel("Empty");
+	    addLabel(Locale.getString("EMPTY"));
 	}
 	else {
 	    
@@ -223,7 +225,7 @@ public class PortfolioModule extends JPanel implements Module,
 	    }
 	    
 	    // Now add summary containing all accounts including total
-	    addLabel("Summary");
+	    addLabel(Locale.getString("SUMMARY"));
 	    
 	    accountTable =
 		new AccountTable(portfolio, quoteBundle);
@@ -447,7 +449,7 @@ public class PortfolioModule extends JPanel implements Module,
     private void graphPortfolio() {
         // Can only graph if there are shares in the portfolio...
         if(portfolio.getStartDate() == null) 
-            DesktopManager.showErrorMessage("Nothing to graph!");
+            DesktopManager.showErrorMessage(Locale.getString("NOTHING_TO_GRAPH"));
         else {
             // If this portfolio has been given to us from a paper trade we will
             // also get a fully loaded quote bundle ready for graphing.
@@ -468,8 +470,8 @@ public class PortfolioModule extends JPanel implements Module,
 
 	int option = 
 	    JOptionPane.showInternalConfirmDialog(desktop,
-						  "Are you sure you wish to delete this portfolio?",
-						  "Delete Portfolio",
+						  Locale.getString("SURE_DELETE_PORTFOLIO"),
+						  Locale.getString("DELETE_PORTFOLIO"),
 						  JOptionPane.YES_NO_OPTION);
 	if(option == JOptionPane.YES_OPTION) {
 	    PreferencesManager.deletePortfolio(portfolio.getName());
@@ -493,8 +495,8 @@ public class PortfolioModule extends JPanel implements Module,
 
         // Get new name for portfolio
 	TextDialog dialog = new TextDialog(desktop,
-					   "Enter new portfolio name",
-					   "Rename Portfolio",
+					   Locale.getString("ENTER_NEW_PORTFOLIO_NAME"),
+					   Locale.getString("RENAME_PORTFOLIO"),
                                            oldPortfolioName);
 	String newPortfolioName = dialog.showDialog();
 
@@ -543,8 +545,8 @@ public class PortfolioModule extends JPanel implements Module,
 	
 	    }
 	    catch(java.io.IOException e) {
-		DesktopManager.showErrorMessage("Error writing to file: " +
-                                                fileName);
+		DesktopManager.showErrorMessage(Locale.getString("ERROR_WRITING_TO_FILE",
+								 fileName));
 	    }
 	}
     }
@@ -645,16 +647,16 @@ public class PortfolioModule extends JPanel implements Module,
 		}
 	    }
 	    catch(TradingDateFormatException e) {
-		DesktopManager.showErrorMessage("Error reading from file: " +
-                                                fileName);
+		DesktopManager.showErrorMessage(Locale.getString("ERROR_READING_FROM_FILE",
+								 fileName));
             }
 
 	    catch(IOException e) {
-		DesktopManager.showErrorMessage("Error reading from file: " +
-                                                fileName);
+		DesktopManager.showErrorMessage(Locale.getString("ERROR_READING_FROM_FILE",
+								 fileName));
 	    }
             catch(SymbolFormatException e) {
-                DesktopManager.showErrorMessage("Error parsing symbol.\n" +
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_PARSING)SYMBOL") + "\n" +
                                                 e.getReason());
             }
 	}
@@ -666,8 +668,8 @@ public class PortfolioModule extends JPanel implements Module,
     // Create a new cash account
     private void newCashAccount() {
 	TextDialog dialog = 
-	    new TextDialog(desktop, "Enter account name",
-			   "New Cash Account");
+	    new TextDialog(desktop, Locale.getString("ENTER_ACCOUNT_NAME"),
+			   Locale.getString("NEW_CASH_ACCOUNT"));
 
 	String accountName = dialog.showDialog();
 
@@ -683,8 +685,8 @@ public class PortfolioModule extends JPanel implements Module,
     // Create a new share account
     private void newShareAccount() {
 	TextDialog dialog = 
-	    new TextDialog(desktop, "Enter account name",
-			   "New Share Account");
+	    new TextDialog(desktop, Locale.getString("ENTER_ACCOUNT_NAME"),
+			   Locale.getString("NEW_SHARE_ACCOUNT"));
 	String accountName = dialog.showDialog();
 	
 	if(accountName != null && accountName.length() > 0) {

@@ -29,6 +29,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import org.mov.main.*;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.quote.*;
@@ -174,9 +175,9 @@ public class TransactionModule extends AbstractTable implements Module,
 
 	case(Transaction.TRANSFER):
 	    transactionString = 
-		transactionString.concat(" from " +
+		transactionString.concat(" " + Locale.getString("FROM") + " " +
 					 transaction.getCashAccount().getName() +
-					 " to " +
+					 " " + Locale.getString("TO") + " " +
 					 transaction.getCashAccount2().getName());
 
 	    break;
@@ -194,11 +195,14 @@ public class TransactionModule extends AbstractTable implements Module,
 			     final Portfolio portfolio) {
 
         List columns = new ArrayList();
-        columns.add(new Column(DATE_COLUMN, "Date", "Date", TradingDate.class, Column.VISIBLE));
-        columns.add(new Column(TRANSACTION_COLUMN, "Transaction", "Transaction", String.class, 
-                               Column.VISIBLE));
-        columns.add(new Column(CREDIT_COLUMN, "Credit", "Credit", Money.class, Column.VISIBLE));
-        columns.add(new Column(CREDIT_COLUMN, "Debit", "Debit", Money.class, Column.VISIBLE));
+        columns.add(new Column(DATE_COLUMN, Locale.getString("DATE"), Locale.getString("DATE"), 
+			       TradingDate.class, Column.VISIBLE));
+        columns.add(new Column(TRANSACTION_COLUMN, Locale.getString("TRANSACTION"), 
+			       Locale.getString("TRANSACTION"), String.class, Column.VISIBLE));
+        columns.add(new Column(CREDIT_COLUMN, Locale.getString("CREDIT"), 
+			       Locale.getString("CREDIT"), Money.class, Column.VISIBLE));
+        columns.add(new Column(CREDIT_COLUMN, Locale.getString("DEBIT"), 
+			       Locale.getString("DEBIT"), Money.class, Column.VISIBLE));
 
 	this.portfolioModule = portfolioModule;
 	this.portfolio = portfolio;
@@ -237,11 +241,11 @@ public class TransactionModule extends AbstractTable implements Module,
             JPopupMenu menu = new JPopupMenu();
 
             popupTransactionNew = 
-                MenuHelper.addMenuItem(this, menu, "New");
+                MenuHelper.addMenuItem(this, menu, Locale.getString("NEW"));
             popupTransactionEdit = 
-                MenuHelper.addMenuItem(this, menu, "Edit");
+                MenuHelper.addMenuItem(this, menu, Locale.getString("EDIT"));
             popupTransactionDelete = 
-                MenuHelper.addMenuItem(this, menu, "Delete");
+                MenuHelper.addMenuItem(this, menu, Locale.getString("DELETE"));
 
             int numberOfSelectedRows = getSelectedRowCount();
 
@@ -267,25 +271,25 @@ public class TransactionModule extends AbstractTable implements Module,
     private void createMenu() {
 	menuBar = new JMenuBar();
 
-	JMenu transactionMenu = MenuHelper.addMenu(menuBar, "Transaction", 'T');
+	JMenu transactionMenu = MenuHelper.addMenu(menuBar, Locale.getString("TRANSACTION"), 'T');
 	{
 	    transactionNew =
-		MenuHelper.addMenuItem(this, transactionMenu,
-				       "New");
+                MenuHelper.addMenuItem(this, transactionMenu,
+				       Locale.getString("NEW"));
 
 	    transactionEdit =
 		MenuHelper.addMenuItem(this, transactionMenu,
-				       "Edit");
+				       Locale.getString("EDIT"));
 
 	    transactionDelete =
 		MenuHelper.addMenuItem(this, transactionMenu,
-				       "Delete");
+				       Locale.getString("DELETE"));
 
 	    transactionMenu.addSeparator();
 
 	    transactionClose =
 		MenuHelper.addMenuItem(this, transactionMenu,
-				       "Close");
+				       Locale.getString("CLOSE"));
 	}
 
 	checkMenuDisabledStatus();
@@ -314,7 +318,7 @@ public class TransactionModule extends AbstractTable implements Module,
     }
 
     public String getTitle() {
-	return portfolio.getName() + " Transactions";
+	return Locale.getString("TRANSACTION_HISTORY_TITLE", portfolio.getName());
     }
 
     /**
@@ -410,8 +414,8 @@ public class TransactionModule extends AbstractTable implements Module,
 	
 	int option = 
 	    JOptionPane.showInternalConfirmDialog(desktop,
-						  "Are you sure you wish to delete the selected transactions?",
-						  "Delete Transactions",
+						  Locale.getString("SURE_DELETE_TRANSACTIONS"),
+						  Locale.getString("DELETE_TRANSACTIONS"),
 						  JOptionPane.YES_NO_OPTION);
 	if(option == JOptionPane.YES_OPTION) {
 	    // Update display

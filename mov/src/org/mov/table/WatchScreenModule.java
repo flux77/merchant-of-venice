@@ -44,6 +44,7 @@ import javax.swing.event.TableModelListener;
 import org.mov.main.CommandManager;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.MissingQuoteException;
@@ -145,22 +146,22 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
         // Right click on the table - raise menu
         if(event.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu menu = new JPopupMenu();
-
+	    
             popupGraphSymbols =
                 MenuHelper.addMenuItem(this, menu,
-                                       "Graph");
+                                       Locale.getString("GRAPH"));
             popupGraphSymbols.setEnabled(getSelectedRowCount() > 0);
 
             popupTableSymbols =
                 MenuHelper.addMenuItem(this, menu,
-                                       "Table");
+                                       Locale.getString("TABLE"));
             popupTableSymbols.setEnabled(getSelectedRowCount() > 0);
 
             menu.addSeparator();
 
             popupRemoveSymbols =
                 MenuHelper.addMenuItem(this, menu,
-                                       "Remove");
+                                       Locale.getString("REMOVE"));
             popupRemoveSymbols.setEnabled(getSelectedRowCount() > 0);
 
             menu.show(this, point.x, point.y);
@@ -188,7 +189,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
         // Watch Screen Menu
         {
-            JMenu tableMenu = MenuHelper.addMenu(menuBar, "Watch Screen");
+            JMenu tableMenu = MenuHelper.addMenu(menuBar, Locale.getString("WATCH_SCREEN"));
             
             // Show columns menu
             tableMenu.add(createShowColumnMenu(model));
@@ -196,41 +197,41 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             tableMenu.addSeparator();
 
             applyEquationsMenuItem = MenuHelper.addMenuItem(this, tableMenu,
-                                                            "Apply Equations");
+                                                            Locale.getString("APPLY_EQUATIONS"));
 
             tableMenu.addSeparator();
             
             deleteWatchScreen = MenuHelper.addMenuItem(this, tableMenu,
-                                                       "Delete");
+                                                       Locale.getString("DELETE"));
             
             renameWatchScreen = MenuHelper.addMenuItem(this, tableMenu,
-                                                       "Rename");
+                                                       Locale.getString("RENAME"));
             
             tableMenu.addSeparator();
             
             tableClose = MenuHelper.addMenuItem(this, tableMenu,
-					    "Close");	
+						Locale.getString("CLOSE"));	
         }
 
         // Symbol Menu
         {
-            JMenu symbolsMenu = MenuHelper.addMenu(menuBar, "Symbols");
+            JMenu symbolsMenu = MenuHelper.addMenu(menuBar, Locale.getString("SYMBOLS"));
 
             addSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
-                                       "Add");
+                                       Locale.getString("ADD"));
             removeSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
-                                       "Remove");
+                                       Locale.getString("REMOVE"));
 
             symbolsMenu.addSeparator();
             
             graphSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
-                                       "Graph");
+                                       Locale.getString("GRAPH"));
             tableSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
-                                       "Table");
+                                       Locale.getString("TABLE"));
         }
 
         // Listen for changes in selection so we can update the menus
@@ -409,8 +410,8 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     private void deleteWatchScreen() {
 	int option =
 	    JOptionPane.showInternalConfirmDialog(DesktopManager.getDesktop(),
-						  "Are you sure you wish to delete this watch screen?",
-						  "Delete Watch Screen",
+						  Locale.getString("SURE_DELETE_WATCH_SCREEN"),
+						  Locale.getString("DELETE_WATCH_SCREEN"),
 						  JOptionPane.YES_NO_OPTION);
 	if(option == JOptionPane.YES_OPTION) {
 	    PreferencesManager.deleteWatchScreen(watchScreen.getName());
@@ -437,8 +438,8 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
                     
                     // Get new name for watch screen
                         TextDialog dialog = new TextDialog(DesktopManager.getDesktop(),
-                                                       "Enter new watch screen name",
-                                                       "Rename Watch Screen",
+							   Locale.getString("ENTER_NEW_WATCH_SCREEN_NAME"),
+							   Locale.getString("RENAME_WATCH_SCREEN"),
                                                        oldWatchScreenName);
                     String newWatchScreenName = dialog.showDialog();
                     
@@ -470,7 +471,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
 		public void run() {
                     Set symbols = SymbolListDialog.getSymbols(DesktopManager.getDesktop(),
-                                                              "Add Symbols");
+                                                              Locale.getString("ADD_SYMBOLS"));
                     if(symbols != null) {
                         for(Iterator iterator = symbols.iterator(); iterator.hasNext();)
                             watchScreen.addSymbol((Symbol)iterator.next());

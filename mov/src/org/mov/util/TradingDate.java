@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.mov.util.Locale;
+
 /**
  * A replacement date for java.util.Date, java.util.Calendar & 
  * java.sql.Date.
@@ -503,15 +505,26 @@ public class TradingDate implements Cloneable, Comparable {
      * @return	the 3 digit month string
      */
     public static String monthToText(int month) {
-	String months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-			   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};	
+	String months[] = {Locale.getString("JAN"), 
+			   Locale.getString("FEB"), 
+			   Locale.getString("MAR"), 
+			   Locale.getString("APR"), 
+			   Locale.getString("MAY"), 
+			   Locale.getString("JUN"),
+			   Locale.getString("JUL"), 
+			   Locale.getString("AUG"), 
+			   Locale.getString("SEP"), 
+			   Locale.getString("OCT"), 
+			   Locale.getString("NOV"), 
+			   Locale.getString("DEC")};
+	
 	month--;
 
 	if(month < months.length && month >= 0)
 	    return months[month];
 	else {
             assert false;
-	    return "Dec";
+	    return Locale.getString("DEC");
         }
     }
 

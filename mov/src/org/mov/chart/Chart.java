@@ -27,7 +27,7 @@ import javax.swing.*;
 
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
-import org.mov.util.*;
+import org.mov.util.Locale;
 
 /**
  * New swing component that allows creation of charts. This charting
@@ -411,7 +411,7 @@ public class Chart extends JComponent implements MouseListener {
 	// the first few tool tips set are NULL when the cursor enters
 	// the gadget.
 	if(text == null && !toolTipBeenUp)
-	    text = "Hover cursor near graph for day quote";
+	    text = Locale.getString("HOVER_CURSOR_NEAR_GRAPH");
 	else if(!toolTipBeenUp)
 	    toolTipBeenUp = true;
 
@@ -555,9 +555,7 @@ public class Chart extends JComponent implements MouseListener {
 	TreeSet sortedSet = new TreeSet(Collator.getInstance());
 	sortedSet.addAll(symbols);
 
-	// Now construct the title "Graph of XXX, BBB, YYY"
-	String title = "Graph of";
-
+	String symbolListString = "";
 	boolean firstSymbol = true;
 	Iterator symbolIterator = sortedSet.iterator();
 
@@ -565,15 +563,16 @@ public class Chart extends JComponent implements MouseListener {
 	    String symbol = (String)symbolIterator.next();
 
 	    if(firstSymbol) {
-		title = title.concat(" " + symbol);
+		symbolListString = symbolListString.concat(" " + symbol);
 		firstSymbol = false;
 	    }
 	    else {
-		title = title.concat(", " + symbol);
+		symbolListString = symbolListString.concat(", " + symbol);
 	    }
 	}
-	
-	return title;
+
+	// Now construct the title "Graph of XXX, BBB, YYY"
+	return Locale.getString("CHART_TITLE", symbolListString);	
     }
 
     public void mouseClicked(MouseEvent e) {}

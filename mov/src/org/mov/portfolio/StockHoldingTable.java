@@ -37,6 +37,7 @@ import org.mov.ui.Column;
 import org.mov.ui.ChangeFormat;
 import org.mov.ui.PointChangeFormat;
 import org.mov.ui.QuoteFormat;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.main.CommandManager;
@@ -56,7 +57,7 @@ public class StockHoldingTable extends AbstractTable {
     private static final int SYMBOL_COLUMN = 0;
     private static final int SHARES_COLUMN = 1;
     private static final int AVERAGE_COST_COLUMN = 2;
-    private static final int DAY_CLOSE_COLUMN = 3;
+    private static final int MARKET_PRICE_COLUMN = 3;
     private static final int MARKET_VALUE_COLUMN = 4;
     private static final int POINT_CHANGE_COLUMN = 5;
     private static final int PERCENT_CHANGE_COLUMN = 6;
@@ -114,7 +115,7 @@ public class StockHoldingTable extends AbstractTable {
             case(AVERAGE_COST_COLUMN):
                 return new QuoteFormat(stockHolding.getCost());
 
-            case(DAY_CLOSE_COLUMN):
+            case(MARKET_PRICE_COLUMN):
                 try {
                     return new QuoteFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
                 }
@@ -208,21 +209,37 @@ public class StockHoldingTable extends AbstractTable {
      */
     public StockHoldingTable(HashMap stockHoldings, QuoteBundle quoteBundle) {
         List columns = new ArrayList();
-        columns.add(new Column(SYMBOL_COLUMN, "Symbol", "Symbol",
+        columns.add(new Column(SYMBOL_COLUMN, 
+			       Locale.getString("SYMBOL"), 
+			       Locale.getString("SYMBOL_COLUMN_HEADER"),
                                Symbol.class, Column.VISIBLE));
-        columns.add(new Column(SHARES_COLUMN, "Shares", "Shares",
+        columns.add(new Column(SHARES_COLUMN, 
+			       Locale.getString("SHARES"), 
+			       Locale.getString("SHARES_COLUMN_HEADER"),
                                Integer.class, Column.VISIBLE));
-        columns.add(new Column(AVERAGE_COST_COLUMN, "Average Cost per Share", "Avg Cost",
+        columns.add(new Column(AVERAGE_COST_COLUMN, 
+			       Locale.getString("AVERAGE_COST"), 
+			       Locale.getString("AVERAGE_COST_COLUMN_HEADER"), 
                                QuoteFormat.class, Column.HIDDEN));
-        columns.add(new Column(DAY_CLOSE_COLUMN, "Day Close", "Day Close",
+        columns.add(new Column(MARKET_PRICE_COLUMN, 
+			       Locale.getString("MARKET_PRICE"),
+			       Locale.getString("MARKET_PRICE_COLUMN_HEADER"),
                                QuoteFormat.class, Column.VISIBLE));
-        columns.add(new Column(MARKET_VALUE_COLUMN, "Market Value", "Mkt Value",
+        columns.add(new Column(MARKET_VALUE_COLUMN, 
+			       Locale.getString("MARKET_VALUE"),
+			       Locale.getString("MARKET_VALUE_COLUMN_HEADER"),
                                Money.class, Column.VISIBLE));
-        columns.add(new Column(POINT_CHANGE_COLUMN, "Point Change", "+/-",
+        columns.add(new Column(POINT_CHANGE_COLUMN, 
+			       Locale.getString("POINT_CHANGE"),
+			       Locale.getString("POINT_CHANGE_COLUMN_HEADER"),
                                PointChangeFormat.class, Column.HIDDEN));
-        columns.add(new Column(PERCENT_CHANGE_COLUMN, "Percent Change", "Change",
+        columns.add(new Column(PERCENT_CHANGE_COLUMN, 
+			       Locale.getString("PERCENT_CHANGE"),
+			       Locale.getString("PERCENT_CHANGE_COLUMN_HEADER"),
                                ChangeFormat.class, Column.VISIBLE));
-        columns.add(new Column(PERCENT_RETURN_COLUMN, "Percent Return", "Return",
+        columns.add(new Column(PERCENT_RETURN_COLUMN, 
+			       Locale.getString("PERCENT_RETURN"),
+			       Locale.getString("PERCENT_RETURN_COLUMN_HEADER"),
                                ChangeFormat.class, Column.HIDDEN));
 
         model = new Model(columns, stockHoldings, quoteBundle);
@@ -257,7 +274,7 @@ public class StockHoldingTable extends AbstractTable {
 
             // Graph
             {
-                JMenuItem popupGraphSymbols = new JMenuItem("Graph");
+                JMenuItem popupGraphSymbols = new JMenuItem(Locale.getString("GRAPH"));
                 popupGraphSymbols.addActionListener(new ActionListener() {
                         public void actionPerformed(final ActionEvent e) {
                             int[] selectedRows = getSelectedRows();
@@ -283,7 +300,7 @@ public class StockHoldingTable extends AbstractTable {
 
             // Table
             {
-                JMenuItem popupTableSymbols = new JMenuItem("Table");
+                JMenuItem popupTableSymbols = new JMenuItem(Locale.getString("TABLE"));
                 popupTableSymbols.addActionListener(new ActionListener() {
                         public void actionPerformed(final ActionEvent e) {
                             int[] selectedRows = getSelectedRows();

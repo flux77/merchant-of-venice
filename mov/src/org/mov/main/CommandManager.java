@@ -34,7 +34,9 @@ import org.mov.chart.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.help.*;
-import org.mov.util.*;
+import org.mov.util.ExpressionQuery;
+import org.mov.util.Locale;
+import org.mov.util.TradingDate;
 import org.mov.parser.Expression;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
@@ -115,8 +117,8 @@ public class CommandManager {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
                     String title =
-                        new String("List " +
-                                   QuoteRange.getDescription(type));
+                        new String(Locale.getString("LIST_IT",
+						    QuoteRange.getDescription(type)));
                     tableStocks(title, type, null, null, null);
                 }
             });
@@ -127,9 +129,9 @@ public class CommandManager {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
                     SortedSet symbolsCopy;
+		    String description = QuoteRange.getDescription(QuoteRange.GIVEN_SYMBOLS);
                     String title =
-                        new String("List " +
-                                   QuoteRange.getDescription(QuoteRange.GIVEN_SYMBOLS));
+                        new String(Locale.getString("LIST_IT", description));
 
                     if(symbols == null)
                         symbolsCopy = SymbolListDialog.getSymbols(desktop, title);
@@ -146,12 +148,12 @@ public class CommandManager {
     public void tableStocksByDate(final int type) {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
-                    String title = new String("List " +
-                                             QuoteRange.getDescription(type) +
-                                              " By Date");
+		    
+                    String title = new String(Locale.getString("LIST_IT_BY_DATE",
+							       QuoteRange.getDescription(type)));
                     TradingDate date = TradingDateDialog.getDate(desktop,
                                                                  title,
-                                                                 "Date");
+                                                                 Locale.getString("DATE"));
                     if(date != null)
                         tableStocks(title, type, null, null, date);
                 }
@@ -162,12 +164,11 @@ public class CommandManager {
     public void tableStocksByRule(final int type) {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
-                    String title = new String("List " +
-                                              QuoteRange.getDescription(type) +
-                                              " By Rule");
+                    String title = new String(Locale.getString("LIST_IT_BY_RULE",
+							       QuoteRange.getDescription(type)));
                     String rule = ExpressionQuery.getExpression(desktop,
                                                                 title,
-                                                                "Rule");
+                                                                Locale.getString("RULE"));
                     if(rule != null)
                         tableStocks(title, type, rule, null, null);
                 }
@@ -251,7 +252,7 @@ public class CommandManager {
                 Thread thread = Thread.currentThread();
                 ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
-                progress.show("Open " + portfolio.getName());
+                progress.show(Locale.getString("OPEN_PORTFOLIO", portfolio.getName()));
 
                 QuoteBundle quoteBundle = null;
                 TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
@@ -331,8 +332,8 @@ public class CommandManager {
     public void newWatchScreen() {
 	// Get name for watch screen
 	TextDialog dialog = new TextDialog(desktop,
-					   "Enter watch screen name",
-					   "New Watch Screen");
+					   Locale.getString("ENTER_WATCH_SCREEN_NAME"),
+					   Locale.getString("NEW_WATCH_SCREEN"));
 	String watchScreenName = dialog.showDialog();
 
         if(watchScreenName != null && watchScreenName.length() > 0) {
@@ -370,7 +371,7 @@ public class CommandManager {
                 Thread thread = Thread.currentThread();
                 ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
-                progress.show("Open " + watchScreen.getName());
+                progress.show(Locale.getString("OPEN_WATCH_SCREEN", watchScreen.getName()));
 
                 ScriptQuoteBundle quoteBundle = null;
                 TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
@@ -417,8 +418,8 @@ public class CommandManager {
     public void newPortfolio() {
 	// Get name for portfolio
 	TextDialog dialog = new TextDialog(desktop,
-					   "Enter portfolio name",
-					   "New Portfolio");
+					   Locale.getString("ENTER_PORTFOLIO_NAME"),
+					   Locale.getString("NEW_PORTFOLIO"));
 	String portfolioName = dialog.showDialog();
 
 	if(portfolioName != null && portfolioName.length() > 0) {
@@ -474,7 +475,7 @@ public class CommandManager {
 	Thread thread = Thread.currentThread();
 	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
-        progress.show("Graph " + portfolio.getName());
+        progress.show(Locale.getString("GRAPH_PORTFOLIO", portfolio.getName()));
 
         PortfolioGraphSource portfolioGraphSource = null;
         Graph graph = null;
@@ -544,8 +545,9 @@ public class CommandManager {
                     SortedSet symbolsCopy;
 
                     if(symbols == null)
-                        symbolsCopy = SymbolListDialog.getSymbols(desktop,
-                                                                  "Graph by Symbols");
+                        symbolsCopy = 
+			    SymbolListDialog.getSymbols(desktop,
+							Locale.getString("GRAPH_BY_SYMBOLS"));
                     else
                         symbolsCopy = new TreeSet(symbols);
 
@@ -601,7 +603,7 @@ public class CommandManager {
             else
                 progress.setIndeterminate(true);
 
-            progress.show("Graph " + title);
+            progress.show(Locale.getString("GRAPH_SYMBOLS", title));
 
             while(iterator.hasNext() && !thread.isInterrupted()) {
                 Symbol symbol = (Symbol)iterator.next();
@@ -634,16 +636,27 @@ public class CommandManager {
     public void openAboutDialog() {
         if(!isAboutDialogUp) {
             isAboutDialogUp = true;
-            String aboutMessage = ("Merchant of Venice, " + Main.LONG_VERSION + " / " +
+            String aboutMessage = (Locale.getString("VENICE_LONG") + ", " +
+				   Main.LONG_VERSION + " / " +
                                    Main.RELEASE_DATE + "\n\n" +
+
+				   Locale.getString("COPYRIGHT", "2003") + ", " +
+				   "Andrew Leppard\n" +
+				   Locale.getString("SEE_LICENSE") + "\n\n" +
 
                                    "Andrew Leppaprd (aleppard@picknow.com.au)\n" +
                                    "Daniel Makovec\n\n" +
+				   
+				   Locale.getString("ADDITIONAL_CODE") + "\n\n" +
 
-                                   "Copyright (C) 2003, Andrew Leppard\n" +
-                                   "See COPYING.txt for license terms.");
+				   "Matthias St\366ckel"
+				   );
 
-            JOptionPane.showInternalMessageDialog(desktop, aboutMessage, "About Venice",
+
+
+	    String aboutVenice = Locale.getString("ABOUT_VENICE",
+						  Locale.getString("VENICE_SHORT"));
+	    JOptionPane.showInternalMessageDialog(desktop, aboutMessage, aboutVenice,
                                                   JOptionPane.PLAIN_MESSAGE);
             isAboutDialogUp = false;
         }

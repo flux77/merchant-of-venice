@@ -31,6 +31,7 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 
 import org.mov.main.*;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.MoneyFormatException;
 import org.mov.util.TradingDate;
@@ -107,7 +108,7 @@ public class TransactionDialog extends JInternalFrame
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 
-	JLabel typeLabel = new JLabel("Transaction Type");
+	JLabel typeLabel = new JLabel(Locale.getString("TRANSACTION_TYPE"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(typeLabel, c);
 	mainPanel.add(typeLabel);
@@ -158,13 +159,14 @@ public class TransactionDialog extends JInternalFrame
 	TradingDate today = new TradingDate();
 
 	dateTextField = 
-	    GridBagHelper.addTextRow(mainPanel, "Date", today.toString("dd/mm/yyyy"), 
+	    GridBagHelper.addTextRow(mainPanel, Locale.getString("DATE"), 
+				     today.toString("dd/mm/yyyy"), 
                                      gridbag, c, 10);
 
 	JPanel buttonPanel = new JPanel();
-	okButton = new JButton("OK");
+	okButton = new JButton(Locale.getString("OK"));
 	okButton.addActionListener(this);
-	cancelButton = new JButton("Cancel");
+	cancelButton = new JButton(Locale.getString("CANCEL"));
 	cancelButton.addActionListener(this);
 	buttonPanel.add(okButton);
 	buttonPanel.add(cancelButton);
@@ -206,7 +208,6 @@ public class TransactionDialog extends JInternalFrame
 
 	return cashAccountComboBox; 
     }
-
 
     // Get second combo box listing cash accounts
     private JComboBox getCashAccountComboBox2() {
@@ -253,7 +254,7 @@ public class TransactionDialog extends JInternalFrame
     // Get panel displayed when user enters a dividend transaction
     private JPanel getDividendPanel() {
 	JPanel borderPanel = new JPanel();
-	TitledBorder titled = new TitledBorder("Dividend");
+	TitledBorder titled = new TitledBorder(Locale.getString("DIVIDEND_TRANSACTION"));
 	borderPanel.setBorder(titled);
 	borderPanel.setLayout(new BorderLayout());
 
@@ -267,7 +268,7 @@ public class TransactionDialog extends JInternalFrame
 	c.anchor = GridBagConstraints.WEST;
 
 	// Cash Account Line
-	JLabel cashAccountLabel = new JLabel("Cash Account");
+	JLabel cashAccountLabel = new JLabel(Locale.getString("CASH_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(cashAccountLabel, c);
 	panel.add(cashAccountLabel);
@@ -277,7 +278,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(cashAccountComboBox);
 
 	// Share Account Line
-	JLabel shareAccountLabel = new JLabel("Share Account");
+	JLabel shareAccountLabel = new JLabel(Locale.getString("SHARE_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(shareAccountLabel, c);
 	panel.add(shareAccountLabel);
@@ -287,7 +288,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(shareAccountComboBox);
 
 	// Symbol Line
-	JLabel symbolLabel = new JLabel("Symbol");
+	JLabel symbolLabel = new JLabel(Locale.getString("SYMBOL"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(symbolLabel, c);
 	panel.add(symbolLabel);
@@ -298,7 +299,8 @@ public class TransactionDialog extends JInternalFrame
 
 	// Amount Line
 	amountTextField = 
-	    GridBagHelper.addTextRow(panel, "Total Dividend Value", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, Locale.getString("TOTAL_DIVIDEND_VALUE"), 
+				     "", gridbag, c, 15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -308,7 +310,7 @@ public class TransactionDialog extends JInternalFrame
     // Get panel displayed when user enters a dividend DRP transaction
     private JPanel getDividendDRPPanel() {
 	JPanel borderPanel = new JPanel();
-	TitledBorder titled = new TitledBorder("Dividend (DRP)");
+	TitledBorder titled = new TitledBorder(Locale.getString("DIVIDEND_DRP_TRANSACTION"));
 	borderPanel.setBorder(titled);
 	borderPanel.setLayout(new BorderLayout());
 
@@ -322,7 +324,7 @@ public class TransactionDialog extends JInternalFrame
 	c.anchor = GridBagConstraints.WEST;
 
 	// Share Account Line
-	JLabel shareAccountLabel = new JLabel("Share Account");
+	JLabel shareAccountLabel = new JLabel(Locale.getString("SHARE_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(shareAccountLabel, c);
 	panel.add(shareAccountLabel);
@@ -332,7 +334,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(shareAccountComboBox);
 
 	// Symbol Line
-	JLabel symbolLabel = new JLabel("Symbol");
+	JLabel symbolLabel = new JLabel(Locale.getString("SYMBOL"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(symbolLabel, c);
 	panel.add(symbolLabel);
@@ -342,7 +344,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(symbolComboBox);
 
 	sharesTextField = 
-	    GridBagHelper.addTextRow(panel, "Shares", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, Locale.getString("SHARES"), "", gridbag, c, 15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -352,7 +354,7 @@ public class TransactionDialog extends JInternalFrame
     // Get panel displayed when user enters an accumulate transaction
     private JPanel getAccumulatePanel() {
 	JPanel borderPanel = new JPanel();
-	TitledBorder titled = new TitledBorder("Accumulate Transaction");
+	TitledBorder titled = new TitledBorder(Locale.getString("ACCUMULATE_TRANSACTION"));
 	borderPanel.setBorder(titled);
 	borderPanel.setLayout(new BorderLayout());
 
@@ -366,7 +368,7 @@ public class TransactionDialog extends JInternalFrame
 	c.anchor = GridBagConstraints.WEST;
 
 	// Cash Account Line
-	JLabel cashAccountLabel = new JLabel("Cash Account");
+	JLabel cashAccountLabel = new JLabel(Locale.getString("CASH_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(cashAccountLabel, c);
 	panel.add(cashAccountLabel);
@@ -376,7 +378,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(cashAccountComboBox);
 
 	// Share Account Line
-	JLabel shareAccountLabel = new JLabel("Share Account");
+	JLabel shareAccountLabel = new JLabel(Locale.getString("SHARE_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(shareAccountLabel, c);
 	panel.add(shareAccountLabel);
@@ -387,18 +389,19 @@ public class TransactionDialog extends JInternalFrame
 
 	// Symbol Line
 	symbolTextField = 
-	    GridBagHelper.addTextRow(panel, "Symbol", "", gridbag, c, 5);
+	    GridBagHelper.addTextRow(panel, Locale.getString("SYMBOL"), "", gridbag, c, 5);
 
 	// Number Shares Line
 	sharesTextField = 
-	    GridBagHelper.addTextRow(panel, "Shares", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, Locale.getString("SHARES"), "", gridbag, c, 15);
 
 	// Share Value Line
 	amountTextField = 
-	    GridBagHelper.addTextRow(panel, "Total Share Value", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, Locale.getString("TOTAL_SHARE_VALUE"), "", 
+				     gridbag, c, 15);
 
 	tradeCostTextField = 
-	    GridBagHelper.addTextRow(panel, "Trade Cost", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, Locale.getString("TRADE_COST"), "", gridbag, c, 15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -408,7 +411,7 @@ public class TransactionDialog extends JInternalFrame
     // Get panel displayed when user enters a reduce transaction
     private JPanel getReducePanel() {
 	JPanel borderPanel = new JPanel();
-	TitledBorder titled = new TitledBorder("Reduce Transaction");
+	TitledBorder titled = new TitledBorder(Locale.getString("REDUCE_TRANSACTION"));
 	borderPanel.setBorder(titled);
 	borderPanel.setLayout(new BorderLayout());
 
@@ -422,7 +425,7 @@ public class TransactionDialog extends JInternalFrame
 	c.anchor = GridBagConstraints.WEST;
 
 	// Cash Account Line
-	JLabel cashAccountLabel = new JLabel("Cash Account");
+	JLabel cashAccountLabel = new JLabel(Locale.getString("CASH_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(cashAccountLabel, c);
 	panel.add(cashAccountLabel);
@@ -432,7 +435,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(cashAccountComboBox);
 
 	// Share Account Line
-	JLabel shareAccountLabel = new JLabel("Share Account");
+	JLabel shareAccountLabel = new JLabel(Locale.getString("SHARE_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(shareAccountLabel, c);
 	panel.add(shareAccountLabel);
@@ -442,7 +445,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(shareAccountComboBox);
 
 	// Symbol Line
-	JLabel symbolLabel = new JLabel("Symbol");
+	JLabel symbolLabel = new JLabel(Locale.getString("SYMBOL"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(symbolLabel, c);
 	panel.add(symbolLabel);
@@ -453,14 +456,15 @@ public class TransactionDialog extends JInternalFrame
 
 	// Number Shares Line
 	sharesTextField = 
-	    GridBagHelper.addTextRow(panel, "Shares", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, Locale.getString("SHARES"), "", gridbag, c, 15);
 
 	// Share Value Line
 	amountTextField = 
-	    GridBagHelper.addTextRow(panel, "Total Share Value", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, Locale.getString("TOTAL_SHARE_VALUE"), "", 
+				     gridbag, c, 15);
 
 	tradeCostTextField = 
-	    GridBagHelper.addTextRow(panel, "Trade Cost", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, Locale.getString("TRADE_COST"), "", gridbag, c, 15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -470,7 +474,7 @@ public class TransactionDialog extends JInternalFrame
     // Get panel displayed when user enters a cash transaction
     private JPanel getCashPanel() {
 	JPanel borderPanel = new JPanel();
-	TitledBorder titled = new TitledBorder("Cash Transaction");
+	TitledBorder titled = new TitledBorder(Locale.getString("CASH_TRANSACTION"));
 	borderPanel.setBorder(titled);
 	borderPanel.setLayout(new BorderLayout());
 
@@ -483,7 +487,7 @@ public class TransactionDialog extends JInternalFrame
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 
-	JLabel cashAccountLabel = new JLabel("Cash Account");
+	JLabel cashAccountLabel = new JLabel(Locale.getString("CASH_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(cashAccountLabel, c);
 	panel.add(cashAccountLabel);
@@ -495,7 +499,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(cashAccountComboBox);
 	
 	amountTextField =
-	    GridBagHelper.addTextRow(panel, "Amount", "", gridbag, c,
+	    GridBagHelper.addTextRow(panel, Locale.getString("AMOUNT"), "", gridbag, c,
                                      15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
@@ -506,7 +510,7 @@ public class TransactionDialog extends JInternalFrame
     // Get panel displayed when user enters a cash transfer
     private JPanel getTransferPanel() {
 	JPanel borderPanel = new JPanel();
-	TitledBorder titled = new TitledBorder("Transfer");
+	TitledBorder titled = new TitledBorder(Locale.getString("TRANSFER_TRANSACTION"));
 	borderPanel.setBorder(titled);
 	borderPanel.setLayout(new BorderLayout());
 
@@ -519,7 +523,7 @@ public class TransactionDialog extends JInternalFrame
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 
-	JLabel cashAccountLabel = new JLabel("Source Cash Account");
+	JLabel cashAccountLabel = new JLabel(Locale.getString("SOURCE_CASH_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(cashAccountLabel, c);
 	panel.add(cashAccountLabel);
@@ -529,7 +533,7 @@ public class TransactionDialog extends JInternalFrame
 	gridbag.setConstraints(cashAccountComboBox, c);
 	panel.add(cashAccountComboBox);
 
-	JLabel cashAccountLabel2 = new JLabel("Destination Cash Account");
+	JLabel cashAccountLabel2 = new JLabel(Locale.getString("DESTINATION_CASH_ACCOUNT"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(cashAccountLabel2, c);
 	panel.add(cashAccountLabel2);
@@ -540,7 +544,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(cashAccountComboBox2);
 	
 	amountTextField =
-	    GridBagHelper.addTextRow(panel, "Amount", "", gridbag, c,
+	    GridBagHelper.addTextRow(panel, Locale.getString("AMOUNT"), "", gridbag, c,
                                      15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
@@ -603,7 +607,7 @@ public class TransactionDialog extends JInternalFrame
      */
     public boolean newTransaction() {
 
-	setTitle("New Transaction");
+	setTitle(Locale.getString("NEW_TRANSACTION"));
 
 	desktop.add(this);
 	show();
@@ -634,7 +638,7 @@ public class TransactionDialog extends JInternalFrame
      */
     public boolean editTransaction(Transaction oldTransaction) {
 
-	setTitle("Edit Transaction");
+	setTitle(Locale.getString("EDIT_TRANSACTION"));
 	displayTransaction(oldTransaction);
 
 	desktop.add(this);
@@ -818,17 +822,15 @@ public class TransactionDialog extends JInternalFrame
             date = new TradingDate(dateTextField.getText(),
                                    TradingDate.BRITISH);
         } catch(TradingDateFormatException e) {
-	    String message = new String("Can't parse date '" + 
-					dateTextField.getText() + "', " +
-					"please enter in form DD/MM/YYYY");
-            
+	    String message = new String(Locale.getString("CANT_PARSE_DATE",
+							 dateTextField.getText()));
 	    JOptionPane.showInternalMessageDialog(desktop, 
 						  message,
-						  "Error building transaction",
+						  Locale.getString("ERROR_BUILDING_TRANSACTION"),
 						  JOptionPane.ERROR_MESSAGE);
 	    return null;
         }
-
+	
 	// Get symbol - try the combo box first. If it doesn't exist then try the
 	// text field.
 	Symbol symbol = null;
@@ -893,51 +895,57 @@ public class TransactionDialog extends JInternalFrame
 
         // Can't parse money field?
         catch(MoneyFormatException e) {
-            String message = new String("Can't parse number '" +
-                                        e.getReason() + "'");
+            String message = new String(Locale.getString("CANT_PARSE_NUMBER",
+							 e.getReason()));
 	    JOptionPane.showInternalMessageDialog(desktop, 
 						  message,
-						  "Error building transaction",
+						  Locale.getString("ERROR_BUILDING_TRANSACTION"),
 						  JOptionPane.ERROR_MESSAGE);
 	    return null;
         }
 
 	// Can't parse numeric field?
 	catch(NumberFormatException e) {
-	    String message = new String("Can't parse number '" +
-					e.getMessage() + "'");
+	    String message = new String(Locale.getString("CANT_PARSE_NUMBER",
+							 e.getMessage()));
 
 	    JOptionPane.showInternalMessageDialog(desktop, 
 						  message,
-						  "Error building transaction",
+						  Locale.getString("ERROR_BUILDING_TRANSACTION"),
 						  JOptionPane.ERROR_MESSAGE);
 	    return null;
-	}
-
-	// Can't parse date? (all fields will be 0)
-	if(date.getYear() == 0) {
-
 	}
 
 	// When transferring money - it must be between two different accounts
 	if(type == Transaction.TRANSFER && cashAccount == cashAccount2) {
 	    JOptionPane.showInternalMessageDialog(desktop, 
-						  "Source and destination accounts are the same",
-						  "Error building transaction",
+						  Locale.getString("SOURCE_AND_DESTINATION_SAME"),
+						  Locale.getString("ERROR_BUILDING_TRANSACTION"),
 						  JOptionPane.ERROR_MESSAGE);
 	    return null;
 	}
 	    
-	// If we are using the stock symbol check that its valid
+	// If we are using the stock symbol check that its valid. 
+	// user hasn't tried to accumulate/reduce or dividend DRP 0 shares.
 	if((type == Transaction.ACCUMULATE || type == Transaction.REDUCE ||
 	    type == Transaction.DIVIDEND_DRP) && symbolParseError != null) {
-
             JOptionPane.showInternalMessageDialog(desktop, 
                                                   symbolParseError,
-                                                  "Error building transaction",
+                                                  Locale.getString("ERROR_BUILDING_TRANSACTION"),
                                                   JOptionPane.ERROR_MESSAGE);
             return null;
         }
+
+	// If a transaction involves a number of shares - make sure the number of
+	// shares is greater than 0.
+	if((type == Transaction.ACCUMULATE || type == Transaction.REDUCE ||
+	    type == Transaction.DIVIDEND_DRP) && shares <= 0) {
+            JOptionPane.showInternalMessageDialog(desktop, 
+                                                  Locale.getString("SHARES_GREATER_THAN_ZERO"),
+                                                  Locale.getString("ERROR_BUILDING_TRANSACTION"),
+                                                  JOptionPane.ERROR_MESSAGE);
+            return null;
+	}
 
 	//
 	// Build transaction

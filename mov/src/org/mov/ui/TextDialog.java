@@ -22,6 +22,8 @@ import java.awt.BorderLayout;
 import java.awt.event.*;
 import javax.swing.*;
 
+import org.mov.util.Locale;
+
 /**
  * Replacement dialog for Java's JOptionPane dialog for querying the user to enter a
  * text field. It provides two fixes for the existing Java code.
@@ -69,8 +71,8 @@ public class TextDialog implements ActionListener
     private void newDialog(JComponent parent, String message, String title, 
 			   String defaultText) 
     {
-	OKButton = new JButton("OK");
-	CancelButton = new JButton("Cancel");
+	OKButton = new JButton(Locale.getString("OK"));
+	CancelButton = new JButton(Locale.getString("CANCEL"));
 	DataTextField = new JTextField();
 	DataTextField.setText(defaultText);
 

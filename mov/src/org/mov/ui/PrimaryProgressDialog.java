@@ -24,6 +24,7 @@ import javax.swing.*;
 import java.util.*;
 
 import org.mov.main.Main;
+import org.mov.util.Locale;
 
 /**
  * This class is the only instance of a progress dialog in venice. When a progress
@@ -72,7 +73,7 @@ public class PrimaryProgressDialog implements ProgressDialog {
 
         // If the cancel button is hit, close the dialog and send an
         // interrupt to the current thread
-	cancelButton = new JButton("Cancel");
+	cancelButton = new JButton(Locale.getString("CANCEL"));
         cancelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     hide();
@@ -84,8 +85,8 @@ public class PrimaryProgressDialog implements ProgressDialog {
         progressBar.setUI(new ProgressBarUI());
 
 	JPanel panel = new JPanel();
-        noteLabel = new JLabel("Loading...");
-	progressLabel = new JLabel("Please Wait...");
+	noteLabel = new JLabel(Locale.getString("LOADING"));
+	progressLabel = new JLabel(Locale.getString("PLEASE_WAIT"));
 
 	BorderLayout layout = new BorderLayout();
 	layout.setHgap(50);
@@ -103,7 +104,7 @@ public class PrimaryProgressDialog implements ProgressDialog {
                             JOptionPane.OK_CANCEL_OPTION,
                             null, options, null);
 
-	dialog = optionPane.createDialog(parent, "Progress");
+	dialog = optionPane.createDialog(parent, Locale.getString("PROGRESS"));
         dialog.setModal(false);
 
 	optionPane.getRootPane().setDefaultButton(cancelButton);
@@ -227,7 +228,7 @@ public class PrimaryProgressDialog implements ProgressDialog {
         assert progress >= getMinimum() && progress <= getMaximum();
 
         if(isIndeterminate()) {
-            progressLabel.setText("Please wait...");
+            progressLabel.setText(Locale.getString("PLEASE_WAIT"));
         }
         else { 
             int newPercent = getPercent();
@@ -235,8 +236,10 @@ public class PrimaryProgressDialog implements ProgressDialog {
             // Only bother updating if the percent has changed
             if(newPercent != percent) {
                 percent = newPercent;
-                progressLabel.setText(getProgress() +" of "+ getMaximum() + 
-                                      " (" + newPercent + "%)");
+                progressLabel.setText(Locale.getString("PROGRESS_PERCENT",
+						       Integer.toString(getProgress()),
+						       Integer.toString(getMaximum()),
+						       Integer.toString(newPercent)));
                 progressBar.setValue(getProgress());
                 progressBar.repaint();
                 updateTitle();

@@ -57,12 +57,14 @@ public class SortedTable extends JTable implements MouseListener
 
     class HeaderCellRenderer extends JLabel implements TableCellRenderer
     {
-	public HeaderCellRenderer(Border border)
+	public HeaderCellRenderer(Border border, Color background, Color foreground)
 	{
 	    setBorder(border);
 	    setHorizontalTextPosition(SwingConstants.LEFT);
 	    setHorizontalAlignment(SwingConstants.CENTER);
-	    setForeground(Color.darkGray);
+
+            setBackground(background);
+            setForeground(foreground);
 	}
 	
 	public Component 
@@ -408,15 +410,15 @@ public class SortedTable extends JTable implements MouseListener
 	
 	// Set custom renderer for the tables headers so we have the 
 	// sort direction arrow
-	getTableHeader().
-	    setDefaultRenderer(new 
-		HeaderCellRenderer(getTableHeaderBorder()));       
-	
+        setCustomHeaderRenderer();
+
 	// Monitor mouse clicks on table header
 	getTableHeader().addMouseListener(this);
 	
 	// Set tool tip text to inform user of column sorting
-	getTableHeader().setToolTipText("Click on table header to sort by that column, click again to change sort direction");
+        String toolTipText =
+            "Click on table header to sort by that column, click again to change sort direction";
+	getTableHeader().setToolTipText(toolTipText);
     }
 
 
@@ -464,10 +466,9 @@ public class SortedTable extends JTable implements MouseListener
 	}
     }
     
-    // gets the border used for the table header - we want our custom
-    // job to look as close as possible to the real thing
-    public Border getTableHeaderBorder()
-    {
+    // We use a custom renderer for the table header so that we can
+    // insert the up/down sort arrows.
+    private void setCustomHeaderRenderer() {
 	TableCellRenderer r = getTableHeader().getDefaultRenderer();	
 	
 	// Assume the header is rendered using swing components (it is) and
@@ -479,8 +480,11 @@ public class SortedTable extends JTable implements MouseListener
 							false,
 							0, 0);
 
-	// Return a new instance of the border around it
-	return header.getBorder();
+        HeaderCellRenderer renderer = 
+            new HeaderCellRenderer(header.getBorder(), 
+                                   header.getBackground(),
+                                   header.getForeground());
+        getTableHeader().setDefaultRenderer(renderer);
     }
 
     public int getColumnSortStatus(int column)
@@ -602,8 +606,7 @@ public class SortedTable extends JTable implements MouseListener
 	// Only interested in left mouse button events *and*
 	// only interested them if the table has more than one
 	// entry
-	if((e.getModifiers() & InputEvent.BUTTON1_MASK) 
-	   == InputEvent.BUTTON1_MASK) {
+	if((e.getModifiers() & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
 	    
 	    // Get which column has been been clicked
 	    int column = columnAtPoint(e.getPoint());

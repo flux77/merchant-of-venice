@@ -18,10 +18,18 @@
 
 package org.mov.quote;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.lang.String;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
-import org.mov.util.*;
+import org.mov.util.TradingDate;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -50,10 +58,10 @@ import org.mov.ui.ProgressDialogManager;
 public class FileQuoteSource implements QuoteSource
 {
     // Construct a map between TradingDates and file names
-    private HashMap dateToFile = null;
+    private HashMap dateToURL = null;
 
-    // List of files containing quotes
-    private Vector fileNames = null;
+    // List of URLs of files containing quotes
+    private List fileURLs = null;
 
     // Buffer first & last trading date in file database
     private TradingDate lastDate = null;
@@ -67,15 +75,31 @@ public class FileQuoteSource implements QuoteSource
     // (Two lines).
     private final static int ONE_LINE_BUFFER_SIZE = 160;
 
+    /**
+     * Creates a new quote source using the list of files specified in the user
+     * preferences.
+     *
+     * @param	format  The format filter to use to parse the quotes
+     * @param	fileURLs       List of URL of files
+     */
+    public FileQuoteSource(String format, List fileURLs) {
+
+	// Set filter to whatever is defined in the preferences to filter
+	// to our internal format
+	filter = QuoteFilterList.getInstance().getFilter(format);
+
+        this.fileURLs = fileURLs;
+    }
+
     // Given a name of a file containing a list of day quotes, return the
     // the day
-    private TradingDate getContainedDate(String fileName)
-	throws java.io.IOException {
+    private TradingDate getContainedDate(URL fileURL)
+	throws IOException {
 
 	TradingDate date = null;
 
-        FileReader fr = new FileReader(fileName);
-        BufferedReader br = new BufferedReader(fr, ONE_LINE_BUFFER_SIZE);
+        InputStreamReader isr = new InputStreamReader(fileURL.openStream());
+        BufferedReader br = new BufferedReader(isr, ONE_LINE_BUFFER_SIZE);
         Quote quote = filter.toQuote(br.readLine());
         if(quote != null)
             date = quote.getDate();
@@ -84,19 +108,19 @@ public class FileQuoteSource implements QuoteSource
 	return date;
     }
 
-    // Given a quote range and a file name, return a vector of all
+    // Given a quote range and a file name, return a list of all
     // quotes we are looking for in this file.
-    private Vector getContainedQuotes(String fileName,
-                                      QuoteRange quoteRange) {
+    private List getContainedQuotes(URL fileURL,
+                                    QuoteRange quoteRange) {
 
-        Vector quotes = new Vector();
+        List quotes = new ArrayList();
 	String line;
 
-        assert fileName != null && quoteRange != null;
+        assert fileURL != null && quoteRange != null;
 
 	try {
-	    FileReader fr = new FileReader(fileName);
-	    BufferedReader br = new BufferedReader(fr);
+            InputStreamReader isr = new InputStreamReader(fileURL.openStream());
+	    BufferedReader br = new BufferedReader(isr);
 	    line = br.readLine();
 
 	    while(line != null) {
@@ -124,37 +148,21 @@ public class FileQuoteSource implements QuoteSource
 		
 	    br.close();
 
-	} catch (java.io.IOException ioe) {
-	    DesktopManager.showErrorMessage("Can't load " + fileName);
+	} catch (IOException e) {
+	    DesktopManager.showErrorMessage("Can't load " + fileURL.getPath());
 	}
 
         return quotes;
     }
 
-    /**
-     * Creates a new quote source using the list of files specified in the user
-     * preferences.
-     *
-     * @param	format	The format filter to use to parse the quotes
-     * @param	fileNames	Vector of file names
-     */
-    public FileQuoteSource(String format, Vector fileNames) {
-
-	// Set filter to whatever is defined in the preferences to filter
-	// to our internal format
-	filter = QuoteFilterList.getInstance().getFilter(format);
-
-        this.fileNames = fileNames;
-    }
-
     // Checks that we actually have any quotes files and that we have any quotes
     // in those files. Returns TRUE if we have at least one quote, FALSE otherwise.
     private synchronized boolean checkFiles() {
-        if(dateToFile == null) {
+        if(dateToURL == null) {
             createIndex();
 
             // Still empty after loading all our quote files?
-            if(dateToFile == null) {
+            if(dateToURL == null) {
                 DesktopManager.showErrorMessage("Venice couldn't find any quotes.\n" +
                                                 "You can import quotes using the import\n" +
                                                 "quote tool under the File menu.");
@@ -171,7 +179,7 @@ public class FileQuoteSource implements QuoteSource
         Thread thread = Thread.currentThread();
 
         // Create map
-        dateToFile = new HashMap();
+        dateToURL = new HashMap();
         
         TradingDate date;
         
@@ -182,19 +190,15 @@ public class FileQuoteSource implements QuoteSource
         // Indexing might take a while
         ProgressDialog p = ProgressDialogManager.getProgressDialog();
         p.setMaster(true);
-        p.setMaximum(fileNames.size());
+        p.setMaximum(fileURLs.size());
         p.setNote("Indexing files");
         p.show("Indexing files");
         
-        Iterator iterator = fileNames.iterator();
-        String fileName;
-        
-        while(iterator.hasNext()) {
-            
-            fileName = (String)iterator.next();
+        for(Iterator iterator = fileURLs.iterator(); iterator.hasNext();) {
+            URL fileURL = (URL)iterator.next();
             
             try {
-                date = getContainedDate(fileName);
+                date = getContainedDate(fileURL);
                 
                 if(date != null) {
                     // Buffer the first and last quote dates
@@ -204,21 +208,21 @@ public class FileQuoteSource implements QuoteSource
                         firstDate = date;
                     
                     // Associate this date with this file
-                    dateToFile.put(date, fileName);
+                    dateToURL.put(date, fileURL);
                 }		
                 else {
                     if(errorCount < 5) {
                         DesktopManager.
                             showErrorMessage("No quotes found in " +
-                                             fileName);
+                                             fileURL.getPath());
                         errorCount++;
                     }
                 }
                 
-            } catch (java.io.IOException ioe) {
+            } catch (IOException e) {
                 if(errorCount < 5) {
                     DesktopManager.showErrorMessage("Can't load " +
-                                                    fileName);
+                                                    fileURL.getPath());
                     errorCount++;	
                 }
             }
@@ -229,10 +233,9 @@ public class FileQuoteSource implements QuoteSource
         ProgressDialogManager.closeProgressDialog(p);
 
         // Nuke the hash if it is empty
-        if(dateToFile.isEmpty())
-            dateToFile = null;
+        if(dateToURL.isEmpty())
+            dateToURL = null;
     }
-
 
     /**
      * Returns the company name associated with the given symbol. Not
@@ -267,13 +270,10 @@ public class FileQuoteSource implements QuoteSource
         if(checkFiles()) {
             // Iterate through all files until we find one containing the
             // symbol name we are looking for
-            Set dates = dateToFile.keySet();
-            Iterator iterator = dates.iterator();
-            
-            while(iterator.hasNext()) {
+            for(Iterator iterator = dateToURL.keySet().iterator(); iterator.hasNext();) {
                 TradingDate date = (TradingDate)iterator.next();
-                Vector quotes = getContainedQuotes(getFileForDate(date),
-                                                   new QuoteRange(symbol));
+                List quotes = getContainedQuotes(getURLForDate(date),
+                                                 new QuoteRange(symbol));
                 if(quotes.size() > 0)
                     return true; // found!
             }
@@ -305,14 +305,14 @@ public class FileQuoteSource implements QuoteSource
     }
 
     /**
-     * Returns the filename that contains quotes for the given date.
+     * Returns the file URL that contains quotes for the given date.
      *
      * @param	date	the given date
-     * @return	the file containing quotes for this date
+     * @return	the file URL containing quotes for this date
      */
-    public String getFileForDate(TradingDate date) {
+    public URL getURLForDate(TradingDate date) {
         if(checkFiles()) 
-            return (String)dateToFile.get(date);
+            return (URL)dateToURL.get(date);
         else
             return null;
     }
@@ -326,8 +326,8 @@ public class FileQuoteSource implements QuoteSource
     public boolean containsDate(TradingDate date) {
         if(checkFiles()) {
             // If we have a file - we'll assume we also have quotes
-            String file = getFileForDate(date);
-            return file != null;
+            URL fileURL = getURLForDate(date);
+            return fileURL != null;
         }
         else
             return false;
@@ -340,7 +340,7 @@ public class FileQuoteSource implements QuoteSource
      */
     public Vector getDates() {
         if(checkFiles()) 
-            return new Vector(dateToFile.keySet());
+            return new Vector(dateToURL.keySet());
         else
             return new Vector();
     }
@@ -377,8 +377,7 @@ public class FileQuoteSource implements QuoteSource
                 lastDate = this.lastDate;
             }
             
-            Vector dates = Converter.dateRangeToTradingDateVector(firstDate,
-                                                                  lastDate);
+            List dates = TradingDate.dateRangeToList(firstDate, lastDate);
             
             // If there are multiple dates, set the progress indicator
             // to indicate the date we are on. Otherwise set it to
@@ -397,10 +396,10 @@ public class FileQuoteSource implements QuoteSource
                 Quote quote;
                 
                 // Load all quotes from the file
-                String fileName = getFileForDate(date);
+                URL fileURL = getURLForDate(date);
                 
-                if(fileName != null) {
-                    Vector quotes = getContainedQuotes(fileName, quoteRange);
+                if(fileURL != null) {
+                    List quotes = getContainedQuotes(fileURL, quoteRange);
                                         
                     // Load quotes into cache
                     for(Iterator quoteIterator = quotes.iterator(); quoteIterator.hasNext();) {
@@ -453,14 +452,14 @@ public class FileQuoteSource implements QuoteSource
 
         if(checkFiles()) {
 
-            String fileName = getFileForDate(date);
+            URL fileURL = getURLForDate(date);
             
-            if(fileName == null)
+            if(fileURL == null)
                 throw new MissingQuoteException();
             
             // Get all ordinaries for that date
             QuoteRange quoteRange = new QuoteRange(QuoteRange.ALL_ORDINARIES, date);
-            Vector quotes = getContainedQuotes(fileName, quoteRange);
+            List quotes = getContainedQuotes(fileURL, quoteRange);
             
             int advanceDecline = 0;
             

@@ -40,36 +40,73 @@ public class DesktopManager
     static private int DEFAULT_FRAME_WIDTH = 450;
     static private int DEFAULT_FRAME_HEIGHT = 375;
 
-    public static final int HORIZONTAL          = 0,
-	VERTICAL            = 1,                          
-	CASCADE             = 2, 
-	ARRANGE             = 3;
+    /** Tile windows horizontally */
+    public static final int HORIZONTAL = 0;
+
+    /** Tile windows vertically */
+    public static final int VERTICAL   = 1;                      
+
+    /** Cascade windows, resizing based on desktop size */
+    public static final int CASCADE    = 2;
+
+    /** Arrange windows in a grid. */
+    public static final int ARRANGE    = 3;
 
     private static JDesktopPane desktop_instance = null;
-
     private static EventListenerList moduleListeners = new EventListenerList();
 
+    /**
+     * Set the desktop we are managing.
+     *
+     * @param desktop the desktop to manage.
+     */
     public static void setDesktop(JDesktopPane desktop) {
 	desktop_instance = desktop;
     }
 
+    /**
+     * Get the desktop we are managing.
+     *
+     * @return the desktop we are managing.
+     */
     public static JDesktopPane getDesktop() {
 	return desktop_instance;
     }
 
+    /**
+     * Create a new Venice desktop manager to manage the given desktop.
+     *
+     * @param desktop the desktop to manage.
+     */
     public DesktopManager(JDesktopPane desktop) {
 	super();
 	setDesktop(desktop);
     }
 
+    /**
+     * Add a listener to list for module events.
+     *
+     * @param moduleListener the class to be informed about module events.
+     */
     public void addModuleListener(ModuleListener moduleListener) {
 	moduleListeners.add(ModuleListener.class, moduleListener);
     }
 
+    /**
+     * Remove a listener of module events.
+     *
+     * @param moduleListener the class to no longer be informeda bout
+     *                       module events.
+     */
     public void removeModuleListener(ModuleListener moduleListener) {
 	moduleListeners.remove(ModuleListener.class, moduleListener);
     }
 
+    /**
+     * Inform all the module listeners that this module has been added.
+     *
+     * @param module that has been added.
+     */
     private void fireModuleAdded(Module module) {
 	ModuleEvent event = null;
 
@@ -87,6 +124,11 @@ public class DesktopManager
 	}
     }
 
+    /**
+     * Inform all the module listeners that this module has been removed.
+     *
+     * @param module that has been removed.
+     */
     public void fireModuleRemoved(Module module) {
 	ModuleEvent event = null;
 
@@ -104,6 +146,11 @@ public class DesktopManager
 	}
     }
 
+    /**
+     * Inform all the module listneres that this module has been renamed.
+     * 
+     * @param module that has been renamed.
+     */
     public void fireModuleRenamed(Module module) {
 	ModuleEvent event = null;
 
@@ -126,19 +173,35 @@ public class DesktopManager
      *
      * @param	message	the error message to display
      */
-    public static void showErrorMessage(String message) {
-	JOptionPane.showInternalMessageDialog(desktop_instance,
-					      message, 
-					      "Venice problem!",
-					      JOptionPane.ERROR_MESSAGE);
+    public static void showErrorMessage(final String message) {
+        // If there is a progress dialog up send an interrupt to the current
+        // thread. This is cool because tasks with progress dialogs only
+        // need to monitor whether the thread is interrupted and it will
+        // tell them whether the task was interrupted because the user clicked
+        // cancel OR there was an error. So I don't need lots of specific
+        // error handling code.
+        if(ProgressDialogManager.isProgressDialogUp()) 
+            Thread.currentThread().interrupt();
+
+        // Now show the dialog in a new thread. This way our dialog isn't
+        // hidden behind the progress dialog.
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                JOptionPane.showInternalMessageDialog(desktop_instance,
+                                                      message, 
+                                                      "Venice problem!",
+                                                      JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        thread.start();            
     }
 
-    // method to tile open windows in various styles:  
-    //    HORIZONTAL = horizontal tiling  
-    //    VERTICAL = vertical tiling  
-    //    CASCADE = cascade windows, resizing based on desktop size  
-    //    ARRANGE = arranges windows in a grid  
-
+    /**
+     * Tiles all the windows in the desktop according to the given style.
+     *
+     * @param style one of {@link #HORIZONTAL}, {@link #VERTICAL}, {@link #CASCADE}
+     *              or {@link #ARRANGE}
+     */
     public static void tileFrames(int style){    
 	Dimension deskDim = desktop_instance.getSize();
 	int deskWidth = deskDim.width;
@@ -261,7 +324,9 @@ public class DesktopManager
 	}  
     }  
 
-    // method to minimize all windows that are iconifiable  
+    /**
+     * Minimises all windows that are iconifiable.
+     */
     public static void minimizeWindows() {
 	JInternalFrame[] openWindows = desktop_instance.getAllFrames();
 	for (int i=0; i<openWindows.length; i++)
@@ -274,8 +339,10 @@ public class DesktopManager
 		}        
 	    } 
     }
-    
-    // method to restore all minimized windows  
+
+    /**
+     * Restores all minimised windows.
+     */
     public static void restoreAll() {
 	JInternalFrame[] openWindows = desktop_instance.getAllFrames();
 	for(int i=0; i<openWindows.length; i++) {
@@ -288,8 +355,10 @@ public class DesktopManager
 		}    
 	} 
     }  
-    
-    // method to close all open windows  
+
+    /**
+     * Closes all open windows.
+     */
     public static void closeAllWindows() {
 	JInternalFrame[] openWindows = desktop_instance.getAllFrames();
 	for (int i=0; i<openWindows.length; i++) { 
@@ -297,51 +366,6 @@ public class DesktopManager
 	}  
     }  
     
-    private static void _windowSelected(ActionEvent e, JInternalFrame f) { 
-	try {
-	    if(f.isIcon())
-		f.setIcon(false);
-	    f.moveToFront();
-	}   
-	catch (Exception ex) { 
-	    ex.printStackTrace();
-	}  
-    }    
-    
-    //Comparator dedicated to sorting objects (File or JInternalFrame) by name  
-    //used to sort files in windowMenu so as to display dynamicaly files currently contained in desktop.  
-    public static final Comparator FILE_NAME = new Comparator() {    
-	    public int compare(Object one, Object two) {
-		String name1="", name2="";
-		if ((one instanceof JInternalFrame) && (two instanceof JInternalFrame)){
-		    name1=((JInternalFrame)one).getTitle();
-		    name2=((JInternalFrame)two).getTitle();
-		}      
-		int index=0;
-		int test=0;
-		while(test==0){     
-		    if (name1.charAt(index)==(name2.charAt(index))) { 
-			//System.out.println(name1+" "+name1.charAt(index)+"    "+name2+" "+name2.charAt(index)+"  ("+index+")");
-			test=0;
-			index++;
-			if((index>=name1.length())|(index>=name2.length())) 
-			    break;
-		    }       
-		    else if (name1.charAt(index)>name2.charAt(index))  
-			test= 1;
-		    else test = -1;
-		}//while      
-		return test;
-	    }   
-	    
-	    public boolean equals(Object object) { 
-		return object.equals(this);
-	    }    
-	    
-	    public String toString(){ return "FILE_NAME";
-	    }  
-	};
-
     /**
      * Display a new frame upon the current desktop. Frame will be
      * displayed at (0,0) and not centred.

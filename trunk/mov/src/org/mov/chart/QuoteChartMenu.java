@@ -234,14 +234,32 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    String val = JOptionPane.showInputDialog(null, "Enter Value");
 
 	    graphConstants.setSmoothingConstant( (new Double(val)).doubleValue());
-	    // And then redraw the graph.
-	    
-	}
 
+
+
+	    // FIXME: replace this kludge with proper redraw code
+	    
+	    if (graphExists(EXP_MOVING_AVERAGE)) {
+		removeGraph(EXP_MOVING_AVERAGE);
+		addGraph(new ExpMovingAverageGraph(getDayClose(), 40, graphConstants.getSmoothingConstant()),
+			 EXP_MOVING_AVERAGE, 0);	    
+		
+		
+	    }
+
+	}
+	
 	else if (e.getSource() == priceThresholdMenuItem) {
 	    String val = JOptionPane.showInputDialog(null, "Enter Value");
 	    
 	    graphConstants.setPriceReversalThreshold( (new Double(val)).doubleValue());
+	    
+	    // FIXME: replace this kludge with proper redraw code
+	    if (graphExists(POINTANDFIGURE)) {
+		removeGraph(POINTANDFIGURE);
+		addGraph(new PointAndFigureGraph(getDayClose(), 20,graphConstants.getPriceReversalThreshold()),
+			 POINTANDFIGURE);
+	    }
 	    
 	}
 	
@@ -308,14 +326,6 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    else if(text == POINTANDFIGURE) 
 		addGraph(new PointAndFigureGraph(getDayClose(), 20,graphConstants.getPriceReversalThreshold()),
 			 POINTANDFIGURE);
-	    
-	    else if(text == SMOOTHING_CONSTANT) {
-		
-	    }
-
-	    else if(text == PRICE_THRESHOLD) {
-		
-	    }
 	    
 	}
     }
@@ -392,6 +402,14 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    JCheckBoxMenuItem item = (JCheckBoxMenuItem)object;
 	    item.setEnabled(true);		
 	}
+    }
+
+    // Return whether or not the graph has been drawn
+    
+    private boolean graphExists(String mapIdentifier) {
+	Graph graph = (Graph)map.get(mapIdentifier);
+	
+	return true ? graph != null : false ;
     }
 
     // Removes graph from chart

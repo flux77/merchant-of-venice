@@ -227,9 +227,24 @@ public class ExpressionFactory {
         case(Token.EMA_TOKEN):
             expression = new EMAExpression(arg1, arg2, arg3, arg4);
             break;
-	case(Token.SD_TOKEN):
-	    expression = new StandardDeviationExpression(arg1, arg2, arg3);
-	    break;
+        case(Token.BBL_TOKEN):
+            expression = new BBLExpression(arg1, arg2, arg3);
+            break;
+        case(Token.BBU_TOKEN):
+            expression = new BBUExpression(arg1, arg2, arg3);
+            break;
+        case(Token.MACD_TOKEN):
+            expression = new MACDExpression(arg1, arg2);
+            break;
+        case(Token.MOMENTUM_TOKEN):
+            expression = new MomentumExpression(arg1, arg2, arg3);
+            break;
+        case(Token.OBV_TOKEN):
+            expression = new OBVExpression(arg1, arg2, arg3);
+            break;
+        case(Token.SD_TOKEN):
+            expression = new SDExpression(arg1, arg2, arg3);
+            break;
         default:
             // No such token
             assert false;

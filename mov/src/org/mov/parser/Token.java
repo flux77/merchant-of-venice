@@ -187,11 +187,26 @@ public class Token {
     /** Represents "<code>ema()</code>" symbol */
     public static final int EMA_TOKEN = 51;
 
+    /** Represents "<code>bbl()</code>" symbol */
+    public static final int BBL_TOKEN = 52;
+    
+    /** Represents "<code>bbu()</code>" symbol */
+    public static final int BBU_TOKEN = 53;
+    
+    /** Represents "<code>macd()</code>" symbol */
+    public static final int MACD_TOKEN = 54;
+    
+    /** Represents "<code>momentum()</code>" symbol */
+    public static final int MOMENTUM_TOKEN = 55;
+    
+    /** Represents "<code>obv()</code>" symbol */
+    public static final int OBV_TOKEN = 56;
+    
     /** Represents "<code>sd()</code>" symbol */
-    public static final int SD_TOKEN = 52;
+    public static final int SD_TOKEN = 57;
     
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 53;
+    private static final int FIXED_LENGTH_TOKENS = 58;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -288,8 +303,13 @@ public class Token {
         tokenStrings[WHILE_TOKEN]              = "while";
         tokenStrings[CORR_TOKEN]               = "corr";
         tokenStrings[EMA_TOKEN]                = "ema";
+        tokenStrings[BBL_TOKEN]                = "bbl";
+        tokenStrings[BBU_TOKEN]                = "bbu";
+        tokenStrings[MACD_TOKEN]               = "macd";
+        tokenStrings[MOMENTUM_TOKEN]           = "momentum";
+        tokenStrings[OBV_TOKEN]                = "obv";
         tokenStrings[SD_TOKEN]                 = "sd";
-        
+       
         boolean matched = false;
         
         // Is it a float or an integer number?

@@ -32,10 +32,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.mov.ui.AbstractTable;
-import org.mov.ui.QuoteModel;
+import org.mov.ui.AbstractTableModel;
+import org.mov.ui.Column;
+import org.mov.ui.ChangeFormat;
+import org.mov.ui.PointChangeFormat;
+import org.mov.ui.QuoteFormat;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.main.CommandManager;
+import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
@@ -48,6 +53,14 @@ import org.mov.quote.Symbol;
  * @see ShareAccount
  */
 public class StockHoldingTable extends AbstractTable {
+    private static final int SYMBOL_COLUMN = 0;
+    private static final int SHARES_COLUMN = 1;
+    private static final int AVERAGE_COST_COLUMN = 2;
+    private static final int DAY_CLOSE_COLUMN = 3;
+    private static final int MARKET_VALUE_COLUMN = 4;
+    private static final int POINT_CHANGE_COLUMN = 5;
+    private static final int PERCENT_CHANGE_COLUMN = 6;
+    private static final int PERCENT_RETURN_COLUMN = 7;
 
     private JMenu showColumnsMenu;
     private Model model;

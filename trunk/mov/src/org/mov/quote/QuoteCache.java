@@ -171,7 +171,7 @@ public class QuoteCache {
 	if(!containsDate(offset))
 	    return null;
 	else
-	    return (TradingDate)dates.get(offset);
+	    return (TradingDate)dates.get(-offset);
     }
 
     /**

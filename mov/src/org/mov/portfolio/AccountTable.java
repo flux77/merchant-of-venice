@@ -47,6 +47,22 @@ public class AccountTable extends AbstractTable {
 	    Iterator iterator = cache.dateIterator(0);
 	    if(iterator.hasNext())
 		date = (TradingDate)iterator.next();
+
+	    // Make sure we dont get an exception when trying to
+	    // work out how much the portfolio is worth on this day
+	    boolean validDate = false;
+
+	    while(!validDate) {
+		try {
+		    portfolio.getValue(cache, date);
+		    validDate = true;
+		}
+		catch(EvaluationException e) {
+		    // If we do its cause its a public holiday and we
+		    // can't get quotes for our stocks. So go back a day
+		    date.previous(1);
+		}
+	    }
 	}
 	
 	public int getRowCount() {
@@ -80,8 +96,13 @@ public class AccountTable extends AbstractTable {
 		    return account.getName();
 		    
 		case(VALUE_COLUMN):
-		    return 
-			Converter.quoteToString(account.getValue(cache, date));
+		    try {
+			return 
+			    Converter.quoteToString(account.getValue(cache, date));
+		    }
+		    catch(EvaluationException e) {
+			// should not happen
+		    }
 		}
 	    }
 
@@ -100,7 +121,12 @@ public class AccountTable extends AbstractTable {
 		    while(iterator.hasNext()) {
 			Account account = (Account)iterator.next();
 
-			value += account.getValue(cache, date);
+			try {
+			    value += account.getValue(cache, date);
+			}
+			catch(EvaluationException e) {
+			    // should not happen
+			}
 		    }
 
 		    return 

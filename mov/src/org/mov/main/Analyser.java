@@ -24,9 +24,9 @@ public class Analyser extends JFrame implements WindowListener {
 		    p.getInt("default_y", 0));
 
 	desktop = new JDesktopPane();
+	Progress.getInstance().setDesktop(desktop);
 	menu = new AnalyserMenu(this, desktop);
 	setContentPane(desktop);
-	Progress.setDesktop(desktop);
 	addWindowListener(this);
     }
 

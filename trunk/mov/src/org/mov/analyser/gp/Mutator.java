@@ -670,19 +670,21 @@ public class Mutator {
     public Expression mutate(Expression expression, int percent) {
         // Mutations do not always occur. Use the given percent to work
         // out whether one should occur.
-        if(percent < random.nextInt(100))
+        int randomPercent = random.nextInt(100);
+        if(percent < randomPercent)
             return expression;
 
         // Mutate
-        if(INSERTION_MUTATION_PERCENT > percent)
+        int randomTypePercent = random.nextInt(100);
+        if(INSERTION_MUTATION_PERCENT > randomTypePercent)
             expression = mutateByInsertion(expression);
         else {
-            percent -= INSERTION_MUTATION_PERCENT;
+            randomTypePercent -= INSERTION_MUTATION_PERCENT;
 
-            if(DELETION_MUTATION_PERCENT > percent)
+            if(DELETION_MUTATION_PERCENT > randomTypePercent)
                 expression = mutateByDeletion(expression);
             else {
-                percent -= DELETION_MUTATION_PERCENT;
+                randomTypePercent -= DELETION_MUTATION_PERCENT;
 
                 expression = mutateByModification(expression);
             }

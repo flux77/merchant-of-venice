@@ -396,6 +396,22 @@ public class CommandManager {
     }
 
     /**
+     * Opens up an instance of the preferences module at the last visited page.
+     */
+    public void openPreferences() {
+	getDesktopManager().newFrame(new PreferencesModule(desktop), true, false);
+    }
+
+    /**
+     * Opens up an instance of the preferences module at the given page.
+     *
+     * @param page the preference page to view.
+     */
+    public void openPreferences(int page ) {
+	getDesktopManager().newFrame(new PreferencesModule(desktop, page), true, false);
+    }
+
+    /**
      * Open up a dialog to create and then display a new portfolio.
      */
     public void newPortfolio() {

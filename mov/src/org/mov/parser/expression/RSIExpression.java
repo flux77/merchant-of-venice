@@ -29,6 +29,8 @@ import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteFunctions;
 import org.mov.quote.Symbol;
 
+import java.util.ArrayList;
+
 /**
  * An expression which finds the RSI over a given trading period.
  */
@@ -43,26 +45,20 @@ public class RSIExpression extends BinaryExpression {
 	
 	int days = (int)getChild(0).evaluate(variables, quoteBundle, symbol, day);
 
-        int maximumYears = PreferencesManager.loadMaximumYears();       
         if(days <= 0)
             throw EvaluationException.rangeForRSI();
-        if (days>maximumYears*365)
-            throw EvaluationException.pastDate();
 
         int offset = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
 
-        if ((offset<=-maximumYears*365) || (offset>maximumYears*365))
-            throw EvaluationException.pastDate();
-
         // To calculate an X day RSI we need X + 1 days of quotes. Put them in
-        // an array so we can use the RSI function in quote functions.
-        double[] values = new double[days + 1];
+        // an ArrayList so we can use the RSI function in quote functions.
+        ArrayList valuesList = new ArrayList();
         int actualDays = 0;
 
         for(int i = 0; i <= days; i++) {
             try {
-                values[actualDays] = quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, day,
-                                                          i - days + offset);
+                valuesList.add(new Double(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, day,
+                                                          i - days + offset)));
                 actualDays++;
             }
             catch(MissingQuoteException e) {
@@ -71,10 +67,16 @@ public class RSIExpression extends BinaryExpression {
         }
 
         // If we don't have enough quotes then return a neutral value
-        if(actualDays <= 1)
+        if(actualDays <= 1) {
             return 50.0D;
-        else
+        } else {
+            // Convert the ArrayList in an array.
+            double[] values = new double[valuesList.size()];
+            for(int i=0; i<values.length; i++) {
+                values[i] = ((Double)valuesList.get(i)).doubleValue();
+            }
             return QuoteFunctions.rsi(values, 1, actualDays);
+        }
     }
 
     public String toString() {

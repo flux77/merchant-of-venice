@@ -186,7 +186,9 @@ public class GeneticProgramme {
                                                 initialCapital,
                                                 stockValue,
                                                 numberStocks,
-                                                tradeCost);
+                                                tradeCost,
+                                                "",
+                                                "");
                     
                     // If we got here the paper trade was successful. Now let the
                     // individual 'compete' to see if it gets to breed next round.

@@ -223,7 +223,9 @@ public class Individual implements Comparable {
                             Money initialCapital,
                             Money stockValue,
                             int numberStocks,
-                            Money tradeCost)
+                            Money tradeCost,
+                            String buySystemRule,
+                            String sellSystemRule)
         throws EvaluationException {
 
         // Is there a fixed number of stocks?
@@ -238,7 +240,9 @@ public class Individual implements Comparable {
                                               getSellRule(),
                                               initialCapital,
                                               numberStocks,
-                                              tradeCost);
+                                              tradeCost,
+                                              buySystemRule,
+                                              sellSystemRule);
         // Or a fixed value?
         else {
             portfolio = PaperTrade.paperTrade(PORTFOLIO_NAME,
@@ -251,7 +255,9 @@ public class Individual implements Comparable {
                                               getSellRule(),
                                               initialCapital,
                                               stockValue,
-                                              tradeCost);
+                                              tradeCost,
+                                              buySystemRule,
+                                              sellSystemRule);
         }
 
         // Get final value of portfolio

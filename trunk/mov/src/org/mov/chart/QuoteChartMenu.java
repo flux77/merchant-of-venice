@@ -19,12 +19,16 @@ import org.mov.quote.*;
 public class QuoteChartMenu extends JMenu implements ActionListener {
 
     // Graphs
+    private static final String BOLLINGER      = "Bollinger Bands";
     private static final String DAY_HIGH       = "Day High";
     private static final String DAY_LOW        = "Day Low";
     private static final String DAY_OPEN       = "Day Open";
     private static final String HIGH_LOW_BAR   = "High Low Bar";
     private static final String MACD           = "MACD";
+    private static final String MOMENTUM       = "Momentum";
     private static final String MOVING_AVERAGE = "Moving Average";
+    private static final String OBV	       = "OBV";
+    private static final String STANDARD_DEVIATION = "Standard Deviation";
     private static final String VOLUME         = "Volume";
     
     // HashMap of graphs to their annotations if any
@@ -53,12 +57,16 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	
 	// Order not important - will be added to menu in
 	// alphabetical order
+	graphMap.put((Object)BOLLINGER,	null);
 	graphMap.put((Object)DAY_HIGH,	null);
 	graphMap.put((Object)DAY_LOW,	null);
 	graphMap.put((Object)DAY_OPEN,	null);
 	graphMap.put((Object)HIGH_LOW_BAR,	null);
 	graphMap.put((Object)MACD,		"Buy/Sell");
+	graphMap.put((Object)MOMENTUM,		null);
 	graphMap.put((Object)MOVING_AVERAGE, "Buy/Sell");
+	graphMap.put((Object)OBV,		null);
+	graphMap.put((Object)STANDARD_DEVIATION,	null);
 	graphMap.put((Object)VOLUME,	null);
 	
 	this.cache = cache; 
@@ -159,6 +167,10 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 		removeGraph(text);
 	    
 	    // Ok looks like its adding a graph
+	    else if(text == BOLLINGER) 
+		addGraph(new BollingerBandsGraph(dayClose, 20), 
+			 BOLLINGER, 0);
+
 	    else if(text == DAY_HIGH) 
 		addGraph(new LineGraph(dayHigh), DAY_HIGH, 0);
 	    
@@ -174,12 +186,23 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    else if(text == MACD)
 		// 1 1 2 3 5 8 13 21 34 55
 		addGraph(new MACDGraph(dayClose, 13, 34), MACD, 0);
+
+	    else if(text == MOMENTUM) 
+		addGraph(new MomentumGraph(dayClose, 10), MOMENTUM);
 	    
 	    else if(text == MOVING_AVERAGE) 
 		addGraph(new MovingAverageGraph(dayClose, 40), 
 			 MOVING_AVERAGE, 0);
+
+	    else if(text == OBV) 
+		addGraph(new OBVGraph(dayOpen, dayClose, dayVolume, 
+				      50000.0F), OBV);
 	    else if(text == VOLUME) 
 		addGraph(new BarGraph(dayVolume), VOLUME);
+
+	    else if(text == STANDARD_DEVIATION) 
+		addGraph(new StandardDeviationGraph(dayClose, 20), 
+			 STANDARD_DEVIATION);
 	}
     }
     

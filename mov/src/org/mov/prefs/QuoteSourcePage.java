@@ -130,6 +130,8 @@ public class QuoteSourcePage extends JPanel
 	    database.add(databasePreferences, BorderLayout.CENTER);
 
 	    pane.addTab("Database", database);
+      	    TitledBorder mainTitled = new TitledBorder("Skins");
+	    this.setBorder(new TitledBorder("Quote Source"));
 	}
 
 	// File Pane
@@ -386,7 +388,7 @@ public class QuoteSourcePage extends JPanel
      * @return	the window title.
      */
     public String getTitle() {
-	return "Quote Source Preferences";
+	return "Quote Source";
     }
 
     /**

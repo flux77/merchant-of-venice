@@ -71,20 +71,21 @@ public class SkinPage extends JPanel
 	pack_skintype.addActionListener(this);
 	x11_skintype.addActionListener(this);
 
-	TitledBorder titled = new TitledBorder("Skins Preferences");
+	TitledBorder titled = new TitledBorder("Skins");
 	this.setBorder(titled);
 
 	// System skin
 	JPanel system_panel;
 	big_c.gridy++;
+        big_c.fill = GridBagConstraints.HORIZONTAL;
 	add(system_panel = new JPanel(),big_c);
 
 	gb = new GridBagLayout();
-	c = new GridBagConstraints();
 	system_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 	system_panel.setLayout(gb);
 	    
-	c.weightx = 1.0;
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 	c.gridx = 0;
@@ -340,7 +341,7 @@ public class SkinPage extends JPanel
      * @return	the window title.
      */
     public String getTitle() {
-	return "Skins Preferences";
+	return "Skins";
     }
 
     /**

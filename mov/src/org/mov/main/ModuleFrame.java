@@ -63,7 +63,10 @@ public class ModuleFrame extends JInternalFrame
 
 	// We want to notify module when it is closing so it can save data
 	addInternalFrameListener(this);
-
+        if (isPreferences) {
+            setResizable(false);
+            setMaximizable(false);
+        }
 	show();	
     }
 

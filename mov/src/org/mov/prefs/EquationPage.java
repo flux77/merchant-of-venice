@@ -1,6 +1,9 @@
 package org.mov.prefs;
 
+import java.util.prefs.*;
+import java.awt.event.*;
 import javax.swing.*;
+import org.liquid.list.*;
 
 /*
  * EquationPage.java
@@ -12,16 +15,38 @@ import javax.swing.*;
  *
  * @author  Dan
  */
-public class EquationPage extends javax.swing.JPanel implements PreferencesPage
+public class EquationPage extends javax.swing.JPanel 
+    implements PreferencesPage, javax.swing.event.DocumentListener,
+    javax.swing.event.ListSelectionListener
 {
 
     /** The desktop that new windows are opened upon */
-    JDesktopPane desktop;
+    private JDesktopPane desktop;
+    
+    /** The list model for the LHS function list */
+    private SortedListModel functionListModel;
+    
+    /** Accessor the system preferences for functions */
+    Preferences prefs;
+    
+    /** Currently selected function in the list view */
+    private int current_selection;
     
     /** Creates new form EquationPage */
     public EquationPage(JDesktopPane desktop) {
         initComponents();
+        functionList.setModel(functionListModel);
+        current_selection = -1;
         this.desktop = desktop;
+        prefs = Preferences.userRoot().node("/filters/functions");
+
+        functionList.addListSelectionListener(this);
+        initFunctionList();
+        
+        /* Set up TextListeners for the text fields */
+        nameText.getDocument().addDocumentListener(this);
+        detailText.getDocument().addDocumentListener(this);
+
     }
 
     /** This method is called from within the constructor to
@@ -33,7 +58,7 @@ public class EquationPage extends javax.swing.JPanel implements PreferencesPage
         jSplitPane1 = new javax.swing.JSplitPane();
         listPanel = new javax.swing.JPanel();
         listScrollPane = new javax.swing.JScrollPane();
-        jList2 = new javax.swing.JList();
+        functionList = new javax.swing.JList();
         listButtonPanel = new javax.swing.JPanel();
         newButton = new javax.swing.JButton();
         editButton = new javax.swing.JButton();
@@ -46,18 +71,22 @@ public class EquationPage extends javax.swing.JPanel implements PreferencesPage
         detailLabel = new javax.swing.JLabel();
         detailText = new javax.swing.JTextField();
         buttonPanel = new javax.swing.JPanel();
-        okButton = new javax.swing.JButton();
-        cancelButton = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
+        undoButton = new javax.swing.JButton();
+        commentLabel = new javax.swing.JLabel();
         
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.X_AXIS));
         
+        setBorder(new javax.swing.border.TitledBorder("Functions"));
         jSplitPane1.setContinuousLayout(true);
         jSplitPane1.setLastDividerLocation(-1);
         jSplitPane1.setOneTouchExpandable(true);
         listPanel.setLayout(new java.awt.GridBagLayout());
         java.awt.GridBagConstraints gridBagConstraints1;
         
-        listScrollPane.setViewportView(jList2);
+        functionListModel = new org.liquid.list.SortedListModel();
+        functionList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        listScrollPane.setViewportView(functionList);
         
         gridBagConstraints1 = new java.awt.GridBagConstraints();
         gridBagConstraints1.fill = java.awt.GridBagConstraints.BOTH;
@@ -69,14 +98,34 @@ public class EquationPage extends javax.swing.JPanel implements PreferencesPage
         java.awt.GridBagConstraints gridBagConstraints2;
         
         newButton.setLabel("New...");
+        newButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newButtonActionPerformed(evt);
+            }
+        });
+        
         gridBagConstraints2 = new java.awt.GridBagConstraints();
         listButtonPanel.add(newButton, gridBagConstraints2);
         
         editButton.setLabel("Edit...");
+        editButton.setEnabled(false);
+        editButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editButtonActionPerformed(evt);
+            }
+        });
+        
         gridBagConstraints2 = new java.awt.GridBagConstraints();
         listButtonPanel.add(editButton, gridBagConstraints2);
         
         deleteButton.setLabel("Delete");
+        deleteButton.setEnabled(false);
+        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButtonActionPerformed(evt);
+            }
+        });
+        
         gridBagConstraints2 = new java.awt.GridBagConstraints();
         listButtonPanel.add(deleteButton, gridBagConstraints2);
         
@@ -99,33 +148,57 @@ public class EquationPage extends javax.swing.JPanel implements PreferencesPage
         
         nameText.setMinimumSize(new java.awt.Dimension(100, 20));
         nameText.setPreferredSize(new java.awt.Dimension(100, 20));
+        nameText.setEnabled(false);
         namePanel.add(nameText);
         
         gridBagConstraints3 = new java.awt.GridBagConstraints();
+        gridBagConstraints3.gridx = 0;
+        gridBagConstraints3.gridy = 1;
         entryPanel.add(namePanel, gridBagConstraints3);
         
         detailLabel.setText("Function details");
         detailPanel.add(detailLabel);
         
         detailText.setPreferredSize(new java.awt.Dimension(100, 20));
+        detailText.setEnabled(false);
         detailPanel.add(detailText);
         
         gridBagConstraints3 = new java.awt.GridBagConstraints();
         gridBagConstraints3.gridx = 0;
-        gridBagConstraints3.gridy = 1;
+        gridBagConstraints3.gridy = 2;
         gridBagConstraints3.insets = new java.awt.Insets(5, 5, 5, 5);
         entryPanel.add(detailPanel, gridBagConstraints3);
         
-        okButton.setText("OK");
-        buttonPanel.add(okButton);
+        saveButton.setText("Save");
+        saveButton.setEnabled(false);
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
+            }
+        });
         
-        cancelButton.setText("Cancel");
-        buttonPanel.add(cancelButton);
+        buttonPanel.add(saveButton);
+        
+        undoButton.setText("Undo");
+        undoButton.setEnabled(false);
+        undoButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                undoButtonActionPerformed(evt);
+            }
+        });
+        
+        buttonPanel.add(undoButton);
         
         gridBagConstraints3 = new java.awt.GridBagConstraints();
         gridBagConstraints3.gridx = 0;
-        gridBagConstraints3.gridy = 2;
+        gridBagConstraints3.gridy = 3;
         entryPanel.add(buttonPanel, gridBagConstraints3);
+        
+        commentLabel.setText(" ");
+        gridBagConstraints3 = new java.awt.GridBagConstraints();
+        gridBagConstraints3.gridx = 0;
+        gridBagConstraints3.gridy = 0;
+        entryPanel.add(commentLabel, gridBagConstraints3);
         
         jSplitPane1.setRightComponent(entryPanel);
         
@@ -133,6 +206,90 @@ public class EquationPage extends javax.swing.JPanel implements PreferencesPage
         
     }//GEN-END:initComponents
 
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        if (current_selection != -1)
+            prefs.remove(""+functionListModel.getElementAt(current_selection));
+        prefs.put(nameText.getText(), detailText.getText());
+
+        initFunctionList();
+
+        current_selection = functionList.getNextMatch(nameText.getText(), 0, javax.swing.text.Position.Bias.Backward);
+        functionList.setSelectedIndex(current_selection);
+        nameText.setEnabled(false);
+        detailText.setEnabled(false);
+        undoButton.setEnabled(false);
+
+    }//GEN-LAST:event_saveButtonActionPerformed
+
+    private void undoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoButtonActionPerformed
+        if (functionList.getSelectedIndex() == -1) {
+            nameText.setText("");
+            detailText.setText("");
+            saveButton.setEnabled(false);
+            undoButton.setEnabled(false);
+        } else {
+            valueChanged(null);
+        }
+    }//GEN-LAST:event_undoButtonActionPerformed
+
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        System.out.println("Delete");
+        if (JOptionPane.showInternalConfirmDialog(desktop,
+                                                  "Really delete function \""+nameText.getText()+"\"?",
+                                                  "Please confirm", 
+                                                  JOptionPane.YES_NO_OPTION, 
+                                                  JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) 
+        {
+            prefs.remove(""+functionListModel.getElementAt(current_selection));
+            current_selection = -1;
+            nameText.setText("");
+            detailText.setText("");
+            initFunctionList();
+            valueChanged(null);
+        }
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
+    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+        nameText.setEnabled(true);
+        detailText.setEnabled(true);
+    }//GEN-LAST:event_editButtonActionPerformed
+
+    private void newButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newButtonActionPerformed
+        if (!isOkToDiscardCurrentFunction())
+            return;
+        current_selection = -1;
+//        functionList.clearSelection();
+//functionList.setSelectedIndex(-1);
+functionList.getSelectionModel().clearSelection();
+        nameText.setText("");
+        nameText.setEnabled(true);
+        detailText.setText("");
+        detailText.setEnabled(true);
+        commentLabel.setText("Enter function, then click \"Add\"");
+        saveButton.setEnabled(false);
+        undoButton.setEnabled(false);
+    }//GEN-LAST:event_newButtonActionPerformed
+
+    /** Initializes the list of functions with all functions stored in user
+     *  preferences */
+    private void initFunctionList() {
+        functionListModel.clear();
+        
+        /* Set up the function list */
+        try {
+            String[] keys = prefs.keys();
+            for(int i = 0; i < keys.length; i++) {
+                functionListModel.addElement(keys[i]);  
+            }
+        } catch (Exception e) {}
+    }
+    
+    /** Determines whether or not it is ok to reset the text fields for either
+     *  entry of a new function or display of another existing one
+     *  @returns true if ok, false otherwise */
+    private boolean isOkToDiscardCurrentFunction() {
+        return true;
+    }
     /**
      * Update the preferences file.
      */
@@ -166,11 +323,54 @@ public class EquationPage extends javax.swing.JPanel implements PreferencesPage
         return null;
     }
     
+    public void changedUpdate(javax.swing.event.DocumentEvent documentEvent) {
+    }    
+
+    public void removeUpdate(javax.swing.event.DocumentEvent documentEvent) {
+        if ((nameText.getText().length() == 0) ||
+            (detailText.getText().length() == 0)) {
+            saveButton.setEnabled(false);
+            if ((nameText.getText().length() == 0) &&
+                (detailText.getText().length() == 0))
+                undoButton.setEnabled(false);
+        } else if (nameText.isEnabled()){
+            undoButton.setEnabled(true);
+            saveButton.setEnabled(true);
+        }
+    }
+    
+    public void insertUpdate(javax.swing.event.DocumentEvent documentEvent) {
+        if ((nameText.getText().length() > 0) && 
+            (detailText.getText().length() > 0) &&
+            (nameText.isEnabled()))
+            saveButton.setEnabled(true);
+        if (nameText.isEnabled())
+            undoButton.setEnabled(true);
+    }
+    
+    public void valueChanged(javax.swing.event.ListSelectionEvent listSelectionEvent) {
+        if (!isOkToDiscardCurrentFunction())
+            return;
+        this.current_selection = functionList.getSelectedIndex();
+        if (current_selection <= functionList.getMaxSelectionIndex()) {
+            nameText.setText(""+functionListModel.getElementAt(current_selection));
+            detailText.setText(""+prefs.get((String)functionListModel.getElementAt(current_selection), ""));
+            editButton.setEnabled(true);
+            deleteButton.setEnabled(true);
+        }
+        
+        nameText.setEnabled(false);
+        detailText.setEnabled(false);
+        undoButton.setEnabled(false);
+        saveButton.setEnabled(false);
+        
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JPanel listPanel;
     private javax.swing.JScrollPane listScrollPane;
-    private javax.swing.JList jList2;
+    private javax.swing.JList functionList;
     private javax.swing.JPanel listButtonPanel;
     private javax.swing.JButton newButton;
     private javax.swing.JButton editButton;
@@ -183,8 +383,9 @@ public class EquationPage extends javax.swing.JPanel implements PreferencesPage
     private javax.swing.JLabel detailLabel;
     private javax.swing.JTextField detailText;
     private javax.swing.JPanel buttonPanel;
-    private javax.swing.JButton okButton;
-    private javax.swing.JButton cancelButton;
+    private javax.swing.JButton saveButton;
+    private javax.swing.JButton undoButton;
+    private javax.swing.JLabel commentLabel;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -1,30 +1,41 @@
 package org.mov.util;
 
-// TODO: Make the next() previous() return a new TradingDate class and
-// leave the current one alone. This fits in with the java philosophy better
-// and works out neater i think.
-
-// Java's three date classes (java.util.Date, java.sql.Date &
-// java.util.Calendar) are a mess. This takes up less room (hopefully),
-// is faster and does exactly what is needed. (Although calendar is still
-// used)
-
 import java.util.*;
 import java.util.regex.*;
 
+/**
+ * A replacement date for java.util.Date, java.util.Calendar & 
+ * java.sql.Date.
+ *
+ * The main principles of this date class are speed (as fast as possible)
+ * and size (as small as possible). It produces a much smaller and faster
+ * date class than using the Calendar hierarchy. It also beats java.util.Date
+ * by not using deprecated methods.
+ */
 public class TradingDate {
 
     private int year;
     private int month;
     private int day;
 
-    // Stored as month 1-12, day 1-31
+    /**
+     * Create a new date from the given year, month and day.
+     *
+     * @param	year	a four digit year, e.g. 1996
+     * @param	month	the month starting from 1
+     * @param	day	the day starting from 1
+     */
     public TradingDate(int year, int month, int day) {
 	this.year = year;
 	this.month = month;
 	this.day = day;
     }
     
+    /**
+     * Create a new date from the given java.util.Date object.
+     *
+     * @param	date	the date to convert
+     */
     public TradingDate(Date date) {
 	GregorianCalendar gc = new GregorianCalendar();
 	gc.setTime(date);
@@ -33,11 +44,18 @@ public class TradingDate {
 	this.day = gc.get(Calendar.DATE);
     }
 
-    // Create a trading date from a string. Can be in one of the following
-    // formats:
-    // YYMMDD, e.g. "010203"
-    // YYYYMMDD, e.g. "20010203"
-    // MM/DD/YY, e.g. "03/02/01"
+    /**
+     * Create a new date from the given string. We can parse the following
+     * date string:
+     * <p>
+     * <table>
+     * <tr><td><pre>YYMMDD</pre></td><td>e.g. "010203"</td></tr>
+     * <tr><td><pre>YYYYMMDD</pre></td><td>e.g. "20010203"</td></tr>
+     * <tr><td><pre>MM/DD/YY</pre></td><td>e.g. "03/02/01"</td></tr>
+     * </table>
+     *
+     * @param	date	the date string to convert from
+     */
     public TradingDate(String date) {
 
 	// Handle DD/MM/YY
@@ -67,7 +85,9 @@ public class TradingDate {
 	}
     }
 
-    // Construct trading date set to today
+    /**
+     * Create a new date set to today.
+     */
     public TradingDate() {
 	GregorianCalendar gc = new GregorianCalendar();
 	gc.setTime(new Date());
@@ -76,18 +96,39 @@ public class TradingDate {
 	this.day = gc.get(Calendar.DATE);
     }
 
+    /**
+     * Return the year.
+     *
+     * @return four digit year
+     */
     public int getYear() {
 	return year;
     }
 
+    /**
+     * Return the month.
+     *
+     * @return the month starting with 1 for January
+     */
     public int getMonth() {
 	return month;
     }
 
+    /**
+     * Return the day.
+     *
+     * @return the day of the month starting from 1
+     */
     public int getDay() {
 	return day;
     }
 
+    /**
+     * Tests if this date is before the specified date.
+     *
+     * @param	the specified date to compare
+     * @return	<pre>true</pre> if the given date is before this one
+     */
     public boolean before(Object date) {
 	if(compareTo(date) > 0)
 	    return false;
@@ -95,6 +136,13 @@ public class TradingDate {
 	    return true;
     }
 
+    /**
+     * Tests if this date is after the specified date.
+     *
+     * @param	the specified date to compare
+     * @return	<pre>true</pre> if the specified date is before this one; 
+     * <pre>false</pre> otherwise.
+     */
     public boolean after(Object date) {
 	if(compareTo(date) > 0)
 	    return true;
@@ -102,6 +150,13 @@ public class TradingDate {
 	    return false;
     }
 
+    /**
+     * Compares this date with the specified object.
+     *
+     * @param	the specified date to compare
+     * @return	<pre>true</pre> if the specified date is equal; 
+     * <pre>false</pre> otherwise.
+     */
     public boolean equals(Object date) {
 	if(compareTo(date) == 0)
 	    return true;
@@ -109,16 +164,31 @@ public class TradingDate {
 	    return false;
     }
 
+    /**
+     * Create a clone of this date
+     *
+     * @return	a clone of this date
+     */
     public Object clone() {
 	return (Object)(new TradingDate(getYear(), getMonth(), 
 					getDay()));
     }
 
+    /**
+     * Create a fast hash code of this date
+     *
+     * @return	hash code
+     */
     public int hashCode() {
 	// theres enough room in an int to store all the data
 	return getDay() + getMonth() * 256 + getYear() * 65536;
     }
 
+    /**
+     * Move the current date the specified number of trading days backward.
+     *
+     * @param	days	the number of days to move
+     */
     public void previous(int days) {
 
 	Calendar date = this.toCalendar();
@@ -138,6 +208,11 @@ public class TradingDate {
 	day = date.get(Calendar.DAY_OF_MONTH);
     }
 
+    /**
+     * Move the current date the specified number of trading days forward.
+     *
+     * @param	days	the number of days to move
+     */
     public void next(int days) {
 
 	Calendar cal = this.toCalendar();
@@ -157,10 +232,23 @@ public class TradingDate {
 	day = cal.get(Calendar.DAY_OF_MONTH);
     }
 
+    /**
+     * Compare the current date to the specified object.
+     *
+     * @see #compareTo(TradingDate)
+     */
     public int compareTo(Object date) {
 	return compareTo((TradingDate)date);
     }
 
+    /**
+     * Compare the current date to the specified date.
+     *
+     * @param	date	the date to compare
+     * @return the value <pre>0</pre> if the dates are equal;
+     * <pre>1</pre> if this date is after the specified date or
+     * <pre>-1</pre> if this date is before the specified date.
+     */
     public int compareTo(TradingDate date) {
 	if(getYear() < date.getYear())
 	    return -1;
@@ -218,39 +306,49 @@ public class TradingDate {
 	return format;
     }
 
-    /**
-     * Convert the date to a string. Defaults to the format string "d?/MMM/yy",
-     * e.g. 3/Sep/01.
-     *
-     * @return	the text string
-     */
-    //    public String toString() {
-    //	return toString("d?/MMM/yy");
-    //}
-
+    // In the given source string replace all occurences of patternText with
+    // text.
     private String replace(String source, String patternText, String text) {
 	Pattern pattern = Pattern.compile(patternText);
 	Matcher matcher = pattern.matcher(source);
 	return matcher.replaceAll(text);
     }
 
-    // Outputs date in a format SQL can understand "year-month-day"
+    /**
+     * Outputs the date in a format SQL can understand - 2001-12-30.
+     *
+     * @return	SQL friendly date string
+     */
     public String toString() {
 	
     	return getYear() + "-" + getMonth() + "-" + getDay();
     }
 
-    // Outputs date in format "day/month"
+    /**
+     * Outputs the date in the format - 12/Dec.
+     *
+     * @return	short version of the date string
+     */
     public String toShortString() {
 	return getDay() + "/" + getMonth();
     }
 
-    // Outputs date in format "monthname day, year"
+    /**
+     * Outputs date in the format - 30 Dec, 2001.
+     *
+     * @return	long version of the date string
+     */
     public String toLongString() {
 	return getDay() + " " + monthToText(getMonth()) + ", " +
 	    getYear();
     }
 
+    /**
+     * Convert a month number to its 3 digit name.
+     *
+     * @param	month	the month number
+     * @return	the 3 digit month string
+     */
     public static String monthToText(int month) {
 	String months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 			   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
@@ -263,10 +361,20 @@ public class TradingDate {
 	    return "Dec";
     }
 
+    /**
+     * Convert this object to a java.util.Date.
+     *
+     * @return	<pre>java.util.Date</pre>
+     */
     public Date toDate() {
 	return this.toCalendar().getTime();
     }
 
+    /**
+     * Convert this object to a java.util.Calendar.
+     *
+     * @return	<pre>java.util.Calendar</pre>
+     */
     public Calendar toCalendar() {
 	// Convert from our month of 1-12 to theirs of 0-11
 	return new GregorianCalendar(getYear(), getMonth() - 1, getDay());

@@ -291,6 +291,26 @@ public class DesktopManager
 	
 	frame.moveToFront();		    
     }
+
+    /**
+     * Call save() on every open module. This will save all the modules'
+     * preferences data.
+     */
+    public void save() {
+	// Get all frames open
+	JInternalFrame[] frames = desktop_instance.getAllFrames();
+
+	for(int i = 0; i < frames.length; i++) {
+	    // Only call save() on modules - these are identified by
+	    // being module frames.
+	    JInternalFrame frame = frames[i];
+
+	    if(frame instanceof ModuleFrame) {
+		ModuleFrame moduleFrame = (ModuleFrame)frame;
+		moduleFrame.getModule().save();
+	    }
+	}
+    }
 }
 
 

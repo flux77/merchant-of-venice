@@ -84,6 +84,11 @@ public class PreferencesManager {
 
         /** Whether we are using the web proxy. */
 	public boolean isEnabled;
+	
+    public String user;
+    public String password;
+    public boolean authEnabled;
+
     }
 
     /** Database preferences fields. */
@@ -689,9 +694,14 @@ public class PreferencesManager {
         Preferences prefs = getUserNode("/proxy");
         PreferencesManager preferencesManager = new PreferencesManager();
         ProxyPreferences proxyPreferences = preferencesManager.new ProxyPreferences();
-        proxyPreferences.host = prefs.get("host", "");
-        proxyPreferences.port = prefs.get("port", "-1");
+        proxyPreferences.host = prefs.get("host", "proxy");
+        proxyPreferences.port = prefs.get("port", "8080");
         proxyPreferences.isEnabled = prefs.getBoolean("enabled", false);
+        
+    	proxyPreferences.user= prefs.get("user", "");
+    	proxyPreferences.password = prefs.get("password", "");
+    	proxyPreferences.authEnabled = prefs.getBoolean("authEnabled", false);
+
         return proxyPreferences;
     }
 
@@ -705,6 +715,11 @@ public class PreferencesManager {
 	prefs.put("host", proxyPreferences.host);
 	prefs.put("port", proxyPreferences.port);
 	prefs.putBoolean("enabled", proxyPreferences.isEnabled);
+	
+	prefs.put("user", proxyPreferences.user);
+	prefs.put("password", proxyPreferences.password);
+	prefs.putBoolean("authEnabled", proxyPreferences.authEnabled);
+	
     }
 
     /**

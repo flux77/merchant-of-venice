@@ -492,14 +492,9 @@ public class ScriptQuoteBundle implements QuoteBundle {
         return quoteCache.dateToOffset(date);
     }
 
-    /**
-     * Free the quote bundle. This will remove the quote bundle from the 
-     * {@link QuoteBundleCache}. This method is optional - quote bundles do not need
-     * to call this when they are done. 
-     */
-    public void free() {
-	quoteBundleCache.free(this);
-    }    
+    public String toString() {
+        return quoteRange.toString();
+    }
 
     /**
      * If we know the given quote is not in the quote cache, this function will reload this

@@ -44,8 +44,6 @@ public class Main extends JFrame implements WindowListener {
 	desktop.setDesktopManager(new org.mov.ui.DesktopManager(desktop));
 	CommandManager.getInstance().setDesktop(desktop);
 
-	Progress.getInstance().setDesktop(desktop);
-
 	menu = new MainMenu(this, desktop);
 	setContentPane(desktop);
 	addWindowListener(this);

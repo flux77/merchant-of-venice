@@ -366,6 +366,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * @see Stock
      */
     public Vector getQuotesForDate(TradingDate date, int type) {
+        ProgressDialogManager.getProgressDialog().setNote("Retrieving stocks present on date "+date);
 	return executeQuery("SELECT * FROM " + SHARE_TABLE_NAME + " " +
 			    "WHERE " + DATE_FIELD + " = '" + date + "'");
     }

@@ -401,11 +401,11 @@ public class ImporterModule extends JPanel
     }
 
     // Perform actual import given source and/or file list
-    private void performImport(QuoteSource source, 
-			       Set dates) {
-	boolean owner = 
-	    Progress.getInstance().open("Importing", 
-					dates.size());
+    private void performImport(QuoteSource source, Set dates) {
+        ProgressDialog p = ProgressDialogManager.getProgressDialog();
+        p.setTitle("Importing");
+        p.setProgress(0);
+        p.setMaximum(dates.size());
 	
 	TradingDate date;
 	Iterator iterator = dates.iterator();
@@ -419,9 +419,7 @@ public class ImporterModule extends JPanel
 	while(iterator.hasNext()) {
 	    date = (TradingDate)iterator.next();
 	    
-	    Progress.getInstance().setText("Importing: " +
-					   date.toString("d?/m?/yyyy"),
-					   owner);
+	    p.setNote("Importing " + date.toString("d?/m?/yyyy"));
 	    // Get the days quotes
 	    dayQuotes = 
 		source.getQuotesForDate(date, QuoteSource.ALL_SYMBOLS);
@@ -443,14 +441,14 @@ public class ImporterModule extends JPanel
 	    if(isToDatabase) 
 		importToDatabase(dayQuotes, date);
 	    
-	    Progress.getInstance().next();
+	    p.increment();
 	}
 	
 	// This makes sure the next query uses the new imported 
 	// quotes
 	Quote.flush();	
 
-	Progress.getInstance().close(owner);	
+	ProgressDialogManager.closeProgressDialog();
     }
 
     // Import file name containing a day's quotes into the file list

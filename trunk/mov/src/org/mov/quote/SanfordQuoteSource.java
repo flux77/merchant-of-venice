@@ -9,6 +9,8 @@ import java.util.regex.*;
 import org.mov.util.*;
 import org.mov.portfolio.Stock;
 import org.mov.ui.DesktopManager;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
 
 /**
  * Provides functionality to obtain stock quotes directly from Sanford's
@@ -65,8 +67,8 @@ public class SanfordQuoteSource implements QuoteSource {
     private void login() {
 
 	// This query might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Logging onto Sanford", 1);
+        ProgressDialog p = ProgressDialogManager.getProgressDialog();
+        p.setNote("Logging into Sanford");
 
 	try {
 	    // Login
@@ -87,7 +89,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    DesktopManager.showErrorMessage("Can't connect to Sanford");
 	}
 
-	Progress.getInstance().close(owner);
+	ProgressDialogManager.closeProgressDialog();
     }
 
     /** 
@@ -110,8 +112,8 @@ public class SanfordQuoteSource implements QuoteSource {
 	if(companyName == null) {
 
 	    // This query might take a while
-	    boolean owner = 
-		Progress.getInstance().open("Retrieving stock name", 1);
+            ProgressDialog p = ProgressDialogManager.getProgressDialog();
+            p.setNote("Retrieving stock name");
 	    boolean symbolFound = false;
 
 	    try {
@@ -140,13 +142,13 @@ public class SanfordQuoteSource implements QuoteSource {
 		    if(line.indexOf("<p><font face") != -1) {
 			// Extract the company name from the line (by
 			// removing all html "<...>"
-			Pattern p = Pattern.compile("<[^>]*>");
-			Matcher m = p.matcher(line);
+			Pattern pat = Pattern.compile("<[^>]*>");
+			Matcher m = pat.matcher(line);
 			companyName = m.replaceAll("");
 
 			// Remove excess spaces
-			p = Pattern.compile("  ");
-			m = p.matcher(companyName);
+			pat = Pattern.compile("  ");
+			m = pat.matcher(companyName);
 			companyName = m.replaceAll("");
 
 			// cache
@@ -162,7 +164,7 @@ public class SanfordQuoteSource implements QuoteSource {
 		DesktopManager.showErrorMessage("Error talking to Sanford");
 	    }
 
-	    Progress.getInstance().close(owner);	
+	    ProgressDialogManager.closeProgressDialog();
 	}
 	
 	return companyName;
@@ -229,20 +231,20 @@ public class SanfordQuoteSource implements QuoteSource {
 	TradingDate date;
 	
 	// This query might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Loading quotes " + 
-					startDate.toShortString() + " to " +
-					endDate.toShortString(), dates.size());
+        ProgressDialog p = ProgressDialogManager.getProgressDialog();
+        p.setTitle("Loading quotes " + startDate.toShortString() + " to " +
+					endDate.toShortString());
+        p.setMaximum(dates.size());
 
 	while(iterator.hasNext()) {
 	    date = (TradingDate)iterator.next();
 	    
 	    quotes.addAll((Collection)getQuotesForDate(date, type));
 
-	    Progress.getInstance().next();
+	    p.increment();
 	}
 
-	Progress.getInstance().close(owner);
+	ProgressDialogManager.closeProgressDialog();
 
 	return quotes;
     }
@@ -264,8 +266,8 @@ public class SanfordQuoteSource implements QuoteSource {
 	    return quotes;
 
 	// This query might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Loading quotes", 1);
+	ProgressDialog p = ProgressDialogManager.getProgressDialog();
+	p.setNote("Loading quotes");
 
 	try {
 	    Stock stock;
@@ -291,8 +293,10 @@ public class SanfordQuoteSource implements QuoteSource {
 	    while ((line = reader.readLine()) != null) {
 		stock = filter.toQuote(line);
 
-		if(stock != null && isType(stock, type)) 
+		if(stock != null && isType(stock, type)) {
 		    quotes.add(stock);
+                    p.increment();
+                }
 	    }
 
 	    reader.close();	    
@@ -301,7 +305,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    DesktopManager.showErrorMessage("Error talking to Sanford");
 	}
 
-	Progress.getInstance().close(owner);
+	ProgressDialogManager.closeProgressDialog();
     
 	return quotes;
     }
@@ -322,8 +326,8 @@ public class SanfordQuoteSource implements QuoteSource {
 	    return quotes;
 
 	// This query might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Loading quotes for " + symbol , 1);
+        ProgressDialog p = ProgressDialogManager.getProgressDialog();
+        p.setNote("Loading quotes for " + symbol);
 
 	try {
 	    Stock stock;
@@ -334,7 +338,7 @@ public class SanfordQuoteSource implements QuoteSource {
 
 	    URLConnection connection = url.openConnection();
 	    connection.setDoOutput(true);
-	    connection.setRequestProperty("Cookie", cookie);
+            connection.setRequestProperty("Cookie", cookie);
 
 	    OutputStream os = connection.getOutputStream();
 	    PrintWriter writer = new PrintWriter(os);
@@ -357,8 +361,10 @@ public class SanfordQuoteSource implements QuoteSource {
 	    while ((line = reader.readLine()) != null) {
 		stock = filter.toQuote(line);
 
-		if(stock != null)
+		if(stock != null) {
 		    quotes.add(stock);
+                    p.increment();
+                }
 	    }
 
 	    reader.close();
@@ -368,7 +374,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    DesktopManager.showErrorMessage("Error talking to Sanford");
 	}
 
-	Progress.getInstance().close(owner);
+	ProgressDialogManager.closeProgressDialog();
     
 	return quotes;
     }
@@ -385,7 +391,6 @@ public class SanfordQuoteSource implements QuoteSource {
 	    if(stock.getSymbol().length() == 3 &&
 	       !stock.getSymbol().startsWith("x"))
 		match = true;
-	    
 	}
 	else if(type == ALL_COMMODITIES) {
 	    if(!stock.getSymbol().startsWith("x"))
@@ -407,5 +412,3 @@ public class SanfordQuoteSource implements QuoteSource {
 	return null;
     }
 }
-
-

@@ -48,18 +48,26 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException PAST_DATE_EXCEPTION =
         new EvaluationException("Date too far into past");
 
-    /** An exception which is thrown on an invalid sum() range. */
-    public static EvaluationException SUM_RANGE_EXCEPTION =
-        new EvaluationException(Locale.getString("SUM_RANGE_ERROR"));
-
     /** An exception which is thrown on an invalid avg() range. */
     public static EvaluationException AVG_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("AVG_RANGE_ERROR"));
 
+    /** An exception which is thrown on an invalid bbl() range. */
+    public static EvaluationException BBL_RANGE_EXCEPTION =
+        new EvaluationException(Locale.getString("BBL_RANGE_ERROR"));
+
+    /** An exception which is thrown on an invalid bbu() range. */
+    public static EvaluationException BBU_RANGE_EXCEPTION =
+        new EvaluationException(Locale.getString("BBU_RANGE_ERROR"));
+
+    /** An exception which is thrown on an invalid corr() range. */
+    public static EvaluationException CORR_RANGE_EXCEPTION =
+        new EvaluationException(Locale.getString("CORR_RANGE_ERROR"));
+
     /** An exception which is thrown on an invalid ema() range. */
     public static EvaluationException EMA_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("EMA_RANGE_ERROR"));
-
+    
     /** An exception which is thrown on an invalid max() range. */
     public static EvaluationException MAX_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("MAX_RANGE_ERROR"));
@@ -67,6 +75,14 @@ public class EvaluationException extends ExpressionException {
     /** An exception which is thrown on an invalid min() range. */
     public static EvaluationException MIN_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("MIN_RANGE_ERROR"));
+
+    /** An exception which is thrown on an invalid momentum() range. */
+    public static EvaluationException MOMENTUM_RANGE_EXCEPTION =
+        new EvaluationException(Locale.getString("MOMENTUM_RANGE_ERROR"));
+
+    /** An exception which is thrown on an invalid obv() range. */
+    public static EvaluationException OBV_RANGE_EXCEPTION =
+        new EvaluationException(Locale.getString("OBV_RANGE_ERROR"));
 
     /** An exception which is thrown on an invalid rsi() range. */
     public static EvaluationException RSI_RANGE_EXCEPTION =
@@ -76,30 +92,37 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException SD_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("SD_RANGE_ERROR"));
 
-    /** An exception which is thrown on an invalid lag() range. */
-    public static EvaluationException LAG_RANGE_EXCEPTION =
-        new EvaluationException(Locale.getString("LAG_RANGE_ERROR"));
-
-    /** An exception which is thrown when trying to calculate the square
-        root of a negative number. */
-    public static EvaluationException SQUARE_ROOT_NEGATIVE_EXCEPTION =
-        new EvaluationException(Locale.getString("SQUARE_ROOT_NEGATIVE_ERROR"));
-
-    /** An exception which is thrown on an invalid sum() offset. */
-    public static EvaluationException SUM_OFFSET_EXCEPTION =
-        new EvaluationException(Locale.getString("SUM_OFFSET_ERROR"));
+    /** An exception which is thrown on an invalid sum() range. */
+    public static EvaluationException SUM_RANGE_EXCEPTION =
+        new EvaluationException(Locale.getString("SUM_RANGE_ERROR"));
 
     /** An exception which is thrown on an invalid avg() offset. */
     public static EvaluationException AVG_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("AVG_OFFSET_ERROR"));
 
-    /** An exception which is thrown on an invalid lag() offset. */
-    public static EvaluationException LAG_OFFSET_EXCEPTION =
-        new EvaluationException(Locale.getString("LAG_OFFSET_ERROR"));
+    /** An exception which is thrown on an invalid bbl() offset. */
+    public static EvaluationException BBL_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("BBL_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid bbu() offset. */
+    public static EvaluationException BBU_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("BBU_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid corr() offset. */
+    public static EvaluationException CORR_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("CORR_OFFSET_ERROR"));
 
     /** An exception which is thrown on an invalid ema() offset. */
     public static EvaluationException EMA_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("EMA_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid lag() offset. */
+    public static EvaluationException LAG_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("LAG_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid macd() offset. */
+    public static EvaluationException MACD_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("MACD_OFFSET_ERROR"));
 
     /** An exception which is thrown on an invalid max() offset. */
     public static EvaluationException MAX_OFFSET_EXCEPTION =
@@ -109,6 +132,14 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException MIN_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("MIN_OFFSET_ERROR"));
 
+    /** An exception which is thrown on an invalid momentum() offset. */
+    public static EvaluationException MOMENTUM_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("MOMENTUM_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid obv() offset. */
+    public static EvaluationException OBV_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("OBV_OFFSET_ERROR"));
+
     /** An exception which is thrown on an invalid rsi() offset. */
     public static EvaluationException RSI_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("RSI_OFFSET_ERROR"));
@@ -117,13 +148,18 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException SD_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("SD_OFFSET_ERROR"));
 
-    /** An exception which is thrown on an invalid corr() offset. */
-    public static EvaluationException CORR_OFFSET_EXCEPTION =
-        new EvaluationException(Locale.getString("CORR_OFFSET_ERROR"));
+    /** An exception which is thrown on an invalid sum() offset. */
+    public static EvaluationException SUM_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("SUM_OFFSET_ERROR"));
 
     /** An exception which is thrown on an invalid ema() smoothing constant. */
     public static EvaluationException EMA_SMOOTHING_EXCEPTION =
         new EvaluationException(Locale.getString("EMA_SMOOTHING_ERROR"));
+
+    /** An exception which is thrown when trying to calculate the square
+        root of a negative number. */
+    public static EvaluationException SQUARE_ROOT_NEGATIVE_EXCEPTION =
+        new EvaluationException(Locale.getString("SQUARE_ROOT_NEGATIVE_ERROR"));
 
     /**
      * Create a new evaluation exception with the given error reason.

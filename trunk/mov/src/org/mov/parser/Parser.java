@@ -72,7 +72,13 @@ import org.mov.util.Locale;
  *                     "sqrt" "(" SUB_EXPR ")" |
  *                     "abs" "(" SUB_EXPR ")" |
  *                     "corr" "(" STRING "," QUOTE "," SUB_EXPR ["," SUB_EXPR] ")"
- *                     "ema" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ["," SUB_EXPR] ")"
+ *                     "ema" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ["," SUB_EXPR] ")"
+ *                     "bbl" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "bbu" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "macd" "(" QUOTE ["," SUB_EXPR] ")" |
+ *                     "momentum" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "obv" "(" SUB_EXPR ["," SUB_EXPR] ["," SUB_EXPR] ")" |
+ *                     "sd" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
  * FLOW_CONTROL      = "if"  "(" SUB_EXPR ")" EXPR "else" EXPR |
  *                     "for" "(" SUB_EXPR ";" SUB_EXPR ";" SUB_EXPR ")" EXPR |
  *                     "while" "(" SUB_EXPR ")" EXPR
@@ -307,7 +313,13 @@ public class Parser {
                 tokens.match(Token.SQRT_TOKEN) ||
                 tokens.match(Token.ABS_TOKEN) ||
                 tokens.match(Token.CORR_TOKEN) ||
-                tokens.match(Token.EMA_TOKEN))
+                tokens.match(Token.EMA_TOKEN) ||
+                tokens.match(Token.BBL_TOKEN) ||
+                tokens.match(Token.BBU_TOKEN) ||
+                tokens.match(Token.MACD_TOKEN) ||
+                tokens.match(Token.MOMENTUM_TOKEN) ||
+                tokens.match(Token.OBV_TOKEN) ||
+                tokens.match(Token.SD_TOKEN))
 	    expression = parseFunction(variables, tokens);
 
         // ABBREVIATION QUOTE FUNCTIONS
@@ -504,6 +516,7 @@ public class Parser {
 
 	switch(function.getType()) {
 	case(Token.LAG_TOKEN):
+	case(Token.MACD_TOKEN):
 	    arg1 = parseQuote(variables, tokens);
 
             // Parse optional offset argument
@@ -512,15 +525,18 @@ public class Parser {
 		arg2 = parseSubExpression(variables, tokens);
 	    }
 	    else
-		arg3 = new NumberExpression(0);
+		arg2 = new NumberExpression(0);
 
 	    break;
 
 	case(Token.MIN_TOKEN):
 	case(Token.MAX_TOKEN):
 	case(Token.AVG_TOKEN):
-	case(Token.SD_TOKEN):
 	case(Token.SUM_TOKEN):
+	case(Token.BBL_TOKEN):
+	case(Token.BBU_TOKEN):
+	case(Token.MOMENTUM_TOKEN):
+	case(Token.SD_TOKEN):
 	    arg1 = parseQuote(variables, tokens);
 	    parseComma(variables, tokens);
 	    arg2 = parseSubExpression(variables, tokens);
@@ -566,7 +582,8 @@ public class Parser {
                 parseComma(variables, tokens);
                 arg4 = parseSubExpression(variables, tokens);
             }
-            arg4 = new NumberExpression(0);
+            else
+                arg4 = new NumberExpression(0);
 
             break;
 
@@ -574,18 +591,53 @@ public class Parser {
 	    arg1 = parseQuote(variables, tokens);
 	    parseComma(variables, tokens);
 	    arg2 = parseSubExpression(variables, tokens);
-	    parseComma(variables, tokens);
-	    arg3 = parseSubExpression(variables, tokens);
 
-            // Parse optional offset argument
+            // Parse optional offset/smoothing constant argument
             if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
 		parseComma(variables, tokens);
-		arg4 = parseSubExpression(variables, tokens);	
+		arg3 = parseSubExpression(variables, tokens);	
+                // Parse optional smoothing constant argument
+                if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+                    parseComma(variables, tokens);
+                    arg4 = parseSubExpression(variables, tokens);	
+                }
+                else {
+                    if (arg3.getType()==NumberExpression.INTEGER_TYPE) {
+                        // ema(quote,period,lag)
+                        arg4 = new NumberExpression(0.1D);
+                    } else {
+                        // ema(quote,period,smoothing constant)
+                        arg4 = arg3;
+                        arg3 = new NumberExpression(0);
+                    }
+                }
 	    }
-	    else
-		arg4 = new NumberExpression(0);
+	    else {
+		// ema(quote,period)
+                arg3 = new NumberExpression(0);
+		arg4 = new NumberExpression(0.1D);
+            }
 
 	    break;
+
+	case(Token.OBV_TOKEN):
+            arg2 = new NumberExpression(0);
+            arg3 = new NumberExpression(50000);
+	    arg1 = parseSubExpression(variables, tokens);
+            // Parse optional offset argument
+            if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+
+                parseComma(variables, tokens);
+                arg2 = parseSubExpression(variables, tokens);
+
+                // Parse optional initialValue argument
+                if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+                    parseComma(variables, tokens);
+                    arg3 = parseSubExpression(variables, tokens);
+                }
+            }
+
+            break;
 
 	case(Token.PERCENT_TOKEN):
 	    arg1 = parseSubExpression(variables, tokens);

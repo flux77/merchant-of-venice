@@ -29,7 +29,7 @@ import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.ProxyAuthenticator;
+import org.mov.prefs.ProxyPage;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
 import org.mov.util.Locale;
@@ -148,10 +148,7 @@ public class Main extends JFrame {
 	    // Shouldn't happen, but if it does just keep going
 	}
 	venice = new Main();
-
 	venice.setVisible(true);
-	
-	ProxyAuthenticator.setupNetworking();
     }
 }
 

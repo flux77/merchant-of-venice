@@ -25,6 +25,7 @@ import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.ProxyPage;
 import org.mov.quote.DatabaseQuoteSource;
 import org.mov.quote.FileQuoteSource;
 import org.mov.quote.InternetQuoteSource;
@@ -411,7 +412,6 @@ public class ImporterModule extends JPanel
             TradingDate startDate;
             TradingDate endDate;
             List symbols;
-
             try {
                 // Don't check that the symbols exist before import. After all
                 // they won't at the first import.
@@ -437,7 +437,7 @@ public class ImporterModule extends JPanel
                                                       JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
+            ProxyPage.setupNetworking();//bryan
             source = new InternetQuoteSource(exchange, startDate, endDate);
             performImport(source, symbols);
 	}

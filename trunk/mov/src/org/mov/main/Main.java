@@ -45,6 +45,17 @@ public class Main extends JFrame implements WindowListener {
     // Is skinlf.jar installed?
     private static boolean skinsAvailable;
 
+    // Release date and version information
+
+    /** Short version string, e.g. "0.1a" */
+    public static String SHORT_VERSION = "0.1a";
+
+    /** Longer version string, e.g. "0.1 alpha" */
+    public static String LONG_VERSION  = "0.1 alpha";
+
+    /** Release date, e.g. 13/Jan/2003 */
+    public static String RELEASE_DATE  = "13/Jan/2003";
+
     /**
      * Get the main frame for the current application
      * @return The frame
@@ -56,8 +67,11 @@ public class Main extends JFrame implements WindowListener {
     // Go!
     private Main() {
         // Display a brief copyright message
-        System.out.println("Merchant of Venice, 0.1 alpha *pre-release* / 13/Jan/2003");
-        System.out.println("---------------------------------------------------------");
+        String title = "Merchant of Venice, " + LONG_VERSION + " / " + RELEASE_DATE;
+        System.out.println(title);
+        for(int i = 0; i < title.length(); i++)
+            System.out.print("-");
+        System.out.println("");
         System.out.println("Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)");
         System.out.println("See COPYING.txt for license terms.");
 
@@ -66,7 +80,8 @@ public class Main extends JFrame implements WindowListener {
 		p.getInt("default_height", 600));
 	setLocation(p.getInt("default_x", 0),
 		    p.getInt("default_y", 0));
-	setTitle("Venice");
+
+	setTitle("Venice " + SHORT_VERSION);
 
 	desktop = new JDesktopPane();
 	desktopManager = new org.mov.ui.DesktopManager(desktop);

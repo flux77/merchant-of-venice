@@ -90,7 +90,6 @@
 ./org.mov/prefs/PreferencesModule.java
 ./org.mov/prefs/PreferencesPage.java
 ./org.mov/prefs/QuoteSourcePage.java
-./org.mov/quote/DatabaseLookup.java
 ./org.mov/quote/DatabaseQuoteSource.java
 ./org.mov/quote/EzyChartQuoteFilter.java
 ./org.mov/quote/FileQuoteSource.java

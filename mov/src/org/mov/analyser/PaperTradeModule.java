@@ -1,112 +1,428 @@
 package org.mov.analyser;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeListener;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.table.*;
+
+import org.mov.main.*;
 import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
+import org.mov.ui.*;
 
-public class PaperTradeModule {
+public class PaperTradeModule extends JPanel implements Module,
+							ActionListener {
 
-    private final static String CASH_ACCOUNT_NAME = "Cash Account";
-    private final static String SHARE_ACCOUNT_NAME = "Share Account";
+    private PropertyChangeSupport propertySupport;
+    
+    private JDesktopPane desktop;
 
-    private static Portfolio createPortfolio(String portfolioName,
-					    TradingDate startDate,
-					    float capital) {
-	Portfolio portfolio = new Portfolio(portfolioName);
+    private JTextField fromDateTextField;
+    private JTextField toDateTextField;
+    private JTextField symbolsTextField;
+    private JTextField buyRuleTextField;
+    private JTextField sellRuleTextField;
+    private JTextField initialCapitalTextField;
+    private JTextField tradeCostTextField;
 
-	// Add a cash account and a share account
-	CashAccount cashAccount = new CashAccount(CASH_ACCOUNT_NAME);
-	ShareAccount shareAccount = new ShareAccount(SHARE_ACCOUNT_NAME);
+    private JButton tradeButton;
+    private JButton closeButton;
 
-	portfolio.addAccount(cashAccount);
-	portfolio.addAccount(shareAccount);
+    /**
+     * Create a new paper trade module.
+     *
+     * @param	desktop	the current desktop
+     */
+    public PaperTradeModule(JDesktopPane desktop) {
 
-	// Deposit starting capital into portfolio
-	Transaction transaction = 
-	    Transaction.newDeposit(startDate, capital, cashAccount);
+	this.desktop = desktop;
 
-	portfolio.addTransaction(transaction);
+	propertySupport = new PropertyChangeSupport(this);
 
-	return portfolio;
+	//	createMenu();
+	layoutPaperTrade();
     }
 
-    /*
-    private static Portfolio sell(QuoteCache cache,
-				  Portfolio portfolio,
-				  CashAccount cashAccount,
-				  ShareAccount shareAccount,
-				  String symbol,
-				  float tradeCost,
-				  int day) {
+    private void layoutPaperTrade() {
 
-	TradingDate date = cache.offsetToDate(day);
+	setLayout(new BorderLayout());
 
-	// Make sure we have enough money for the trade
-	if(cashAccount.getValue(cache, date) >= tradeCost) {
+	Box paperTradeOptions = Box.createVerticalBox();
+
+	// Date panel
+	{
+	    TitledBorder dateTitled = new TitledBorder("Date Range");
+	    JPanel datePanel = new JPanel();
+	    datePanel.setBorder(dateTitled);
+
+	    GridBagLayout gridbag = new GridBagLayout();
+	    GridBagConstraints c = new GridBagConstraints();
+	    datePanel.setLayout(gridbag);
+
+	    c.weightx = 1.0;
+	    c.ipadx = 5;
+	    c.anchor = GridBagConstraints.WEST;
+
+	    fromDateTextField = 
+		addTextRow(datePanel, "From Date", "", gridbag, c, 15);
+	    toDateTextField = 
+		addTextRow(datePanel, "To Date", "", gridbag, c, 15);
+
+	    paperTradeOptions.add(datePanel);
+	}
+
+	// Symbols Panel
+	{
+	    TitledBorder symbolTitled = new TitledBorder("Symbol");
+	    JPanel symbolPanel = new JPanel();
+	    symbolPanel.setBorder(symbolTitled);
+
+	    GridBagLayout gridbag = new GridBagLayout();
+	    GridBagConstraints c = new GridBagConstraints();
+	    symbolPanel.setLayout(gridbag);
+
+	    c.weightx = 1.0;
+	    c.ipadx = 5;
+	    c.anchor = GridBagConstraints.WEST;
+
+	    symbolsTextField = 
+		addTextRow(symbolPanel, "Symbols", "", gridbag, c, 15);
+
+	    paperTradeOptions.add(symbolPanel);
 
 	}
 
+	// Equations Panel
+	{
+	    TitledBorder equationTitled = new TitledBorder("Buy/Sell Rules");
+	    JPanel equationPanel = new JPanel();
+	    equationPanel.setBorder(equationTitled);
+
+	    GridBagLayout gridbag = new GridBagLayout();
+	    GridBagConstraints c = new GridBagConstraints();
+	    equationPanel.setLayout(gridbag);
+
+	    c.weightx = 1.0;
+	    c.ipadx = 5;
+	    c.anchor = GridBagConstraints.WEST;
+
+	    buyRuleTextField = 
+		addTextRow(equationPanel, "Buy Rule", "", gridbag, c, 18);
+	    sellRuleTextField = 
+		addTextRow(equationPanel, "Sell Rule", "", gridbag, c, 18);
+	    
+	    paperTradeOptions.add(equationPanel);
+
+	}
+
+	// Portfolio Panel
+	{
+	    TitledBorder portfolioTitled = new TitledBorder("Portfolio");
+	    JPanel portfolioPanel = new JPanel();
+	    portfolioPanel.setBorder(portfolioTitled);
+
+	    GridBagLayout gridbag = new GridBagLayout();
+	    GridBagConstraints c = new GridBagConstraints();
+	    portfolioPanel.setLayout(gridbag);
+
+	    c.weightx = 1.0;
+	    c.ipadx = 5;
+	    c.anchor = GridBagConstraints.WEST;
+
+	    initialCapitalTextField = 
+		addTextRow(portfolioPanel, "Initial Capital", "", gridbag, c, 
+			   15);
+	    tradeCostTextField =
+		addTextRow(portfolioPanel, "Trade Cost", "", gridbag, c, 15);
+	    
+	    paperTradeOptions.add(portfolioPanel);
+	}
+
+	add(paperTradeOptions, BorderLayout.CENTER);
+
+	// Paper trade, close buttons
+	JPanel buttonPanel = new JPanel();
+	tradeButton = new JButton("Paper Trade");
+	tradeButton.addActionListener(this);
+	closeButton = new JButton("Close");
+	closeButton.addActionListener(this);
+	buttonPanel.add(tradeButton);
+	buttonPanel.add(closeButton);
+
+	add(buttonPanel, BorderLayout.SOUTH);
     }
-    */
 
-    public static Portfolio paperTrade(String portfolioName, 
-				       QuoteCache cache, String symbol,
-				       TradingDate startDate, 
-				       TradingDate endDate,
-				       Expression buy,
-				       Expression sell,
-				       float capital,
-				       float tradeCost) {
+    // Helper method which adds a new text field in a new row to the given 
+    // grid bag layout.
+    private JTextField addTextRow(JPanel panel, String field, String value,
+				  GridBagLayout gridbag,
+				  GridBagConstraints c,
+				  int length) {
+	JLabel label = new JLabel(field);
+	c.gridwidth = 1;
+	gridbag.setConstraints(label, c);
+	panel.add(label);
 
-	// First create a portfolio suitable for paper trading
-	Portfolio portfolio = createPortfolio(portfolioName,
-					      startDate,
-					      capital);
-	ShareAccount shareAccount = 
-	    (ShareAccount)
-	    portfolio.findAccountByName(SHARE_ACCOUNT_NAME);
-	CashAccount cashAccount = 
-	    (CashAccount)
-	    portfolio.findAccountByName(CASH_ACCOUNT_NAME);
+	JTextField text = new JTextField(value, length);
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(text, c);
+	panel.add(text);
 
-	int day = cache.dateToOffset(startDate);
-	int endDay = cache.dateToOffset(endDate);
+	return text;
+    }
 
-	// This is set when we own the stock
-	boolean ownStock = false;
+    public void save() {
 
-	// Now iterate through each trading day and decide whether
-	// to buy/sell
-	while(day <= endDay) {
+    }
 
-	    try {		
-		// If we own the stock should we sell?
-		if(ownStock) {
-		    if(sell.evaluate(cache, symbol, day) >= Expression.TRUE) {
-			//			portfolio = sell(portfolio, cashAccount,
-			//		 shareAccount, cache, symbol, 
-			//		 tradeCost, day);
+    public String getTitle() {
+	return "Paper Trade";
+    }
+
+    /**
+     * Add a property change listener for module change events.
+     *
+     * @param	listener	listener
+     */
+    public void addModuleChangeListener(PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(listener);
+    }
+    
+    /**
+     * Remove a property change listener for module change events.
+     *
+     * @param	listener	listener
+     */
+    public void removeModuleChangeListener(PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(listener);
+    }
+    
+    /**
+     * Return frame icon for table module.
+     *
+     * @return	the frame icon.
+     */
+    public ImageIcon getFrameIcon() {
+	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/TableIcon.gif"));
+    }    
+
+    /**
+     * Return displayed component for this module.
+     *
+     * @return the component to display.
+     */
+    public JComponent getComponent() {
+	return this;
+    }
+
+    /**
+     * Return menu bar for chart module.
+     *
+     * @return	the menu bar.
+     */
+    public JMenuBar getJMenuBar() {
+	//	return menuBar;
+	return null;
+    }
+
+    /**
+     * Return whether the module should be enclosed in a scroll pane.
+     *
+     * @return	enclose module in scroll bar
+     */
+    public boolean encloseInScrollPane() {
+	return true;
+    }
+
+    /**
+     * Handle widget events.
+     *
+     * @param	e	action event
+     */
+    public void actionPerformed(final ActionEvent e) {
+
+	if(e.getSource() == closeButton) {
+	    // Tell frame we want to close
+	    propertySupport.
+		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
+	}
+	else if(e.getSource() == tradeButton) {
+	    Thread t = new Thread(new Runnable() {
+		    public void run() {
+			paperTrade();
 		    }
+		});
+
+	    t.start();
+	}
+
+    }
+    
+    private void paperTrade() {
+
+	// 
+	// Extract data from GUI
+	//
+
+	TradingDate fromDate = new TradingDate(fromDateTextField.getText(),
+					       TradingDate.BRITISH);
+	TradingDate toDate = new TradingDate(toDateTextField.getText(),
+					     TradingDate.BRITISH);
+	SortedSet symbols = 
+	    Converter.stringToSortedSet(symbolsTextField.getText());
+
+	Parser parser = new Parser();
+	Expression buyRule = null;
+	Expression sellRule = null;
+
+	try {
+	    buyRule = parser.parse(buyRuleTextField.getText());
+	}
+	catch(ExpressionException e) {	   
+	    buildPaperTradeError("Error parsing buy rule: " +
+				 e.getReason());
+	    return;
+	}
+
+	try {
+	    sellRule = parser.parse(sellRuleTextField.getText());
+	}
+	catch(ExpressionException e) {
+	    buildPaperTradeError("Error parsing sell rule: " +
+				 e.getReason());
+	    return;
+	}
+
+	float initialCapital = 0.0F;
+	float tradeCost = 0.0F;
+
+	try {
+	    if(!initialCapitalTextField.getText().equals(""))
+		initialCapital = 
+		    Float.parseFloat(initialCapitalTextField.getText());
+	    	   
+	    if(!tradeCostTextField.getText().equals(""))
+		tradeCost = 
+		    Float.parseFloat(tradeCostTextField.getText());
+	}
+
+	//
+	// Validate data
+	//
+
+	catch(NumberFormatException e) {
+	    buildPaperTradeError("Can't parse number '" +
+				 e.getMessage() + "'");
+	    return;
+	}
+
+	if(initialCapital <= 0) {
+	    buildPaperTradeError("Cannot trade without some initial capital");
+	    return;
+	}
+
+	if(fromDate.getYear() == 0 || toDate.getYear() == 0 ||
+	   fromDate.after(toDate)) {
+	    buildPaperTradeError("Invalid date range");
+	    return;
+	}
+
+	if(symbols.size() == 0) {
+	    buildPaperTradeError("Need to specify a commodity to trade");
+	    return;
+	}
+	else {
+	    String symbol = (String)symbols.first();
+
+	    // Check company exists
+	    if(!QuoteSourceManager.getSource().symbolExists(symbol)) {
+		buildPaperTradeError("No data available for commodity: " +
+				     symbol);
+				     
+		return;
+	    }
+
+	}
+
+	//
+	// Trade
+	//
+
+	final Thread thread = Thread.currentThread();
+	ProgressDialog progress = 
+	    ProgressDialogManager.getProgressDialog();
+	progress.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    thread.interrupt();
 		}
+	    });
+
+	Portfolio portfolio = null;
+	    
+	try {
+	    progress.setTitle("Loading quotes for paper trade");
+	    progress.show();
 		
-		// If we don't own the stock should we buy?
-		else {
-		    if(buy.evaluate(cache, symbol, day) >= Expression.TRUE) {
-			//			portfolio = buy(portfolio, cash, symbol, date);
-		    }
+	    QuoteCache cache = new QuoteCache((String)symbols.first());
+
+            if (!thread.isInterrupted()) {	       
+
+		// Skip non trading days. Non trading days wont be in
+		// the cache and will have positive offsets.
+		while(cache.dateToOffset(fromDate) > 0 &&
+		      fromDate.before(toDate))
+		    fromDate = fromDate.next(1);
+
+		while(cache.dateToOffset(toDate) > 0 &&
+		      toDate.after(fromDate))
+		    toDate = toDate.previous(1);
+
+		// This error will happen if the entire date range does
+		// not cover a single trading day
+		if(cache.dateToOffset(fromDate) > 0 ||
+		   cache.dateToOffset(toDate) > 0) {
+		    buildPaperTradeError("Invalid date range");
+		    return;
 		}
-	    }
-	    catch(EvaluationException e) {
-		// we couldnt get a quote for this day - ignore
+
+		String symbol = (String)symbols.first();
+		symbol = symbol.toLowerCase();
+
+		portfolio = 
+		    PaperTrade.paperTrade("Paper Trade of " + 
+					  symbol.toUpperCase(),
+					  cache,
+					  symbol,
+					  fromDate,
+					  toDate,
+					  buyRule,
+					  sellRule,
+					  initialCapital,
+					  tradeCost);
 	    }
 
-	    // Go to the next trading day
-	    day++;
+	    if (!Thread.currentThread().interrupted()) {
+		ProgressDialogManager.closeProgressDialog();
+		CommandManager.getInstance().graphPortfolio(portfolio);
+	    }
+
+	} catch (Exception e) {
+	    ProgressDialogManager.closeProgressDialog();
 	}
-
-	return portfolio;
     }
 
+
+    private void buildPaperTradeError(String message) {
+	JOptionPane.showInternalMessageDialog(desktop, 
+					      message,
+					      "Error building Paper Trade",
+					      JOptionPane.ERROR_MESSAGE);
+    }
 
 }

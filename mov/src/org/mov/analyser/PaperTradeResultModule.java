@@ -162,12 +162,10 @@ public class PaperTradeResultModule extends AbstractTable
 		(PaperTradeResult)results.elementAt(row);
 
 	    if(column == START_DATE_COLUMN) {
-		System.out.println("start date " + result.startDate);
 		return result.startDate;
 	    }
 
 	    else if(column == END_DATE_COLUMN) {
-		System.out.println("end date " + result.endDate);
 		return result.endDate;
 	    }
 
@@ -180,7 +178,10 @@ public class PaperTradeResultModule extends AbstractTable
 		    String symbol = (String)iterator.next();
 		    symbol = symbol.toUpperCase();
 
-		    string = string.concat(", " + symbol);
+		    if(string.length() > 0)
+			string = string.concat(", " + symbol);
+		    else
+			string = symbol;
 		}
 
 		return string;

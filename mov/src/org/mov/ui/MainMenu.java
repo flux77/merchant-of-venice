@@ -64,7 +64,7 @@ public class MainMenu
     private JMenuItem quoteStocksListSymbolsMenuItem;
 
     private JMenuItem analysisPaperTradeMenuItem;
-    private JMenuItem analysisGeneticProgrammingMenuItem;
+    private JMenuItem analysisGPMenuItem;
 
     private JMenuItem windowTileHorizontalMenuItem;
     private JMenuItem windowTileVerticalMenuItem;
@@ -261,7 +261,7 @@ public class MainMenu
 		MenuHelper.addMenuItem(this, analysisMenu,
 				       "Paper Trade");
 
-	    analysisGeneticProgrammingMenuItem = 
+	    analysisGPMenuItem = 
 		MenuHelper.addMenuItem(this, analysisMenu,
 				       "Genetic Programming");
 	}
@@ -386,8 +386,8 @@ public class MainMenu
 		    // Analysis Menu
 		    else if (menu == analysisPaperTradeMenuItem)
 			CommandManager.getInstance().paperTrade();
-		    else if (menu == analysisGeneticProgrammingMenuItem)
-			CommandManager.getInstance().geneticProgramming();
+		    else if (menu == analysisGPMenuItem)
+			CommandManager.getInstance().gp();
 
 		    // Window Menu
 		    else if (menu == windowTileHorizontalMenuItem)

@@ -299,6 +299,7 @@ public class QuoteFunctions {
      *
      * @param source the source of quotes to average
      * @param period the number of days to analyse
+     * @param smoothingConstant a smoothing constant
      * @return       the exponential moving average
      * @see          org.mov.chart.graph.ExpMovingAverageGraph
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
@@ -379,4 +380,3 @@ public class QuoteFunctions {
             (double) places);
     }
 }
-

@@ -10,6 +10,7 @@ import javax.swing.*;
 
 import org.mov.main.*;
 import org.mov.util.*;
+import org.mov.quote.*;
 
 /**
  * The charting module for venice. This class provides the user interface
@@ -245,7 +246,7 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
      *
      * @param	listener	listener
      */
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    public void addModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
     }
 
@@ -254,7 +255,7 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
      *
      * @param	listener	listener
      */
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
+    public void removeModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
     }
 
@@ -395,6 +396,11 @@ public class AnalyserChart extends JPanel implements AnalyserModule,
     public boolean encloseInScrollPane() {
 	return false;
     }
+
+    /**
+     * Tell chart to save any current state data.
+     */
+    public void save() { }
 
     private class Menu extends JMenu implements ActionListener {
 

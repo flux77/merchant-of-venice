@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.*;
 
 import org.mov.util.*;
+import org.mov.quote.*;
 
 abstract public class Graph {
     private GraphDataSource source;

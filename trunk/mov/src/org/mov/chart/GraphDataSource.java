@@ -3,6 +3,7 @@ package org.mov.chart;
 import java.util.*;
 
 import org.mov.util.*;
+import org.mov.quote.*;
 
 abstract public class GraphDataSource extends BasicGraphDataSource {
     abstract public String getName();

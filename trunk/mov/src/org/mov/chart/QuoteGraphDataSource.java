@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.mov.util.*;
 import org.mov.parser.*;
+import org.mov.quote.*;
 
 abstract public class QuoteGraphDataSource extends GraphDataSource {
 

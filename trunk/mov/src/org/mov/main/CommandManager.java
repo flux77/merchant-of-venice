@@ -55,7 +55,7 @@ public class CommandManager {
     // Singleton instance of this class
     private static CommandManager instance = null;
 
-    // The desktop that any window operations will be performed on
+    private DesktopManager desktopManager;
     private JDesktopPane desktop;
 
     // Is the about dialog showing?
@@ -76,13 +76,10 @@ public class CommandManager {
 	return instance;
     }
 
-    /**
-     * Sets the desktop that any window operations will be performed on
-     *
-     * @param desktop The desktop that any window operations will be performed on
-     */
-    public void setDesktop(JDesktopPane desktop) {
-	this.desktop = desktop;
+
+    public void setDesktopManager(DesktopManager desktopManager) {
+	this.desktopManager = desktopManager;
+        this.desktop = desktopManager.getDesktop();
     }
 
     /**
@@ -218,7 +215,7 @@ public class CommandManager {
 
         if (!thread.isInterrupted()) {
             table = new QuoteModule(quoteBundle, rule, singleDate);
-            getDesktopManager().newFrame(table);
+            desktopManager.newFrame(table);
         }
 
         ProgressDialogManager.closeProgressDialog(progressDialog);
@@ -284,8 +281,8 @@ public class CommandManager {
      */
     public void openPortfolio(final Portfolio portfolio,
                               final QuoteBundle quoteBundle) {
-        getDesktopManager().newFrame(new PortfolioModule(desktop,
-                                                         portfolio, quoteBundle));
+        desktopManager.newFrame(new PortfolioModule(desktop,
+                                                    portfolio, quoteBundle));
     }
 
     /**
@@ -293,7 +290,7 @@ public class CommandManager {
      */
     public void paperTrade() {
 	PaperTradeModule module = new PaperTradeModule(desktop);
-	getDesktopManager().newFrame(module, true, true);
+	desktopManager.newFrame(module, true, true);
     }
 
     /**
@@ -301,7 +298,7 @@ public class CommandManager {
      */
     public void gp() {
 	GPModule module = new GPModule(desktop);
-	getDesktopManager().newFrame(module, true, true);
+	desktopManager.newFrame(module, true, true);
     }
 
     /**
@@ -312,7 +309,7 @@ public class CommandManager {
      */
     public ModuleFrame newPaperTradeResultTable() {	
 	PaperTradeResultModule results = new PaperTradeResultModule();
-	return getDesktopManager().newFrame(results);	
+	return desktopManager.newFrame(results);	
     }
 
     /**
@@ -323,7 +320,7 @@ public class CommandManager {
      */
     public ModuleFrame newGPResultTable() {
 	GPResultModule results = new GPResultModule();
-	return getDesktopManager().newFrame(results);	
+	return desktopManager.newFrame(results);	
     }
 
     /**
@@ -385,8 +382,8 @@ public class CommandManager {
                     }
 
                     if(!thread.isInterrupted())
-                        getDesktopManager().newFrame(new WatchScreenModule(watchScreen,
-                                                                           quoteBundle));
+                        desktopManager.newFrame(new WatchScreenModule(watchScreen,
+                                                                      quoteBundle));
                 }
 
                 ProgressDialogManager.closeProgressDialog(progress);
@@ -400,7 +397,7 @@ public class CommandManager {
      * Opens up an instance of the preferences module at the last visited page.
      */
     public void openPreferences() {
-	getDesktopManager().newFrame(new PreferencesModule(desktop), true, false);
+	desktopManager.newFrame(new PreferencesModule(desktop), true, false);
     }
 
     /**
@@ -409,7 +406,7 @@ public class CommandManager {
      * @param page the preference page to view.
      */
     public void openPreferences(int page ) {
-	getDesktopManager().newFrame(new PreferencesModule(desktop, page), true, false);
+	desktopManager.newFrame(new PreferencesModule(desktop, page), true, false);
     }
 
     /**
@@ -501,7 +498,7 @@ public class CommandManager {
             graph = new LineGraph(portfolioGraphSource);
             chart.add(graph, portfolio, quoteBundle, 0);
             chart.redraw();
-            getDesktopManager().newFrame(chart);
+            desktopManager.newFrame(chart);
         }
 
         ProgressDialogManager.closeProgressDialog(progress);
@@ -523,7 +520,7 @@ public class CommandManager {
                     chart.add(graph, null, 0);
                     chart.redraw();
 
-                    getDesktopManager().newFrame(chart);
+                    desktopManager.newFrame(chart);
                 }
 	    }
 	    });
@@ -624,7 +621,7 @@ public class CommandManager {
             }
 
             if (!thread.isInterrupted())
-                getDesktopManager().newFrame(chart);
+                desktopManager.newFrame(chart);
 
             ProgressDialogManager.closeProgressDialog(progress);
         }
@@ -668,20 +665,13 @@ public class CommandManager {
     public void openHelp() {
         HelpModule helpModule = new HelpModule(desktop);
 
-        getDesktopManager().newFrame(helpModule, false, false);
+        desktopManager.newFrame(helpModule, false, false);
     }
 
     /**
      * Shows a dialog and imports quotes into Venice
      */
     public void importQuotes() {
-        getDesktopManager().newFrame(new ImporterModule(desktop), true, true);
-    }
-
-    // Returns the singleton desktop manager. This will be an instance of
-    // org.mov.ui.DesktopManager. The desktop manager controls the layout of
-    // the internal frames in the desktop
-    private DesktopManager getDesktopManager() {
-        return (DesktopManager)desktop.getDesktopManager();
+        desktopManager.newFrame(new ImporterModule(desktop), true, true);
     }
 }

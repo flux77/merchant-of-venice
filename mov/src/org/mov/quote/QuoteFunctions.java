@@ -203,5 +203,24 @@ public class QuoteFunctions {
             return 100.0D - 100.D / (1.0D + RS);
         }
     }
+
+    static public double ema(double values[], int start, int end, double smoothingConstant) {
+	double avg = 0.0D;
+	double prev = 0.0;
+	int period = end - start;
+
+	// Formula: AVGcurrent = AVGprev + k(DATAcurrent - AVGprev) where:
+	// AVGcurrent is the avg over values, DATAcurrent is values[i], and k is the smoothing constant.
+	for(int i = start; i < end; i++) {	    
+	    if (i > start) {
+		avg = prev + (smoothingConstant) * (values[i] - prev);
+		prev = avg;
+	    } else {
+		prev = values[i];
+		avg = prev;
+	    }
+	}	
+	return avg;
+    }
 }
 

@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import org.mov.ui.DesktopManager;
 
 /**
  * An internal frame designed specifically for holding Module objects.  Every visible Module should run within
@@ -30,18 +31,19 @@ public class ModuleFrame extends JInternalFrame
     /**
      * Construct a new frame around the given module and display.
      *
-     * @param desktop the desktop to display the frame on
      * @param module The module to feed to the frame
      * @param isPreferences	Is the frame a preferences frame that should
      *				be centred and size honoured?
      */
-    public ModuleFrame(JDesktopPane desktop, Module module, 
+    public ModuleFrame(Module module, 
 		       boolean isPreferences) {
 
 	// Resizable, closable etc
 	super(module.getTitle(), true, true, true, true);
 
 	this.module = module;
+
+	JDesktopPane desktop = DesktopManager.getDesktop();
 
 	// Module can be enclosed in scroll pane if it desires to be
 	if(module.encloseInScrollPane()) 

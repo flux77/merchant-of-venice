@@ -12,7 +12,7 @@ import org.mov.main.*;
 import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
-import org.mov.ui.AnalyserDesktopManager;
+import org.mov.ui.DesktopManager;
 
 public class QuoteModule extends AbstractTable
     implements Module {
@@ -25,6 +25,9 @@ public class QuoteModule extends AbstractTable
     private static final int DAY_CLOSE_COLUMN = 5;
     private static final int CHANGE_COLUMN = 6;
 
+
+    private JMenuBar menuBar;
+    
     private PropertyChangeSupport propertySupport;
     private QuoteCache cache;
     private Object[] symbols;
@@ -129,7 +132,9 @@ public class QuoteModule extends AbstractTable
     private void newTable(QuoteCache cache, 
 			  org.mov.parser.Expression expression) {
 	
-	
+	menuBar = new JMenuBar();
+	menuBar.add(new JMenu("Test menu 1"));
+	menuBar.add(new JMenu("Test menu 2"));
 	this.expression = expression;
 	this.cache = cache;
 
@@ -189,7 +194,7 @@ public class QuoteModule extends AbstractTable
 
 	    // Tell user expression didnt evaluate properly
 	    JOptionPane.
-		showInternalMessageDialog(AnalyserDesktopManager.getDesktop(),
+		showInternalMessageDialog(DesktopManager.getDesktop(),
 					  e.getReason() + ": " +
 					  expression.toString(),
 					  "Error evaluating expression",
@@ -209,7 +214,63 @@ public class QuoteModule extends AbstractTable
     public void save() {
 
     }
+
+    public String getTitle() {
+	return "Quotes";
+    }
+
+    /**
+     * Add a property change listener for module change events.
+     *
+     * @param	listener	listener
+     */
+    public void addModuleChangeListener(PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(listener);
+    }
+    
+    /**
+     * Remove a property change listener for module change events.
+     *
+     * @param	listener	listener
+     */
+    public void removeModuleChangeListener(PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(listener);
+    }
+    
+    /**
+     * Return frame icon for table module.
+     *
+     * @return	the frame icon.
+     */
+    public ImageIcon getFrameIcon() {
+	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/TableIcon.gif"));
+    }    
+
+    /**
+     * Return displayed component for this module.
+     *
+     * @return the component to display.
+     */
+    public JComponent getComponent() {
+	return this;
+    }
+
+    /**
+     * Return menu bar for chart module.
+     *
+     * @return	the menu bar.
+     */
+    public JMenuBar getJMenuBar() {
+	return menuBar;
+    }
+
+    /**
+     * Return whether the module should be enclosed in a scroll pane.
+     *
+     * @return	enclose module in scroll bar
+     */
+    public boolean encloseInScrollPane() {
+	return true;
+    }
+    
 }
-
-
-

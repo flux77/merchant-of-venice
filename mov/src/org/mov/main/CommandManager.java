@@ -115,7 +115,7 @@ public class CommandManager {
     private void displayStockList(int searchRestriction, Expression expression) {
 	QuoteCache cache = new QuoteCache(Quote.getSource().getLatestQuoteDate(),
 					  searchRestriction);
-	((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new QuoteModule(desktop_instance, cache, expression), false);
+	((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new QuoteModule(cache, expression), false);
     }
 
     /** Displays a graph closing prices for stock(s), based on their code. The stock(s) is/are determined by a user prompt */

@@ -20,8 +20,9 @@ package org.mov.importer;
 
 import org.mov.main.ModuleFrame;
 import org.mov.main.Module;
-import org.mov.util.Converter;
+import org.mov.ui.GridBagHelper;
 import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.DatabaseQuoteSource;
 import org.mov.quote.FileQuoteSource;
@@ -35,6 +36,8 @@ import org.mov.quote.QuoteRange;
 import org.mov.quote.QuoteSource;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.ScriptQuoteBundle;
+import org.mov.quote.Symbol;
+import org.mov.quote.SymbolFormatException;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
 
@@ -67,6 +70,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -87,10 +91,15 @@ public class ImporterModule extends JPanel
 
     // Import From
     private JRadioButton fromDatabase;
+
     private JRadioButton fromFiles;
     private JComboBox formatComboBox;
+
     private JRadioButton fromInternet;
     private JComboBox exchangeComboBox;
+    private JTextField symbolList;
+    private JTextField startDateTextField;
+    private JTextField endDateTextField;
 
     // Import To
     private JCheckBox toFiles;
@@ -134,6 +143,7 @@ public class ImporterModule extends JPanel
 	    c.weightx = 1.0;
 	    c.ipadx = 5;
 	    c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
 
 	    // From Database
 	    fromDatabase = new JRadioButton("Database");
@@ -162,7 +172,7 @@ public class ImporterModule extends JPanel
 		QuoteFilter filter = (QuoteFilter)iterator.next();
 		formatComboBox.addItem(filter.getName());
                 if(filter.getName().equals(selectedFilter))
-                    formatComboBox.setSelectedItem((Object)filter.getName());
+                    formatComboBox.setSelectedItem(filter.getName());
 	    }
 
 	    c.gridwidth = GridBagConstraints.REMAINDER;
@@ -170,7 +180,7 @@ public class ImporterModule extends JPanel
 	    importFromPanel.add(formatComboBox);
 
 	    // From Internet
-	    fromInternet = new JRadioButton("Internet");
+            fromInternet = new JRadioButton("Internet");
 	    fromInternet.addActionListener(this);
 	    if(importFromSource.equals("internet"))
 		fromInternet.setSelected(true);
@@ -178,12 +188,33 @@ public class ImporterModule extends JPanel
 	    gridbag.setConstraints(fromInternet, c);
 	    importFromPanel.add(fromInternet);
 
+            String selectedExchange = p.get("internetExchange", "");
 	    exchangeComboBox = new JComboBox(InternetQuoteSource.getExchanges());
+            exchangeComboBox.setSelectedItem(selectedExchange);
 	    exchangeComboBox.addActionListener(this);
 
 	    c.gridwidth = GridBagConstraints.REMAINDER;
 	    gridbag.setConstraints(exchangeComboBox, c);
 	    importFromPanel.add(exchangeComboBox);
+
+            c.gridx = 1;
+            symbolList = GridBagHelper.addTextRow(importFromPanel, "Symbols", 
+                                                  p.get("internetSymbolList", ""),
+                                                  gridbag, c, 11);
+            c.gridx = 1;
+            TradingDate today = new TradingDate();
+            TradingDate previous = today.previous(30);
+
+            startDateTextField = GridBagHelper.addTextRow(importFromPanel, "Start Date",
+                                                          p.get("internetStartDate", 
+                                                                previous.toString("dd/mm/yyyy")),
+                                                          gridbag, c, 11);
+            c.gridx = 1;
+            endDateTextField = GridBagHelper.addTextRow(importFromPanel, "End Date", 
+                                                        p.get("internetEndDate",
+                                                              today.toString("dd/mm/yyyy")),
+                                                        gridbag, c, 11);
+            c.gridx = -1;
 
 	    // Put all "import from" radio buttons into group
 	    ButtonGroup group = new ButtonGroup();
@@ -207,6 +238,7 @@ public class ImporterModule extends JPanel
 	    c.weightx = 1.0;
 	    c.ipadx = 5;
 	    c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
 
 	    // To Database
 	    toDatabase = new JCheckBox("Database");
@@ -226,7 +258,8 @@ public class ImporterModule extends JPanel
 	    gridbag.setConstraints(toFiles, c);
 	    importToPanel.add(toFiles);
 
-	    toFileName = new JTextField(p.get("toFileName", ""), 15);
+	    toFileName = new JTextField(p.get("toFileName", 
+                                              "/tmp/quotes/dd-mm-yy.txt"), 15);
 	    c.gridwidth = GridBagConstraints.REMAINDER;
 	    gridbag.setConstraints(toFileName, c);
 	    importToPanel.add(toFileName);
@@ -263,9 +296,13 @@ public class ImporterModule extends JPanel
 	// to files (where the format is fixed)
 	formatComboBox.setEnabled(fromFiles.isSelected() &&
 				  !toFiles.isSelected());
-
-	// Year is only specified if importing from the internet
-        //	yearComboBox.setEnabled(fromInternet.isSelected());
+        
+        // Exchange, symbol list and dates are only applicable if importing
+        // from the internet
+        exchangeComboBox.setEnabled(fromInternet.isSelected());
+        symbolList.setEnabled(fromInternet.isSelected());
+        startDateTextField.setEnabled(fromInternet.isSelected());
+        endDateTextField.setEnabled(fromInternet.isSelected());
 
 	// Destination file name is only specified if importing to files
 	// and not importing from files
@@ -321,7 +358,6 @@ public class ImporterModule extends JPanel
     // Import quotes
     private void importQuotes() {
         QuoteSource source = null;
-	List dates = new ArrayList();
 
 	// If we are importing from files we'll need to open a dialog
 	if(fromFiles.isSelected()) {
@@ -361,79 +397,59 @@ public class ImporterModule extends JPanel
                     }
 
                     source = new FileQuoteSource(format, fileURLs);
-                    performImport(source);
+                    performImport(source, null);
                 }
 	    }
 	}
 
 	// Importing from the net
-
-        /*
 	else if(fromInternet.isSelected()) {
-	    // Create dates array from combo box
-	    String start = (String)yearComboBox.getSelectedItem();
-	    TradingDate startDate = null;
+            int exchange = exchangeComboBox.getSelectedIndex();
+            TradingDate startDate;
+            TradingDate endDate;
+            List symbols;
 
-	    // Otherwise go from the last day in the current qoute source
-	    if(start.equals("Latest Quotes")) {
-		if(toDatabase.isSelected()) {
-		    QuoteSource databaseSource =
-			QuoteSourceManager.createDatabaseQuoteSource();
-		    startDate = databaseSource.getLastDate();
-		}
+            try {
+                // Don't check that the symbols exist before import. After all
+                // they won't at the first import.
+                symbols = new ArrayList(Symbol.toSortedSet(symbolList.getText(), false));
+            }
+            catch(SymbolFormatException e) {
+                JOptionPane.showInternalMessageDialog(desktop, 
+                                                      e.getReason(),
+                                                      "Invalid Symbol List",
+                                                      JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-		if(toFiles.isSelected()) {
-		
-		    TradingDate fileStartDate;
-		    QuoteSource fileQuoteSource =
-			QuoteSourceManager.createFileQuoteSource();
+            try {
+                startDate = new TradingDate(startDateTextField.getText(), TradingDate.BRITISH);
+                endDate = new TradingDate(endDateTextField.getText(), TradingDate.BRITISH);
+            }
+            catch(TradingDateFormatException e) {
+                JOptionPane.showInternalMessageDialog(desktop, 
+                                                      "Invalid date.",
+                                                      "Invalid date range",
+                                                      JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-		    fileStartDate = fileQuoteSource.getLastDate();
-
-		    // Pick the earliest of the two dates
-		    if(fileStartDate != null &&
-		       fileStartDate.before(startDate))
-		    	startDate = fileStartDate;
-		}
-
-		// Increment start date to go past last date in data source
-		startDate = startDate.next(1);
-	    }
-
-	    else {
-		// Year is in last 4 characters
-		String yearString =
-		    start.substring(start.length() - 4,
-				    start.length());
-
-		startDate = new TradingDate(Integer.parseInt(yearString),
-					    1, 1);
-	    }
-
-	    // End date is yesterday
-	    TradingDate endDate = new TradingDate();
-	    endDate = endDate.previous(1);
-
-	    // Get vector of all trading dates inbetween
-	    dates = TradingDate.dateRangeToList(startDate, endDate);
-
-	    assert false;
-	    source = null;
-	    //	    source = QuoteSourceManager.createInternetQuoteSource();
+            source = new InternetQuoteSource(exchange, startDate, endDate);
+            performImport(source, symbols);
 	}
-        */
 
 	// Or database
 	else {
 	    source = QuoteSourceManager.createDatabaseQuoteSource();
 
 	    // Export all dates in database
-            performImport(source);
+            performImport(source, null);
 	}
     }
 
-    // Perform actual import given source and/or file list
-    private void performImport(QuoteSource source) {
+    // Perform actual import given source and/or file list. The symbols
+    // field is only specified for an import from the internet quote source.
+    private void performImport(QuoteSource source, List symbols) {
 
 	Thread thread = Thread.currentThread();
 
@@ -476,12 +492,17 @@ public class ImporterModule extends JPanel
 
                 progress.setNote("Importing " + date.toString("d?/m?/yyyy"));
 
-                // Load the next day's quotes to import - but only if we are
-                // importing to/from the database, otherwise there's no point since
-                // we would only copy the file name. 
+                // Load the next day's quotes to import - but don't
+                // bother if we are just importing files, since we don't
+                // need to load the quotes now. Also note that the internet
+                // quote source accepts a list of specific symbols - and
+                // cannot handle "ALL_SYMBOLS".
                 QuoteBundle quoteBundle = null;
 
-                if(isToDatabase || fromDatabase.isSelected() || fromInternet.isSelected())
+                if(fromInternet.isSelected())
+                    quoteBundle = 
+                        new ScriptQuoteBundle(new QuoteRange(symbols, date));
+                else if(isToDatabase || fromDatabase.isSelected())
                     quoteBundle = 
                         new ScriptQuoteBundle(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
 
@@ -597,7 +618,11 @@ public class ImporterModule extends JPanel
 	    p.put("from", "files");
 	else
 	    p.put("from", "internet");
-       	//p.put("internetYear", (String)yearComboBox.getSelectedItem());
+
+        p.put("internetExchange", (String)exchangeComboBox.getSelectedItem());
+        p.put("internetSymbolList", symbolList.getText());
+        p.put("internetStartDate", startDateTextField.getText());
+        p.put("internetEndDate", endDateTextField.getText());
 	p.put("fileFilter", (String)formatComboBox.getSelectedItem());
 
 	// Import To

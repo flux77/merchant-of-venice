@@ -47,7 +47,7 @@ public class Symbol implements Cloneable, Comparable {
     private String symbol;
     
     /** The minimum valid length for a symbol */
-    public final static int MINIMUM_SYMBOL_LENGTH = 2;
+    public final static int MINIMUM_SYMBOL_LENGTH = 1;
 
     /** The maximum valid length for a symbol. This cannot be more than 6 */
     public final static int MAXIMUM_SYMBOL_LENGTH = 9;
@@ -69,12 +69,13 @@ public class Symbol implements Cloneable, Comparable {
         else if(string.length() < MINIMUM_SYMBOL_LENGTH)
             throw new SymbolFormatException("Symbol '" + string + "' is too short.");
 
-        // A symbol can only contain letters. Yahoo finance adds in full stops and
-        // carots. So support them.
+        // A symbol can only contain numbers & letters. Yahoo finance adds in
+        // full stops and carots. So support them.
         for(int i = 0; i < string.length(); i++) {
             char letter = string.charAt(i);
 
-            if(!Character.isLetter(letter) && letter != '.' && letter != '^')
+            if(!Character.isLetter(letter) && !Character.isDigit(letter) &&
+               letter != '.' && letter != '^')
                 throw new SymbolFormatException("Symbol '" + string + "' contains non-" +
                                                 "alphabetical characters.");
         }
@@ -151,11 +152,13 @@ public class Symbol implements Cloneable, Comparable {
      * e.g "CBA WBC TLS" -> [CBA, TLS, WBC].
      *
      * @param	string	a comma or space separated list of symbols
+     * @param   checkExists set this flag to <code>TRUE</code> to make sure
+     *                      that the symbols are in the current quote source
      * @return	a sorted set of symbols
      * @exception SymbolFormatException if the string doesn't contain a 
      *            list of valid quotes
      */
-    public static SortedSet toSortedSet(String string)
+    public static SortedSet toSortedSet(String string, boolean checkExists)
         throws SymbolFormatException {
 
         // Split the string around spaces or commas
@@ -167,7 +170,7 @@ public class Symbol implements Cloneable, Comparable {
             if(symbols[i].length() > 0) {
                 Symbol symbol = find(symbols[i]);
                 
-                if(!QuoteSourceManager.getSource().symbolExists(symbol))
+                if(checkExists && !QuoteSourceManager.getSource().symbolExists(symbol))
                     throw new SymbolFormatException("No quotes available for symbol '" +
                                                     symbol + "'.");
                 sortedSet.add(symbol);
@@ -188,7 +191,7 @@ public class Symbol implements Cloneable, Comparable {
     public static Symbol toSymbol(String string)
         throws SymbolFormatException {
         
-        SortedSet symbols = toSortedSet(string);
+        SortedSet symbols = toSortedSet(string, true);
         Object[] symbolsArray = symbols.toArray();
 
         if(symbolsArray.length > 1)

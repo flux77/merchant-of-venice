@@ -121,6 +121,19 @@ public class CommandManager {
 	DesktopManager.tileFrames(DesktopManager.ARRANGE);
     }
 
+    /**
+     * Display the transactions to the user, opening portfolio window
+     *
+     * @param portfolio the portfolio
+     * @param quoteBundle fully loaded quote bundle
+     */
+    public void tableTransactions(final Portfolio portfolio,
+                              final QuoteBundle quoteBundle) {
+        PortfolioModule porfolioModule = new PortfolioModule(desktop, portfolio, quoteBundle);
+        desktopManager.newFrame(porfolioModule);
+        porfolioModule.showTransactionHistory();
+    }
+
     public void tableStocks(final int type) {
         Thread thread = new Thread(new Runnable() {
                 public void run() {

@@ -26,7 +26,10 @@ import java.util.TreeSet;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
-import org.mov.analyser.*;
+import org.mov.analyser.GPModule;
+import org.mov.analyser.GPResultModule;
+import org.mov.analyser.PaperTradeModule;
+import org.mov.analyser.PaperTradeResultModule;
 import org.mov.chart.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
@@ -109,15 +112,15 @@ public class CommandManager {
     public void tableStocks(final int type) {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
-                    String title = 
-                        new String("List " + 
+                    String title =
+                        new String("List " +
                                    QuoteRange.getDescription(type));
                     tableStocks(title, type, null, null, null);
                 }
             });
         thread.start();
     }
-    
+
     public void tableStocks(final List symbols) {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
@@ -125,12 +128,12 @@ public class CommandManager {
                     String title =
                         new String("List " +
                                    QuoteRange.getDescription(QuoteRange.GIVEN_SYMBOLS));
-                    
+
                     if(symbols == null)
                         symbolsCopy = SymbolListDialog.getSymbols(desktop, title);
                     else
                         symbolsCopy = new TreeSet(symbols);
-                    
+
                     tableStocks(title, QuoteRange.GIVEN_SYMBOLS, null, symbolsCopy, null);
                 }
             });
@@ -146,8 +149,8 @@ public class CommandManager {
                     TradingDate date = TradingDateDialog.getDate(desktop,
                                                                  title,
                                                                  "Date");
-                    if(date != null) 
-                        tableStocks(title, type, null, null, date); 
+                    if(date != null)
+                        tableStocks(title, type, null, null, date);
                 }
             });
         thread.start();
@@ -162,7 +165,7 @@ public class CommandManager {
                     String rule = ExpressionQuery.getExpression(desktop,
                                                                 title,
                                                                 "Rule");
-                    if(rule != null) 
+                    if(rule != null)
                         tableStocks(title, type, rule, null, null);
                 }
             });
@@ -201,7 +204,7 @@ public class CommandManager {
             }
         }
 
-        if (!thread.isInterrupted()) 
+        if (!thread.isInterrupted())
             quoteBundle = new ScriptQuoteBundle(quoteRange);
 
         if (!thread.isInterrupted()) {
@@ -249,10 +252,10 @@ public class CommandManager {
                     if(!thread.isInterrupted()) {
                         QuoteRange quoteRange =
                             new QuoteRange(QuoteRange.ALL_SYMBOLS, lastDate.previous(1), lastDate);
-                        
+
                         quoteBundle = new ScriptQuoteBundle(quoteRange);
                     }
-                    
+
                     if(!thread.isInterrupted())
                         openPortfolio(portfolio, quoteBundle);
                 }
@@ -280,18 +283,16 @@ public class CommandManager {
      * Open up a new paper trade module.
      */
     public void paperTrade() {
-	PaperTradeModule paperTrade = new PaperTradeModule(desktop);
-
-	getDesktopManager().newFrame(paperTrade, true, true);
+	PaperTradeModule module = new PaperTradeModule(desktop);
+	getDesktopManager().newFrame(module, true, true);
     }
 
     /**
      * Open up a new genetic programming module.
      */
-    public void geneticProgramming() {
-	GeneticProgrammeModule geneticProgramme = new GeneticProgrammeModule(desktop);
-
-	getDesktopManager().newFrame(geneticProgramme, true, true);
+    public void gp() {
+	GPModule module = new GPModule(desktop);
+	getDesktopManager().newFrame(module, true, true);
     }
 
     /**
@@ -300,11 +301,19 @@ public class CommandManager {
      *
      * @return	frame containing paper trade result module
      */
-    public ModuleFrame newPaperTradeResultTable() {
-	
-	PaperTradeResultModule results =
-	    new PaperTradeResultModule();
+    public ModuleFrame newPaperTradeResultTable() {	
+	PaperTradeResultModule results = new PaperTradeResultModule();
+	return getDesktopManager().newFrame(results);	
+    }
 
+    /**
+     * Open up a result table that will display a summary of results
+     * from genetic programming.
+     *
+     * @return	frame containing genetic programmes
+     */
+    public ModuleFrame newGPResultTable() {
+	GPResultModule results = new GPResultModule();
 	return getDesktopManager().newFrame(results);	
     }
 
@@ -435,17 +444,17 @@ public class CommandManager {
      * @param	symbols	Optional. Set of symbols to graph.
      */
     public void graphStockBySymbol(final java.util.List symbols) {
-        
+
         final Thread thread = new Thread(new Runnable() {
                 public void run() {
                     SortedSet symbolsCopy;
-                    
+
                     if(symbols == null)
                         symbolsCopy = SymbolListDialog.getSymbols(desktop,
                                                                   "Graph by Symbols");
                     else
                         symbolsCopy = new TreeSet(symbols);
-                    
+
                     graphStock(symbolsCopy);
                 }
             });
@@ -531,7 +540,7 @@ public class CommandManager {
     public void openAboutDialog() {
         if(!isAboutDialogUp) {
             isAboutDialogUp = true;
-            String aboutMessage = ("Merchant of Venice, " + Main.LONG_VERSION + " / " + 
+            String aboutMessage = ("Merchant of Venice, " + Main.LONG_VERSION + " / " +
                                    Main.RELEASE_DATE + "\n\n" +
 
                                    "Andrew Leppaprd (aleppard@picknow.com.au)\n" +
@@ -539,7 +548,7 @@ public class CommandManager {
 
                                    "Copyright (C) 2003, Andrew Leppard\n" +
                                    "See COPYING.txt for license terms.");
-            
+
             JOptionPane.showInternalMessageDialog(desktop, aboutMessage, "About Venice",
                                                   JOptionPane.PLAIN_MESSAGE);
             isAboutDialogUp = false;
@@ -551,12 +560,12 @@ public class CommandManager {
      */
     public void openHelp() {
         HelpModule helpModule = new HelpModule(desktop);
-        
+
         getDesktopManager().newFrame(helpModule, false, false);
     }
 
-    /** 
-     * Shows a dialog and imports quotes into Venice 
+    /**
+     * Shows a dialog and imports quotes into Venice
      */
     public void importQuotes() {
         getDesktopManager().newFrame(new ImporterModule(desktop), true, true);

@@ -66,15 +66,20 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
 		String symbol = quoteParts[i++];
 		TradingDate date = new TradingDate(quoteParts[i++],
 						   TradingDate.BRITISH);
-		float day_open = Float.parseFloat(quoteParts[i++]);
-		float day_high = Float.parseFloat(quoteParts[i++]);
-		float day_low = Float.parseFloat(quoteParts[i++]);
-		float day_close = Float.parseFloat(quoteParts[i++]);
-
-		// Convert volume from 1/100th volume to real volume
-		int volume = Integer.parseInt(quoteParts[i++]) * 100;
-		quote = new Quote(symbol, date, volume, day_low, day_high,
-				  day_open, day_close);
+                try {
+                    float day_open = Float.parseFloat(quoteParts[i++]);
+                    float day_high = Float.parseFloat(quoteParts[i++]);
+                    float day_low = Float.parseFloat(quoteParts[i++]);
+                    float day_close = Float.parseFloat(quoteParts[i++]);
+                    
+                    // Convert volume from 1/100th volume to real volume
+                    int volume = Integer.parseInt(quoteParts[i++]) * 100;
+                    quote = new Quote(symbol, date, volume, day_low, day_high,
+                                      day_open, day_close);
+                } 
+                catch(NumberFormatException e) {
+                    // Return null - couldn't parse quote
+                }
 	    }	    
 	}
 	return quote;

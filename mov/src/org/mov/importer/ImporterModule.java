@@ -25,6 +25,7 @@ import org.mov.util.TradingDate;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.DatabaseQuoteSource;
 import org.mov.quote.FileQuoteSource;
+import org.mov.quote.InternetQuoteSource;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteCache;
@@ -89,7 +90,7 @@ public class ImporterModule extends JPanel
     private JRadioButton fromFiles;
     private JComboBox formatComboBox;
     private JRadioButton fromInternet;
-    private JComboBox yearComboBox;
+    private JComboBox exchangeComboBox;
 
     // Import To
     private JCheckBox toFiles;
@@ -169,8 +170,6 @@ public class ImporterModule extends JPanel
 	    importFromPanel.add(formatComboBox);
 
 	    // From Internet
-
-            /*
 	    fromInternet = new JRadioButton("Internet");
 	    fromInternet.addActionListener(this);
 	    if(importFromSource.equals("internet"))
@@ -179,29 +178,18 @@ public class ImporterModule extends JPanel
 	    gridbag.setConstraints(fromInternet, c);
 	    importFromPanel.add(fromInternet);
 
-	    yearComboBox = new JComboBox();
-	    yearComboBox.addActionListener(this);
-	    // Add years from 1901 to preset
-	    TradingDate today = new TradingDate();
-	    int thisYear = today.getYear();
-	    for(int year = 1901; year <= thisYear; year++) {
-		yearComboBox.addItem("Quotes From " + Integer.toString(year));
-	    }
-	    yearComboBox.addItem("Latest Quotes");
-	    yearComboBox.setSelectedItem(p.get("internetYear",
-					       "Latest Quotes"));
+	    exchangeComboBox = new JComboBox(InternetQuoteSource.getExchanges());
+	    exchangeComboBox.addActionListener(this);
 
 	    c.gridwidth = GridBagConstraints.REMAINDER;
-	    gridbag.setConstraints(yearComboBox, c);
-	    importFromPanel.add(yearComboBox);
-            */
-
+	    gridbag.setConstraints(exchangeComboBox, c);
+	    importFromPanel.add(exchangeComboBox);
 
 	    // Put all "import from" radio buttons into group
 	    ButtonGroup group = new ButtonGroup();
 	    group.add(fromDatabase);
 	    group.add(fromFiles);
-            //	    group.add(fromInternet);
+            group.add(fromInternet);
 
 	    importOptions.add(importFromPanel);
 	}
@@ -299,7 +287,7 @@ public class ImporterModule extends JPanel
 	// Make sure the appropriate widgets are disabled if they are
 	// not in use
 	if(e.getSource() == fromFiles ||
-           //	   e.getSource() == fromInternet ||
+           e.getSource() == fromInternet ||
 	   e.getSource() == fromDatabase ||	
 	   e.getSource() == toDatabase ||
 	   e.getSource() == toFiles) {	
@@ -493,7 +481,7 @@ public class ImporterModule extends JPanel
                 // we would only copy the file name. 
                 QuoteBundle quoteBundle = null;
 
-                if(isToDatabase || fromDatabase.isSelected())
+                if(isToDatabase || fromDatabase.isSelected() || fromInternet.isSelected())
                     quoteBundle = 
                         new ScriptQuoteBundle(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
 
@@ -506,9 +494,8 @@ public class ImporterModule extends JPanel
                 }			
 
                 // anything but file -> file
-                if(!fromFiles.isSelected() && isToFiles) {
+                if(!fromFiles.isSelected() && isToFiles)
                     importToFile(quoteBundle, date);
-                }
 
                 // anything -> database
                 if(isToDatabase)
@@ -610,7 +597,7 @@ public class ImporterModule extends JPanel
 	    p.put("from", "files");
 	else
 	    p.put("from", "internet");
-        //	p.put("internetYear", (String)yearComboBox.getSelectedItem());
+       	//p.put("internetYear", (String)yearComboBox.getSelectedItem());
 	p.put("fileFilter", (String)formatComboBox.getSelectedItem());
 
 	// Import To
@@ -706,7 +693,9 @@ public class ImporterModule extends JPanel
             String fileName = (String)iterator.next();
 
             try {
-                URL fileURL = new URL("file://" + fileName);
+                // I originally had this as "file://" but this did
+                // not work under Windows
+                URL fileURL = new URL("file:///" + fileName);
                 fileURLs.add(fileURL);
             }
             catch(MalformedURLException e) {

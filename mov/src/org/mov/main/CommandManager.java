@@ -3,10 +3,13 @@ package org.mov.main;
 import java.util.*;
 import javax.swing.JDesktopPane;
 import org.mov.chart.*;
+import org.mov.chart.graph.*;
+import org.mov.chart.source.*;
 import org.mov.util.CommodityListQuery;
 import org.mov.util.ExpressionQuery;
 import org.mov.util.Progress;
 import org.mov.parser.Expression;
+import org.mov.parser.Token;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteSource;
@@ -148,10 +151,11 @@ public class CommandManager {
 		symbol = (String)iterator.next();
 		
 		QuoteCache cache = new QuoteCache(symbol);
-		Graph graph = 
-		    new LineGraph(new DayCloseGraphDataSource(cache));
+		GraphSource dayClose = 
+		    new OHLCVQuoteGraphSource(cache, Token.DAY_CLOSE_TOKEN);
+		Graph graph = new LineGraph(dayClose);
 		
-		chart.add(graph, 0);
+		chart.add(graph, cache, 0);
 	    }
 	    
 	    Progress.getInstance().close(owner);

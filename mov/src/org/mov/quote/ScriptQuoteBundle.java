@@ -159,7 +159,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
             return getQuote(symbol, quoteType, today + offset);
         }
         catch(MissingQuoteException e) {
-            return 0.0F;
+            return 0.0D;
         }
     }
 

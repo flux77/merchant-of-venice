@@ -73,10 +73,10 @@ public class Quote {
         assert day_low <= day_high; 
         assert day_high >= day_open; 
         assert day_high >= day_close;
-        assert day_low >= 0.0F;
-        assert day_open >= 0.0F;
-        assert day_high >= 0.0F;
-        assert day_close >= 0.0F;
+        assert day_low >= 0.0D;
+        assert day_open >= 0.0D;
+        assert day_high >= 0.0D;
+        assert day_close >= 0.0D;
         assert day_volume >= 0;
         */
 
@@ -212,7 +212,7 @@ public class Quote {
 	    return getDayVolume();
 	default:
 	    assert false;
-	    return 0.0F;
+	    return 0.0D;
 	}
     }
 

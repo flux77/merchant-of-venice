@@ -129,7 +129,7 @@ public class HorizontalAxis {
     }
 
     public static double calculateScale(int width, int dataPoints) {
-	double horizontalScale = 1.0F;
+	double horizontalScale = 1.0D;
 	
 	if(dataPoints < width) {
 	    horizontalScale = (double)width / dataPoints;

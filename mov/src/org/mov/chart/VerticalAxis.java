@@ -114,7 +114,7 @@ public class VerticalAxis {
 	// shouldnt get here
         assert false;
 
-	valueDelta = 10000000.0F;
+	valueDelta = 10000000.0D;
     }
 
     private void calculateHeightOfGraph() {

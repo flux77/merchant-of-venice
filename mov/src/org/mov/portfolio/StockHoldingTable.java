@@ -123,7 +123,7 @@ public class StockHoldingTable extends AbstractTable {
                     return new QuoteFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
                 }
                 catch(MissingQuoteException e) {
-                    return new QuoteFormat(0.0F);
+                    return new QuoteFormat(0.0D);
                 }
 
             case(MARKET_VALUE_COLUMN):
@@ -141,7 +141,7 @@ public class StockHoldingTable extends AbstractTable {
                                             quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
                 }
                 catch(MissingQuoteException e) {
-                    return new ChangeFormat(1.0F, 1.0F);
+                    return new ChangeFormat(1.0D, 1.0D);
                 }
 
             case(POINT_CHANGE_COLUMN):
@@ -168,7 +168,7 @@ public class StockHoldingTable extends AbstractTable {
                     return new PointChangeFormat(initialQuote, finalQuote);
                 }
                 catch(MissingQuoteException e) {
-                    return new PointChangeFormat(1.0F, 1.0F);
+                    return new PointChangeFormat(1.0D, 1.0D);
                 }
 
             case(PERCENT_CHANGE_COLUMN):
@@ -195,7 +195,7 @@ public class StockHoldingTable extends AbstractTable {
                     return new ChangeFormat(initialQuote, finalQuote);
                 }
                 catch(MissingQuoteException e) {
-                    return new ChangeFormat(1.0F, 1.0F);
+                    return new ChangeFormat(1.0D, 1.0D);
                 }
 
             }

@@ -18,7 +18,6 @@
 
 package org.mov.util;
 
-import java.io.File;
 import java.lang.*;
 import java.text.*;
 import java.util.*;
@@ -27,27 +26,13 @@ import java.util.regex.*;
 import org.mov.quote.*;
 
 /**
- * Contains a set of general conversion functions. These functiosn include
- * things like converting two digit years to four digits years, integers
- * to fixed point strings etc.
+ * Contains a set of general conversion functions. Previously this was a
+ * grab bag of functions that converted anything to anything else.
+ * However thinking in more OO terms some of these functions better belonged
+ * elsewhere and have been moved. This class is gradually dwindling away and
+ * will be removed soon.
  */
 public class Converter {
-
-    /**
-     * Convert a file array to a file name array.
-     *
-     * @param	files	an array of files
-     * @return	a vector of strings
-     */
-    public static Vector toFileNameVector(File[] files) {
-	Vector fileNames = new Vector();
-	
-	for(int i = 0; i < files.length; i++) {
-	    fileNames.add(files[i].getPath());
-	}
-
-	return fileNames;
-    }
 
     /**
      * Convert a number to a fixed length string of the given number of

@@ -354,10 +354,10 @@ public class ImporterModule extends JPanel
                 PreferencesManager.saveLastImportDirectory(lastDirectory);
 
 		File files[] = chooser.getSelectedFiles();
-		List fileNames = Converter.toFileNameVector(files);
+		List fileURLs = toURLList(files);
 
 		// Cancel if no files were selected (one day = one file)
-		if(fileNames.size() != 0) {
+		if(fileURLs.size() != 0) {
 
                     // Format is one in combo box - unless its disable
                     // which means we honour the format choosen in the
@@ -371,7 +371,7 @@ public class ImporterModule extends JPanel
                         format = p.get("format", "MetaStock");
                     }
 
-                    source = new FileQuoteSource(format, fileNames);
+                    source = new FileQuoteSource(format, fileURLs);
                     performImport(source);
                 }
 	    }
@@ -793,6 +793,23 @@ public class ImporterModule extends JPanel
 	while(!p.get("list" + Integer.toString(bundleNumber), "").equals("")) {
 	    p.put("list" + Integer.toString(bundleNumber++), "");	
 	}
+    }
+
+    // This function converts the output of the JFileChooser widget from
+    // an array of files to a list of URLs.
+    private List toURLList(File[] files) {
+        List fileURLs = new ArrayList();
+
+	for(int i = 0; i < files.length; i++) {
+            try {
+                fileURLs.add(files[i].toURL());
+            } catch(MalformedURLException e) {
+                // Is this possible?
+                assert false;
+            }
+	}
+
+	return fileURLs;
     }
 }
 

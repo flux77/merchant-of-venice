@@ -101,7 +101,8 @@ public class InternetQuoteSource implements QuoteSource
     // You can get all the stock quotes from the one URL
     private final static String[] sources = {
 	"Yahoo",
-	"http://table.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
+//	"http://table.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
+	"http://ichart.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
     };
 
     private final static int numberExchanges = (sources.length / 2);

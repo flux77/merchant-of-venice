@@ -346,7 +346,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             innerPanel.add(orderByKeyButton);
 
             orderByKeyComboBox = new JComboBox();
-            orderByKeyComboBox.addItem("No Real Order");
+            orderByKeyComboBox.addItem("Unordered");
             orderByKeyComboBox.addItem("Stock Symbol");
             orderByKeyComboBox.addItem("Volume Decreasing");
             orderByKeyComboBox.addItem("Volume Increasing");

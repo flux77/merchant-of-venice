@@ -1187,8 +1187,8 @@ then if the individual is not fine for breeding,
 other mutations will be done until it is.
 </para>
 
-<section name="The GP Parameters Page">
-<para>The Genetic Programme (GP) Parameters page defines the Gondola settings.
+<section name="The GP Language Page">
+<para>The Genetic Programme (GP) Language page defines the Gondola settings.
 Currently you can set the probabilities for each word of Gondola. So the random
 GP algorithm will choose the words in accordance with user defined probabilities.
 If you set any of these values to zero, the GP algorithm will work do not considering

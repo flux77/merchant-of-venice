@@ -440,7 +440,7 @@ public class CommandManager {
 
 		if(symbols == null) 
 		    symbolsCopy = SymbolListDialog.getSymbols(desktop, 
-							      "Graph stocks by symbol");
+							      "Graph by symbol(s)");
 		else 
 		    symbolsCopy = new TreeSet(symbols);
                 
@@ -458,7 +458,7 @@ public class CommandManager {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
                 SortedSet s = SymbolListDialog.getSymbolByName(desktop, 
-							       "Graph stock by name");
+							       "Graph by name");
                 graphStock(s);
             }
         });

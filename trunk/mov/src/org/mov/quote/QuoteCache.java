@@ -20,9 +20,7 @@ package org.mov.quote;
 
 import java.util.*;
 
-import org.mov.ui.DesktopManager;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
+import org.mov.ui.*;
 import org.mov.util.*;
 
 /**
@@ -75,14 +73,11 @@ public class QuoteCache {
      *
      * @return  singleton instance of this class
      */
-    public static QuoteCache getInstance() {
-	if(instance != null) {
-	    return instance;
-	}
-	else {
+    public static synchronized QuoteCache getInstance() {
+	if(instance == null)
 	    instance = new QuoteCache();
-	    return instance;
-	}
+
+        return instance;
     }
 
     /** 

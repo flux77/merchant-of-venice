@@ -22,8 +22,6 @@ import org.mov.chart.*;
 import org.mov.util.*;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
 
 import java.util.*;
 

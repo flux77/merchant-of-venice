@@ -290,19 +290,13 @@ public class ChartModule extends JPanel implements Module,
 
         final Thread thread = Thread.currentThread();
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-        progress.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {thread.interrupt();}
-        });
-
 	QuoteBundle quoteBundle = null;
 	Graph graph = null;
 	GraphSource dayClose = null;
 
 	while(iterator.hasNext()) {
 	    String symbol = (String)iterator.next();
-	    progress.setTitle("Loading quotes for " + symbol);
-	    
-	    progress.show();
+	    progress.show("Loading quotes for " + symbol);
 	    
 	    if (!thread.isInterrupted())
 		quoteBundle = new QuoteBundle(new QuoteRange(symbol));
@@ -338,8 +332,7 @@ public class ChartModule extends JPanel implements Module,
 	    }
 	}
 
-	if (!thread.isInterrupted())
-	    ProgressDialogManager.closeProgressDialog();
+        ProgressDialogManager.closeProgressDialog(progress);
     }
 
     /**

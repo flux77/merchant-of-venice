@@ -16,59 +16,141 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-/*
- * ProgressDialogManager.java
- *
- * Created on 5 February 2002, 21:48
- */
-
 package org.mov.ui;
-import java.util.Hashtable;
+
+import java.awt.event.*;
+import java.util.*;
 
 /**
+ * This class controls progress dialog creation/deletion in venice. It controls
+ * progress dialogs by allowing each thread in venice to have only a single
+ * progress dialog running at anyone time. If, in a thread, a request for another
+ * progress dialog is called, it will use the current progress dialog being displayed
+ * for that thread. By using a proxy progress dialog class ({@link SecondaryProgressDialog}), 
+ * we can control how much the second comer can change the current progress, without
+ * the caller even knowing.
+ * <p>
+ * <b>How to Display Progress</b>
+ * <pre>
+ * // Get the current thread - we'll need this to see 
+ * // if the user has cancelled the dialog
+ * Thread thread = Thread.currentThread();
  *
- * @author  Dan
- * @version 1.0
+ * // Create the progress dialog, configure it and show it.
+ * ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+ * progress.setMaximum(3);
+ * progress.setProgress(0);
+ * progress.show();
  *
- * This class maintains progress dialogs for the application on a thread by thread
- * basis.  Each thread has one ProgressDialog associated with it, and by using the 
- * static methods defined in this class, the user can access the specific dialog
- * to be used with the current thread from any point within the application.
+ * for(int i = 0; i < 3; i++) {
+ *    Task(i);
  *
- * This approach allows multiple ProgressDialog objects to be used simultaneously
- * by multiple concurrent threads, while providing a single access point for users
- * to reference them from any point within their associated thread.
+ *    // If the progress dialog is cancelled. The thread will be interrupted.
+ *    // Has the user cancelled the dialog? If the user has, we should stop 
+ *    // what we are doing.
+ *    if(thread.isInterrupted())
+ *       break;
+ *
+ *    progress.increment();
+ * }
+ *
+ * ProgressDialogManager.closeProgressDialog(progress);
+ * </pre>
+ *
+ * <b>Master Dialogs</b>
+ * <p>
+ * Sometimes when you are displaying progress you might be performing several tasks,
+ * where some of the tasks display their own progress. In this situation it might
+ * be undesirable for the contained tasks to show their progress. You can stop them
+ * by making your progress dialog a master dialog.
+ * <pre>
+ * progress.setMaster(true);
+ * </pre>
+ * This will stop their progress being displayed. The only thing they will
+ * have control over is the note field. 
+ * <p>
+ * On the other side, if you set a contained task to be a master, it will show
+ * its progress, <i>even if its container task is set to be a master</i>. This
+ * is useful for initialisation tasks that can be very slow and should 
+ * always be shown to the user.
+ * <p>
+ *
+ * @see ProgressDialog
+ * @see PrimaryProgressDialog
+ * @see SecondaryProgressDialog
  */
 public class ProgressDialogManager {
-    /** List of all the currently defined Progress Dialogs available */
-    private static Hashtable progress_dialogs = null;
 
-    /** Prevent instantiation of ProgressDialogManager */
+    /* List of all the currently defined Progress Dialogs available */
+    private static Hashtable cachedPrimaryProgressDialogs = new Hashtable();
+    private static Hashtable cachedSecondaryProgressDialogs = new Hashtable();
+
+    /* Prevent instantiation of ProgressDialogManager */
     private ProgressDialogManager() {
+        // nothing to do
     }
 
     /**
-     * Fetches the progress dialog associated with the current thread, creating
-     * it on the fly if it doesn't exist as yet
+     * Create a new {@link PrimaryProgressDialog} if one is not already being displayed for 
+     * the current thread. If one is displayed, return a proxy to the current dialog, i.e.
+     * a {@link SecondaryProgressDialog}.
+     * The secondary progress dialog may or may not have full control over the real dialog. 
      *
-     * @return a reference to the progress dialog associated with the given thread
+     * @return progress dialog
+     * @see PrimaryProgressDialog
+     * @see SecondaryProgressDialog
      */
     public static ProgressDialog getProgressDialog() {
-        if (progress_dialogs == null)
-            progress_dialogs = new Hashtable();
-        
-        ProgressDialog p = (ProgressDialog)progress_dialogs.get(Thread.currentThread());
-        if (p == null) {
-            progress_dialogs.put(Thread.currentThread(), (p = new ProgressDialog()));
+        PrimaryProgressDialog primaryProgressDialog = 
+            (PrimaryProgressDialog)cachedPrimaryProgressDialogs.get(Thread.currentThread());
+
+        // If there isn't a primary progress window up, then create one
+        if (primaryProgressDialog == null) {
+            primaryProgressDialog = new PrimaryProgressDialog(DesktopManager.getDesktop());
+            cachedPrimaryProgressDialogs.put(Thread.currentThread(), primaryProgressDialog);
+            return primaryProgressDialog;
+        }            
+
+        // Otherwise create a secondary progress dialog which proxies to the primary. 
+        // This allows us to set which dialog (primary or secondary) has control.
+        else {
+
+            // If a primary dialog and a secondary dialog are up, we can't open another
+            // secondary dialog until the first one closses. Otherwise we'd have 3 level
+            // nested dialogs which isn't supported.
+            assert cachedSecondaryProgressDialogs.get(Thread.currentThread()) == null;
+
+            ProgressDialog secondaryProgressDialog = 
+                new SecondaryProgressDialog(primaryProgressDialog);
+            cachedSecondaryProgressDialogs.put(Thread.currentThread(), secondaryProgressDialog);
+            return secondaryProgressDialog;
         }
-        return p;
     }
     
-    /** Closes and removes the progress dialog associated with the current thread */
-    public static void closeProgressDialog() {
-        ProgressDialog p = (ProgressDialog)progress_dialogs.remove(Thread.currentThread());
-        if (p != null) {
-            p.dispose();
+    /** 
+     * Closes and removes the progress dialog associated with the current thread.
+     */
+    public static void closeProgressDialog(ProgressDialog progressDialog) {
+
+        // Remove dialog from appropriate list
+        if(progressDialog instanceof PrimaryProgressDialog) {
+            ProgressDialog removedProgressDialog = 
+                (ProgressDialog)cachedPrimaryProgressDialogs.remove(Thread.currentThread());
+            assert removedProgressDialog == progressDialog;
+
+            // If we are closing a primary - there shouldn't be any secondary open
+            assert cachedSecondaryProgressDialogs.get(Thread.currentThread()) == null;
         }
+        else {
+            assert progressDialog instanceof SecondaryProgressDialog;
+            ProgressDialog removedProgressDialog = 
+                (ProgressDialog)cachedSecondaryProgressDialogs.remove(Thread.currentThread());
+            assert removedProgressDialog == progressDialog;            
+
+            // If we are closing a secondary - there should be a primary open
+            assert cachedPrimaryProgressDialogs.get(Thread.currentThread()) != null;
+        }
+
+        progressDialog.hide();
     }
 }

@@ -36,7 +36,11 @@ import org.mov.prefs.PreferencesManager;
  * @see QuoteSource
  */
 public class QuoteSourceManager {
+
+    // Singleton instance of this class
     private static QuoteSourceManager instance = null;
+
+    // Singleton instance of QuoteSource class
     private QuoteSource sourceInstance = null;
 
     /**
@@ -44,10 +48,9 @@ public class QuoteSourceManager {
      *
      * @return reference to a quote source.
      */
-    public static QuoteSource getSource() {
-	if(instance == null) {
+    public static synchronized QuoteSource getSource() {
+	if(instance == null) 
 	    instance = new QuoteSourceManager();
-	}
 	
 	return instance.getSourceInstance();
     }
@@ -66,7 +69,7 @@ public class QuoteSourceManager {
     }
 
     // Creates and returns singleton instance of quote source
-    private QuoteSource getSourceInstance() {
+    private synchronized QuoteSource getSourceInstance() {
 	if(sourceInstance == null) {
 	    Preferences p = PreferencesManager.getUserNode("/quote_source");
 	    String quoteSource = p.get("source", "database");

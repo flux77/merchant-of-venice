@@ -19,6 +19,7 @@
 package org.mov.main;
 
 import java.awt.event.*;
+import java.lang.*;
 import java.util.*;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
@@ -37,166 +38,182 @@ import org.mov.importer.ImporterModule;
 import org.mov.ui.*;
 
 /**
- * This class manages the actions that can be initiated from menus and toolbars, usually by firing off modules.
- */
-
+ * This class manages the tasks that can be initiated from menus and toolbars. Each
+ * task is launched in a separate thread. */
 public class CommandManager {
 
-    /** The instance of the CommandManager to be returned whenever getInstance() is called */
-    private static CommandManager command_manager_instance = null;
+    // Singleton instance of this class
+    private static CommandManager instance = null;
+
+    // The desktop that any window operations will be performed on
+    private JDesktopPane desktop;
+
+    // Class should only be constructed once by this class
+    private CommandManager() {
+        // nothing to do
+    }
 
     /** 
      * Return the static CommandManager for this application
      */
     public static CommandManager getInstance() {
-	if (command_manager_instance == null)
-	    command_manager_instance = new CommandManager();
+	if (instance == null)
+	    instance = new CommandManager();
 
-	return command_manager_instance;
+	return instance;
     }
-
-    /** The desktop that any window operations will be performed on */
-    private JDesktopPane desktop_instance;
     
-    /**************************************************************************/
-    /**************************************************************************/
-
     /**
      * Sets the desktop that any window operations will be performed on
+     *
      * @param desktop The desktop that any window operations will be performed on 
      */
     public void setDesktop(JDesktopPane desktop) {
-	desktop_instance = desktop;
+	this.desktop = desktop;
     }
-
-    /**************************************************************************/
     
-    /** Tiles all the open internal frames horizontally */
+    /**
+     * Tile all the open internal frames horizontally 
+     */
     public void tileFramesHorizontal() {
 	DesktopManager.tileFrames(DesktopManager.HORIZONTAL);
     }
 
-    /** Tiles all the open internal frames vertically */
+    /** 
+     * Tile all the open internal frames vertically 
+     */
     public void tileFramesVertical() {
 	DesktopManager.tileFrames(DesktopManager.VERTICAL);
     }
-    /** Arranges all open internal frames in a cascading fashion */
+
+    /**
+     * Arrange all open internal frames in a cascading fashion 
+     */
     public void tileFramesCascade() {
 	DesktopManager.tileFrames(DesktopManager.CASCADE);
     }
-    /** Allocates as square a shape as possible to open infternal frames*/
+
+    /** 
+     * Allocate as square a shape as possible to open infternal frames
+     */
     public void tileFramesArrange() {
 	DesktopManager.tileFrames(DesktopManager.ARRANGE);
     }
-
-    /**************************************************************************/
-    /**************************************************************************/
     
-    /** Display an internal frame, listing all the stocks by company name */
+    /**
+     *  Display an internal frame, listing all the stocks by company name.
+     */
     public void quoteListCompanyNamesAll() {
-        Thread t = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             public void run() {
+                Thread thread = Thread.currentThread();
+
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying list of all companies");
-                p.show();
+                p.show("List All Ordinaries");
                 displayStockList(QuoteRange.ALL_ORDINARIES, null);
-
-		ProgressDialogManager.closeProgressDialog();
+                ProgressDialogManager.closeProgressDialog(p);
             }
         });
-        t.start();
+        thread.start();
     }
 
-    /** Display an internal frame, listing stocks by company name, matching a rule that is to be input by the user */
+    /** 
+     * Display an internal frame, listing stocks by company name, matching a rule that is to 
+     * be input by the user 
+     */
     public void quoteListCompanyNamesByRule() {
-        Thread t = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             public void run() {
-                String expr = ExpressionQuery.getExpression(desktop_instance,
-							    "List Companies and Funds",
-							    "By Rule");
-		if(expr != null) {
-		    ProgressDialog p = 
-			ProgressDialogManager.getProgressDialog();
-		    p.setTitle("Displaying quotes of companies by rule \""+expr+"\"");
-		    p.show();
-
-		    displayStockList(QuoteRange.ALL_ORDINARIES, expr);
-                
-		    ProgressDialogManager.closeProgressDialog();
-		}
+                String expr = ExpressionQuery.getExpression(desktop,
+                                                            "List All Ordinaries",
+                                                            "By Rule");
+                if(expr != null) {
+                    ProgressDialog p = 
+                        ProgressDialogManager.getProgressDialog();
+                    p.show("List All Ordinaries by rule \""+expr+"\"");
+                    
+                    displayStockList(QuoteRange.ALL_ORDINARIES, expr);
+                    
+                    ProgressDialogManager.closeProgressDialog(p);
+                }
             }
-        });
-        t.start();
+            });
+        thread.start();
     }
 
-    /** Display an internal frame, listing all the stocks by symbol */
+    /** 
+     * Display an internal frame, listing all the stocks by symbol.
+     */
     public void quoteListCommoditiesAll() {
-        final Thread t = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             public void run() {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying quotes of all commodities");
-                p.show();
-
+                p.show("List All Symbols");
+                
                 displayStockList(QuoteRange.ALL_SYMBOLS, null);
-
-		ProgressDialogManager.closeProgressDialog();
+                
+                ProgressDialogManager.closeProgressDialog(p);
             }
-        });
-        t.start();
+            });
+        thread.start();
     }
 
-    /** Display an internal frame, listing stocks by symbol, 
-	matching a rule that is to be input by the user */
+    /** 
+     * Display an internal frame, listing stocks by symbol, matching a rule that is to be 
+     * input by the user.
+     */
     public void quoteListCommoditiesByRule() {
-        Thread t = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             public void run() {
-                String expr = ExpressionQuery.getExpression(desktop_instance,
-							    "List Commodities",
-							    "By Rule"); 
+                String expr = ExpressionQuery.getExpression(desktop,
+                                                            "List All Symbols",
+                                                            "By Rule"); 
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying quotes of commodities by rule \""+expr+"\"");
-                p.show();
-
+                p.show("List All Symbols by rule \""+expr+"\"");
+                
                 displayStockList(QuoteRange.ALL_SYMBOLS,expr);
-                ProgressDialogManager.closeProgressDialog();
+                ProgressDialogManager.closeProgressDialog(p);
             }
-        });
-        t.start();
+            });
+        thread.start();
     }
 
-    /** Display an internal frame, listing all the indices by symbol */
+    /** 
+     * Display an internal frame, listing all the indices by symbol.
+     */
     public void quoteListIndicesAll() {
-        Thread t = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             public void run() {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying quotes of all indices");
-                p.show();
-
+                p.show("List Market Indices");
+                
                 displayStockList(QuoteRange.MARKET_INDICES, null);
-                ProgressDialogManager.closeProgressDialog();
+                ProgressDialogManager.closeProgressDialog(p);
             }
-        });
-        t.start();
+            });
+        thread.start();
     }
 
-    /** Display an internal frame, listing indices by symbol, matching a rule that is to be input by the user */
+    /** 
+     * Display an internal frame, listing indices by symbol, matching a rule that is to be 
+     * input by the user.
+     */
     public void quoteListIndicesByRule() {
-        Thread t = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             public void run() {
-                String expr = ExpressionQuery.getExpression(desktop_instance,
-							    "List Indices",
-							    "By Rule"); 
-
+                String expr = ExpressionQuery.getExpression(desktop,
+                                                            "List Market Indices",
+                                                            "By Rule"); 
+                
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying quotes of companies by rule \""+expr+"\"");
-                p.show();
+                p.show("List Market Indices by rule \""+expr+"\"");
+                
                 displayStockList(QuoteRange.MARKET_INDICES, expr);
             }
-        });
-        t.start();
+            });
+        thread.start();
     }
 
-    
     /** 
      * Internal function for retrieving the required data displaying a table showing the results
      *
@@ -206,29 +223,21 @@ public class CommandManager {
      */
     private void displayStockList(int searchRestriction, 
 				  String expression) {
-        try {
-            final Thread thread = Thread.currentThread();
-            ProgressDialogManager.getProgressDialog().addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {thread.interrupt();}
-		});
 
-            ScriptQuoteBundle quoteBundle = null;
-            QuoteModule table = null;
-
-            if (!thread.isInterrupted()) {
-		QuoteRange quoteRange = 
-		    new QuoteRange(searchRestriction, 
-				   QuoteSourceManager.getSource().getLastDate());
-		quoteBundle = new ScriptQuoteBundle(quoteRange);
-	    }
-
-            if (!thread.isInterrupted()) {
-                table = new QuoteModule(quoteBundle, expression);
-                ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(table);
-	    }
-
-        } catch (Exception e) {
-            ProgressDialogManager.closeProgressDialog();
+	Thread thread = Thread.currentThread();
+        ScriptQuoteBundle quoteBundle = null;
+        QuoteModule table = null;
+        
+        if (!thread.isInterrupted()) {
+            QuoteRange quoteRange = 
+                new QuoteRange(searchRestriction, 
+                               QuoteSourceManager.getSource().getLastDate());
+            quoteBundle = new ScriptQuoteBundle(quoteRange);
+        }
+        
+        if (!thread.isInterrupted()) {
+            table = new QuoteModule(quoteBundle, expression);
+            getDesktopManager().newFrame(table);
         }
     }
 
@@ -238,38 +247,24 @@ public class CommandManager {
      * @param	portfolioName	name of portfolio to display
      */
     public void openPortfolio(String portfolioName) {
-	final Thread thread = Thread.currentThread();
+	Thread thread = Thread.currentThread();
 	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-	progress.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    thread.interrupt();
-		}
-	    });
 
-	try {
-	    QuoteBundle quoteBundle = null;
-	    Portfolio portfolio = 
-		PreferencesManager.loadPortfolio(portfolioName);
-
-	    progress.setTitle("Loading quotes for portfolio");
-	    progress.show();
-
-            if (!thread.isInterrupted()) { 
-		QuoteRange quoteRange =
-		    new QuoteRange(portfolio.getSymbolsTraded(),
-				   QuoteSourceManager.getSource().getLastDate());
-		quoteBundle = new QuoteBundle(quoteRange);
-	    }
-	    if (!thread.isInterrupted()) {
-		((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, quoteBundle));
-		ProgressDialogManager.closeProgressDialog();
-	    }
-	    	
-	} catch (Exception e) {
-            System.out.println(e);
-
-	    e.printStackTrace();
-            ProgressDialogManager.closeProgressDialog();
+        QuoteBundle quoteBundle = null;
+        Portfolio portfolio = 
+            PreferencesManager.loadPortfolio(portfolioName);
+        
+        progress.show("Open " + portfolioName);
+        
+        if (!thread.isInterrupted()) { 
+            QuoteRange quoteRange =
+                new QuoteRange(portfolio.getSymbolsTraded(),
+                               QuoteSourceManager.getSource().getLastDate());
+            quoteBundle = new QuoteBundle(quoteRange);
+        }
+        if (!thread.isInterrupted()) {
+            getDesktopManager().newFrame(new PortfolioModule(desktop, portfolio, quoteBundle));
+            ProgressDialogManager.closeProgressDialog(progress);
         }
     }
 
@@ -277,10 +272,9 @@ public class CommandManager {
      * Open up a new paper trade module. 
      */
     public void paperTrade() {
+	PaperTradeModule paperTrade = new PaperTradeModule(desktop);
 
-	PaperTradeModule paperTrade = new PaperTradeModule(desktop_instance);
-
-	((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(paperTrade, true, true);
+	getDesktopManager().newFrame(paperTrade, true, true);
     }
 
     /**
@@ -294,7 +288,7 @@ public class CommandManager {
 	PaperTradeResultModule results =
 	    new PaperTradeResultModule();
 
-	return ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(results);	
+	return getDesktopManager().newFrame(results);	
     }
 
     /**
@@ -302,7 +296,7 @@ public class CommandManager {
      */
     public void newPortfolio() {
 	// Get name for portfolio
-	TextDialog dialog = new TextDialog(desktop_instance, 
+	TextDialog dialog = new TextDialog(desktop, 
 					   "Enter portfolio name",
 					   "New Portfolio");
 	String portfolioName = dialog.showDialog();
@@ -344,64 +338,41 @@ public class CommandManager {
 			       TradingDate startDate,
 			       TradingDate endDate) {
 
-        final ChartModule chart = new ChartModule(desktop_instance);
+        ChartModule chart = new ChartModule(desktop);
 
-	final Thread thread = Thread.currentThread();
+	Thread thread = Thread.currentThread();
 	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-	progress.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    thread.interrupt();
-		}
-	    });
 
-	try {
-	    progress.setTitle("Loading quotes for portfolio");
-	    progress.show();
+        progress.show("Graph " + portfolio.getName());
 
-	    PortfolioGraphSource portfolioGraphSource = null;
-	    Graph graph = null;
+        PortfolioGraphSource portfolioGraphSource = null;
+        Graph graph = null;
+        
+        // Get default start and end date if not supplied
+        if(startDate == null) 
+            startDate = portfolio.getStartDate();
+        
+        if(endDate == null)
+            endDate = QuoteSourceManager.getSource().getLastDate();		
+        Vector symbols = portfolio.getSymbolsTraded();
+        
+        // Only need to load from quote bundle if there are any stocks
+        // in the portfolio
+        if(quoteBundle == null && symbols.size() > 0) {
+            quoteBundle = new QuoteBundle(new QuoteRange(symbols, startDate, endDate));
+        }
+        
+        if (!thread.isInterrupted()) {
+            portfolioGraphSource =
+                new PortfolioGraphSource(portfolio, quoteBundle, 
+                                         PortfolioGraphSource.MARKET_VALUE);
+            graph = new LineGraph(portfolioGraphSource);
+            chart.add(graph, portfolio, quoteBundle, 0);            
+            chart.redraw();
+            getDesktopManager().newFrame(chart);
+        }
 
-            if (!thread.isInterrupted()) {
-		// Get default start and end date if not supplied
-		if(startDate == null) 
-		    startDate = portfolio.getStartDate();
-
-		if(endDate == null)
-		    endDate = QuoteSourceManager.getSource().getLastDate();		
-		Vector symbols = portfolio.getSymbolsTraded();
-
-		// Only need to load from quote bundle if there are any stocks
-		// in the portfolio
-		if(quoteBundle == null && symbols.size() > 0) {
-		    quoteBundle = new QuoteBundle(new QuoteRange(symbols, startDate, endDate));
-		}
-	    }
-
-            if (!thread.isInterrupted()) {
-		portfolioGraphSource =
-		    new PortfolioGraphSource(portfolio, quoteBundle, 
-					     PortfolioGraphSource.MARKET_VALUE);
-	    }
-
-            if (!thread.isInterrupted()) {	 
-		graph = new LineGraph(portfolioGraphSource);
-	    }
-
-            if (!thread.isInterrupted()) {	       
-		chart.add(graph, portfolio, quoteBundle, 0);
-
-		chart.redraw();
-		((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart);
-	    }
-
-	    if (!Thread.currentThread().interrupted())
-		ProgressDialogManager.closeProgressDialog();
-	    
-	} catch (Exception e) {
-	    e.printStackTrace();
-
-	    ProgressDialogManager.closeProgressDialog();
-	}
+        ProgressDialogManager.closeProgressDialog(progress);
     }
 
     /**
@@ -409,43 +380,26 @@ public class CommandManager {
      */
     public void graphAdvanceDecline() {
 
-        final Thread t = new Thread(new Runnable() {
+        final Thread thread = new Thread(new Runnable() {
+
             public void run() {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Calculating advance/decline");
-                p.show();
+                p.show("Graph Advance/Decline");
+                Thread thread = Thread.currentThread();
+                
+                if (!thread.isInterrupted()) {
+                    Graph graph = new AdvanceDeclineGraph();
 
-		final Thread thread = Thread.currentThread();
+                    ChartModule chart = new ChartModule(desktop);
+                    chart.add(graph, null, 0);
+                    getDesktopManager().newFrame(chart);
+                }
 
-		p.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			    thread.interrupt();
-			}
-		    });
-		
-		try {
-		    ChartModule chart = new ChartModule(desktop_instance);
-		    Graph graph = null;
-
-                    if (!thread.isInterrupted())
-			graph = new AdvanceDeclineGraph();
-
-                    if (!thread.isInterrupted())
-                        chart.add(graph, null, 0);
-
-                    if (!thread.isInterrupted())
-			ProgressDialogManager.closeProgressDialog();
-
-		    if (!thread.isInterrupted())
-			((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart);
-		}
-		catch (Exception e) {
-		    ProgressDialogManager.closeProgressDialog();
-		}
+                ProgressDialogManager.closeProgressDialog(p);
 	    }
 	    });
 
-	t.start();
+	thread.start();
     }
 
     /** 
@@ -457,29 +411,20 @@ public class CommandManager {
      */
     public void graphStockBySymbol(final Vector symbols) {
 
-        final Thread t = new Thread(new Runnable() {
+        final Thread thread = new Thread(new Runnable() {
             public void run() {
 		SortedSet symbolsCopy;
 
-		if(symbols == null) {
-		    symbolsCopy = SymbolListDialog.getSymbols(desktop_instance, 
+		if(symbols == null) 
+		    symbolsCopy = SymbolListDialog.getSymbols(desktop, 
 							      "Graph stocks by code");
-		}
-		else {
+		else 
 		    symbolsCopy = new TreeSet(symbols);
-		}
-
-                String str = symbolsCopy.toString();
-                str = str.substring(1,str.length()-1);
-                ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying graph of stock symbols "+str);
-                p.show();
+                
                 graphStock(symbolsCopy);
-                if (!Thread.currentThread().interrupted())
-                    ProgressDialogManager.closeProgressDialog();
             }
         });
-        t.start();
+        thread.start();
     }
 
     /** 
@@ -487,21 +432,14 @@ public class CommandManager {
      *  The stock(s) is/are determined by a user prompt 
      */
     public void graphStockByName() {
-        final Thread t = new Thread(new Runnable() {
+        final Thread thread = new Thread(new Runnable() {
             public void run() {
-                SortedSet s = SymbolListDialog.getSymbolByName(desktop_instance, 
+                SortedSet s = SymbolListDialog.getSymbolByName(desktop, 
 							       "Graph stock by name");
-                String str = s.toString();
-                str = str.substring(1,str.length()-1);
-                ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying graph of stock named "+str);
-                p.show();
                 graphStock(s);
-                if (!Thread.currentThread().interrupted())
-                    ProgressDialogManager.closeProgressDialog();
             }
         });
-        t.start();
+        thread.start();
     }
 
     /**
@@ -509,55 +447,68 @@ public class CommandManager {
      *
      * @param companySet the list of stock symbols to graph 
      */
-    private void graphStock(final SortedSet companySet) {
-        final ChartModule chart = new ChartModule(desktop_instance);
+    private void graphStock(SortedSet companySet) {
 
-        final Thread thread = Thread.currentThread();
-        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-        progress.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {thread.interrupt();}
-        });
+        if(companySet != null) {
+            ChartModule chart = new ChartModule(desktop);
+            Thread thread = Thread.currentThread();
+            ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
-        try {
-            if(companySet != null) {
-                Iterator iterator = companySet.iterator();
-                String symbol = null;
-                QuoteBundle quoteBundle = null;
-                GraphSource dayClose = null;
-                Graph graph = null;
+            Iterator iterator = companySet.iterator();
+            String symbol = null;
+            QuoteBundle quoteBundle = null;
+            GraphSource dayClose = null;
+            Graph graph = null;
+            
+            String title = companySet.toString();
+            title = title.substring(1, title.length() - 1);
 
-                while(iterator.hasNext() && !thread.isInterrupted()) {
-                    symbol = (String)iterator.next();
-                    progress.setTitle("Loading quotes for "+symbol);
+            int progressValue = 0;
 
-                    progress.show();
-                    if (!thread.isInterrupted())
-                        quoteBundle = new QuoteBundle(new QuoteRange(symbol));
-
-                    if (!thread.isInterrupted())
-                        dayClose = 
-                            new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
-
-                    if (!thread.isInterrupted())
-                        graph = new LineGraph(dayClose);
-
-                    if (!thread.isInterrupted())
-                        chart.add(graph, quoteBundle, 0);
-
-                    chart.redraw();
-                }
-                if (!thread.isInterrupted())
-                    ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart);
-
+            if(companySet.size() > 1) {
+                progress.setIndeterminate(false);
+                progress.setMaximum(companySet.size());
+                progress.setMaster(true);
             }
-        } catch (Exception e) {
-            ProgressDialogManager.closeProgressDialog();
+            else
+                progress.setIndeterminate(true);
+
+            progress.show("Graph " + title);
+
+            while(iterator.hasNext() && !thread.isInterrupted()) {
+                symbol = (String)iterator.next();
+                
+                quoteBundle = new QuoteBundle(new QuoteRange(symbol));
+                
+                if(thread.isInterrupted())
+                    break;
+                
+                dayClose = 
+                    new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+                graph = new LineGraph(dayClose);
+                chart.add(graph, quoteBundle, 0);
+                chart.redraw();
+
+                if(companySet.size() > 1) 
+                    progress.increment();
+            }
+
+            if (!thread.isInterrupted())
+                getDesktopManager().newFrame(chart);            
+
+            ProgressDialogManager.closeProgressDialog(progress);
         }
     }
 
     /** Shows a dialog and imports quotes into Venice */
     public void importQuotes() {
-	((DesktopManager)(desktop_instance.getDesktopManager()))
-	    .newFrame(new ImporterModule(desktop_instance), true, true);
+        getDesktopManager().newFrame(new ImporterModule(desktop), true, true);
+    }
+
+    // Returns the singleton desktop manager. This will be an instance of
+    // org.mov.ui.DesktopManager. The desktop manager controls the layout of
+    // the internal frames in the desktop 
+    private DesktopManager getDesktopManager() {
+        return (DesktopManager)desktop.getDesktopManager();
     }
 }

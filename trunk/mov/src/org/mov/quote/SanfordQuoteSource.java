@@ -107,7 +107,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    DesktopManager.showErrorMessage("Can't connect to Sanford");
 	}
 
-	ProgressDialogManager.closeProgressDialog();
+	ProgressDialogManager.closeProgressDialog(p);
     }
 
     /** 
@@ -184,7 +184,7 @@ public class SanfordQuoteSource implements QuoteSource {
 		DesktopManager.showErrorMessage("Error talking to Sanford");
 	    }
 
-	    ProgressDialogManager.closeProgressDialog();
+	    ProgressDialogManager.closeProgressDialog(p);
 	}
 	
 	return companyName;
@@ -252,7 +252,8 @@ public class SanfordQuoteSource implements QuoteSource {
      *
      * @param	quoteRange	the range of quotes to load
      * @return	a vector of stock quotes
-     * @see Quote, QuoteRange
+     * @see Quote
+     * @see QuoteRange
      */
     public Vector loadQuoteRange(QuoteRange quoteRange) {
         assert false;
@@ -285,8 +286,8 @@ public class SanfordQuoteSource implements QuoteSource {
 	
 	// This query might take a while
         ProgressDialog p = ProgressDialogManager.getProgressDialog();
-        p.setTitle("Loading quotes " + startDate.toShortString() + " to " +
-					endDate.toShortString());
+        p.setNote("Loading quotes " + startDate.toShortString() + " to " +
+                  endDate.toShortString());
         p.setMaximum(dates.size());
 
 	while(iterator.hasNext()) {
@@ -297,7 +298,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    p.increment();
 	}
 
-	ProgressDialogManager.closeProgressDialog();
+	ProgressDialogManager.closeProgressDialog(p);
 
 	return quotes;
     }
@@ -375,7 +376,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    DesktopManager.showErrorMessage("Error talking to Sanford");
 	}
 
-	ProgressDialogManager.closeProgressDialog();
+	ProgressDialogManager.closeProgressDialog(p);
     
 	return quotes;
     }
@@ -444,7 +445,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	    DesktopManager.showErrorMessage("Error talking to Sanford");
 	}
 
-	ProgressDialogManager.closeProgressDialog();
+	ProgressDialogManager.closeProgressDialog(p);
     
 	return quotes;
     }

@@ -372,23 +372,20 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	// This query might take a while...
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-        try {
-            progress.setNote("Loading Quotes...");
-            progress.setIndeterminate(true);
-	}
-	catch (Exception e) {
-	    assert false; // I'm not sure what this means...?
-	}
+        progress.setNote("Loading Quotes...");
+        progress.setIndeterminate(true);
 
-	return executeSQLString(queryString);
+	Vector result = executeSQLString(progress, queryString);
+
+        ProgressDialogManager.closeProgressDialog(progress);
+
+        return result;
     }
 
     // Takes a string containing an SQL statement and then executes it. Returns
     // a vector of quotes.
-    private Vector executeSQLString(String SQLString) {
+    private Vector executeSQLString(ProgressDialog progress, String SQLString) {
 	Vector quotes = new Vector();
-
-        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
 	if(connection != null) {
 	    try {
@@ -744,9 +741,9 @@ public class DatabaseQuoteSource implements QuoteSource
 	
 	// This might take a while
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-        progress.setTitle("Getting dates...");
-        progress.setNote("");
+        progress.setNote("Getting dates...");
         progress.setIndeterminate(true);
+
 	try {
 	    // 1. Create the table
 	    Statement statement = connection.createStatement();
@@ -764,7 +761,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	    DesktopManager.showErrorMessage("Error talking to database");
 	}
 
-	ProgressDialogManager.closeProgressDialog();
+	ProgressDialogManager.closeProgressDialog(progress);
 
 	return dates;
     }

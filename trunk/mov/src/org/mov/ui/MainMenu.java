@@ -151,7 +151,7 @@ public class MainMenu
 	    
 	    // Quote -> Companies + Funds
 	    JMenu quoteMenuCompany = MenuHelper.addMenu(quoteMenu, 
-							"Companies + Funds",
+							"All Ordinaries",
 					     'C');
 
 	    // Quote -> Companies + Funds -> List all
@@ -164,7 +164,7 @@ public class MainMenu
 	    
 	    // Quote -> Indices
 	    JMenu quoteMenuIndices = MenuHelper.addMenu(quoteMenu, 
-							"Indices", 'I');
+							"Market Indices", 'I');
 
 	    // Quote -> Indices -> List All
 	    quoteIndicesListAllMenuItem = 
@@ -176,7 +176,7 @@ public class MainMenu
 	    
 	    // Quote -> All Commodities
 	    JMenu quoteMenuCommodities = MenuHelper.addMenu(quoteMenu, 
-							    "All Commodities",
+							    "All Symbols",
 							    'A');
 
 	    // Quote -> All Commodities -> List All
@@ -196,7 +196,7 @@ public class MainMenu
 	    
 	    // Graph -> Commodities
 	    JMenu graphCommodityMenu = MenuHelper.addMenu(graphMenu, 
-							  "Commodities");
+							  "Symbol");
 	    
 	    // Graph -> Commodities -> By Codes
 	    graphCommodityCodeMenuItem = 

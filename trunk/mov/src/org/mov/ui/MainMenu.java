@@ -39,7 +39,7 @@ public class MainMenu implements ActionListener, ContainerListener {
     private JDesktopPane desktop;
     private JFrame frame;
 
-    public AnalyserMenu(JFrame frame, JDesktopPane desktop) {
+    public MainMenu(JFrame frame, JDesktopPane desktop) {
 
 	this.frame = frame;
 	this.desktop = desktop;

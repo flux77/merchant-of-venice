@@ -133,7 +133,7 @@ public class GeneticProgramme {
         // Calculate sum of portfolio values of each individual. We use this
         // when choosing who gets to breed next. The bigger the value compared
         // to other individuals, the greater chance of breeding.
-        breedingPopulationSum = 0.0F;
+        breedingPopulationSum = 0.0D;
 
         for(Iterator iterator = breedingPopulation.keySet().iterator(); iterator.hasNext();) {
             Money value = (Money)iterator.next();
@@ -172,7 +172,7 @@ public class GeneticProgramme {
 
             value -= individual.getValue().doubleValue();
 
-            if(value <= 0.0F)
+            if(value <= 0.0D)
                 return individual;
         }
 

@@ -270,7 +270,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
                 // No equation? Just display 0.
                 else
-                    return new Double(0.0F);
+                    return new Double(0.0D);
             }
 
             assert false;
@@ -763,12 +763,12 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                     catch(EvaluationException e) {
                         // Should display error message to user
                         assert false;
-                        results.add(new Double(0.0F));
+                        results.add(new Double(0.0D));
                     }
                     catch(WeekendDateException e) {
                         // Shouldn't happen
                         assert false;
-                        results.add(new Double(0.0F));
+                        results.add(new Double(0.0D));
                     }
                 }
             }

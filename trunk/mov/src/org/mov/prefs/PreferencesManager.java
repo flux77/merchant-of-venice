@@ -213,10 +213,10 @@ public class PreferencesManager {
 		    new TradingDate(transactionPrefs.get("date", 
 							 "01/01/2000"),
 				    TradingDate.BRITISH);
-		Money amount = new Money(transactionPrefs.getDouble("amount", 0.0F));
+		Money amount = new Money(transactionPrefs.getDouble("amount", 0.0D));
 		Symbol symbol = null;
 		int shares = transactionPrefs.getInt("shares", 0);
-		Money tradeCost = new Money(transactionPrefs.getDouble("trade_cost", 0.0F));
+		Money tradeCost = new Money(transactionPrefs.getDouble("trade_cost", 0.0D));
 
                 try {
                     symbol = Symbol.find(transactionPrefs.get("symbol", ""));

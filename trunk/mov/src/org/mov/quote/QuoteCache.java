@@ -18,10 +18,13 @@
 
 package org.mov.quote;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
-import org.mov.ui.*;
-import org.mov.util.*;
+import org.mov.util.TradingDate;
+import org.mov.util.TradingDateComparator;
 
 /**
  * This class contains all the stock quotes currently in memory. Its purpose is to
@@ -93,7 +96,7 @@ public class QuoteCache {
                 return (double)day_volume;
             default:
                 assert false;
-                return 0.0F;
+                return 0.0D;
             }
         }
 

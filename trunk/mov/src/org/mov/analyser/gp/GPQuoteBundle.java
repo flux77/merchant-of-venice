@@ -104,7 +104,7 @@ public class GPQuoteBundle implements QuoteBundle {
     public double getQuote(Symbol symbol, int quoteType, TradingDate date) 
         throws MissingQuoteException {
         assert false;
-        return 0.0F;
+        return 0.0D;
     }
 
     /**

@@ -197,7 +197,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    else if(text == OBV) 
 		addGraph(new OBVGraph(getDayOpen(), getDayClose(), 
 				      getDayVolume(), 
-				      50000.0F), OBV);
+				      50000.0D), OBV);
 	    else if(text == DAY_VOLUME) 
 		addGraph(new BarGraph(getDayVolume()), DAY_VOLUME);
 

@@ -131,8 +131,8 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 
     public String getYLabel(double value) {
 	if(quote == Quote.DAY_VOLUME) {
-	    final double BILLION = 1000000000F;
-	    final double MILLION = 1000000F;
+	    final double BILLION = 1000000000D;
+	    final double MILLION = 1000000D;
 	    String extension = "";
 	    
 	    if(Math.abs(value) >= BILLION) {
@@ -154,39 +154,39 @@ public class OHLCVQuoteGraphSource implements GraphSource {
     public double[] getAcceptableMajorDeltas() {
 
 	if(quote == Quote.DAY_VOLUME) {
-	    double[] major = {10F,
-			     100F,
-			     1000F, // 1T
-			     10000F,
-			     100000F,
-			     1000000F, // 1M
-			     10000000F,
-			     100000000F,
-			     1000000000F, // 1B
-			     10000000000F}; 
+	    double[] major = {10D,
+			     100D,
+			     1000D, // 1T
+			     10000D,
+			     100000D,
+			     1000000D, // 1M
+			     10000000D,
+			     100000000D,
+			     1000000000D, // 1B
+			     10000000000D}; 
 	    return major;
 	}
 	else {
-	    double[] major = {0.001F, // 0.1c
-			     0.01F, // 1c
-			     0.1F, // 10c
-			     1.0F, // $1
-			     10.0F, // $10
-			     100.0F, // $100
-			     1000.0F}; // $1000
+	    double[] major = {0.001D, // 0.1c
+			     0.01D, // 1c
+			     0.1D, // 10c
+			     1.0D, // $1
+			     10.0D, // $10
+			     100.0D, // $100
+			     1000.0D}; // $1000
 	    return major;	    
 	}
     }
 
     public double[] getAcceptableMinorDeltas() {
 	if(quote == Quote.DAY_VOLUME) {
-	    double[] minor = {1F, 1.5F, 2F, 2.5F, 3F, 4F, 5F, 6F, 8F};
+	    double[] minor = {1D, 1.5D, 2D, 2.5D, 3D, 4D, 5D, 6D, 8D};
 	    return minor;
 	}
 	else {
-	    double[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F, 
-			     2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F, 
-			     8F, 9F};
+	    double[] minor = {1D, 1.1D, 1.25D, 1.3333D, 1.5D, 2D, 2.25D, 
+			     2.5D, 3D, 3.3333D, 4D, 5D, 6D, 6.5D, 7D, 7.5D, 
+			     8D, 9D};
 	    return minor;
 	}
     }

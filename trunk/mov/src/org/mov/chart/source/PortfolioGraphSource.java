@@ -220,28 +220,28 @@ public class PortfolioGraphSource implements GraphSource {
     }
 
     public double[] getAcceptableMajorDeltas() {
-	double[] major = {0.001F, // 0.1c
-			 0.01F, // 1c
-			 0.1F, // 10c
-			 1.0F, // $1
-			 10.0F, // $10
-			 100.0F, // $100
-			 1000.0F, // $1k
-			 10000.0F, // $10k (secure)
-			 100000.0F, // $100k (well off)
-			 1000000.0F, // $1M (rich)
-			 10000000.0F, // $10M (very rich)
-			 100000000.0F, // $100M (super rich)
-			 1000000000.0F, // $1B (wow)
-			 1000000000.0F}; // $10B (Bill Gates)
+	double[] major = {0.001D, // 0.1c
+			 0.01D, // 1c
+			 0.1D, // 10c
+			 1.0D, // $1
+			 10.0D, // $10
+			 100.0D, // $100
+			 1000.0D, // $1k
+			 10000.0D, // $10k (secure)
+			 100000.0D, // $100k (well off)
+			 1000000.0D, // $1M (rich)
+			 10000000.0D, // $10M (very rich)
+			 100000000.0D, // $100M (super rich)
+			 1000000000.0D, // $1B (wow)
+			 1000000000.0D}; // $10B (Bill Gates)
 
 	return major;	
     }
 
     public double[] getAcceptableMinorDeltas() {
-	double[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F,
-			 2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F,
-			 8F, 9F};
+	double[] minor = {1D, 1.1D, 1.25D, 1.3333D, 1.5D, 2D, 2.25D,
+			 2.5D, 3D, 3.3333D, 4D, 5D, 6D, 6.5D, 7D, 7.5D,
+			 8D, 9D};
 	return minor;
     }
 }

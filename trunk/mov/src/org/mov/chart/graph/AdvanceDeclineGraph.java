@@ -164,12 +164,12 @@ public class AdvanceDeclineGraph implements Graph {
      *		of the default <code>GraphSource</code>
      */
     public double[] getAcceptableMajorDeltas() {
-	double[] major = {1.0F, // 1 point
-			 10.0F, // 10 points
-			 100.0F, // 100 points
-			 1000.0F, // 1000 points
-			 10000.0F, // 10,000 points
-			 100000.0F}; // 100,000 points
+	double[] major = {1.0D, // 1 point
+			 10.0D, // 10 points
+			 100.0D, // 100 points
+			 1000.0D, // 1000 points
+			 10000.0D, // 10,000 points
+			 100000.0D}; // 100,000 points
 	return major;	
     }
 
@@ -182,9 +182,9 @@ public class AdvanceDeclineGraph implements Graph {
      * @see	Graph#getAcceptableMajorDeltas
      */
     public double[] getAcceptableMinorDeltas() {
-	double[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F,
-			 2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F,
-			 8F, 9F};
+	double[] minor = {1D, 1.1D, 1.25D, 1.3333D, 1.5D, 2D, 2.25D,
+			 2.5D, 3D, 3.3333D, 4D, 5D, 6D, 6.5D, 7D, 7.5D,
+			 8D, 9D};
 	return minor;
     }
 

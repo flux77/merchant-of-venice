@@ -84,25 +84,25 @@ public class StandardDeviationGraph extends AbstractGraph {
 
     // Override vertical axis
     public double[] getAcceptableMajorDeltas() {
-	double[] major = {0.1F,
-			 0.5F,
-			 1F,
-			 10F,
-			 100F};
+	double[] major = {0.1D,
+			 0.5D,
+			 1D,
+			 10D,
+			 100D};
 	return major;
     }
 
     // Override vertical axis
     public double[] getAcceptableMinorDeltas() {
-	double[] minor = {1F, 
-			 2F,
-			 3F,
-			 4F,
-			 5F,
-			 6F,
-			 7F,
-			 8F,
-			 9F};
+	double[] minor = {1D, 
+			 2D,
+			 3D,
+			 4D,
+			 5D,
+			 6D,
+			 7D,
+			 8D,
+			 9D};
 	return minor;
     }
 

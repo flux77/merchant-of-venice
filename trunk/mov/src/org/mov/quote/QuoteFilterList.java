@@ -18,7 +18,9 @@
 
 package org.mov.quote;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.mov.util.TradingDate;
 
@@ -34,19 +36,19 @@ import org.mov.util.TradingDate;
  * </pre>
  * OR
  * <pre>
- * Vector filters = QuoteFilterList.getInstance().getList();
+ * List filters = QuoteFilterList.getInstance().getList();
  * </pre>
  */
 public class QuoteFilterList {
 
     private static QuoteFilterList instance = null;
 
-    private Vector filters;
+    private List filters;
 
     // Creates new instance of the filter list - registers all available
     // filters.
     private QuoteFilterList() {
-	filters = new Vector();
+	filters = new ArrayList();
 
 	filters.add(new EzyChartQuoteFilter());
 	filters.add(new InsightTraderQuoteFilter());
@@ -72,7 +74,7 @@ public class QuoteFilterList {
 	}
 	
 	// String did not match any filter! Default to first
-	return (QuoteFilter)filters.firstElement();
+	return (QuoteFilter)filters.get(0);
     }
 
     /**
@@ -90,9 +92,9 @@ public class QuoteFilterList {
     /**
      * Get a vector of available filter classes.
      *
-     * @return	vector of classes implementing QuoteFilter.
+     * @return	list of classes implementing QuoteFilter.
      */
-    public Vector getList() {
+    public List getList() {
 	return filters;
     }
 
@@ -127,7 +129,7 @@ public class QuoteFilterList {
 	Iterator iterator = list.iterator();
 	QuoteFilter filter;
 	Quote quote = new Quote(new Symbol("AAA"), new TradingDate(), 10000,
-				10.00F, 20.00F, 30.00F, 40.00F);
+				10.00D, 20.00D, 30.00D, 40.00D);
 	Quote filteredQuote;
 	String filteredString;
 

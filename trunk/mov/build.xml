@@ -81,6 +81,7 @@
     </copy>
     <copy file="build.xml" todir="${release}/venice-${VERSION}/build/"/>
     <copy file="COPYING.txt" todir="${release}/venice-${VERSION}/"/>
+    <copy file="readme.txt" todir="${release}/venice-${VERSION}/"/>
     <copy file="venice" todir="${release}/venice-${VERSION}/"/>
     <copy file="venice.jar" todir="${release}/venice-${VERSION}/"/>   
 

@@ -85,8 +85,7 @@ public class PortfolioGraphSource implements GraphSource {
 
 	// Iterate through each day between start and end date, recreating
 	// portfolio value on that day
-	Vector dateRange = Converter.dateRangeToTradingDateVector(startDate,
-								  endDate);
+	List dateRange = TradingDate.dateRangeToList(startDate, endDate);
 	Iterator dateIterator = dateRange.iterator();	
 
 	if(mode == MARKET_VALUE) {

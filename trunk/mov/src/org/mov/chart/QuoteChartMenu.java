@@ -87,7 +87,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
      */
     public QuoteChartMenu(ChartModule listener, QuoteBundle quoteBundle,
 			  Graph graph) {
-
+	
 
 	super(graph.getName());
 
@@ -103,23 +103,17 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 
 	// heuristic to guess a starting value for the box reversal value
 
-	Symbol symbol = quoteBundle.getFirstSymbol();
-	TradingDate td = quoteBundle.getFirstDate();
-	Double guess;
-
-	try {
-	    
-	    Double close = new Double(quoteBundle.getQuote(symbol, 1, td));
-	    guess = new Double(close.toString());
-	    
-	    graphConstants.setPriceReversalThreshold(guess.doubleValue());
-	}
+	GraphSource source = getDayClose();
+	Graphable graphable = source.getGraphable();
+	double[] values = graphable.toArray();
 	
+	double guess  = QuoteFunctions.sd(values,  
+					  1,
+					  values.length) / 2;
 	
-	catch(MissingQuoteException e) {
+	graphConstants.setPriceReversalThreshold(guess);
 	    
-	}
-	
+		
 	this.add(graphMenu);
 	this.add(annotateMenu);
 	this.add(graphConstantsMenu);
@@ -233,12 +227,22 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    //This doesn't work and I don't know why.  
 	    //The dialog doesn't appear and the thread hangs
 	    //TextDialog dialog = new TextDialog(listener.getDesktop(), "Smoothing Constant", "Enter Value");
+
 	    //String val = dialog.showDialog();
 
+	    // Replace this with TextDialog 
+	    String val = JOptionPane.showInputDialog(null, "Enter Value");
+
+	    graphConstants.setSmoothingConstant( (new Double(val)).doubleValue());
+	    // And then redraw the graph.
+	    
 	}
 
 	else if (e.getSource() == priceThresholdMenuItem) {
-
+	    String val = JOptionPane.showInputDialog(null, "Enter Value");
+	    
+	    graphConstants.setPriceReversalThreshold( (new Double(val)).doubleValue());
+	    
 	}
 	
 	// Otherwise check dynamic menus

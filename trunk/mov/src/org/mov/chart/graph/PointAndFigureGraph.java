@@ -175,15 +175,24 @@ public class PointAndFigureGraph extends AbstractGraph {
 		  price moves by greater than twice the box value
 		  the inteverning boxes are marked.
 		*/
-		
-		diff -= boxPriceScale;
-		while (diff  >= 0.0) {		    
-		    double tmp = (upmove) ? values[i] - boxPriceScale : values[i] + boxPriceScale;
+
+		/* 
+		   When prev = 0.0, no plot has yet been made.
+		   We avoid putting in intervening marks in this
+		   case to avoid a large column of 'X's arising out of
+		   0. 
+		*/
+
+		diff = Math.abs(diff) - boxPriceScale;
+		int counter = 1;
+		while (diff  >= 0.0 && prev != 0.0) {		    
+		    double tmp = (upmove) ? values[i] - (boxPriceScale * counter) : values[i] + (boxPriceScale * counter);
+
 		    Double yTemp = new Double(tmp);
 		    yList.add(yTemp);
-		    diff -= boxPriceScale;
+		    diff = Math.abs(diff) - boxPriceScale;
+		    counter++;		    
 		}
-		
 
 		Double yTemp = new Double(values[i]);
 		yList.add(yTemp);
@@ -192,7 +201,12 @@ public class PointAndFigureGraph extends AbstractGraph {
 		pointAndFigure.putString(col, marker);
 		
 	    }
-	    prev = values[i];	
+	    //The price meeting the box value is defined by the last 
+	    //marker placed, which is not necessarily the previous value.
+	    if (plot) {
+		prev = values[i];	
+	    }
+	    
 	    i++;
 	}
 	
@@ -271,7 +285,9 @@ public class PointAndFigureGraph extends AbstractGraph {
 	    Comparable x = (Comparable)iterator.next();
 	    
 	    diff = (i <= 1)  ? 0 : (values[i] - prev);
-	    prev = values[i];
+	    if (diff >= boxValue) {
+		prev = values[i];
+	    }
 	    i++;
 	    
 	    if (Math.abs(diff) >= boxValue) {

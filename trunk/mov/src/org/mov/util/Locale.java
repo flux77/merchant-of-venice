@@ -273,6 +273,10 @@ public class Locale {
 	return getString(key, Integer.toString(arg1), Integer.toString(arg2));
     }
 
+    public static String getString(String key, int arg1, int arg2, int arg3) {
+	return getString(key, Integer.toString(arg1), Integer.toString(arg2), Integer.toString(arg3));
+    }
+
     /**
      * Return the current language translation of the text associated
      * with the given key. Insert the given arguments into the text

@@ -65,7 +65,7 @@ public class NumberExpression extends TerminalExpression {
     /**
      * Get the type of the expression.
      *
-     * @return one of {@link BOOLEAN_TYPE}, {@link FLOAT_TYPE} or {@link INTEGER_TYPE}.
+     * @return one of {@link #BOOLEAN_TYPE}, {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
     public int getType() {
         return type;

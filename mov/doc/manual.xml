@@ -37,7 +37,7 @@ in Venice. For charting see <link to="Graphs">Graphs</link>.
 </para>
 </help>
 
-<text>Merchant of Venice, 0.1 alpha / 07/Feb/2003
+<text>Merchant of Venice, 0.1 alpha / 13/Apr/2003
 ===========================================
 
 Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
@@ -137,7 +137,8 @@ http://www.mysql.com/downloads/api-jdbc-stable.html. Venice also supports
 a software driver called <highlight>mm.mysql</highlight> which is available
 from http://sourceforge.net/projects/mmmysql. Both are good, get either,
 although I use the later. See documentation in MySQL and the driver for how to
-set all this up.</para>
+set all this up. Once MySQL is set up you'll need to create a database for
+Venice, call the database <highlight>shares</highlight>.</para>
 
 <para>Once all that is done, you'll need to configure Venice to use the database.
 From the quote source page, to tell Venice to read quotes from the database 
@@ -161,8 +162,8 @@ radio button. You'll be confronted with several fields you need to fill in:</par
       the database. You should have created a user/password pair when setting 
       up the database.
 </item>
-<item><highlight>Database Name</highlight> - This is the name of the database Venice will create. 
-      You shouldn't need to touch this.
+<item><highlight>Database Name</highlight> - This is the name of the database that you created
+      earlier. You shouldn't need to touch this.
 </item></list>
 <para>Finally you'll need to import the quotes into the database, you can do this by 
 using the <link to="Importing Quotes">Import Quotes</link> dialog.</para>

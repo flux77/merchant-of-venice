@@ -642,12 +642,15 @@ public class Mutator {
      * @see #delete(Expression root, Expression destination)
      */
     public Expression modify(Expression root, Expression destination) {
-        Expression newExpression = createRandom(destination, destination.getType(), 1);
-
-        if(destination == root)
+        if(destination == root) {
+            Expression newExpression = createRandom(destination.getType(), 1);
+            newExpression = newExpression.simplify();
             return newExpression;
-        else
+        } else {
+            Expression newExpression = createRandom(destination, destination.getType(), 1);
+            newExpression = newExpression.simplify();
             return insert(root, destination, newExpression);
+        }
     }
 
     /**

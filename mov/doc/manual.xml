@@ -27,7 +27,7 @@ of your portfolios in Venice.</para>
 
 <para><link to="Gondola Language">Gondola Language</link> is a language for 
 analysing stock market data. The language allows you to do a variety of tasks 
-from listing stocks in tables that only match your critiera to creating 
+from listing stocks in tables that only match your criteria to creating 
 automated buy/sell paper trade rules.
 </para>
 
@@ -54,7 +54,7 @@ stock market? With some promising preliminary results, the project scope
 expanded and Venice was re-written.</para>
 
 <para>Venice now supports portfolio management, charting, technical analysis all
-within a graphical user interface with online help. The current direction
+within a graphical user interface with on-line help. The current direction
 of the project is to re-implement Genetic Programming.</para>
 
 </chapter>
@@ -72,7 +72,7 @@ a short name instead.</para>
 configure Venice to read stock quotes from either files or from
 a database.</para>
 
-<para><link to="Skins">Skins</link> descriabes how to customise the look for
+<para><link to="Skins">Skins</link> describes how to customise the look for
 Venice. Skins allow you to make Venice look more like a Windows XP, MacOS or
 Gnome application rather than the default Java look.</para>
 </help>
@@ -140,7 +140,7 @@ although I use the later. See documentation in MySQL and the driver for how to
 set all this up.</para>
 
 <para>Once all that is done, you'll need to configure Venice to use the database.
-From the quote source page, to tell Venice to read qutoes from the database 
+From the quote source page, to tell Venice to read quotes from the database 
 click on the <highlight>Database</highlight> tab and select the <highlight>Use Database</highlight>
 radio button. You'll be confronted with several fields you need to fill in:</para>
 <list><item><highlight>Database</highlight> - The only database supported is MySQL, so you can leave 
@@ -192,7 +192,7 @@ operations:</para>
 <para>Click on <highlight>Files</highlight> in the <highlight>Import From</highlight> area and on <highlight>Database</highlight>
 in the <highlight>Import To</highlight> area.</para>
 <para>This allows you to import multiple quote files into the database in one 
-operaton. Importing quotes into the database can take a while, so please be 
+operation. Importing quotes into the database can take a while, so please be 
 patient. You need to select the quote type you are importing, see
 <link to="Quote Source">Quote Source</link> for an explanation of these types.
 When you click <highlight>Import</highlight> a dialog will come up and you can select
@@ -250,7 +250,7 @@ work.</para>
 table. When listing the day's trading you need to decide which stocks you
 are interested in. Currently you can select from <highlight>All Ordinaries</highlight>, 
 <highlight>Market Indices</highlight> and <highlight>All Symbols</highlight>. These categories
-are based on the ASX (Australian Stock Exchange) so might not be very relavent
+are based on the ASX (Australian Stock Exchange) so might not be very relevant
 for other exchanges. Currently Venice is very ASX-centric. At the moment 
 Venice does not have access to any data relating to the symbols it is given, so
 it has to guess which category the symbol falls in. All Ordinaries lists all 
@@ -336,7 +336,7 @@ the profit/loss of the portfolio. To do this, graph the portfolio as above,
 then click on the menu item with the same name as your portfolio, then select 
 the <highlight>Graph</highlight> menu item and then click on <highlight>Profit/Loss</highlight>. The profit and loss 
 graph is calculated by ignoring any deposits and withdrawals made to the 
-portfolio, the balance of that portfolio over time will refect the profit and 
+portfolio, the balance of that portfolio over time will reflect the profit and 
 loss made.</para>
 </section>
 
@@ -359,7 +359,7 @@ advance/decline indicator. You can graph this indicator by:</para>
 </list>
 <para>This operation reads in almost all of the available stock quotes, so it might
 be very slow.</para>
-<para>The advance/decline indicator is calculated by taking an arbitary start value 
+<para>The advance/decline indicator is calculated by taking an arbitrary start value 
 (currently 0). Each day's value is calculated by taking the number of stocks 
 that advanced (i.e. have a higher day close than day open) minus the number of
 stocks that declined and adding that to the previous day's value. This creates
@@ -383,7 +383,7 @@ trading. You can create a new portfolio by:</para>
 </item>
 <item>Then clicking on the <highlight>Portfolio</highlight> menu item.
 </item>
-<item>Then clickiong on the <highlight>New Portfolio</highlight> menu item.
+<item>Then clicking on the <highlight>New Portfolio</highlight> menu item.
 </item>
 </list>
 <para>A portfolio is made up of several <highlight>Cash Accounts</highlight> and several
@@ -396,7 +396,7 @@ transaction is any financial transaction that involves one or more of the
 accounts. See transactions for more details.</para>
 <section name="Import/Export">
 <para>You can import and export portfolios to CSV files (comma separated values)
-these files can then be read by an Excel spreedsheet and other tools. This
+these files can then be read by an Excel spreadsheet and other tools. This
 can be useful for backup purposes. Venice is alpha after all! The format of
 the output files is:</para>
 <para><code>dd/mm/yyyy,transaction name,value,symbol,share number,trade cost,cash 
@@ -411,13 +411,13 @@ for more details.</para>
 </section>
 
 <section name="Transaction History">
-<para>You can view a list of all the transactions that have occured in the 
+<para>You can view a list of all the transactions that have occurred in the 
 portfolio. You can reach this by clicking on the <highlight>Transaction</highlight> menu
 item and then clicking on the <highlight>Show History</highlight> menu item.</para>
 </section>
 
 <section name="Transactions">
-<para>Venice currently supports serveral comman transactions:
+<para>Venice currently supports several common transactions:
 <highlight>Accumulate Transaction</highlight>, <highlight>Deposit Transaction</highlight>, <highlight>Dividend Transaction</highlight>, 
 <highlight>Dividend DRP Transaction</highlight>, <highlight>Fee Transaction</highlight>, <highlight>Interest Transaction</highlight>, 
 <highlight>Reduce Transaction</highlight>, <highlight>Transfer Transaction</highlight> and <highlight>Withdrawal Transaction</highlight>.</para>
@@ -433,7 +433,7 @@ these might not be available yet, e.g. you cannot enter a Reduce Transaction
 transaction you will need the date the transaction took place, the cash 
 account where you withdrew the money from, the share account that accumulated 
 the shares, the symbol of the stock you accumulated (e.g. CBA), the number of 
-shares you accumualated, the total value of the shares at the time of purchase
+shares you accumulated, the total value of the shares at the time of purchase
 and finally the cost of the trade. This information should all be available 
 from your broker.</para>
 </subsection>
@@ -459,11 +459,11 @@ transaction when you receive a share dividend that is automatically
 re-invested back into the company by buying more shares. To enter this
 transaction you will need the date the transaction took place, the 
 share account containing the stock, the symbol of the stock and the amount
-of shares aquired.</para>
+of shares acquired.</para>
 </subsection>
 
 <subsection name="Fee Transaction">
-<para>The fee transaction is the transaction when you recieve any kind of
+<para>The fee transaction is the transaction when you receive any kind of
 fee such as account keeping fees, Tax etc. To enter this transaction you
 will need the date the transaction took place, the cash account that
 received the fee and the amount that you were charged.</para>
@@ -482,7 +482,7 @@ then put a minus sign in front of the value.</para>
 <para>The reduce transaction is the "sell shares" transaction. To enter this
 transaction you will need the date the transaction took place, the cash 
 account where the money from the sale will go, the share account that
-reduced teh shares, the symbol of the stock you reduced (e.g. CBA), the
+reduced the shares, the symbol of the stock you reduced (e.g. CBA), the
 number of shares you reduced, the total value of the shares at the time of
 sale and finally the cost of the trade. This information should all be 
 available from your broker.</para>
@@ -509,7 +509,7 @@ account you withdrew the money from and the amount you withdrew.</para>
 <chapter name="Gondola Language">
 <para>The <highlight>Gondola Language</highlight> is a language for analysing stock market data.
 The language allows you to do a variety of tasks from listing stocks in tables
-that only match your critiera to creating automated buy/sell paper trade rules.</para>
+that only match your criteria to creating automated buy/sell paper trade rules.</para>
 
 <para>Whenever you enter a Gondola expression there are two implicit variables that
 are always set: the current date and the current stock. For example if
@@ -591,7 +591,7 @@ trading date, -1 means the previous trading date, etc.</para>
 <para>The if function allows a selection of which code to be executed.</para>
 <para><code>if(VALUE) { TRUE } else { FALSE }</code></para>
 <para>If the value of the VALUE expression renders to true, then the TRUE expression
-will be exeucted, otherwise the FALSE expression will be.</para>
+will be executed, otherwise the FALSE expression will be.</para>
 <para>Example:</para>
 <para><code>if(lag(day_open, 0) &gt; lag(day_open, -1)) 
     { lag(day_open, 0) } 
@@ -674,7 +674,7 @@ Next you need to enter in the buy/sell rules. These rules are written in the
 <link to="Gondola">Gondola Language</link> so see that section for details. The range
 fields allow you to test multiple equations at once, if you enter a value in
 one of the fields, say the <highlight>Range $A: 1 to</highlight>, it will run separate paper 
-trades using the buy/sell rules where each occurence of <highlight>$A</highlight> will be
+trades using the buy/sell rules where each occurrence of <highlight>$A</highlight> will be
 replaced by 1, then 2, then 3 etc up to the number entered. You can leave these
 empty if you only wish to test a single equation. An example of a (bad) 
 buy/sell rule pair is buy on <code>avg(day_close, 15, 0) &gt; avg(day_close, 30, 0)</code> and 

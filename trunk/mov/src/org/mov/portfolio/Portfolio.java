@@ -125,7 +125,7 @@ public class Portfolio implements Cloneable {
     /**
      * Record a single transaction on the portfolio. 
      *
-     * @param	transactions	a new transaction
+     * @param	transaction	a new transaction
      */
     public void addTransaction(Transaction transaction) {
 
@@ -264,7 +264,7 @@ public class Portfolio implements Cloneable {
      * Find and return the account with the given name in the
      * portfolio.
      *
-     * @param	the name of the account to search for
+     * @param	name the name of the account to search for
      * @return	the account with the same name as given or <code>null</code>
      *		if it could not be found
      */
@@ -346,7 +346,7 @@ public class Portfolio implements Cloneable {
     /**
      * Return the transaction history.
      *
-     * @param	transaction history
+     * @return	transaction history
      * @see	Transaction
      */
     public List getTransactions() {

@@ -46,10 +46,10 @@ public class Main extends JFrame {
     public static String SHORT_VERSION = "0.31a";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION  = "0.31 alpha";
+    public static String LONG_VERSION = "0.31 alpha";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE  = "14/Mar/2004";
+    public static String RELEASE_DATE = "14/Mar/2004";
 
     /**
      * Get the main frame for the current application

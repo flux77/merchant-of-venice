@@ -3,7 +3,9 @@ package org.mov.importer;
 import org.mov.main.ModuleFrame;
 import org.mov.main.Module;
 import org.mov.util.*;
+import org.mov.portfolio.*;
 import org.mov.quote.*;
+import org.mov.ui.*;
 
 import java.awt.*;
 import java.awt.image.*;
@@ -46,7 +48,10 @@ public class ImporterModule extends JPanel
     private JButton importButton;
     private JButton cancelButton;
 
+    // Importing into database
     private DatabaseQuoteSource databaseSource = null;
+    private Vector databaseDates = null;
+    private TradingDate latestDatabaseDate = null;
 
     /**
      * Create a new Importer Module.
@@ -257,7 +262,20 @@ public class ImporterModule extends JPanel
 	else if(e.getSource() == importButton) {
 
 	    saveConfiguration();
-	    importQuotes();
+
+	    // Close frame before doing import - we just want the progress bar
+	    // visible
+	    propertySupport.
+		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
+
+	    // Performing the quote import in a separate thread will
+	    // prevent the application appearing to "lock up"
+	    Thread importQuotes = new Thread() {		
+		    public void run() {
+			importQuotes();
+		    }
+		};	    
+	    importQuotes.start();
 	}
     }
 
@@ -269,9 +287,7 @@ public class ImporterModule extends JPanel
 	//
  
 	QuoteSource source = null;
-	String fileNames[] = {};
 	Vector dates = new Vector();
-	int numberDays = 0;
 
 	// If we are importing from files we'll need to open a dialog
 	if(fromFiles.isSelected()) {
@@ -282,27 +298,28 @@ public class ImporterModule extends JPanel
 
 	    if(action == JFileChooser.APPROVE_OPTION) {
 		File files[] = chooser.getSelectedFiles();
-		fileNames = Converter.toFileNames(files);
-
-		numberDays = files.length; 
+		Vector fileNames = Converter.toFileNameVector(files);
 
 		// Cancel if no files were selected (one day = one file)
-		if(numberDays == 0)
+		if(fileNames.size() == 0)
 		    return;
 
-		// If we are importing to the database we'll need a quote
-		// source - if we are importing only to files we dont need
-		// this source as we'll just add the file names to the list
-		if(toDatabase.isSelected()) {
-		    source = 
-			new FileQuoteSource((String)formatComboBox.getSelectedItem(), 
-					    fileNames);
-		    dates = source.getDates();
-
-		    // Update number of days to reflect REAL number of days
-		    // in cache
-		    numberDays = dates.size();
+		// Format is one in combo box - unless its disable
+		// which means we honour the format choosen in the
+		// user's preferences.
+		String format;
+		if(formatComboBox.isEnabled())
+		    format = (String)formatComboBox.getSelectedItem();
+		else {
+		    Preferences p = 
+			Preferences.userRoot().node("/quote_source/files");
+		    format = p.get("format", "MetaStock");
 		}
+		
+		source = new FileQuoteSource(format, fileNames);
+
+		// Get dates contained in files
+		dates = source.getDates();
 	    }
 	    else
 		return; // if the user cancelled then dont import
@@ -310,100 +327,246 @@ public class ImporterModule extends JPanel
 
 	// Importing from the net
 	else if(fromInternet.isSelected()) {
-	    // Get username and password from preferences
-	    Preferences p = 
-		Preferences.userRoot().node("/quote_source/internet");
-	    source = new SanfordQuoteSource(p.get("username", ""),
-					    p.get("password", ""));
+	    // Create dates array from combo box
+	    String start = (String)yearComboBox.getSelectedItem();
+	    TradingDate startDate = null;
+
+	    // Otherwise go from the last day in the current qoute source
+	    if(start.equals("Latest Quotes")) {
+		if(toDatabase.isSelected()) {
+		    QuoteSource databaseSource = 
+			Quote.createDatabaseQuoteSource();
+		    startDate = databaseSource.getLatestQuoteDate();
+		}
+
+		if(toFiles.isSelected()) {
+		   
+		    TradingDate fileStartDate;
+		    QuoteSource fileQuoteSource = 
+			Quote.createFileQuoteSource();
+
+		    fileStartDate = fileQuoteSource.getLatestQuoteDate();
+
+		    // Pick the earliest of the two dates
+		    if(fileStartDate != null && 
+		       fileStartDate.before(startDate))
+		    	startDate = fileStartDate;
+		}
+
+		// Increment start date to go past last date in data source
+		startDate.next(1);
+	    }
+
+	    else {
+		// Year is in last 4 characters
+		String yearString = 
+		    start.substring(start.length() - 4,
+				    start.length());
+
+		startDate = new TradingDate(Integer.parseInt(yearString), 
+					    1, 1);
+	    }
+
+	    // End date is yesterday
+	    TradingDate endDate = new TradingDate();
+	    endDate.previous(1);
+
+	    // Get vector of all trading dates inbetween
+	    dates = Converter.dateRangeToTradingDateVector(startDate,
+							   endDate);
+
+	    source = Quote.createInternetQuoteSource();
 	}
 
 	// Or database
-	else 
-	    source = new DatabaseQuoteSource();
+	else {
+	    source = Quote.createDatabaseQuoteSource();
 
+	    // Export all dates in database
+	    dates = source.getDates(); 
+	}
 	//
 	// Step two: Import
 	//
 
-	// Close frame before doing import - we just want the progress bar
-	// visible
-	propertySupport.
-	    firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
+	// Sort date array so user gets a better progress rather than
+	// being shown the programme is importing random dates
+	Comparator sortByDate = 
+	    new TradingDateComparator(TradingDateComparator.FORWARDS);
+	TreeSet sortedDates = new TreeSet(sortByDate);
+	sortedDates.addAll(dates);
 
-	if(numberDays > 0)
-	    performImport(source, numberDays, fileNames, dates); 
+	if(sortedDates.size() > 0)
+	    performImport(source, sortedDates);
+	
     }
 
     // Perform actual import given source and/or file list
-    private void performImport(final QuoteSource source, 
-			       final int numberDays,
-			       final String[] fileNames,
-			       final Vector dates) {
+    private void performImport(QuoteSource source, 
+			       Set dates) {
+	boolean owner = 
+	    Progress.getInstance().open("Importing", 
+					dates.size());
 	
-	Thread importQuotes = new Thread() {		
-		public void run() {
-		    
-		    TradingDate date;
-		    boolean owner = 
-			Progress.getInstance().open("Importing", numberDays);
+	TradingDate date;
+	Iterator iterator = dates.iterator();
+	Vector dayQuotes;
 
-		    // Import a day at a time
-		    for(int i = 0; i < numberDays; i++) {
-			date = (TradingDate)dates.get(i);
-			
-			Progress.getInstance().setText("Importing: " +
-						       date.toString("d?/m?/yyyy"),
-						       owner);
+	boolean isToFiles = toFiles.isSelected() && toFiles.isEnabled();
+	boolean isToDatabase = 
+	    toDatabase.isSelected() && toDatabase.isEnabled();
+	
+	// Import a day at a time
+	while(iterator.hasNext()) {
+	    date = (TradingDate)iterator.next();
+	    
+	    Progress.getInstance().setText("Importing: " +
+					   date.toString("d?/m?/yyyy"),
+					   owner);
+	    // Get the days quotes
+	    dayQuotes = 
+		source.getQuotesForDate(date, QuoteSource.ALL_COMMODITIES);
+	    
+	    // file -> file 
+	    if(fromFiles.isSelected() && isToFiles) {
+		FileQuoteSource fileQuoteSource =
+		    (FileQuoteSource)source;
+		importFileToFile(fileQuoteSource.
+				 getFileForDate(date));
+	    }			
+	    
+	    // anything but file -> file
+	    if(!fromFiles.isSelected() && isToFiles) {
+		importToFile(dayQuotes, date);
+	    }
+	    
+	    // anything -> database
+	    if(isToDatabase) 
+		importToDatabase(dayQuotes, date);
+	    
+	    Progress.getInstance().next();
+	}
+	
+	// This makes sure the next query uses the new imported 
+	// quotes
+	Quote.flush();	
 
-			// file -> file 
-			if(fromFiles.isSelected() && toFiles.isSelected())
-			    importFileToFile(fileNames[i]);
-			
-			// anything -> database
-			if(toDatabase.isSelected())
-			    importToDatabase(source, date);
-
-			Progress.getInstance().next();
-		    }
-
-		    // This makes sure the next query uses the new imported 
-		    // quotes
-		    Quote.flush();	
-
-		    Progress.getInstance().close(owner);	
-		}
-	    };
-
-	importQuotes.start();
-		
+	Progress.getInstance().close(owner);	
     }
 
-    // Import a single file into the file list
+    // Import file name containing a day's quotes into the file list
     private void importFileToFile(String fileName) {
 	// Get list of files
-	Preferences p = Preferences.userRoot().node("/quote_source/files");
-	String fileList = p.get("list", "");
-	String[] fileNames = fileList.split(", ");
+	Vector fileList = getFileList();
 
 	// Add file if its not already there
-	for(int i = 0; i < fileNames.length; i++) {
-	    if(fileNames[i].equals(fileName))
-	       return; // exit its already there
+	Iterator iterator = fileList.iterator();
+	String traverseFileName;
+
+	while(iterator.hasNext()) {
+	    traverseFileName = (String)iterator.next();
+	    if(traverseFileName.equals(fileName))
+		return; // exit its already there
 	}
        
 	// If we got here its not so add it
-	p.put("list", fileList.concat(", ").concat(fileName));	
+	fileList.add((Object)fileName);
+
+	// Save
+	putFileList(fileList);
     }
 
-    // Import a file into the database
-    private void importToDatabase(QuoteSource source, TradingDate date) {
+    // Create a file containing the given day's quotes and import the file name
+    // into file list.
+    private void importToFile(Vector dayQuotes, TradingDate date) {
+
+	// Create file name to store file quotes in
+	String template = toFileName.getText(); // get file name format 
+	String fileName = date.toString(template); // insert date
+
+	// Get filter we are using
+	Preferences p = Preferences.userRoot().node("/quote_source/files");
+	String format = p.get("format", "MetaStock");
+	QuoteFilter filter = QuoteFilterList.getInstance().getFilter(format);
+
+	// Create file and write quotes
+	try {
+	    FileWriter fileOut = new FileWriter(fileName);
+	    PrintWriter out = new PrintWriter(new BufferedWriter(fileOut));
+ 
+	    // Iterate through stocks printing them to file
+	    Iterator iterator = dayQuotes.iterator();
+	    Stock quote;
+
+	    while(iterator.hasNext()) {
+		quote = (Stock)iterator.next();
+		out.println(filter.toString(quote));
+	    }
+	    out.close();
+	}
+	catch(java.io.IOException e) {
+	    org.mov.ui.DesktopManager.
+		showErrorMessage("Error writing to file: " +
+				 fileName);
+	}
+
+	// Finally add the file we just created to the list of files
+	importFileToFile(fileName);
+    }
+
+    // Import a day's quotes into the database
+    private void importToDatabase(Vector dayQuotes, TradingDate date) {
+
 	Preferences p = Preferences.userRoot().node("/quote_source/database");
 	String databaseName = p.get("dbname", "shares");
 
-	if(databaseSource == null)
-	    databaseSource = new DatabaseQuoteSource();
+	if(databaseSource == null) 
+	    databaseSource = Quote.createDatabaseQuoteSource();
 
-	databaseSource.importQuotes(databaseName, source, date);
+	// Loading all the dates in the database to check for
+	// duplicate dates can take quite a while. Given the
+	// most frequent activity is importing new quote dates
+	// all we need is the check against the latest quote
+	// date. So use this and only load all the quote dates if
+	// necessary.
+	if(latestDatabaseDate == null) 
+	    latestDatabaseDate = databaseSource.getLatestQuoteDate();
+
+	// If the date we are importing is not after the latest quote date
+	// we will have to load all the dates in
+	if(!date.after(latestDatabaseDate) && databaseDates == null) 
+	    databaseDates = databaseSource.getDates();
+	    
+	// Dont import if the database already contains the date
+	if(date.after(latestDatabaseDate) ||
+	   !containsDate(databaseDates, date)) {
+	    databaseSource.importQuotes(databaseName, dayQuotes, date);
+
+	    if(databaseDates != null)
+		// We are keeping a list of dates in database - add it
+		// to that
+		databaseDates.add(date);
+	    else
+		// We are only keeping track of the latest date in database,
+		// new date is after
+		latestDatabaseDate = date;
+	}
+    }
+
+    // Return whether the given vector contains the given date
+    private boolean containsDate(Vector dates, TradingDate date) {
+	Iterator iterator = dates.iterator();
+	TradingDate traverseDate;
+
+	while(iterator.hasNext()) {
+	    traverseDate = (TradingDate)iterator.next();
+
+	    if(date.equals(traverseDate)) 
+		return true;
+	}
+	
+	// If we got here it wasnt found
+	return false;
     }
 
     // Save the configuration on screen to the preferences file
@@ -500,6 +663,98 @@ public class ImporterModule extends JPanel
     public void save() {
 	// Same as hitting cancel - do not save anything
     }
+
+    /**
+     * Retreive the user's selection of files into the preferences structure.
+     *
+     * @return	a vector of strings containing quote file names
+     */
+    public static Vector getFileList() {
+	Preferences p = Preferences.userRoot().node("/quote_source/files");
+
+	// Files are stored in the nodes list1, list2, list3 etc - the
+	// maximum size of each list is Preferences.MAX_VALUE_LENGTH so
+	// we need to 'paste' together all the parts
+	boolean complete = false;
+	String fileList = "";
+	String partialFileList;
+	int bundleNumber = 1;
+
+	while(!complete) {
+	    partialFileList = p.get("list" + 
+				    Integer.toString(bundleNumber), "");
+
+	    if(partialFileList.length() > 1) {
+		fileList = fileList.concat(partialFileList);
+	    }
+	    else
+		complete = true; // done!
+
+	    bundleNumber++;
+	}
+
+	// Now split the comma separated entries
+	String[] fileNames = fileList.split(", ");
+
+	Vector fileVector = new Vector();
+	for(int i = 0; i < fileNames.length; i++) {
+	    if(fileNames[i].length() > 0)
+		fileVector.add(fileNames[i]);
+	}
+
+	return fileVector;
+    }
+
+    /**
+     * Save the user's selection of files into the preferences structure.
+     *
+     * @param	fileVector	a vector of strings containing quote file
+     *				names
+     */
+    public static void putFileList(Vector fileVector) {
+	// First convert the vector into a comma separated string of
+	// all the file names
+	String fileList = "";
+	String fileName;
+	Iterator iterator = fileVector.iterator();
+
+	while(iterator.hasNext()) {
+	    fileName = (String)iterator.next();
+
+	    if(fileList.length() > 1)
+		fileList = fileList.concat(", ");
+
+	    fileList = fileList.concat(fileName);
+	}
+
+	// Now split up the string into bundles that can fit into the
+	// preferences structure and write them to the preferences
+	// structure
+	Preferences p = Preferences.userRoot().node("/quote_source/files");
+	
+	int beginBundle = 0;
+	int endBundle;
+	int bundleNumber = 1;
+	final int bundleSize = Preferences.MAX_VALUE_LENGTH - 1;
+	String bundle;
+
+	while(beginBundle < fileList.length()) {
+	    endBundle = beginBundle + bundleSize; 
+	    if(endBundle > fileList.length())
+		endBundle = fileList.length();
+
+	    p.put("list" + Integer.toString(bundleNumber),
+		  fileList.substring(beginBundle, endBundle));
+
+	    beginBundle += bundleSize;
+	    bundleNumber++;
+	}
+
+	// Delete any old bundles that might still contain quotes
+	while(!p.get("list" + Integer.toString(bundleNumber), "").equals("")) {
+	    p.put("list" + Integer.toString(bundleNumber++), "");	    
+	}
+    }    
 }
 
 

@@ -1,45 +1,103 @@
+<!-- Venice Build File -->
 <project name="Venice" default="build" basedir=".">
 
-<property name="src" value="${basedir}/src"/>
-<property name="api" value="${basedir}/api"/>
+  <!-- Current version we are working towards -->
+  <property name="VERSION" value="0.1alpha"/>
 
-<target name="build">
-  <javac srcdir="${src}" 
-	 debug="on"
-	 optimize="on"
-	 source="1.4"
-         includes="**/*.java"/>
-</target>
+  <!-- Paths -->
+  <property name="api" value="${basedir}/api"/>
+  <property name="backup" value="${basedir}/backup"/>
+  <property name="release" value="${basedir}/release"/>
+  <property name="src" value="${basedir}/src"/>
 
-<target name="clean">
-  <delete>
-    <fileset dir="${src}" includes="**/*.class"/>
-  </delete>
-</target>
+  <!-- Generate API documentation -->
+  <target name="api">
+    <javadoc packagenames="org.mov.*"
+             sourcepath="${src}"
+	     source="1.4"
+             destdir="${api}"
+	     windowtitle="Venice ${VERSION}">
+    <header><![CDATA[<b>Venice ${VERSION}</b>]]></header>
+    <footer><![CDATA[<b>Venice ${VERSION}</b>]]></footer>
+    <doctitle>Venice ${VERSION}</doctitle>
+  </javadoc>           
+  </target>
 
-<target name="api">
-  <javadoc packagenames="org.mov.*"
-           sourcepath="${src}"
+  <!-- Get a backup of the CVS tree from sourceforge -->
+  <target name="backup">
+    <tstamp>
+      <format property="today" pattern="ddmmyyyy"/>
+    </tstamp> 
+    <mkdir dir="${backup}"/>
+    <get src="http://cvs.sourceforge.net/cvstarballs/mov-cvsroot.tar.gz"
+         dest="${backup}/backup-${today}.tar.gz"
+	 verbose="true"/>        
+  </target>
+
+  <!-- Build venice -->
+  <target name="build">
+    <javac srcdir="${src}" 
+	   debug="on"
+  	   optimize="on"
 	   source="1.4"
-           destdir="${api}"
-	   windowtitle="Venice">
-    <header><![CDATA[<b>Venice</b>]]></header>
-    <footer><![CDATA[<b>Venice</b>]]></footer>
-    <doctitle>Venice</doctitle>
-  </javadoc>
-           
-</target>
+	   includes="**/*.java"/>
+  </target>
 
-<target name="run" depends="build">
-  <java classname="org.mov.main.Main" 
-        dir="${src}"
-        fork="yes">
-    <jvmarg value="-ea"/>
-    <classpath>
-      <pathelement path="${java.class.path}"/>
-      <pathelement path="${src}"/>
-    </classpath>
-  </java>
-</target>
+  <!-- Remove all built files -->
+  <target name="clean">
+    <delete>
+      <fileset dir="${src}" includes="**/*.class"/>
+    </delete>
+    <delete file="venice.jar"/>
+    <delete dir="${api}"/>
+    <delete dir="${release}"/>
+  </target>
+
+  <!-- Generate a jar -->
+  <target name="jar" depends="build">
+    <jar jarfile="venice.jar" 
+         basedir="${src}"
+	 manifest="${src}/MANIFEST.MF"/>
+  </target>
+
+  <!-- Package venice up ready for release -->
+  <target name="release" depends="jar">
+
+    <!-- Layout files ready for release -->
+    <mkdir dir="${release}"/>
+    <mkdir dir="${release}/venice-${VERSION}"/>
+    <mkdir dir="${release}/venice-${VERSION}/build"/>
+    <mkdir dir="${release}/venice-${VERSION}/build/src/"/>
+    <copy todir="${release}/venice-${VERSION}/build/src/"> 
+      <fileset dir="${src}" includes="**/*.java"/>
+    </copy>
+    <copy file="build.xml" todir="${release}/venice-${VERSION}/build/"/>
+    <copy file="COPYING.txt" todir="${release}/venice-${VERSION}/"/>
+    <copy file="venice" todir="${release}/venice-${VERSION}/"/>
+    <copy file="venice.jar" todir="${release}/venice-${VERSION}/"/>   
+
+    <!-- Create release files for windows and unix -->
+    <zip zipfile="${release}/venice-${VERSION}.zip">
+      <fileset dir="${release}/" includes="venice-${VERSION}/**"/>
+    </zip>
+    <tar tarfile="${release}/venice-${VERSION}.tar">
+      <tarfileset dir="${release}/" includes="venice-${VERSION}/**"/>
+    </tar>
+    <gzip zipfile="${release}/venice-${VERSION}.tar.gz" 
+      src="${release}/venice-${VERSION}.tar"/>
+  </target>
+
+  <!-- Run Venice -->
+  <target name="run" depends="build">
+    <java classname="org.mov.main.Main" 
+          dir="${src}"
+          fork="yes">
+      <jvmarg value="-ea"/>
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+      </classpath>
+    </java>
+  </target>
 
 </project>

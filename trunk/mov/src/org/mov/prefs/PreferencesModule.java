@@ -31,6 +31,7 @@ import javax.swing.event.*;
 
 import org.mov.main.*;
 import org.mov.prefs.PreferencesManager;
+import org.mov.util.Locale;
 
 /**
  * The preferences module for venice. This class provides the user
@@ -64,6 +65,9 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
 
     /** Refers to the tuning preferences page */
     public final static int TUNING_PAGE = 2;
+
+    /** Refers to the proxy preferences page */
+    public final static int PROXY_PAGE = 3;
 
     private Vector pages;
     private DefaultListModel pageListModel;
@@ -99,6 +103,7 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
 	pages = new Vector();
 
 	addPage(new EquationPage(desktop));
+        addPage(new ProxyPage(desktop));
 	addPage(new QuoteSourcePage(desktop));	
 	addPage(new TuningPage(desktop));
 
@@ -123,9 +128,9 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
 	    BorderLayout.CENTER);
 
 	JPanel buttonPanel = new JPanel();
-	okButton = new JButton("OK");
+	okButton = new JButton(Locale.getString("OK"));
 	okButton.addActionListener(this);
-	cancelButton = new JButton("Cancel");
+	cancelButton = new JButton(Locale.getString("CANCEL"));
 	cancelButton.addActionListener(this);
 	buttonPanel.add(okButton);
 	buttonPanel.add(cancelButton);
@@ -237,7 +242,7 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
      * @return	the window title.
      */
     public String getTitle() {
-	return "Application Preferences";
+	return Locale.getString("PREFERENCES_TITLE");
     }
 
     /**

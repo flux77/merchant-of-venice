@@ -27,6 +27,7 @@ import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
 import org.mov.ui.EquationComboBox;
 import org.mov.ui.ExpressionEditorDialog;
+import org.mov.util.Locale;
 
 /**
  * The table in the Equation Preferences page that lists stored equations.
@@ -71,9 +72,14 @@ public class EquationTable extends AbstractTable {
      */
     public EquationTable() {
 	List columns = new ArrayList();
-	columns.add(new Column(NAME_COLUMN, "Name", "Name", String.class, Column.VISIBLE));
-	columns.add(new Column(EQUATION_COLUMN, "Equation", "Equation", String.class, 
-			       Column.VISIBLE));
+	columns.add(new Column(NAME_COLUMN, 
+			       Locale.getString("NAME"), 
+			       Locale.getString("NAME_COLUMN_HEADER"), 
+			       String.class, Column.VISIBLE));
+	columns.add(new Column(EQUATION_COLUMN, 
+			       Locale.getString("EQUATION"), 
+			       Locale.getString("FULL_EQUATION_COLUMN_HEADER"), 
+			       String.class, Column.VISIBLE));
 
 	storedEquations = PreferencesManager.loadStoredEquations();
 
@@ -89,7 +95,8 @@ public class EquationTable extends AbstractTable {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
 		    StoredEquation storedEquation = 
-			ExpressionEditorDialog.showAddDialog(storedEquations, "Add Equation");
+			ExpressionEditorDialog.showAddDialog(storedEquations, 
+							     Locale.getString("ADD_EQUATION"));
 
 		    if(storedEquation != null) {
 			storedEquations.add(storedEquation);
@@ -113,7 +120,8 @@ public class EquationTable extends AbstractTable {
 
 	    Thread thread = new Thread(new Runnable() {
 		    public void run() {
-			ExpressionEditorDialog.showEditDialog(storedEquations,"Edit Equation", 
+			ExpressionEditorDialog.showEditDialog(storedEquations,
+							      Locale.getString("EDIT_EQUATION"), 
 							      storedEquation);
 			model.fireTableDataChanged();
 			repaint();

@@ -35,6 +35,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.mov.prefs.PreferencesManager;
+import org.mov.util.Locale;
 
 /**
  * Provides a preference page to let the user manage stored equations.
@@ -42,7 +43,7 @@ import org.mov.prefs.PreferencesManager;
  * the user does not have to type in the same equations each time they
  * are required, but can instead reference them with a name.
  *
- * @author  Dan
+ * @author Daniel Makovec
  */
 public class EquationPage extends JPanel implements PreferencesPage
 {
@@ -67,14 +68,14 @@ public class EquationPage extends JPanel implements PreferencesPage
 	add(new JScrollPane(equationTable), BorderLayout.CENTER);
 
 	JPanel buttonPanel = new JPanel();
-	addEquationButton = new JButton("Add");
+	addEquationButton = new JButton(Locale.getString("ADD"));
 	addEquationButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    equationTable.add();
 		    checkButtonDisabledStatus();
 		}});
 
-	editEquationButton = new JButton("Edit");
+	editEquationButton = new JButton(Locale.getString("EDIT"));
 	editEquationButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    int[] selectedRows = equationTable.getSelectedRows();
@@ -82,7 +83,7 @@ public class EquationPage extends JPanel implements PreferencesPage
 			equationTable.edit(selectedRows[0]);
 		}});
 
-	deleteEquationsButton = new JButton("Delete");
+	deleteEquationsButton = new JButton(Locale.getString("DELETE"));
 	deleteEquationsButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			equationTable.delete(equationTable.getSelectedRows());
@@ -150,6 +151,6 @@ public class EquationPage extends JPanel implements PreferencesPage
      * @return	the window title.
      */
     public String getTitle() {
-        return "Equations";
+        return Locale.getString("EQUATION_PAGE_TITLE");
     }
 }

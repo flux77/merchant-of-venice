@@ -43,7 +43,7 @@ import org.mov.util.TradingDateFormatException;
  * place allows us to maintain preferences namespace convention and also
  * allows us to easily change the method of storage at a later date if desired.
  *
- * @author  Dan
+ * @author Daniel Makovec
  */
 public class PreferencesManager {
     // The base in the prefs tree where all Venice settings are stored
@@ -55,6 +55,12 @@ public class PreferencesManager {
     // This class cannot be instantiated
     private PreferencesManager() {
 	// nothing to do
+    }
+
+    public class ProxyPreferences {
+	public String host;
+	public String port;
+	public boolean isEnabled;
     }
   
     /**
@@ -400,9 +406,8 @@ public class PreferencesManager {
 		Preferences transactionPrefs = 
 		    p.node("transactions").node(transactionNumbers[i]);
 
-		int type = 
-		    Transaction.stringToType(transactionPrefs.get("type",
-								  "withdrawal"));
+		int type = getTransactionType(transactionPrefs.get("type", ""));
+
 		TradingDate date = null;
 
                 try {
@@ -464,6 +469,41 @@ public class PreferencesManager {
 	return portfolio;
     }
 
+    // Venice 0.1 & 0.2 did not have i8ln support so they saved the
+    // transactions by name. But this does not work if the transaction
+    // names can change! But I also want 0.3 to be backward compatible
+    // with 0.2. So this routine will understand both transaction name
+    // and transaction number.
+    private static int getTransactionType(String transactionType) {
+	// Venice 0.3+ saves transactions by numbers.
+	try {
+	    return Integer.parseInt(transactionType);
+	}
+	catch(NumberFormatException e) {
+	    // not a number
+	}
+
+	// Otherwise compare with all the old transaction names
+	if(transactionType.equals("Accumulate"))
+	    return Transaction.ACCUMULATE;
+	else if(transactionType.equals("Reduce")) 
+	    return Transaction.REDUCE;
+	else if(transactionType.equals("Deposit")) 
+	    return Transaction.DEPOSIT;
+	else if(transactionType.equals("Fee")) 
+	    return Transaction.FEE;
+	else if(transactionType.equals("Interest")) 
+	    return Transaction.INTEREST;
+	else if(transactionType.equals("Withdrawal"))
+	    return Transaction.WITHDRAWAL;
+	else if(transactionType.equals("Dividend")) 
+	    return Transaction.DIVIDEND;
+	else if(transactionType.equals("Dividend DRP"))
+	    return Transaction.DIVIDEND_DRP;
+	else
+	    return Transaction.TRANSFER;
+    }
+
     /**
      * Save the portfolio.
      *
@@ -509,8 +549,7 @@ public class PreferencesManager {
 	    Preferences transactionPrefs = p.node("transactions/" +
 						  Integer.toString(i++));
 	    
-	    transactionPrefs.put("type", 
-			     Transaction.typeToString(transaction.getType()));
+	    transactionPrefs.put("type", Integer.toString(transaction.getType()));
 	    transactionPrefs.put("date", 
 			     transaction.getDate().toString("dd/mm/yyyy"));
 	    transactionPrefs.putDouble("amount", transaction.getAmount().doubleValue());
@@ -537,5 +576,32 @@ public class PreferencesManager {
 		transactionPrefs.put("share_account", 
 				     shareAccount.getName());
 	}
+    }
+
+     /**
+      * Load proxy settings.
+      *
+      * @return proxy preferences.
+      */
+     public static ProxyPreferences loadProxySettings() {
+         Preferences prefs = getUserNode("/proxy");
+	 PreferencesManager preferencesManager = new PreferencesManager();
+	 ProxyPreferences proxyPreferences = preferencesManager.new ProxyPreferences();
+	 proxyPreferences.host = prefs.get("host", "");
+	 proxyPreferences.port = prefs.get("port", "-1");
+	 proxyPreferences.isEnabled = prefs.getBoolean("enabled", false);
+	 return proxyPreferences;
+     }
+
+     /**
+      * Save proxy settings.
+      *
+      * @param proxyPreferences the new proxy preferences.
+      */
+    public static void saveProxySettings(ProxyPreferences proxyPreferences) {
+	Preferences prefs = getUserNode("/proxy");
+	prefs.put("host", proxyPreferences.host);
+	prefs.put("port", proxyPreferences.port);
+	prefs.putBoolean("enabled", proxyPreferences.isEnabled);
     }
 }

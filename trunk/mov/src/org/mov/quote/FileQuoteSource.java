@@ -27,6 +27,9 @@ public class FileQuoteSource implements QuoteSource
     // Buffer last trading date in database
     private TradingDate latestQuoteDate = null;
 
+    // Filter to convert data into quote
+    private QuoteFilter filter;
+
     // Given a name of a file containing a list of day quotes, return the
     // the day 
     private TradingDate getContainedDate(String fileName) {
@@ -35,7 +38,7 @@ public class FileQuoteSource implements QuoteSource
 	try {
 	    FileReader fr = new FileReader(fileName);
 	    BufferedReader br = new BufferedReader(fr);
-	    Stock stock = Converter.lineToQuote(br.readLine());
+	    Stock stock = filter.filter(br.readLine());
 	    if(stock != null)
 		date = stock.getDate();
 	    br.close();
@@ -64,7 +67,8 @@ public class FileQuoteSource implements QuoteSource
 	    line = br.readLine();
 
 	    while(line != null && !found) {
-		stock = Converter.lineToQuote(line);
+
+		stock = filter.filter(line);
 	    
 		if(stock != null && stock.getSymbol().equals(symbol)) 
 		    found = true;
@@ -111,18 +115,28 @@ public class FileQuoteSource implements QuoteSource
     /**
      * Creates a new quote source using the list of files specified in the user
      * preferences. 
+     *
+     * @param	format	The format filter to use to parse the quotes
+     * @param	files	An array of files to search through
      */
-    public FileQuoteSource() {
+    public FileQuoteSource(String format, String[] files) {
+
+	// Set filter to whatever is defined in the preferences to filter
+	// to our internal format
+	filter = QuoteFilterList.getInstance().getFilter(format);
+
 	// Create map between TradingDates and file names and record
 	// latest trading date. This allows us to quickly locate the
 	// file containg the given date.
-	Preferences p = Preferences.userRoot().node("/quote_source/files");
-	String fileList = p.get("list", "");
-	String[] fileListArray = fileList.split(", ");
 	TradingDate date;
 
-	for(int i = 0; i < fileListArray.length; i++) {
-	    date = getContainedDate(fileListArray[i]);
+	// Indexing might take a while
+	boolean owner = 
+	    Progress.getInstance().open("Indexing files", 
+					files.length);
+
+	for(int i = 0; i < files.length; i++) {
+	    date = getContainedDate(files[i]);
 
 	    if(date != null) {
 		// Buffer the latest quote date 
@@ -130,9 +144,13 @@ public class FileQuoteSource implements QuoteSource
 		    latestQuoteDate = date;
 		
 		// Associate this date with this file
-		dateToFile.put(date, fileListArray[i]);
+		dateToFile.put(date, files[i]);
+
+		Progress.getInstance().next();
 	    }
 	}
+
+	Progress.getInstance().close(owner);
     }
 
     /**
@@ -256,8 +274,7 @@ public class FileQuoteSource implements QuoteSource
 	    line = br.readLine();
 
 	    while(line != null) {
-	    
-		stock = Converter.lineToQuote(line);
+		stock = filter.filter(line);
 
 		if(stock != null && isType(stock, type)) 
 		    quotes.add((Object)stock);

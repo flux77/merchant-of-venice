@@ -64,6 +64,7 @@ public class EquationTable extends AbstractTable {
 	    else
 		return storedEquation.equation;
 	}
+        
     }
 
     /**
@@ -99,8 +100,9 @@ public class EquationTable extends AbstractTable {
 							     Locale.getString("ADD_EQUATION"));
 
 		    if(storedEquation != null) {
-			storedEquations.add(storedEquation);
-			model.fireTableDataChanged();
+                        storedEquations.add(storedEquation);
+                        setModel(model);
+                        model.fireTableDataChanged();
 			repaint();
 		    }
 		}
@@ -123,7 +125,7 @@ public class EquationTable extends AbstractTable {
 			ExpressionEditorDialog.showEditDialog(storedEquations,
 							      Locale.getString("EDIT_EQUATION"), 
 							      storedEquation);
-			model.fireTableDataChanged();
+                        model.fireTableDataChanged();
 			repaint();
 		    }
 		});
@@ -147,7 +149,7 @@ public class EquationTable extends AbstractTable {
 
 	// For some reason we need to do an explicit repaint call
 	// here to get the table to redraw itself.
-	model.fireTableDataChanged();
+        model.fireTableDataChanged();
 	repaint();
     }
     

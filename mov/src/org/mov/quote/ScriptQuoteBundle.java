@@ -107,9 +107,6 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	double quote;
 
         try {
-            // if it looks for future quote, a MissingQuoteException is thrown.
-            if (dateOffset>0)
-                throw MissingQuoteException.getInstance();
             quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
         }
         catch(QuoteNotLoadedException e) {

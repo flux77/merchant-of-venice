@@ -180,14 +180,18 @@ public class Parser {
 
 	while(string.length() > 0) {
 
-	    // skip leading spaces
-	    while(Character.isWhitespace(string.charAt(0)))
+	    // skip spaces
+	    while(string.length() > 0 &&
+		  Character.isWhitespace(string.charAt(0)))		  
 		string = string.substring(1);
 
-	    // Extract next token
-	    token = new Token();
-	    string = Token.stringToToken(token, string);
-	    tokens.add(token);
+	    if(string.length() > 0) {
+
+		// Extract next token
+		token = new Token();
+		string = Token.stringToToken(token, string);
+		tokens.add(token);
+	    }
 	}
 
 	return tokens;

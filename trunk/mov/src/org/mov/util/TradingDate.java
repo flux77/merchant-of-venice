@@ -102,57 +102,79 @@ public class TradingDate implements Cloneable, Comparable {
      * <tr><td><pre>DD-MM-YYYY</pre></td><td>e.g. "3-2-2001"</td></tr>
      * <tr><td><pre>MM-DD-YY</pre></td><td>e.g. "2-3-01"</td></tr>
      * <tr><td><pre>MM-DD-YYYY</pre></td><td>e.g. "2-3-2001"</td></tr>
+     * <tr><td><pre>DD/MONTH/YY</pre></td><td>e.g. "3/Feb/01"</td></tr>
+     * <tr><td><pre>DD/MONTH/YYYY</pre></td><td>e.g. "3/Feb/2001"</td></tr>
+     * <tr><td><pre>DD-MONTH-YY</pre></td><td>e.g. "3-February-01"</td></tr>
+     * <tr><td><pre>DD-MONTH-YYYY</pre></td><td>e.g. "3-February-2001"</td></tr>
      * </table>
      *
      * @param	date	the date string to convert from
      * @param	type	either <code>BRITISH</code> or <code>US</code>
+     * @exception   TradingDateException if the date couldn't be parsed
      */
-    public TradingDate(String date, int type) {
+    public TradingDate(String date, int type) 
+        throws TradingDateFormatException {
 
 	try {
+            boolean isMonthNumeric;
+            boolean isSeparator;
+            char separator = ' ';
+            int separatorIndex;
+
+	    if(date.indexOf('/') >= 0) {
+                separator = '/';
+                isSeparator = true;
+            }
+            else if(date.indexOf('-') >= 0) {
+                separator = '-';
+                isSeparator = true;
+            }
+            else
+                isSeparator = false;
+                
 	    // DD/MM/YY, DD/MM/YYYY, DD-MM-YY, DD-MM-YYYY		
-	    if(date.indexOf('/') >= 0 ||
-	       date.indexOf('-') >= 0) {
+            // DD/MONTH/YY, DD/MONTH/YYYY, DD-MONTH-YY, DD-MONTH-YYYY
+	    if(isSeparator) {	       
 		int i = 0;
 
 		// DAY
-		day = 0;
-		day += Integer.parseInt(date.substring(i, ++i));
-		if(date.charAt(i) != '/' &&
-		   date.charAt(i) != '-') {
-		    day *= 10;
-		    day += Integer.parseInt(date.substring(i, ++i));
-		}
-
-		// Skip /, -
-		i++;
+                separatorIndex = date.indexOf(separator, i);
+                if(separatorIndex == -1)
+                    throw new TradingDateFormatException();
+                day = Integer.parseInt(date.substring(i, separatorIndex));
+		i = separatorIndex + 1;
  
 		// MONTH
-		month = 0;
-		month += Integer.parseInt(date.substring(i, ++i));
-		if(date.charAt(i) != '/' &&
-		   date.charAt(i) != '-') {
-		    month *= 10;
-		    month += Integer.parseInt(date.substring(i, ++i));
-		}
+                separatorIndex = date.indexOf(separator, i);
+                if(separatorIndex == -1)
+                    throw new TradingDateFormatException();
 
-		// Skip /, -
-		i++;
+                // Is the month numeric? e.g. 10?
+                if(Character.isDigit(date.charAt(i))) {
+                    month = Integer.parseInt(date.substring(i, separatorIndex));
+                    isMonthNumeric = true;
+                }
+
+                // Or by name? e.g. Oct?
+                else {
+                    month = textToMonth(date.substring(i, separatorIndex));
+                    if(month == -1) 
+                        throw new TradingDateFormatException();
+                    isMonthNumeric = false;
+                }
+
+                i = separatorIndex + 1;
 
 		// YEAR
-		year = 0;
-		year += Integer.parseInt(date.substring(i, ++i));
-		while(i < date.length()) {
-		    year *= 10;
-		    year += Integer.parseInt(date.substring(i, ++i));
-		}
-
-		if(year < 100) {
+		year = Integer.parseInt(date.substring(i, date.length()));
+		if(year < 100)
 		    year = twoToFourDigitYear(year);
-		}
 
-		// Swap day and month around if expecting US dates
-		if(type == US) {
+		// Swap day and month around if expecting US dates.
+                // However if the user gave the month by name, then
+                // there is no confusion and they do not need to be
+                // swapped.
+		if(type == US && isMonthNumeric) {
 		    int temp;
 		    temp = day; day = month; month = temp;
 		}	
@@ -175,11 +197,21 @@ public class TradingDate implements Cloneable, Comparable {
 		month = Integer.parseInt(date.substring(4, 6));
 		day = Integer.parseInt(date.substring(6, 8));
 	    }
+            else
+                throw new TradingDateFormatException();
 	}
+
+        // If we can't parse, throw an exception
 	catch(NumberFormatException e) {
-	    // If we can't parse, set everything to null
-	    year = month = day = 0;
-	}
+            throw new TradingDateFormatException();
+        }
+        catch(StringIndexOutOfBoundsException e) {
+            throw new TradingDateFormatException();
+        }
+
+        // Simple range checking.
+        if(month == 0 || month > 12 || day == 0 || day > 31)
+            throw new TradingDateFormatException();
     }
 
     /**
@@ -441,8 +473,7 @@ public class TradingDate implements Cloneable, Comparable {
      *
      * @return	SQL friendly date string
      */
-    public String toString() {
-	
+    public String toString() {	
     	return getYear() + "-" + getMonth() + "-" + getDay();
     }
 
@@ -482,6 +513,44 @@ public class TradingDate implements Cloneable, Comparable {
             assert false;
 	    return "Dec";
         }
+    }
+
+    // Converts a month name to the month of the year. Returns
+    // -1 if it couldn't recognise the month name.
+    private static int textToMonth(String monthString) {
+
+        // English abbreviation, full english, french, spanish, danish, german, italian,
+        // norweigan, swedish.
+
+        // Missing words in the language mean that they are the same as a preceeding
+        // language.
+        String months[][] = 
+            {{"jan", "january", "janvier", "enero", "januar", "gennaio", "januari"},
+             {"feb", "february", "février", "febrero", "februar", "febbraio", "februari"},
+             {"mar", "march", "mars", "marzo", "marts", "märz", "marzo"},
+             {"apr", "april", "avril", "abril", "aprile"},
+             {"may", "mai", "mayo", "maj", "maggio"},
+             {"jun", "june", "juin", "junio", "juni", "giugno"},
+             {"jul", "july", "juillet", "julio", "juli", "luglio"},
+             {"aug", "august", "août", "agosto", "augsti"},
+             {"sep", "september", "septembre", "septiembre","settembre"},
+             {"oct", "october", "octobre", "octubre", "oktober", "ottobre"},
+             {"nov", "november", "novembre", "noviembre"},
+             {"dec", "december", "décembre", "diciembre", "dezember","dicembre", "desember"}};
+
+        monthString = monthString.toLowerCase();
+
+        for(int month = 0; month < months.length ; month++) {
+            String[] monthNames = months[month];
+
+            for(int i = 0; i < monthNames.length; i++) {
+                if(monthNames[i].equals(monthString))
+                    return (month + 1);
+            }
+        }
+
+        // Not found
+        return -1;
     }
 
     /**
@@ -537,7 +606,7 @@ public class TradingDate implements Cloneable, Comparable {
                startDate.compareTo(endDate) <= 0);
 
 	List dates = new ArrayList();
-	TradingDate date = (TradingDate)startDate.clone();
+	TradingDate date = startDate;
 
 	while(!date.after(endDate)) {
 	    dates.add(date);

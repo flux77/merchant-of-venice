@@ -76,6 +76,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     private JMenuItem addSymbols;
     private JMenuItem removeSymbols;
     private JMenuItem graphSymbols;
+    private JMenuItem graphIndexSymbols;
     private JMenuItem tableSymbols;
     private JMenuItem tableClose;
     private JMenuItem renameWatchScreen;
@@ -108,6 +109,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
      */
     public WatchScreenModule(WatchScreen watchScreen,
                              ScriptQuoteBundle quoteBundle) {
+
         this.watchScreen = watchScreen;
 	this.quoteBundle = quoteBundle;
 	propertySupport = new PropertyChangeSupport(this);
@@ -134,6 +136,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
        
         removeSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
         graphSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
+	graphIndexSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
         tableSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
     }
 
@@ -230,6 +233,12 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             graphSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
                                        Locale.getString("GRAPH"));
+
+            graphIndexSymbols =
+                MenuHelper.addMenuItem(this, symbolsMenu,
+                                       Locale.getString("GRAPH_INDEX"));
+
+
             tableSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
                                        Locale.getString("TABLE"));
@@ -326,6 +335,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
      * @param	e	action event
      */
     public void actionPerformed(final ActionEvent e) {
+
 	if(e.getSource() == tableClose) {
 	    propertySupport.
 		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
@@ -333,7 +343,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
         // Graph symbols, either by the popup menu or the main menu
         else if((popupGraphSymbols != null && e.getSource() == popupGraphSymbols) ||
-                e.getSource() == graphSymbols) {
+                e.getSource() == graphSymbols || e.getSource() == graphIndexSymbols) {
 
             int[] selectedRows = getSelectedRows();
             List symbols = new ArrayList();
@@ -345,7 +355,12 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             }
 
             // Graph the highlighted symbols
-            CommandManager.getInstance().graphStockBySymbol(symbols);
+	    if (e.getSource() == graphSymbols) {
+		CommandManager.getInstance().graphStockBySymbol(symbols);
+	    }
+	    if (e.getSource() == graphIndexSymbols) {
+		CommandManager.getInstance().graphIndexBySymbol(symbols);
+	    }
         }
 
         // Remove symbols, either by the popup menu or the main menu

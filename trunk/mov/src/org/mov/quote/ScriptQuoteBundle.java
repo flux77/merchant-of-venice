@@ -274,15 +274,32 @@ public class ScriptQuoteBundle implements QuoteBundle {
     
     // Returns all the symbols in the quote bundle between the two dates
     private List getSymbols(int firstDateOffset, int lastDateOffset) {
-	if(getQuoteRange().getType() == QuoteRange.GIVEN_SYMBOLS) {
-	    return getQuoteRange().getAllSymbols();
-	}
-	
 	// To get list of symbols - the quote bundle *must* be loaded!
 	if(!quoteBundleCache.isLoaded(this))
 	    quoteBundleCache.load(this);
-	
-	if(getQuoteRange().getType() == QuoteRange.ALL_SYMBOLS) {
+
+	if(getQuoteRange().getType() == QuoteRange.GIVEN_SYMBOLS) {
+            // We can't just call getQuoteRange().getAllSymbols() because
+            // for the given quote range it is possible we don't have any
+            // quotes for them. So make sure all the given symbols are 
+            // present in the cache for the given range.
+            List presentSymbols = new ArrayList();
+            List allSymbols = quoteCache.getSymbols(firstDateOffset, lastDateOffset);
+            List expectedSymbols = getQuoteRange().getAllSymbols();
+
+	    // Weed out ones that aren't ours
+	    Iterator iterator = expectedSymbols.iterator();
+	    while(iterator.hasNext()) {
+		String symbol = (String)iterator.next();
+
+		if(allSymbols.contains(symbol))
+                    presentSymbols.add(symbol);
+	    }
+	    
+	    return presentSymbols;
+	}
+		
+	else if(getQuoteRange().getType() == QuoteRange.ALL_SYMBOLS) {
 	    return quoteCache.getSymbols(firstDateOffset, lastDateOffset);
 	}
 	

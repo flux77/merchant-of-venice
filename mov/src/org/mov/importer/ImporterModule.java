@@ -4,6 +4,7 @@ import org.mov.main.ModuleFrame;
 import org.mov.main.Module;
 import org.mov.util.*;
 import org.mov.portfolio.*;
+import org.mov.prefs.PreferencesManager;
 import org.mov.quote.*;
 import org.mov.ui.*;
 
@@ -14,7 +15,7 @@ import java.beans.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
-import java.util.prefs.*;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -63,7 +64,7 @@ public class ImporterModule extends JPanel
 
 	setLayout(new BorderLayout());
 
-	Preferences p = Preferences.userRoot().node("/import_quotes");
+	Preferences p = PreferencesManager.getUserNode("/import_quotes");
 	String importFromSource = p.get("from", "internet");
 
 	Box importOptions = Box.createVerticalBox();
@@ -310,7 +311,7 @@ public class ImporterModule extends JPanel
 		    format = (String)formatComboBox.getSelectedItem();
 		else {
 		    Preferences p = 
-			Preferences.userRoot().node("/quote_source/files");
+			PreferencesManager.getUserNode("/quote_source/files");
 		    format = p.get("format", "MetaStock");
 		}
 		
@@ -483,7 +484,7 @@ public class ImporterModule extends JPanel
 	String fileName = date.toString(template); // insert date
 
 	// Get filter we are using
-	Preferences p = Preferences.userRoot().node("/quote_source/files");
+	Preferences p = PreferencesManager.getUserNode("/quote_source/files");
 	String format = p.get("format", "MetaStock");
 	QuoteFilter filter = QuoteFilterList.getInstance().getFilter(format);
 
@@ -515,7 +516,7 @@ public class ImporterModule extends JPanel
     // Import a day's quotes into the database
     private void importToDatabase(Vector dayQuotes, TradingDate date) {
 
-	Preferences p = Preferences.userRoot().node("/quote_source/database");
+	Preferences p = PreferencesManager.getUserNode("/quote_source/database");
 	String databaseName = p.get("dbname", "shares");
 
 	if(databaseSource == null) 
@@ -526,7 +527,7 @@ public class ImporterModule extends JPanel
 
     // Save the configuration on screen to the preferences file
     private void saveConfiguration() {
-	Preferences p = Preferences.userRoot().node("/import_quotes");
+	Preferences p = PreferencesManager.getUserNode("/import_quotes");
 
 	// Import From
 	if(fromDatabase.isSelected())
@@ -625,7 +626,7 @@ public class ImporterModule extends JPanel
      * @return	a vector of strings containing quote file names
      */
     public static Vector getFileList() {
-	Preferences p = Preferences.userRoot().node("/quote_source/files");
+	Preferences p = PreferencesManager.getUserNode("/quote_source/files");
 
 	// Files are stored in the nodes list1, list2, list3 etc - the
 	// maximum size of each list is Preferences.MAX_VALUE_LENGTH so
@@ -685,7 +686,7 @@ public class ImporterModule extends JPanel
 	// Now split up the string into bundles that can fit into the
 	// preferences structure and write them to the preferences
 	// structure
-	Preferences p = Preferences.userRoot().node("/quote_source/files");
+	Preferences p = PreferencesManager.getUserNode("/quote_source/files");
 	
 	int beginBundle = 0;
 	int endBundle;

@@ -1,9 +1,10 @@
 package org.mov.prefs;
 
-import java.util.prefs.*;
 import java.awt.event.*;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import org.liquid.list.*;
+import org.mov.prefs.PreferencesManager;
 
 /*
  * EquationPage.java
@@ -38,7 +39,7 @@ public class EquationPage extends javax.swing.JPanel
         functionList.setModel(functionListModel);
         current_selection = -1;
         this.desktop = desktop;
-        prefs = Preferences.userRoot().node("/filters/functions");
+        prefs = PreferencesManager.getUserNode("/filters/functions");
 
         functionList.addListSelectionListener(this);
         initFunctionList();

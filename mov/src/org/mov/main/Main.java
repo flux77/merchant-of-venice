@@ -1,16 +1,17 @@
 package org.mov.main;
 
 import java.awt.*;
-import java.net.URL;
 import java.awt.event.*;
 import java.io.*;
+import java.net.URL;
 import java.util.prefs.*;
 import javax.swing.*;
 
 import org.mov.util.*;
-import org.mov.ui.*;
-import org.mov.quote.*;
 import org.mov.portfolio.*;
+import org.mov.prefs.PreferencesManager;
+import org.mov.quote.*;
+import org.mov.ui.*;
 
 /**
  * The top level class which contains the main() function. This class builds 
@@ -32,7 +33,7 @@ public class Main extends JFrame implements WindowListener {
 
     // Go!
     private Main() {
-	Preferences p = Preferences.userRoot().node("/display");
+	Preferences p = PreferencesManager.getUserNode("/display");
 	setSize(p.getInt("default_width", 800),
 		p.getInt("default_height", 600));
 	setLocation(p.getInt("default_x", 0),
@@ -53,7 +54,7 @@ public class Main extends JFrame implements WindowListener {
     public void windowActivated(WindowEvent e) {}
     public void windowClosing(WindowEvent e) {
 	// Save window dimensions in prefs file
-	Preferences p = Preferences.userRoot().node("/display");
+	Preferences p = PreferencesManager.getUserNode("/display");
 	p.putInt("default_width", getWidth());
 	p.putInt("default_height", getHeight());
 	p.putInt("default_x", getX());

@@ -7,11 +7,12 @@ import java.beans.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
-import java.util.prefs.*;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
+import org.mov.prefs.PreferencesManager;
 import org.mov.ui.SkinManager;
 
 /** 
@@ -56,7 +57,7 @@ public class SkinPage extends JPanel
 
 	setLayout(gb);
 
-	Preferences p = Preferences.userRoot().node("/display/skin");
+	Preferences p = PreferencesManager.getUserNode("/display/skin");
 	skin_type = p.get("skin_type", "none");
 
 	ButtonGroup group = new ButtonGroup();
@@ -350,7 +351,7 @@ public class SkinPage extends JPanel
     public void save() {
 	
 	Preferences p = 
-	    Preferences.userRoot().node("/display/skin");
+	    PreferencesManager.getUserNode("/display/skin");
 	p.put("skin_type", skin_type);
 	p.put("system_skin", system_skin);
 	p.put("pack_file", pack_file);

@@ -1,8 +1,10 @@
 package org.mov.quote;
 
+import java.util.prefs.Preferences;
 import org.mov.importer.ImporterModule;
+import org.mov.prefs.PreferencesManager;
 
-import java.util.prefs.*;
+
 
 /**
  * Returns the singleton reference to the quote source that the user
@@ -50,7 +52,7 @@ public class Quote {
     // Creates and returns singleton instance of quote source
     private QuoteSource getSourceInstance() {
 	if(sourceInstance == null) {
-	    Preferences p = Preferences.userRoot().node("/quote_source");
+	    Preferences p = PreferencesManager.getUserNode("/quote_source");
 	    String quoteSource = p.get("source", "database");
 
 	    if(quoteSource.equals("files")) {
@@ -75,7 +77,7 @@ public class Quote {
     public static FileQuoteSource createFileQuoteSource() {
 
 	// Get file format from preferences
-	Preferences p = Preferences.userRoot().node("/quote_source/files");
+	Preferences p = PreferencesManager.getUserNode("/quote_source/files");
 
 	return
 	    new FileQuoteSource(p.get("format", "MetaStock"),
@@ -89,7 +91,7 @@ public class Quote {
      */
     public static SanfordQuoteSource createInternetQuoteSource() {
 	// Get username and password from preferences
-	Preferences p = Preferences.userRoot().node("/quote_source/internet");
+	Preferences p = PreferencesManager.getUserNode("/quote_source/internet");
 	
 	return new SanfordQuoteSource(p.get("username", ""),
 				      p.get("password", ""));
@@ -102,7 +104,7 @@ public class Quote {
      */
     public static DatabaseQuoteSource createDatabaseQuoteSource() {
 
-	Preferences p = Preferences.userRoot().node("/quote_source/database");
+	Preferences p = PreferencesManager.getUserNode("/quote_source/database");
 	String host = p.get("host", "db");
 	String port = p.get("port",  "3306");
 	String database = p.get("dbname", "shares");

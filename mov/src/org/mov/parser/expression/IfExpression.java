@@ -18,13 +18,16 @@
 
 package org.mov.parser.expression;
 
-import org.mov.util.*;
-import org.mov.parser.*;
-import org.mov.quote.*;
+import org.mov.parser.Expression;
+import org.mov.parser.EvaluationException;
+import org.mov.parser.TypeMismatchException;
+import org.mov.parser.Variables;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.Symbol;
 
 /**
  * An expression which represents the control flow of 
- * <code>if (x) {y} else {z}</code>.
+ * <code>if (x) y else z</code>.
  */
 public class IfExpression extends TernaryExpression {
 
@@ -37,9 +40,7 @@ public class IfExpression extends TernaryExpression {
      * @param	arg3	the expression to be executed if the test was 
      *			{@link #FALSE}
      */
-    public IfExpression(Expression arg1, 
-			Expression arg2,
-			Expression arg3) {
+    public IfExpression(Expression arg1, Expression arg2, Expression arg3) {
 	super(arg1, arg2, arg3);
     }
 
@@ -47,8 +48,7 @@ public class IfExpression extends TernaryExpression {
 	throws EvaluationException {
 
 	// if(...) then
-	if(getChild(0).evaluate(variables, quoteBundle, symbol, day) 
-	   >= Expression.TRUE_LEVEL)
+	if(getChild(0).evaluate(variables, quoteBundle, symbol, day) >= Expression.TRUE_LEVEL)
 	    return getChild(1).evaluate(variables, quoteBundle, symbol, day);
 	// else
 	else
@@ -56,9 +56,11 @@ public class IfExpression extends TernaryExpression {
     }
 
     public String toString() {
-	return new String("if(" + getChild(0).toString() + ") {" +
-			  getChild(1).toString() + "} else {" +
-			  getChild(2).toString() + "}");
+	String string = "if(" + getChild(0) + ")";
+	string = string.concat(ClauseExpression.toString(getChild(1)));
+	string = string.concat("else");	
+	string = string.concat(ClauseExpression.toString(getChild(2)));
+	return string;
     }
 
     /**
@@ -70,11 +72,11 @@ public class IfExpression extends TernaryExpression {
      * @return	the type of the second and third arguments
      */
     public int checkType() throws TypeMismatchException {
-	if(getChild(0).getType() == BOOLEAN_TYPE &&
-           getChild(1).getType() == getChild(2).getType() &&
+	if(getChild(0).checkType() == BOOLEAN_TYPE &&
+           getChild(1).checkType() == getChild(2).checkType() &&
            (getChild(1).getType() == FLOAT_TYPE || getChild(1).getType() == INTEGER_TYPE ||
             getChild(1).getType() == BOOLEAN_TYPE))
-           return getType();
+	    return getType();
 	else
 	    throw new TypeMismatchException();
     }

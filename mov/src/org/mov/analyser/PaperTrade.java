@@ -271,9 +271,9 @@ public class PaperTrade {
         int dateOffset = environment.startDateOffset;
 
         if(orderCache.isOrdered() && !variables.contains("order"))
-            variables.add("order", Expression.INTEGER_TYPE);
+            variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
         if(!variables.contains("held"))
-            variables.add("held", Expression.INTEGER_TYPE);
+            variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
 
         // Now iterate through each trading date and decide whether
 	// to buy/sell. The last date is used for placing the previous
@@ -318,9 +318,9 @@ public class PaperTrade {
         int dateOffset = environment.startDateOffset;
 
         if(orderCache.isOrdered() && !variables.contains("order"))
-            variables.add("order", Expression.INTEGER_TYPE);
+            variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
         if(!variables.contains("held"))
-            variables.add("held", Expression.INTEGER_TYPE);
+            variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
 
         // Now iterate through each trading date and decide whether
 	// to buy/sell. The last date is used for placing the previous

@@ -46,13 +46,14 @@ public class Variables {
 
     /**
      * Add a new variable. The variable will be initialised to zero
-     * if numeric or FALSE if boolean.
+     * if numeric or <code>FALSE</code> if boolean.
      *
      * @param name the name of the variable.
      * @param type the type of the variable.
+     * @param isConstant set to <code>TRUE</code> if the variable is a constant.
      */
-    public void add(String name, int type) {
-        add(name, type, 0.0D);
+    public void add(String name, int type, boolean isConstant) {
+        add(name, type, isConstant, 0.0D);
     }
 
     /**
@@ -60,11 +61,12 @@ public class Variables {
      *
      * @param name the name of the variable.
      * @param type the type of the variable.
+     * @param isConstant set to <code>TRUE</code> if the variable is a constant.
      * @param value the initial value.
      */
-    public void add(String name, int type, double value) {
+    public void add(String name, int type, boolean isConstant, double value) {
         if(!variables.containsKey(name)) {
-            Variable variable = new Variable(name, type, value);
+            Variable variable = new Variable(name, type, isConstant, value);
             variables.put(name, variable);
         }
         else
@@ -76,11 +78,12 @@ public class Variables {
      *
      * @param name the name of the variable.
      * @param type the type of the variable.
+     * @param isConstant set to <code>TRUE</code> if the variable is a constant.
      * @param value the initial value.
      */
-    public void add(String name, int type, int value) {
+    public void add(String name, int type, boolean isConstant, int value) {
         if(!variables.containsKey(name)) {
-            Variable variable = new Variable(name, type, value);
+            Variable variable = new Variable(name, type, isConstant, value);
             variables.put(name, variable);
         }
         else

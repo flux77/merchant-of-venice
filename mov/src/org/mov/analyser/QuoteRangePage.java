@@ -30,6 +30,7 @@ import java.util.Iterator;
 import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
@@ -57,7 +58,22 @@ import org.mov.util.TradingDateFormatException;
 
 public class QuoteRangePage extends JPanel implements AnalyserPage {
 
+    // Period types
+    public final static int NO_PERIOD = 0;
+    public final static int ONE_WEEK = 1;
+    public final static int TWO_WEEKS = 2;
+    public final static int ONE_MONTH = 3;
+    public final static int TWO_MONTHS = 4;
+    public final static int THREE_MONTHS = 5;
+    public final static int FOUR_MONTHS = 6;
+    public final static int SIX_MONTHS = 7;
+    public final static int ONE_YEAR = 8;
+    public final static int TWO_YEARS = 9;
+    public final static int THREE_YEARS = 10;
+    public final static int FOUR_YEARS = 11;
+
     private JDesktopPane desktop;
+    private boolean allowMultipleDateRanges;
 
     // Swing items
     private JTextField startDateTextField;
@@ -67,15 +83,23 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     private JRadioButton orderByEquationButton;
     private JComboBox orderByKeyComboBox; 
     private EquationComboBox orderByEquationComboBox;
+    private JCheckBox multipleDateRangesCheckBox;
+    private JComboBox dateRangePeriodComboBox;    
 
     // Parsed data
     private QuoteRange quoteRange;
     private Expression orderByEquation;
     private TradingDate startDate;
     private TradingDate endDate;
+    private int dateRangePeriod;
 
     public QuoteRangePage(JDesktopPane desktop) {
+	this(desktop, false);
+    }
+
+    public QuoteRangePage(JDesktopPane desktop, boolean allowMultipleDateRanges) {
         this.desktop = desktop;
+	this.allowMultipleDateRanges = allowMultipleDateRanges;
 
         layoutPage();
     }
@@ -90,7 +114,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
                               
 	while(iterator.hasNext()) {
 	    String setting = (String)iterator.next();
-	    String value = (String)settings.get((Object)setting);
+	    String value = (String)settings.get(setting);
 
             if(setting.equals("start_date")) 
                 startDateTextField.setText(value); 
@@ -108,6 +132,14 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
                 orderByKeyComboBox.setSelectedItem(value);
             else if(setting.equals("by_equation"))
                 orderByEquationComboBox.setEquationText(value);
+	    else if(setting.equals("is_multiple_date_ranges")) {
+		if(allowMultipleDateRanges)
+		    multipleDateRangesCheckBox.setSelected(value.equals("1"));
+	    }
+	    else if(setting.equals("period")) {
+		if(allowMultipleDateRanges)
+		    dateRangePeriodComboBox.setSelectedItem(value);
+	    }
             else
                 assert false;
         }
@@ -124,6 +156,11 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         settings.put("by", orderByKeyButton.isSelected()? "orderByKey" : "orderByEquation");
         settings.put("by_key", orderByKeyComboBox.getSelectedItem());
         settings.put("by_equation", orderByEquationComboBox.getEquationText());
+	if(allowMultipleDateRanges) {
+	    settings.put("is_multiple_date_ranges",
+			 multipleDateRangesCheckBox.isSelected()? "1" : "0");
+	    settings.put("period", dateRangePeriodComboBox.getSelectedItem());
+	}
 
         PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
                                                     settings);
@@ -144,6 +181,12 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
                                                   "Invalid date range",
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
+	}
+
+	dateRangePeriod = NO_PERIOD;
+	if(allowMultipleDateRanges) {
+	    if(multipleDateRangesCheckBox.isSelected())
+		dateRangePeriod = dateRangePeriodComboBox.getSelectedIndex();
 	}
 
         if(startDate.after(endDate)) {
@@ -242,6 +285,12 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         return endDate;
     }
 
+    public int getDateRangePeriod() {
+	assert allowMultipleDateRanges;
+
+	return dateRangePeriod;
+    }
+
     public OrderComparator getOrderComparator(QuoteBundle quoteBundle) {
         if(orderByKeyButton.isSelected()) {
             // Set order (e.g. by volume).
@@ -258,7 +307,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-	// Date panel
+	// Date Range Panel
 	{
 	    TitledBorder dateTitled = new TitledBorder("Date Range");
 	    JPanel panel = new JPanel();
@@ -278,6 +327,58 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	    	GridBagHelper.addTextRow(innerPanel, "Start Date", "", gridbag, c, 15);
 	    endDateTextField = 
 		GridBagHelper.addTextRow(innerPanel, "End Date", "", gridbag, c, 15);
+
+            panel.add(innerPanel, BorderLayout.NORTH);
+	    add(panel);
+	}
+
+	// Multiple Date Range Panel
+	if(allowMultipleDateRanges) {
+	    TitledBorder dateTitled = new TitledBorder("Multiple Date Ranges");
+	    JPanel panel = new JPanel();
+	    panel.setBorder(dateTitled);
+            panel.setLayout(new BorderLayout());
+
+            JPanel innerPanel = new JPanel();
+	    GridBagLayout gridbag = new GridBagLayout();
+	    GridBagConstraints c = new GridBagConstraints();
+	    innerPanel.setLayout(gridbag);	    
+
+	    c.weightx = 1.0;
+	    c.ipadx = 5;
+	    c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+
+            multipleDateRangesCheckBox = 
+                GridBagHelper.addCheckBoxRow(innerPanel, "Enable multiple date ranges", 
+                                             false, gridbag, c);
+            multipleDateRangesCheckBox.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {                        
+                        checkDisabledStatus();
+                    }});
+
+
+	    JLabel label = new JLabel("Period");
+	    c.gridwidth = 1;
+	    gridbag.setConstraints(label, c);
+	    innerPanel.add(label);
+
+	    dateRangePeriodComboBox = new JComboBox();
+	    dateRangePeriodComboBox.addItem("One Week");
+	    dateRangePeriodComboBox.addItem("Two Weeks");
+	    dateRangePeriodComboBox.addItem("One Month");
+	    dateRangePeriodComboBox.addItem("Two Months");
+	    dateRangePeriodComboBox.addItem("Three Months");
+	    dateRangePeriodComboBox.addItem("Four Months");
+	    dateRangePeriodComboBox.addItem("Six Months");
+	    dateRangePeriodComboBox.addItem("One Year");
+	    dateRangePeriodComboBox.addItem("Two Years");
+	    dateRangePeriodComboBox.addItem("Three Years");
+	    dateRangePeriodComboBox.addItem("Four Years");
+
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            gridbag.setConstraints(dateRangePeriodComboBox, c);
+            innerPanel.add(dateRangePeriodComboBox);
 
             panel.add(innerPanel, BorderLayout.NORTH);
 	    add(panel);
@@ -386,5 +487,8 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     private void checkDisabledStatus() {
         orderByKeyComboBox.setEnabled(orderByKeyButton.isSelected());
         orderByEquationComboBox.setEnabled(orderByEquationButton.isSelected());        
+
+	if(allowMultipleDateRanges) 
+	    dateRangePeriodComboBox.setEnabled(multipleDateRangesCheckBox.isSelected());
     }
 }

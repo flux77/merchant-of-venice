@@ -152,8 +152,32 @@ public class Token {
     /** Represents "<code>abs</code>" symbol */
     public static final int ABS_TOKEN = 41;
 
+    /** Represents "<code>const</code>" symbol */
+    public static final int CONSTANT_TOKEN = 42;
+
+    /** Represents "<code>boolean</code>" symbol */
+    public static final int BOOLEAN_TOKEN = 43;
+
+    /** Represents "<code>int</code>" symbol */
+    public static final int INTEGER_TOKEN = 44;
+
+    /** Represents "<code>float</code>" symbol */
+    public static final int FLOAT_TOKEN = 45;
+
+    /** Represents "<code>=</code>" symbol */
+    public static final int SET_TOKEN = 46;              
+
+    /** Represents "<code>;</code>" symbol */
+    public static final int SEMICOLON_TOKEN = 47;              
+
+    /** Represents "<code>flor</code>" symbol */
+    public static final int FOR_TOKEN = 48;
+
+    /** Represents "<code>while</code>" symbol */
+    public static final int WHILE_TOKEN = 49;
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 42;
+    private static final int FIXED_LENGTH_TOKENS = 50;
 
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;       
@@ -168,9 +192,9 @@ public class Token {
     private double value; 
 
     // For VARIABLE_TOKEN - the variable name 
-    private String valueName;
+    private String variableName;
 
-    // For NUMBER_TOKEN or VARIABLE_TOKEN - the value's type
+    // For NUMBER_TOKEN - the value's type
     private int valueType;
     
     /**
@@ -233,6 +257,14 @@ public class Token {
 	tokenStrings[SUM_TOKEN]  	       = "sum";
 	tokenStrings[SQRT_TOKEN]  	       = "sqrt";
 	tokenStrings[ABS_TOKEN]  	       = "abs";
+	tokenStrings[CONSTANT_TOKEN]  	       = "const";
+	tokenStrings[BOOLEAN_TOKEN]  	       = "boolean";
+	tokenStrings[INTEGER_TOKEN]  	       = "int";
+	tokenStrings[FLOAT_TOKEN]  	       = "float";
+	tokenStrings[SET_TOKEN]                = "=";
+	tokenStrings[SEMICOLON_TOKEN]          = ";";
+	tokenStrings[FOR_TOKEN]                = "for";
+	tokenStrings[WHILE_TOKEN]              = "while";
 
 	boolean matched = false;
 
@@ -274,7 +306,7 @@ public class Token {
 	else if(Character.isLetter(string.charAt(0))) {
             
             // Extract all letters
-            Pattern pattern = Pattern.compile("^[a-zA-Z]*");
+            Pattern pattern = Pattern.compile("^[a-zA-Z0-9_]*");
             Matcher matcher = pattern.matcher(string);
             matcher.find();
             String identifier = matcher.group();
@@ -292,21 +324,16 @@ public class Token {
             if(!matched) {
                 
                 // Greedily extract possible variable name
-                pattern = Pattern.compile("^[a-zA-Z][a-zA-Z0-9]*");
+                pattern = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]*");
                 matcher = pattern.matcher(string);
                 
                 if(matcher.find()) {
-                    String possibleVariableName = matcher.group();
-                    
-                    if(variables.contains(possibleVariableName)) {
-                        string = string.substring(possibleVariableName.length());
-                        matched = true;
-                        
-                        token.setType(Token.VARIABLE_TOKEN);
-                        token.setValueName(possibleVariableName);
-                        token.setValueType(variables.getType(possibleVariableName));
-                    }
-                }
+		    String variableName = matcher.group();
+		    string = string.substring(variableName.length());
+		    matched = true;
+		    token.setType(Token.VARIABLE_TOKEN);
+		    token.setVariableName(variableName);
+		}
             }
 
             if(!matched) 
@@ -343,7 +370,7 @@ public class Token {
 	type = 0;
 	value = 0;
 
-        valueName = null;
+        variableName = null;
         valueType = 0;
     }
 
@@ -380,18 +407,18 @@ public class Token {
      *
      * @return the name.
      */
-    public String getValueName() {
+    public String getVariableName() {
         assert getType() == VARIABLE_TOKEN;
-        return valueName;
+        return variableName;
     }
 
     /**
-     * For {@link #VARIABLE_TOKEN} or {@link #NUMBER_TOKEN} get the type.
+     * For {@link #NUMBER_TOKEN} get the type.
      *
      * @return the type.
      */
     public int getValueType() {
-        assert getType() == VARIABLE_TOKEN || getType() == NUMBER_TOKEN;
+        assert getType() == NUMBER_TOKEN;
         return valueType;
     }
 
@@ -404,9 +431,9 @@ public class Token {
     }
 
     // For variable tokens, set the variable name
-    private void setValueName(String valueName) {
+    private void setVariableName(String variableName) {
         assert getType() == VARIABLE_TOKEN;
-        this.valueName = valueName;
+        this.variableName = variableName;
     }
 
     // For variable or number tokens, set the value type

@@ -56,9 +56,8 @@ public class TokenStack extends Vector {
      * Remove the token on the top of the stack and compare it with the
      * given type.
      *
-     * @param	tokenType	the expected token type on the stack
-     * @return	<code>1</code> if the token is of the same type; 
-     *		<code>0</code> otherwise
+     * @param	tokenType	the expected token type on the stack.
+     * @return	<code>TRUE</code> if the token is of the same type.
      */
     public boolean pop(int tokenType) {
 	Token token = pop();

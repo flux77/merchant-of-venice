@@ -34,38 +34,38 @@ public class ExpressionFactory {
     /**
      * Create an executable terminal expression from the given token.
      *
-     * @param	operation	the terminal expression, e.g. a number
+     * @param	token	the terminal expression, e.g. a number
      * @return	an executable expression
      */	
-    public static Expression newExpression(Token operation) {
-	return ExpressionFactory.newExpression(operation, null, null, null);
+    public static Expression newExpression(Token token) {
+	return ExpressionFactory.newExpression(token, null, null, null, null);
     }
 
     /**
      * Create an executable unary expression from the given token and argument.
      *
-     * @param	operation	the unary expression, e.g. 
+     * @param	token	the unary expression, e.g. 
      *	"<code>not(X)</code>"
      * @param	arg1		the first argument
      * @return	an executable expression
      */	
-    public static Expression newExpression(Token operation, Expression arg1) {
-	return ExpressionFactory.newExpression(operation, arg1, null, null);
+    public static Expression newExpression(Token token, Expression arg1) {
+	return ExpressionFactory.newExpression(token, arg1, null, null, null);
     }
 
     /**
      * Create an executable binary expression from the given token and 
      * arguments.
      *
-     * @param	operation	the binary expression, e.g. 
+     * @param	token	the binary expression, e.g. 
      *	"<code>X and Y</code>"
      * @param	arg1		the first argument
      * @param	arg2		the second argument
      * @return	an executable expression
      */	
-    public static Expression newExpression(Token operation, Expression arg1,
+    public static Expression newExpression(Token token, Expression arg1,
 					   Expression arg2) {
-	return ExpressionFactory.newExpression(operation, arg1, arg2, null);
+	return ExpressionFactory.newExpression(token, arg1, arg2, null, null);
     }
 
     /**
@@ -79,9 +79,25 @@ public class ExpressionFactory {
      * @param	arg3		the third argument
      * @return	an executable expression
      */	
-    public static Expression newExpression(Token token, Expression arg1,
-					   Expression arg2, Expression arg3) {
+    public static Expression newExpression(Token token, Expression arg1, Expression arg2, 
+					   Expression arg3) {
+	return ExpressionFactory.newExpression(token, arg1, arg2, arg3, null);
+    }
 
+    /**
+     * Create an executable quaternary expression from the given token and 
+     * arguments.
+     *
+     * @param	token	the ternary expression, e.g. 
+     *	"<code>if(X) { Y } else { Z }</code>"
+     * @param	arg1		the first argument
+     * @param	arg2		the second argument
+     * @param	arg3		the third argument
+     * @param	arg4		the fourth argument
+     * @return	an executable expression
+     */	
+    public static Expression newExpression(Token token, Expression arg1, Expression arg2, 
+					   Expression arg3, Expression arg4) {
 	Expression expression = null;
 
 	switch(token.getType()) {
@@ -169,9 +185,6 @@ public class ExpressionFactory {
 	case(Token.NUMBER_TOKEN):
 	    expression = new NumberExpression(token.getValue(), token.getValueType());
 	    break;
-	case(Token.VARIABLE_TOKEN):
-	    expression = new VariableExpression(token.getValueName(), token.getValueType());
-	    break;
 	case(Token.DAY_OF_WEEK_TOKEN):
 	    expression = new DayOfWeekExpression();
 	    break;
@@ -195,6 +208,12 @@ public class ExpressionFactory {
             break;
         case(Token.ABS_TOKEN):
             expression = new AbsExpression(arg1);
+            break;
+        case(Token.FOR_TOKEN):
+            expression = new ForExpression(arg1, arg2, arg3, arg4);
+            break;
+        case(Token.WHILE_TOKEN):
+            expression = new WhileExpression(arg1, arg2);
             break;
         default:
             // No such token

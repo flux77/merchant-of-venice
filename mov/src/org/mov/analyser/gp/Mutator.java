@@ -151,15 +151,15 @@ public class Mutator {
                 else {
                     if(allowOrder && allowHeld) {
                         if(randomNumber == 2)
-                            return new VariableExpression("held", Expression.INTEGER_TYPE);
+                            return new GetVariableExpression("held", Expression.INTEGER_TYPE);
                         else
-                            return new VariableExpression("order", Expression.INTEGER_TYPE);
+                            return new GetVariableExpression("order", Expression.INTEGER_TYPE);
                     }
                     else if(allowHeld)
-                        return new VariableExpression("held", Expression.INTEGER_TYPE);
+                        return new GetVariableExpression("held", Expression.INTEGER_TYPE);
                     else {
                         assert allowOrder;
-                        return new VariableExpression("order", Expression.INTEGER_TYPE);
+                        return new GetVariableExpression("order", Expression.INTEGER_TYPE);
                     }
                 }
             }

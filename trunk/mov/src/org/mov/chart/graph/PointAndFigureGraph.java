@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import org.mov.chart.*;
 import org.mov.chart.source.*;
@@ -39,7 +40,7 @@ import org.mov.quote.*;
  */
 public class PointAndFigureGraph extends AbstractGraph {
 
-    private Graphable pointAndFigure;
+    private PFGraphable pointAndFigure;
     private GraphSource source;
     private HashMap annotations;
 
@@ -57,7 +58,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 
 	this.priceScale = priceScale;
 	
-	// Create moving average graphable
+	// Create point and figure graphable
 	pointAndFigure = createPointAndFigureGraph(source.getGraphable(), period,priceScale);
 
 	// Create buy sell recommendations
@@ -81,16 +82,21 @@ public class PointAndFigureGraph extends AbstractGraph {
 				 double bottomLineValue)
     {
 
+	/*
 	Double yCoord = getY(x);
 
 	int yOfGraph = yoffset -  
 	    GraphTools.scaleAndFitPoint(yCoord.doubleValue(),
 					bottomLineValue, verticalScale);
 
+	*/
+
 	// Its our graph *only* if its within 5 pixels	    
+	/*
 	if(Math.abs(y - yOfGraph) < Graph.TOOL_TIP_BUFFER) {
 	    return getSource().getToolTipText(x);
 	}	
+	*/
 	
 	return null;
     }
@@ -149,11 +155,13 @@ public class PointAndFigureGraph extends AbstractGraph {
        3. Plot only prices which meet the price scale. A plot is marked regardless of the direction. If a direction change occurs, the affect is to move the column one to the right.
     */
 
-    public static Graphable createPointAndFigureGraph(Graphable source, int period, double priceScale) {
-	Graphable pointAndFigure = new Graphable();
+    public static PFGraphable createPointAndFigureGraph(Graphable source, int period, double priceScale) {
+	PFGraphable pointAndFigure = new PFGraphable();
 
 	// Date set and value array will be in sync
 	double[] values = source.toArray();
+	Vector yList = new Vector();
+		    
 	Set xRange = source.getXRange();
 	Set column = source.getXRange(); // Associate Column with date 
 	Iterator iterator = xRange.iterator();
@@ -187,26 +195,25 @@ public class PointAndFigureGraph extends AbstractGraph {
 		
 		// Stay in the same column until theres a change in direction 
 		if (changeDirection) {
+
+		    // Associate a new set of points.
+		    yList = new Vector();
+
 		    upmove = (upmove) ? false: true;
 		    // This places the marker on when the price changed
 		    // direction
 		    col = x;	
 		    // This places it in the next column
-		    // col = (Comparable)iterator2.next();
-
-		    // Reconsider the placement when putY is changed
-		    // to return multiple values
+		    //col = (Comparable)iterator2.next();
+		    
 		}
 		
 		marker = (upmove) ? "X" : "O";
 		
-		// This will replace the any marker associated with that 
-		// column. P&F is a relation not a function; there is
-		// more than one data point associated with the date
-		// TODO: Allow more than one data point to be associated
-		// with a date.
+		Double yTemp = new Double(values[i]);
+		yList.add(yTemp);
 		
-		pointAndFigure.putY(col, new Double(values[i]));
+		pointAndFigure.putYList(col, yList);
 		pointAndFigure.putString(col, marker);
 		
 	    }

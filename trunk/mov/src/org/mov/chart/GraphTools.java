@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
@@ -199,13 +200,14 @@ public class GraphTools {
 
     // chars is character to draw - in synch with list xRange 
 
-    public static void renderChar(Graphics g, Graphable source, 
+    public static void renderChar(Graphics g, PFGraphable source, 
 				 int xoffset, int yoffset,
 				 double horizontalScale, double verticalScale,
 				  double bottomLineValue, List xRange) {
 
 	int xCoordinate, yCoordinate;
 	int lastXCoordinate = -1 , lastYCoordinate = -1;
+	Vector yList;
 	Double y;
 	Comparable x;
 	Iterator iterator = xRange.iterator();
@@ -226,17 +228,25 @@ public class GraphTools {
 		break;
 
 	    // Otherwise draw point
-	    y = source.getY(x);
+	    yList = source.getYList(x);
 
-	    // The graph is allowed to skip points
-	    if(y != null) {
+	    if (yList != null) {
+		System.out.println("date: " + x.toString() + "cols: " + yList.toString());
+	    }
+
+	    for (int j = 0; yList != null && j < yList.size(); j++) {
+		y = (Double)yList.elementAt(j);
 		
-		xCoordinate = (int)(xoffset + horizontalScale * i);
-		yCoordinate = yoffset - scaleAndFitPoint(y.doubleValue(), 
-							 bottomLineValue, 
-							 verticalScale);
-		g.drawString(source.getString(x),xCoordinate, yCoordinate);
+		// The graph is allowed to skip points
+		if(y != null) {
 		
+		    xCoordinate = (int)(xoffset + horizontalScale * i);
+		    yCoordinate = yoffset - scaleAndFitPoint(y.doubleValue(), 
+							     bottomLineValue, 
+							     verticalScale);
+		    g.drawString(source.getString(x),xCoordinate, yCoordinate);
+		    
+		}				
 	    }
 	    
 	    i++;

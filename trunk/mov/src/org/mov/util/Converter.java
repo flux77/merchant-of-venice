@@ -69,30 +69,6 @@ public class Converter {
     }
 
     /**
-     * Convert a start and end date to a vector of all the trading
-     * dates inbetween which do not fall on weekends.
-     *
-     * @param	startDate	the start date of the range
-     * @param	endDate		the end date of the range
-     * @return	a vector of all the trading dates inbetween
-     */
-    public static Vector dateRangeToTradingDateVector(TradingDate startDate,
-						      TradingDate endDate) {
-        assert(startDate != null && endDate != null &&
-               startDate.compareTo(endDate) <= 0);
-
-	Vector dates = new Vector();
-	TradingDate date = (TradingDate)startDate.clone();
-
-	while(!date.after(endDate)) {
-	    dates.add(date);
-	    date = date.next(1);
-	}
-
-	return dates;
-    }
-
-    /**
      * Convert a string containing a list of symbols separated by spaces
      * or commas into a sorted set with duplicates removed.
      *

@@ -25,7 +25,7 @@ public class MainMenu implements ActionListener, ContainerListener {
 
     // All the menu items
     private JMenuItem fileImportQuotesMenuItem;
-    private JMenuItem filePreferencesQuoteMenuItem;
+    private JMenuItem filePreferencesMenuItem;
     private JMenuItem fileExitMenuItem;
     private JMenuItem graphCommodityCodeMenuItem;
     private JMenuItem graphCommodityNameMenuItem;
@@ -65,11 +65,10 @@ public class MainMenu implements ActionListener, ContainerListener {
 						   'I');
 
 	    // File -> Preferences
-	    JMenu filePreferences = addMenu(fileMenu, "Preferences", 'P');
-
-	    // File -> Preferences -> Stock Quote Source
-	    filePreferencesQuoteMenuItem = addMenuItem(filePreferences, 
-						       "Quote Source");
+	    filePreferencesMenuItem = addMenuItem(fileMenu, "Preferences", 'P');
+	    filePreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+									  KeyEvent.VK_R, 
+									  ActionEvent.CTRL_MASK));
 
 	    fileMenu.addSeparator();
 
@@ -245,11 +244,10 @@ public class MainMenu implements ActionListener, ContainerListener {
 		    }
 		    else if(menu == fileExitMenuItem)
 			System.exit(0);
-		    else if(menu == filePreferencesQuoteMenuItem) {
+		    else if(menu == filePreferencesMenuItem) {
 			// Display preferences
 			((DesktopManager)(desktop.getDesktopManager()))
-			    .newFrame(new PreferencesModule(desktop, 
-							    PreferencesModule.QUOTE_SOURCE_PAGE), true);
+			    .newFrame(new PreferencesModule(desktop), true);
 		    }
 		    
 		    // Table Menu *******************************************************************************

@@ -26,7 +26,14 @@
 </target>
 
 <target name="run">
-  <java fork="yes" dir="${src}" classname = "org.mov.main.Main"/>
+  <java classname="org.mov.main.Main" 
+        dir="${src}"
+        fork="yes">
+    <classpath>
+      <pathelement path="${java.class.path}"/>
+      <pathelement path="${src}"/>
+    </classpath>
+  </java>
 </target>
 
 </project>

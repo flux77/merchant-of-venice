@@ -1,6 +1,7 @@
 package org.mov.main;
 
 import java.awt.*;
+import java.net.URL;
 import java.awt.event.*;
 import java.io.*;
 import java.util.prefs.*;
@@ -10,6 +11,11 @@ import org.mov.util.*;
 import org.mov.ui.*;
 import org.mov.quote.*;
 import org.mov.portfolio.*;
+
+import com.l2fprod.gui.plaf.skin.Skin;
+import com.l2fprod.gui.plaf.skin.CompoundSkin;
+import com.l2fprod.gui.plaf.skin.SkinLookAndFeel;
+import com.l2fprod.util.*;
 
 /**
  * The top level class which contains the main() function. This class builds 
@@ -29,6 +35,7 @@ public class Main extends JFrame implements WindowListener {
 		    p.getInt("default_y", 0));
 	setTitle("Venice");
 
+	SkinManager.loadSkin();
 	desktop = new JDesktopPane();
 	desktop.setDesktopManager(new org.mov.ui.DesktopManager(desktop));
 	CommandManager.getInstance().setDesktop(desktop);

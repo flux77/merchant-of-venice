@@ -33,12 +33,78 @@ public class PreferencesManager {
         return user_root;
     }
 
+    /** Value given to an integer if it is undefined and we need to 
+	know if it is defined or not */
+    public static final int UNDEFINED_INT = -1000000;
+
     /** Fetches the desired user node, based at the <code>base</code> branch
      * @param node the path to the node to be fetched
      */
     public static java.util.prefs.Preferences getUserNode(String node) {
         if (node.charAt(0) == '/') node = node.substring(1);
         return user_root.node(node);
+    }
+
+    public static int loadCachedAdvance(TradingDate date) {
+	Preferences p = getUserNode("/advance");	
+
+	return p.getInt(date.toString(), UNDEFINED_INT);
+    }
+
+
+    public static void saveCachedAdvance(TradingDate date, int value) {
+	Preferences p = getUserNode("/advance");	
+
+	p.putInt(date.toString(), value);
+    }
+
+    public static int loadCachedDecline(TradingDate date) {
+	Preferences p = getUserNode("/decline");	
+
+	return p.getInt(date.toString(), UNDEFINED_INT);
+    }
+
+
+    public static void saveCachedDecline(TradingDate date, int value) {
+	Preferences p = getUserNode("/decline");	
+
+	p.putInt(date.toString(), value);
+    }
+
+    public static HashMap loadLastPaperTradeSettings() {
+
+	HashMap settings = new HashMap();
+	Preferences p = getUserNode("/papertrade");
+	String[] settingList = null;
+
+	// Get all the settings that we've saved
+	try {
+	    settingList = p.keys();
+	}
+	catch(BackingStoreException e) {
+	    // ignore
+	}
+
+	// Now populate settings into a hash
+	for(int i = 0; i < settingList.length; i++) {
+	    String value = p.get(settingList[i], "");
+	    settings.put((Object)settingList[i], (Object)value);
+	}
+
+	return settings;
+    }
+
+    public static void saveLastPaperTradeSettings(HashMap settings) {
+	Preferences p = getUserNode("/papertrade");
+
+	Iterator iterator = settings.keySet().iterator();
+
+	while(iterator.hasNext()) {
+	    String setting = (String)iterator.next();
+	    String value = (String)settings.get((Object)setting);
+
+	    p.put(setting, value);
+	}
     }
 
     public static String[] getPortfolioNames() {

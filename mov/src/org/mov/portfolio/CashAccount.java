@@ -61,6 +61,15 @@ public class CashAccount implements Account, Cloneable {
 	return capital;
     }
 
+    /**
+     * Return the value of this account. Since the value does not
+     * depend on any stock price, the cache and date can be
+     * omitted.
+     */
+    public float getValue() {
+	return capital;
+    }
+
     public void removeAllTransactions() {
 	capital = 0.0F;
     }

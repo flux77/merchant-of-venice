@@ -45,7 +45,7 @@ public class TokenStack extends Vector {
     public boolean pop(int tokenType) {
 	Token token = pop();
 	
-	if(tokenType == token.getType())
+	if(token != null && tokenType == token.getType())
 	    return true;
 	else
 	    return false;

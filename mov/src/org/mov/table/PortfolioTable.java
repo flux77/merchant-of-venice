@@ -12,8 +12,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
-public class PortfolioTable extends AbstractAnalyserTable
-    implements AnalyserModule {
+public class PortfolioTable extends AbstractTable
+    implements Module {
 
     public static final int SYMBOL_COLUMN = 0;
     public static final int SHARES_COLUMN = 1;

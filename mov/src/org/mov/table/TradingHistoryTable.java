@@ -12,8 +12,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
-public class TradingHistoryTable extends AbstractAnalyserTable
-    implements AnalyserModule {
+public class TradingHistoryTable extends AbstractTable
+    implements Module {
 
     public static final int DATE_COLUMN = 0;
     public static final int TRADE_COLUMN = 1;

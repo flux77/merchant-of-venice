@@ -16,10 +16,11 @@ import org.mov.table.*;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
-import org.mov.ui.AnalyserDesktopManager;
+import org.mov.ui.DesktopManager;
 
 public class MainMenu implements ActionListener, ContainerListener {
 
+    private JMenuItem fileImportQuotesMenuItem;
     private JMenuItem filePreferencesQuoteMenuItem;
     private JMenuItem fileExitMenuItem;
     private JMenuItem graphCommodityCodeMenuItem;
@@ -48,6 +49,11 @@ public class MainMenu implements ActionListener, ContainerListener {
 	// File 
 	{	   
 	    JMenu fileMenu = addMenu(menuBar, "File", 'F');
+
+	    // File -> Import
+	    fileImportQuotesMenuItem = addMenuItem(fileMenu, "Import Quotes", 
+						   'I');
+
 	    // File -> Preferences
 	    JMenu filePreferences = addMenu(fileMenu, "Preferences", 'P');
 
@@ -219,13 +225,16 @@ public class MainMenu implements ActionListener, ContainerListener {
 		    JMenuItem menu = (JMenuItem)e.getSource();
 		    
 		    // File Menu ********************************************************************************
-		    if(menu == fileExitMenuItem)
+		    if(menu == fileImportQuotesMenuItem) {
+			CommandManager.getInstance().importQuotes();
+		    }
+		    else if(menu == fileExitMenuItem)
 			System.exit(0);
 		    else if(menu == filePreferencesQuoteMenuItem) {
 			// Display preferences
-			((AnalyserDesktopManager)(desktop.getDesktopManager()))
-			    .newCentredFrame(new PreferencesModule(desktop, 
-								   PreferencesModule.QUOTE_SOURCE_PAGE));
+			((DesktopManager)(desktop.getDesktopManager()))
+			    .newFrame(new PreferencesModule(desktop, 
+							    PreferencesModule.QUOTE_SOURCE_PAGE), true);
 		    }
 		    
 		    // Table Menu *******************************************************************************
@@ -296,7 +305,7 @@ public class MainMenu implements ActionListener, ContainerListener {
     public void componentAdded(ContainerEvent e) {
 	Object o = e.getChild();
 
-	if (o.getClass().getName().equals("org.mov.main.AnalyserFrame") ||
+	if (o.getClass().getName().equals("org.mov.main.ModuleFrame") ||
 	    o.getClass().getName().equals("javax.swing.JInternalFrame$JDesktopIcon")) {
 	    if (frame_menu_hash ==  null) {
 		frame_menu_hash = new Hashtable();
@@ -304,8 +313,8 @@ public class MainMenu implements ActionListener, ContainerListener {
 	    }
 	    
 	    String title;
-	    if (o.getClass().getName().equals("org.mov.main.AnalyserFrame"))
-		title = ((AnalyserFrame)o).getTitle();
+	    if (o.getClass().getName().equals("org.mov.main.ModuleFrame"))
+		title = ((ModuleFrame)o).getTitle();
 	    else if (o.getClass().getName().equals("javax.swing.JInternalFrame$JDesktopIcon"))
 		title = "("+((JInternalFrame.JDesktopIcon)o).getInternalFrame().getTitle()+")";
 	    else
@@ -331,7 +340,7 @@ public class MainMenu implements ActionListener, ContainerListener {
      */
     public void componentRemoved(ContainerEvent e) {
 	Object o = e.getChild();
-	if (o.getClass().getName().equals("org.mov.main.AnalyserFrame") ||
+	if (o.getClass().getName().equals("org.mov.main.ModuleFrame") ||
 	    o.getClass().getName().equals("javax.swing.JInternalFrame$JDesktopIcon")) {
 	    windowMenu.remove((JMenuItem)frame_menu_hash.get(o));
 	    menu_frame_hash.remove(frame_menu_hash.get(o));

@@ -1,7 +1,7 @@
 package org.mov.main;
 
 import java.util.*;
-import javax.swing.*;
+import javax.swing.JDesktopPane;
 import org.mov.chart.*;
 import org.mov.util.CommodityListQuery;
 import org.mov.util.ExpressionQuery;
@@ -11,6 +11,7 @@ import org.mov.quote.Quote;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteSource;
 import org.mov.table.QuoteModule;
+import org.mov.importer.ImporterModule;
 import org.mov.ui.*;
 
 /**
@@ -45,20 +46,20 @@ public class CommandManager {
 
     /** Tiles all the open internal frames horizontally */
     public void tileFramesHorizontal() {
-	AnalyserDesktopManager.tileFrames(AnalyserDesktopManager.HORIZONTAL);
+	DesktopManager.tileFrames(DesktopManager.HORIZONTAL);
     }
 
     /** Tiles all the open internal frames vertically */
     public void tileFramesVertical() {
-	AnalyserDesktopManager.tileFrames(AnalyserDesktopManager.VERTICAL);
+	DesktopManager.tileFrames(DesktopManager.VERTICAL);
     }
     /** Arranges all open internal frames in a cascading fashion */
     public void tileFramesCascade() {
-	AnalyserDesktopManager.tileFrames(AnalyserDesktopManager.CASCADE);
+	DesktopManager.tileFrames(DesktopManager.CASCADE);
     }
     /** Allocates as square a shape as possible to open infternal frames*/
     public void tileFramesArrange() {
-	AnalyserDesktopManager.tileFrames(AnalyserDesktopManager.ARRANGE);
+	DesktopManager.tileFrames(DesktopManager.ARRANGE);
     }
 
     /** Display an internal frame, listing all the stocks by company name */
@@ -114,9 +115,7 @@ public class CommandManager {
     private void displayStockList(int searchRestriction, Expression expression) {
 	QuoteCache cache = new QuoteCache(Quote.getSource().getLatestQuoteDate(),
 					  searchRestriction);
-	((AnalyserDesktopManager)(desktop_instance.getDesktopManager())).newFrame(new QuoteModule(desktop_instance, 
-												 cache, 
-												 expression));
+	((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new QuoteModule(desktop_instance, cache, expression), false);
     }
 
     /** Displays a graph closing prices for stock(s), based on their code. The stock(s) is/are determined by a user prompt */
@@ -129,11 +128,17 @@ public class CommandManager {
 	graphStock(CommodityListQuery.getCommodityByName(desktop_instance, "Graph stocks by name"));
     }
 
+    /** Shows a dialog and imports quotes into Venice */
+    public void importQuotes() {
+	((DesktopManager)(desktop_instance.getDesktopManager()))
+	    .newFrame(new ImporterModule(desktop_instance), true);
+    }
+
     private void graphStock(SortedSet companySet) {
 	if(companySet != null) {
 	    Iterator iterator = companySet.iterator();
 	    String symbol;
-	    AnalyserChart chart = new AnalyserChart(desktop_instance);
+	    ChartModule chart = new ChartModule(desktop_instance);
 	    
 	    // Iterate through companies adding them to the graph
 	    boolean owner =
@@ -152,7 +157,7 @@ public class CommandManager {
 	    Progress.getInstance().close(owner);
 	    
 	    chart.redraw();
-	    ((AnalyserDesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart);
+	    ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart, false);
 	}
     }
 }

@@ -182,7 +182,7 @@ public class SymbolListDialog {
 		
                 // Parse
                 try {
-                    symbolSet = Symbol.toSortedSet(symbols);
+                    symbolSet = Symbol.toSortedSet(symbols, true);
                 }
                 catch(SymbolFormatException e) {
                     invalidResponse = true;

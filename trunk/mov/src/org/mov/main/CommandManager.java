@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
+
 import org.mov.analyser.*;
 import org.mov.chart.*;
 import org.mov.chart.graph.*;
@@ -256,6 +257,20 @@ public class CommandManager {
     }
 
     /**
+     * Open up a result table that will display a summary of results
+     * from paper trading.
+     *
+     * @return	frame containing paper trade result module
+     */
+    public ModuleFrame newPaperTradeResultTable() {
+	
+	PaperTradeResultModule results =
+	    new PaperTradeResultModule();
+
+	return ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(results);	
+    }
+
+    /**
      * Open up a dialog to create and then display a new portfolio.
      */
     public void newPortfolio() {
@@ -286,19 +301,22 @@ public class CommandManager {
 
 	// Set the start and end dates to null - the other graph
 	// function will determine appropriate start and end dates
-	graphPortfolio(portfolio, null, null);
+	graphPortfolio(portfolio, null, null, null);
     }
 
     /**
      * Graph the given portfolio inbetween the given dates.
      *
      * @param	portfolio	the portfolio to graph
+     * @param	cache		quote cache
      * @param	startDate	date to graph from
      * @param	endDate		date to graph to
      */
     public void graphPortfolio(Portfolio portfolio, 
+			       QuoteCache cache,
 			       TradingDate startDate,
 			       TradingDate endDate) {
+
         final ChartModule chart = new ChartModule(desktop_instance);
 
 	final Thread thread = Thread.currentThread();
@@ -313,12 +331,10 @@ public class CommandManager {
 	    progress.setTitle("Loading quotes for portfolio");
 	    progress.show();
 
-	    QuoteCache cache = null;
 	    PortfolioGraphSource portfolioGraphSource = null;
 	    Graph graph = null;
 
             if (!thread.isInterrupted()) {
-
 		// Get default start and end date if not supplied
 		if(startDate == null) 
 		    startDate = portfolio.getStartDate();
@@ -329,7 +345,7 @@ public class CommandManager {
 
 		// Only need to load from cache if there are any stocks
 		// in the portfolio
-		if(symbols.size() > 0) {
+		if(cache == null && symbols.size() > 0) {
 		    cache = new QuoteCache(symbols, startDate, endDate);
 		}
 	    }
@@ -340,7 +356,7 @@ public class CommandManager {
 					     PortfolioGraphSource.MARKET_VALUE);
 	    }
 
-            if (!thread.isInterrupted()) {	       
+            if (!thread.isInterrupted()) {	 
 		graph = new LineGraph(portfolioGraphSource);
 	    }
 
@@ -355,6 +371,8 @@ public class CommandManager {
 		ProgressDialogManager.closeProgressDialog();
 	    
 	} catch (Exception e) {
+	    e.printStackTrace();
+
 	    ProgressDialogManager.closeProgressDialog();
 	}
     }

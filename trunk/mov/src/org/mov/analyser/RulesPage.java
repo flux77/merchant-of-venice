@@ -267,6 +267,7 @@ public class RulesPage extends JPanel implements AnalyserPage {
             c.weightx = 1.0;
             c.ipadx = 5;
             c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
 
             buyRuleEquationComboBox = 
                 GridBagHelper.addEquationRow(innerPanel, "Buy Rule", "", gridbag, c);

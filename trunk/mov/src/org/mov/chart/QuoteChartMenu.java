@@ -71,8 +71,9 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
     public QuoteChartMenu(ChartModule listener, QuoteBundle quoteBundle,
 			  Graph graph) {
 
+
 	super(graph.getName());
-	
+
 	this.quoteBundle = quoteBundle;
 	this.graph = graph;
 	this.listener = listener;
@@ -114,6 +115,13 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
     private void addMenuItem(String label) {
 	// Add graph menu
 	JMenuItem item = new JCheckBoxMenuItem(label);
+	// Grey out menu item for when quoteBundle is null since
+	// there is no data and would just cause a Null Pointer Exception
+	// E.g with the Advance/Decline graph
+	if (quoteBundle == null) {
+	    item.setEnabled(false);
+	}
+	
 	item.addActionListener(this);
 	graphMenu.add(item);
     }

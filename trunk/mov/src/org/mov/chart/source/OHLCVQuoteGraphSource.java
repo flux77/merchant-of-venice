@@ -57,9 +57,9 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	graphable = new Graphable();
 	Float value;
 
-	for(TradingDate date = quoteBundle.getLastDate();
-	    date.compareTo(quoteBundle.getFirstDate()) >= 0;
-	    date = date.previous(1)) {
+	for(TradingDate date = quoteBundle.getFirstDate();
+	    date.compareTo(quoteBundle.getLastDate()) <= 0;
+	    date = date.next(1)) {
 
 	    try {
 		value = new Float(quoteBundle.getQuote(symbol, quote, date));

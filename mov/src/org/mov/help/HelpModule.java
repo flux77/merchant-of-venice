@@ -31,6 +31,13 @@ import javax.swing.tree.*;
 
 import org.mov.main.*;
 
+/**
+ * This module provides a help browser for Venice. It allows traveresal of a tree
+ * like document in a extremely cut down HTML type browser. The tree is made from
+ * {@link HelpPage} pages.
+ *
+ * @see HelpPage
+ */
 public class HelpModule extends JPanel implements Module {
     
     // ToolBar Images - these are from jlfgr-1.0.jar
@@ -67,7 +74,12 @@ public class HelpModule extends JPanel implements Module {
     // Stack of pages we've visited
     private Stack visitedPages;
     private int positionInStack;
-
+    
+    /**
+     * Create a new help browser loaded at the root page.
+     *
+     * @param	desktop	the parent desktop.
+     */
     public HelpModule(JDesktopPane desktop) {
         this.desktop = desktop;
 
@@ -98,6 +110,7 @@ public class HelpModule extends JPanel implements Module {
         displayPage((HelpPage)root);
     }
 
+    // Adds the tool bar
     private void addFunctionToolBar() {
         // Create images on toolbar
         URL backURL = ClassLoader.getSystemResource(backImage);
@@ -137,6 +150,7 @@ public class HelpModule extends JPanel implements Module {
         }
     }
 
+    // Adds the menu bar
     private void addMenuBar() {
         menuBar = new JMenuBar();
 
@@ -179,6 +193,10 @@ public class HelpModule extends JPanel implements Module {
         menuBar.add(goMenu);
     }
 
+    // This function creates the index tree widget on the left hand side. It
+    // does this by feeding in the root document page into the tree. This
+    // function is also responsible for listening to tree events. If the
+    // user clicks on an item in the tree it will display that page.
     private JTree createIndexTree() {
         JTree indexTree = new JTree(root);
         indexTree.addTreeSelectionListener(new TreeSelectionListener() {
@@ -200,6 +218,8 @@ public class HelpModule extends JPanel implements Module {
         return indexTree;
     }
 
+    // This function creates the editor pane (actually it's non-editable) that displays
+    // the current HTML page
     private JEditorPane createEditorPane() {
         JEditorPane editorPane = new JEditorPane();
         editorPane.setEditable(false);
@@ -231,7 +251,9 @@ public class HelpModule extends JPanel implements Module {
         return editorPane;
     }
 
-    // Make sure you update the stack!!!
+    // Display the given page. Make sure you update the stack!!! You can use the
+    // function jump() to display a page and handle the stack. The stack is used
+    // to handle the user pressing the back/forward buttons.
     private void displayPage(HelpPage page) {
         // Display page
         editorPane.setText(page.getText());
@@ -253,6 +275,8 @@ public class HelpModule extends JPanel implements Module {
         ignoreTreeSelectionEvent = false;       
     }
 
+    // Enable/disable the back/forward buttons depending on whether we can
+    // go back/forward
     private void checkDisabledStatus() {
         backMenuItem.setEnabled(positionInStack > 0);
         backButton.setEnabled(positionInStack > 0);
@@ -261,6 +285,7 @@ public class HelpModule extends JPanel implements Module {
         forwardButton.setEnabled(positionInStack < (visitedPages.size() - 1));
     }
 
+    // Go to the last page visited
     private void back() {
         assert positionInStack > 0;
         
@@ -269,6 +294,7 @@ public class HelpModule extends JPanel implements Module {
         displayPage(previousPage);
     }
 
+    // Go to the next page visited
     private void forward() {       
         assert positionInStack < (visitedPages.size() - 1);
 
@@ -277,6 +303,7 @@ public class HelpModule extends JPanel implements Module {
         displayPage(nextPage);
     }
 
+    // Jump to the following page
     private void jump(HelpPage page) {
         // If there are "forward" pages in the stack they are deleted if the
         // user jumps to another page
@@ -294,6 +321,7 @@ public class HelpModule extends JPanel implements Module {
             checkDisabledStatus();
     }
 
+    // Jump to the home page
     private void home() {
         jump(root);
     }

@@ -27,6 +27,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneLayout;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.ConfirmDialog;
@@ -47,7 +49,7 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
         random = new Random(System.currentTimeMillis());
 
         Dimension preferredSize = new Dimension();
-        preferredSize.setSize(this.getPreferredSize().getWidth(), maxHeight/2);
+        preferredSize.setSize(this.getPreferredSize().getWidth(), maxHeight/20);
         
         // Integers
         int[] defaultValuesIntegers = {5000,    //ordinary number has 50% probabilty as default
@@ -261,6 +263,12 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setPreferredSize(preferredSize);
 
+        JPanel upDownPanel = new JPanel();
+        upDownPanel.setLayout(new BoxLayout(upDownPanel, BoxLayout.Y_AXIS));
+        
+        JScrollPane upDownScrollPane = new JScrollPane(upDownPanel);
+        upDownScrollPane.setLayout(new ScrollPaneLayout());
+        
         TitledBorder[] titledBorderSections = new TitledBorder[maxPanels];
         titledBorderSections[0] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_INTEGER_SHORT"));
         titledBorderSections[1] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_FLOAT_INTEGER_SHORT"));
@@ -269,7 +277,9 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
         titledBorderSections[4] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_EXPRESSION_SHORT"));
         for (int i=0; i<maxPanels; i++) {
             GPGondolaSelectionPanel[i].setBorder(titledBorderSections[i]);
-            this.add(GPGondolaSelectionPanel[i]);
+            upDownPanel.add(GPGondolaSelectionPanel[i]);
         }
+        
+        this.add(upDownScrollPane);
     }
 }

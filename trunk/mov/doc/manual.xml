@@ -734,6 +734,15 @@ and <highlight>not</highlight>. For example:</para>
 <item><code>close * lag(close, -1)
 </code></item>
 </list>
+
+<para>The type of returned value of arithmetic operators is the same of the first operand.
+The following examples explain the behaviour:</para>
+<list><item>INTEGER_TYPE + INTEGER_TYPE returns an INTEGER_TYPE</item>
+<item>INTEGER_TYPE - FLOAT_TYPE returns an INTEGER_TYPE</item>
+<item>FLOAT_TYPE / INTEGER_TYPE returns a FLOAT_TYPE</item>
+<item>FLOAT_TYPE * FLOAT_TYPE returns a FLOAT_TYPE</item>
+</list>
+
 <para>And finally it also supports the relational operators: <highlight>==</highlight>, <highlight>&gt;</highlight>, <highlight>&gt;=</highlight>, <highlight>&lt;</highlight>,
 <highlight>&lt;=</highlight> and <highlight>!=</highlight>. For example:</para>
 <list><item><code>volume == lag(volume, -1)
@@ -829,6 +838,21 @@ CBA over 30 days ending in yesterday.</para>
 <para>Example:</para>
 <para><code>dayofyear()</code></para>
 <para>Returns the current day of the year, which might be 365, if it is New Years Eve.</para>
+</section>
+
+<section name="Exponential Moving Average">
+<para>The exponential moving average function averages a series of stock quotes according to
+the following equation: EMA(current) = EMA(previous) + SMOOTHING_CONSTANT * (QUOTE - EMA(previous).</para>
+<para><code>ema(QUOTE, DAYS, SMOOTHING_CONSTANT, [START_OFFSET])</code></para>
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
+Where DAYS is the number of days to average.
+Where SMOOTHING_CONSTANT is the smoothing constant.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</para>
+<para>Example:</para>
+<para><code>ema(close, 26, 0.1, -1)</code></para>
+<para>Returns the average of the day close value for the current stock for the last
+26 days, ending with yesterday.</para>
 </section>
 
 <section name="For">

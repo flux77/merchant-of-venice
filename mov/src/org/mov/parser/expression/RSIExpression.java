@@ -5,45 +5,77 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.parser.expression;
 
-import org.mov.parser.*;
-import org.mov.quote.*;
+import org.mov.parser.EvaluationException;
+import org.mov.parser.Expression;
+import org.mov.parser.TypeMismatchException;
+import org.mov.parser.Variables;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.Quote;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteFunctions;
+import org.mov.quote.Symbol;
 
 /**
  * An expression which finds the RSI over a given trading period.
  */
 public class RSIExpression extends BinaryExpression {
-    
+
     public RSIExpression(Expression days, Expression lag) {
         super(days, lag);
     }
 
-    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
 	
 	int days = (int)getChild(0).evaluate(variables, quoteBundle, symbol, day);
-	int lastDay = day + (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
-	System.err.println("calling rsi on symbol "+symbol);
-	return QuoteFunctions.rsi(quoteBundle, symbol, Quote.DAY_CLOSE, days,
-				  lastDay);
+        int offset = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+
+        if(days <= 0)
+            throw EvaluationException.rangeForRSI();
+
+        // To calculate an X day RSI we need X + 1 days of quotes. Put them in
+        // an array so we can use the RSI function in quote functions.
+        double[] values = new double[days + 1];
+        int actualDays = 0;
+
+        for(int i = 0; i <= days; i++) {
+            try {
+                values[actualDays] = quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, day,
+                                                          i - days + offset);
+                actualDays++;
+            }
+            catch(MissingQuoteException e) {
+                // nothing to do
+            }
+        }
+
+        // If we don't have enough quotes then return a neutral value
+        if(actualDays <= 1)
+            return 50.0D;
+        else
+            return QuoteFunctions.rsi(values, 1, actualDays);
     }
 
     public String toString() {
-	return new String("rsi(" + 
-			  getChild(0).toString() + ", " +
-			  getChild(1).toString() + ")");
+        Expression periodExpression = getChild(0);
+        Expression lagExpression = getChild(1);
+
+        return new String("rsi(" +
+                          periodExpression.toString() + ", " +
+                          lagExpression.toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {
@@ -64,7 +96,7 @@ public class RSIExpression extends BinaryExpression {
     }
 
     public Object clone() {
-        return new RSIExpression((Expression)getChild(0).clone(), 
+        return new RSIExpression((Expression)getChild(0).clone(),
                                  (Expression)getChild(1).clone());
     }
 }

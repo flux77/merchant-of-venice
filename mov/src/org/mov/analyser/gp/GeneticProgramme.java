@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.analyser.gp;
@@ -32,34 +32,94 @@ import org.mov.quote.QuoteBundle;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
+/**
+ * The Genetic Programme creates and breeds random paper trading individuals. This
+ * class runs the GP.
+ *
+ * @author Andrew Leppard
+ * @see Individual
+ * @see Mutator
+ */
 public class GeneticProgramme {
+
     // An individual with less nodes than this will be dropped
     private final int MIN_SIZE = 12;
 
     // An individual with more nodes than this will be dropped
     private final int MAX_SIZE = 48;
 
+    // Size of breeding population. This is the number of individuals
+    // each generation that can have their "genes" pass on to the
+    // next generation.
     private int breedingPopulationSize;
+
+    // The sum of the value of all the breeding population indviduals.
+    // This is used when calculating which individual to breed from,
+    // it allows us to proportionally breed from the most successful
+    // individuals.
     private double breedingPopulationSum;
+
+    // An ordered map of the breeding individauls for the current generation.
+    // This will be empty for the first generation.
     private TreeMap breedingPopulation;
+
+    // An ordered map of the breeding individuals for the next generation
     private TreeMap nextBreedingPopulation;
+
+    // The mutator used to create/mutate buy rules
     private Mutator buyRuleMutator;
+
+    // The mutator used to create/mutate sell rules
     private Mutator sellRuleMutator;
+
+    // Our random number generator
     private Random random;
 
+    // Historical quote data
     private GPQuoteBundle quoteBundle;
+
+    // UI containing user's probability of using certain expression nodes
     private GPGondolaSelection GPGondolaSelection;
+
+    // Cache of stock quote order
     private OrderCache orderCache;
+
+    // Start date of paper trading
     private TradingDate startDate;
+
+    // End date of paper trading
     private TradingDate endDate;
+
+    // Initial value of each portfolio
     private Money initialCapital;
+
+    // Initial value of portfolio's stocks
     private Money stockValue;
+
+    // Number of stocks in portfolio (used iff stockValue == null).
     private int numberStocks;
+
+    // Cost of trade
     private Money tradeCost;
 
+    // Current generation number, starting from 1.
     private int generation;
 
-    public GeneticProgramme(GPQuoteBundle quoteBundle, 
+    /**
+     * Get ready to run the GP.
+     *
+     * @param quoteBundle the historical quote data
+     * @param GPGondolaSelection UI containing user's desired expression probabilities
+     * @param orderCache cache of ordered symbols
+     * @param startDate start date of trading
+     * @param endDate last date of trading
+     * @param initialCapital initial capital in the portfolio
+     * @param stockValue the rough value of each stock holding
+     * @param numberStocks number of stocks in the portfolio
+     * @param tradeCost the cost of a trade
+     * @param breedingPopulationSize number of individuals that can breed
+     */
+    public GeneticProgramme(GPQuoteBundle quoteBundle,
                             GPGondolaSelection GPGondolaSelection,
                             OrderCache orderCache,
                             TradingDate startDate,
@@ -93,6 +153,9 @@ public class GeneticProgramme {
         generation = 1;
     }
 
+    /**
+     * Run one iteration of the GP. This will create a single valid individual.
+     */
     public void nextIndividual() {
         boolean validIndividual = false;
 
@@ -111,13 +174,13 @@ public class GeneticProgramme {
                                               stockValue,
                                               numberStocks,
                                               tradeCost);
-                    
+
                     // If we got here the paper trade was successful. Now let the
                     // individual 'compete' to see if it gets to breed next round.
                     // If the individual is fit enough, it'll get a chance to breed.
                     competeForBreeding(individual, value);
                     validIndividual = true;
-                    
+
                 }
                 catch(EvaluationException e) {
                     // If there is a problem running the equation then
@@ -127,13 +190,16 @@ public class GeneticProgramme {
         }
     }
 
+    /**
+     * Enter the next generation.
+     */
     public int nextGeneration() {
         // The new breeding population is made from the strongest
         // individuals from last generation. We also leave "nextBreedingPopulation"
         // the same - to ensure that the next population's strongest individuals
         // will be at least as good as the previous ones.
         breedingPopulation = new TreeMap(nextBreedingPopulation);
-        
+
         // Calculate sum of portfolio values of each individual. We use this
         // when choosing who gets to breed next. The bigger the value compared
         // to other individuals, the greater chance of breeding.
@@ -147,6 +213,12 @@ public class GeneticProgramme {
         return ++generation;
     }
 
+    /**
+     * Get one of the current generation's breeding individual.
+     *
+     * @param index of the breeding individual
+     * @return the breeding individual
+     */
     public Individual getBreedingIndividual(int index) {
         assert index < breedingPopulation.size();
 
@@ -163,11 +235,16 @@ public class GeneticProgramme {
         return null;
     }
 
-    // This function is used to return a breeding individuals. We keep a sum of
-    // the values of all the breeding individuals. To choose an individual to
-    // breed we pick a random number between 0 and the sum of the values.
-    // That random number is passed to this function. The individuals with
-    // the largest values will be more likely to breed.
+    /**
+     * This function is used to return a breeding individuals. We keep a sum of
+     * the values of all the breeding individuals. To choose an individual to
+     * breed we pick a random number between 0 and the sum of the values.
+     * That random number is passed to this function. The individuals with
+     * the largest values will be more likely to breed.
+     *
+     * @param value random number
+     * @return breeding individual
+     */
     private Individual getBreedingIndividual(double value) {
         assert value <= breedingPopulationSum;
 
@@ -180,22 +257,39 @@ public class GeneticProgramme {
                 return individual;
         }
 
-        // It's possible but unlikely we get here. If so return the best performing 
+        // It's possible but unlikely we get here. If so return the best performing
         // individual to give it a little more chance.
         return (Individual)breedingPopulation.get(breedingPopulation.lastKey());
-        
+
     }
 
+    /**
+     * Get the size of the current breeding population.
+     *
+     * @return current breeding population size
+     */
     public int getBreedingPopulationSize() {
         return breedingPopulation.size();
     }
 
+    /**
+     * Get the size of the next generation's breeding population.
+     *
+     * @return future breeding population size
+     */
     public int getNextBreedingPopulationSize() {
         return nextBreedingPopulation.size();
     }
 
+    /**
+     * Create a new individual. If it is the first generation then we will
+     * create an entirely random individual, otherwise we will base it on
+     * the combination of two existing individuals.
+     *
+     * @return the new individual
+     */
     private Individual createIndividual() {
-        if(generation == 1) 
+        if(generation == 1)
             return new Individual(buyRuleMutator, sellRuleMutator);
         else {
             // Otherwise breed two parent individuals. We do these by calculating
@@ -211,8 +305,15 @@ public class GeneticProgramme {
         }
     }
 
+    /**
+     * Given an individual and its net worth, make it fight for a place in the
+     * next generation's breeding population.
+     *
+     * @param individual new individual
+     * @param value the individual's value
+     */
     private void competeForBreeding(Individual individual, Money value) {
-        // If the individual made a loss or broke even, then we are just going to get 
+        // If the individual made a loss or broke even, then we are just going to get
         // rubbish if we breed from it, so even if it is the best we've seen so far, it
         // gets ignored.
         if(value.isGreaterThan(initialCapital)) {
@@ -220,11 +321,11 @@ public class GeneticProgramme {
             // we assume it made the same trades. Replace this individual
             // ONLY if the new individual is smaller in size. This puts a small
             // pressure for equations to be as tight as possible.
-            Individual sameTradeIndividual = 
+            Individual sameTradeIndividual =
                 (Individual)nextBreedingPopulation.get(value);
 
             if(sameTradeIndividual != null) {
-                if(individual.getTotalEquationSize() < 
+                if(individual.getTotalEquationSize() <
                    sameTradeIndividual.getTotalEquationSize())
                     nextBreedingPopulation.put(value, individual);
             }
@@ -233,9 +334,9 @@ public class GeneticProgramme {
             // breeding population isn't full yet, or it is better than an
             // existing individual.
             else {
-                if(nextBreedingPopulation.size() < breedingPopulationSize) 
+                if(nextBreedingPopulation.size() < breedingPopulationSize)
                     nextBreedingPopulation.put(value, individual);
-            
+
                 else {
                     Money weakestValue = (Money)nextBreedingPopulation.firstKey();
 

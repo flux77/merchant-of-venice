@@ -52,11 +52,11 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException AVG_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("AVG_RANGE_ERROR"));
 
-    /** An exception which is thrown on an invalid bbl() range. */
+    /** An exception which is thrown on an invalid bol_lower() range. */
     public static EvaluationException BBL_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("BBL_RANGE_ERROR"));
 
-    /** An exception which is thrown on an invalid bbu() range. */
+    /** An exception which is thrown on an invalid bol_upper() range. */
     public static EvaluationException BBU_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("BBU_RANGE_ERROR"));
 
@@ -100,7 +100,7 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException AVG_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("AVG_OFFSET_ERROR"));
 
-    /** An exception which is thrown on an invalid bbl() offset. */
+    /** An exception which is thrown on an invalid bol_upper() offset. */
     public static EvaluationException BBL_OFFSET_EXCEPTION =
         new EvaluationException(Locale.getString("BBL_OFFSET_ERROR"));
 

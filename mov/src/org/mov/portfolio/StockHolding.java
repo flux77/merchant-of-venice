@@ -36,16 +36,21 @@ public class StockHolding {
     // Date shares were purchased
     private TradingDate date;
 
+    // Average cost per share
+    private float cost;
+
     /**
      * Create a new stock holding
      *
      * @param	symbol	the stock to own
      * @param	shares	the number of shares of that stock
+     * @param   cost    average cost per share
      * @param   date    the date the shares were purchased
      */
-    public StockHolding(Symbol symbol, int shares, TradingDate date) {
+    public StockHolding(Symbol symbol, int shares, float cost, TradingDate date) {
 	this.symbol = symbol;
 	this.shares = shares;
+        this.cost = cost;
         this.date = date;
     }
 
@@ -53,8 +58,10 @@ public class StockHolding {
      * Increase ownership of stock.
      *
      * @param	shares	number of new shares to accumulate
+     * @param   cost    average cost of shares
      */
-    public void accumulate(int shares) {
+    public void accumulate(int shares, float cost) {
+        this.cost = (this.shares * this.cost + shares * cost) / (this.shares + shares);
 	this.shares += shares;
     }
 
@@ -83,6 +90,15 @@ public class StockHolding {
      */
     public int getShares() {
 	return shares;
+    }
+
+    /**
+     * Get average cost per share
+     *
+     * @return	average cost per share
+     */
+    public float getCost() {
+	return cost;
     }
 
     /**

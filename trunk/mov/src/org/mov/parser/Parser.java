@@ -16,11 +16,11 @@ import java.util.*;
  *         referenced</li>
  * </ul>
  * <p>
- * <b>Language summary</b>
+ * <h2>Language summary</h2>
  * <p>
  *
  * <p>
- * <b>Functions</b>
+ * <h2>Functions</h2>
  * <p>
  *
  * <ul>
@@ -74,7 +74,7 @@ import java.util.*;
  *
  * </ul>
  * <p>
- * <b>Operators</b>
+ * <h2>Operators</h2>
  * <p>
  *
  * <ul>
@@ -100,7 +100,7 @@ import java.util.*;
  * </ul>
  *
  * <p>
- * <b>Control Statements</b>
+ * <h2>Control Statements</h2>
  * <p>
  * <ul>
  * <li>
@@ -110,7 +110,7 @@ import java.util.*;
  * </li>
  *
  * </ul>
- * <b>Examples</b>
+ * <h2>Examples</h2>
  * <p>
  * <ul>
  * <li>Returns true if the current stock has traded more than
@@ -127,7 +127,7 @@ import java.util.*;
  *
  * </ul>
  * <p>
- * <b>Langauge EBNF</b>
+ * <h2>Langauge EBNF</h2>
  * <pre>
  * EXPR = BOOLEAN_EXPR [ LOGIC BOOLEAN_EXPR ]
  * LOGIC = "and" | "or"
@@ -151,7 +151,7 @@ import java.util.*;
  *            "percent" "(" EXPR "," EXPR ")" |
  *            "if"  "(" EXPR ")" "{" EXPR "}" "else" "{" EXPR "}"
  * </pre>
- * <b>Symbols to be implemented</b>
+ * <h2>Symbols to be implemented</h2>
  * <p><i>age, held, today, yesterday</i>
  * 
  */

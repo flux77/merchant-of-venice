@@ -3,7 +3,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+Ã   the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -42,8 +42,8 @@ import org.mov.prefs.PreferencesManager;
  * @see java.util.ResourceBundle
  */
 public class Locale {
-    final private static int numberOfLanguages = LocaleConstants.numberOfLanguages;
     final private static java.util.Locale[] locales = LocaleConstants.locales;
+    final private static int localeCount  = LocaleConstants.locales.length;
     
     private static java.util.Locale locale = null;
     
@@ -68,7 +68,7 @@ public class Locale {
                 // input parameter should be one of the constants
                 // defined at the top of the class.
                 // Each of them represent one of MoV acceptable localization.
-		if (locale==null)
+		if (locale == null)
                     primaryResourceBundle = ResourceBundle.getBundle("org.mov.util.locale.venice");
                 else
                     primaryResourceBundle = ResourceBundle.getBundle("org.mov.util.locale.venice", locale);
@@ -114,7 +114,7 @@ public class Locale {
         if (languagePreferences.locale==null) {
             languagePreferences.locale = Locale.getLocale().getISO3Language();
         }
-        for (int i = 0; i < numberOfLanguages; i++) {
+        for (int i = 0; i < localeCount; i++) {
             if (languagePreferences.locale.compareTo(locales[i].getISO3Language())==0) {
                 locale = locales[i];
             }

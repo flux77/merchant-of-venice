@@ -105,4 +105,5 @@ Matthias Stöckel.
 
 And the following for providing translations:
 
-Quentin Bossard (French), Bryan Lin (Chinese) & Alberto Nacher (Italian)
+Quentin Bossard (French), Bryan Lin (Chinese), Alberto Nacher (Italian) &
+Pontus Strömdahl (Swedish)

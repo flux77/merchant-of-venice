@@ -38,10 +38,10 @@ import org.mov.util.LocaleConstants;
  */
 public class LanguagePage extends JPanel implements PreferencesPage {
     
-    final private static int numberOfLanguages = LocaleConstants.numberOfLanguages;
+    final private static int localeCount = LocaleConstants.localeCount;
     final private static java.util.Locale[] locales = LocaleConstants.locales;
     final private ButtonGroup group = new ButtonGroup();
-    final private JRadioButton[] radioButtons = new JRadioButton[numberOfLanguages];
+    final private JRadioButton[] radioButtons = new JRadioButton[localeCount];
     
         
     private JDesktopPane desktop = null;
@@ -70,11 +70,10 @@ public class LanguagePage extends JPanel implements PreferencesPage {
 	languagePreferences = 
 	    PreferencesManager.loadLanguageSettings();
         
-        if (languagePreferences.locale==null) {
+        if (languagePreferences.locale == null)
             languagePreferences.locale = Locale.getLocale().getISO3Language();
-        }
 
-        for (int i = 0; i < numberOfLanguages; i++) {
+        for (int i = 0; i < localeCount; i++) {
             radioButtons[i] = new JRadioButton(locales[i].getDisplayLanguage(Locale.getLocale()));
             radioButtons[i].setActionCommand(new Integer(i).toString());
             if (languagePreferences.locale.compareTo(locales[i].getISO3Language())==0)

@@ -84,6 +84,12 @@ public class CommandManager {
     private JInternalFrame importModuleFrame = null;
     private JInternalFrame preferencesModuleFrame = null;
 
+    // Locales for about box translation credits
+    private java.util.Locale french = new java.util.Locale("FR");
+    private java.util.Locale italian = new java.util.Locale("IT");
+    private java.util.Locale swedish = new java.util.Locale("SV");
+    private java.util.Locale simplifiedChinese = new java.util.Locale("ZH");    
+
     // Class should only be constructed once by this class
     private CommandManager() {
         // nothing to do
@@ -888,9 +894,10 @@ public class CommandManager {
                                    "Bryan Lin, Alberto Nacher & Matthias St\366ckel.\n\n" +
 
                                    Locale.getString("TRANSLATORS") + "\n" +
-                                   "Quentin Bossard (" + Locale.getString("FRENCH") + "), " +
-                                   "Bryan Lin (" + Locale.getString("SIMPLIFIED_CHINESE") + ")\n" +
-                                   "Alberto Nacher (" + Locale.getString("ITALIAN") + ")"
+                                   "Quentin Bossard (" + french.getDisplayName() + "), " +
+                                   "Bryan Lin (" + simplifiedChinese.getDisplayName() + ")\n" +
+                                   "Alberto Nacher (" + italian.getDisplayName() + "), " +
+				   "Pontus Str\366mdahl (" + swedish.getDisplayName() + ")"
 				   );
 
 	    String aboutVenice = Locale.getString("ABOUT_VENICE",

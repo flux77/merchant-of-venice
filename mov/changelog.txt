@@ -1,3 +1,13 @@
+Changes for Venice, 0.5 alpha 14/Jan/2005
+==========================================
+
+* Internationalisation:
+  - Swedish translation added (Pontus Strömdahl).
+  - Can now specify the language to use in preferences (Alberto Nacher).
+
+* Internet quote download:
+  - Added proxy authentication support (Bryan Lin).
+
 Changes for Venice, 0.4 alpha 14/Aug/2004
 ==========================================
 
@@ -180,7 +190,7 @@ Changes for Venice, 0.2 alpha 24/Aug/2003
   - Tuning Preferences Page lets you specify number of quotes cached.
 
 * Technical Updates:
-  - Canceling an operation now also cancels the underlying database
+  - Cancelling an operation now also cancels the underlying database
     transaction.
   - UNIX shell script now uses full path of Java to run Venice.
 

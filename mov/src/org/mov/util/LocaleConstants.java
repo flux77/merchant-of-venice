@@ -20,14 +20,14 @@ package org.mov.util;
 
 public final class LocaleConstants {
     
-    // To be modified if another localization is added.
-    // Just increment numberOfLanguages and add a row with the proper language to locales variable.
-    final public static int numberOfLanguages = 4;
+    // To be modified if another localization is added. Just add the supported languages here.
     final public static java.util.Locale[] locales =  {
         java.util.Locale.ENGLISH,
         java.util.Locale.FRENCH,
         java.util.Locale.ITALIAN,
-        java.util.Locale.SIMPLIFIED_CHINESE
+        java.util.Locale.SIMPLIFIED_CHINESE,
+	new java.util.Locale("SV"), // Swedish
     };
-    
+
+    final public static int localeCount = locales.length;
 }

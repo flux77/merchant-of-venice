@@ -40,6 +40,8 @@ import org.mov.portfolio.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
 import org.mov.table.QuoteModule;
+import org.mov.table.WatchScreen;
+import org.mov.table.WatchScreenModule;
 import org.mov.importer.ImporterModule;
 import org.mov.ui.*;
 
@@ -321,6 +323,76 @@ public class CommandManager {
     public ModuleFrame newGPResultTable() {
 	GPResultModule results = new GPResultModule();
 	return getDesktopManager().newFrame(results);	
+    }
+
+    /**
+     * Open up a dialog to create and then display a new watch screen.
+     */
+    public void newWatchScreen() {
+	// Get name for watch screen
+	TextDialog dialog = new TextDialog(desktop,
+					   "Enter watch screen name",
+					   "New Watch Screen");
+	String watchScreenName = dialog.showDialog();
+
+        if(watchScreenName != null && watchScreenName.length() > 0) {
+            WatchScreen watchScreen = new WatchScreen(watchScreenName);
+            
+	    // Save watch screen so we can update the menu
+	    PreferencesManager.saveWatchScreen(watchScreen);
+	    MainMenu.getInstance().updateWatchScreenMenu();
+	
+	    // Open as normal
+            openWatchScreen(watchScreen);
+	}
+    }
+
+    /**
+     * Display the watch screen to the user
+     *
+     * @param watchScreenName the name of the watch screen
+     */
+    public void openWatchScreen(String watchScreenName) {
+        WatchScreen watchScreen = 
+            PreferencesManager.loadWatchScreen(watchScreenName);       
+        openWatchScreen(watchScreen);
+    }
+
+    /**
+     * Display the watch screen to the user
+     *
+     * @param watchScreen the watch screen
+     */
+    public void openWatchScreen(final WatchScreen watchScreen) {
+        final Thread thread = new Thread(new Runnable() {
+
+            public void run() {
+                Thread thread = Thread.currentThread();
+                ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+
+                progress.show("Open " + watchScreen.getName());
+
+                ScriptQuoteBundle quoteBundle = null;
+                TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
+
+                if(lastDate != null) {
+                    if(!thread.isInterrupted()) {
+                        QuoteRange quoteRange =
+                            new QuoteRange(QuoteRange.ALL_SYMBOLS, lastDate.previous(1), lastDate);
+
+                        quoteBundle = new ScriptQuoteBundle(quoteRange);
+                    }
+
+                    if(!thread.isInterrupted())
+                        getDesktopManager().newFrame(new WatchScreenModule(watchScreen,
+                                                                           quoteBundle));
+                }
+
+                ProgressDialogManager.closeProgressDialog(progress);
+            }
+            });
+
+        thread.start();
     }
 
     /**

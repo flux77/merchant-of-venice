@@ -1,6 +1,6 @@
 ; The name that appears in the installer window
-Name "Merchant of Venice 0.4a"
-Caption "Merchant of Venice 0.4a"
+Name "Merchant of Venice 0.5a"
+Caption "Merchant of Venice 0.5a"
 OutFile "venice.exe"
 InstallDir $PROGRAMFILES\Venice
 BGGradient 6f8389 CCD1CC FFFFFF

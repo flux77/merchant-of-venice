@@ -212,7 +212,8 @@ public class DatabaseQuoteSource implements QuoteSource
 
             connection = DriverManager.getConnection(connectionURL);
 
-        } catch (ClassNotFoundException e) {
+        } 
+        catch (ClassNotFoundException e) {
             // Couldn't find the driver!
             DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_DATABASE_DRIVER", 
                                                              driver, software));
@@ -634,7 +635,7 @@ public class DatabaseQuoteSource implements QuoteSource
             if(filterString.length() > 0)
                 filterString = filterString.concat("AND ");
             
-            filterString =	filterString.concat(DATE_FIELD + " = '" + quoteRange.getFirstDate() + "' ");
+            filterString = filterString.concat(DATE_FIELD + " = '" + quoteRange.getFirstDate() + "' ");
         }
 	
         // Otherwise check within a range of dates

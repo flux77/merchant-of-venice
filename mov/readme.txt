@@ -1,7 +1,7 @@
-Merchant of Venice, 0.4 alpha 14/Aug/2004
+Merchant of Venice, 0.5 alpha 13/Mar/2005
 =========================================
 
-Copyright (C) 2003-4, Andrew Leppard (aleppard@picknowl.com.au)
+Copyright (C) 2003-5, Andrew Leppard (aleppard picknowl com au)
 See COPYING.txt for license terms.
 
 1 Introduction
@@ -27,12 +27,7 @@ software which is available here:
    MySQL
         http://www.mysql.com
 
-You will also need a software driver, this is already included in the
-Venice jar file, but for reference you can download a copy here:
-
-   MySQL Java Driver
-        http://sourceforge.net/projects/mmmysql
-     OR http://www.mysql.com/downloads/api-jdbc-stable.html
+Venice includes a copy of a MySQL JDBC driver for your convenience.
 
 If you want to connect to a PostgreSQL databse you will need the
 database software and driver which are available here:
@@ -43,17 +38,26 @@ database software and driver which are available here:
    PostgreSQL Java Driver
         http://jdbc.postgresql.org/
 
-   Venice allows you to access stock quotes through a MySQL or PostgrSQL
-   database or directly from text files. Reading from text files is easy to
-   set up, but the database is much faster and more flexible.
+Venice allows you to access stock quotes through an internal
+database (hsqldb) which should require no configuration on your part.
 
 Once they are set up, you can run Venice by typing from the command prompt:
 
    sh venice
 
 Or in Windows by clicking on the "venice.jar" file.
+Or in Mac OS X by clicking on the "Venice.app" file.
 
-3 Bug Reports and Enhancements
+3 Contained technology
+
+Venice contains the following technologies
+
+   hsqldb V1.7.3.3           from http://hsqldb.sourceforge.net
+   Jython V2.1               from http://www.jython.org
+   MySQL Connector/J V3.1.7  from http://www.mysql.com
+   One-Jar V0.95             from http://one-jar.sourceforge.net/
+
+4 Bug Reports and Enhancements
 
 Please report any bugs that you encounter via the Sourceforge bug
 tracking system at:
@@ -66,9 +70,9 @@ Sourceforge enhancement tracking system at:
    https://sourceforge.net/tracker/?func=add&group_id=53631&atid=471028
 
 Or if you have any comments, please don't hesitate to email me,
-Andrew Leppard at aleppard@picknowl.com.au.
+Andrew Leppard, at (aleppard picknowl com au).
 
-4 Building
+5 Building
 
 To build Venice you will need the programmes listed in the "Running"
 section and the following:
@@ -95,6 +99,7 @@ The build file (build.xml) provides other functions for developers (some
 of these will only work from source checked out from CVS):
 
 api     Generate a javadoc API of the code
+app     Generate a Mac OS X Venice application
 backup  Pulls a backup copy of the CVS tree from Sourceforge and stores it
         in the backup directory
 clean   Removes all built and temporary files
@@ -105,7 +110,7 @@ release Packages Venice into a file ready for release
 test    Runs the automated test suite
 web     Packages the web files ready for deployment
 
-5. Thanks
+6 Thanks
 
 Thanks to the following people for providing additional code, patches or
 bugfixes:
@@ -117,3 +122,7 @@ And the following for providing translations:
 
 Quentin Bossard (French), Bryan Lin (Chinese), Alberto Nacher (Italian) &
 Pontus Strömdahl (Swedish)
+
+The winged lion image is:
+
+Copyright (C) Nicholas Aodhagan Webb (naw1 cec wustl edu)

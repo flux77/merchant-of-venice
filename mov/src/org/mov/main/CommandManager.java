@@ -60,6 +60,7 @@ import org.mov.table.WatchScreen;
 import org.mov.table.WatchScreenModule;
 import org.mov.importer.PreferencesXML;
 import org.mov.ui.DesktopManager;
+import org.mov.ui.GPLViewDialog;
 import org.mov.ui.MainMenu;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -84,6 +85,7 @@ public class CommandManager {
     // Keep track of dialogs/modules to make sure the user doesn't open
     // two about dialogs, two preferences etc.
     private boolean isAboutDialogUp = false;
+    private boolean isLicenseDialogUp = false;
     private JInternalFrame importQuoteModuleFrame = null;
     private JInternalFrame exportQuoteModuleFrame = null;
     private JInternalFrame preferencesModuleFrame = null;
@@ -914,8 +916,7 @@ public class CommandManager {
                                    Main.RELEASE_DATE + "\n" +
 
 				   Locale.getString("COPYRIGHT", "2003-4") + ", " +
-				   "Andrew Leppard\n" +
-				   Locale.getString("SEE_LICENSE") + "\n\n" +
+				   "Andrew Leppard\n\n" +
 
                                    "Andrew Leppard (aleppard@picknow.com.au)\n\n" +
 				
@@ -935,6 +936,17 @@ public class CommandManager {
 	    JOptionPane.showInternalMessageDialog(desktop, aboutMessage, aboutVenice,
                                                   JOptionPane.PLAIN_MESSAGE);
             isAboutDialogUp = false;
+        }
+    }
+
+    /**
+     * Display a dialog to the user showing Venice's license.
+     */
+    public void openLicenseDialog() {
+        if(!isLicenseDialogUp) {
+            isLicenseDialogUp = true;
+            GPLViewDialog.showGPLViewDialog();
+            isLicenseDialogUp = false;
         }
     }
 

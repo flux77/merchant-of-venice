@@ -2,7 +2,7 @@
 <project name="Venice" default="run" basedir=".">
 
   <!-- Current version we are working towards -->
-  <property name="VERSION" value="0.4alpha"/>
+  <property name="VERSION" value="0.5alpha"/>
 
   <!-- Paths -->
   <property name="api" value="${basedir}/api"/>
@@ -125,13 +125,13 @@
   <!-- Generate a jar -->
   <target name="jar" depends="build, doc">
 
-    <!-- First expand the MySQL driver so we can include it              -->
+    <!-- First expand the MySQL driver so we can include it              
     <unjar src="${src}/mysql-connector-java-3.0.16-ga-bin.jar"
            dest="${src}">
       <patternset>
         <include name="com/**"/>
       </patternset>
-    </unjar>
+    </unjar> -->
 
     <jar jarfile="venice.jar"
          includes="**/*.class, **/*.gif, **/*.png, org/mov/help/doc/*.html,
@@ -143,6 +143,21 @@
 	 manifest="${src}/MANIFEST.MF"/>
   </target>
 
+  <target name="app" depends="jar">
+    <mkdir dir="${basedir}/Venice.app"/>
+    <mkdir dir="${basedir}/Venice.app/Contents/"/>
+    <mkdir dir="${basedir}/Venice.app/Contents/MacOS"/>
+    <mkdir dir="${basedir}/Venice.app/Contents/Resources"/>
+    <mkdir dir="${basedir}/Venice.app/Contents/Resources/Java"/>
+    <copy file="/System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS/JavaApplicationStub/"
+          todir="${basedir}/Venice.app/Contents/MacOS"/>
+    <exec command="chmod 755 ${basedir}/Venice.app/Contents/MacOS/JavaApplicationStub"/>
+    <copy file="Info.plist" todir="${basedir}/Venice.app/Contents/"/>
+    <copy file="venice.jar" todir="${basedir}/Venice.app/Contents/Resources/Java"/>
+    <copy file="icons/winged_lion.icns" todir="${basedir}/Venice.app/Contents/Resources"/>
+    <exec command="/Developer/Tools/SetFile -a B ${basedir}/Venice.app"/>
+  </target>
+  
   <!-- Check the locale files for consistency -->
   <target name="locale">
     

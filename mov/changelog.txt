@@ -1,12 +1,7 @@
 Changes for Venice, 0.5 alpha 13/Mar/2005
 ==========================================
 
-* Jython macro support:
-  - First release (Dan Makovec)
-  - Allows all functionality to be automated via the Jython 
-    (http://www.jython.org) scripting language.
-  - Macros can be configured to run automatically upon Venice startup
-    or manually from a new top level menu
+* Added Jython macro support (Dan Makovec).
   
 * Chart Update:
   - Added the custom graph to allow users to graph arbitrary indicators
@@ -16,6 +11,8 @@ Changes for Venice, 0.5 alpha 13/Mar/2005
 * Internationalisation:
   - Can now specify the language to use in preferences (Alberto Nacher).
   - Swedish translation added (Pontus Strömdahl).
+
+* Added Genetic Algorithms (Alberto Nacher).
 
 * Updates to Genetic Programming:
   - Can now specify window size in days.
@@ -48,8 +45,18 @@ Changes for Venice, 0.5 alpha 13/Mar/2005
     the day low is greater than the day high etc.
   - Venice now displays an import report with any warnings and errors
     encountered.
+  - Added support for other databases through the JDBC driver field
+    (Dan Makovec).
+
+* Updates to Usability:
+  - Added Venice icon.
+  - Mac OS X specific release.
 
 * Can now import/export preference settings (Alberto Nacher).
+
+* Licensing addtions:
+  - User now asked to accept license at startup.
+  - License viewable from Help menu.
 
 * Bug Fixes:
   - Paper trade and GP no longer sell, then buy back, the same stock on the
@@ -68,7 +75,10 @@ Changes for Venice, 0.5 alpha 13/Mar/2005
     it now uses the standard, and better looking, progress bar.
   - Fixed portfolio import/export bug. Exported portfolio format has now
     changed and is not backwards compatible.
-  - Removed numerous compilation warnings
+  - Fixed a bug where portfolios, watch screens and saved equations could
+    unintentionally be deleted.
+  - Fixed bugs in point & figure chart (Mark Hummel).
+  - Removed numerous compilation warnings (Dan Makovec).
 
 Changes for Venice, 0.4 alpha 14/Aug/2004
 ==========================================

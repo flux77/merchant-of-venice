@@ -78,6 +78,20 @@ public interface QuoteSource {
     public Vector getQuotesForDates(TradingDate startDate, 
 				    TradingDate endDate, 
 				    int type);
+
+    /**
+     * Return all quotes for the given symbols between the given dates. 
+     * They will be returned in order of date.
+     *
+     * @param	symbols	the symbols to query.
+     * @param	startDate	the first trading date to query for
+     * @param	endDate		the last trading date to query for
+     * @return	a vector of stock quotes.
+     * @see Quote
+     */
+    public Vector getQuotesForSymbolsAndDates(Vector symbols, 
+					      TradingDate startDate,
+					      TradingDate endDate);
     
     /**
      * Return a vector of all quotes in the given date.

@@ -150,6 +150,7 @@ public class AbstractTable extends SortedTable {
 	setDefaultRenderer(ChangeFormat.class, new StockQuoteRenderer());
 	setDefaultRenderer(PriceFormat.class, new StockQuoteRenderer());
 	setDefaultRenderer(QuoteFormat.class, new StockQuoteRenderer());
+        setDefaultRenderer(PointChangeFormat.class, new StockQuoteRenderer());
 
         // Set up number formatter for rendering ChangeFormat.java
         format = NumberFormat.getInstance();

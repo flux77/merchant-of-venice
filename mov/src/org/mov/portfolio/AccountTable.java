@@ -61,24 +61,8 @@ public class AccountTable extends AbstractTable {
 
 	    accounts = portfolio.getAccounts().toArray();
 
-	    // Pull first date from quoteBundle
-	    date = quoteBundle.getFirstDate();
-
-	    // Make sure we dont get an exception when trying to
-	    // work out how much the portfolio is worth on this day
-	    boolean validDate = false;
-
-	    while(!validDate) {
-		try {
-		    portfolio.getValue(quoteBundle, date);
-		    validDate = true;
-		}
-		catch(MissingQuoteException e) {
-		    // If we do its cause its a public holiday and we
-		    // can't get quotes for our stocks. So go back a day
-		    date = date.previous(1);
-		}
-	    }
+            // Use the latest date in the quote bundle
+	    date = quoteBundle.getLastDate();
 	}
 	
 	public int getRowCount() {
@@ -116,7 +100,7 @@ public class AccountTable extends AbstractTable {
 			return new PriceFormat(account.getValue(quoteBundle, date));
 		    }
 		    catch(MissingQuoteException e) {
-			assert false;
+			return new PriceFormat(0.0F);
 		    }
 		}
 	    }
@@ -140,7 +124,7 @@ public class AccountTable extends AbstractTable {
 			    value += account.getValue(quoteBundle, date);
 			}
 			catch(MissingQuoteException e) {
-			    assert false;
+			    // nothing to do 
 			}
 		    }
 

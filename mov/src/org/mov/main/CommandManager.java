@@ -105,147 +105,110 @@ public class CommandManager {
 	DesktopManager.tileFrames(DesktopManager.ARRANGE);
     }
 
-    /**
-     *  Display an internal frame, listing all the stocks by company name.
-     */
-    public void quoteListCompanyNamesAll() {
+    public void tableStocks(final int type) {
         Thread thread = new Thread(new Runnable() {
-            public void run() {
-                Thread thread = Thread.currentThread();
-
-                ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.show("List All Ordinaries");
-                displayStockList(QuoteRange.ALL_ORDINARIES, null);
-                ProgressDialogManager.closeProgressDialog(p);
-            }
-        });
-        thread.start();
-    }
-
-    /**
-     * Display an internal frame, listing stocks by company name, matching a rule that is to
-     * be input by the user
-     */
-    public void quoteListCompanyNamesByRule() {
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                String expr = ExpressionQuery.getExpression(desktop,
-                                                            "List All Ordinaries",
-                                                            "By Rule");
-                if(expr != null) {
-                    ProgressDialog p =
-                        ProgressDialogManager.getProgressDialog();
-                    p.show("List All Ordinaries by rule \""+expr+"\"");
-
-                    displayStockList(QuoteRange.ALL_ORDINARIES, expr);
-
-                    ProgressDialogManager.closeProgressDialog(p);
+                public void run() {
+                    String title = 
+                        new String("List " + 
+                                   QuoteRange.getDescription(type));
+                    tableStocks(title, type, null, null, null);
                 }
-            }
             });
         thread.start();
     }
-
-    /**
-     * Display an internal frame, listing all the stocks by symbol.
-     */
-    public void quoteListCommoditiesAll() {
+    
+    public void tableStocks(final Vector symbols) {
         Thread thread = new Thread(new Runnable() {
-            public void run() {
-                ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.show("List All Symbols");
-
-                displayStockList(QuoteRange.ALL_SYMBOLS, null);
-
-                ProgressDialogManager.closeProgressDialog(p);
-            }
+                public void run() {
+                    SortedSet symbolsCopy;
+                    String title =
+                        new String("List " +
+                                   QuoteRange.getDescription(QuoteRange.GIVEN_SYMBOLS));
+                    
+                    if(symbols == null)
+                        symbolsCopy = SymbolListDialog.getSymbols(desktop, title);
+                    else
+                        symbolsCopy = new TreeSet(symbols);
+                    
+                    tableStocks(title, QuoteRange.GIVEN_SYMBOLS, null, symbolsCopy, null);
+                }
             });
         thread.start();
     }
 
-    /**
-     * Display an internal frame, listing stocks by symbol, matching a rule that is to be
-     * input by the user.
-     */
-    public void quoteListCommoditiesByRule() {
+    public void tableStocksByDate(final int type) {
         Thread thread = new Thread(new Runnable() {
-            public void run() {
-                String expr = ExpressionQuery.getExpression(desktop,
-                                                            "List All Symbols",
-                                                            "By Rule");
-                ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.show("List All Symbols by rule \""+expr+"\"");
-
-                displayStockList(QuoteRange.ALL_SYMBOLS,expr);
-                ProgressDialogManager.closeProgressDialog(p);
-            }
+                public void run() {
+                    String title = new String("List " +
+                                             QuoteRange.getDescription(type) +
+                                              " By Date");
+                    TradingDate date = TradingDateDialog.getDate(desktop,
+                                                                 title,
+                                                                 "Date");
+                    if(date != null) 
+                        tableStocks(title, type, null, null, date); 
+                }
             });
         thread.start();
     }
 
-    /**
-     * Display an internal frame, listing all the indices by symbol.
-     */
-    public void quoteListIndicesAll() {
+    public void tableStocksByRule(final int type) {
         Thread thread = new Thread(new Runnable() {
-            public void run() {
-                ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.show("List Market Indices");
-
-                displayStockList(QuoteRange.MARKET_INDICES, null);
-                ProgressDialogManager.closeProgressDialog(p);
-            }
+                public void run() {
+                    String title = new String("List " +
+                                              QuoteRange.getDescription(type) +
+                                              " By Rule");
+                    String rule = ExpressionQuery.getExpression(desktop,
+                                                                title,
+                                                                "Rule");
+                    if(rule != null) 
+                        tableStocks(title, type, rule, null, null);
+                }
             });
         thread.start();
     }
 
-    /**
-     * Display an internal frame, listing indices by symbol, matching a rule that is to be
-     * input by the user.
-     */
-    public void quoteListIndicesByRule() {
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                String expr = ExpressionQuery.getExpression(desktop,
-                                                            "List Market Indices",
-                                                            "By Rule");
-
-                ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.show("List Market Indices by rule \""+expr+"\"");
-
-                displayStockList(QuoteRange.MARKET_INDICES, expr);
-            }
-            });
-        thread.start();
-    }
-
-    /**
-     * Internal function for retrieving the required data displaying a table showing the results
-     *
-     * @param searchRestriction as defined by QuoteSource
-     * @param expression as defined by Expression
-     * @see org.mov.quote.QouteSource
-     */
-    private void displayStockList(int searchRestriction,
-				  String expression) {
-
+    private void tableStocks(String title, int type, String rule, SortedSet symbols,
+                             TradingDate date) {
 	Thread thread = Thread.currentThread();
         ScriptQuoteBundle quoteBundle = null;
+        QuoteRange quoteRange = null;
         QuoteModule table = null;
-
-        // If this fails it'll throw a thread interupted to cancel the operation
-        TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
+        ProgressDialog progressDialog = ProgressDialogManager.getProgressDialog();
+        progressDialog.show(title);
+        boolean singleDate = false;
 
         if (!thread.isInterrupted()) {
-            QuoteRange quoteRange =
-                new QuoteRange(searchRestriction, lastDate);
-            quoteBundle = new ScriptQuoteBundle(quoteRange);
+
+            if(type == QuoteRange.GIVEN_SYMBOLS) {
+                quoteRange =
+                    new QuoteRange(new Vector(symbols));
+                singleDate = false;
+            }
+            else {
+                // If this fails it'll throw a thread interupted to cancel the operation
+                // If we were given a date use that, otherwise use the latest date
+                // available. Load the last two dates - we need yesterday's quotes to
+                // calculate each stocks percent change.
+                if(date == null)
+                    date = QuoteSourceManager.getSource().getLastDate();
+
+                if (!thread.isInterrupted())
+                    quoteRange = new QuoteRange(type, date.previous(1), date);
+
+                singleDate = true;
+            }
         }
 
+        if (!thread.isInterrupted()) 
+            quoteBundle = new ScriptQuoteBundle(quoteRange);
+
         if (!thread.isInterrupted()) {
-            table = new QuoteModule(quoteBundle, expression);
+            table = new QuoteModule(quoteBundle, rule, singleDate);
             getDesktopManager().newFrame(table);
         }
+
+        ProgressDialogManager.closeProgressDialog(progressDialog);
     }
 
     /**
@@ -279,16 +242,20 @@ public class CommandManager {
                 progress.show("Open " + portfolio.getName());
 
                 QuoteBundle quoteBundle = null;
+                TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
 
-                if (!thread.isInterrupted()) {
-                    QuoteRange quoteRange =
-                        new QuoteRange(QuoteRange.ALL_SYMBOLS,
-                                       QuoteSourceManager.getSource().getLastDate());
-                    quoteBundle = new QuoteBundle(quoteRange);
-                }
-                if (!thread.isInterrupted()) {
-                    getDesktopManager().newFrame(new PortfolioModule(desktop,
-                                                                     portfolio, quoteBundle));
+                if(lastDate != null) {
+                    if(!thread.isInterrupted()) {
+                        QuoteRange quoteRange =
+                            new QuoteRange(QuoteRange.ALL_SYMBOLS, lastDate.previous(1), lastDate);
+                        
+                        quoteBundle = new QuoteBundle(quoteRange);
+                    }
+                    
+                    if(!thread.isInterrupted()) {
+                        getDesktopManager().newFrame(new PortfolioModule(desktop,
+                                                                         portfolio, quoteBundle));
+                    }
                 }
 
                 ProgressDialogManager.closeProgressDialog(progress);
@@ -305,6 +272,15 @@ public class CommandManager {
 	PaperTradeModule paperTrade = new PaperTradeModule(desktop);
 
 	getDesktopManager().newFrame(paperTrade, true, true);
+    }
+
+    /**
+     * Open up a new genetic programming module.
+     */
+    public void geneticProgramming() {
+	GeneticProgrammeModule geneticProgramme = new GeneticProgrammeModule(desktop);
+
+	getDesktopManager().newFrame(geneticProgramme, true, true);
     }
 
     /**
@@ -436,21 +412,21 @@ public class CommandManager {
      *
      * @param	symbols	Optional. Set of symbols to graph.
      */
-    public void graphStockBySymbol(final Vector symbols) {
-
+    public void graphStockBySymbol(final java.util.List symbols) {
+        
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
-		SortedSet symbolsCopy;
-
-		if(symbols == null)
-		    symbolsCopy = SymbolListDialog.getSymbols(desktop,
-							      "Graph by symbol(s)");
-		else
-		    symbolsCopy = new TreeSet(symbols);
-
-                graphStock(symbolsCopy);
-            }
-        });
+                public void run() {
+                    SortedSet symbolsCopy;
+                    
+                    if(symbols == null)
+                        symbolsCopy = SymbolListDialog.getSymbols(desktop,
+                                                                  "Graph by Symbols");
+                    else
+                        symbolsCopy = new TreeSet(symbols);
+                    
+                    graphStock(symbolsCopy);
+                }
+            });
         thread.start();
     }
 
@@ -474,27 +450,27 @@ public class CommandManager {
      *
      * @param companySet the list of stock symbols to graph
      */
-    private void graphStock(SortedSet companySet) {
+    private void graphStock(SortedSet symbols) {
 
-        if(companySet != null) {
+        if(symbols != null) {
             ChartModule chart = new ChartModule(desktop);
             Thread thread = Thread.currentThread();
             ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
-            Iterator iterator = companySet.iterator();
+            Iterator iterator = symbols.iterator();
             String symbol = null;
             QuoteBundle quoteBundle = null;
             GraphSource dayClose = null;
             Graph graph = null;
 
-            String title = companySet.toString();
+            String title = symbols.toString();
             title = title.substring(1, title.length() - 1);
 
             int progressValue = 0;
 
-            if(companySet.size() > 1) {
+            if(symbols.size() > 1) {
                 progress.setIndeterminate(false);
-                progress.setMaximum(companySet.size());
+                progress.setMaximum(symbols.size());
                 progress.setMaster(true);
             }
             else
@@ -516,7 +492,7 @@ public class CommandManager {
                 chart.add(graph, quoteBundle, 0);
                 chart.redraw();
 
-                if(companySet.size() > 1)
+                if(symbols.size() > 1)
                     progress.increment();
             }
 

@@ -53,26 +53,6 @@ public class Analyser extends JFrame implements WindowListener {
 	}
     }
 
-    private void savePreferences() {
-	// Save the preferences
-	try {
-	    FileOutputStream os = new FileOutputStream(PREFS_FILE);
-	    Preferences p = Preferences.userRoot();
-	    p.exportSubtree(os);
-	    os.close();
-	} catch (java.io.IOException ioe) {
-	    System.err.println("IO Exception thrown while saving "+
-			       PREFS_FILE+
-			       ":\n"+
-			       ioe.getMessage());
-	} catch (java.util.prefs.BackingStoreException bse) {
-	    System.err.println("Trouble saving file "+
-			       PREFS_FILE+
-			       ":\n"+
-			       bse.getMessage());
-	}
-    }
-
     public void windowActivated(WindowEvent e) {}
     public void windowClosing(WindowEvent e) {
 	// Save window dimensions in prefs file
@@ -83,7 +63,6 @@ public class Analyser extends JFrame implements WindowListener {
 	p.putInt("default_y", getY());
 
 	dispose();	
-	savePreferences();
 	System.exit(0);
     }
     public void windowClosed(WindowEvent e) {}

@@ -18,6 +18,9 @@ public class DesktopManager
     extends javax.swing.DefaultDesktopManager
     implements java.io.Serializable {  
 
+    static private int DEFAULT_FRAME_WIDTH = 450;
+    static private int DEFAULT_FRAME_HEIGHT = 375;
+
     public static final int HORIZONTAL          = 0,
 	VERTICAL            = 1,                          
 	CASCADE             = 2, 
@@ -27,6 +30,10 @@ public class DesktopManager
 
     public static void setDesktop(JDesktopPane desktop) {
 	desktop_instance = desktop;
+    }
+
+    public static JDesktopPane getDesktop() {
+	return desktop_instance;
     }
 
     public DesktopManager(JDesktopPane desktop) {
@@ -240,18 +247,76 @@ public class DesktopManager
 	    public String toString(){ return "FILE_NAME";
 	    }  
 	};
+
+    /**
+     * Display a new frame in the center of the current desktop
+     * 
+     * @param module the module to render in the frame
+     */
+    public void newCentredFrame(Module module) {
+	int xOffset = (desktop_instance.getWidth() - DEFAULT_FRAME_WIDTH) / 2;
+	int yOffset = (desktop_instance.getHeight() - DEFAULT_FRAME_HEIGHT) / 2;
+	
+	newFrame(module, xOffset, yOffset, DEFAULT_FRAME_WIDTH,
+		 DEFAULT_FRAME_HEIGHT);
+    }
     
     /**
      * Display a new frame upon the current desktop
      * 
      * @param module the module to render in the frame
+     */
+    public void newFrame(Module module) {
+	newFrame(module, 0, 0, DEFAULT_FRAME_WIDTH, DEFAULT_FRAME_HEIGHT);
+    }
+
+    /**
+     * Display a new frame upon the current desktop
+     *
+     * @param module the module to render in the frame
      * @param isPreferences Is the frame a preferences frame that should
-     *			    be centred and size honoured?	
+     *                      be centred and size honoured?
      */
     public void newFrame(Module module, boolean isPreferences) {
-		
-	ModuleFrame frame = new ModuleFrame(desktop_instance,
-					    module, isPreferences);
+	if (isPreferences)
+		newCenteredFrame(module);
+	else
+		newFrame(module);
+    }
+
+    
+    /**
+     * Display a new frame upon the current desktop
+     * 
+     * @param module the module to render in the frame
+     * @param x the X coordinate of the top left corner of the new frame
+     * @param Y the Y coordinate of the top left corner of the new frame
+     * @param width the width of the new frame
+     * @param height the height of the new frame
+     */
+    public void newFrame(Module module, int x, int y,
+			  int width, int height) {
+	
+	// Make sure new frame is within window bounds
+	
+	// ORDER IMPORTANT
+	{
+	    if(x > width)
+		x = desktop_instance.getWidth() - width;
+	    if(y > height)
+		y = desktop_instance.getHeight() - height;
+	    if(x < 0) 
+		x = 0;
+	    if(y < 0)
+		y = 0;
+	    
+	    if(x + width > desktop_instance.getWidth())
+		width = desktop_instance.getWidth() - x;
+	    if(y + height > desktop_instance.getHeight())
+		height = desktop_instance.getHeight() - y;
+	}
+	
+	ModuleFrame frame = new ModuleFrame(module, x, y, width, height);
 	desktop_instance.add(frame);
 	
 	try {

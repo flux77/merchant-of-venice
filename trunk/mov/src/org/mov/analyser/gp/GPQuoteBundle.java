@@ -33,11 +33,29 @@ import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.TradingDate;
 
+/**
+ * This class is a specialised version of the QuoteBundle tailored specifically
+ * for the GP. It differs from ScriptQuoteBundle in that it enforces a
+ * window of dates. This window prevents the GP expressions from accessing quotes
+ * too far in the past which would slow down calculations (e.g. calculating the
+ * average value of a stock for the last 3,000 days), and also prevents GP expressions
+ * accessing quotes that would be in their future.
+ *
+ * @author Andrew Leppard
+ * @see org.mov.quote.ScriptQuoteBundle
+ */
 public class GPQuoteBundle implements QuoteBundle {
 
     private QuoteBundle quoteBundle;
     private int earliestDateOffset;
 
+    /**
+     * Create a new quote bundle for the GP.
+     *
+     * @param quoteBundle wrap the given quote bundle
+     * @param window prevent access to quotes this many days before
+     *               the first quote in the given quote bundle
+     */
     public GPQuoteBundle(QuoteBundle quoteBundle, int window) {
         this.quoteBundle = quoteBundle;
 

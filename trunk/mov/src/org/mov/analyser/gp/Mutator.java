@@ -26,42 +26,115 @@ import org.mov.parser.Expression;
 import org.mov.parser.expression.*;
 import org.mov.quote.Quote;
 
+/**
+ * The mutator can build random expressions and randomly mutate existing
+ * expressions. This class is at the heart of the GP as it creates the
+ * random buy and sell rules and combines the rules during "breeding".
+ *
+ * @author Andrew Leppard
+ * @see Individual
+ * @see GeneticProgramme
+ */
 public class Mutator {
 
+    // The branch factor is a number which defines the likelihood of
+    // us choosing a non-terminal expression over a terminal expression.
+    // The likelihood will be diminished as the expression tree grows
+    // in depth.
     private final static int BRANCH_FACTOR = 80;
+
+    // When mutating a numeric value (e.g. 10), this is the percent
+    // chance that we favour applying a percent change to the number
+    // (e.g. +20%) rather than replacing it with an entirely random number
     private final static int FAVOUR_NUMBER_PERCENT = 85;
 
+    // This is the chance that a mutation occurs
     private final static int MUTATION_PERCENT       = 10;
+
+    // This is the chance that an additional mutation occurs. And an
+    // additional mutation after that, and after that etc.
     private final static int EXTRA_MUTATION_PERCENT = 10;
 
+    // Given a mutation, this is the chance of it being an insertion mutation
+    // (i.e. we insert an expression tree at the mutation point).
     private final static int INSERTION_MUTATION_PERCENT    = 10;
+
+    // Given a mutation, this is the chance of it being a deletion mutation
+    // (i.e. we delete the expression tree at the mutation point).
     private final static int DELETION_MUTATION_PERCENT     = 20;
+
+    // Given a mutation, this is the chance of it being a modification mutation
+    // (i.e. we modify the expression tree at the mutation point).
     private final static int MODIFICATION_MUTATION_PERCENT = 70;
 
+    // Random number generator
     private Random random;
+
+    // UI Panel containing user's selection of percent chance of generating
+    // each expression type
     private GPGondolaSelection GPGondolaSelection;
+
+    // Is this mutator allowed to generate the "held" variable? Typically
+    // buy mutators cannot, and sell mutators can.
     private boolean allowHeld;
+
+    // Is this mutator allowed to generate the "order" variable? Typically
+    // only if the user has ordered the stocks will this variable bew
+    // available.
     private boolean allowOrder;
 
-    public Mutator(Random random, GPGondolaSelection GPGondolaSelection, boolean allowHeld, boolean allowOrder) {
+    /**
+     * Create a new mutator.
+     *
+     * @param random use this random number generator
+     * @param GPGondolaSelection UI containing user's desired expression probabilities
+     * @param allowHeld allow the creation of the <code>held</code> variable
+     * @param allowOrder allow the creation of the <code>order</code> variable
+     */
+    public Mutator(Random random, GPGondolaSelection GPGondolaSelection,
+                   boolean allowHeld, boolean allowOrder) {
         this.random = random;
         this.GPGondolaSelection = GPGondolaSelection;
         this.allowHeld = allowHeld;
         this.allowOrder = allowOrder;
     }
 
+    /**
+     * Create a new random expression of the given type.
+     *
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @return a randomly generated expression
+     */
     public Expression createRandom(int type) {
         return createRandom(null, type, 1);
     }
 
+    /**
+     * Create a new random expression of the given type at the given level. The
+     * level parameter is used to vary the probability of the expression
+     * being a non-terminal or a terminal expression. As the level of the expression
+     * tree gets larger, the probability of creating a non-terminal child
+     * expression decreases.
+     *
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param level the level in the tree
+     * @return a randomly generated expression
+     */
     public Expression createRandom(int type, int level) {
         return createRandom(null, type, level);
     }
 
-    // hmm i think the mutate is going to want better percent controls on the
-    // terminal/non-terminal relationship?
-    // Describe how if you set level < 1 you can force the top nodes to
-    // be non-terminal
+    /**
+     * Create a new random expression based on mutating the given expression.
+     * If <code>level < 1</code> then the top node of the created expression
+     * will not be terminal.
+     *
+     * @param model initial expression to work with
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param level the level in the tree
+     * @return a randomly generated expression
+     * @see #createRandom(int type, int level)
+     */
     public Expression createRandom(Expression model, int type, int level) {
         boolean terminal = true;
 
@@ -86,14 +159,40 @@ public class Mutator {
             return createRandomTerminal(type);
     }
 
+    /**
+     * Create a  new random non-terminal expression of the given type.
+     * A terminal expression is one that has children, e.g. an operator
+     * such as plus. (Thus plus operator would have two children, e.g.
+     * 1 and 1).
+     *
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @return a randomly generated non-terminal expression
+     */
     public Expression createRandomNonTerminal(int type) {
         return createRandomNonTerminal(null, type, 1);
     }
 
+    /**
+     * Create a new random non-terminal expression of the given type
+     * at the given level.
+     *
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param level the level in the tree
+     * @return a randomly generated non-terminal expression
+     */
     public Expression createRandomNonTerminal(int type, int level) {
         return createRandomNonTerminal(null, type, level);
     }
 
+    /**
+     * Create a new random non-terminal expression based on mutating the given expression.
+     *
+     * @param model initial expression to work with
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param level the level in the tree
+     * @return a randomly generated non-terminal expression
+     * @see #createRandom(int type, int level)
+     */
     public Expression createRandomNonTerminal(Expression model, int type, int level) {
         if(type == Expression.BOOLEAN_TYPE)
             return createRandomNonTerminalBoolean(model, level);
@@ -109,6 +208,14 @@ public class Mutator {
         }
     }
 
+    /**
+     * Creates a random terminal expression of the given type. A terminal
+     * expression is one that does not have any children, e.g. a number
+     * or a variable expression.
+     *
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @return a randomly generated terminal expression
+     */
     public Expression createRandomTerminal(int type) {
         int randomNumber;
 
@@ -129,7 +236,7 @@ public class Mutator {
         case Expression.INTEGER_TYPE:
 
             randomNumber = GPGondolaSelection.getRandomToGenerateInteger(allowHeld, allowOrder);
-            
+
             if(randomNumber == 0)
                 // Generate an ordinary number
                 return new NumberExpression(50 - random.nextInt(100));
@@ -179,6 +286,13 @@ public class Mutator {
         }
     }
 
+    /**
+     * Create a random non-terminal {@link Expression#BOOLEAN_TYPE} expression.
+     *
+     * @param model model expression
+     * @param level tree level
+     * @return randomly generated non-terminal boolean expression
+     */
     private Expression createRandomNonTerminalBoolean(Expression model, int level) {
         int randomNumber = GPGondolaSelection.getRandomToGenerateBoolean();
 
@@ -226,6 +340,13 @@ public class Mutator {
         }
     }
 
+    /**
+     * Create a random non-terminal {@link Expression#FLOAT_TYPE} expression.
+     *
+     * @param model model expression
+     * @param level tree level
+     * @return randomly generated non-terminal float expression
+     */
     private Expression createRandomNonTerminalFloat(Expression model, int level) {
         int randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
 
@@ -297,6 +418,13 @@ public class Mutator {
         }
     }
 
+    /**
+     * Create a random non-terminal {@link Expression#INTEGER_TYPE} expression.
+     *
+     * @param model model expression
+     * @param level tree level
+     * @return randomly generated non-terminal integer expression
+     */
     private Expression createRandomNonTerminalInteger(Expression model, int level) {
         int randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
 
@@ -368,6 +496,7 @@ public class Mutator {
         }
     }
 
+
     private Expression getChild(Expression model, int level, int arg, int type) {
 
         // Case 1: The expression doesn't have this many children or
@@ -408,6 +537,12 @@ public class Mutator {
             return model.getChild(arg);
     }
 
+    /**
+     * Randomly pick a node in the given expression.
+     *
+     * @param expression the expression to search
+     * @return expression node
+     */
     public Expression findRandomSite(Expression expression) {
         int randomNumber = random.nextInt(expression.size());
         Expression randomSite = null;
@@ -427,7 +562,13 @@ public class Mutator {
         return randomSite;
     }
 
-    // may return null
+    /**
+     * Randomly pick a node of the given type in the given expression.
+     *
+     * @param expression the expression node
+     * @param type the type of the node, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @return expression node or <code>null</code> if one could not be found
+     */
     public Expression findRandomSite(Expression expression, int type) {
         Expression randomSite = null;
         int possibleSites = expression.size(type);
@@ -452,11 +593,29 @@ public class Mutator {
         return randomSite;
     }
 
+    /**
+     * Perform a deletion mutation on the given expression. Since the mutation
+     * might chance the root of the expression, the updated root is
+     * returned. The returned root may be the same as the one passed in.
+     *
+     * @param root the root of the expression being mutated
+     * @param destination the destination site for the deletion
+     * @return the new root of the expression
+     */
     public Expression delete(Expression root, Expression destination) {
         return insert(root, destination,
                       createRandomTerminal(destination.getType()));
     }
 
+    /**
+     * Perform an insertion mutation on the given expression.
+     *
+     * @param root the root of the expression being mutated
+     * @param destination the destination site for the insertion
+     * @param source the expression to insert
+     * @return the new root of the expression
+     * @see #delete(Expression root, Expression destination)
+     */
     public Expression insert(Expression root, Expression destination,
                              Expression source) {
 
@@ -474,6 +633,14 @@ public class Mutator {
         }
     }
 
+    /**
+     * Perform a modification mutation on the given expression.
+     *
+     * @param root the root of the expression being mutated
+     * @param destination the destination site for the modification
+     * @return the new root of the expression
+     * @see #delete(Expression root, Expression destination)
+     */
     public Expression modify(Expression root, Expression destination) {
         Expression newExpression = createRandom(destination, destination.getType(), 1);
 
@@ -483,10 +650,23 @@ public class Mutator {
             return insert(root, destination, newExpression);
     }
 
+    /**
+     * Possibly mutate the given expression.
+     *
+     * @param expression the root of the expression to modify
+     * @return the new root of the expression
+     */
     public Expression mutate(Expression expression) {
         return mutate(expression, MUTATION_PERCENT);
     }
 
+    /**
+     * Possibly mutate the given expression
+     *
+     * @param expression the root of the expression to modify
+     * @param percent percent change of mutation
+     * @return the new root of the expression
+     */
     public Expression mutate(Expression expression, int percent) {
         // Mutations do not always occur. Use the given percent to work
         // out whether one should occur.
@@ -513,12 +693,24 @@ public class Mutator {
         return mutate(expression, EXTRA_MUTATION_PERCENT);
     }
 
+    /**
+     * Mutate the given expression by modification.
+     *
+     * @param expression the root of the expression to modify
+     * @return the new root of the expression
+     */
     private Expression mutateByModification(Expression expression) {
         Expression destination = findRandomSite(expression);
 
         return modify(expression, destination);
     }
 
+    /**
+     * Mutate the given expression by insertion.
+     *
+     * @param expression the root of the expression to modify
+     * @return the new root of the expression
+     */
     private Expression mutateByInsertion(Expression expression) {
         Expression destination = findRandomSite(expression);
         Expression insertSubTree = createRandom(destination.getType());
@@ -526,6 +718,12 @@ public class Mutator {
         return insert(expression, destination, insertSubTree);
     }
 
+    /**
+     * Mutate the given expression by deletion.
+     *
+     * @param expression the root of the expression to modify
+     * @return the new root of the expression
+     */
     private Expression mutateByDeletion(Expression expression) {
         Expression destination = findRandomSite(expression);
 

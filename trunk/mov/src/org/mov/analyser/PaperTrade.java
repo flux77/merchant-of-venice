@@ -66,8 +66,6 @@ public class PaperTrade {
     private static String[] symbolStock;
     private static boolean[] buyRule;
     private static boolean[] sellRule;
-    private static double[] buyValue;
-    private static double[] sellValue;
 
     // Since this process uses so many temporary variables, it makes sense
     // grouping them all together.
@@ -576,8 +574,6 @@ public class PaperTrade {
         symbolStock = new String[symbols.size()];
         buyRule = new boolean[symbols.size()];
         sellRule = new boolean[symbols.size()];
-        buyValue = new double[symbols.size()];
-        sellValue = new double[symbols.size()];
         
         setSellTip(environment, quoteBundle, variables, sell, dateOffset,
                     tradeCost, symbols, orderCache);
@@ -631,16 +627,10 @@ public class PaperTrade {
             }
 
             try {
+                // Get if the stock must be sold
                 sellRule[index] = (sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE);
-                // price to sell.
-                Expression tradeValueSellExpression = ExpressionFactory.newExpression(environment.tradeValueSell);
-                sellValue[index] = tradeValueSellExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
             }
             catch(EvaluationException e) {
-                sellValue[index] = 0.0D;
-            }
-            catch(java.lang.ArrayIndexOutOfBoundsException ex) {
-                sellValue[index] = 0.0D;
             }
             finally {
                 index++;
@@ -675,7 +665,7 @@ public class PaperTrade {
                 variables.setValue("order", order);
 
             try {
-                // Did we have enough money to buy at least one share?
+                // Get if the stock must be bought
                 buyRule[index] = (buy.evaluate(variables, quoteBundle, symbol,
                             dateOffset) >= Expression.TRUE);
                 
@@ -687,15 +677,8 @@ public class PaperTrade {
                 //    buyRule[index] = false;
                 //}
 
-                // price to buy
-                Expression tradeValueBuyExpression = ExpressionFactory.newExpression(environment.tradeValueBuy);
-                buyValue[index] = tradeValueBuyExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
-            }
+           }
             catch(EvaluationException e) {
-                buyValue[index] = 0.0D;
-            }
-            catch(java.lang.ArrayIndexOutOfBoundsException ex) {
-                buyValue[index] = 0.0D;
             }
             finally {
                 index++;
@@ -715,38 +698,42 @@ public class PaperTrade {
      */
     public static String getTip() {
         StringBuffer retValue = new StringBuffer();
+        boolean first = true;
+        
+        retValue.append(Locale.getString("BUY_STOCKS"));
         
         for (int i=0; i<symbolStock.length; i++) {
 
-            retValue.append(symbolStock[i] + " --> ");
-            
             if (buyRule[i]) {
-                if (buyValue[i]==0.0D) {
-                    retValue.append(Locale.getString("BUY_OPEN"));
+                if (first) {
+                    retValue.append(" " + symbolStock[i]);
+                    first = false;
                 } else {
-                    retValue.append(Locale.getString("BUY_FIXED_PRICE", Double.toString(buyValue[i])));
+                    retValue.append(", " + symbolStock[i]);
                 }
-            } else {
-                retValue.append(Locale.getString("BUY_NOT"));
             }
-
-            retValue.append("\n");
-
-            retValue.append(symbolStock[i] + " --> ");
-            
-            if (sellRule[i]) {
-                if (sellValue[i]==0.0D) {
-                    retValue.append(Locale.getString("SELL_OPEN"));
-                } else {
-                    retValue.append(Locale.getString("SELL_FIXED_PRICE", Double.toString(sellValue[i])));
-                }
-            } else {
-                retValue.append(Locale.getString("SELL_NOT"));
-            }
-            
-            retValue.append("\n");
 
         }
+        
+        retValue.append("\n");
+
+        first = true;
+        retValue.append(Locale.getString("SELL_STOCKS"));
+            
+        for (int i=0; i<symbolStock.length; i++) {
+            
+            if (sellRule[i]) {
+                if (first) {
+                    retValue.append(" " + symbolStock[i]);
+                    first = false;
+                } else {
+                    retValue.append(", " + symbolStock[i]);
+                }
+            }
+            
+        }
+        
+        retValue.append("\n");
         
         return retValue.toString();
     }

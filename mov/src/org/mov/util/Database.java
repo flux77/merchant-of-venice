@@ -39,6 +39,9 @@ public class Database
     // Indicates a single symbol
     public static final int SINGLE_SYMBOL = 3;
 
+    // Buffer last trading date in database
+    private TradingDate latestQuoteDate;
+
     public static Database getInstance() {
 	if(instance == null) {
 	    instance = new Database();
@@ -59,6 +62,8 @@ public class Database
 	    System.err.println("Unable to load driver.");
 	    E.printStackTrace();
 	}
+
+	latestQuoteDate = null;
 
 	// connect to database
 	connect();
@@ -198,6 +203,11 @@ public class Database
     }
 
     public TradingDate getLatestQuoteDate() {
+
+	// Do we have it buffered?
+	if(latestQuoteDate != null)
+	    return latestQuoteDate;
+
 	java.util.Date date = null;
 
 	if(connection != null) {
@@ -224,8 +234,10 @@ public class Database
 	    }
 	}
 
-	if(date != null)
-	    return new TradingDate(date);
+	if(date != null) {
+	    latestQuoteDate = new TradingDate(date);
+	    return latestQuoteDate;
+	}
 	else
 	    return null;
     }

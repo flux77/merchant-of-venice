@@ -49,7 +49,7 @@ public class Main extends JFrame {
     public static String LONG_VERSION  = "0.29 alpha";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE  = "17/Jan/2004";
+    public static String RELEASE_DATE  = "15/Feb/2004";
 
     /**
      * Get the main frame for the current application

@@ -18,12 +18,13 @@
 
 package org.mov.ui;
 
-import java.awt.*;
-import java.util.*;
-import javax.swing.*;
+import java.util.SortedSet;
+import javax.swing.JDesktopPane;
+import javax.swing.JOptionPane;
 
-import org.mov.quote.*;
-import org.mov.util.*;
+import org.mov.quote.Symbol;
+import org.mov.quote.SymbolFormatException;
+import org.mov.util.Locale;
 
 /**
  * A set of dialogs used for querying the user for commodities either
@@ -122,10 +123,10 @@ public class SymbolListDialog {
 
 	    // First prompt user for symbol
 	    TextDialog dialog = new TextDialog(parent, 
-                                               "Please enter symbol",
+                                               Locale.getString("SYMBOL"),
                                                title);
 	    symbolString = dialog.showDialog();
-					    
+            
 	    // Parse what the user inputed
 	    if(symbolString != null) {
 		
@@ -138,7 +139,7 @@ public class SymbolListDialog {
 
                     JOptionPane.showInternalMessageDialog(parent, 
                                                           e.getReason(),
-                                                          "Error parsing symbol",
+                                                          Locale.getString("ERROR_PARSING_SYMBOL"),
                                                           JOptionPane.ERROR_MESSAGE);
                 }
 	    }
@@ -173,7 +174,7 @@ public class SymbolListDialog {
 
 	    // First prompt user for list
 	    TextDialog dlg = new TextDialog(parent, 
-					    "Please enter symbol(s)",
+					    Locale.getString("SYMBOLS"),
                                             title);
 	    symbols = dlg.showDialog();
 					    
@@ -189,7 +190,7 @@ public class SymbolListDialog {
 
                     JOptionPane.showInternalMessageDialog(parent, 
                                                           e.getReason(),
-                                                          "Error parsing symbols",
+                                                          Locale.getString("ERROR_PARSING_SYMBOLS"),
                                                           JOptionPane.ERROR_MESSAGE);
                 }
 	    }

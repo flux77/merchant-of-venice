@@ -18,21 +18,21 @@
 
 package org.mov.ui;
 
-import org.mov.prefs.*;
-import org.mov.quote.*;
-import org.mov.util.*;
+import java.util.ArrayList;
+import java.util.SortedSet;
+import javax.swing.JComboBox;
 
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import org.mov.quote.QuoteRange;
+import org.mov.quote.Symbol;
+import org.mov.quote.SymbolFormatException;
+import org.mov.util.Locale;
 
 public class SymbolListComboBox extends JComboBox {
 
     // Drop down menu choices 
-    private final static String ALL_ORDINARIES = "All Ordinaries";
-    private final static String ALL_SYMBOLS    = "All Symbols";
-    private final static String MARKET_INDICES = "Market Indices";
+    private final static String ALL_ORDINARIES = Locale.getString("ALL_ORDINARIES");
+    private final static String ALL_SYMBOLS    = Locale.getString("ALL_SYMBOLS");
+    private final static String MARKET_INDICES = Locale.getString("MARKET_INDICES");
 
     public SymbolListComboBox() {
 	this(new String(""));
@@ -47,7 +47,7 @@ public class SymbolListComboBox extends JComboBox {
 
         // The combo box must be big enough to hold this text. This makes it
         // as wide as the equation combo box. Yes but on 1.4.1 it makes them short!
-	//setPrototypeDisplayValue("avg(day_close, 15, 15) > 121");
+	//setPrototypeDisplayValue("avg(close, 15, 15) > 121");
     }
     
     public QuoteRange getQuoteRange()
@@ -70,7 +70,7 @@ public class SymbolListComboBox extends JComboBox {
 
             // If it returned empty there was an error...
             if(symbolSet.isEmpty())
-                throw new SymbolFormatException("Missing symbols.");
+                throw new SymbolFormatException(Locale.getString("MISSING_SYMBOLS"));
             else
                 return new QuoteRange(new ArrayList(symbolSet));
         }

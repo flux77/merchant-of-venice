@@ -39,6 +39,7 @@ import javax.swing.border.TitledBorder;
 import org.mov.main.ModuleFrame;
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.StoredEquation;
+import org.mov.util.Locale;
 
 public class ExpressionEditorDialog {
 
@@ -86,9 +87,9 @@ public class ExpressionEditorDialog {
 
         if(displayName) {
             JPanel innerNamePanel = new JPanel();
-            innerNamePanel.add(new JLabel("Name:"));
+            innerNamePanel.add(new JLabel(Locale.getString("NAME")));
             innerNamePanel.add(nameField);
-
+            
             JPanel namePanel = new JPanel();
             namePanel.setLayout(new BorderLayout());
             namePanel.add(innerNamePanel, BorderLayout.WEST);
@@ -101,7 +102,7 @@ public class ExpressionEditorDialog {
         equationEditor.setText(equation);
         equationEditor.setEditable(isEditable);
 
-        TitledBorder titledBorder = new TitledBorder("Equation");
+        TitledBorder titledBorder = new TitledBorder(Locale.getString("EQUATION"));
         equationPanel.setLayout(new BorderLayout());
         equationPanel.setBorder(titledBorder);
         equationPanel.add(new JScrollPane(equationEditor));
@@ -109,7 +110,7 @@ public class ExpressionEditorDialog {
         panel.add(equationPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
-        JButton okButton = new JButton("OK");
+        JButton okButton = new JButton(Locale.getString("OK"));
         okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     // Update equation
@@ -124,7 +125,7 @@ public class ExpressionEditorDialog {
 
         // The cancel button may not be displayed
         if(buttonArray == OK_CANCEL_BUTTON) {
-            JButton cancelButton = new JButton("Cancel");
+            JButton cancelButton = new JButton(Locale.getString("CANCEL"));
             cancelButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         // User cancelled dialog so don't modify equation
@@ -311,8 +312,8 @@ public class ExpressionEditorDialog {
 
 	if(newName.length() == 0) {
 	    JOptionPane.showInternalMessageDialog(DesktopManager.getDesktop(),
-						  "Missing equation name.",
-						  "Error parsing stored equation",
+						  Locale.getString("MISSING_EQUATION_NAME"),
+						  Locale.getString("ERROR_STORING_EQUATION"),
 						  JOptionPane.ERROR_MESSAGE);
 	    isValid = false;
 	}
@@ -331,8 +332,9 @@ public class ExpressionEditorDialog {
 	    
 	    if(isDuplicateName) {
 		JOptionPane.showInternalMessageDialog(DesktopManager.getDesktop(),
-						      "Equation name '" + newName + "' is already being used.",
-						      "Error parsing stored equation",
+                                                      Locale.getString("DUPLICATE_EQUATION_NAME",
+                                                                       newName),
+						      Locale.getString("ERROR_STORING_EQUATION"),
 						      JOptionPane.ERROR_MESSAGE);
 		isValid = false;
 	    }

@@ -68,15 +68,20 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
 						   TradingDate.US);
 
 		// Convert all prices from cents to dollars
-		float day_open = Float.parseFloat(quoteParts[i++]) / 100;
-		float day_high = Float.parseFloat(quoteParts[i++]) / 100;
-		float day_low = Float.parseFloat(quoteParts[i++]) / 100;
-		float day_close = Float.parseFloat(quoteParts[i++]) / 100;
-
-		// Convert volume from 1/100th volume to real volume
-		int volume = Integer.parseInt(quoteParts[i++]) * 100;
-		quote = new Quote(symbol, date, volume, day_low, day_high,
-				  day_open, day_close);
+                try {
+                    float day_open = Float.parseFloat(quoteParts[i++]) / 100;
+                    float day_high = Float.parseFloat(quoteParts[i++]) / 100;
+                    float day_low = Float.parseFloat(quoteParts[i++]) / 100;
+                    float day_close = Float.parseFloat(quoteParts[i++]) / 100;
+                    
+                    // Convert volume from 1/100th volume to real volume
+                    int volume = Integer.parseInt(quoteParts[i++]) * 100;
+                    quote = new Quote(symbol, date, volume, day_low, day_high,
+                                      day_open, day_close);
+                } 
+                catch(NumberFormatException e) {
+                    // Return null - couldn't parse quote
+                }
 	    }	    
 	}
 	return quote;

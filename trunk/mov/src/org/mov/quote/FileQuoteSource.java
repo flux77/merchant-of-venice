@@ -70,11 +70,6 @@ public class FileQuoteSource implements QuoteSource
     // Filter to convert data into quote
     private QuoteFilter filter;
 
-    // When reading in the first quote - don't read the whole file,
-    // we don't need it. Make sure we read in this amount and no more.
-    // (Two lines).
-    private final static int ONE_LINE_BUFFER_SIZE = 160;
-
     /**
      * Creates a new quote source using the list of files specified in the user
      * preferences.
@@ -96,16 +91,23 @@ public class FileQuoteSource implements QuoteSource
     private TradingDate getContainedDate(URL fileURL)
 	throws IOException {
 
-	TradingDate date = null;
-
         InputStreamReader isr = new InputStreamReader(fileURL.openStream());
-        BufferedReader br = new BufferedReader(isr, ONE_LINE_BUFFER_SIZE);
-        Quote quote = filter.toQuote(br.readLine());
-        if(quote != null)
-            date = quote.getDate();
-        br.close();
+        BufferedReader br = new BufferedReader(isr);
+        String line = br.readLine();
 
-	return date;
+        // Keep reading each line until we find a valid quote and then
+        // return its date
+        while(line != null) {
+            Quote quote = filter.toQuote(line);
+
+            if(quote != null) 
+                return quote.getDate();
+            else
+                line = br.readLine();
+        }
+
+        // Couldn't find a legal quote...
+	return null;
     }
 
     // Given a quote range and a file name, return a list of all
@@ -128,7 +130,6 @@ public class FileQuoteSource implements QuoteSource
 
                 // Legal quote?
                 if(quote != null) {
-
                     assert quote.getSymbol() != null;
 
                     // Is this one of the ones we are looking for?

@@ -8,6 +8,7 @@ import java.awt.event.*;
 import java.awt.BorderLayout;
 import java.beans.PropertyVetoException;
 import javax.swing.*;
+import javax.swing.event.*;
 
 import org.mov.main.*;
 
@@ -28,6 +29,8 @@ public class DesktopManager
 
     private static JDesktopPane desktop_instance = null;
 
+    private static EventListenerList moduleListeners = new EventListenerList();
+
     public static void setDesktop(JDesktopPane desktop) {
 	desktop_instance = desktop;
     }
@@ -39,6 +42,65 @@ public class DesktopManager
     public DesktopManager(JDesktopPane desktop) {
 	super();
 	setDesktop(desktop);
+    }
+
+    public void addModuleListener(ModuleListener moduleListener) {
+	moduleListeners.add(ModuleListener.class, moduleListener);
+    }
+
+    public void removeModuleListener(ModuleListener moduleListener) {
+	moduleListeners.remove(ModuleListener.class, moduleListener);
+    }
+
+    private void fireModuleAdded(Module module) {
+	ModuleEvent event = null;
+
+	// Guaranteed to return a non-null array
+	Object[] listeners = moduleListeners.getListenerList();
+	// Process the listeners last to first, notifying
+	// those that are interested in this event
+	for (int i = listeners.length-2; i>=0; i-=2) {
+	    if (listeners[i]==ModuleListener.class) {
+		// Lazily create the event:
+		if (event == null)
+		    event = new ModuleEvent(module);
+		((ModuleListener)listeners[i+1]).moduleAdded(event);
+	    }
+	}
+    }
+
+    public void fireModuleRemoved(Module module) {
+	ModuleEvent event = null;
+
+	// Guaranteed to return a non-null array
+	Object[] listeners = moduleListeners.getListenerList();
+	// Process the listeners last to first, notifying
+	// those that are interested in this event
+	for (int i = listeners.length-2; i>=0; i-=2) {
+	    if (listeners[i]==ModuleListener.class) {
+		// Lazily create the event:
+		if (event == null)
+		    event = new ModuleEvent(module);
+		((ModuleListener)listeners[i+1]).moduleRemoved(event);
+	    }
+	}
+    }
+
+    public void fireModuleRenamed(Module module) {
+	ModuleEvent event = null;
+
+	// Guaranteed to return a non-null array
+	Object[] listeners = moduleListeners.getListenerList();
+	// Process the listeners last to first, notifying
+	// those that are interested in this event
+	for (int i = listeners.length-2; i>=0; i-=2) {
+	    if (listeners[i]==ModuleListener.class) {
+		// Lazily create the event:
+		if (event == null)
+		    event = new ModuleEvent(module);
+		((ModuleListener)listeners[i+1]).moduleRenamed(event);
+	    }
+	}
     }
 
     /**
@@ -284,7 +346,7 @@ public class DesktopManager
     public ModuleFrame newFrame(Module module, boolean centre, 
 				boolean honourSize) {
 
-	ModuleFrame frame = new ModuleFrame(module, centre, honourSize);
+	ModuleFrame frame = new ModuleFrame(this, module, centre, honourSize);
 	desktop_instance.add(frame);
 	
 	try {
@@ -295,6 +357,8 @@ public class DesktopManager
 	}
 	
 	frame.moveToFront();		    
+
+	fireModuleAdded(module);
 
 	return frame;
     }

@@ -10,6 +10,7 @@ package org.mov.util;
 import java.lang.*;
 import java.sql.*;
 import java.util.*;
+import java.util.prefs.*;
 import javax.swing.*;
 
 import org.mov.portfolio.*;
@@ -44,17 +45,14 @@ public class Database
 	}
 	return instance;
     }
-
-    private DatabaseLookup db;
-
+    
     private Database() {
-	db = new DatabaseLookup();
-
 	// Get driver
+	DatabaseLookup db = DatabaseLookup.getInstance();
 	try {
 	    // The newInstance() call is a work around for some
 	    // broken Java implementations
-	    Class.forName(db.driverclass).newInstance(); 
+	    Class.forName(db.get("driverclass")).newInstance(); 
 	    
 	}
 	catch (Exception E) {
@@ -66,32 +64,23 @@ public class Database
 	connect();
     }
 
+    DatabaseLookup db;
+
     private void connect() {
 
 	try {
+	     db = DatabaseLookup.getInstance();
+
 	    connection = 
 		DriverManager.
-		getConnection("jdbc:"+db.drivername+"://db/shares?user="+db.user+"&password="+db.password);
+		getConnection("jdbc:"+db.get("drivername")+"://"+db.get("host")+
+			      "/"+db.get("dbname")+
+			      "?user="+db.get("username")+
+			      "&password="+db.get("password"));
 	}
 	catch (SQLException E) {
-
-	    // If we got here - maybe mysql daemon hasnt started
-	    if(!launchedMysql) {
-		try {
-		    Runtime.getRuntime().exec("mysqld");
-		} catch(java.io.IOException i) {
-		    // Display original database connect error
-		    System.out.println(E.getMessage());
-		    System.exit(0);
-		}
-
-		launchedMysql = true;
-		connect(); // try to connect again
-	    }
-	    else { // tried the above - bomb
-		System.out.println(E.getMessage());
-		System.exit(0);
-	    }
+	    System.out.println(E.getMessage());
+	    System.exit(0);
 	}
     }
 
@@ -109,7 +98,7 @@ public class Database
 		Statement statement = connection.createStatement();
 		
 		ResultSet RS = statement.executeQuery
-		    ("SELECT "+db.info.name+" FROM "+db.info+" WHERE "+db.info.symbol+" = '"
+		    ("SELECT "+db.get("info.name")+" FROM "+db.get("info")+" WHERE "+db.get("info.symbol")+" = '"
 		     + symbol.toUpperCase() + "'");
 
 		// Import SQL data into vector
@@ -144,8 +133,8 @@ public class Database
 		
 		ResultSet RS = statement.executeQuery
 		    ("SELECT " + symbol.toUpperCase() + 
-		     " FROM "+db.info+" WHERE LOCATE(" +
-		     "UPPER('" + partialCompanyName + "'), "+db.info.name+") != 0");
+		     " FROM "+db.get("info")+" WHERE LOCATE(" +
+		     "UPPER('" + partialCompanyName + "'), "+db.get("info.name")+") != 0");
 
 		// Import SQL data into vector
 		RS.next();
@@ -182,7 +171,7 @@ public class Database
 		Statement statement = connection.createStatement();
 		
 		ResultSet RS = statement.executeQuery
-		    ("SELECT MIN("+db.prices.date+") FROM shares WHERE "+db.prices.symbol+" = '"
+		    ("SELECT MIN("+db.get("prices.date")+") FROM shares WHERE "+db.get("prices.symbol")+" = '"
 		     + symbol.toUpperCase() + "'");
 
 		// Import SQL data into vector
@@ -216,7 +205,7 @@ public class Database
 		Statement statement = connection.createStatement();
 		
 		ResultSet RS = statement.executeQuery
-		    ("SELECT MAX("+db.prices.date+") FROM "+db.prices);
+		    ("SELECT MAX("+db.get("prices.date")+") FROM "+db.get("prices"));
 
 		// Import SQL data into vector
 		RS.next();
@@ -253,13 +242,13 @@ public class Database
 		int i = 0;
 
 		while (RS.next()) {
-		    table.add(new Stock(RS.getString(db.prices.symbol).toLowerCase(),
-					new TradingDate(RS.getDate(db.prices.date)),
-					RS.getInt(db.prices.volume),
-					RS.getFloat(db.prices.low),
-					RS.getFloat(db.prices.high),
-					RS.getFloat(db.prices.open),
-					RS.getFloat(db.prices.close)));
+		    table.add(new Stock(RS.getString(db.get("prices.symbol")).toLowerCase(),
+					new TradingDate(RS.getDate(db.get("prices.date"))),
+					RS.getInt(db.get("prices.volume")),
+					RS.getFloat(db.get("prices.low")),
+					RS.getFloat(db.get("prices.high")),
+					RS.getFloat(db.get("prices.open")),
+					RS.getFloat(db.get("prices.close"))));
 		}
 		// Clean up after ourselves
 		RS.close();
@@ -303,7 +292,7 @@ public class Database
     }
 
     private String selectAllString() {
-	return "SELECT * FROM "+db.prices;
+	return "SELECT * FROM "+db.get("prices");
     }
 
     private String whereClauseString() {
@@ -312,12 +301,12 @@ public class Database
 
     private String dateRangeString(TradingDate startDate,
 				   TradingDate endDate) {
-	return db.prices.date+" >= '" + startDate + "' " + andString() + 
-	    db.prices.date+" <= '" + endDate + "' ";
+	return db.get("prices.date")+" >= '" + startDate + "' " + andString() + 
+	    db.get("prices.date")+" <= '" + endDate + "' ";
     }
 
     private String dateString(TradingDate date) {
-	return db.prices.date+" = '" + date + "' ";
+	return db.get("prices.date")+" = '" + date + "' ";
     }
 
     private String andString() {
@@ -326,23 +315,24 @@ public class Database
 
     private String restrictTypeString(int type) {
 	if(type == ALL_COMMODITIES)
-	    return "LEFT("+db.prices.symbol+", 1) != 'X' ";
+	    return "LEFT("+db.get("prices.symbol")+", 1) != 'X' ";
     
 	else if(type == COMPANIES_AND_FUNDS)
-	    return "LENGTH("+db.prices.symbol+") = 3 " + andString() + 
-		"LEFT("+db.prices.symbol+",1) != 'X' ";
+	    return "LENGTH("+db.get("prices.symbol")+") = 3 " + andString() + 
+		"LEFT("+db.get("prices.symbol")+",1) != 'X' ";
 	
 	else
-	    return "LENGTH("+db.prices.symbol+") = 3 " + andString() + 
-		"LEFT("+db.prices.symbol+", 1) = 'X' ";
+	    return "LENGTH("+db.get("prices.symbol")+") = 3 " + andString() + 
+		"LEFT("+db.get("prices.symbol")+", 1) = 'X' ";
     }
 
     private String specificSymbolString(String symbol) {
-	return db.prices.symbol+" = '" + symbol + "' ";
+	return db.get("prices.symbol")+" = '" + symbol + "' ";
     }
 
     private String orderByDateString() {
-	return "ORDER BY "+db.prices.date;
+	return "ORDER BY "+db.get("prices.date");
     }
 }
+
 

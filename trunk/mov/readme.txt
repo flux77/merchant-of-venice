@@ -1,4 +1,4 @@
-Merchant of Venice, 0.1 alpha 07/Feb/2003
+Merchant of Venice, 0.1 alpha 13/Apr/2003
 =========================================
 
 Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
@@ -19,13 +19,10 @@ of the project is to re-implement Genetic Programming.
 
 2 Running
 
-To run Venice you will need the following packages, available from the
-following locations:
-
-   Java J2SE 1.4 or higher
+To run Venice you will need Java J2SE 1.4 or higher, available from the
+following location:
+   
         http://java.sun.com/j2se/1.4.1/download.html
-   Java Look & Feel Graphics Repository
-        http://developer.java.sun.com/developer/techDocs/hi/repository/
 
 The following packages are optional:
 
@@ -47,7 +44,7 @@ The following packages are optional:
 
 Once they are set up, you can run Venice by typing from the command prompt:
 
-   ./venice
+   sh venice
 
 Or in Windows by clicking on the "venice.jar" file.
 
@@ -97,6 +94,7 @@ backup  Pulls a backup copy of the CVS tree from Sourceforge and stores it
         in the backup directory.
 clean   Removes all built and temporary files
 doc     Builds the documentation
+jar     Create a java archive file for Venice
 release Packages Venice into a file ready for release
 test    Runs the automated test suite
 web     Packages the web files ready for deployment

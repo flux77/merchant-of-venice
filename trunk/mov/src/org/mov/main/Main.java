@@ -54,7 +54,7 @@ public class Main extends JFrame implements WindowListener {
     public static String LONG_VERSION  = "0.1 alpha";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE  = "13/Jan/2003";
+    public static String RELEASE_DATE  = "13/Apr/2003";
 
     /**
      * Get the main frame for the current application

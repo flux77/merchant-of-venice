@@ -39,7 +39,7 @@ public class Variables {
     public void add(String name, int type, float value) {
         if(!variables.containsKey(name)) {
             Variable variable = new Variable(name, type, value);
-            variables.put(variable, name);
+            variables.put(name, variable);
         }
         else
             assert false;

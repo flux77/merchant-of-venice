@@ -107,6 +107,7 @@ public class Portfolio implements Cloneable {
 		// Is this account involved in the transaction? If it
 		// it is we'll need to update it
 		if(account == transaction.getCashAccount() ||
+		   account == transaction.getCashAccount2() ||
 		   account == transaction.getShareAccount()) {
 		    account.transaction(transaction);
 		}
@@ -180,22 +181,22 @@ public class Portfolio implements Cloneable {
     }
 
     /**
-     * Return if this portfolio has the following account type.
+     * Return the number of accounts of the given type the portfolio has
      *
      * @param	type	account type, e.g. {@link Account#CASH_ACCOUNT}
-     * @return	<code>1</code> if the portfolio has the account type;
-     *		<code>0</code> otherwise
+     * @return	number of accounts of the given type
      */
-    public boolean hasAccount(int type) {
+    public int countAccounts(int type) {
 	Iterator iterator = accounts.iterator();
+	int count = 0;
 
 	while(iterator.hasNext()) {
 	    Account account = (Account)iterator.next();
 	    if(account.getType() == type)
-		return true;
+		count++;
 	}
 
-	return false;
+	return count;
     }
 
     /**

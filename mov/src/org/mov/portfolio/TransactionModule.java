@@ -106,6 +106,7 @@ public class TransactionModule extends AbstractTable implements Module,
 		case(Transaction.DEPOSIT):
 		case(Transaction.DIVIDEND):
 		case(Transaction.INTEREST):
+		case(Transaction.TRANSFER):
 		    credit = new Float(transaction.getAmount());
 		    break;
 		}
@@ -118,6 +119,7 @@ public class TransactionModule extends AbstractTable implements Module,
 		switch(type) {
 		case(Transaction.WITHDRAWAL):
 		case(Transaction.FEE):
+		case(Transaction.TRANSFER):
 		    debit = new Float(transaction.getAmount());
 		    break;
 		case(Transaction.ACCUMULATE):
@@ -167,6 +169,15 @@ public class TransactionModule extends AbstractTable implements Module,
 					 transaction.getShares() +
 					 " " +
 					 transaction.getSymbol());
+	    break;
+
+	case(Transaction.TRANSFER):
+	    transactionString = 
+		transactionString.concat(" from " +
+					 transaction.getCashAccount().getName() +
+					 " to " +
+					 transaction.getCashAccount2().getName());
+
 	    break;
 	}
 	

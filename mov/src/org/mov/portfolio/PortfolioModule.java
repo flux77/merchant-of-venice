@@ -129,10 +129,10 @@ public class PortfolioModule extends JPanel implements Module,
 
     // You can only create transactions if youve got a cash account
     private void checkMenuDisabledStatus() {
-	boolean hasCashAccount = portfolio.hasAccount(Account.CASH_ACCOUNT);
+	int hasCashAccount = portfolio.countAccounts(Account.CASH_ACCOUNT);
 
-	transactionNew.setEnabled(hasCashAccount);
-	transactionShowHistory.setEnabled(hasCashAccount);
+	transactionNew.setEnabled(hasCashAccount > 0);
+	transactionShowHistory.setEnabled(hasCashAccount > 0);
     }
 
     /**
@@ -491,6 +491,7 @@ public class PortfolioModule extends JPanel implements Module,
 		    int shares = Integer.valueOf(parts[i++]).intValue();
 		    float tradeCost = Float.valueOf(parts[i++]).floatValue();
 		    String cashAccountName = parts[i++];
+		    String cashAccountName2 = parts[i++];
 		    String shareAccountName = "";
 
 		    // This may be ommited in the imported string as it
@@ -502,6 +503,7 @@ public class PortfolioModule extends JPanel implements Module,
 		    // Convert the cash/share accounts to a string - if
 		    // we don't have the account in the portfolio, create it
 		    CashAccount cashAccount = null;
+		    CashAccount cashAccount2 = null;
 		    ShareAccount shareAccount = null;
 
 		    if(!cashAccountName.equals("")) {
@@ -512,6 +514,18 @@ public class PortfolioModule extends JPanel implements Module,
 			if(cashAccount == null) { 
 			    cashAccount = new CashAccount(cashAccountName);
 			    portfolio.addAccount(cashAccount);
+			}
+		    }
+
+
+		    if(!cashAccountName2.equals("")) {
+			cashAccount2 = (CashAccount)
+			    portfolio.findAccountByName(cashAccountName2);
+
+			// If its not found then create it
+			if(cashAccount2 == null) { 
+			    cashAccount2 = new CashAccount(cashAccountName2);
+			    portfolio.addAccount(cashAccount2);
 			}
 		    }
 
@@ -528,7 +542,7 @@ public class PortfolioModule extends JPanel implements Module,
 		    
 		    Transaction transaction = 
 			new Transaction(type, date, amount, symbol, shares,
-					tradeCost, cashAccount, shareAccount);
+					tradeCost, cashAccount, cashAccount2, shareAccount);
 		    portfolio.addTransaction(transaction);
 
 		    line = br.readLine();

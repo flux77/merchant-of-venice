@@ -46,6 +46,7 @@ public class TransactionDialog extends JInternalFrame
     private JTextField sharesTextField;
     private JTextField tradeCostTextField;
     private JComboBox cashAccountComboBox;
+    private JComboBox cashAccountComboBox2;
     private JComboBox shareAccountComboBox;
 
     private Portfolio portfolio;
@@ -91,7 +92,7 @@ public class TransactionDialog extends JInternalFrame
 
 	// If the portfolio only has a cash account then dont display
 	// the share transactions
-	if(portfolio.hasAccount(Account.SHARE_ACCOUNT)) {
+	if(portfolio.countAccounts(Account.SHARE_ACCOUNT) > 0) {
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.ACCUMULATE));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.DEPOSIT));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.DIVIDEND));
@@ -99,12 +100,20 @@ public class TransactionDialog extends JInternalFrame
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.FEE));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.INTEREST));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.REDUCE));
+
+	    if(portfolio.countAccounts(Account.CASH_ACCOUNT) >= 2) 
+		typeComboBox.addItem(Transaction.typeToString(Transaction.TRANSFER));
+
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.WITHDRAWAL));
 	}
 	else {
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.DEPOSIT));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.FEE));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.INTEREST));
+
+	    if(portfolio.countAccounts(Account.CASH_ACCOUNT) >= 2) 
+		typeComboBox.addItem(Transaction.typeToString(Transaction.TRANSFER));
+
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.WITHDRAWAL));
 	}
 
@@ -129,12 +138,12 @@ public class TransactionDialog extends JInternalFrame
 	buttonPanel.add(cancelButton);
   
 	getContentPane().add(mainPanel, BorderLayout.NORTH);
-
 	getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
 	setFrameSize();
 
-	if(portfolio.hasAccount(Account.SHARE_ACCOUNT))
+	// Work out starting panel
+	if(portfolio.countAccounts(Account.SHARE_ACCOUNT) > 0)
 	    transactionPanel = getTradePanel();
 	else
 	    transactionPanel = getCashPanel();
@@ -158,6 +167,25 @@ public class TransactionDialog extends JInternalFrame
 	}
 
 	return cashAccountComboBox; 
+    }
+
+
+    // Get second combo box listing cash accounts
+    private JComboBox getCashAccountComboBox2() {
+	Vector accounts = portfolio.getAccounts();
+	Iterator iterator = accounts.iterator();
+
+	cashAccountComboBox2 = new JComboBox();
+	
+	while(iterator.hasNext()) {
+	    Account account = (Account)iterator.next();
+
+	    if(account.getType() == Account.CASH_ACCOUNT) 
+		cashAccountComboBox2.addItem(account.getName());
+
+	}
+
+	return cashAccountComboBox2; 
     }
 
     // Get combo box listing share accounts
@@ -355,6 +383,51 @@ public class TransactionDialog extends JInternalFrame
 	return borderPanel;
     }
 
+    // Get panel displayed when user enters a cash transfer
+    private JPanel getTransferPanel() {
+	JPanel borderPanel = new JPanel();
+	TitledBorder titled = new TitledBorder("Transfer");
+	borderPanel.setBorder(titled);
+	borderPanel.setLayout(new BorderLayout());
+
+	JPanel panel = new JPanel();
+	GridBagLayout gridbag = new GridBagLayout();
+	GridBagConstraints c = new GridBagConstraints();
+	panel.setLayout(gridbag);
+
+	c.weightx = 1.0;
+	c.ipadx = 5;
+	c.anchor = GridBagConstraints.WEST;
+
+	JLabel cashAccountLabel = new JLabel("Source Cash Account");
+	c.gridwidth = 1;
+	gridbag.setConstraints(cashAccountLabel, c);
+	panel.add(cashAccountLabel);
+
+	JComboBox cashAccountComboBox = getCashAccountComboBox();
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(cashAccountComboBox, c);
+	panel.add(cashAccountComboBox);
+
+	JLabel cashAccountLabel2 = new JLabel("Destination Cash Account");
+	c.gridwidth = 1;
+	gridbag.setConstraints(cashAccountLabel2, c);
+	panel.add(cashAccountLabel2);
+
+	JComboBox cashAccountComboBox2 = getCashAccountComboBox2();
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(cashAccountComboBox2, c);
+	panel.add(cashAccountComboBox2);
+	
+	amountTextField =
+	    addTextRow(panel, "Amount", "", gridbag, c,
+		       15);
+
+	borderPanel.add(panel, BorderLayout.NORTH);
+
+	return borderPanel;
+    }
+
     // Helper method which adds a new text field in a new row to the given 
     // grid bag layout.
     private JTextField addTextRow(JPanel panel, String field, String value,
@@ -404,6 +477,10 @@ public class TransactionDialog extends JInternalFrame
 	height = Math.max(height, preferred.height);
 
 	preferred = getPreferredSizeWithPanel(getTradePanel());
+	width = Math.max(width, preferred.width);
+	height = Math.max(height, preferred.height);
+
+	preferred = getPreferredSizeWithPanel(getTransferPanel());
 	width = Math.max(width, preferred.width);
 	height = Math.max(height, preferred.height);
 
@@ -531,12 +608,18 @@ public class TransactionDialog extends JInternalFrame
 	    symbolTextField.setText(transaction.getSymbol());
 	    amountTextField.setText(String.valueOf(transaction.getAmount()));
 	}
-	else { 
-	    assert type == Transaction.DIVIDEND_DRP;
+	else if(type == Transaction.DIVIDEND_DRP) {
 	    shareAccountComboBox.setSelectedItem(transaction.getShareAccount().getName());
 	    symbolTextField.setText(transaction.getSymbol());
 	    sharesTextField.setText(String.valueOf(transaction.getShares()));
 	}       
+	else {
+	    assert type == Transaction.TRANSFER;
+
+	    cashAccountComboBox.setSelectedItem(transaction.getCashAccount().getName());
+	    cashAccountComboBox2.setSelectedItem(transaction.getCashAccount2().getName());
+	    amountTextField.setText(String.valueOf(transaction.getAmount()));	    
+	}
     }
 
     // Changes the transaction panel we are displaying depending on the type
@@ -556,9 +639,12 @@ public class TransactionDialog extends JInternalFrame
 	else if(type == Transaction.DIVIDEND) {
 	    transactionPanel = getDividendPanel();
 	}
-	else { 
-	    assert type == Transaction.DIVIDEND_DRP;
+	else if(type == Transaction.DIVIDEND_DRP) {
 	    transactionPanel = getDividendDRPPanel();
+	}
+	else {
+	    assert type == Transaction.TRANSFER;
+	    transactionPanel = getTransferPanel();
 	}
 	
 	getContentPane().add(transactionPanel, BorderLayout.CENTER);
@@ -623,6 +709,14 @@ public class TransactionDialog extends JInternalFrame
 		(CashAccount)portfolio.findAccountByName(accountName);
 	}
 
+	CashAccount cashAccount2 = null;
+	if(cashAccountComboBox2 != null) {
+	    String accountName = 
+		(String)cashAccountComboBox2.getSelectedItem();
+	    cashAccount2 = 
+		(CashAccount)portfolio.findAccountByName(accountName);
+	}
+
 	ShareAccount shareAccount = null;
 	if(shareAccountComboBox != null) {
 	    String accountName = 
@@ -678,6 +772,15 @@ public class TransactionDialog extends JInternalFrame
 	    return null;
 	}
 
+	// When transferring money - it must be between two different accounts
+	if(type == Transaction.TRANSFER && cashAccount == cashAccount2) {
+	    JOptionPane.showInternalMessageDialog(desktop, 
+						  "Source and destination accounts are the same",
+						  "Error building transaction",
+						  JOptionPane.ERROR_MESSAGE);
+	    return null;
+	}
+	    
 	// If we are using the stock symbol check that its valid
 	if((type == Transaction.ACCUMULATE || type == Transaction.REDUCE ||
 	    type == Transaction.DIVIDEND_DRP) &&
@@ -739,6 +842,13 @@ public class TransactionDialog extends JInternalFrame
 	    transaction = Transaction.newDividendDRP(date, amount,
 						     symbol, shares,
 						     shareAccount);
+	}
+
+	else {
+	    assert type == Transaction.TRANSFER;
+	    transaction = Transaction.newTransfer(date, amount,
+						  cashAccount,
+						  cashAccount2);
 	}
 
 	return transaction;

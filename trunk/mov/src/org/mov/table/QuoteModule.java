@@ -12,6 +12,7 @@ import org.mov.main.*;
 import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
+import org.mov.ui.AnalyserDesktopManager;
 
 public class QuoteModule extends AbstractTable
     implements Module {
@@ -116,24 +117,25 @@ public class QuoteModule extends AbstractTable
 	}
     }
 
-    public QuoteModule(JDesktopPane desktop, QuoteCache cache) {
-	newTable(desktop, cache, null);
+    public QuoteModule(QuoteCache cache) {
+	newTable(cache, null);
     }
 
-    public QuoteModule(JDesktopPane desktop, QuoteCache cache, 
+    public QuoteModule(QuoteCache cache, 
 		      org.mov.parser.Expression expression) {
-	newTable(desktop, cache, expression);
+	newTable(cache, expression);
     }
 
-    private void newTable(JDesktopPane desktop, QuoteCache cache, 
+    private void newTable(QuoteCache cache, 
 			  org.mov.parser.Expression expression) {
-
+	
+	
 	this.expression = expression;
 	this.cache = cache;
 
 	// If theres a rule, create restricted list of symbols to display
 	if(expression != null)
-	    symbols = extractSymbolsUsingRule(desktop, cache);
+	    symbols = extractSymbolsUsingRule(cache);
 	else
 	    symbols = cache.getSymbols();
 
@@ -146,52 +148,9 @@ public class QuoteModule extends AbstractTable
 	setGreenColumn(DAY_HIGH_COLUMN);
     }
 
-    public String getTitle() {
-	// Get date in cache (should only be one so get the first one)
-	String dateString = "???";
-	Iterator iterator = cache.dateIterator();       
-	if(iterator.hasNext()) {
-	    TradingDate date = (TradingDate)iterator.next();
-	    dateString = date.toLongString();
-	}
+    
 
-	String expressionString = "";
-	if(expression != null) 
-	    expressionString = " [" + expression + "]";
-
-	return "Stock Quotes for " + 
-	    dateString +
-	    expressionString + " (" +
-	    symbols.length +
-	    ")";	    
-    }
-
-    public void addModuleChangeListener (PropertyChangeListener listener) {
-	propertySupport.addPropertyChangeListener (listener);
-    }
-
-    public void removeModuleChangeListener (PropertyChangeListener listener)
-    {
-        propertySupport.removePropertyChangeListener (listener);
-    }
-
-    public JComponent getComponent() {
-	return this;
-    }
-
-    public JMenuBar getJMenuBar() {
-	return null;
-    }
-
-    public ImageIcon getFrameIcon() {
-	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource("images/TableIcon.gif"));
-    }
-    public boolean encloseInScrollPane() {
-	return true;
-    }
-
-    private Object[] extractSymbolsUsingRule(JDesktopPane desktop, 
-					     QuoteCache cache) {
+    private Object[] extractSymbolsUsingRule(QuoteCache cache) {
 
 	Object[] symbols = cache.getSymbols();
 
@@ -230,7 +189,7 @@ public class QuoteModule extends AbstractTable
 
 	    // Tell user expression didnt evaluate properly
 	    JOptionPane.
-		showInternalMessageDialog(desktop, 
+		showInternalMessageDialog(AnalyserDesktopManager.getDesktop(),
 					  e.getReason() + ": " +
 					  expression.toString(),
 					  "Error evaluating expression",

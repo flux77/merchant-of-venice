@@ -1,7 +1,5 @@
 package org.mov.chart.graph;
 
-// Implements Simple Moving Average
-
 import java.awt.*;
 import java.lang.*;
 import java.util.*;
@@ -12,12 +10,23 @@ import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
 
+/**
+ * Simple Moving Average graph. This graph draws a single moving
+ * average. When the line crosses the original graph it indicates
+ * a <b>Buy</b> or <b>Sell</b> recommendation.
+ */
 public class MovingAverageGraph extends AbstractGraph {
 
     private Graphable movingAverage;
     private GraphSource source;
     private HashMap annotations;
 
+    /**
+     * Create a new simple moving average graph.
+     *
+     * @param	source	the source to create a moving average from
+     * @param	period	the period of the moving average
+     */
     public MovingAverageGraph(GraphSource source, int period) {
 
 	super(source);
@@ -48,31 +57,51 @@ public class MovingAverageGraph extends AbstractGraph {
 	return null; // we never give tool tip information
     }
 
-    // Override base class method
+    /** 
+     * Return annotations containing buy/sell recommendations based on
+     * when the moving average crosses its source.
+     *
+     * @return	annotations
+     */
     public HashMap getAnnotations() {
 	return annotations;
     }
 
-    // Override base class method
+    /**
+     * Return that we support annotations.
+     *
+     * @return	<code>true</code>
+     */
     public boolean hasAnnotations() {
 	return true;
     }
 
-    // Override base class method
+    // Highest Y value is in the moving average graph
     public float getHighestY(Vector x) {
 	return movingAverage.getHighestY(x);
     }
 
-    // Override base class method
+    // Lowest Y value is in the moving average graph
     public float getLowestY(Vector x) {
 	return movingAverage.getLowestY(x);
     }
 
-    // Override base class method
+    /**
+     * Return the name of this graph.
+     *
+     * @return	<code>Moving Average</code>
+     */
     public String getName() {
 	return "Moving Average";
     }
 
+    /**
+     * Creates a new moving average based on the given data source.
+     *
+     * @param	source	the graph source to average
+     * @param	period	the desired period of the averaged data
+     * @return	the graphable containing averaged data from the source
+     */
     public static Graphable createMovingAverage(Graphable source, int period) {
 	Graphable movingAverage = new Graphable();
 
@@ -88,7 +117,7 @@ public class MovingAverageGraph extends AbstractGraph {
 	    Comparable x = (Comparable)iterator.next();
 
 	    average = QuoteFunctions.avg2(values,  
-					  i - Math.min(period, i),
+					  i - Math.min(period - 1, i),
 					  i + 1);
 	    i++;
 

@@ -780,7 +780,7 @@ public class CommandManager {
                             }
                         }
                     }
-		    
+
                     graphIndex(symbolsCopy);
                 }
             });
@@ -981,7 +981,7 @@ public class CommandManager {
 	    }
 	}
     }
-
+		
     /**
      * Displays the export quotes modules that allows the user to export
      * quotes from the application.

@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -51,7 +50,6 @@ import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
 import org.mov.prefs.ProxyPage;
 import org.mov.prefs.PreferencesManager;
-import org.mov.ui.DesktopManager;
 import org.mov.ui.GridBagHelper;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;

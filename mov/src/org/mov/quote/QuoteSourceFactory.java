@@ -21,7 +21,6 @@ package org.mov.quote;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import org.mov.prefs.PreferencesManager;
 
@@ -118,20 +117,14 @@ public class QuoteSourceFactory {
      */
     public static DatabaseQuoteSource createDatabaseQuoteSource() {
         PreferencesManager.DatabasePreferences prefs = PreferencesManager.loadDatabaseSettings();
-        int software;
         
-        if(prefs.software.equals("mysql"))
-            software = DatabaseQuoteSource.MYSQL;
-        else if(prefs.software.equals("postgresql"))
-            software = DatabaseQuoteSource.POSTGRESQL;
-        else
-            software = DatabaseQuoteSource.HSQLDB;
-
-        return new DatabaseQuoteSource(software, 
-                                       prefs.host, 
-                                       prefs.port, 
-                                       prefs.database, 
-                                       prefs.username, 
-                                       prefs.password);
+        return new DatabaseQuoteSource(prefs.software, 
+                prefs.driver,
+                prefs.host, 
+                prefs.port, 
+                prefs.database, 
+                prefs.username, 
+                prefs.password);
     }
 }
+    

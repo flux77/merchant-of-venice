@@ -20,8 +20,6 @@ package org.mov.util;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.mov.prefs.PreferencesManager;
 

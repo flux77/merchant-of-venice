@@ -26,15 +26,12 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -56,7 +53,6 @@ import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
 
 /**
  * The export module allows exporting of quotes from Venice.

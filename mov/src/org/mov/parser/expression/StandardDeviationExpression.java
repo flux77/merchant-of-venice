@@ -22,7 +22,6 @@ import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
 import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
-import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteBundleFunctionSource;
 import org.mov.quote.QuoteFunctions;

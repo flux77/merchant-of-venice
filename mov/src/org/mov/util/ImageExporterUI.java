@@ -27,10 +27,6 @@
 
 package org.mov.util;
 
- import java.awt.*;
- import java.io.*;
- import java.awt.image.*;
-
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
 

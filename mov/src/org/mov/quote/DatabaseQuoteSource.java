@@ -76,6 +76,8 @@ public class DatabaseQuoteSource implements QuoteSource
     /** Hypersonic SQL Database. */
     public final static int HSQLDB      = 2;
 
+    /** Any generic SQL Database. */
+    public final static int OTHER       = 3;
     // Mode
 
     /** Internal database. */
@@ -85,16 +87,13 @@ public class DatabaseQuoteSource implements QuoteSource
     public final static int EXTERNAL = 1;
 
     // MySQL driver info
-    private final static String MYSQL_DRIVER_NAME = "mysql";
-    private final static String MM_MYSQL_DRIVER   = "org.gjt.mm.mysql.Driver";
-    private final static String MYSQL_DRIVER      = "com.mysql.jdbc.Driver";
+    public final static String MYSQL_SOFTWARE = "mysql";
 
     // PostgreSQL driver info
-    private final static String POSTGRESQL_DRIVER_NAME = "postgresql";
-    private final static String POSTGRESQL_DRIVER      = "org.postgresql.Driver";
+    public final static String POSTGRESQL_SOFTWARE = "postgresql";
 
     // Hypersonic SQL driver info
-    private final static String HSQLDB_DRIVER      = "org.hsqldb.jdbcDriver";
+    public final static String HSQLDB_SOFTWARE    = "hsql";
 
     // Shares table
     private final static String SHARE_TABLE_NAME  = "shares";
@@ -116,9 +115,12 @@ public class DatabaseQuoteSource implements QuoteSource
 
     // Database details
     private int mode;
-    private int software;
-
+    
+    private String software;
+    private String driver;
+    
     // Fields for external mode
+
     private String host;
     private String port;
     private String database;
@@ -135,20 +137,20 @@ public class DatabaseQuoteSource implements QuoteSource
     /**
      * Creates a new quote source to connect to an external database.
      *
-     * @param   software        the database software, either {@link #MYSQL},
-     *                          {@link #POSTGRESQL} or {@link #HSQLDB}.
-     * @param	host	the host location of the database
-     * @param	port	the port of the database
-     * @param	database	the name of the database
-     * @param	username	the user login
-     * @param	password	the password for the login
+     * @param   software  the database software
+     * @param   driver    the class name for the driver to connect to the database
+     * @param	host	  the host location of the database
+     * @param	port	  the port of the database
+     * @param	database  the name of the database
+     * @param	username  the user login
+     * @param	password  the password for the login
      */
-    public DatabaseQuoteSource(int software, String host, String port, 
+    public DatabaseQuoteSource(String software, String driver, String host, String port, 
 			       String database, String username, String password) {
-	assert software == MYSQL || software == POSTGRESQL || software == HSQLDB;
 
         this.mode = EXTERNAL;
-	this.software = software;
+        this.software = software;
+        this.driver = driver;
         this.host = host;
         this.port = port;
         this.database = database;
@@ -164,7 +166,7 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public DatabaseQuoteSource(String fileName) {
         mode = INTERNAL;
-        software = HSQLDB;
+        software = HSQLDB_SOFTWARE;
         this.fileName = fileName;
     }
 
@@ -175,14 +177,7 @@ public class DatabaseQuoteSource implements QuoteSource
         // Connect to database if we haven't already
         if(connection == null) {
             // Connect
-            if(software == MYSQL)
-                success = connectMySQL();
-            else if(software == POSTGRESQL)
-                success = connectPostgreSQL();
-            else {
-                assert software == HSQLDB;
-                success = connectHSQLDB();
-            }
+            success = connect();
         }
 
         // If we are connected, check the tables exist, if not, create them.
@@ -191,106 +186,41 @@ public class DatabaseQuoteSource implements QuoteSource
 
         return success;
     }
-    
-    // Connect to a MySQL database
-    private boolean connectMySQL() {
-	// Get driver
-	try {
-            // Try MM MySql driver first as if anything it seems a little
-            // faster and it's the one I used first
-	    Class.forName(MM_MYSQL_DRIVER).newInstance();
-            return connect();
-	}
-	catch (Exception e) {
-            // If the MM mysql driver doesn't work, we can try the
-            // official driver from MySql
-            try {
-                Class.forName(MYSQL_DRIVER).newInstance();
-                return connect();
-            }
-            catch(Exception e2) {
-                // Neither worked!
-                DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_MYSQL_DRIVER"));
-                return false;
-            }
-	}
-    }
-
-    // Connect to a PostgreSQL database
-    private boolean connectPostgreSQL() {
-	// Get driver
-	try {
-	    Class.forName(POSTGRESQL_DRIVER).newInstance();
-            return connect();
-	}
-	catch (Exception e) {
-	    // Couldn't find the driver!
-	    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_POSTGRESQL_DRIVER"));
-	    return false;
-	}
-    }
-
-    // Connect to a Hypersonic database
-    private boolean connectHSQLDB() {
-        boolean success = false;
-
-	// Get driver
-	try {
-	    Class.forName(HSQLDB_DRIVER).newInstance();
-
-            // We can operate the HSQLDB mode in one of three different wayys.
-            // Construct connection string depending on mode
-            String connectionURL;
-
-            if(mode == INTERNAL)
-                connectionURL = new String("jdbc:hsqldb:file:/" + fileName);
-            else {
-                assert mode == EXTERNAL;
-                connectionURL = new String("jdbc:hsqldb:hsql://"+ host + ":" + port + "/"+ database);
-            }
-
-            try {
-                connection = DriverManager.getConnection(connectionURL, "sa", "");
-                success = true;
-            }
-            catch (SQLException e) {
-                DesktopManager.showErrorMessage(Locale.getString("ERROR_CONNECTING_TO_DATABASE",
-                                                                 e.getMessage()));
-            }
-	}
-	catch (Exception e) {
-	    // Couldn't find the driver!
-	    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_HSQLDB_DRIVER"));
-	}    
-
-        return success;
-    }
 
     // Connect to the database
     private boolean connect() {
-	try {
-	    String driverName;
+		try {
+		    // Resolve the classname
+		    Class.forName(driver);
+	
+	        // We can operate the HSQLDB mode in one of three different wayys.
+            // Construct connection string depending on mode
+            String connectionURL = null;
+	        
+		    // Set up the conection
+		    if (mode == INTERNAL && software.equals(HSQLDB_SOFTWARE)) 
+		        connectionURL = new String("jdbc:hsqldb:file:/" + fileName);
+		    else {
+		        connectionURL = new String("jdbc:" + software +"://"+ host +
+			         					   ":" + port +
+			        					   "/"+ database);
+			    if (username != null)
+			    	connectionURL += new String("?user=" + username +
+			        					   		"&password=" + password);
+            }
+			DriverManager.getConnection(connectionURL);
+		} catch (ClassNotFoundException e) {
+		    // Couldn't find the driver!
+		    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_DATABASE_DRIVER", driver, software));
+		    return false;
+		}
+		catch (SQLException e) {
+		    DesktopManager.showErrorMessage(Locale.getString("ERROR_CONNECTING_TO_DATABASE",
+		            						e.getMessage()));
+	            return false;
+		}
+		return true;
 
-	    if(software == MYSQL)
-		driverName = MYSQL_DRIVER_NAME;
-	    else {
-                assert software == POSTGRESQL;
-                driverName = POSTGRESQL_DRIVER_NAME;
-	    }
-
-	    connection =
-		DriverManager.getConnection("jdbc:" + driverName +"://"+ host +
-					    ":" + port +
-					    "/"+ database +
-					    "?user=" + username +
-					    "&password=" + password);
-            return true;
-	}
-	catch (SQLException e) {
-	    DesktopManager.showErrorMessage(Locale.getString("ERROR_CONNECTING_TO_DATABASE",
-							     e.getMessage()));
-            return false;
-	}
     }
 
     /**
@@ -389,7 +319,9 @@ public class DatabaseQuoteSource implements QuoteSource
 		// Return the first date found matching the given symbol.
 		// If no dates are found - the symbol is unknown to us.
 		// This should take << 1s
-                String query = buildSymbolPresentQuery(symbol);
+
+		String query = buildSymbolPresentQuery(symbol);
+
 		ResultSet RS = statement.executeQuery(query);
 
                 // Find out if it has any rows
@@ -632,186 +564,184 @@ public class DatabaseQuoteSource implements QuoteSource
     // Creates an SQL statement that will return all the quotes in the given
     // quote range.
     private String buildSQLString(QuoteRange quoteRange) {
-
-	//
-	// 1. Create select line
-	//
-
-	String queryString = "SELECT * FROM " + SHARE_TABLE_NAME + " WHERE ";
-
-	//
-	// 2. Filter select by symbols we are looking for
-	//
-
-	String filterString = new String("");
-
-	if(quoteRange.getType() == QuoteRange.GIVEN_SYMBOLS) {
-	    List symbols = quoteRange.getAllSymbols();
-
-	    if(symbols.size() == 1) {
-		Symbol symbol = (Symbol)symbols.get(0);
-
-		filterString =
-		    filterString.concat(SYMBOL_FIELD + " = '" + symbol + "' ");
-	    }
-	    else {
-		assert symbols.size() > 1;
-
-		filterString = filterString.concat(SYMBOL_FIELD + " IN (");
-		Iterator iterator = symbols.iterator();
-
-		while(iterator.hasNext()) {
-		    Symbol symbol = (Symbol)iterator.next();
-
-		    filterString = filterString.concat("'" + symbol + "'");
-
-		    if(iterator.hasNext())
-			filterString = filterString.concat(", ");
-		}
-
-		filterString = filterString.concat(") ");
-	    }
-	}
-	else if(quoteRange.getType() == QuoteRange.ALL_SYMBOLS) {
-	    // nothing to do
-	}
-	else if(quoteRange.getType() == QuoteRange.ALL_ORDINARIES) {
-	    filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
-                                               left(SYMBOL_FIELD, 1) + " != 'X' ");
-	}
-	else {
-	    assert quoteRange.getType() == QuoteRange.MARKET_INDICES;
-
-	    filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
-                                               left(SYMBOL_FIELD, 1) + " = 'X' ");
-	}
-
-	//
-	// 3. Filter select by date range
-	//
+		//
+		// 1. Create select line
+		//
 	
-	// No dates in quote range, mean load quotes for all dates in the database
-	if(quoteRange.getFirstDate() == null) {
-	    // nothing to do
-	}
-
-	// If they are the same its only one day
-	else if(quoteRange.getFirstDate().equals(quoteRange.getLastDate())) {
-	    if(filterString.length() > 0)
-		filterString = filterString.concat("AND ");
-
-	    filterString =
-		filterString.concat(DATE_FIELD + " = '" + quoteRange.getFirstDate() + "' ");
-	}
-
-	// Otherwise check within a range of dates
-	else {
-	    if(filterString.length() > 0)
-		filterString = filterString.concat("AND ");
-
-	    filterString =
-		filterString.concat(DATE_FIELD + " >= '" + quoteRange.getFirstDate() + "' AND " +
-				    DATE_FIELD + " <= '" + quoteRange.getLastDate() + "' ");
-	}
-
-	return queryString.concat(filterString);
+		String queryString = "SELECT * FROM " + SHARE_TABLE_NAME + " WHERE ";
+	
+		//
+		// 2. Filter select by symbols we are looking for
+		//
+	
+		String filterString = new String("");
+	
+		if(quoteRange.getType() == QuoteRange.GIVEN_SYMBOLS) {
+		    List symbols = quoteRange.getAllSymbols();
+	
+		    if(symbols.size() == 1) {
+			Symbol symbol = (Symbol)symbols.get(0);
+	
+			filterString =
+			    filterString.concat(SYMBOL_FIELD + " = '" + symbol + "' ");
+		    }
+		    else {
+				assert symbols.size() > 1;
+		
+				filterString = filterString.concat(SYMBOL_FIELD + " IN (");
+				Iterator iterator = symbols.iterator();
+		
+				while(iterator.hasNext()) {
+				    Symbol symbol = (Symbol)iterator.next();
+		
+				    filterString = filterString.concat("'" + symbol + "'");
+		
+				    if(iterator.hasNext())
+					filterString = filterString.concat(", ");
+				}
+		
+				filterString = filterString.concat(") ");
+		    }
+		}
+		else if(quoteRange.getType() == QuoteRange.ALL_SYMBOLS) {
+		    // nothing to do
+		}
+		else if(quoteRange.getType() == QuoteRange.ALL_ORDINARIES) {
+		    filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
+	                                               left(SYMBOL_FIELD, 1) + " != 'X' ");
+		}
+		else {
+		    assert quoteRange.getType() == QuoteRange.MARKET_INDICES;
+	
+		    filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
+	                                               left(SYMBOL_FIELD, 1) + " = 'X' ");
+		}
+	
+		//
+		// 3. Filter select by date range
+		//
+		
+		// No dates in quote range, mean load quotes for all dates in the database
+		if(quoteRange.getFirstDate() == null) {
+		    // nothing to do
+		}
+	
+		// If they are the same its only one day
+		else if(quoteRange.getFirstDate().equals(quoteRange.getLastDate())) {
+		    if(filterString.length() > 0)
+		        filterString = filterString.concat("AND ");
+	
+		    filterString =	filterString.concat(DATE_FIELD + " = '" + quoteRange.getFirstDate() + "' ");
+		}
+	
+		// Otherwise check within a range of dates
+		else {
+		    if(filterString.length() > 0)
+		        filterString = filterString.concat("AND ");
+	
+		    filterString = filterString.concat(DATE_FIELD + " >= '" + quoteRange.getFirstDate() + "' AND " +
+					    DATE_FIELD + " <= '" + quoteRange.getLastDate() + "' ");
+		}
+	
+		return queryString.concat(filterString);
     }
-
+	
     // Creates database tables
     private boolean createTables() {
-	boolean success = false;
-
-	try {
-	    // 1. Create the shares table
-	    Statement statement = connection.createStatement();
-	    statement.executeUpdate("CREATE TABLE " + SHARE_TABLE_NAME + " (" +
-				    DATE_FIELD +	" DATE NOT NULL, " +
-				    SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
-				    ") NOT NULL, " +
-				    DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, " +
-				    DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
-				    DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
-				    DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, " +
-				    DAY_VOLUME_FIELD +	" INT DEFAULT 0, " +
-				    "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
-
-	    // 2. Create a couple of indices to speed things up
-	    statement.executeUpdate("CREATE INDEX " + DATE_INDEX_NAME + " ON " +
-				    SHARE_TABLE_NAME + " (" + DATE_FIELD + ")");
-	    statement.executeUpdate("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " +
-				    SHARE_TABLE_NAME + " (" + SYMBOL_FIELD + ")");
-
-	    // 3. Create the lookup table
-	    statement.executeUpdate("CREATE TABLE " + LOOKUP_TABLE_NAME + " (" +
-				    SYMBOL_FIELD +		" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
-				    ") NOT NULL, " +
-				    NAME_FIELD +		" VARCHAR(100), " +
-                                    "PRIMARY KEY(" + SYMBOL_FIELD + "))");
-
-	    success = true;
-	}
-	catch (SQLException e) {
+		boolean success = false;
+	
+		try {
+		    // 1. Create the shares table
+		    Statement statement = connection.createStatement();
+		    statement.executeUpdate("CREATE TABLE " + SHARE_TABLE_NAME + " (" +
+					    DATE_FIELD +	" DATE NOT NULL, " +
+					    SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
+					    ") NOT NULL, " +
+					    DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, " +
+					    DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
+					    DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
+					    DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, " +
+					    DAY_VOLUME_FIELD +	" INT DEFAULT 0, " +
+					    "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
+	
+		    // 2. Create a couple of indices to speed things up
+		    statement.executeUpdate("CREATE INDEX " + DATE_INDEX_NAME + " ON " +
+					    SHARE_TABLE_NAME + " (" + DATE_FIELD + ")");
+		    statement.executeUpdate("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " +
+					    SHARE_TABLE_NAME + " (" + SYMBOL_FIELD + ")");
+	
+		    // 3. Create the lookup table
+		    statement.executeUpdate("CREATE TABLE " + LOOKUP_TABLE_NAME + " (" +
+		            				SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
+		            				") NOT NULL, " +
+		            				NAME_FIELD +	" VARCHAR(100), " +
+	                                "PRIMARY KEY(" + SYMBOL_FIELD + "))");
+	
+		    success = true;
+		}
+		catch (SQLException e) {
             // Since hypersonic won't let us check if the table is already created,
             // we need to ignore the inevitable error about the table already being present.
-            if(software != HSQLDB)
-                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-                                                                 e.getMessage()));
+            if(software != HSQLDB_SOFTWARE)
+         	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+							     e.getMessage()));
             else
                 success = true;
+
+		}
+	
+		return success;	
 	}
-
-	return success;	
-    }
-
-    private boolean checkDatabase() {
-	boolean success = true;
-
-        // Skip this check for hypersonic - it doesn't support it
-        if(software != HSQLDB) {
-            try {
-                DatabaseMetaData meta = connection.getMetaData();
-                
-                // Check database exists
-                {
-                    ResultSet RS = meta.getCatalogs();
-                    String traverseDatabaseName;
-                    boolean foundDatabase = false;
-                    
-                    while(RS.next()) {
-                        traverseDatabaseName = RS.getString(1);
-                        
-                        if(traverseDatabaseName.equals(database)) {
-                            foundDatabase = true;
-                            break;
-                        }
-                    }
-                    
-                    if(!foundDatabase) {
-                        DesktopManager.showErrorMessage(Locale.getString("CANT_FIND_DATABASE",
-                                                                         database));
-                        return false;
-                    }
-                }
-            }
-            catch (SQLException e) {
-                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-                                                                 e.getMessage()));
-                return false;
-            }
-        }
-
-	// If we got here the database is available
-	return success;
+	
+	private boolean checkDatabase() {
+		boolean success = true;
+	
+	        // Skip this check for hypersonic - it doesn't support it
+	        if(software != HSQLDB_SOFTWARE) {
+	            try {
+	                DatabaseMetaData meta = connection.getMetaData();
+	                
+	                // Check database exists
+	                {
+	                    ResultSet RS = meta.getCatalogs();
+	                    String traverseDatabaseName;
+	                    boolean foundDatabase = false;
+	                    
+	                    while(RS.next()) {
+	                        traverseDatabaseName = RS.getString(1);
+	                        
+	                        if(traverseDatabaseName.equals(database)) {
+	                            foundDatabase = true;
+	                            break;
+	                        }
+	                    }
+	                    
+	                    if(!foundDatabase) {
+	                        DesktopManager.showErrorMessage(Locale.getString("CANT_FIND_DATABASE",
+	                                                                         database));
+	                        return false;
+	                    }
+	                }
+	            }
+	            catch (SQLException e) {
+	                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+	                                                                 e.getMessage()));
+	                return false;
+	            }
+	        }
+	
+		// If we got here the database is available
+		return success;
     }
 
     private boolean checkTables() {
         boolean success = false;
 
-	try {
+        try {
             boolean foundTable = false;
 
             // Skip this check for hypersonic - it doesn't support it
-            if(software != HSQLDB) {
+            if(software != HSQLDB_SOFTWARE) {
                 DatabaseMetaData meta = connection.getMetaData();
                 ResultSet RS = meta.getTables(database, null, "%", null);
                 String traverseTables;
@@ -824,18 +754,16 @@ public class DatabaseQuoteSource implements QuoteSource
                         break;
                     }
                 }
-            }                
-
+            }
             // No table? Well have to go create it
             if(!foundTable)
                 success = createTables();
             else
                 success = true;
         }
-        
-	catch (SQLException e) {
-	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-							     e.getMessage()));
+        catch (SQLException e) {
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                    						e.getMessage()));
         }
 
         return success;
@@ -865,7 +793,7 @@ public class DatabaseQuoteSource implements QuoteSource
             }
 
             if(newQuotes.size() > 0) {
-                if(software == HSQLDB)
+                if(software == HSQLDB_SOFTWARE)
                     quotesImported = importQuoteMultipleStatements(newQuotes);
                 else
                     quotesImported = importQuoteSingleStatement(newQuotes);
@@ -1154,7 +1082,7 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public void shutdown() {
         // We only need to shutdown the internal HYSQLDB database
-        if(software == HSQLDB && mode == INTERNAL && checkConnection()) {
+        if(software == HSQLDB_SOFTWARE && mode == INTERNAL && checkConnection()) {
             try {
                 Statement statement = connection.createStatement();
                 ResultSet RS = statement.executeQuery("SHUTDOWN");
@@ -1321,11 +1249,10 @@ public class DatabaseQuoteSource implements QuoteSource
      * @return the SQL clause for performing <code>LEFT(string, letters)</code>
      */
     private String left(String field, int length) {
-        if(software == MYSQL)
+        if(software.equals(MYSQL_SOFTWARE))
             return new String("LEFT(" + field + ", " + length + ")");
         else {
             // This is probably more portable than the above
-            assert software == POSTGRESQL || software == HSQLDB;
             return new String("SUBSTR(" + field + ", 1, " + length + ")");
         }        
     }
@@ -1338,7 +1265,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * @return the SQL clause
      */
     private String buildDatePresentQuery(TradingDate date) {
-        if(software == HSQLDB)
+        if(software == HSQLDB_SOFTWARE)
             return new String("SELECT TOP 1 " + DATE_FIELD + " FROM " +
                               SHARE_TABLE_NAME + " WHERE " + DATE_FIELD + " = '"
                               + date + "' ");
@@ -1356,7 +1283,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * @return the SQL clause
      */
     private String buildSymbolPresentQuery(Symbol symbol) {
-        if(software == HSQLDB)
+        if(software == HSQLDB_SOFTWARE)
             return new String("SELECT TOP 1 " + SYMBOL_FIELD + " FROM " +
                               SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
                               + symbol + "' ");

@@ -266,7 +266,8 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         double[] values = new double[sizeOfIndividual];
         int[] types = new int[sizeOfIndividual];
         for (int ii=0; ii<sizeOfIndividual; ii++) {
-            parameters[ii]=(String)GARulesPageModule.getValueAt(ii,GARulesPageModule.PARAMETER_COLUMN);
+            parameters[ii]=(String)GARulesPageModule.getValueAt(ii, 
+                    GARulesPageModule.PARAMETER_COLUMN);
             String value=(String)GARulesPageModule.getValueAt(ii,GARulesPageModule.MIN_PARAMETER_COLUMN);
             try {
                 values[ii] = Double.valueOf(value.trim()).doubleValue();

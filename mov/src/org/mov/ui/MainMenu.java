@@ -362,12 +362,18 @@ public class MainMenu implements ActionListener, ModuleListener
                     StoredMacro stored_macro;
                     try {
                         stored_macro = (StoredMacro)mo;
+                        MacroManager.execute(stored_macro);
                     }
                     catch(ClassCastException e) {
                         assert false;
                         return;
+                    } catch (NoClassDefFoundError e) {
+                        JOptionPane.showInternalMessageDialog(desktop, 
+                                Locale.getString("NO_JYTHON_ERROR",
+                                                 e.getMessage()),
+                                Locale.getString("MACRO_EXECUTION_ERROR"),
+                                JOptionPane.ERROR_MESSAGE);
                     }
-                    MacroManager.execute(stored_macro);
                 } else if ((mo = menuItemToModuleHash.get(menu)) != null) {
                     
                     Module module;

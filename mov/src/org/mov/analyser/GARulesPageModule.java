@@ -29,21 +29,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -52,18 +48,17 @@ import org.mov.main.Module;
 import org.mov.ui.AbstractTable;
 import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
-import org.mov.ui.ConfirmDialog;
-import org.mov.ui.ExpressionEditorDialog;
 import org.mov.ui.MenuHelper;
 import org.mov.util.Locale;
 
 public class GARulesPageModule extends AbstractTable implements Module {
-    private PropertyChangeSupport propertySupport;
     
-    public static final int PARAMETER_COLUMN = 0;
-    public static final int MIN_PARAMETER_COLUMN = 1;
-    public static final int MAX_PARAMETER_COLUMN = 2;
-    public static final int NUMBER_COLUMN = 3;
+    public static int PARAMETER_COLUMN = 0;
+    public final static int MIN_PARAMETER_COLUMN = 1;
+    public final static int MAX_PARAMETER_COLUMN = 2;
+    public final static int NUMBER_COLUMN = 3;
+
+    private PropertyChangeSupport propertySupport;
 
     private final static String separatorString = GPModuleConstants.separatorString;
     private final static String nullString = GPModuleConstants.nullString;

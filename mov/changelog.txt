@@ -1,6 +1,13 @@
 Changes for Venice, 0.5 alpha 13/Mar/2005
 ==========================================
 
+* Jython macro support:
+  - First release (Dan Makovec)
+  - Allows all functionality to be automated via the Jython 
+    (http://www.jython.org) scripting language.
+  - Macros can be configured to run automatically upon Venice startup
+    or manually from a new top level menu
+  
 * Chart Update:
   - Added the custom graph to allow users to graph arbitrary indicators
     using the Gondola language.
@@ -61,6 +68,7 @@ Changes for Venice, 0.5 alpha 13/Mar/2005
     it now uses the standard, and better looking, progress bar.
   - Fixed portfolio import/export bug. Exported portfolio format has now
     changed and is not backwards compatible.
+  - Removed numerous compilation warnings
 
 Changes for Venice, 0.4 alpha 14/Aug/2004
 ==========================================

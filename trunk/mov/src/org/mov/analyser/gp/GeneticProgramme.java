@@ -114,6 +114,12 @@ public class GeneticProgramme {
     // Current generation number, starting from 1.
     private int generation;
     
+    // The rule getting the buy price
+    private String tradeCostBuy;
+
+    // The rule getting the sell price
+    private String tradeCostSell;
+    
     /**
      * Get ready to run the GP.
      *
@@ -137,7 +143,9 @@ public class GeneticProgramme {
                             Money stockValue,
                             int numberStocks,
                             Money tradeCost,
-                            int breedingPopulationSize) {
+                            int breedingPopulationSize,
+                            String tradeCostBuy,
+                            String tradeCostSell) {
         
         this.quoteBundle = quoteBundle;
         this.GPGondolaSelection = GPGondolaSelection;
@@ -149,6 +157,8 @@ public class GeneticProgramme {
         this.numberStocks = numberStocks;
         this.tradeCost = tradeCost;
         this.breedingPopulationSize = breedingPopulationSize;
+        this.tradeCostBuy = tradeCostBuy;
+        this.tradeCostSell = tradeCostSell;
         
         nextBreedingPopulation = new TreeMap();
         breedingPopulation = new TreeMap();
@@ -187,8 +197,8 @@ public class GeneticProgramme {
                                                 stockValue,
                                                 numberStocks,
                                                 tradeCost,
-                                                "",
-                                                "");
+                                                tradeCostBuy,
+                                                tradeCostSell);
                     
                     // If we got here the paper trade was successful. Now let the
                     // individual 'compete' to see if it gets to breed next round.

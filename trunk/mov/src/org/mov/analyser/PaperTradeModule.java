@@ -66,7 +66,10 @@ public class PaperTradeModule extends JPanel implements Module {
     private QuoteRangePage quoteRangePage;
     private RulesPage rulesPage;
     private PortfolioPage portfolioPage;
-    private BuySellSystemPage buySellSystemPage;
+    private TradeValuePage tradeValuePage;
+    
+    // Tip
+    private String tip;
 
     /**
      * Create a new paper trade module.
@@ -97,8 +100,8 @@ public class PaperTradeModule extends JPanel implements Module {
         portfolioPage = new PortfolioPage(desktop);
         tabbedPane.addTab(portfolioPage.getTitle(), portfolioPage.getComponent());
         
-        buySellSystemPage = new BuySellSystemPage(desktop);
-        tabbedPane.addTab(buySellSystemPage.getTitle(), buySellSystemPage.getComponent());
+        tradeValuePage = new TradeValuePage(desktop);
+        tabbedPane.addTab(tradeValuePage.getTitle(), tradeValuePage.getComponent());
 
 	// Run, close buttons
 	JPanel buttonPanel = new JPanel();
@@ -132,7 +135,7 @@ public class PaperTradeModule extends JPanel implements Module {
         quoteRangePage.load(getClass().getName());
         rulesPage.load(getClass().getName());
         portfolioPage.load(getClass().getName());
-        buySellSystemPage.load(getClass().getName());
+        tradeValuePage.load(getClass().getName());
     }
 
     // Save GUI settings to preferences
@@ -140,7 +143,7 @@ public class PaperTradeModule extends JPanel implements Module {
         quoteRangePage.save(getClass().getName());
         rulesPage.save(getClass().getName());
         portfolioPage.save(getClass().getName());
-        buySellSystemPage.save(getClass().getName());
+        tradeValuePage.save(getClass().getName());
     }
 
     public String getTitle() {
@@ -238,8 +241,8 @@ public class PaperTradeModule extends JPanel implements Module {
             tabbedPane.setSelectedComponent(portfolioPage.getComponent());
             return false;
         }
-        else if(!buySellSystemPage.parse()) {
-            tabbedPane.setSelectedComponent(buySellSystemPage.getComponent());
+        else if(!tradeValuePage.parse()) {
+            tabbedPane.setSelectedComponent(tradeValuePage.getComponent());
             return false;
         }
         else
@@ -261,8 +264,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                         Money tradeCost,
                                         Variables variables,
                                         int a, int b, int c,
-                                        String buySystemRule,
-                                        String sellSystemRule)
+                                        String tradeCostBuy,
+                                        String tradeCostSell)
         throws EvaluationException {
 
         Portfolio portfolio;
@@ -280,8 +283,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                               initialCapital,
                                               stockValue,
                                               tradeCost,
-                                              buySystemRule,
-                                              sellSystemRule);
+                                              tradeCostBuy,
+                                              tradeCostSell);
         }
         else {
             assert portfolioPage.getMode() == PortfolioPage.NUMBER_STOCKS_MODE;
@@ -297,9 +300,11 @@ public class PaperTradeModule extends JPanel implements Module {
                                               initialCapital,
                                               numberStocks,
                                               tradeCost,
-                                              buySystemRule,
-                                              sellSystemRule);
+                                              tradeCostBuy,
+                                              tradeCostSell);
         }
+        
+        this.tip = PaperTrade.getTip();
 
         // Running the equation means we might need to load in
         // more quotes so the note may have changed...
@@ -340,6 +345,7 @@ public class PaperTradeModule extends JPanel implements Module {
         Money stockValue = portfolioPage.getStockValue();
         int numberStocks = portfolioPage.getNumberStocks();
         Money tradeCost = portfolioPage.getTradeCost();
+        
 
         quoteBundle = new ScriptQuoteBundle(quoteRangePage.getQuoteRange());
 
@@ -352,8 +358,8 @@ public class PaperTradeModule extends JPanel implements Module {
         int numberEquations = (isFamilyEnabled ? aRange * bRange * cRange : 1);
         
         // We get the formulas that rule at which price the stock is sold or bought
-        String buySystemRule = buySellSystemPage.getBuySystemRule();
-        String sellSystemRule = buySellSystemPage.getSellSystemRule();
+        String tradeCostBuy = tradeValuePage.getTradeCostBuy();
+        String tradeCostSell = tradeValuePage.getTradeCostSell();
 
         progress.setIndeterminate(false);
         progress.setMaximum(numberEquations);
@@ -408,8 +414,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                                              tradeCost,
                                                              variables,
                                                              a, b, c,
-                                                             buySystemRule,
-                                                             sellSystemRule));
+                                                             tradeCostBuy,
+                                                             tradeCostSell));
                         }
                     }
                 }
@@ -432,8 +438,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                                  tradeCost,
                                                  variables,
                                                  0, 0, 0,
-                                                 buySystemRule,
-                                                 sellSystemRule));
+                                                 tradeCostBuy,
+                                                 tradeCostSell));
 
         } catch(EvaluationException e) {
             ProgressDialogManager.closeProgressDialog(progress);
@@ -485,6 +491,7 @@ public class PaperTradeModule extends JPanel implements Module {
 			(PaperTradeResultModule)resultsFrame.getModule();
 		
                     resultsModule.addResults(paperTradeResults);
+                    resultsModule.setTip(desktop, tip);
 		}});
     }
 }

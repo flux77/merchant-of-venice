@@ -616,10 +616,7 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
         String[] object = new String[NUMBER_COLUMN];
         object[BUY_RULE_COLUMN] = new String(buyRule);
         object[SELL_RULE_COLUMN] = new String(sellRule);
-        if (perc.compareTo("")==0)
-            object[PERCENT_COLUMN] = new String(perc);
-        else
-            object[PERCENT_COLUMN] = new String(perc);
+        object[PERCENT_COLUMN] = new String(perc);
         results.add(object);
         model.addResults(results);
         checkMenuDisabledStatus();
@@ -741,11 +738,17 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
             total += perc[i];
         // Check total == 0
         if (total==0) {
-            JOptionPane.showInternalMessageDialog(desktop,
+            // If all values are null or 0,
+            // then all the percents are set each one equal
+            for (int i=0; (i<totalLength); i++)
+                perc[i] = 1;
+            /* activate this code if you do not want the above behaviour
+             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("NO_TOTAL_GREATER_THAN_ZERO_PAGE_ERROR"),
                                                   Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
             return false;
+             */
         }
         return true;
     }

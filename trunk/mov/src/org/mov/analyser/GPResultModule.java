@@ -324,7 +324,7 @@ public class GPResultModule extends AbstractTable implements Module {
             
             JMenuItem popupStoreRulesInitialPopulation =
                 new JMenuItem(Locale.getString("STORE_RULES_INIT_POP"));
-            popupStoreRulesInitialPopulation.setEnabled(getSelectedRowCount() == 1);
+            popupStoreRulesInitialPopulation.setEnabled(getSelectedRowCount() >= 1);
             popupStoreRulesInitialPopulation.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         storeRulesInitialPopulation();
@@ -482,15 +482,17 @@ public class GPResultModule extends AbstractTable implements Module {
         }
     }
 
-    // Store the rules, adding a row to the GPInitialPopulation section
+    // Store the rules, adding rows to the GPInitialPopulation section
     private void storeRulesInitialPopulation() {
-        // Get result at row
-        int row = getSelectedRow();
+        // Get results at rows
+        int rows[] = getSelectedRows();
 
-        // Don't do anything if we couldn't retrieve the selected row
-        if(row != -1) {
-            final GPResult result = model.getResult(row);
-            this.GPPageInitialPopulation.addRowTable(result.getBuyRule(), result.getSellRule(), "");
+        // Don't do anything if we couldn't retrieve at least one selected row
+        if(rows.length >= 1) {
+            for(int i = 0; i < rows.length; i++) {
+                final GPResult result = model.getResult(rows[i]);
+                this.GPPageInitialPopulation.addRowTable(result.getBuyRule(), result.getSellRule(), "");
+            }
         }
     }
     
@@ -532,7 +534,7 @@ public class GPResultModule extends AbstractTable implements Module {
         viewSellRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         storeBuyRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         storeSellRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
-        storeRulesInitialPopulation.setEnabled(numberOfSelectedRows == 1);
+        storeRulesInitialPopulation.setEnabled(numberOfSelectedRows >= 1);
         removeMenuItem.setEnabled(numberOfSelectedRows >= 1);
         removeAllMenuItem.setEnabled(model.getRowCount() > 0);
     }

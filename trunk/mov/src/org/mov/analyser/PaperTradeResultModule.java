@@ -31,9 +31,11 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -79,8 +81,13 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     private JMenuItem viewSellRuleMenuItem;
     private JMenuItem storeBuyRuleMenuItem;
     private JMenuItem storeSellRuleMenuItem;
+    private JMenuItem getTipMenuItem;
     private JMenuItem removeMenuItem;
     private JMenuItem removeAllMenuItem;
+    
+    // Tip
+    private String tip;
+    private JDesktopPane desktop;
 
     private class Model extends AbstractTableModel {
 	private List results;
@@ -331,6 +338,17 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
             menu.add(popupStoreSellRuleMenuItem);
 
             menu.addSeparator();
+            
+            JMenuItem popupGetTipMenuItem =
+                new JMenuItem(Locale.getString("GET_TIP"));
+            popupGetTipMenuItem.setEnabled(getSelectedRowCount() == 1);
+            popupGetTipMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        showTip();
+                    }});
+            menu.add(popupGetTipMenuItem);
+
+            menu.addSeparator();
 
             JMenuItem popupRemoveMenuItem =
                 new JMenuItem(Locale.getString("REMOVE"));
@@ -456,6 +474,31 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
             thread.start();
         }
     }
+    
+    // Displays the tip for next day trading, in an alert window
+    private void showTip() {
+        // Get result at row
+        int row = getSelectedRow();
+
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            final PaperTradeResult result = model.getResult(row);
+
+            Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        showTipWindow();
+                    }});
+
+            thread.start();
+        }
+    }
+
+    private void showTipWindow() {
+        JOptionPane.showInternalMessageDialog(this.desktop,
+                                              this.tip,
+                                              Locale.getString("GET_TIP"),
+                                              JOptionPane.INFORMATION_MESSAGE);
+    }
 
     // Opens first selected result
     private void openSelectedResult() {
@@ -510,6 +553,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
         viewSellRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         storeBuyRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         storeSellRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
+        getTipMenuItem.setEnabled(numberOfSelectedRows == 1);
         removeMenuItem.setEnabled(numberOfSelectedRows >= 1);
         removeAllMenuItem.setEnabled(model.getRowCount() > 0);
     }
@@ -573,6 +617,15 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
 	resultMenu.addSeparator();
 
+        getTipMenuItem = new JMenuItem(Locale.getString("GET_TIP"));
+        getTipMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    showTip();
+                }});
+        resultMenu.add(getTipMenuItem);
+
+	resultMenu.addSeparator();
+
         removeMenuItem = new JMenuItem(Locale.getString("REMOVE"));
         removeMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -628,6 +681,11 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     public void save() {
         // Free up precious memory
         model.removeAllResults();
+    }
+
+    public void setTip(JDesktopPane desktop, String tip) {
+	this.desktop = desktop;
+        this.tip = tip;
     }
 
     public String getTitle() {

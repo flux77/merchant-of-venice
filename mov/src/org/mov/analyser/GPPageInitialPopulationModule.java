@@ -33,10 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.prefs.Preferences;
-import java.util.prefs.BackingStoreException;
 import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JMenuBar;
@@ -47,20 +44,14 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.mov.main.CommandManager;
 import org.mov.main.Module;
-import org.mov.main.ModuleFrame;
-import org.mov.prefs.PreferencesManager;
 import org.mov.ui.AbstractTable;
 import org.mov.ui.AbstractTableModel;
-import org.mov.ui.ChangeFormat;
 import org.mov.ui.Column;
 import org.mov.ui.ConfirmDialog;
 import org.mov.ui.ExpressionEditorDialog;
 import org.mov.ui.MenuHelper;
 import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
 
 public class GPPageInitialPopulationModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -93,7 +84,6 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
     private JMenuItem viewSellRuleMenuItem;
     private JMenuItem storeBuyRuleMenuItem;
     private JMenuItem storeSellRuleMenuItem;
-    private JMenuItem storeSeedMenuItem;
     private JMenuItem removeMenuItem;
     private JMenuItem removeAllMenuItem;
     
@@ -141,18 +131,21 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
             for (int i=0; i<getRowCount(); i++) {
                 String[] result = (String[])results.get(i);
                 if (result[BUY_RULE_COLUMN].equals("") &&
-                result[SELL_RULE_COLUMN].equals(""))
+                    result[SELL_RULE_COLUMN].equals("")) {
                     isAlreadyEmpty = true;
+                }
                 result = null;
             }
-            if (!isAlreadyEmpty)
+            if (!isAlreadyEmpty) {
                 this.addEmpty();
+            }
         }
         
         private void addEmpty() {
             String values[] = new String[NUMBER_COLUMN];
-            for (int i=0; i<values.length; i++)
+            for (int i=0; i<values.length; i++) {
                 values[i] = new String("");
+            }
             this.results.add(values);
         }
         
@@ -165,7 +158,7 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
                 return "";
             
             String[] result =
-            (String[])results.get(row);
+                (String[])results.get(row);
             
             if(column == BUY_RULE_COLUMN)
                 return result[BUY_RULE_COLUMN];
@@ -782,8 +775,9 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
             // In that case we can't manage the split operation
             // without using the wild char
             for (int j=0; j<values.length; j++) {
-                if (values[j].equals(""))
+                if (values[j].equals("")) {
                     values[j] = new String(nullString);
+                }
             }
             if (!((values[BUY_RULE_COLUMN].compareTo(nullString)==0) &&
                 (values[SELL_RULE_COLUMN].compareTo(nullString)==0))) {

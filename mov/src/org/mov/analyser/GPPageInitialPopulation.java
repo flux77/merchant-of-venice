@@ -25,33 +25,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
-import java.util.prefs.Preferences;
-import java.util.prefs.BackingStoreException;
-import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneLayout;
 
 import org.mov.prefs.PreferencesManager;
-import org.mov.ui.AbstractTable;
-import org.mov.ui.AbstractTableModel;
 import org.mov.ui.ConfirmDialog;
 import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
-public class GPPageInitialPopulation extends JPanel {
+public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
     
     private final static String format = GPModuleConstants.format;
     private final static double PERCENT_DOUBLE = GPModuleConstants.PERCENT_DOUBLE;
@@ -76,37 +68,79 @@ public class GPPageInitialPopulation extends JPanel {
     private int mutations;
     
     public GPPageInitialPopulation(JDesktopPane desktop,
-                                    String titledBorderText,
-                                    Dimension preferredSize) {
+                                    double maxHeight) {
+        
+        Dimension preferredSize = new Dimension();
+        preferredSize.setSize(this.getPreferredSize().getWidth(), maxHeight/2);
         
         this.desktop = desktop;
         this.GPPageInitialPopulationModule = new GPPageInitialPopulationModule(desktop);
         
-        setGraphic(titledBorderText, preferredSize);
+        setGraphic(preferredSize);
         
     }
     
-    public void save(HashMap settingsCommon, HashMap settings, String idStr) {
-        settingsCommon.put("generations_changing_seeds", numberMutationTextRow.getText());
-        settingsCommon.put("generations_random", generateRandomPopTextRow.getText());
-        settingsCommon.put("generations_init_pop", generateInitPopTextRow.getText());
-        GPPageInitialPopulationModule.save(settings, idStr);
+    public void save(String key) {
+        String idStr = "GPInitialPopulation";
+
+        HashMap settingsInitPop =
+                PreferencesManager.loadAnalyserPageSettings(key + idStr);
+        HashMap settingsInitPopCommon = new HashMap();
+
+        GPPageInitialPopulationModule.save(settingsInitPop, idStr);
+        settingsInitPopCommon.put("generations_changing_seeds", numberMutationTextRow.getText());
+        settingsInitPopCommon.put("generations_random", generateRandomPopTextRow.getText());
+        settingsInitPopCommon.put("generations_init_pop", generateInitPopTextRow.getText());
+
+        PreferencesManager.saveAnalyserPageSettings(key + idStr,
+                                                    settingsInitPop);
+        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
+                                                    settingsInitPopCommon);
     }
     
-    public void loadCommon(String setting, String value) {
-        if(setting.equals("generations_changing_seeds"))
+    public void load(String key) {
+        String idStr = "GPInitialPopulation";
+        
+        // Load last GUI settings from preferences
+	HashMap settings =
+            PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
+
+	Iterator iterator = settings.keySet().iterator();
+
+	while(iterator.hasNext()) {
+	    String setting = (String)iterator.next();
+	    String value = (String)settings.get((Object)setting);
+
+            this.loadCommon(setting, value);
+        }
+       
+        HashMap settingsInitPop =
+                PreferencesManager.loadAnalyserPageSettings(key + idStr);
+
+        Iterator iteratorInitPop = settingsInitPop.keySet().iterator();
+
+	while(iteratorInitPop.hasNext()) {
+	    String settingInitPop = (String)iteratorInitPop.next();
+	    String valueInitPop = (String)settingsInitPop.get((Object)settingInitPop);
+
+            GPPageInitialPopulationModule.load(valueInitPop);
+        }
+        this.loadEmpty();
+    }
+    
+    private void loadCommon(String setting, String value) {
+        if(setting.equals("generations_changing_seeds")) {
             numberMutationTextRow.setText(value);
-        if(setting.equals("generations_random"))
+        }
+        if(setting.equals("generations_random")) {
             generateRandomPopTextRow.setText(value);
-        if(setting.equals("generations_init_pop"))
+        }
+        if(setting.equals("generations_init_pop")) {
             generateInitPopTextRow.setText(value);
+        }
     }
     
-    public void load(String value) {
-        GPPageInitialPopulationModule.load(value);
-    }
-    
-    public void loadEmpty() {
+    private void loadEmpty() {
         GPPageInitialPopulationModule.loadEmpty();
     }
     
@@ -120,25 +154,26 @@ public class GPPageInitialPopulation extends JPanel {
         mutations = 0;
         
         if(!isAllValuesAcceptable()) {
-            return false;
+            returnValue = false;
         } else {
             if(!isFitAll()) {
                 ConfirmDialog dialog = new ConfirmDialog(desktop,
                 Locale.getString("GP_FIT_PAGE"),
                 Locale.getString("GP_FIT_TITLE"));
                 boolean returnConfirm = dialog.showDialog();
-                if (returnConfirm)
+                if (returnConfirm) {
                     fitAll();
-                else
-                    return false;
+                } else {
+                    returnValue = false;
+                }
             }
         }
         
         try {
             
-            if(!numberMutationTextRow.getText().equals(""))
-                mutations =
-                Integer.parseInt(numberMutationTextRow.getText());
+            if(!numberMutationTextRow.getText().equals("")) {
+                mutations = Integer.parseInt(numberMutationTextRow.getText());
+            } 
         } catch(NumberFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop,
             Locale.getString("ERROR_PARSING_NUMBER",
@@ -152,13 +187,22 @@ public class GPPageInitialPopulation extends JPanel {
         // we don't have to check for the table,
         // because the values on the table are of initial population
         // and we do not need them.
-        if (perc[PERCENT_RANDOM]!=PERCENT_INT)
+        if (perc[PERCENT_RANDOM]!=PERCENT_INT) {
             // Parse all the values in the GPPageInitialPopulationModule
             // so that we know if the table with initial population rules is OK or not.
-            if (!GPPageInitialPopulationModule.parse())
+            if (!GPPageInitialPopulationModule.parse()) {
                 returnValue = false;
-        
+            }
+        }
         return returnValue;
+    }
+    
+    public JComponent getComponent() {
+        return this;
+    }
+
+    public String getTitle() {
+        return Locale.getString("GP_PAGE_INITIAL_POPULATION_SHORT");
     }
     
     public int getMutations() {
@@ -171,11 +215,14 @@ public class GPPageInitialPopulation extends JPanel {
     // so 0 means that we should get a random rule
     // while 1 means that we should get a rule from the user defined ones.
     public int getIfRandom() {
+        int retValue = 0;
+        
         if (isAllValuesAcceptable()) {
             int total = 0;
             int totalLength = perc.length;
-            for (int i=0; i<totalLength; i++)
+            for (int i=0; i<totalLength; i++) {
                 total += perc[i];
+            }
             int randomValue = random.nextInt(total);
             
             int totalMin = 0;
@@ -183,17 +230,12 @@ public class GPPageInitialPopulation extends JPanel {
             for (int i=0; i<totalLength; i++) {
                 totalMax = totalMin + perc[i];
                 if ((randomValue >= totalMin) && (randomValue < totalMax)) {
-                    return i;
+                    retValue = i;
                 }
                 totalMin += perc[i];
             }
-            
-            JOptionPane.showInternalMessageDialog(desktop,
-            Locale.getString("ERROR_GENERATING_RANDOM_NUMBER"),
-            Locale.getString("INVALID_GP_ERROR"),
-            JOptionPane.ERROR_MESSAGE);
         }
-        return 0;
+        return retValue;
     }
     
     public int getRandom() {
@@ -218,11 +260,13 @@ public class GPPageInitialPopulation extends JPanel {
             
             // Set dummy values according to PERCENT_INT that is the maximum
             int[] dummyPerc = new int[perc.length];
-            for (int i=0; i<perc.length; i++)
+            for (int i=0; i<perc.length; i++) {
                 dummyPerc[i] = Math.round((perc[i] * PERCENT_INT) / total);
+            }
             int dummyTotal = 0;
-            for (int i=0; i<perc.length; i++)
+            for (int i=0; i<perc.length; i++) {
                 dummyTotal += dummyPerc[i];
+            }
             // Adjust approximations of Math.round method
             int count=0;
             while (dummyTotal!=PERCENT_INT) {
@@ -236,8 +280,9 @@ public class GPPageInitialPopulation extends JPanel {
                 count++;
             }
             // Set new values
-            for (int i=0; i<perc.length; i++)
+            for (int i=0; i<perc.length; i++) {
                 perc[i] = dummyPerc[i];
+            }
             // Update the text in the user interface
             setTexts();
         }
@@ -247,17 +292,23 @@ public class GPPageInitialPopulation extends JPanel {
     
     // Return true if values already fit to percentage
     private boolean isFitAll() {
+        boolean retValue = false;
+        
         if (isAllValuesAcceptable()) {
             int total = 0;
-            for (int i=0; (i<perc.length); i++)
+            for (int i=0; (i<perc.length); i++) {
                 total += perc[i];
-            if (total==PERCENT_INT)
-                return true;
+            }
+            if (total==PERCENT_INT) {
+                retValue = true;
+            }
         }
-        return false;
+        return retValue;
     }
     
     private boolean isAllValuesAcceptable() {
+        boolean retValue = true;
+        
         try {
             setNumericalValues();
         } catch(ParseException e) {
@@ -266,7 +317,7 @@ public class GPPageInitialPopulation extends JPanel {
             e.getMessage()),
             Locale.getString("INVALID_GP_ERROR"),
             JOptionPane.ERROR_MESSAGE);
-            return false;
+            retValue = false;
         }
         
         if(!isAllValuesPositive()) {
@@ -274,15 +325,15 @@ public class GPPageInitialPopulation extends JPanel {
             Locale.getString("NO_POSITIVE_VALUES_ERROR"),
             Locale.getString("INVALID_GP_ERROR"),
             JOptionPane.ERROR_MESSAGE);
-            return false;
+            retValue = false;
         }
         
         if(!isTotalOK()) {
             // Messages inside the isTotalOK method
-            return false;
+            retValue = false;
         }
         
-        return true;
+        return retValue;
     }
     
     private void setNumericalValues() throws ParseException {
@@ -313,25 +364,29 @@ public class GPPageInitialPopulation extends JPanel {
     
     private boolean isAllValuesPositive() {
         boolean returnValue = true;
-        for (int i=0; i<perc.length; i++)
+        for (int i=0; i<perc.length; i++) {
             returnValue = returnValue && (perc[i]>=0);
+        }
         return returnValue;
     }
     
     private boolean isTotalOK() {
+        boolean retValue = true;
+        
         long total = 0;
         int totalLength = perc.length;
-        for (int i=0; (i<totalLength); i++)
+        for (int i=0; (i<totalLength); i++) {
             total += perc[i];
+        }
         // Check total == 0
         if (total==0) {
             JOptionPane.showInternalMessageDialog(desktop,
             Locale.getString("NO_TOTAL_GREATER_THAN_ZERO_PAGE_ERROR"),
             Locale.getString("INVALID_GP_ERROR"),
             JOptionPane.ERROR_MESSAGE);
-            return false;
+            retValue = false;
         }
-        return true;
+        return retValue;
     }
     
     private void setDefaultValues() {
@@ -345,13 +400,10 @@ public class GPPageInitialPopulation extends JPanel {
     }
 
     
-    private void setGraphic(String titledBorderText, Dimension preferredSize) {
+    private void setGraphic(Dimension preferredSize) {
         
         GridBagLayout gridbag = new GridBagLayout();
         
-        TitledBorder titledBorder = new TitledBorder(titledBorderText);
-        
-        this.setBorder(titledBorder);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         // GPPageInitialPopulationModule is already declared as global variable
@@ -417,5 +469,4 @@ public class GPPageInitialPopulation extends JPanel {
         // Put the default values so that random initial population is the default behaviour
         this.setDefaultValues();
     }
-    
 }

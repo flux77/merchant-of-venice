@@ -20,37 +20,43 @@ package org.mov.analyser;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 
 import org.mov.prefs.PreferencesManager;
-import org.mov.ui.ConfirmDialog;
+import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
 public class GPPage extends JPanel implements AnalyserPage {
 
     private JDesktopPane desktop;
-    
-    // Panels inside the tabs
-    private GPPageParameters GPPageParameters;
-    public GPPageInitialPopulation GPPageInitialPopulation;
-    
-    
+
+    // Swing components
+    private JTextField generationsTextField;
+    private JTextField populationTextField;
+    private JTextField breedingPopulationTextField;
+    private JTextField displayPopulationTextField;
+
+    // Parsed input
+    private int generations;
+    private int population;
+    private int breedingPopulation;
+    private int displayPopulation;
+
     public GPPage(JDesktopPane desktop, double maxHeight) {
         this.desktop = desktop;
 
         Dimension preferredSize = new Dimension();
         preferredSize.setSize(this.getPreferredSize().getWidth(), maxHeight/2);
-        
-        this.GPPageParameters = new GPPageParameters(desktop);
-        this.GPPageInitialPopulation = new GPPageInitialPopulation(desktop, Locale.getString("GP_PAGE_INITIAL_POPULATION_LONG"), preferredSize);
         
         layoutPage();
     }
@@ -66,48 +72,101 @@ public class GPPage extends JPanel implements AnalyserPage {
 	    String setting = (String)iterator.next();
 	    String value = (String)settings.get((Object)setting);
 
-            GPPageParameters.load(setting, value);
-            GPPageInitialPopulation.loadCommon(setting, value);
+            if(setting.equals("generations"))
+                generationsTextField.setText(value);
+            else if(setting.equals("population"))
+                populationTextField.setText(value);
+            else if(setting.equals("breeding_population"))
+                breedingPopulationTextField.setText(value);
+            else if(setting.equals("display_population"))
+                displayPopulationTextField.setText(value);
         }
-       
-        HashMap settingsInitPop =
-                PreferencesManager.loadAnalyserPageSettings(key + getClass().getName() + "GPInitialPopulation");
-
-        Iterator iteratorInitPop = settingsInitPop.keySet().iterator();
-
-	while(iteratorInitPop.hasNext()) {
-	    String settingInitPop = (String)iteratorInitPop.next();
-	    String valueInitPop = (String)settingsInitPop.get((Object)settingInitPop);
-
-            GPPageInitialPopulation.load(valueInitPop);
-        }
-        GPPageInitialPopulation.loadEmpty();
-
     }
 
     public void save(String key) {
-        
         HashMap settings = new HashMap();
-        HashMap settingsInitPop =
-                PreferencesManager.loadAnalyserPageSettings(key + getClass().getName() + "GPInitialPopulation");
-        HashMap settingsInitPopCommon = new HashMap();
 
-        GPPageParameters.save(settings);
-        GPPageInitialPopulation.save(settingsInitPopCommon, settingsInitPop, "GPInitialPopulation");
+	settings.put("generations", generationsTextField.getText());
+	settings.put("population", populationTextField.getText());
+	settings.put("breeding_population", breedingPopulationTextField.getText());
+	settings.put("display_population", displayPopulationTextField.getText());
 
         PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
                                                     settings);
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName() + "GPInitialPopulation",
-                                                    settingsInitPop);
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settingsInitPopCommon);
     }
 
     public boolean parse() {
-        if(!GPPageParameters.parse())
-            return false;
-        if(!GPPageInitialPopulation.parse())
-            return false;
+        generations = 0;
+        population = 0;
+        breedingPopulation = 0;
+        displayPopulation = 0;
+
+        try {
+	    if(!generationsTextField.getText().equals(""))
+		generations =
+		    Integer.parseInt(generationsTextField.getText());
+
+	    if(!populationTextField.getText().equals(""))
+		population =
+		    Integer.parseInt(populationTextField.getText());
+	    	
+	    if(!breedingPopulationTextField.getText().equals(""))
+		breedingPopulation =
+		    Integer.parseInt(breedingPopulationTextField.getText());
+
+	    if(!displayPopulationTextField.getText().equals(""))
+		displayPopulation =
+		    Integer.parseInt(displayPopulationTextField.getText());
+	}
+	catch(NumberFormatException e) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("ERROR_PARSING_NUMBER",
+                                                                   e.getMessage()),
+                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+	}
+
+        if(displayPopulation > breedingPopulation) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("DISPLAY_POPULATION_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+        }
+
+        if(generations <= 0) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("NO_GENERATION_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+        }
+
+        if(population <= 0) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("NO_INDIVIDUAL_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+        }
+
+        if(breedingPopulation <= 0) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("NO_BREEDING_INDIVIDUAL_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+        }
+
+        if(displayPopulation <= 0) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("NO_DISPLAY_INDIVIDUAL_ERROR"),
+                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+        }
+
         return true;
     }
 
@@ -116,60 +175,63 @@ public class GPPage extends JPanel implements AnalyserPage {
     }
 
     public String getTitle() {
-        return Locale.getString("GP_PAGE_SHORT_TITLE");
-    }
-    
-    public int getBreedingPopulation() {
-        return GPPageParameters.getBreedingPopulation();
-    }
-
-    public int getDisplayPopulation() {
-        return GPPageParameters.getDisplayPopulation();
+        return Locale.getString("GP_PAGE_PARAMETERS_SHORT");
     }
 
     public int getGenerations() {
-        return GPPageParameters.getGenerations();
+        return generations;
     }
 
     public int getPopulation() {
-        return GPPageParameters.getPopulation();
+        return population;
     }
-    
-    public int getMutations() {
-        return GPPageInitialPopulation.getMutations();
+
+    public int getBreedingPopulation() {
+        return breedingPopulation;
     }
-    
-    public int getIfRandom() {
-        return GPPageInitialPopulation.getIfRandom();
+
+    public int getDisplayPopulation() {
+        return displayPopulation;
     }
-    
-    public int getRandomFromInitialPopulation() {
-        return GPPageInitialPopulation.getRandom();
-    }
-    
-    public String getBuyRuleFromInitialPopulation(int row) {
-        return GPPageInitialPopulation.getBuyRule(row);
-    }
-    
-    public String getSellRuleFromInitialPopulation(int row) {
-        return GPPageInitialPopulation.getSellRule(row);
-    }
-    
+
     private void layoutPage() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        TitledBorder titledBorder = new TitledBorder(Locale.getString("GP_PAGE_TITLE"));
+        TitledBorder titledBorder = new TitledBorder(Locale.getString("GP_PAGE_PARAMETERS_LONG"));
         JPanel panel = new JPanel();
         panel.setBorder(titledBorder);
         panel.setLayout(new BorderLayout());
-        
-        JTabbedPane tabbedPane = new JTabbedPane();
-        
-        tabbedPane.addTab(Locale.getString("GP_PAGE_PARAMETERS_SHORT"), GPPageParameters);
-        tabbedPane.addTab(Locale.getString("GP_PAGE_INITIAL_POPULATION_SHORT"), GPPageInitialPopulation);
 
-        // The last panel (the GP Page Selection one)
-        panel.add(tabbedPane, BorderLayout.NORTH);
-        this.add(panel);
+        JPanel innerPanel = new JPanel();
+        GridBagLayout gridbag = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
+        innerPanel.setLayout(gridbag);
+
+        c.weightx = 1.0;
+        c.ipadx = 5;
+        c.anchor = GridBagConstraints.WEST;
+
+        generationsTextField =
+            GridBagHelper.addTextRow(innerPanel, Locale.getString("GENERATIONS"), "",
+                                     gridbag, c,
+                                     5);
+        populationTextField =
+            GridBagHelper.addTextRow(innerPanel,
+                                     Locale.getString("POPULATION"), "",
+                                     gridbag, c,
+                                     10);
+        breedingPopulationTextField =
+            GridBagHelper.addTextRow(innerPanel,
+                                     Locale.getString("BREEDING_POPULATION"), "",
+                                     gridbag, c, 7);
+
+        displayPopulationTextField =
+            GridBagHelper.addTextRow(innerPanel,
+                                     Locale.getString("DISPLAY_POPULATION"), "",
+                                     gridbag, c, 7);
+
+        panel.add(innerPanel, BorderLayout.NORTH);
+        add(panel);
     }
+    
 }

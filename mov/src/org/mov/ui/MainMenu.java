@@ -38,8 +38,7 @@ import org.mov.ui.*;
 /**
  * The main menu of the application.
  */
-public class MainMenu 
-    implements ActionListener, ModuleListener
+public class MainMenu implements ActionListener, ModuleListener
 {
 
     // All the menu items
@@ -52,6 +51,7 @@ public class MainMenu
     private JMenuItem graphCommodityNameMenuItem;
     private JMenuItem graphMarketAdvanceDeclineMenuItem;
 
+    private JMenuItem quoteWatchScreenNewMenuItem;
     private JMenuItem quoteCompanyListAllMenuItem;
     private JMenuItem quoteCompanyListRuleMenuItem;
     private JMenuItem quoteCompanyListDateMenuItem;
@@ -78,13 +78,18 @@ public class MainMenu
     private JMenu windowMenu;
     private JMenu filePortfolioMenu;
     private JMenu graphPortfolioMenu;
+    private JMenu quoteWatchScreenMenu;
 
     private org.mov.ui.DesktopManager desktopManager;
     private JDesktopPane desktop;
     private JFrame frame;
 
+    // Mappings between menus and portfolios
     private HashMap portfolioHash = new HashMap();
     private HashMap portfolioGraphHash = new HashMap();
+
+    // Mapping between menus and watch screens
+    private HashMap watchScreenHash = new HashMap();
 
     // Used for window menu - keeps track of modules + menu items
     private Hashtable moduleToMenuItemHash = new Hashtable();
@@ -157,6 +162,11 @@ public class MainMenu
 	// Table
 	{
 	    JMenu quoteMenu = MenuHelper.addMenu(menuBar, "Table", 'T');
+
+            // Table -> Watch screens
+            quoteWatchScreenMenu = MenuHelper.addMenu(quoteMenu, "Watch Screen", 'W');
+
+            quoteMenu.addSeparator();
 	    
 	    // Table -> Companies + Funds
 	    JMenu quoteMenuCompany = MenuHelper.addMenu(quoteMenu, 
@@ -210,8 +220,6 @@ public class MainMenu
 	    quoteCommoditiesListDateMenuItem = 
 		MenuHelper.addMenuItem(this, quoteMenuCommodities, 
 				       "List by Date",'D');
-
-            quoteMenu.addSeparator();
 
             // Table -> Stocks -> List by Symbols
             JMenu quoteMenuStocks = MenuHelper.addMenu(quoteMenu,
@@ -290,8 +298,9 @@ public class MainMenu
             helpAboutMenuItem = MenuHelper.addMenuItem(this, helpMenu, "About");
         }
 
-	// Build portfolio menus
+	// Build portfolio and watchscreen menus
 	updatePortfolioMenu();
+        updateWatchScreenMenu();
 
 	frame.setJMenuBar(menuBar);
     }
@@ -321,7 +330,7 @@ public class MainMenu
 		    else if(menu == filePortfolioNewMenuItem)
 			CommandManager.getInstance().newPortfolio();
 
-		    // Maybe its a portfolio?
+		    // Maybe it's a portfolio?
 		    else if(portfolioHash.get(menu) != null) {
 			String portfolioName =
 			    (String)portfolioHash.get(menu);
@@ -340,6 +349,16 @@ public class MainMenu
 		    }
 		    
 		    // Table Menu
+		    else if(menu == quoteWatchScreenNewMenuItem)
+			CommandManager.getInstance().newWatchScreen();
+
+		    // Maybe it's a watch screen
+		    else if(watchScreenHash.get(menu) != null) {
+			String watchScreenName =
+			    (String)watchScreenHash.get(menu);
+			CommandManager.getInstance().openWatchScreen(watchScreenName);
+		    }
+
 		    else if(menu == quoteCommoditiesListAllMenuItem)
 			CommandManager.getInstance().tableStocks(QuoteRange.ALL_SYMBOLS);
 		    else if (menu == quoteCommoditiesListRuleMenuItem)
@@ -523,32 +542,50 @@ public class MainMenu
 	filePortfolioNewMenuItem = 
 	    MenuHelper.addMenuItem(this, filePortfolioMenu, "New Portfolio");
 
-	if(PreferencesManager.getPortfolioNames().length > 0) {
-	    filePortfolioMenu.addSeparator();
-	}
-
 	// Build both portfolio menus
-	portfolioHash = buildPortfolioMenu(filePortfolioMenu);
-	portfolioGraphHash = buildPortfolioMenu(graphPortfolioMenu);
+	String[] portfolioNames = PreferencesManager.getPortfolioNames();
+
+	if(portfolioNames.length > 0)
+	    filePortfolioMenu.addSeparator();
+
+	portfolioHash = buildMenu(filePortfolioMenu, portfolioNames);
+	portfolioGraphHash = buildMenu(graphPortfolioMenu, portfolioNames);
     }
 
-    // Build menu with names of all portfolios. Create hashmap which
-    // maps menu items back to the portfolio listed.
-    private HashMap buildPortfolioMenu(JMenu portfolioMenu)
+    /**
+     * Inform menu that the list of watch screens has changed and that
+     * its menus should be redrawn
+     */
+    public void updateWatchScreenMenu() {
+	// Remove old menu items from watch screen menu (if there were any)
+	quoteWatchScreenMenu.removeAll();
+
+	quoteWatchScreenNewMenuItem = 
+	    MenuHelper.addMenuItem(this, quoteWatchScreenMenu, "New Watch Screen");
+
+	// Build both portfolio menus
+	String[] watchScreenNames = PreferencesManager.getWatchScreenNames();
+
+	if(watchScreenNames.length > 0)
+	    quoteWatchScreenMenu.addSeparator();
+
+	watchScreenHash = buildMenu(quoteWatchScreenMenu, watchScreenNames);
+    }
+
+    // Take the list of menu item and add them to the given menu. Return
+    // a hashmap which maps each menu created with the given menu item.
+    private HashMap buildMenu(JMenu menu, String[] items)
     {
-	HashMap menuPortfolioMap = new HashMap();
+	HashMap menuMap = new HashMap();
 	
-	String[] portfolioNames = PreferencesManager.getPortfolioNames();
-	if(portfolioNames.length > 0) {
-	    for(int i = 0; i < portfolioNames.length; i++) {
-		JMenuItem menu = MenuHelper.addMenuItem(this, 
-							portfolioMenu,
-							portfolioNames[i]);
-		menuPortfolioMap.put(menu, portfolioNames[i]);
+	if(items.length > 0) {
+	    for(int i = 0; i < items.length; i++) {
+		JMenuItem menuItem = MenuHelper.addMenuItem(this, menu, items[i]);
+		menuMap.put(menuItem, items[i]);
 	    }
 	}
 
-	return menuPortfolioMap;
+	return menuMap;
     }
 }
 

@@ -189,6 +189,12 @@ public class ExpressionFactory {
 	case(Token.SUM_TOKEN):
 	    expression = new SumExpression(arg1, arg2, arg3);
 	    break;
+        case(Token.SQRT_TOKEN):
+            expression = new SqrtExpression(arg1);
+            break;
+        case(Token.ABS_TOKEN):
+            expression = new AbsExpression(arg1);
+            break;
         default:
             // No such token
             assert false;

@@ -45,7 +45,7 @@ import java.util.*;
  *            "max" "(" QUOTE "," EXPR "," EXPR ")" |
  *            "avg" "(" QUOTE "," EXPR "," EXPR ")" |
  *            "sum" "(" QUOTE "," EXPR "," EXPR ")" |
- *            "rsi" "(" EXPR "," EXPR ")" |y
+ *            "rsi" "(" EXPR "," EXPR ")" |
  *            "not" "(" EXPR ")" |
  *            "percent" "(" EXPR "," EXPR ")" |
  *            "if"  "(" EXPR ")" "{" EXPR "}" "else" "{" EXPR "}" |
@@ -53,7 +53,9 @@ import java.util.*;
  *            "dayofyear" "(" ")" |
  *            "day" "(" ")" |
  *            "month" "(" ")" |
- *            "year" "(" ")"
+ *            "year" "(" ")" |
+ *            "sqrt" "(" EXPR ")" |
+ *            "abs" "(" EXPR ")"
  * </pre>
  */
 public class Parser {
@@ -186,9 +188,8 @@ public class Parser {
 	if(tokens.match(Token.NUMBER_TOKEN) || 
            tokens.match(Token.TRUE_TOKEN) || 
            tokens.match(Token.FALSE_TOKEN) || 
-           tokens.match(Token.SUBTRACT_TOKEN)) {
+           tokens.match(Token.SUBTRACT_TOKEN))
 	    expression = parseNumber(tokens);
-	}
 	
 	// FUNCTION
 	else if(tokens.match(Token.LAG_TOKEN) ||
@@ -204,9 +205,10 @@ public class Parser {
 		tokens.match(Token.DAY_OF_YEAR_TOKEN) ||
 		tokens.match(Token.DAY_TOKEN) ||
 		tokens.match(Token.MONTH_TOKEN) ||
-		tokens.match(Token.YEAR_TOKEN)) {
+		tokens.match(Token.YEAR_TOKEN) ||
+                tokens.match(Token.SQRT_TOKEN) ||
+                tokens.match(Token.ABS_TOKEN))
 	    expression = parseFunction(tokens);
-	}
 
 	// EXPRESSION
 	else if(tokens.match(Token.LEFT_PARENTHESIS_TOKEN)) {
@@ -320,6 +322,8 @@ public class Parser {
 	    break;
 
 	case(Token.NOT_TOKEN):
+        case(Token.SQRT_TOKEN):
+        case(Token.ABS_TOKEN):
 	    arg1 = parseExpression(tokens);
 	    break;
 					       

@@ -146,8 +146,14 @@ public class Token {
     /** Represents "<code>sum</code>" symbol */
     public static final int SUM_TOKEN = 39;        
 
+    /** Represents "<code>sqrt</code>" symbol */
+    public static final int SQRT_TOKEN = 40;
+
+    /** Represents "<code>abs</code>" symbol */
+    public static final int ABS_TOKEN = 41;
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 40;
+    private static final int FIXED_LENGTH_TOKENS = 42;
 
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;       
@@ -225,6 +231,8 @@ public class Token {
 	tokenStrings[MONTH_TOKEN]	       = "month";
 	tokenStrings[YEAR_TOKEN]	       = "year";
 	tokenStrings[SUM_TOKEN]  	       = "sum";
+	tokenStrings[SQRT_TOKEN]  	       = "sqrt";
+	tokenStrings[ABS_TOKEN]  	       = "abs";
 
 	boolean matched = false;
 

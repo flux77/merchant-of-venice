@@ -29,7 +29,6 @@ import org.mov.analyser.OrderCache;
 
 import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
-import org.mov.quote.QuoteBundle;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 

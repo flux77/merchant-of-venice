@@ -32,7 +32,6 @@ import org.mov.parser.EvaluationException;
 import org.mov.quote.QuoteFunctions;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
-import org.mov.quote.QuoteFunctions;
 
 /**
  * Standard Deviation graph. This graph is used to show the

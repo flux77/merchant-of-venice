@@ -32,8 +32,6 @@ import org.mov.main.*;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
-import org.mov.quote.*;
-import org.mov.table.*;
 import org.mov.ui.AbstractTable;
 import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;

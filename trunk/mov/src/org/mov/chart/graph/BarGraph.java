@@ -19,13 +19,9 @@
 package org.mov.chart.graph;
 
 import java.awt.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-
 import org.mov.chart.*;
 import org.mov.chart.source.*;
-import org.mov.util.*;
 
 /**
  * Horizontal bar graph. This graph is most commonly used to draw

@@ -40,7 +40,6 @@ import org.mov.help.HelpModule;
 import org.mov.util.ExpressionQuery;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
-import org.mov.parser.Expression;
 import org.mov.portfolio.Portfolio;
 import org.mov.portfolio.PortfolioModule;
 import org.mov.prefs.PreferencesModule;

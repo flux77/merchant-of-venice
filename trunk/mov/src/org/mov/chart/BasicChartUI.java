@@ -20,16 +20,11 @@ package org.mov.chart;
 
 import java.awt.*;
 import java.awt.image.*;
-import java.lang.*;
-import java.text.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.plaf.*;
 
 import org.mov.chart.graph.*;
-import org.mov.chart.source.*;
-import org.mov.util.*;
-import org.mov.quote.*;
 
 /**
  * Chart Implementation.

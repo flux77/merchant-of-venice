@@ -24,7 +24,6 @@ import java.awt.event.ActionListener;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -37,7 +36,6 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 
-import org.mov.parser.EvaluationException;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.util.Locale;

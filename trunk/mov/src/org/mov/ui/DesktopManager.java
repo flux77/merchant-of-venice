@@ -20,11 +20,7 @@ package org.mov.ui;
 
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.Comparator;
 import java.awt.Dimension;
-import java.awt.Component;
-import java.awt.event.*;
-import java.awt.BorderLayout;
 import java.beans.PropertyVetoException;
 import javax.swing.*;
 import javax.swing.event.*;

@@ -20,7 +20,6 @@ package org.mov.help;
 
 import java.io.*;
 import java.net.*;
-import java.text.*;
 import java.util.*;
 import javax.swing.tree.*;
 import javax.xml.parsers.*;

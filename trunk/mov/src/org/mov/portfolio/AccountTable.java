@@ -19,7 +19,6 @@
 package org.mov.portfolio;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.mov.ui.AbstractTable;

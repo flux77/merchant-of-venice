@@ -28,7 +28,6 @@ import org.mov.chart.Graphable;
 import org.mov.chart.GraphTools;
 import org.mov.chart.source.GraphSource;
 import org.mov.util.Locale;
-import org.mov.quote.QuoteFunctions;
 
 /**
  * Momentum graph. This graph is used to show the direction that the

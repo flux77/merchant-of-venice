@@ -24,8 +24,6 @@ import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.quote.*;
 
-import java.util.*;
-
 /**
  * Provides a <code>QuoteBundle</code> graph source. This class
  * allows graph sources for day Open, High, Low, Close and

@@ -19,14 +19,9 @@
 package org.mov.chart.graph;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
 import org.mov.chart.*;
 import org.mov.chart.source.*;
-import org.mov.util.*;
 
 /**
  * Simple line graph. This graph is used to draw any kind of line such

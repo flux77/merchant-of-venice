@@ -23,8 +23,6 @@ import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
 import org.mov.chart.Graphable;
 import org.mov.chart.GraphableQuoteFunctionSource;
 import org.mov.chart.GraphTools;

@@ -21,9 +21,6 @@ package org.mov.ui;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.lang.*;
-import java.text.*;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.plaf.*;
 

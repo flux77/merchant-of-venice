@@ -18,11 +18,7 @@
 
 package org.mov.chart.source;
 
-import java.util.*;
-
 import org.mov.chart.*;
-import org.mov.util.*;
-import org.mov.quote.*;
 
 /**
  * Provides an abstraction of the data being graphed, this way graphs

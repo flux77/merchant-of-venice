@@ -21,14 +21,11 @@ package org.mov.analyser;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -43,7 +40,6 @@ import org.mov.parser.ExpressionException;
 import org.mov.parser.Parser;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
-import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
 public class TradeValuePage extends JPanel implements AnalyserPage {

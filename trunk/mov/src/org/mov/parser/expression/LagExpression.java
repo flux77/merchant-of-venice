@@ -23,9 +23,7 @@ import org.mov.parser.Expression;
 import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
 import org.mov.quote.MissingQuoteException;
-import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteFunctions;
 import org.mov.quote.Symbol;
 
 /**

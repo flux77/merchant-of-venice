@@ -18,12 +18,19 @@
 
 package org.mov.prefs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.IllegalStateException;
+import java.lang.SecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
+
 
 import org.mov.portfolio.Account;
 import org.mov.portfolio.CashAccount;
@@ -116,6 +123,22 @@ public class PreferencesManager {
 	public int height;
     }
 
+    /** Web windows preferences preferences fields. */
+    public class WindowPreferencePreferences {
+
+        /** Windows preferences path. */
+	public String path;
+        /** Windows preferences file current selected. */
+	public String XMLfile;
+    }
+
+    /** Web language preferences fields. */
+    public class LanguagePreferences {
+
+        /** Language. */
+	public String locale;
+    }
+
     /**
      * Forces the preferences data to be saved to the backend store (e.g. disk).
      */
@@ -134,6 +157,24 @@ public class PreferencesManager {
     public static Preferences getUserNode(String node) {
         if (node.charAt(0) == '/') node = node.substring(1);
         return userRoot.node(node);
+    }
+
+    /**
+     * Get the preferences from the input XML stream
+     * @param inputStream the input XML stream
+     */
+    public static void importPreferences(InputStream inputStream)
+        throws IOException, InvalidPreferencesFormatException {
+            userRoot.importPreferences(inputStream);
+    }
+
+    /**
+     * Set the preferences in the output XML stream
+     * @param outputStream the output XML stream
+     */
+    public static void exportPreferences(OutputStream outputStream)
+        throws IOException, BackingStoreException {
+            userRoot.exportSubtree(outputStream);
     }
 
     /**
@@ -664,6 +705,54 @@ public class PreferencesManager {
 	prefs.put("host", proxyPreferences.host);
 	prefs.put("port", proxyPreferences.port);
 	prefs.putBoolean("enabled", proxyPreferences.isEnabled);
+    }
+
+    /**
+     * Load language settings.
+     *
+     * @return language preferences.
+     */
+    public static LanguagePreferences loadLanguageSettings() {
+        Preferences prefs = getUserNode("/language");
+        PreferencesManager preferencesManager = new PreferencesManager();
+        LanguagePreferences languagePreferences = preferencesManager.new LanguagePreferences();
+        languagePreferences.locale = prefs.get("locale", null);
+        return languagePreferences;
+    }
+
+    /**
+     * Save language settings.
+     *
+     * @param languagePreferences the new proxy preferences.
+     */
+    public static void saveLanguageSettings(LanguagePreferences languagePreferences) {
+	Preferences prefs = getUserNode("/language");
+	prefs.put("locale", languagePreferences.locale);
+    }
+
+    /**
+     * Load windows preferences settings.
+     *
+     * @return windows preferences preferences.
+     */
+    public static WindowPreferencePreferences loadWindowPreferenceSettings() {
+        Preferences prefs = getUserNode("/window_preference");
+        PreferencesManager preferencesManager = new PreferencesManager();
+        WindowPreferencePreferences windowPreferencePreferences = preferencesManager.new WindowPreferencePreferences();
+        windowPreferencePreferences.path = prefs.get("path", null);
+        windowPreferencePreferences.XMLfile = prefs.get("file", "");
+        return windowPreferencePreferences;
+    }
+
+    /**
+     * Save windows preferences settings.
+     *
+     * @param windowPreferencePreferences the new proxy preferences.
+     */
+    public static void saveWindowPreferenceSettings(WindowPreferencePreferences windowPreferencePreferences) {
+	Preferences prefs = getUserNode("/window_preference");
+	prefs.put("path", windowPreferencePreferences.path);
+	prefs.put("file", windowPreferencePreferences.XMLfile);
     }
 
     /**

@@ -65,7 +65,7 @@ public class StockHoldingTable extends AbstractTable {
 
     private JMenu showColumnsMenu;
     private Model model;
-    
+
     class Model extends AbstractTableModel {
 	private QuoteBundle quoteBundle;
 	private HashMap stockHoldings;
@@ -134,7 +134,7 @@ public class StockHoldingTable extends AbstractTable {
 
             case(PERCENT_RETURN_COLUMN):
                 try {
-                    return new ChangeFormat(stockHolding.getCost(), 
+                    return new ChangeFormat(stockHolding.getCost(),
                                             quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
                 }
                 catch(MissingQuoteException e) {
@@ -209,35 +209,35 @@ public class StockHoldingTable extends AbstractTable {
      */
     public StockHoldingTable(HashMap stockHoldings, QuoteBundle quoteBundle) {
         List columns = new ArrayList();
-        columns.add(new Column(SYMBOL_COLUMN, 
-			       Locale.getString("SYMBOL"), 
+        columns.add(new Column(SYMBOL_COLUMN,
+			       Locale.getString("SYMBOL"),
 			       Locale.getString("SYMBOL_COLUMN_HEADER"),
                                Symbol.class, Column.VISIBLE));
-        columns.add(new Column(SHARES_COLUMN, 
-			       Locale.getString("SHARES"), 
+        columns.add(new Column(SHARES_COLUMN,
+			       Locale.getString("SHARES"),
 			       Locale.getString("SHARES_COLUMN_HEADER"),
                                Integer.class, Column.VISIBLE));
-        columns.add(new Column(AVERAGE_COST_COLUMN, 
-			       Locale.getString("AVERAGE_COST"), 
-			       Locale.getString("AVERAGE_COST_COLUMN_HEADER"), 
+        columns.add(new Column(AVERAGE_COST_COLUMN,
+			       Locale.getString("AVERAGE_COST"),
+			       Locale.getString("AVERAGE_COST_COLUMN_HEADER"),
                                QuoteFormat.class, Column.HIDDEN));
-        columns.add(new Column(MARKET_PRICE_COLUMN, 
+        columns.add(new Column(MARKET_PRICE_COLUMN,
 			       Locale.getString("MARKET_PRICE"),
 			       Locale.getString("MARKET_PRICE_COLUMN_HEADER"),
                                QuoteFormat.class, Column.VISIBLE));
-        columns.add(new Column(MARKET_VALUE_COLUMN, 
+        columns.add(new Column(MARKET_VALUE_COLUMN,
 			       Locale.getString("MARKET_VALUE"),
 			       Locale.getString("MARKET_VALUE_COLUMN_HEADER"),
                                Money.class, Column.VISIBLE));
-        columns.add(new Column(POINT_CHANGE_COLUMN, 
+        columns.add(new Column(POINT_CHANGE_COLUMN,
 			       Locale.getString("POINT_CHANGE"),
 			       Locale.getString("POINT_CHANGE_COLUMN_HEADER"),
                                PointChangeFormat.class, Column.HIDDEN));
-        columns.add(new Column(PERCENT_CHANGE_COLUMN, 
+        columns.add(new Column(PERCENT_CHANGE_COLUMN,
 			       Locale.getString("PERCENT_CHANGE"),
 			       Locale.getString("PERCENT_CHANGE_COLUMN_HEADER"),
                                ChangeFormat.class, Column.VISIBLE));
-        columns.add(new Column(PERCENT_RETURN_COLUMN, 
+        columns.add(new Column(PERCENT_RETURN_COLUMN,
 			       Locale.getString("PERCENT_RETURN"),
 			       Locale.getString("PERCENT_RETURN_COLUMN_HEADER"),
                                ChangeFormat.class, Column.HIDDEN));

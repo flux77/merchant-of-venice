@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.ui;
@@ -46,12 +46,12 @@ import javax.swing.table.TableModel;
 /**
  * Table that allows the user to sort by column by clicking on the column's
  * table header
- * 
+ *
  * @version	0.1, 01/02/19	
  * @author	Andrew Leppard
  */
 
-public class SortedTable extends JTable 
+public class SortedTable extends JTable
 {
     /** Row is not sorted */
     public final static int DONT_SORT = 0;
@@ -85,12 +85,12 @@ public class SortedTable extends JTable
             setForeground(foreground);
 	}
 	
-	public Component 
+	public Component
 	    getTableCellRendererComponent(JTable table,
 					  Object value,
 					  boolean isSelected,
 					  boolean hasFocus,
-					  int row, int column) 
+					  int row, int column)
 	{
 	    SortedTable sortedTable = (SortedTable)table;
 	    SortModel sortModel = (SortModel)sortedTable.getModel();
@@ -104,12 +104,12 @@ public class SortedTable extends JTable
 	    setText((String)value);
 
 	    // Work out which icon to display - is this column a key for
-	    // sorting? 
+	    // sorting?
 	    if(sortedTable.getColumnSortStatus(column) == DONT_SORT)
 		setIcon(null);
 	    else if(sortedTable.getColumnSortStatus(column) == SORT_UP) {
 		// Create up arrow for header column
-                URL upImageURL = 
+                URL upImageURL =
                     ClassLoader.getSystemResource(upImage);
 
                 // Handle case where jlfgr isn't installed and the image
@@ -121,7 +121,7 @@ public class SortedTable extends JTable
 	    }
 	    else {
 		// Create down arrow for header column
-                URL downImageURL = 
+                URL downImageURL =
                     ClassLoader.getSystemResource(downImage);
 
                 // Handle case where jlfgr isn't installed and the image
@@ -135,7 +135,7 @@ public class SortedTable extends JTable
 	    return this;
 	}
     }
-    
+
     public class SortModel extends AbstractTableModel implements TableModelListener {
 
 	private TableModel userModel;
@@ -158,7 +158,7 @@ public class SortedTable extends JTable
 		this.key = key;
 		this.index = index;
 	    }
-	    
+	
 	    Object getKey() {
 		return key;
 	    }
@@ -171,12 +171,12 @@ public class SortedTable extends JTable
 	private class SortComparator implements Comparator
 	{
 	    private int sortDirection;
-	    
+	
 	    public SortComparator(int sortDirection)
 	    {
 		setDirection(sortDirection);
 	    }
-	    
+	
 	    public void setDirection(int sortDirection)
 	    {
 		this.sortDirection = sortDirection;
@@ -186,33 +186,48 @@ public class SortedTable extends JTable
 	    {
 		TableElement firstElement = (TableElement)firstObject;
 		TableElement secondElement = (TableElement)secondObject;
-		int result = 0;
+                Object firstKey = firstElement.getKey();
+                Object secondKey = secondElement.getKey();
 
-		// If type implements Comparable we can sort via the
-		// compareTo. This handles string, double, integer etc
-		try {
-		    Comparable firstComparable = (Comparable)firstElement.getKey();
-		    Comparable secondComparable = (Comparable)secondElement.getKey();
+                // The sorted table supports two way comparable. Objects which sort
+                // differently depending on the direction of sort. (I.e. it isn't
+                // a mirror image). An Example is columns with total columns that
+                // shoud always appear at the bottom.
+                try {
+                    if(firstKey instanceof TwoWayComparable) {
+                        TwoWayComparable firstComparable = (TwoWayComparable)firstKey;
+                        TwoWayComparable secondComparable = (TwoWayComparable)secondKey;
 
-		    result = firstComparable.compareTo(secondComparable);
-		}
-		catch(ClassCastException e) {
-                    // Everything should be comparable
+                        return firstComparable.compareTo(secondComparable,
+                                                         sortDirection == SORT_UP);
+                    }
+                    else {
+                        Comparable firstComparable = (Comparable)firstKey;
+                        Comparable secondComparable = (Comparable)secondKey;
+
+                        return applySortDirection(firstComparable.compareTo(secondComparable));
+                    }
+                }
+                catch(ClassCastException e) {
+                    // Everything should be either Comparable or TwoWayComparable and match.
                     assert false;
                 }
 
-		// Change depending on direction of sort arrow
-		return applySortDirection(result);
+                // If we got here there was an error - so return equality.
+                return 0;
 	    }
-	    
+	
 	    private int applySortDirection(int comparision)
 	    {
 		// Changes direction of sort
 		if(sortDirection == SORT_UP) {
+                    comparision = -comparision;
+                    /*
 		    if(comparision > 0)
 			comparision = -1;
 		    else if(comparision < 0)
 			comparision = 1;
+                    */
 		}
 		
 		return comparision; // no change
@@ -224,11 +239,11 @@ public class SortedTable extends JTable
 	{
 	    this.userModel = userModel;
 	    userModel.addTableModelListener(this);
-	    
+	
 	    hiddenColumns = new TreeSet();
 	    sortComparator = new SortComparator(sortDirection);
 	    sortIndex = null;
-	    
+	
 	    sort(sortColumn, sortDirection);
 	}
 
@@ -246,7 +261,7 @@ public class SortedTable extends JTable
 	    while(iterator.hasNext()) {
 		int hiddenColumnNumber = ((Integer)iterator.next()).intValue();
 
-		if(hiddenColumnNumber == columnNumber) 
+		if(hiddenColumnNumber == columnNumber)
 		    return false;
 	    }
 
@@ -313,14 +328,14 @@ public class SortedTable extends JTable
 	    // perform sort
 	    sortIndex = new LinkedList();
 	    TableElement tableElement;
-            
+
 	    for(int i = 0; i < getRowCount(); i++) {
-		tableElement = 
-		    new TableElement(userModel.getValueAt(i, sortColumn), 
+		tableElement =
+		    new TableElement(userModel.getValueAt(i, sortColumn),
 				     i);
 		sortIndex.add(tableElement);
 	    }
-	    
+	
 	    // 2. Get comparator ready and then sort
 	    sortComparator.setDirection(sortDirection);
 	    Collections.sort(sortIndex, sortComparator);
@@ -375,7 +390,7 @@ public class SortedTable extends JTable
             if(sortedRow == -1)
                 return -1;
             else {
-                TableElement index = (TableElement)sortIndex.get(sortedRow);            
+                TableElement index = (TableElement)sortIndex.get(sortedRow);
                 return index.getIndex();
             }
 	}
@@ -387,10 +402,10 @@ public class SortedTable extends JTable
                 return -1;
             else {
                 TableElement index;
-                
+
                 for(int i = 0; i < getRowCount(); i++) {
                     index = (TableElement)sortIndex.get(i);
-                    
+
                     if(index.getIndex() == unsortedRow)
                         return i;		
                 }
@@ -405,7 +420,7 @@ public class SortedTable extends JTable
 	    return userModel;
 	}
     }
-    
+
     public SortedTable()
     {
 	// Set defaults
@@ -413,7 +428,7 @@ public class SortedTable extends JTable
 	sortDirection = SORT_DOWN;
 	model = null;
 	
-	// Set custom renderer for the tables headers so we have the 
+	// Set custom renderer for the tables headers so we have the
 	// sort direction arrow
         setCustomHeaderRenderer();
 
@@ -430,22 +445,22 @@ public class SortedTable extends JTable
                     // only interested them if the table has more than one
                     // entry
                     if((e.getModifiers() & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
-                        
+
                         // Get which column has been been clicked
                         int column = columnAtPoint(e.getPoint());
-                        
+
                         // Deal with "moved" columns
                         column = convertColumnIndexToModel(column);
-                        
+
                         // Deal with "hidden" columns
                         column = model.convertFromDisplayedColumn(column);
-                        
+
                         // Toggle up/down arrow on column. Assign to new one if needed
                         toggleColumnSortStatus(column);
-                        
+
                         // Tell table model a resort is needed
                         resort();
-                        
+
                         // redraw
                         revalidate();
                         repaint();
@@ -461,7 +476,7 @@ public class SortedTable extends JTable
 
     public void setModel(TableModel model, int sortColumn, int sortDirection)
     {
-	// wrap user's model with our sort model 
+	// wrap user's model with our sort model
 	this.model = new SortModel(model, sortColumn, sortDirection);
 
 	super.setModel(this.model);
@@ -478,25 +493,25 @@ public class SortedTable extends JTable
 	if(model != null) {
 
 	    // Make sure when the table is sorted, the previous people selected
-	    // are still selected - rather than selecting the new people 
+	    // are still selected - rather than selecting the new people
 	    // whom occupy their previous rows. First get indices of people
 	    // who are currently selected
 
 	    int[] selectedRows = getSelectedRows();
 	    int selectedRowCount = getSelectedRowCount();
-	    
+	
 	    // Resort data in table model
 	    model.sort(sortColumn, sortDirection);
 
 	    // Reselect people
 	    clearSelection();
 
-	    for(int i = 0; i < selectedRowCount; i++) 
+	    for(int i = 0; i < selectedRowCount; i++)
 		addRowSelectionInterval(selectedRows[i],
-					selectedRows[i]); 
+					selectedRows[i]);
 	}
     }
-    
+
     // We use a custom renderer for the table header so that we can
     // insert the up/down sort arrows.
     private void setCustomHeaderRenderer() {
@@ -504,15 +519,15 @@ public class SortedTable extends JTable
 	
 	// Assume the header is rendered using swing components (it is) and
 	// get the component used to render the first cell of the header
-	JComponent header = 
+	JComponent header =
 	    (JComponent)r.getTableCellRendererComponent((JTable)this,
 							(Object)"",
 							false,
 							false,
 							0, 0);
 
-        HeaderCellRenderer renderer = 
-            new HeaderCellRenderer(header.getBorder(), 
+        HeaderCellRenderer renderer =
+            new HeaderCellRenderer(header.getBorder(),
                                    header.getBackground(),
                                    header.getForeground());
         getTableHeader().setDefaultRenderer(renderer);
@@ -552,7 +567,7 @@ public class SortedTable extends JTable
     public int getSelectedRow()
     {
         int row = super.getSelectedRow();
-        
+
         // No selected row?
         if(row == -1)
             return -1;
@@ -566,8 +581,8 @@ public class SortedTable extends JTable
 	int[] selectedRows = new int[getSelectedRowCount()];
 	
 	if(getSelectedRowCount() > 0) {
-	    for(int i = 0; i < getSelectedRowCount(); i++) 
-		selectedRows[i] = 
+	    for(int i = 0; i < getSelectedRowCount(); i++)
+		selectedRows[i] =
 		    model.getUnsortedRow(unsortedSelectedRows[i]);
 	}
 
@@ -589,9 +604,9 @@ public class SortedTable extends JTable
     {
 	// Doing a straight select of data using the user model doesnt
 	// convert very well to sorted. I.e. a straight selection of unsorted
-	// data could end up being a descrete grouping of sorted data 
-	// selections. It is for this reason this function will only work 
-	// when index0 == index1 otherwise it will be ignored. 
+	// data could end up being a descrete grouping of sorted data
+	// selections. It is for this reason this function will only work
+	// when index0 == index1 otherwise it will be ignored.
 	// This forces the user to think about what they are doing.
 	if(index0 == index1) {
 	    // Convert
@@ -602,10 +617,10 @@ public class SortedTable extends JTable
 	}
     }
 
-    public void setVisible(int row, int column) 
+    public void setVisible(int row, int column)
     {
         int sortedRow = model.getSortedRow(row);
-        
+
         if(sortedRow != -1) {
             Rectangle rectangle = super.getCellRect(sortedRow, column, true);
             scrollRectToVisible(rectangle);

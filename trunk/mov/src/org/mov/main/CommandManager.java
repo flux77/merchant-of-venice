@@ -43,6 +43,7 @@ import org.mov.parser.Expression;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
+import org.mov.table.PortfolioTableModule;
 import org.mov.table.QuoteModule;
 import org.mov.table.WatchScreen;
 import org.mov.table.WatchScreenModule;
@@ -527,24 +528,36 @@ public class CommandManager {
 
         progress.show(Locale.getString("GRAPH_PORTFOLIO", portfolio.getName()));
 
+        List symbolsTraded = portfolio.getSymbolsTraded();
         PortfolioGraphSource portfolioGraphSource = null;
         Graph graph = null;
 
-        // Get default start and end date if not supplied
-        if(startDate == null)
-            startDate = portfolio.getStartDate();
+        // If the portfolio has traded symbols and the caller has not supplied a
+        // quote bundle, then load one now.
+        if (symbolsTraded.size() > 0 && quoteBundle == null) {
+            // Get default start and end date if not supplied
+            if(startDate == null)
+                startDate = portfolio.getStartDate();
 
-        if(endDate == null)
-            endDate = QuoteSourceManager.getSource().getLastDate();		
-        List symbols = portfolio.getSymbolsTraded();
+            if(endDate == null) {
+                endDate = QuoteSourceManager.getSource().getLastDate();		
 
-        // Only need to load from quote bundle if there are any stocks
-        // in the portfolio
-        if(quoteBundle == null && symbols.size() > 0) {
-            quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbols, startDate, endDate));
+                // Make sure the end date is after the start date! Otherwise the code
+                // will assert later.
+                if (endDate.before(startDate))
+                    endDate = startDate;
+            }
+
+            quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbolsTraded, startDate,
+                                                               endDate));
         }
 
-        if (!thread.isInterrupted()) {
+        // If the portfolio hasn't traded symbols then there is nothing to
+        // graph
+        if (symbolsTraded.size() == 0)
+            DesktopManager.showErrorMessage(Locale.getString("NOTHING_TO_GRAPH"));
+
+        else if (!thread.isInterrupted()) {
             portfolioGraphSource =
                 new PortfolioGraphSource(portfolio, quoteBundle,
                                          PortfolioGraphSource.MARKET_VALUE);
@@ -552,6 +565,54 @@ public class CommandManager {
             chart.add(graph, portfolio, quoteBundle, 0);
             chart.redraw();
             desktopManager.newFrame(chart);
+        }
+
+        ProgressDialogManager.closeProgressDialog(progress);
+    }
+
+    public void tablePortfolio(Portfolio portfolio) {
+        tablePortfolio(portfolio, null, null, null);
+    }
+
+    public void tablePortfolio(Portfolio portfolio, QuoteBundle quoteBundle) {
+        tablePortfolio(portfolio, quoteBundle, null, null);
+    }
+
+    public void tablePortfolio(Portfolio portfolio,
+                               QuoteBundle quoteBundle,
+                               TradingDate startDate,
+                               TradingDate endDate) {
+
+	Thread thread = Thread.currentThread();
+	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+
+        progress.show(Locale.getString("TABLE_PORTFOLIO", portfolio.getName()));
+
+        List symbolsTraded = portfolio.getSymbolsTraded();
+
+        // If the portfolio has traded symbols and the caller has not supplied a
+        // quote bundle, then load one now.
+        if (symbolsTraded.size() > 0 && quoteBundle == null) {
+            // Get default start and end date if not supplied
+            if(startDate == null)
+                startDate = portfolio.getStartDate();
+
+            if(endDate == null) {
+                endDate = QuoteSourceManager.getSource().getLastDate();		
+
+                // Make sure the end date is after the start date! Otherwise the code
+                // will assert later.
+                if (endDate.before(startDate))
+                    endDate = startDate;
+            }
+
+            quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbolsTraded, startDate,
+                                                               endDate));
+        }
+
+        if (!thread.isInterrupted()) {
+            PortfolioTableModule table = new PortfolioTableModule(portfolio, quoteBundle);
+            desktopManager.newFrame(table);
         }
 
         ProgressDialogManager.closeProgressDialog(progress);
@@ -777,7 +838,7 @@ public class CommandManager {
 	    graph = new LineGraph(dayClose);
 	    chart.add(graph, quoteBundle, 0);
 	    chart.redraw();
-	    
+	
 	    if(symbols.size() > 1)
 		progress.increment();
 	
@@ -788,7 +849,7 @@ public class CommandManager {
 	
 	    ProgressDialogManager.closeProgressDialog(progress);
 	}
-        
+
     }
 
     /**
@@ -799,21 +860,23 @@ public class CommandManager {
             isAboutDialogUp = true;
             String aboutMessage = (Locale.getString("VENICE_LONG") + ", " +
 				   Main.LONG_VERSION + " / " +
-                                   Main.RELEASE_DATE + "\n\n" +
+                                   Main.RELEASE_DATE + "\n" +
 
-				   Locale.getString("COPYRIGHT", "2003") + ", " +
+				   Locale.getString("COPYRIGHT", "2003-4") + ", " +
 				   "Andrew Leppard\n" +
 				   Locale.getString("SEE_LICENSE") + "\n\n" +
 
-                                   "Andrew Leppard (aleppard@picknow.com.au)\n" +
-                                   "Daniel Makovec\n\n" +
+                                   "Andrew Leppard (aleppard@picknow.com.au)\n\n" +
 				
-				   Locale.getString("ADDITIONAL_CODE") + "\n\n" +
+				   Locale.getString("ADDITIONAL_CODE") + "\n" +
+                                   "Daniel Makovec, Quentin Bossard, Peter Fradley, Mark Hummel,\n" +
+                                   "Bryan Lin, Alberto Nacher & Matthias St\366ckel.\n\n" +
 
-                                   "Peter Fradley, Bryan Lin, Alberto Nacher & Matthias St\366ckel."
+                                   Locale.getString("TRANSLATORS") + "\n" +
+                                   "Quentin Bossard (" + Locale.getString("FRENCH") + "), " +
+                                   "Bryan Lin (" + Locale.getString("SIMPLIFIED_CHINESE") + ")\n" +
+                                   "Alberto Nacher (" + Locale.getString("ITALIAN") + ")"
 				   );
-
-
 
 	    String aboutVenice = Locale.getString("ABOUT_VENICE",
 						  Locale.getString("VENICE_SHORT"));
@@ -851,7 +914,7 @@ public class CommandManager {
     }
 
     /**
-     * Checks to see if the current frame is open. If so it will make sure the 
+     * Checks to see if the current frame is open. If so it will make sure the
      * frame is visible and move it to the front of the screen. This function
      * has too purposes: (1) To re-use previously created frames (2) To prevent
      * multiple instances of the frames being displayed.

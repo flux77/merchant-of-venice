@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.ui;
@@ -98,9 +98,9 @@ public class AbstractTable extends SortedTable {
 			      alternativeBackgroundColor);
 
 	    // The change column has specific rendering
-	    if(value instanceof ChangeFormat) 
+	    if(value instanceof ChangeFormat)
 		renderChangeComponent(table, value, isSelected,
-				      hasFocus, row, column); 
+				      hasFocus, row, column);
 	    else if(value instanceof TradingDate) {
 	    	TradingDate date = (TradingDate)value;
 
@@ -112,13 +112,13 @@ public class AbstractTable extends SortedTable {
 		textLabel.setText(value.toString());
 		add(textLabel);
 	    }
-	    	    
+	    	
 	    return this;
 	}
 
 	private void renderChangeComponent(JTable table, Object value,
-					   boolean isSelected, 
-					   boolean hasFocus, 
+					   boolean isSelected,
+					   boolean hasFocus,
 					   int row, int column) {
 
 	    ChangeFormat change = (ChangeFormat)value;
@@ -127,7 +127,7 @@ public class AbstractTable extends SortedTable {
 
 	    if(changePercent > 0)
 		text = "+";
-            
+
             text = text.concat(format.format(changePercent));
             text = text.concat("%");
 	    textLabel.setText(text);
@@ -152,18 +152,19 @@ public class AbstractTable extends SortedTable {
 	setShowGrid(true);
 
 	// Our own stock quote renderer
-	setDefaultRenderer(String.class, new StockQuoteRenderer());
-	setDefaultRenderer(Integer.class, new StockQuoteRenderer());
+	setDefaultRenderer(AccountNameFormat.class, new StockQuoteRenderer());
+	setDefaultRenderer(ChangeFormat.class, new StockQuoteRenderer());
 	setDefaultRenderer(Double.class, new StockQuoteRenderer());
 	setDefaultRenderer(Float.class, new StockQuoteRenderer());
-	setDefaultRenderer(TradingDate.class, new StockQuoteRenderer());
-	setDefaultRenderer(ChangeFormat.class, new StockQuoteRenderer());
+	setDefaultRenderer(Integer.class, new StockQuoteRenderer());
 	setDefaultRenderer(Money.class, new StockQuoteRenderer());
 	setDefaultRenderer(QuoteFormat.class, new StockQuoteRenderer());
+	setDefaultRenderer(String.class, new StockQuoteRenderer());
+	setDefaultRenderer(TradingDate.class, new StockQuoteRenderer());
+        setDefaultRenderer(EquationResult.class, new StockQuoteRenderer());
         setDefaultRenderer(PointChangeFormat.class, new StockQuoteRenderer());
         setDefaultRenderer(Symbol.class, new StockQuoteRenderer());
-        setDefaultRenderer(EquationResult.class, new StockQuoteRenderer());
-        
+
         // Set up number formatter for rendering ChangeFormat.java
         format = NumberFormat.getInstance();
         format.setMinimumIntegerDigits(1);
@@ -178,7 +179,7 @@ public class AbstractTable extends SortedTable {
         downImageIcon = (downImageResource != null? new ImageIcon(downImageResource) : null);
 
         URL unchangedImageResource = ClassLoader.getSystemResource(unchangedImage);
-        unchangedImageIcon = (unchangedImageResource != null? 
+        unchangedImageIcon = (unchangedImageResource != null?
                               new ImageIcon(unchangedImageResource) : null);
     }
 
@@ -201,24 +202,24 @@ public class AbstractTable extends SortedTable {
 
             if(column.getVisible() != Column.ALWAYS_HIDDEN) {
                 boolean isEquationColumn = (column instanceof EquationColumn);
-                
+
                 // Insert a bar between the ordinary columns and the equation
                 // columns
                 if(!foundEquationColumn && isEquationColumn) {
                     foundEquationColumn = true;
-                    showColumnsMenu.addSeparator();                
+                    showColumnsMenu.addSeparator();
                 }
-                
-                JCheckBoxMenuItem showMenuItem = 
+
+                JCheckBoxMenuItem showMenuItem =
                     MenuHelper.addCheckBoxMenuItem(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)e.getSource();
                                 showColumn(column.getNumber(), menuItem.getState());
                             }
                         }, showColumnsMenu, column.getFullName());
-                
+
                 showMenuItem.setState(column.getVisible() == Column.VISIBLE);
-                
+
                 if(isEquationColumn)
                     showEquationColumnMenuItems.add(showMenuItem);
             }
@@ -234,7 +235,7 @@ public class AbstractTable extends SortedTable {
 	Thread thread = new Thread() {
 
 		public void run() {
-		    final EquationColumnDialog dialog = 
+		    final EquationColumnDialog dialog =
                         new EquationColumnDialog(model.getEquationColumns().length);
 
 		    // Did the user modify the equation columns?
@@ -250,9 +251,9 @@ public class AbstractTable extends SortedTable {
 				    // are visible and all without are not.
 				    // Also update check box menus
 				    for(int i = 0; i < equationColumns.length; i++) {
-                                        boolean containsEquation = 
+                                        boolean containsEquation =
                                             equationColumns[i].getEquation().length() > 0;
-                                        JCheckBoxMenuItem menuItem = 
+                                        JCheckBoxMenuItem menuItem =
                                             (JCheckBoxMenuItem)showEquationColumnMenuItems.get(i);
 			
                                         showColumn(equationColumns[i].getNumber(),
@@ -265,7 +266,7 @@ public class AbstractTable extends SortedTable {
 	    };
 
 	thread.start();
-    }    
+    }
 }
 
 

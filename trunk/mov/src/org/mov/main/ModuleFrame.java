@@ -73,9 +73,10 @@ public class ModuleFrame extends JInternalFrame
 				    boolean isPreferences) {
 	int x, y, width, height;
 
-	// Preference window is centred and custom size
+        Dimension preferred = getPreferredSize();	    
+
+        // Preference window is centred and custom size
 	if(isPreferences) {
-	    Dimension preferred = getPreferredSize();	    
 	    x = (desktop.getWidth() - preferred.width) / 2;
 	    y = (desktop.getHeight() - preferred.height) / 2;
 	    width = preferred.width;

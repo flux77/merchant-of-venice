@@ -1,6 +1,6 @@
 ; The name that appears in the installer window
-Name "Merchant of Venice 0.3a"
-Caption "Merchant of Venice 0.3a"
+Name "Merchant of Venice 0.4a"
+Caption "Merchant of Venice 0.4a"
 OutFile "venice.exe"
 InstallDir $PROGRAMFILES\Venice
 BGGradient 6f8389 CCD1CC FFFFFF
@@ -35,7 +35,7 @@ Section "Start Menu Shortcuts"
   CreateShortCut "$SMPROGRAMS\Venice\Read Me.lnk" "$INSTDIR\readme.txt" "" "$INSTDIR\readme.txt" 0
   CreateShortCut "$SMPROGRAMS\Venice\Venice.lnk" "$INSTDIR\venice.jar" "" "$INSTDIR\venice.jar" 0
   CreateShortCut "$SMPROGRAMS\Venice\Uninstall Venice.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  
+
 SectionEnd
 
 UninstallText "This will remove Venice from your computer."

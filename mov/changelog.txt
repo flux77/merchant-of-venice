@@ -1,7 +1,10 @@
-Changes for Venice, 0.4 alpha 14/Mar/2004
+Changes for Venice, 0.4 alpha 14/Aug/2004
 ==========================================
 
 * Chart Update:
+  - Graphs' parameters are now user configurable.
+  - Separated graph views from indicators. Selecting a view
+    now replaces the current view, instead of appending.
   - Added Bar Chart (Quentin Bossard).
   - Added Candle Stick (Quentin Bossard).
   - Added Exponentially Weighted Moving Average (Mark Hummel).
@@ -33,6 +36,10 @@ Changes for Venice, 0.4 alpha 14/Mar/2004
   - Added corr() quote function for finding the correlation between
     two stock quotes.
 
+* Updates to Genetic Programming:
+  - Can now specify the probability of each symbol being created
+    by the GP (Alberto Nacher).
+
 * Updates to Usability:
   - Multiple copies of the Importer Module will no longer be displayed.
   - Multiple copies of the Preferences Module will no longer be displayed.
@@ -40,7 +47,10 @@ Changes for Venice, 0.4 alpha 14/Mar/2004
 * Updates to Stock Quote Support:
   - Added experimental PostgreSQL support.
 
-* Bug Fixes;
+* Updates to Watch Screen:
+  - Can now graph an index of a group of any stocks (Mark Hummel).
+
+* Bug Fixes:
   - Fixed a bug preventing Portfolio deletion under Windows (Bryan Lin).
   - Fixed a bug when viewing a Portfolio created from a GP.
   - Fixed various graphing bugs (Bryan Lin, Andrew Leppard).

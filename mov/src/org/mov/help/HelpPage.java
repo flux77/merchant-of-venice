@@ -34,6 +34,8 @@ import org.mov.util.Locale;
  * This package defines a single help page that can be viewed by the
  * {@link HelpModule} help browser. The help page is actually a node in a tree
  * so a help page can contain child pages - creating a hierarchichal document.
+ *
+ * @author Andrew Leppard
  */
 public class HelpPage extends DefaultMutableTreeNode {
 
@@ -139,7 +141,7 @@ public class HelpPage extends DefaultMutableTreeNode {
 		
 		    while(line != null) {
 			stringBuffer = stringBuffer.append(line);
-                        stringBuffer = stringBuffer.append(" ");
+                        stringBuffer = stringBuffer.append("\n");
 
 			line = br.readLine();
 		    }

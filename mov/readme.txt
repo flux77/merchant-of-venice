@@ -1,7 +1,7 @@
-Merchant of Venice, 0.3 alpha 14/Mar/2004
+Merchant of Venice, 0.4 alpha 14/Aug/2004
 =========================================
 
-Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
+Copyright (C) 2003-4, Andrew Leppard (aleppard@picknowl.com.au)
 See COPYING.txt for license terms.
 
 1 Introduction
@@ -18,7 +18,7 @@ Venice runs on UNIX, including Mac OS X and Windows.
 
 To run Venice you will need Java J2SE JRE 1.4 or higher, available from the
 following location:
-   
+
         http://java.sun.com/j2se/1.4.2/download.html
 
 The following packages are optional:
@@ -28,10 +28,15 @@ The following packages are optional:
    MySQL Java Driver
         http://sourceforge.net/projects/mmmysql
      OR http://www.mysql.com/downloads/api-jdbc-stable.html
- 
-   Venice allows you to access stock quotes through a MySQL database or
-   directly from text files. Reading from text files is easy to set up,
-   but the database is much faster.
+
+   PostgreSQL
+        http://www.postgresql.org/
+   PostgreSQL Java Driver
+        http://jdbc.postgresql.org/
+
+   Venice allows you to access stock quotes through a MySQL or PostgrSQL
+   database or directly from text files. Reading from text files is easy to
+   set up, but the database is much faster and more flexible.
 
 Once they are set up, you can run Venice by typing from the command prompt:
 
@@ -93,6 +98,11 @@ web     Packages the web files ready for deployment
 5. Thanks
 
 Thanks to the following people for providing additional code, patches or
-bugfixes: 
+bugfixes:
 
-Peter Fradley, Bryan Lin & Matthias Stöckel.
+Daniel Makovec, Quentin Bossard, Peter Fradley, Bryan Lin, Alberto Nacher &
+Matthias Stöckel.
+
+And the following for providing translations:
+
+Quentin Bossard (French), Bryan Lin (Chinese) & Alberto Nacher (Italian)

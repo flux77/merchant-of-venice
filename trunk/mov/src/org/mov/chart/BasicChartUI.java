@@ -821,22 +821,22 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    // CBA would be one colour and WBC another
 	
 	    // Colours of graphs in order of use
-	    Color[] colours = {Color.cyan.darker(),
-			       Color.blue.darker(),
+	    Color[] colours = {Color.blue.darker(),
+			       Color.cyan.darker(),
 			       Color.magenta.darker(), Color.orange.darker(),
 			       Color.pink.darker(),
 			       						
 			       Color.blue, Color.magenta,
 			       Color.orange, Color.pink,
 
-			       Color.cyan.darker().darker(),
 			       Color.blue.darker().darker(),
+			       Color.cyan.darker().darker(),
 			       Color.magenta.darker().darker(),
 			       Color.orange.darker().darker(),
 			       Color.pink.darker().darker(),
 
-			       Color.cyan.brighter(),
 			       Color.blue.brighter(),
+			       Color.cyan.brighter(),
 			       Color.magenta.brighter(),
 			       Color.orange.brighter(),
 			       Color.pink.brighter()};

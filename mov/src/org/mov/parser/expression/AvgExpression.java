@@ -50,8 +50,7 @@ public class AvgExpression extends QuoteExpression {
 	int days = (int)getArg(1).evaluate(quoteBundle, symbol, day);
 	int lastDay = day + (int)getArg(2).evaluate(quoteBundle, symbol, day);
 
-	return QuoteFunctions.avg(quoteBundle, symbol, getQuoteKind(), days,
-				  lastDay);
+	return avg(quoteBundle, symbol, getQuoteKind(), days, lastDay);
     }
 
     public String toString() {
@@ -74,6 +73,39 @@ public class AvgExpression extends QuoteExpression {
 
     public int getNeededChildren() {
 	return 3;
+    }
+
+    /** 
+     * Average the stock quotes for a given symbol in a given range. 
+     *
+     * @param	quoteBundle	the quote bundle to read the quotes from.
+     * @param	symbol	the symbol to use.
+     * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
+     * @param	lastDay	fast access date offset in cache.
+     * @return	average stock quote.
+     */
+    static public float avg(QuoteBundle quoteBundle, String symbol, 
+			    int quote, int days, int lastDay) {
+
+	float avg = 0.0F;
+        int daysAveraged = 0;
+
+	// Sum quotes
+	for(int i = lastDay - days + 1; i <= lastDay; i++) {
+            try {
+                avg += quoteBundle.getQuote(symbol, quote, i);
+                daysAveraged++;
+            }
+            catch(MissingQuoteException e) {
+                // nothing to do
+            }
+        }       
+
+	// Average
+        if(daysAveraged > 1)
+            avg /= daysAveraged;
+
+	return avg;
     }
 }
 

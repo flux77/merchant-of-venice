@@ -3,6 +3,7 @@ package org.mov.chart;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
+import java.text.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -227,7 +228,7 @@ public class Chart extends JComponent implements MouseListener {
 
     /**
      * Chart a new graph at the given level. If the chart does not contain
-     * the level, create a new one/
+     * the level, create a new one.
      *
      * @param	graph	the new graph to chart
      * @param	index	the level index
@@ -497,27 +498,43 @@ public class Chart extends JComponent implements MouseListener {
     public String getTitle() {
 
 	Iterator levelIterator = levels.iterator();
-	Iterator graphIterator;
-	Vector graphs;
-	String title = "Graph of ";
+
+	// First create a vector of all the chart symbols
+	Vector symbols = new Vector();
 
 	while(levelIterator.hasNext()) {
-	    graphs = (Vector)levelIterator.next();
-	    graphIterator = graphs.iterator();
+	    Vector graphs = (Vector)levelIterator.next();
+	    Iterator graphIterator = graphs.iterator();
 
 	    while(graphIterator.hasNext()) {
 		Graph graph = (Graph)graphIterator.next();
 
-		title += graph.getName();
-
-		if(graphIterator.hasNext())
-		    title += ", ";
+		symbols.addElement(graph.getName());
 	    }
-	    
-	    if(levelIterator.hasNext())
-		title += " + ";
 	}
 
+	// Sort array of chart symbols
+	TreeSet sortedSet = new TreeSet(Collator.getInstance());
+	sortedSet.addAll(symbols);
+
+	// Now construct the title "Graph of XXX, BBB, YYY"
+	String title = "Graph of";
+
+	boolean firstSymbol = true;
+	Iterator symbolIterator = sortedSet.iterator();
+
+	while(symbolIterator.hasNext()) {
+	    String symbol = (String)symbolIterator.next();
+
+	    if(firstSymbol) {
+		title = title.concat(" " + symbol);
+		firstSymbol = false;
+	    }
+	    else {
+		title = title.concat(", " + symbol);
+	    }
+	}
+	
 	return title;
     }
 

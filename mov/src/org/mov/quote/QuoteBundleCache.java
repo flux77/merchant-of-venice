@@ -120,10 +120,9 @@ public class QuoteBundleCache {
         Iterator iterator = loadedQuoteBundles.iterator();
         
         while(iterator.hasNext()) {
-            QuoteBundle traverse = (QuoteBundle)iterator.next();
-            
+            QuoteBundle traverse = (QuoteBundle)iterator.next();            
             quoteRange = traverse.getQuoteRange().clip(quoteRange);
-            
+
             // If the quote range is null it means that the range
             // contains no quotes, meaning its entirely contained
             // by already loaded quote ranges

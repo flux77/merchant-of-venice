@@ -203,13 +203,10 @@ public class QuoteRange implements Cloneable {
     public Object clone() {
 	QuoteRange cloned;
 
-	if(symbols != null) {
+	if(type == GIVEN_SYMBOLS) 
 	    cloned = new QuoteRange(symbols, firstDate, lastDate);
-
-	}
-	else {
-	    cloned = new QuoteRange(type, firstDate);
-	}
+        else
+	    cloned = new QuoteRange(type, firstDate, lastDate);
 
 	return (Object)cloned;
     }
@@ -409,10 +406,10 @@ public class QuoteRange implements Cloneable {
      * <p>
      * e.g.
      * <pre>
-     * QuoteRange quoteRange = new QuoteRange("CBA", new TradingDate("1-1-2000"),
-     *                                               new TradingDate("1-12-2000"));
-     * QuoteRange quoteRange2 = new QuoteRange("CBA", new TradingDate("1-1-1999"),
-     *                                                new TradingDate("6-6-2000"));
+     * QuoteRange quoteRange = new QuoteRange("CBA", new TradingDate(2000, 1, 1),
+     *                                               new TradingDate(2000, 12, 1));
+     * QuoteRange quoteRange2 = new QuoteRange("CBA", new TradingDate(1999, 1, 1),
+     *                                                new TradingDate(2000, 6, 6));
      * QuoteRange clippedQuoteRange = quoteRange.clipRange(quoteRange2); 
      *
      * System.out.println(clippedQuoteRange);
@@ -425,7 +422,6 @@ public class QuoteRange implements Cloneable {
      * @return  the clipped quote range
      */
     public QuoteRange clip(QuoteRange quoteRange) {
-
 	int overlapType = getOverlapType(quoteRange);
 
 	if(overlapType == CONTAINS || overlapType == PARTIAL_OVERLAP) {
@@ -442,26 +438,24 @@ public class QuoteRange implements Cloneable {
 
 		// They partially overlap - perform clip
 		if(overlapType == PARTIAL_OVERLAP) {
-		    // this:        [----------]
-		    // quote range:    [----------]
- 		    if(getLastDate().compareTo(quoteRange.getFirstDate()) >= 0 &&
-		       getLastDate().compareTo(quoteRange.getLastDate()) <= 0)
-			lastDate = quoteRange.getFirstDate();
+		    QuoteRange clipped = (QuoteRange)quoteRange.clone();
 
-		    // this:           [----------]
-		    // quote range: [----------]
+		    // this:        [----------]    -> [----------]
+		    // quote range:    [----------]                [-]    
+ 		    if(getFirstDate().compareTo(quoteRange.getFirstDate()) <= 0 &&
+                       getLastDate().compareTo(quoteRange.getLastDate()) <= 0)
+                        clipped.setFirstDate(getLastDate().next(1));
+
+		    // this:           [----------] ->    [----------]
+		    // quote range: [----------]       [-]  
 		    else {
 			assert 
 			    getFirstDate().compareTo(quoteRange.getFirstDate()) >= 0 &&
-			    getFirstDate().compareTo(quoteRange.getLastDate()) <= 0;
-			firstDate = quoteRange.getLastDate();
+			    getLastDate().compareTo(quoteRange.getLastDate()) >= 0;
+                        clipped.setLastDate(getFirstDate().previous(1));
 		    }
-
-		    QuoteRange clipped = (QuoteRange)clone();
-		    clipped.setFirstDate(getFirstDate());
-		    clipped.setLastDate(getLastDate());
-
-		    return clipped;
+	
+                    return clipped;
 
 		}
 		else {
@@ -478,7 +472,7 @@ public class QuoteRange implements Cloneable {
 
     // Given two quote ranges. Return if they overlap.
     // CONTAINS - this quote range contains the given quote range
-    // CONTAINED - this quote range is contained by the given quote rangey
+    // CONTAINED - this quote range is contained by the given quote range
     // NO_OVERLAP - the two quote ranges don't overlap
     // PARTIAL_OVERLAP - the two quotes overlap slightly
     private int getOverlapType(QuoteRange quoteRange) {
@@ -496,8 +490,8 @@ public class QuoteRange implements Cloneable {
 		getLastDate().compareTo(quoteRange.getLastDate()) >= 0) 
 	    return CONTAINS;
 
-	else if(getFirstDate().compareTo(quoteRange.getFirstDate()) >= 0 &&
-		getLastDate().compareTo(quoteRange.getLastDate()) <= 0) 
+	else if(getFirstDate().compareTo(quoteRange.getFirstDate()) > 0 &&
+		getLastDate().compareTo(quoteRange.getLastDate()) < 0) 
 	    return CONTAINED;
 	
 	return PARTIAL_OVERLAP;

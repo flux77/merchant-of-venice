@@ -36,6 +36,8 @@ import org.mov.util.Locale;
 /**
  * The top level class which contains the main() function. This class builds
  * the outer frame and creates the desktop.
+ *
+ * @author Andrew Leppard
  */
 public class Main extends JFrame {
 
@@ -46,13 +48,13 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.31a";
+    public static String SHORT_VERSION = "0.4a";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION = "0.31 alpha";
+    public static String LONG_VERSION = "0.4 alpha";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "14/" + Locale.getString("MAR") + "/2004";
+    public static String RELEASE_DATE = "14/" + Locale.getString("AUG") + "/2004";
 
     /**
      * Get the main frame for the current application

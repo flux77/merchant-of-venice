@@ -650,8 +650,6 @@ public class PaperTradeModule extends JPanel implements Module,
         long endTime = date.getTime();
         long timeTaken = endTime - startTime;
 
-        System.out.println("it took " + timeTaken + " ms");
-
         Vector symbols = quoteBundle.getAllSymbols();
 	String symbol = (String)symbols.firstElement();
 	symbol = symbol.toLowerCase();

@@ -26,6 +26,7 @@ public class Analyser extends JFrame implements WindowListener {
 
 	desktop = new JDesktopPane();
 	desktop.setDesktopManager(new AnalyserDesktopManager(desktop));
+	CommandManager.getInstance().setDesktop(desktop);
 	Progress.getInstance().setDesktop(desktop);
 	menu = new AnalyserMenu(this, desktop);
 	setContentPane(desktop);
@@ -79,5 +80,6 @@ public class Analyser extends JFrame implements WindowListener {
 	analyser.setVisible(true);
     }
 }
+
 
 

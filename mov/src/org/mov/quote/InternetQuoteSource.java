@@ -19,6 +19,7 @@
 package org.mov.quote;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.NoRouteToHostException;
@@ -355,6 +356,11 @@ public class InternetQuoteSource implements QuoteSource
                                                              proxyPreferences.port));
 	    success = false;
 	}
+        
+        catch(FileNotFoundException e) {
+            // This just means the page isn't there - which is valid if we have tried to
+            // download a quote on a holiday.
+        }
 
         catch(IOException e) {
             DesktopManager.showErrorMessage(Locale.getString("ERROR_DOWNLOADING_QUOTES"));

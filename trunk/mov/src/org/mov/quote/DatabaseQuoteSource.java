@@ -5,7 +5,6 @@ import java.sql.*;
 import java.util.*;
 import javax.swing.*;
 
-import org.liquid.misc.*;
 import org.mov.util.*;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;

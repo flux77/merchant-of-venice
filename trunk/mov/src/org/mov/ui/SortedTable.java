@@ -10,8 +10,6 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-import org.liquid.misc.*;
-
 /**
  * Table that allows the user to sort by column by clicking on the column's
  * table header

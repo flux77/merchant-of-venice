@@ -28,7 +28,7 @@ import org.mov.util.*;
 public class Quote {
     private Symbol symbol;
     private TradingDate date;
-    private int volume;
+    private int day_volume;
     private float day_low;
     private float day_high;
     private float day_open;
@@ -54,20 +54,36 @@ public class Quote {
      *
      * @param	symbol	the stock symbol
      * @param	date	the date for this stock quote
-     * @param	volume	the number of shares traded on this date
+     * @param	day_volume	the number of shares traded on this date
      * @param	day_low	the lowest quote on this date
      * @param	day_high	the highest quote on this date
      * @param	day_open	the opening quote on this date
      * @param	day_close	the closing quote on this date
      */
     public Quote(Symbol symbol, TradingDate date,
-		 int volume, float day_low, float day_high,
+		 int day_volume, float day_low, float day_high,
 		 float day_open, float day_close) {
+
+        /*
+
+        // Some of these fail in my data!! Shouldn't assert. It should
+        // do better parsing. Import should show warnings or something?
+        assert day_low <= day_open; 
+        assert day_low <= day_close;
+        assert day_low <= day_high; 
+        assert day_high >= day_open; 
+        assert day_high >= day_close;
+        assert day_low >= 0.0F;
+        assert day_open >= 0.0F;
+        assert day_high >= 0.0F;
+        assert day_close >= 0.0F;
+        assert day_volume >= 0;
+        */
 
 	setSymbol(symbol);
 	setDate(date);
 
-	this.volume = volume;
+	this.day_volume = day_volume;
 	this.day_low = day_low;
 	this.day_high = day_high;
 	this.day_open = day_open;
@@ -97,8 +113,8 @@ public class Quote {
      *
      * @return	the volume
      */
-    public int getVolume() {
-	return volume;
+    public int getDayVolume() {
+	return day_volume;
     }
 
     /**
@@ -169,7 +185,7 @@ public class Quote {
 	   getDayHigh() == quote.getDayHigh() &&
 	   getDayOpen() == quote.getDayOpen() &&
 	   getDayClose() == quote.getDayClose() &&
-	   getVolume() == quote.getVolume())
+	   getDayVolume() == quote.getDayVolume())
 	    return true;
 	else
 	    return false;
@@ -193,7 +209,7 @@ public class Quote {
 	case(DAY_HIGH):
 	    return getDayHigh();
 	case(DAY_VOLUME):
-	    return getVolume();
+	    return getDayVolume();
 	default:
 	    assert false;
 	    return 0.0F;
@@ -209,7 +225,7 @@ public class Quote {
 	return new String(getSymbol() + ", " + getDate() + ", " +
 			  getDayOpen() + ", " + getDayHigh() + ", " + 
 			  getDayLow() + ", " + getDayClose() + ", " + 
-			  getVolume());
+			  getDayVolume());
 			   
     }
 }

@@ -54,9 +54,9 @@ public class RSIExpression extends BinaryExpression {
         // and increase the period by one day, as the RSI calculation needs an extra day
         // over the period.
 	QuoteBundleFunctionSource source = 
-	    new QuoteBundleFunctionSource(quoteBundle, symbol, Quote.DAY_CLOSE, day, offset + 1,
-					  period + 1);
-	return QuoteFunctions.rsi(source, period + 1);
+	    new QuoteBundleFunctionSource(quoteBundle, symbol, Quote.DAY_CLOSE, day, offset - 1,
+					  period - 1);
+	return QuoteFunctions.rsi(source, period - 1);
     }
 
     public String toString() {

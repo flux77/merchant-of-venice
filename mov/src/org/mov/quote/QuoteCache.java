@@ -271,6 +271,21 @@ public class QuoteCache {
     /**
      * Load the given quote into the cache.
      *
+     * @param quote the quote
+     */
+    public void load(Quote quote) {
+        load(quote.getSymbol(),
+             quote.getDate(),
+             quote.getDayVolume(),
+             (float)quote.getDayLow(),
+             (float)quote.getDayHigh(),
+             (float)quote.getDayOpen(),
+             (float)quote.getDayClose());
+    }
+
+    /**
+     * Load the given quote into the cache.
+     *
      * @param symbol symbol of quote
      * @param date   quote date
      * @param day_volume day volume

@@ -46,9 +46,9 @@ public class GAIndividual {
     
     // The following define the probabilities that two inviduals
     // will be breed by the following methods.
-    private final static int MOTHER    = 47;
-    private final static int FATHER    = 47;
-    private final static int MUTATION  = 6;
+    private final static int MOTHER    = 40;
+    private final static int FATHER    = 40;
+    private final static int MUTATION  = 20;
 
     // The following enumerate the different methods that indivudals can
     // "breed" or be combined.

@@ -41,13 +41,15 @@ public class MainMenu implements ActionListener, ContainerListener {
     private JMenuItem windowCascadeMenuItem;
     private JMenuItem windowGridMenuItem;
 
-    private JMenu filePortfolioMenu;
     private JMenu windowMenu;
+    private JMenu filePortfolioMenu;
+    private JMenu graphPortfolioMenu;
 
     private JDesktopPane desktop;
     private JFrame frame;
 
     private HashMap portfolioHash = new HashMap();
+    private HashMap portfolioGraphHash = new HashMap();
 
     private static MainMenu instance = null;
 
@@ -86,9 +88,6 @@ public class MainMenu implements ActionListener, ContainerListener {
 
 	    // File -> Portfolio
 	    filePortfolioMenu = MenuHelper.addMenu(fileMenu, "Portfolio", 'P');
-
-	    // File -> Portfolio -> New
-	    updatePortfolioMenu();
 
 	    fileMenu.addSeparator();
 
@@ -168,12 +167,15 @@ public class MainMenu implements ActionListener, ContainerListener {
 	    graphCommodityNameMenuItem = 
 		MenuHelper.addMenuItem(this, graphCommodityMenu, 
 				       "By Name",'N');
+
+	    // Graph -> Portfolio
+	    graphPortfolioMenu = MenuHelper.addMenu(graphMenu, "Portfolio");
 	}
 
-	// Genetic Algorithm menu
+	// Analysis menu
 	{
-	    JMenu geneticAlgorithmMenu = 
-		MenuHelper.addMenu(menuBar, "GA", 'A');
+	    JMenu analysisMenu = 
+		MenuHelper.addMenu(menuBar, "Analysis", 'A');
 	}
 
 	// Window menu
@@ -194,6 +196,9 @@ public class MainMenu implements ActionListener, ContainerListener {
 	    windowMenu.addSeparator();
 	}
 
+	// Build portfolio menus
+	updatePortfolioMenu();
+
 	frame.setJMenuBar(menuBar);
     }
 
@@ -209,7 +214,6 @@ public class MainMenu implements ActionListener, ContainerListener {
 	Thread menuAction = new Thread() {
 
 		public void run() {
-
 		    // They should all be menu actions
 		    JMenuItem menu = (JMenuItem)e.getSource();
 		    
@@ -254,10 +258,22 @@ public class MainMenu implements ActionListener, ContainerListener {
 			CommandManager.getInstance().tableListIndicesByRule();
 		    
 		    // Graph Menu *******************************************************************************
-		    else if (menu == graphCommodityCodeMenuItem)
+		    else if (menu == graphCommodityCodeMenuItem) {
 			CommandManager.getInstance().graphStockByCode();
+		    }
 		    else if (menu == graphCommodityNameMenuItem)
 			CommandManager.getInstance().graphStockByName();
+
+		    // Maybe its a portfolio?
+		    else if(portfolioGraphHash.get(menu) != null) {
+			String portfolioName =
+			    (String)portfolioGraphHash.get(menu);
+
+			Portfolio portfolio = 
+			    PreferencesManager.loadPortfolio(portfolioName);
+
+			CommandManager.getInstance().graphPortfolio(portfolio);
+		    }
 		    
 		    // Window Menu ******************************************************************************
 		    else if (menu == windowTileHorizontalMenuItem)
@@ -285,7 +301,7 @@ public class MainMenu implements ActionListener, ContainerListener {
 			    desktop.setSelectedFrame(f);
 			    f.setSelected(true);
 			    f.toFront();
-			} catch (PropertyVetoException e) {}
+			} catch (PropertyVetoException exception) {}
 		    }
 		}
 	    };
@@ -294,8 +310,8 @@ public class MainMenu implements ActionListener, ContainerListener {
     }
 
 
-    private Hashtable frame_menu_hash = null;
-    private Hashtable menu_frame_hash = null;
+    private Hashtable frame_menu_hash = new Hashtable();
+    private Hashtable menu_frame_hash = new Hashtable();
 
     /**
      * Called by the JDesktopPane to notify of a new JInternalFrame being added to the display
@@ -307,10 +323,6 @@ public class MainMenu implements ActionListener, ContainerListener {
 
 	if (o.getClass().getName().equals("org.mov.main.ModuleFrame") ||
 	    o.getClass().getName().equals("javax.swing.JInternalFrame$JDesktopIcon")) {
-	    if (frame_menu_hash ==  null) {
-		frame_menu_hash = new Hashtable();
-		menu_frame_hash = new Hashtable();
-	    }
 	    
 	    String title;
 	    if (o.getClass().getName().equals("org.mov.main.ModuleFrame"))
@@ -354,26 +366,46 @@ public class MainMenu implements ActionListener, ContainerListener {
 	}
     }
 
+    /**
+     * Inform menu that the list of portfolios has changed and that
+     * its menus should be redrawn
+     */
     public void updatePortfolioMenu() {
-	// Remove old menu items from portfolio menu (if there were any)
+	// Remove old menu items from portfolio menus (if there were any)
 	filePortfolioMenu.removeAll();
-	portfolioHash.clear();
+	graphPortfolioMenu.removeAll();
 
-	// Now rebuild menu listing all portfolios
+	// Portfolio menu off of file has the ability to create a new
+	// portfolio
 	filePortfolioNewMenuItem = 
 	    MenuHelper.addMenuItem(this, filePortfolioMenu, "New Portfolio");
+
+	if(PreferencesManager.getPortfolioNames().length > 0) {
+	    filePortfolioMenu.addSeparator();
+	}
+
+	// Build both portfolio menus
+	portfolioHash = buildPortfolioMenu(filePortfolioMenu);
+	portfolioGraphHash = buildPortfolioMenu(graphPortfolioMenu);
+    }
+
+    // Build menu with names of all portfolios. Create hashmap which
+    // maps menu items back to the portfolio listed.
+    private HashMap buildPortfolioMenu(JMenu portfolioMenu)
+    {
+	HashMap menuPortfolioMap = new HashMap();
 	
 	String[] portfolioNames = PreferencesManager.getPortfolioNames();
 	if(portfolioNames.length > 0) {
-	    filePortfolioMenu.addSeparator();
-	    
 	    for(int i = 0; i < portfolioNames.length; i++) {
-		    JMenuItem menu = MenuHelper.addMenuItem(this, 
-							    filePortfolioMenu,
-							    portfolioNames[i]);
-		    portfolioHash.put(menu, portfolioNames[i]);
+		JMenuItem menu = MenuHelper.addMenuItem(this, 
+							portfolioMenu,
+							portfolioNames[i]);
+		menuPortfolioMap.put(menu, portfolioNames[i]);
 	    }
 	}
+
+	return menuPortfolioMap;
     }
 }
 

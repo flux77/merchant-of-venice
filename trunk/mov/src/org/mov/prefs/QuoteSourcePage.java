@@ -39,6 +39,13 @@ public class QuoteSourcePage extends JPanel
     private DefaultListModel fileListModel;
     private JButton addFiles;
     private JButton deleteFiles;
+    private JComboBox formatComboBox;
+
+    // Widgets from internet pane
+    private JRadioButton useInternet;
+    private JComboBox internetHost;
+    private JTextField internetUsername;
+    private JPasswordField internetPassword;
 
     /**
      * Create a new Quote Source Preferences page.
@@ -104,16 +111,8 @@ public class QuoteSourcePage extends JPanel
 					  db.get("username"), gridbag, c);
 	    
 	    // Password
-	    label = new JLabel("Password");
-	    c.gridwidth = 1;
-	    gridbag.setConstraints(label, c);
-	    borderPanel.add(label);
-	    
-	    databasePassword = new JPasswordField(db.get("password"),
-						  15);
-	    c.gridwidth = GridBagConstraints.REMAINDER;
-	    gridbag.setConstraints(databasePassword, c);
-	    borderPanel.add(databasePassword);
+	    databasePassword = addPasswordRow(borderPanel, "Password", 
+					      db.get("password"), gridbag, c);
 	    
 	    // Database Name
 	    databaseName = addTextRow(borderPanel, "Database Name", 
@@ -125,7 +124,6 @@ public class QuoteSourcePage extends JPanel
 	    database.setLayout(new BorderLayout());
 	    database.add(useDatabase, BorderLayout.NORTH);
 	    database.add(databasePreferences, BorderLayout.CENTER);
-	    //database.add(buttonPanel, BorderLayout.SOUTH);
 
 	    pane.addTab("Database", database);
 	}
@@ -144,14 +142,34 @@ public class QuoteSourcePage extends JPanel
 	    TitledBorder titled = new TitledBorder("Files");
 	    JPanel filePreferences = new JPanel();
 	    filePreferences.setBorder(titled);
-	    filePreferences.setLayout(new BoxLayout(filePreferences,
-						    BoxLayout.Y_AXIS));
+	    filePreferences.setLayout(new BorderLayout());
+
+	    String selectedFilter = p.get("format", "MetaStock");
+	    Box box = Box.createHorizontalBox();
+	    formatComboBox = new JComboBox();
+	    Vector formats = QuoteFilterList.getInstance().getList();
+	    Iterator iterator = formats.iterator();
+	    QuoteFilter filter;
+
+	    while(iterator.hasNext()) {
+		filter = (QuoteFilter)iterator.next();
+		formatComboBox.addItem(filter.getName());
+		if(filter.getName().equals(selectedFilter))
+		    formatComboBox.setSelectedItem((Object)filter.getName());
+	    }
+
+	    box.add(new JLabel("Format"));
+	    box.add(Box.createHorizontalStrut(5));
+	    box.add(formatComboBox);
+
+	    filePreferences.add(box, BorderLayout.NORTH);
 
 	    fileList = new JList();
 	    fileListModel = new DefaultListModel();
 	    fileList.setModel(fileListModel);
-	    fileList.addListSelectionListener(this);
-	    filePreferences.add(new JScrollPane(fileList));
+	    fileList.addListSelectionListener(this);	   
+	    filePreferences.add(new JScrollPane(fileList), 
+				BorderLayout.CENTER);
 
 	    // Add files from prefs
 	    String fileList = p.get("list", "");
@@ -181,18 +199,71 @@ public class QuoteSourcePage extends JPanel
 
 	// Internet Pane
 	{
-	    pane.addTab("Internet", new JLabel("Not yet implemented"));
+	    p = Preferences.userRoot().node("/quote_source/internet");
+
+	    useInternet = new JRadioButton("Use Internet", true);
+	    useInternet.addActionListener(this);
+	    if(quoteSource.equals("internet"))
+		useInternet.setSelected(true);
+	    else
+		useInternet.setSelected(false);
+
+	    TitledBorder titled = new TitledBorder("Internet");
+	    JPanel internetPreferences = new JPanel();
+	    internetPreferences.setBorder(titled);
+	    internetPreferences.setLayout(new BorderLayout());
+	    JPanel borderPanel = new JPanel();
+	    
+	    GridBagLayout gridbag = new GridBagLayout();
+	    GridBagConstraints c = new GridBagConstraints();
+	    borderPanel.setLayout(gridbag);
+	    
+	    c.weightx = 1.0;
+	    c.ipadx = 5;
+	    c.anchor = GridBagConstraints.WEST;
+	    
+	    // Host
+	    JLabel label = new JLabel("Host");
+	    gridbag.setConstraints(label, c);
+	    borderPanel.add(label);
+	    
+	    internetHost = new JComboBox();
+	    internetHost.addItem("Sanford");
+	    c.gridwidth = GridBagConstraints.REMAINDER;
+	    gridbag.setConstraints(internetHost, c);
+	    borderPanel.add(internetHost);
+	    
+	    // Username
+	    internetUsername = addTextRow(borderPanel, "Username", 
+					  p.get("username", ""), gridbag, c);
+
+	    // Password
+	    internetPassword = 
+		addPasswordRow(borderPanel, "Password",
+			       p.get("password", ""), gridbag, c);
+
+	    internetPreferences.add(borderPanel, BorderLayout.NORTH);
+
+	    JPanel internet = new JPanel();
+	    internet.setLayout(new BorderLayout());
+	    internet.add(useInternet, BorderLayout.NORTH);
+	    internet.add(internetPreferences, BorderLayout.CENTER);
+
+	    pane.addTab("Internet", internet);
 	}
 
 	// Put all "use this option" radio buttons into group
 	ButtonGroup group = new ButtonGroup();
 	group.add(useDatabase);
 	group.add(useFiles);
+	group.add(useInternet);
 
 	// Raise the select source's pane
 	if(quoteSource.equals("files")) 
 	    pane.setSelectedIndex(1);
-	else 
+	else if(quoteSource.equals("internet"))
+	    pane.setSelectedIndex(2);
+	else
 	    pane.setSelectedIndex(0);
 
 	add(pane);
@@ -214,6 +285,25 @@ public class QuoteSourcePage extends JPanel
 	panel.add(text);
 
 	return text;
+    }
+
+    // Helper method which adds a new password text field in a new row to
+    // the given grid bag layout.
+    private JPasswordField addPasswordRow(JPanel panel, String field, 
+					  String value,
+					  GridBagLayout gridbag,
+					  GridBagConstraints c) {
+	JLabel label = new JLabel(field);
+	c.gridwidth = 1;
+	gridbag.setConstraints(label, c);
+	panel.add(label);
+	    
+	JPasswordField password = new JPasswordField(value, 15);
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(password, c);
+	panel.add(password);
+
+	return password;
     }
 
     /**
@@ -300,7 +390,9 @@ public class QuoteSourcePage extends JPanel
 	    Preferences.userRoot().node("/quote_source");
 	if(useFiles.isSelected())
 	    p.put("source", "files");
-	else
+	else if(useInternet.isSelected())
+	    p.put("source", "internet");
+	else 
 	    p.put("source", "database");
 
 	// Save database preferences
@@ -315,8 +407,10 @@ public class QuoteSourcePage extends JPanel
 
 	// Save file preferences
 	{
-	    // Files
 	    p = Preferences.userRoot().node("/quote_source/files");
+
+	    p.put("format", (String)formatComboBox.getSelectedItem());
+
 	    String fileList = "";
 	    for(int i = 0; i < fileListModel.getSize(); i++) {
 		if(!fileList.equals(""))
@@ -325,6 +419,13 @@ public class QuoteSourcePage extends JPanel
 	    }
 
 	    p.put("list", fileList);
+	}
+
+	// Save internet preferences
+	{
+	    p = Preferences.userRoot().node("/quote_source/internet");
+	    p.put("username", internetUsername.getText());
+	    p.put("password", new String(internetPassword.getPassword()));
 	}
 
 	// This makes the next query use our new settings

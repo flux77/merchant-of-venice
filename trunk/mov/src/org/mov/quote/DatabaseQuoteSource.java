@@ -159,14 +159,15 @@ public class DatabaseQuoteSource implements QuoteSource
     }
 
     /**
-     * Create a new quote source to connect to an internal database stored in
-     * the given file.
+     * Create a new quote source to connect to an internal HSQL 
+     * database stored in the given file.
      *
      * @param fileName name of database file
      */
     public DatabaseQuoteSource(String fileName) {
         mode = INTERNAL;
         software = HSQLDB_SOFTWARE;
+        this.driver = "org.hsqldb.jdbcDriver";
         this.fileName = fileName;
     }
 

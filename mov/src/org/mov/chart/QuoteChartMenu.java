@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart;
@@ -29,13 +29,13 @@ import org.mov.util.Locale;
 import org.mov.quote.*;
 
 /**
- * Provides a menu which is associated with a stock symbol being graphed. 
+ * Provides a menu which is associated with a stock symbol being graphed.
  * The menu provides a series of options which allow the user
- * to graph related charts and indicators. 
+ * to graph related charts and indicators.
  */
 public class QuoteChartMenu extends JMenu implements ActionListener {
 
-    // Graphs 
+    // Graphs
     private static final String BOLLINGER      = Locale.getString("BOLLINGER_BANDS");
     private static final String DAY_HIGH       = Locale.getString("DAY_HIGH");
     private static final String DAY_LOW        = Locale.getString("DAY_LOW");
@@ -45,20 +45,21 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
     private static final String MOMENTUM       = Locale.getString("MOMENTUM");
     private static final String MOVING_AVERAGE = Locale.getString("MOVING_AVERAGE");
     private static final String OBV	       = Locale.getString("OBV");
+    private static final String RSI	       = Locale.getString("RSI");
     private static final String STANDARD_DEVIATION = Locale.getString("STANDARD_DEVIATION");
     private static final String DAY_VOLUME     = Locale.getString("VOLUME");
-    
+
     JMenu graphMenu;
     JMenu annotateMenu;
 
     private JMenuItem removeMenu;
-    
+
     private QuoteBundle quoteBundle;
     private Graph graph;
     private ChartModule listener;
     private HashMap map = new HashMap();
     private HashMap annotateMap = new HashMap();
-  
+
     /**
      * Create a new menu allowing the user to graph related graphs
      * for the given graph. The symbol we are associated with will be
@@ -72,7 +73,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 
 	super(graph.getName());
 	
-	this.quoteBundle = quoteBundle; 
+	this.quoteBundle = quoteBundle;
 	this.graph = graph;
 	this.listener = listener;
 	
@@ -95,6 +96,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	addMenuItem(MOMENTUM);
 	addMenuItem(MOVING_AVERAGE);
 	addMenuItem(OBV);
+        addMenuItem(RSI);
 	addMenuItem(STANDARD_DEVIATION);
 
 	// Add annotation menu items
@@ -105,7 +107,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	this.addSeparator();
 	removeMenu = new JMenuItem(Locale.getString("REMOVE"));
 	removeMenu.addActionListener(this);
-	this.add(removeMenu);	    
+	this.add(removeMenu);	
     }
 
     // Add a graph menu item, e.g. "Day Close", "Bollinger Bands"
@@ -124,7 +126,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	annotateMenu.add(item);
 		
 	// Save reference to annotation
-	annotateMap.put((Object)graphName, item);		    
+	annotateMap.put((Object)graphName, item);		
     }
 
     /**
@@ -163,52 +165,55 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	else {
 	    JCheckBoxMenuItem menu = (JCheckBoxMenuItem)e.getSource();
 	    String text = menu.getText();
-	    
+	
 	    // Check annotation menus first
 	    if(handleAnnotationMenu(text, menu));
-	    
+	
 	    // Handle removing graphs next
 	    else if(!menu.getState())
 		removeGraph(text);
-	    
+	
 	    // Ok looks like its adding a graph
-	    else if(text == BOLLINGER) 
-		addGraph(new BollingerBandsGraph(getDayClose(), 20), 
+	    else if(text == BOLLINGER)
+		addGraph(new BollingerBandsGraph(getDayClose(), 20),
 			 BOLLINGER, 0);
 
-	    else if(text == DAY_HIGH) 
+	    else if(text == DAY_HIGH)
 		addGraph(new LineGraph(getDayHigh()), DAY_HIGH, 0);
-	    
-	    else if(text == DAY_LOW) 
+	
+	    else if(text == DAY_LOW)
 		addGraph(new LineGraph(getDayLow()), DAY_LOW, 0);
-	    
-	    else if(text == DAY_OPEN) 
+	
+	    else if(text == DAY_OPEN)
 		addGraph(new LineGraph(getDayOpen()), DAY_OPEN, 0);
-	    
-	    else if(text == HIGH_LOW_BAR) 
-		addGraph(new HighLowBarGraph(getDayLow(), getDayHigh(), 
+	
+	    else if(text == HIGH_LOW_BAR)
+		addGraph(new HighLowBarGraph(getDayLow(), getDayHigh(),
 					     getDayClose()),
 			 HIGH_LOW_BAR, 0);
 	    else if(text == MACD)
 		// 1 1 2 3 5 8 13 21 34 55
 		addGraph(new MACDGraph(getDayClose(), 13, 34), MACD, 0);
 
-	    else if(text == MOMENTUM) 
+	    else if(text == MOMENTUM)
 		addGraph(new MomentumGraph(getDayClose(), 10), MOMENTUM);
-	    
-	    else if(text == MOVING_AVERAGE) 
-		addGraph(new MovingAverageGraph(getDayClose(), 40), 
+	
+	    else if(text == MOVING_AVERAGE)
+		addGraph(new MovingAverageGraph(getDayClose(), 40),
 			 MOVING_AVERAGE, 0);
 
-	    else if(text == OBV) 
-		addGraph(new OBVGraph(getDayOpen(), getDayClose(), 
-				      getDayVolume(), 
+	    else if(text == OBV)
+		addGraph(new OBVGraph(getDayOpen(), getDayClose(),
+				      getDayVolume(),
 				      50000.0D), OBV);
-	    else if(text == DAY_VOLUME) 
+	    else if(text == DAY_VOLUME)
 		addGraph(new BarGraph(getDayVolume()), DAY_VOLUME);
 
-	    else if(text == STANDARD_DEVIATION) 
-		addGraph(new StandardDeviationGraph(getDayClose(), 20), 
+            else if(text == RSI)
+                addGraph(new RSIGraph(getDayClose(), 14), RSI);
+
+	    else if(text == STANDARD_DEVIATION)
+		addGraph(new StandardDeviationGraph(getDayClose(), 20),
 			 STANDARD_DEVIATION);
 	}
     }
@@ -237,9 +242,9 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
     private GraphSource getDayVolume() {
 	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
     }
-    
+
     // Is annotation menu?
-    private boolean handleAnnotationMenu(String text, 
+    private boolean handleAnnotationMenu(String text,
 					 JCheckBoxMenuItem menu) {
 	boolean state = menu.getState();
 	Set set = annotateMap.keySet();
@@ -248,14 +253,14 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 
 	while(iterator.hasNext()) {
 	    graphName = (String)iterator.next();
-	    
+	
 	    // is it an annotation menu?
 	    Object object = annotateMap.get(graphName);
-	    
+	
 	    if(object == menu) {
 		// Turn on annotation for this graph
 		listener.handleAnnotation((Graph)map.get(graphName),
-					  state);		   
+					  state);		
 		listener.redraw();
 		return true;
 	    }
@@ -263,17 +268,17 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 
 	return false;
     }
-    
+
     // Adds graph to chart
     private void addGraph(Graph graph, String mapIdentifier) {
-	map.put(mapIdentifier, graph); 
+	map.put(mapIdentifier, graph);
 	listener.append(graph);
 	listener.redraw();
     }
-    
+
     // Same as above but add at specific index
     private void addGraph(Graph graph, String mapIdentifier, int index) {
-	map.put(mapIdentifier, graph); 
+	map.put(mapIdentifier, graph);
 	listener.append(graph, index);
 	listener.redraw();
 	
@@ -282,7 +287,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	
 	if(object != null) {
 	    JCheckBoxMenuItem item = (JCheckBoxMenuItem)object;
-	    item.setEnabled(true);		   
+	    item.setEnabled(true);		
 	}
     }
 
@@ -301,7 +306,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	
 	if(object != null) {
 	    JCheckBoxMenuItem item = (JCheckBoxMenuItem)object;
-	    item.setEnabled(false); // disable check box	   
+	    item.setEnabled(false); // disable check box	
 	    item.setSelected(false); // remove tick
 	}
     }

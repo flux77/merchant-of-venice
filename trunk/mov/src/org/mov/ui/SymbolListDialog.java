@@ -37,7 +37,7 @@ public class SymbolListDialog {
 
     /**
      * Open a new <code>SymbolListDialog</code> dialog. Ask the user
-     * to enter a partial name of a company and return the appropriate
+     * to enter a partial name of a symbol and return the appropriate
      * symbol.
      *
      * @param	parent	the parent desktop
@@ -47,140 +47,164 @@ public class SymbolListDialog {
      */
     public static SortedSet getSymbolByName(JDesktopPane parent, 
 					    String title) {
-	SortedSet companySet;
-	String company;
+	SortedSet symbolSet;
+	String symbolName;
 	boolean invalidResponse;
 
 	do {
-	    companySet = null;
-	    company = "";
+	    symbolSet = null;
+	    symbolName = "";
 	    invalidResponse = false; // assume user does OK
 
 	    // First prompt user for list
 	    TextDialog dlg = new TextDialog(parent, 
-					    "Please enter commodity name",
-					    "Graphing company share price");
-	    company = dlg.showDialog();
+					    "Please enter symbol name",
+                                            title);
+
+	    symbolName = dlg.showDialog();
 	    
 	    // Parse what the user inputed
-	    if(company != null) {
+	    if(symbolName != null) {
 		String symbol = 
-		    QuoteSourceManager.getSource().getSymbol(company);
+		    QuoteSourceManager.getSource().getSymbol(symbolName);
 		
 		// Not recognised?
 		if(symbol == null) {
 		    String noData = 
-			"No match for '" + company + "'";
+			"No match for '" + symbol + "'";
 
 		    JOptionPane.
 			showInternalMessageDialog(parent, noData, 
-						  "Unknown company",
+						  "Unknown symbol",
 						  JOptionPane.ERROR_MESSAGE);
 		    invalidResponse = true;
 		}
 
-		// Recognised! Build company set
+		// Recognised! Build symbol set
 		else {
-		    companySet = new TreeSet();
-		    companySet.add(symbol);
+		    symbolSet = new TreeSet();
+		    symbolSet.add(symbol);
 		}
 	    }
 
-	    // Keep going while user hasnt entered a valid company and
+	    // Keep going while user hasnt entered a valid symbol and
 	    // is selecting "ok"
 	} while(invalidResponse); 
 
-	// Return either null for no company selected or a set of one
-	if(companySet != null && companySet.size() == 0)
+	// Return either null for no symbol selected or a set of one
+	if(symbolSet != null && symbolSet.size() == 0)
 	    return null;
 	
-	return companySet;
+	return symbolSet;
     }
 
     /**
      * Open a new <code>SymbolListDialog</code> dialog. Ask the user
-     * to enter a list of company symbols. It will test to make each is
+     * to enter a list of symbol symbols. It will test to make each is
      * a valid symbol.
      *
      * @param	parent	the parent desktop
      * @param	title	the title of the dialog
-     * @return	a sorted set containing at least one company symbol string or
+     * @return	a sorted set containing at least one symbol symbol string or
      * <code>null</code> if the user cancelled the dialog
      */
     public static SortedSet getSymbols(JDesktopPane parent, 
 				       String title) {
-	SortedSet companySet;
-	String symbol;
-	String companies;
-	String unknownCompanies;
+	SortedSet symbolSet;
+	String symbols;
 	boolean invalidResponse;
 
 	do {
-	    companySet = null;
-	    companies = "";
-	    unknownCompanies = "";
+	    symbolSet = null;
+	    symbols = "";
 	    invalidResponse = false; // assume user does OK
 
 	    // First prompt user for list
 	    TextDialog dlg = new TextDialog(parent, 
-					    "Please enter commodity symbols",
-					    "Graphing symbol(s)");
-	    companies = dlg.showDialog();
+					    "Please enter symbol(s)",
+                                            title);
+	    symbols = dlg.showDialog();
 					    
-
 	    // Parse what the user inputed
-	    if(companies != null) {
+	    if(symbols != null) {
 		
-		// Convert string to sorted set
-		companySet = Converter.stringToSortedSet(companies);
-		Iterator iterator = companySet.iterator();
-		
-		while(iterator.hasNext()) {
-		    symbol = (String)iterator.next();
-		    
-		    // See if company exists
-		    if(!QuoteSourceManager.getSource().symbolExists(symbol)) {
-			
-			// Add to list of companies we don't know
-			if(unknownCompanies.length() > 0)
-			    unknownCompanies = unknownCompanies.concat(" ");
-			
-			unknownCompanies = unknownCompanies.concat(symbol);
-			
-			// Remove company from set of valid companies the user
-			// has entered
-			iterator.remove();
-		    }
-		}
-	    	
-		// If there was any unknowno companies put up a message dialog
-		// telling the user which ones were unknown
-		if(unknownCompanies.length() > 0) {
-		    String noData = 
-			"No data available for companies '" + 
-			unknownCompanies + 
-			"'";
-		    
-		    JOptionPane.
-			showInternalMessageDialog(parent, noData, 
-						  "Unknown companies",
-						  JOptionPane.ERROR_MESSAGE);
-		    // Invalid if user entered illegal company(s) but no
-		    // legal ones
-		    if(companySet.size() == 0)
-			invalidResponse = true;
-		}
+                // Get the set of symbols and check to see if they
+                // all exist
+                symbolSet = checkSymbols(parent, symbols);
+
+                if(symbolSet == null)
+                    invalidResponse = true;
 	    }
 
-	    // Keep going while user hasnt entered a valid company and
+	    // Keep going while user hasnt entered a valid symbol and
 	    // is selecting "ok"
 	} while(invalidResponse); 
 
 	// If the set is empty return a null pointer
-	if(companySet != null && companySet.size() == 0)
+	if(symbolSet != null && symbolSet.size() == 0)
 	    return null;
 
-	return companySet;
+	return symbolSet;
+    }
+
+    /**
+     * This function takes a string containing a comma or space
+     * separated list of symbols and turns it into a sorted list of
+     * strings containing each symbol. It will then check to make
+     * sure that each symbol exists.
+     *
+     * If any symbols do not exist in the quote source, it will display
+     * a dialog to the user informing them of the error.
+     *
+     * @param parent the parent component used for displaying the error
+     *               dialog
+     * @param symbols space or comma separated list of symbols
+     * @return sorted set of symbol strings or <code>null</code> if there
+     *         was an error
+     */
+    public static SortedSet checkSymbols(JComponent parent, String symbols) {
+        // Convert string to sorted set of symbols        
+        SortedSet symbolSet = Converter.stringToSortedSet(symbols);
+	String symbol;
+        Iterator iterator = symbolSet.iterator();
+	String unknownSymbols = new String();
+        
+        while(iterator.hasNext()) {
+            symbol = (String)iterator.next();
+            
+            // See if symbol exists
+            if(!QuoteSourceManager.getSource().symbolExists(symbol)) {
+                
+                // Add to list of symbols we don't know
+                if(unknownSymbols.length() > 0)
+                    unknownSymbols = unknownSymbols.concat(" ");
+                
+                unknownSymbols = unknownSymbols.concat(symbol);
+                
+                // Remove symbol from set of valid symbols the user
+                // has entered
+                iterator.remove();
+            }
+        }
+
+        // If there was any unknown symbols put up a message dialog
+        // telling the user which ones were unknown
+        if(unknownSymbols.length() > 0) {
+            String noData = 
+                "No data available for symbol(s) '" + 
+                unknownSymbols + 
+                "'";
+            
+            JOptionPane.
+                showInternalMessageDialog(parent, noData, 
+                                          "Unknown symbol(s)",
+                                          JOptionPane.ERROR_MESSAGE);
+
+            // Return null indicating there was at least one
+            // unknown symbol
+            symbolSet = null;
+        }
+        
+        return symbolSet;
     }
 }
-

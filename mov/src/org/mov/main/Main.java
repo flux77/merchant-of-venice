@@ -12,11 +12,6 @@ import org.mov.ui.*;
 import org.mov.quote.*;
 import org.mov.portfolio.*;
 
-import com.l2fprod.gui.plaf.skin.Skin;
-import com.l2fprod.gui.plaf.skin.CompoundSkin;
-import com.l2fprod.gui.plaf.skin.SkinLookAndFeel;
-import com.l2fprod.util.*;
-
 /**
  * The top level class which contains the main() function. This class builds 
  * the outer frame and creates the desktop.
@@ -24,7 +19,16 @@ import com.l2fprod.util.*;
 public class Main extends JFrame implements WindowListener {
     
     private JDesktopPane desktop;
-    private MainMenu menu;
+    private static MainMenu menu;
+    private static Main venice;
+
+    /**
+     * Get the main frame for the current application
+     * @returns The frame
+     */
+    public static JFrame getApplicationFrame() {
+	return Main.venice;
+    }
 
     // Go!
     private Main() {
@@ -35,7 +39,6 @@ public class Main extends JFrame implements WindowListener {
 		    p.getInt("default_y", 0));
 	setTitle("Venice");
 
-	SkinManager.loadSkin();
 	desktop = new JDesktopPane();
 	desktop.setDesktopManager(new org.mov.ui.DesktopManager(desktop));
 	CommandManager.getInstance().setDesktop(desktop);
@@ -70,9 +73,10 @@ public class Main extends JFrame implements WindowListener {
      * command line arguments.
      */
     public static void main(String[] args) {
-	Main venice = new Main();
+	venice = new Main();
 
 	venice.setVisible(true);
+	SkinManager.loadSkin();
     }
 }
 

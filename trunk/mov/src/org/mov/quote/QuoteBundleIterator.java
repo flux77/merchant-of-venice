@@ -65,25 +65,48 @@ public class QuoteBundleIterator implements Iterator {
         // not be, but we assume there are.
         assert isMore;
 
-        // Is there anymore symbols for this date?
-        if(symbolsIterator.hasNext())
-            nextSymbol = (String)symbolsIterator.next();
+        boolean found = false;
 
-        // No, try the next date.. and the next date...
-        else {
-            nextDate = nextDate.next(1);
+        while(!found && isMore) {
 
-            while(nextDate.compareTo(quoteBundle.getLastDate()) <= 0) {
-                Vector symbols = quoteBundle.getSymbols(nextDate);
-
-                // Are there symbols in the cache?
-                if(symbols.size() > 0) {
-                    symbolsIterator = symbols.iterator();
-                    return;
-                }
+            // Is there anymore symbols for this date?
+            if(symbolsIterator.hasNext())
+                nextSymbol = (String)symbolsIterator.next();
+            
+            // No, try the next date.. and the next date...
+            else {
                 nextDate = nextDate.next(1);
+
+                while(nextDate.compareTo(quoteBundle.getLastDate()) <= 0) {
+                    Vector symbols = quoteBundle.getSymbols(nextDate);
+                    
+                    // Are there symbols in the cache?
+                    if(symbols.size() > 0) {
+                        symbolsIterator = symbols.iterator();
+                        nextSymbol = (String)symbolsIterator.next();
+                        break;
+                    }
+                    nextDate = nextDate.next(1);
+                }
+
+                if(nextDate.compareTo(quoteBundle.getLastDate()) > 0) {
+                    isMore = false;
+                    break;
+                }
             }
-            isMore = false;
+
+            // Check that the quote is actually in the bundle. When we load
+            // a quote over all the ranges in the cache, it might lie and say
+            // it starts on a certain date (i.e. the first date in the cache),
+            // but it might not have any quotes until a much later date.
+            try {
+                float volume = 
+                    quoteBundle.getQuote(nextSymbol, Quote.DAY_VOLUME, nextDate);
+                found = true;
+            }
+            catch(MissingQuoteException e) {
+                found = false;
+            }
         }
     }
 

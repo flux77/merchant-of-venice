@@ -53,17 +53,17 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
     private JDesktopPane desktop;
 
     // Swing items
-    private ButtonGroup tradeCostBuyButtonGroup;
-    private JRadioButton tradeCostBuyByKeyButton;
-    private JRadioButton tradeCostBuyByEquationButton;
-    private JComboBox tradeCostBuyComboBox;
-    private JTextField tradeCostBuyTextField;
+    private ButtonGroup tradeValueBuyButtonGroup;
+    private JRadioButton tradeValueBuyByKeyButton;
+    private JRadioButton tradeValueBuyByEquationButton;
+    private JComboBox tradeValueBuyComboBox;
+    private JTextField tradeValueBuyTextField;
     
-    private ButtonGroup tradeCostSellButtonGroup;
-    private JRadioButton tradeCostSellByKeyButton;
-    private JRadioButton tradeCostSellByEquationButton;
-    private JComboBox tradeCostSellComboBox;
-    private JTextField tradeCostSellTextField;
+    private ButtonGroup tradeValueSellButtonGroup;
+    private JRadioButton tradeValueSellByKeyButton;
+    private JRadioButton tradeValueSellByEquationButton;
+    private JComboBox tradeValueSellComboBox;
+    private JTextField tradeValueSellTextField;
     
     public TradeValuePage(JDesktopPane desktop) {
 	this.desktop = desktop;
@@ -82,40 +82,38 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
 	    String setting = (String)iterator.next();
 	    String value = (String)settings.get(setting);
 
-            if(setting.equals("trade_cost_buy_text_field"))
-                tradeCostBuyTextField.setText(value);
-            else if(setting.equals("trade_cost_buy_combo"))
-                tradeCostBuyComboBox.setSelectedItem(value);
-            else if(setting.equals("trade_cost_buy")) {
+            if(setting.equals("trade_value_buy_text_field"))
+                tradeValueBuyTextField.setText(value);
+            else if(setting.equals("trade_value_buy_combo"))
+                tradeValueBuyComboBox.setSelectedItem(value);
+            else if(setting.equals("trade_value_buy")) {
                 if(value.equals("byKey"))
-                    tradeCostBuyByKeyButton.setSelected(true);
+                    tradeValueBuyByKeyButton.setSelected(true);
                 else
-                    tradeCostBuyByEquationButton.setSelected(true);
+                    tradeValueBuyByEquationButton.setSelected(true);
             }
-            if(setting.equals("trade_cost_sell_text_field"))
-                tradeCostSellTextField.setText(value);
-            else if(setting.equals("trade_cost_sell_combo"))
-                tradeCostSellComboBox.setSelectedItem(value);
-            else if(setting.equals("trade_cost_sell")) {
+            if(setting.equals("trade_value_sell_text_field"))
+                tradeValueSellTextField.setText(value);
+            else if(setting.equals("trade_value_sell_combo"))
+                tradeValueSellComboBox.setSelectedItem(value);
+            else if(setting.equals("trade_value_sell")) {
                 if(value.equals("byKey"))
-                    tradeCostSellByKeyButton.setSelected(true);
+                    tradeValueSellByKeyButton.setSelected(true);
                 else
-                    tradeCostSellByEquationButton.setSelected(true);
+                    tradeValueSellByEquationButton.setSelected(true);
             }
-            else
-                assert false;
         }
    }
 
     public void save(String key) {
         HashMap settings = new HashMap();
 
-        settings.put("trade_cost_buy", tradeCostBuyByKeyButton.isSelected()? "byKey" : "byEquation");
-        settings.put("trade_cost_buy_combo", tradeCostBuyComboBox.getSelectedItem());
-        settings.put("trade_cost_buy_text_field", tradeCostBuyTextField.getText());
-        settings.put("trade_cost_sell", tradeCostSellByKeyButton.isSelected()? "byKey" : "byEquation");
-        settings.put("trade_cost_sell_combo", tradeCostSellComboBox.getSelectedItem());
-        settings.put("trade_cost_sell_text_field", tradeCostSellTextField.getText());
+        settings.put("trade_value_buy", tradeValueBuyByKeyButton.isSelected()? "byKey" : "byEquation");
+        settings.put("trade_value_buy_combo", tradeValueBuyComboBox.getSelectedItem());
+        settings.put("trade_value_buy_text_field", tradeValueBuyTextField.getText());
+        settings.put("trade_value_sell", tradeValueSellByKeyButton.isSelected()? "byKey" : "byEquation");
+        settings.put("trade_value_sell_combo", tradeValueSellComboBox.getSelectedItem());
+        settings.put("trade_value_sell_text_field", tradeValueSellTextField.getText());
 
         PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
                                                     settings);
@@ -128,11 +126,11 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
             Variables variables = new Variables();
             variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
             variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-            if (tradeCostBuyByEquationButton.isSelected()) {
-                Expression tradeCostBuyExpression = Parser.parse(variables, tradeCostBuyTextField.getText());
+            if (tradeValueBuyByEquationButton.isSelected()) {
+                Expression tradeValueBuyExpression = Parser.parse(variables, tradeValueBuyTextField.getText());
             }
-            if (tradeCostSellByEquationButton.isSelected()) {
-                Expression tradeCostSellExpression = Parser.parse(variables, tradeCostSellTextField.getText());
+            if (tradeValueSellByEquationButton.isSelected()) {
+                Expression tradeValueSellExpression = Parser.parse(variables, tradeValueSellTextField.getText());
             }
         } catch(ExpressionException e) {
             JOptionPane.showInternalMessageDialog(desktop,
@@ -153,17 +151,17 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
     }
 
     public String getTradeValueBuy() {
-        JRadioButton generalTradeCostByKeyButton = tradeCostBuyByKeyButton;
-        JComboBox generalTradeCostComboBox = tradeCostBuyComboBox;
-        JTextField generalTradeCostTextField = tradeCostBuyTextField;
-        return getTradeValue(generalTradeCostByKeyButton, generalTradeCostComboBox, generalTradeCostTextField);
+        JRadioButton generalTradeValueByKeyButton = tradeValueBuyByKeyButton;
+        JComboBox generalTradeValueComboBox = tradeValueBuyComboBox;
+        JTextField generalTradeValueTextField = tradeValueBuyTextField;
+        return getTradeValue(generalTradeValueByKeyButton, generalTradeValueComboBox, generalTradeValueTextField);
     }
     
-    public String getTradeValueSell() {
-        JRadioButton generalTradeCostByKeyButton = tradeCostSellByKeyButton;
-        JComboBox generalTradeCostComboBox = tradeCostSellComboBox;
-        JTextField generalTradeCostTextField = tradeCostSellTextField;
-        return getTradeValue(generalTradeCostByKeyButton, generalTradeCostComboBox, generalTradeCostTextField);
+   public String getTradeValueSell() {
+        JRadioButton generalTradeValueByKeyButton = tradeValueSellByKeyButton;
+        JComboBox generalTradeValueComboBox = tradeValueSellComboBox;
+        JTextField generalTradeValueTextField = tradeValueSellTextField;
+        return getTradeValue(generalTradeValueByKeyButton, generalTradeValueComboBox, generalTradeValueTextField);
     }
     
     private String getTradeValue(JRadioButton radio, JComboBox combo, JTextField text) {
@@ -217,48 +215,48 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
         JPanel innerPanelBuy = new JPanel();
         innerPanelBuy.setLayout(gridbag);
         
-        tradeCostBuyButtonGroup = new ButtonGroup();
+        tradeValueBuyButtonGroup = new ButtonGroup();
 
         c.weightx = 1.0;
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        tradeCostBuyByKeyButton = new JRadioButton(Locale.getString("BY"));
-        tradeCostBuyByKeyButton.setSelected(true);
-        tradeCostBuyButtonGroup.add(tradeCostBuyByKeyButton);
+        tradeValueBuyByKeyButton = new JRadioButton(Locale.getString("BY"));
+        tradeValueBuyByKeyButton.setSelected(true);
+        tradeValueBuyButtonGroup.add(tradeValueBuyByKeyButton);
 
         c.gridwidth = 1;
-        gridbag.setConstraints(tradeCostBuyByKeyButton, c);
-        innerPanelBuy.add(tradeCostBuyByKeyButton);
+        gridbag.setConstraints(tradeValueBuyByKeyButton, c);
+        innerPanelBuy.add(tradeValueBuyByKeyButton);
 
-        tradeCostBuyComboBox = new JComboBox();
-        tradeCostBuyComboBox.addItem(Locale.getString("TOMORROW_OPEN"));
-        tradeCostBuyComboBox.addItem(Locale.getString("TODAY_CLOSE"));
-        tradeCostBuyComboBox.addItem(Locale.getString("TODAY_MIN_MAX_AVG"));
-        tradeCostBuyComboBox.addItem(Locale.getString("TODAY_OPEN_CLOSE_AVG"));
-        tradeCostBuyComboBox.addItem(Locale.getString("TODAY_MIN"));
-        tradeCostBuyComboBox.addItem(Locale.getString("TODAY_MAX"));
+        tradeValueBuyComboBox = new JComboBox();
+        tradeValueBuyComboBox.addItem(Locale.getString("TOMORROW_OPEN"));
+        tradeValueBuyComboBox.addItem(Locale.getString("TODAY_CLOSE"));
+        tradeValueBuyComboBox.addItem(Locale.getString("TODAY_MIN_MAX_AVG"));
+        tradeValueBuyComboBox.addItem(Locale.getString("TODAY_OPEN_CLOSE_AVG"));
+        tradeValueBuyComboBox.addItem(Locale.getString("TODAY_MIN"));
+        tradeValueBuyComboBox.addItem(Locale.getString("TODAY_MAX"));
         
         c.gridwidth = GridBagConstraints.REMAINDER;
-        gridbag.setConstraints(tradeCostBuyComboBox, c);
-        innerPanelBuy.add(tradeCostBuyComboBox);
+        gridbag.setConstraints(tradeValueBuyComboBox, c);
+        innerPanelBuy.add(tradeValueBuyComboBox);
 
         c.weightx = 1.0;
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
 
-        tradeCostBuyByEquationButton = new JRadioButton(Locale.getString("BY_EQUATION"));
-        tradeCostBuyButtonGroup.add(tradeCostBuyByEquationButton);
+        tradeValueBuyByEquationButton = new JRadioButton(Locale.getString("BY_EQUATION"));
+        tradeValueBuyButtonGroup.add(tradeValueBuyByEquationButton);
 
         c.gridwidth = 1;
-        gridbag.setConstraints(tradeCostBuyByEquationButton, c);
-        innerPanelBuy.add(tradeCostBuyByEquationButton);
+        gridbag.setConstraints(tradeValueBuyByEquationButton, c);
+        innerPanelBuy.add(tradeValueBuyByEquationButton);
 
-        tradeCostBuyTextField = new JTextField();
+        tradeValueBuyTextField = new JTextField();
         c.gridwidth = GridBagConstraints.REMAINDER;
-        gridbag.setConstraints(tradeCostBuyTextField, c);
-        innerPanelBuy.add(tradeCostBuyTextField);
+        gridbag.setConstraints(tradeValueBuyTextField, c);
+        innerPanelBuy.add(tradeValueBuyTextField);
 
         panelBuy.add(innerPanelBuy, BorderLayout.NORTH);
         
@@ -271,48 +269,48 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
         JPanel innerPanelSell = new JPanel();
         innerPanelSell.setLayout(gridbag);
         
-        tradeCostSellButtonGroup = new ButtonGroup();
+        tradeValueSellButtonGroup = new ButtonGroup();
 
         c.weightx = 1.0;
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        tradeCostSellByKeyButton = new JRadioButton(Locale.getString("BY"));
-        tradeCostSellByKeyButton.setSelected(true);
-        tradeCostSellButtonGroup.add(tradeCostSellByKeyButton);
+        tradeValueSellByKeyButton = new JRadioButton(Locale.getString("BY"));
+        tradeValueSellByKeyButton.setSelected(true);
+        tradeValueSellButtonGroup.add(tradeValueSellByKeyButton);
 
         c.gridwidth = 1;
-        gridbag.setConstraints(tradeCostSellByKeyButton, c);
-        innerPanelSell.add(tradeCostSellByKeyButton);
+        gridbag.setConstraints(tradeValueSellByKeyButton, c);
+        innerPanelSell.add(tradeValueSellByKeyButton);
 
-        tradeCostSellComboBox = new JComboBox();
-        tradeCostSellComboBox.addItem(Locale.getString("TOMORROW_OPEN"));
-        tradeCostSellComboBox.addItem(Locale.getString("TODAY_CLOSE"));
-        tradeCostSellComboBox.addItem(Locale.getString("TODAY_MIN_MAX_AVG"));
-        tradeCostSellComboBox.addItem(Locale.getString("TODAY_OPEN_CLOSE_AVG"));
-        tradeCostSellComboBox.addItem(Locale.getString("TODAY_MIN"));
-        tradeCostSellComboBox.addItem(Locale.getString("TODAY_MAX"));
+        tradeValueSellComboBox = new JComboBox();
+        tradeValueSellComboBox.addItem(Locale.getString("TOMORROW_OPEN"));
+        tradeValueSellComboBox.addItem(Locale.getString("TODAY_CLOSE"));
+        tradeValueSellComboBox.addItem(Locale.getString("TODAY_MIN_MAX_AVG"));
+        tradeValueSellComboBox.addItem(Locale.getString("TODAY_OPEN_CLOSE_AVG"));
+        tradeValueSellComboBox.addItem(Locale.getString("TODAY_MIN"));
+        tradeValueSellComboBox.addItem(Locale.getString("TODAY_MAX"));
         
         c.gridwidth = GridBagConstraints.REMAINDER;
-        gridbag.setConstraints(tradeCostSellComboBox, c);
-        innerPanelSell.add(tradeCostSellComboBox);
+        gridbag.setConstraints(tradeValueSellComboBox, c);
+        innerPanelSell.add(tradeValueSellComboBox);
 
         c.weightx = 1.0;
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
 
-        tradeCostSellByEquationButton = new JRadioButton(Locale.getString("BY_EQUATION"));
-        tradeCostSellButtonGroup.add(tradeCostSellByEquationButton);
+        tradeValueSellByEquationButton = new JRadioButton(Locale.getString("BY_EQUATION"));
+        tradeValueSellButtonGroup.add(tradeValueSellByEquationButton);
 
         c.gridwidth = 1;
-        gridbag.setConstraints(tradeCostSellByEquationButton, c);
-        innerPanelSell.add(tradeCostSellByEquationButton);
+        gridbag.setConstraints(tradeValueSellByEquationButton, c);
+        innerPanelSell.add(tradeValueSellByEquationButton);
 
-        tradeCostSellTextField = new JTextField();
+        tradeValueSellTextField = new JTextField();
         c.gridwidth = GridBagConstraints.REMAINDER;
-        gridbag.setConstraints(tradeCostSellTextField, c);
-        innerPanelSell.add(tradeCostSellTextField);
+        gridbag.setConstraints(tradeValueSellTextField, c);
+        innerPanelSell.add(tradeValueSellTextField);
 
         panelSell.add(innerPanelSell, BorderLayout.NORTH);
         

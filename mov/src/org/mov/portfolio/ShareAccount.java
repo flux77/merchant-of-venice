@@ -83,26 +83,29 @@ public class ShareAccount implements Account, Cloneable {
 
 	if(type == Transaction.ACCUMULATE ||
 	   type == Transaction.DIVIDEND_DRP) {
+            assert shares > 0;
+
+            float averageCost = (transaction.getAmount() / 
+                                 transaction.getShares());
 
 	    // Do we already own the stock? If so accumulate
 	    if(holding != null)
-		holding.accumulate(shares);
+		holding.accumulate(shares, averageCost);
 	    else // otherwise add new stock to portfolio
-		stockHoldings.put((Object)symbol, new StockHolding(symbol,
-								   shares,
-                                                                   transaction.getDate()));
+		stockHoldings.put(symbol, new StockHolding(symbol, shares, averageCost,
+                                                           transaction.getDate()));
 	}
 	else if(type == Transaction.REDUCE) {
-
 	    // We shouldnt be selling stuff we don't own
 	    assert holding != null;
+            assert shares > 0;
 	    
 	    holding.reduce(shares);
 	    
 	    // do we have any left? if not remove stock holding from
 	    // holdings
 	    if(holding.getShares() <= 0)
-		stockHoldings.remove((Object)symbol);
+		stockHoldings.remove(symbol);
 	}
     }
 
@@ -124,7 +127,7 @@ public class ShareAccount implements Account, Cloneable {
      * @return <code>TRUE</code> if we are holding the symbol; <code>FALSE</code> otherwise
      */
     public boolean isHolding(Symbol symbol) {
-        return (stockHoldings.get(symbol) != null);
+        return stockHoldings.containsKey(symbol);
     }
 
     /**
@@ -141,7 +144,6 @@ public class ShareAccount implements Account, Cloneable {
     }
 
     public void removeAllTransactions() {
-
 	// Removing all transactions means removing all stocks
 	// from our account
 	stockHoldings.clear();

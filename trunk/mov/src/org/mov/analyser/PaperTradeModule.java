@@ -271,7 +271,6 @@ public class PaperTradeModule extends JPanel implements Module,
 		fromDateTextField.setText(value);
 	    else if(setting.equals("to_date"))
 		toDateTextField.setText(value);
-
 	    else if(setting.equals("symbols"))
 		symbolsTextField.setText(value);
 	    else if(setting.equals("buy_rule"))
@@ -282,11 +281,19 @@ public class PaperTradeModule extends JPanel implements Module,
 		initialCapitalTextField.setText(value);
 	    else if(setting.equals("trade_cost"))
 		tradeCostTextField.setText(value);
+	    else if(setting.equals("arange"))
+		aRangeTextField.setText(value);
+	    else if(setting.equals("brange"))
+		bRangeTextField.setText(value);
+	    else if(setting.equals("crange"))
+		cRangeTextField.setText(value);
+	    else
+		assert false;
 	}
     }
 
+    // Save last GUI settings to preferences
     public void save() {
-	// Save last GUI settings to preferences
 	HashMap settings = new HashMap();
 
 	settings.put("from_date", fromDateTextField.getText());
@@ -296,6 +303,9 @@ public class PaperTradeModule extends JPanel implements Module,
 	settings.put("sell_rule", sellRuleEquationComboBox.getEquationText());
 	settings.put("initial_capital", initialCapitalTextField.getText());
 	settings.put("trade_cost", tradeCostTextField.getText());
+	settings.put("arange", aRangeTextField.getText());
+	settings.put("brange", bRangeTextField.getText());
+	settings.put("crange", cRangeTextField.getText());
 
 	PreferencesManager.saveLastPaperTradeSettings(settings);
     }

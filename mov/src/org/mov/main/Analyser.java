@@ -13,7 +13,7 @@ public class Analyser extends JFrame implements WindowListener {
     
     private static final String PREFS_FILE = "prefs.xml";
     private JDesktopPane desktop;
-    private AnalyserMenu menu;
+    private MainMenu menu;
 
     public Analyser() {
 	loadPreferences();
@@ -27,8 +27,10 @@ public class Analyser extends JFrame implements WindowListener {
 	desktop = new JDesktopPane();
 	desktop.setDesktopManager(new AnalyserDesktopManager(desktop));
 	CommandManager.getInstance().setDesktop(desktop);
+
 	Progress.getInstance().setDesktop(desktop);
-	menu = new AnalyserMenu(this, desktop);
+
+	menu = new MainMenu(this, desktop);
 	setContentPane(desktop);
 	addWindowListener(this);
     }

@@ -37,13 +37,17 @@ public class PaperTradeResult {
     private int c;
     private TradingDate startDate;	
     private TradingDate endDate;
+    private String tip;
+
+
     
     public PaperTradeResult(Portfolio portfolio, ScriptQuoteBundle quoteBundle,
                             Money initialCapital, Money tradeCost,
                             String buyRule, String sellRule,
                             int a, int b, int c,
                             TradingDate startDate,
-                            TradingDate endDate) {
+                            TradingDate endDate,
+                            String tip) {
         this.portfolio = portfolio;
         this.quoteBundle = quoteBundle;
         this.initialCapital = initialCapital;
@@ -55,6 +59,7 @@ public class PaperTradeResult {
         this.c = c;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.tip = tip;
     }
 
     public TradingDate getStartDate() {
@@ -136,5 +141,9 @@ public class PaperTradeResult {
 
     public ScriptQuoteBundle getQuoteBundle() {
         return quoteBundle;
+    }
+    
+    public String getTip() {
+        return tip;
     }
 }

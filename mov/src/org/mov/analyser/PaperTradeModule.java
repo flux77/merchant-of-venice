@@ -68,9 +68,6 @@ public class PaperTradeModule extends JPanel implements Module {
     private PortfolioPage portfolioPage;
     private TradeValuePage tradeValuePage;
     
-    // Tip
-    private String tip;
-
     /**
      * Create a new paper trade module.
      *
@@ -304,8 +301,6 @@ public class PaperTradeModule extends JPanel implements Module {
                                               tradeCostSell);
         }
         
-        this.tip = PaperTrade.getTip();
-
         // Running the equation means we might need to load in
         // more quotes so the note may have changed...
         progress.setNote(Locale.getString("PAPER_TRADING"));
@@ -319,7 +314,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                     sellRule.toString(),
                                     a, b, c,
                                     startDate,
-                                    endDate);
+                                    endDate,
+                                    PaperTrade.getTip());
     }
 
     private List getPaperTradeResults() {
@@ -490,8 +486,8 @@ public class PaperTradeModule extends JPanel implements Module {
 		    PaperTradeResultModule resultsModule =
 			(PaperTradeResultModule)resultsFrame.getModule();
 		
+                    resultsModule.setDesktop(desktop);
                     resultsModule.addResults(paperTradeResults);
-                    resultsModule.setTip(desktop, tip);
 		}});
     }
 }

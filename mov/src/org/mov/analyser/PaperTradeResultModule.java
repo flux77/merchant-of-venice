@@ -85,8 +85,6 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     private JMenuItem removeMenuItem;
     private JMenuItem removeAllMenuItem;
     
-    // Tip
-    private String tip;
     private JDesktopPane desktop;
 
     private class Model extends AbstractTableModel {
@@ -265,7 +263,11 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
         showColumns(model);
     }
-
+    
+    public void setDesktop(JDesktopPane desktop) {
+        this.desktop = desktop;
+    }
+    
     // If the user double clicks on a result with the LMB, graph the portfolio.
     // If the user right clicks over the table, open up a popup menu.
     private void handleMouseClicked(MouseEvent event) {
@@ -494,10 +496,18 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     }
 
     private void showTipWindow() {
-        JOptionPane.showInternalMessageDialog(this.desktop,
-                                              this.tip,
-                                              Locale.getString("GET_TIP"),
-                                              JOptionPane.INFORMATION_MESSAGE);
+        // Get result at row
+        int row = getSelectedRow();
+
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            PaperTradeResult result = model.getResult(row);
+
+            JOptionPane.showInternalMessageDialog(this.desktop,
+                                                  new String(result.getTip()),
+                                                  Locale.getString("GET_TIP"),
+                                                  JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     // Opens first selected result
@@ -681,11 +691,6 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     public void save() {
         // Free up precious memory
         model.removeAllResults();
-    }
-
-    public void setTip(JDesktopPane desktop, String tip) {
-	this.desktop = desktop;
-        this.tip = tip;
     }
 
     public String getTitle() {

@@ -20,22 +20,55 @@ package org.mov.importer;
 
 import org.mov.main.ModuleFrame;
 import org.mov.main.Module;
-import org.mov.util.*;
+import org.mov.util.Converter;
+import org.mov.util.TradingDate;
 import org.mov.prefs.PreferencesManager;
-import org.mov.quote.*;
-import org.mov.ui.*;
+import org.mov.quote.DatabaseQuoteSource;
+import org.mov.quote.FileQuoteSource;
+import org.mov.quote.Quote;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteCache;
+import org.mov.quote.QuoteFilter;
+import org.mov.quote.QuoteFilterList;
+import org.mov.quote.QuoteRange;
+import org.mov.quote.QuoteSource;
+import org.mov.quote.QuoteSourceManager;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.prefs.Preferences;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JComboBox;
+import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
 
 /**
  * The importer module for venice which allows importing of quotes from
@@ -120,13 +153,11 @@ public class ImporterModule extends JPanel
 
 	    formatComboBox = new JComboBox();
 	    formatComboBox.addActionListener(this);
-	    Vector formats = QuoteFilterList.getInstance().getList();
-	    Iterator iterator = formats.iterator();
-	    QuoteFilter filter;
-	    String selectedFilter = p.get("fileFilter", "MetaStock");
+	    List formats = QuoteFilterList.getInstance().getList();
+            String selectedFilter = p.get("fileFilter", "MetaStock");
 
-	    while(iterator.hasNext()) {
-		filter = (QuoteFilter)iterator.next();
+            for(Iterator iterator = formats.iterator(); iterator.hasNext();) {
+		QuoteFilter filter = (QuoteFilter)iterator.next();
 		formatComboBox.addItem(filter.getName());
                 if(filter.getName().equals(selectedFilter))
                     formatComboBox.setSelectedItem((Object)filter.getName());
@@ -301,18 +332,29 @@ public class ImporterModule extends JPanel
     // Import quotes
     private void importQuotes() {
         QuoteSource source = null;
-	Vector dates = new Vector();
+	List dates = new ArrayList();
 
 	// If we are importing from files we'll need to open a dialog
 	if(fromFiles.isSelected()) {
 	    // Get files user wants to import
-	    JFileChooser chooser = new JFileChooser();
+	    JFileChooser chooser;
+            String lastDirectory = PreferencesManager.loadLastImportDirectory();
+            
+            if(lastDirectory != null)
+                chooser = new JFileChooser(lastDirectory);
+            else
+                chooser = new JFileChooser();
+
 	    chooser.setMultiSelectionEnabled(true);
 	    int action = chooser.showOpenDialog(desktop);
 
 	    if(action == JFileChooser.APPROVE_OPTION) {
+                // Remember directory
+                lastDirectory = chooser.getCurrentDirectory().getAbsolutePath();
+                PreferencesManager.saveLastImportDirectory(lastDirectory);
+
 		File files[] = chooser.getSelectedFiles();
-		Vector fileNames = Converter.toFileNameVector(files);
+		List fileNames = Converter.toFileNameVector(files);
 
 		// Cancel if no files were selected (one day = one file)
 		if(fileNames.size() != 0) {
@@ -384,8 +426,7 @@ public class ImporterModule extends JPanel
 	    endDate = endDate.previous(1);
 
 	    // Get vector of all trading dates inbetween
-	    dates = Converter.dateRangeToTradingDateVector(startDate,
-							   endDate);
+	    dates = TradingDate.dateRangeToList(startDate, endDate);
 
 	    assert false;
 	    source = null;
@@ -408,9 +449,8 @@ public class ImporterModule extends JPanel
 	Thread thread = Thread.currentThread();
 
         // Get a list of all dates between the first and last
-        Vector dateRange =
-            Converter.dateRangeToTradingDateVector(source.getFirstDate(),
-                                                   source.getLastDate());
+        List dateRange = TradingDate.dateRangeToList(source.getFirstDate(),
+                                                     source.getLastDate());
 
         // Now set up progress dialog to display date by date progress
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
@@ -450,7 +490,7 @@ public class ImporterModule extends JPanel
                     FileQuoteSource fileQuoteSource =
                         (FileQuoteSource)source;
                     importFileToFile(fileQuoteSource.
-                                     getFileForDate(date));
+                                     getURLForDate(date).getPath());
                 }			
 
                 // anything but file -> file
@@ -480,7 +520,7 @@ public class ImporterModule extends JPanel
     // Import file name containing a day's quotes into the file list
     private void importFileToFile(String fileName) {
 	// Get list of files
-	Vector fileList = getFileList();
+	List fileList = getFileList();
 
 	// Add file if its not already there
 	Iterator iterator = fileList.iterator();
@@ -642,11 +682,35 @@ public class ImporterModule extends JPanel
     }
 
     /**
-     * Retreive the user's selection of files into the preferences structure.
+     * Retrieve the user's selection files from the preferneces structure.
      *
-     * @return	a vector of strings containing quote file names
+     * @return a list of file URLs.
      */
-    public static Vector getFileList() {
+    public static List getFileURLList() {
+        List files = getFileList();
+        List fileURLs = new ArrayList();
+
+        for(Iterator iterator = files.iterator(); iterator.hasNext();) {
+            String fileName = (String)iterator.next();
+
+            try {
+                URL fileURL = new URL("file://" + fileName);
+                fileURLs.add(fileURL);
+            }
+            catch(MalformedURLException e) {
+                assert false;
+            }
+        }
+        
+        return fileURLs;
+    }
+
+    /**
+     * Retreive the user's selection of files from the preferences structure.
+     *
+     * @return	a list of strings containing quote file names
+     */
+    public static List getFileList() {
 	Preferences p = PreferencesManager.getUserNode("/quote_source/files");
 
 	// Files are stored in the nodes list1, list2, list3 etc - the
@@ -673,30 +737,28 @@ public class ImporterModule extends JPanel
 	// Now split the comma separated entries
 	String[] fileNames = fileList.split(", ");
 
-	Vector fileVector = new Vector();
+	List files = new ArrayList();
 	for(int i = 0; i < fileNames.length; i++) {
 	    if(fileNames[i].length() > 0)
-		fileVector.add(fileNames[i]);
+		files.add(fileNames[i]);
 	}
 
-	return fileVector;
+	return files;
     }
 
     /**
      * Save the user's selection of files into the preferences structure.
      *
-     * @param	fileVector	a vector of strings containing quote file
-     *				names
+     * @param	files	a list of strings containing quote file
+     *			names
      */
-    public static void putFileList(Vector fileVector) {
-	// First convert the vector into a comma separated string of
+    public static void putFileList(List files) {
+	// First convert the list into a comma separated string of
 	// all the file names
 	String fileList = "";
-	String fileName;
-	Iterator iterator = fileVector.iterator();
 
-	while(iterator.hasNext()) {
-	    fileName = (String)iterator.next();
+	for(Iterator iterator = files.iterator(); iterator.hasNext();) {
+	    String fileName = (String)iterator.next();
 
 	    if(fileList.length() > 1)
 		fileList = fileList.concat(", ");

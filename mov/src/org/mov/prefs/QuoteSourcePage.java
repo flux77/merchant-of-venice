@@ -104,7 +104,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	Preferences p = PreferencesManager.getUserNode("/quote_source");
 	String quoteSource = p.get("source", "samples");
 
-        setBorder(new TitledBorder("Quote Source"));
+        setBorder(new TitledBorder(getTitle()));
 
 	// Tab Pane
 	JTabbedPane pane = new JTabbedPane(JTabbedPane.TOP);
@@ -391,36 +391,14 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         return samples;
     }
 
-    /**
-     * Return displayed component for this module.
-     *
-     * @return the component to display.
-     */
     public JComponent getComponent() {
 	return this;
     }
 
-    /**
-     * Return menu bar for quote source preferences module.
-     *
-     * @return	the menu bar.
-     */
-    public JMenuBar getJMenuBar() {
-	return null;
-    }
-
-    /**
-     * Returns the window title.
-     *
-     * @return	the window title.
-     */
     public String getTitle() {
 	return "Quote Source";
     }
 
-    /**
-     * Update the preferences file.
-     */
     public void save() {
 	// Type
 	Preferences p = 

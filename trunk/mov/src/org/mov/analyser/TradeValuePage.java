@@ -168,19 +168,19 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
                 retValue = "open";
             } else if (combo.getSelectedIndex()==1) {
                 // TODAY_CLOSE
-                retValue = "lag(close,-1)";
+                retValue = "close";
             } else if (combo.getSelectedIndex()==2) {
                 // TODAY_MIN_MAX_AVG
-                retValue = "(lag(low,-1)+lag(high,-1))/2.0";
+                retValue = "(low+high)/2.0";
             } else if (combo.getSelectedIndex()==3) {
                 // TODAY_OPEN_CLOSE_AVG
-                retValue = "(lag(open,-1)+lag(close,-1))/2.0";
+                retValue = "(open+close)/2.0";
             } else if (combo.getSelectedIndex()==4) {
                 // TODAY_MIN
-                retValue = "lag(low,-1)";
+                retValue = "low";
             } else if (combo.getSelectedIndex()==5) {
                 // TODAY_MAX
-                retValue = "lag(high,-1)";
+                retValue = "high";
             } 
         } else {
             retValue = text.getText();

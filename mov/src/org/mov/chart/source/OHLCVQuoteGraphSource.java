@@ -67,7 +67,8 @@ public class OHLCVQuoteGraphSource implements GraphSource {
     }
 
     public String getName() {
-	return symbol;
+	// Display symbols in upper case
+	return symbol.toUpperCase();
     }
 
     public String getToolTipText(Comparable x) {

@@ -82,6 +82,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
     // Main menu items
     private JMenuItem graphSymbols;
+    private JMenuItem tableSymbols;
     private JMenuItem applyEquations;
     private JMenuItem applyFilter;
     private JMenuItem sortByMostActive;
@@ -89,6 +90,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
     // Poup menu items
     private JMenuItem popupGraphSymbols = null;
+    private JMenuItem popupTableSymbols = null;
 
     private PropertyChangeSupport propertySupport;
     private ScriptQuoteBundle quoteBundle;
@@ -374,6 +376,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	int numberOfSelectedRows = getSelectedRowCount();
 
         graphSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
+        tableSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
     }
 
     // If the user double clicks on a stock with the LMB, graph the stock.
@@ -390,6 +393,11 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 MenuHelper.addMenuItem(this, menu,
                                        "Graph");
             popupGraphSymbols.setEnabled(getSelectedRowCount() > 0);
+
+            popupTableSymbols =
+                MenuHelper.addMenuItem(this, menu,
+                                       "Table");
+            popupTableSymbols.setEnabled(getSelectedRowCount() > 0);
 
             menu.show(this, point.x, point.y);
         }
@@ -504,6 +512,9 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	graphSymbols =
 	    MenuHelper.addMenuItem(this, tableMenu,
 				   "Graph");
+	tableSymbols =
+	    MenuHelper.addMenuItem(this, tableMenu,
+				   "Table");
 
 	tableMenu.addSeparator();
 
@@ -831,7 +842,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 e.getSource() == graphSymbols) {
 
             int[] selectedRows = getSelectedRows();
-            ArrayList symbols = new ArrayList();
+            List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
                 String symbol = (String)model.getValueAt(selectedRows[i], SYMBOL_COLUMN);
@@ -841,6 +852,23 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
             // Graph the highlighted symbols
             CommandManager.getInstance().graphStockBySymbol(symbols);
+        }
+
+        // Table symbols, either by the popup menu or the main menu
+        else if((popupTableSymbols != null && e.getSource() == popupTableSymbols) ||
+                e.getSource() == tableSymbols) {
+
+            int[] selectedRows = getSelectedRows();
+            ArrayList symbols = new ArrayList();
+
+            for(int i = 0; i < selectedRows.length; i++) {
+                String symbol = (String)model.getValueAt(selectedRows[i], SYMBOL_COLUMN);
+
+                symbols.add(symbol.toLowerCase());
+            }
+
+            // Table the highlighted symbols
+            CommandManager.getInstance().tableStocks(symbols);
         }
 
 	else {

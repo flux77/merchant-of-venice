@@ -186,7 +186,6 @@ public class PaperTrade {
             // your stocks will be sold.
             // It simulates an order of selling at fixed price (sellPrice).
             if (sellPrice<=environment.quoteBundle.getQuote(symbol, Quote.DAY_HIGH, day)) {
-                sellCost = sellPrice;
                 Money amount =
                     new Money(shares * sellPrice);
                 TradingDate date = environment.quoteBundle.offsetToDate(day);
@@ -226,8 +225,6 @@ public class PaperTrade {
         // your stocks will be bought.
         // It simulates an order of buying at fixed price (buyPrice).
         if (buyPrice>=environment.quoteBundle.getQuote(symbol, Quote.DAY_LOW, day)) {
-            
-            buyCost = buyPrice;
             // Calculate maximum number of shares we can buy with the given amount
             double sharePrice = buyPrice;
             int shares = (int)Math.floor(amount.doubleValue() / sharePrice);
@@ -297,11 +294,7 @@ public class PaperTrade {
             variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
 
             try {
-                sellRule = false;
-                sellCost = Double.NaN;
-
                 if(sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE) {
-                    sellRule = true;
                     sell(environment, variables, stockHolding, tradeCost, dateOffset + 1);
                 }
             }
@@ -360,13 +353,9 @@ public class PaperTrade {
                         variables.setValue("order", order);
 
                     try {
-                        buyRule = false;
-                        buyCost = Double.NaN;
-
                         if(buy.evaluate(variables, quoteBundle, symbol,
                                         dateOffset) >= Expression.TRUE) {
 
-                            buyRule = true;
                             // Did we have enough money to buy at least one share?
                             if(buy(environment, variables, symbol, stockValue,  tradeCost,
                                    dateOffset + 1)) {
@@ -556,9 +545,93 @@ public class PaperTrade {
             dateOffset++;
         }
 
+        setTip(environment, quoteBundle, variables, buy, sell, dateOffset, tradeCost,
+                  orderCache.getTodaySymbols(dateOffset), orderCache);
+        
         return environment.portfolio;
     }
 
+    /**
+     * Set the information for the tip of the next day.
+     */
+    private static void setTip(Environment environment,
+                                  QuoteBundle quoteBundle,
+                                  Variables variables,
+                                  Expression buy,
+                                  Expression sell,
+                                  int dateOffset,
+                                  Money tradeCost,
+                                  List symbols,
+                                  OrderCache orderCache) {
+        // Count the buy tip for the next day
+        variables.setValue("held", 0);
+
+        int order = 0;
+
+        // Iterate through stocks available today - should we buy or sell any of it?
+        for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
+            Symbol symbol = (Symbol)iterator.next();
+
+            // Skip if we already own it
+            if(!environment.shareAccount.isHolding(symbol)) {
+
+                // If we care about the order, make sure the "order" variable is set
+                if(orderCache.isOrdered())
+                    variables.setValue("order", order);
+
+                try {
+                    if(buy.evaluate(variables, quoteBundle, symbol,
+                                    dateOffset) >= Expression.TRUE) {
+
+                        // Did we have enough money to buy at least one share?
+                        buyRule = (buy.evaluate(variables, quoteBundle, symbol,
+                                    dateOffset+1) >= Expression.TRUE);
+                        // price to buy
+                        Expression tradeCostBuyExpression = ExpressionFactory.newExpression(environment.tradeCostBuy);
+                        buyCost = tradeCostBuyExpression.evaluate(variables, quoteBundle, symbol, dateOffset+2);
+                    }
+                }
+                catch(EvaluationException e) {
+                    buyCost = 0.0D;
+                }
+            }
+
+            order++;
+        }
+        
+        // Count the sell tip for the next day
+        // Iterate through our stock holdings and see if we should sell any
+        List stockHoldings = new ArrayList(environment.shareAccount.getStockHoldings().values());
+
+        for(Iterator iterator = stockHoldings.iterator(); iterator.hasNext();) {
+            StockHolding stockHolding = (StockHolding)iterator.next();
+            Symbol symbol = stockHolding.getSymbol();
+
+            // If we care about the order, make sure the "order" variable is set.
+            if(orderCache.isOrdered()) {
+                order = symbols.indexOf(symbol);
+
+                // It's possible that we don't have a quote for the symbol today.
+                // So skip it.
+                if(order == -1)
+                    continue;
+                variables.setValue("order", order);
+            }
+
+            variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
+
+            try {
+                sellRule = (sell.evaluate(variables, quoteBundle, symbol, dateOffset+1) >= Expression.TRUE);
+                // price to sell.
+                Expression tradeCostSellExpression = ExpressionFactory.newExpression(environment.tradeCostSell);
+                sellCost = tradeCostSellExpression.evaluate(variables, quoteBundle, symbol, dateOffset+2);
+            }
+            catch(EvaluationException e) {
+                sellCost = 0.0D;
+            }
+        }
+    }
+    
     /**
      * Return a string representing the tip for next day trading.
      * The method can be called after a paperTrade one, so doing
@@ -571,7 +644,7 @@ public class PaperTrade {
         StringBuffer retValue = new StringBuffer();
         
         if (buyRule) {
-            if (buyCost==Double.NaN) {
+            if (buyCost==0.0D) {
                 retValue.append(Locale.getString("BUY_OPEN"));
             } else {
                 retValue.append(Locale.getString("BUY_FIXED_PRICE", Double.toString(buyCost)));
@@ -583,7 +656,7 @@ public class PaperTrade {
         retValue.append("\n");
         
         if (sellRule) {
-            if (sellCost==Double.NaN) {
+            if (sellCost==0.0D) {
                 retValue.append(Locale.getString("SELL_OPEN"));
             } else {
                 retValue.append(Locale.getString("SELL_FIXED_PRICE", Double.toString(sellCost)));

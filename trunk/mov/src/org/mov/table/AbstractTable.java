@@ -19,22 +19,6 @@ public class AbstractTable extends SortedTable {
     private static final Color alternativeBackgroundColor = 
 	new Color(237, 237, 237);
 
-    class ChangeComparator implements Comparator {
-
-	public int compare(Object firstObject, Object secondObject)
-	{
-	    Change first = (Change)firstObject;
-	    Change second = (Change)secondObject;
-
-	    if(first.getChange() < second.getChange())
-		return -1;
-	    if(first.getChange() > second.getChange())
-		return 1;
-	    else
-		return 0;
-	}
-    }
-
     class StockQuoteRenderer extends JPanel implements TableCellRenderer,
 						       MouseListener
     {
@@ -151,10 +135,7 @@ public class AbstractTable extends SortedTable {
     }
 
     public void setModel(TableModel model) {
-
 	super.setModel(model);
-	setDefaultSortComparator(Change.class,
-				 new ChangeComparator());
     }
 }
 

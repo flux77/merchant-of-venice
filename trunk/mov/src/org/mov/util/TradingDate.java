@@ -32,6 +32,28 @@ public class TradingDate {
 	this.day = gc.get(Calendar.DATE);
     }
 
+    // Create trading date from date in text file, date should be in format
+    // YYMMDD e.g. "010203" or YYYYMMDD e.g. "20010203". For some reason
+    // both of these formats are used in Metastock? format.
+    public TradingDate(String date) {
+	if(date.length() == 6) {
+	    year = Integer.parseInt(date.substring(0, 2));
+	    month = Integer.parseInt(date.substring(2, 4));
+	    day = Integer.parseInt(date.substring(4, 6));
+	    
+	    // Convert year from 2 digit to 4 digit
+	    if(year > 30)
+		year += 1900;
+	    else
+		year += 2000;
+	}
+	else if(date.length() == 8) {
+	    year = Integer.parseInt(date.substring(0, 4));
+	    month = Integer.parseInt(date.substring(4, 6));
+	    day = Integer.parseInt(date.substring(6, 8));
+	}
+    }
+
     // Create trading date set to closest trading date to today (e.g.
     // if today is Saturday, this will be set to last Friday).
     public TradingDate() {

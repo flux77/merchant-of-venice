@@ -1,0 +1,52 @@
+Changes for Venice 0.2 (18/Aug/2003)
+------------------------------------
+
+* Updates to Gondola Language:
+  - Strong type checking between INTEGER, BOOLEAN, FLOAT & QUOTE types.
+  - Creation of "true" and "false" keywords for BOOLEAN type.
+  - Addition of date functions: day(), month(), year(), dayofweek() and
+    dayofyear().
+  - Addition of maths functions: sqrt() and abs().
+  - Addition of sum() quote function.
+  - Renamed day_open, day_close, day_low, day_high, day_volume to 
+    open, close, low, high & volume respectively.
+  - Partial support for variables. 
+  - Now handles some run-time errors such as "divide by zero".
+
+* Table Updates:
+  - Can now display each day's stock quotes for given stocks in a table.
+  - Can now display any given day's stock quotes in a table.
+  - Now displays correct percent change in stocks. Previously it calculated it
+    as day_close/day_open instead of day_close/yesterday day_close.
+  - Quote tables and Stock holding tables can now display point change.
+  - Stock holding table can now display percent return and average cost.
+
+* Updates to Usability:
+  - Windows Installer.
+  - When importing quotes it now remembers the last directory specified.
+  - Improved paper trade interface.
+  - Sample quotes included.
+  - Removed skinlf support and moved to Java native look & feel support.
+    Under Java 1.4.2 or higher on Windows XP, Venice will now look like a 
+    native Windows XP application.
+  - Equation viewer / editor dialog.
+
+* Updates to Paper Trade:
+  - Can now paper trade multiple stock portfolios.
+  - Number of days held available to paper trade.
+  - Can now order stocks before trading.
+
+* Addition of Genetic Programming
+
+* Updates to Stock Quote Support:
+  - Improved parsing of stock symbols.
+  - Importing quotes can now handle quote files with headers and comments.
+
+* Tuning Support:
+  - Reduced memory footprint of stock quotes by 30%. 
+  - Tuning Preferences Page lets you specify number of quotes cached.
+
+* Technical Updates:
+  - Canceling an operation now also cancels the underlying database 
+    transaction.
+  - UNIX shell script now uses full path of Java to run Venice.

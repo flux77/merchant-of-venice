@@ -40,8 +40,8 @@ import org.mov.util.*;
  */
 public class Graphable {
 
-    private Comparable startX;
-    private Comparable endX;
+    private Comparable startX = null;
+    private Comparable endX = null;
     private LinkedHashMap map;
 
     /**
@@ -57,6 +57,13 @@ public class Graphable {
      * @return	the last x value which we contain data
      */
     public Comparable getEndX() {
+        if(endX == null) {
+            // Get last value
+            Iterator iterator = map.keySet().iterator();
+            while(iterator.hasNext()) 
+                endX = (Comparable)iterator.next();
+        }
+        
 	return endX;
     }
 
@@ -66,6 +73,13 @@ public class Graphable {
      * @return	the first x value which we contain data
      */
     public Comparable getStartX() {
+        if(startX == null) {
+            // Get first value
+            Iterator iterator = map.keySet().iterator();
+            assert iterator.hasNext();
+            startX = (Comparable)iterator.next();
+        }        
+
 	return startX;
     }
 
@@ -87,11 +101,7 @@ public class Graphable {
      * @param	y	the associated y value
      */
     public void putY(Comparable x, Float y) {
-	// Make sure out start and end X values are consistent
-	if(startX == null || x.compareTo(startX) < 0)
-	    startX = x;
-	if(endX == null || x.compareTo(endX) > 0)
-	    endX = x;
+        startX = endX = null;
 
 	map.put(x, (Object)y);
     }
@@ -112,10 +122,10 @@ public class Graphable {
 	while(iterator.hasNext()) {
 	    y = getY((Comparable)iterator.next());
 
-	    if(highestY == null && y != null)
-		highestY = y;
+            if(highestY == null && y != null)
+                highestY = y;
 	    else if(y != null && y.compareTo(highestY) > 0)
-		highestY = y;
+            	highestY = y;
 	}
 	
 	return highestY.floatValue();

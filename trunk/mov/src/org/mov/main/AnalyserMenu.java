@@ -38,6 +38,9 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
     private JDesktopPane desktop;
     private JFrame frame;
 
+    static private int DEFAULT_FRAME_WIDTH = 425;
+    static private int DEFAULT_FRAME_HEIGHT = 350;
+
     public AnalyserMenu(JFrame frame, JDesktopPane desktop) {
 
 	this.frame = frame;
@@ -180,7 +183,7 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	    System.exit(0);
 	else if(menu == filePreferencesQuoteMenuItem) {
 	    // Display preferences
-	    newFrame(new QuoteSourcePreferences(desktop));
+	    newCentredFrame(new PreferencesModule(desktop, PreferencesModule.QUOTE_SOURCE_PAGE));
 	}
 
 	// Is it a table menu?
@@ -312,7 +315,31 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
     }
 
     private void newFrame(AnalyserModule module) {
-	AnalyserFrame frame = new AnalyserFrame(module, 0, 0, 400, 350);
+	newFrame(module, 0, 0, DEFAULT_FRAME_WIDTH, DEFAULT_FRAME_HEIGHT);
+    }
+    
+    private void newCentredFrame(AnalyserModule module) {
+	int xOffset = (desktop.getWidth() - DEFAULT_FRAME_WIDTH) / 2;
+	int yOffset = (desktop.getHeight() - DEFAULT_FRAME_HEIGHT) / 2;
+
+	newFrame(module, xOffset, yOffset, DEFAULT_FRAME_WIDTH,
+		 DEFAULT_FRAME_HEIGHT);
+    }
+
+    private void newFrame(AnalyserModule module, int x, int y,
+			  int width, int height) {
+
+	// Make sure new frame is within bounds
+	if(x < 0) 
+	    x = 0;
+	if(y < 0)
+	    y = 0;
+	if(x + width > desktop.getWidth())
+	    width = desktop.getWidth() - x;
+	if(y + height > desktop.getHeight())
+	    height = desktop.getHeight() - y;
+	
+	AnalyserFrame frame = new AnalyserFrame(module, x, y, width, height);
 	desktop.add(frame);
 	int numframes = (new Integer(System.getProperty("number_of_frames", "0"))).intValue();
 	//	System.setProperty();

@@ -6,10 +6,11 @@ import javax.swing.JDesktopPane;
 import org.mov.chart.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
-import org.mov.util.CommodityListQuery;
-import org.mov.util.ExpressionQuery;
+import org.mov.util.*;
 import org.mov.parser.Expression;
 import org.mov.parser.Token;
+import org.mov.portfolio.*;
+import org.mov.prefs.*;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteSource;
@@ -183,7 +184,8 @@ public class CommandManager {
      * @see org.mov.quote.QouteSource
      * @see org.mov.parser.Expression
      */
-    private void displayStockList(int searchRestriction, Expression expression) {
+    private void displayStockList(int searchRestriction, 
+				  Expression expression) {
         try {
             final Thread thread = Thread.currentThread();
             ProgressDialogManager.getProgressDialog().addActionListener(new ActionListener() {
@@ -204,6 +206,38 @@ public class CommandManager {
         } catch (Exception e) {
             ProgressDialogManager.closeProgressDialog();
         }
+    }
+
+    public void openPortfolio(String portfolioName) {
+	Portfolio portfolio = PreferencesManager.loadPortfolio(portfolioName);
+
+	QuoteCache cache = 
+	    new QuoteCache(Quote.getSource().getLatestQuoteDate(),
+			   QuoteSource.ALL_COMMODITIES);
+	
+	((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, cache));
+    }
+
+    public void newPortfolio() {
+	// Get name for portfolio
+	TextDialog dialog = new TextDialog(desktop_instance, 
+					   "Enter portfolio name",
+					   "New Portfolio");
+	String portfolioName = dialog.showDialog();
+
+	if(portfolioName != null && portfolioName.length() > 0) {
+	    Portfolio portfolio = new Portfolio(portfolioName);
+
+	    // Save portfolio so we can update the menu
+	    PreferencesManager.savePortfolio(portfolio);
+	    MainMenu.getInstance().updatePortfolioMenu();
+	    
+	    QuoteCache cache = 
+		new QuoteCache(Quote.getSource().getLatestQuoteDate(),
+			       QuoteSource.ALL_COMMODITIES);
+
+	    ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, cache));
+	}
     }
     /** Displays a graph closing prices for stock(s), based on their code. The stock(s) is/are determined by a user prompt */
     public void graphStockByCode() {
@@ -288,7 +322,7 @@ public class CommandManager {
                     chart.redraw();
                 }
                 if (!thread.isInterrupted())
-                    ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart, false);
+                    ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart);
 
             }
         } catch (Exception e) {
@@ -299,7 +333,6 @@ public class CommandManager {
     /** Shows a dialog and imports quotes into Venice */
     public void importQuotes() {
 	((DesktopManager)(desktop_instance.getDesktopManager()))
-	    .newFrame(new ImporterModule(desktop_instance), true);
+	    .newFrame(new ImporterModule(desktop_instance), true, true);
     }
-
 }

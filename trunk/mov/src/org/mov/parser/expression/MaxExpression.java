@@ -22,6 +22,7 @@ import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
 import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
+import org.mov.prefs.PreferencesManager;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
@@ -37,7 +38,8 @@ public class MaxExpression extends TernaryExpression {
      * <code>lag</code> days away.
      *
      * @param	quote	the quote kind to find the maximum
-     * @param	days	the number of days to search
+
+    * @param	days	the number of days to search
      * @param	lag	the offset from the current day
      */
     public MaxExpression(Expression quote, Expression days,
@@ -48,13 +50,23 @@ public class MaxExpression extends TernaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+
+        int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
 
+        int maximumYears = PreferencesManager.loadMaximumYears();
+       
         if(days <= 0)
             throw EvaluationException.rangeForMax();
 
+        if (days>maximumYears*365)
+            throw EvaluationException.pastDate();
+
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        
+        if ((offset<=-maximumYears*365) || (offset>maximumYears*365))
+            throw EvaluationException.pastDate();
+
 	return max(quoteBundle, symbol, quoteKind, days, day, offset);
     }
 
@@ -69,10 +81,10 @@ public class MaxExpression extends TernaryExpression {
 	// First type must be quote, second and third types must be value
 	if((getChild(0).checkType() == FLOAT_QUOTE_TYPE ||
             getChild(0).checkType() == INTEGER_QUOTE_TYPE) &&
-	   getChild(1).checkType() == INTEGER_TYPE &&
-	   getChild(2).checkType() == INTEGER_TYPE)
+	    getChild(1).checkType() == INTEGER_TYPE &&
+	    getChild(2).checkType() == INTEGER_TYPE)
 	    return getType();
-	else
+        else
 	    throw new TypeMismatchException();
     }
 

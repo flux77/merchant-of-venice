@@ -343,6 +343,26 @@ public class PreferencesManager {
     }
 
     /**
+     * Load the maximum years of offset days.
+     *
+     * @return the number of years.
+     */
+    public static int loadMaximumYears() {
+	Preferences prefs = getUserNode("/cache");
+        return prefs.getInt("maximumYears", 10);
+    }
+
+    /**
+     * Save the maximum years of offset days.
+     *
+     * @param maximumCachedQuotes the number of years.
+     */
+    public static void saveMaximumYears(int maximumYears) {
+        Preferences prefs = getUserNode("/cache");
+        prefs.putInt("maximumYears", maximumYears);
+    }
+
+    /**
      * Return a list of the names of all the watch screens.
      *
      * @return the list of watch screen names.

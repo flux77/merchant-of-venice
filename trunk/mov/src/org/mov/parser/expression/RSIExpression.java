@@ -22,6 +22,7 @@ import org.mov.parser.EvaluationException;
 import org.mov.parser.Expression;
 import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
+import org.mov.prefs.PreferencesManager;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
@@ -41,10 +42,17 @@ public class RSIExpression extends BinaryExpression {
 	throws EvaluationException {
 	
 	int days = (int)getChild(0).evaluate(variables, quoteBundle, symbol, day);
-        int offset = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
 
+        int maximumYears = PreferencesManager.loadMaximumYears();       
         if(days <= 0)
             throw EvaluationException.rangeForRSI();
+        if (days>maximumYears*365)
+            throw EvaluationException.pastDate();
+
+        int offset = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+
+        if ((offset<=-maximumYears*365) || (offset>maximumYears*365))
+            throw EvaluationException.pastDate();
 
         // To calculate an X day RSI we need X + 1 days of quotes. Put them in
         // an array so we can use the RSI function in quote functions.

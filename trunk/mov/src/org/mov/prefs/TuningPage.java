@@ -39,6 +39,7 @@ public class TuningPage extends JPanel implements PreferencesPage
 {
     private JDesktopPane desktop;
     private JTextField maxCachedQuotesTextField;
+    private JTextField maxYearsTextField;
    
     /**
      * Create a new tuning preferences page.
@@ -81,6 +82,13 @@ public class TuningPage extends JPanel implements PreferencesPage
                                      Integer.toString(maximumCachedQuotes),
                                      gridbag, c, 10);
 
+        int maximumYears = PreferencesManager.loadMaximumYears();
+        maxYearsTextField = 
+            GridBagHelper.addTextRow(borderPanel, 
+                                     Locale.getString("MAXIMUM_YEARS_OFFSET"), 
+                                     Integer.toString(maximumYears),
+                                     gridbag, c, 10);
+        
         quotesPanel.add(borderPanel, BorderLayout.NORTH);
         return quotesPanel;
     }
@@ -95,9 +103,11 @@ public class TuningPage extends JPanel implements PreferencesPage
 
     public void save() {
         int maximumCachedQuotes = 0;
+        int maximumYears = 0;
 
         try {
             maximumCachedQuotes = Integer.parseInt(maxCachedQuotesTextField.getText());
+            maximumYears = Integer.parseInt(maxYearsTextField.getText());
         }
         catch(NumberFormatException e) {
             // ignore
@@ -105,5 +115,7 @@ public class TuningPage extends JPanel implements PreferencesPage
 
         if(maximumCachedQuotes > 0)
             PreferencesManager.saveMaximumCachedQuotes(maximumCachedQuotes);
+        if(maximumYears > 0)
+            PreferencesManager.saveMaximumYears(maximumYears);
     }
 }

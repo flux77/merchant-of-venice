@@ -24,6 +24,9 @@ public class Main extends JFrame implements WindowListener {
 
     private static Main venice;
 
+    // Is skinlf.jar installed?
+    private static boolean skinsAvailable;
+
     /**
      * Get the main frame for the current application
      * @return The frame
@@ -94,7 +97,24 @@ public class Main extends JFrame implements WindowListener {
 	venice = new Main();
 
 	venice.setVisible(true);
-	SkinManager.loadSkin();
+
+	// skinlf.jar may not be available so cope with this error
+	try {
+	    SkinManager.loadSkin();
+	    skinsAvailable = true;
+	}
+	catch(java.lang.NoClassDefFoundError e) {
+	    skinsAvailable = false;
+	}
+    }
+
+    /**
+     * Return whether the skins module is available
+     *
+     * @return	true or false
+     */
+    public static boolean isSkinsAvailable() {
+	return skinsAvailable;
     }
 }
 

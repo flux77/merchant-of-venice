@@ -10,8 +10,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import org.mov.main.ModuleFrame;
-import org.mov.main.Module;
+import org.mov.main.*;
 import org.mov.prefs.PreferencesManager;
 
 /**
@@ -71,9 +70,12 @@ public class PreferencesModule extends JPanel
         
         pageListModel.addElement((Object)new String("Quote Source"));
 	pages.addElement(new QuoteSourcePage(desktop));
-	
-	pageListModel.addElement((Object)new String("Skins"));
-	pages.addElement(new SkinPage(desktop));
+
+	// Only add the skins page if skinlf.jar is available
+	if(Main.isSkinsAvailable()) {
+	    pageListModel.addElement((Object)new String("Skins"));
+	    pages.addElement(new SkinPage(desktop));
+	}
 
 	final JList pageList = new JList(pageListModel);
 

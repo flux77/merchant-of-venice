@@ -218,7 +218,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * @return	whether the symbol was found or not
      */
     public boolean symbolExists(String symbol) {
-	java.util.Date date = null;
+        boolean symbolExists = false;
 
 	if(connection != null) {
 	    try {
@@ -227,17 +227,16 @@ public class DatabaseQuoteSource implements QuoteSource
 		// Return the first date found matching the given symbol.
 		// If no dates are found - the symbol is unknown to us.
 		// This should take << 1s
-		ResultSet RS = statement.executeQuery
-		    ("SELECT " + DATE_FIELD + " FROM " + 
-		     SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
-		     + symbol.toUpperCase() + "' " +
-		     "LIMIT 1");
+                String query = 
+                    new String("SELECT " + DATE_FIELD + " FROM " + 
+                               SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
+                               + symbol.toUpperCase() + "' " +
+                               "LIMIT 1");
+		ResultSet RS = statement.executeQuery(query);
 
-		// Import SQL data into vector
-		RS.next();
-
-		// Get only entry which is the date
-		date = RS.getDate(1);
+                // Find out if it has any rows
+                RS.last();
+                symbolExists = RS.getRow() > 0;
 
 		// Clean up after ourselves
 		RS.close();
@@ -248,10 +247,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	    }
 	}
 
-	if(date != null)
-	    return true;
-	else
-	    return false;
+        return symbolExists;
     }
 
     /**

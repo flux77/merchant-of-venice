@@ -22,12 +22,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.text.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
 
 import org.mov.ui.*;
-import org.mov.util.*;
+import org.mov.util.TradingDate;
 import org.mov.main.*;
 import org.mov.table.*;
 import org.mov.quote.*;
@@ -189,26 +192,58 @@ public class StockHoldingTable extends AbstractTable {
         if(event.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu menu = new JPopupMenu();
 
-            JMenuItem popupGraphSymbols = new JMenuItem("Graph");
-            popupGraphSymbols.addActionListener(new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        int[] selectedRows = getSelectedRows();
-                        Vector symbols = new Vector();
-
-                        for(int i = 0; i < selectedRows.length; i++) {
-                            String symbol = 
-                                (String)getModel().getValueAt(selectedRows[i], SYMBOL_COLUMN);
+            // Graph
+            {
+                JMenuItem popupGraphSymbols = new JMenuItem("Graph");
+                popupGraphSymbols.addActionListener(new ActionListener() {
+                        public void actionPerformed(final ActionEvent e) {
+                            int[] selectedRows = getSelectedRows();
+                            List symbols = new ArrayList();
                             
-                            symbols.add(symbol.toLowerCase());
+                            for(int i = 0; i < selectedRows.length; i++) {
+                                int row = getSortedRow(selectedRows[i]);
+
+                                String symbol = 
+                                    (String)getModel().getValueAt(row, SYMBOL_COLUMN);
+                                
+                                symbols.add(symbol.toLowerCase());
+                            }
+                            
+                            // Graph the highlighted symbols
+                            CommandManager.getInstance().graphStockBySymbol(symbols);
                         }
+                    });
 
-                        // Graph the highlighted symbols
-                        CommandManager.getInstance().graphStockBySymbol(symbols);
-                    }
-                });
+                popupGraphSymbols.setEnabled(getSelectedRowCount() > 0);
+                menu.add(popupGraphSymbols);
+            }
 
-            popupGraphSymbols.setEnabled(getSelectedRowCount() > 0);
-            menu.add(popupGraphSymbols);
+            // Table
+            {
+                JMenuItem popupTableSymbols = new JMenuItem("Table");
+                popupTableSymbols.addActionListener(new ActionListener() {
+                        public void actionPerformed(final ActionEvent e) {
+                            int[] selectedRows = getSelectedRows();
+                            List symbols = new ArrayList();
+                            
+                            for(int i = 0; i < selectedRows.length; i++) {
+                                int row = getSortedRow(selectedRows[i]);
+                                
+                                String symbol = 
+                                    (String)getModel().getValueAt(row, SYMBOL_COLUMN);
+                                
+                                symbols.add(symbol.toLowerCase());
+                            }
+                            
+                            // Table the highlighted symbols
+                            CommandManager.getInstance().tableStocks(symbols);
+                        }
+                    });
+                
+                popupTableSymbols.setEnabled(getSelectedRowCount() > 0);
+                menu.add(popupTableSymbols);
+            }
+
             menu.show(this, point.x, point.y);
         }
             
@@ -222,7 +257,7 @@ public class StockHoldingTable extends AbstractTable {
                 (String)getModel().getValueAt(row, SYMBOL_COLUMN);
             symbol = symbol.toLowerCase();
             
-            Vector symbols = new Vector();
+            List symbols = new ArrayList();
             symbols.add((Object)symbol);
             
             CommandManager.getInstance().graphStockBySymbol(symbols);

@@ -126,6 +126,15 @@ public class ProgressDialogManager {
             return secondaryProgressDialog;
         }
     }
+
+    /**
+     * Returns whether a progress dialog is currently on screen.
+     *
+     * @return <code>TRUE</code> if a progress dialog is being displayed.
+     */
+    public static boolean isProgressDialogUp() {
+        return cachedPrimaryProgressDialogs.containsKey(Thread.currentThread());
+    }
     
     /** 
      * Closes and removes the progress dialog associated with the current thread.

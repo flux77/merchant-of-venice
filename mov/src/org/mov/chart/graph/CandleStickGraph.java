@@ -109,29 +109,39 @@ public class CandleStickGraph extends AbstractGraph {
                     - GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(),
                         bottomLineValue, verticalScale);
 
-                // Draw bar
-                g.setColor(Color.BLACK);
-                g.drawLine(xCoordinate, lowY, xCoordinate, highY);
-
-                if (closeY > openY) { // green candle : close higher than open
+		// Draw bar
+                int halfbarWidth=(int)(0.382 * horizontalScale);
+                if (closeY > openY) { // red candle : open higher than close
                     g.setColor(Color.RED);
-                    g.fillRect((int) (xCoordinate - 0.2 * horizontalScale), openY,
-                           (int) (0.4 * horizontalScale) + 1, closeY - openY);
-                    g.setColor(Color.BLACK);
-                    g.drawRect((int) (xCoordinate - 0.2 * horizontalScale), openY,
-                           (int) (0.4 * horizontalScale) + 1, closeY - openY);
-                } else if (closeY < openY) { // red candle : open higher than
-            	    // close
+                    g.drawRect(xCoordinate - halfbarWidth, openY, 
+                            halfbarWidth, closeY-openY);
+                    g.drawRect(xCoordinate, openY, 
+                            halfbarWidth, closeY-openY);
+                    if(halfbarWidth>=1){
+                        g.setColor(Color.white);
+                        g.drawLine(xCoordinate, openY, xCoordinate, closeY);
+                    }
+                    g.setColor(Color.RED);
+                    g.drawLine(xCoordinate, lowY, xCoordinate, closeY);
+                    g.drawLine(xCoordinate, openY, xCoordinate, highY);
+                } else if (closeY < openY) { // green candle : close higher than open
                     g.setColor(Color.GREEN);
-                    g.fillRect((int) (xCoordinate - 0.2 * horizontalScale), closeY,
-                           (int) (0.4 * horizontalScale) + 1, openY - closeY);
-                    g.setColor(Color.BLACK);
-                    g.drawRect((int) (xCoordinate - 0.2 * horizontalScale), closeY,
-                           (int) (0.4 * horizontalScale) + 1, openY - closeY);
+                    g.drawRect(xCoordinate - halfbarWidth, closeY, 
+                            halfbarWidth, openY-closeY);
+                    g.drawRect(xCoordinate, closeY, 
+                            halfbarWidth, openY-closeY);
+                    if(halfbarWidth>=1){
+	                    g.setColor(Color.white);
+	                    g.drawLine(xCoordinate, closeY, xCoordinate, openY);
+                    }
+                    g.setColor(Color.GREEN);
+                    g.drawLine(xCoordinate, lowY, xCoordinate, openY);
+                    g.drawLine(xCoordinate, closeY, xCoordinate, highY);
                 } else { // no candle
-                    g.setColor(Color.BLACK);
-                    g.drawLine((int) (xCoordinate - 0.2 * horizontalScale), openY,
-                       (int) (xCoordinate + 0.2 * horizontalScale), openY);
+                    g.setColor(Color.RED);
+                    g.drawLine(xCoordinate, lowY, xCoordinate, highY);
+                    g.drawLine(xCoordinate - halfbarWidth, openY,
+                            xCoordinate+halfbarWidth, openY);
                 }
             }
             i++;

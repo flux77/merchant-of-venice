@@ -12,7 +12,7 @@ import org.mov.util.*;
  * enter how many shares they own but rather their share transactions and
  * their current total is calculated from that.
  */
-public class Transaction implements Comparable {
+public class Transaction implements Cloneable, Comparable {
 
     // Transaction types on any account
    
@@ -281,6 +281,20 @@ public class Transaction implements Comparable {
 	return(getDate().compareTo(transaction.getDate()));
     }
 
+    public Object clone() {
+	Transaction clonedTransaction = 
+	    new Transaction(getType(),
+			    getDate(),
+			    getAmount(),
+			    getSymbol(),
+			    getShares(),
+			    getTradeCost(),
+			    getCashAccount(),
+			    getShareAccount());
+	
+	return clonedTransaction;
+    }
+
     /**
      * Convert this transaction to a CSV string.
      * 
@@ -394,6 +408,26 @@ public class Transaction implements Comparable {
      */
     public ShareAccount getShareAccount() {
 	return shareAccount;
+    }
+
+    /**
+     * Set the associated cash account. 
+     *
+     * @param	new cash account
+     * @see	CashAccount
+     */
+    public void setCashAccount(CashAccount cashAccount) {
+	this.cashAccount = cashAccount;
+    }
+
+    /**
+     * Set the associated share account.
+     *
+     * @param	new share account
+     * @see	ShareAccount
+     */
+    public void setShareAccount(ShareAccount shareAccount) {
+	this.shareAccount = shareAccount;
     }
 }
 

@@ -117,7 +117,7 @@ public class EquationPage extends javax.swing.JPanel
         listButtonPanel.setLayout(new java.awt.GridBagLayout());
         java.awt.GridBagConstraints gridBagConstraints2;
         
-        newButton.setLabel("New...");
+        newButton.setText("New...");
         newButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newButtonActionPerformed(evt);
@@ -127,7 +127,7 @@ public class EquationPage extends javax.swing.JPanel
         gridBagConstraints2 = new java.awt.GridBagConstraints();
         listButtonPanel.add(newButton, gridBagConstraints2);
         
-        editButton.setLabel("Edit...");
+        editButton.setText("Edit...");
         editButton.setEnabled(false);
         editButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -138,7 +138,7 @@ public class EquationPage extends javax.swing.JPanel
         gridBagConstraints2 = new java.awt.GridBagConstraints();
         listButtonPanel.add(editButton, gridBagConstraints2);
         
-        deleteButton.setLabel("Delete");
+        deleteButton.setText("Delete");
         deleteButton.setEnabled(false);
         deleteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

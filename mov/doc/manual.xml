@@ -90,6 +90,13 @@ It will give you the options to <highlight>Add</highlight>, <highlight>Edit</hig
 or <highlight>Manage</highlight>. Most of these options are self-explanatory; Manage
 will display the equations preferences page.</para>
 
+<para>You have to write the equations according to the English localization.
+For example you cannot write a number inside an equation as 17,17
+(with comma as decimal separator), but you have to write it as 17.17
+(with point as decimal separator), without mattering what localization you're using.
+This rule applies only to equations, all other numbers in Venice follow
+the selected localization.</para>
+
 <para>You can reach the equations page by:</para>
 <list><item>Clicking on the <highlight>File</highlight> menu item.
 </item>
@@ -256,6 +263,45 @@ On this page you can view the number of quotes Venice is currently
 caching and set the maximum amount. From time to time, Venice may need
 to go a little higher than this amount.</para>
 </chapter></chapter>
+
+<chapter name="Windows Preferences">
+<para>You can load from or save to an XML file the whole Venice preferences.</para>
+
+<para>You can reach the windows preferences configuration page by:</para>
+<list><item>Clicking on the <highlight>File</highlight> menu item.
+</item>
+<item>Then clicking on the <highlight>Preferences</highlight> menu item.
+</item>
+<item>Then selecting the <highlight>Windows Preferences</highlight> page.
+</item>
+</list>
+
+<para>This feature can be used in several ways:</para>
+<list><item>You can do a library of XML files, so that you can choose many different
+possible default configurations.
+</item>
+<item>You can import preferences created with another user.
+</item>
+<item>You can import preferences in another working copy of Venice.
+</item>
+</list>
+
+<chapter name="Language">
+<para>You can change the default language and use a different Venice localization.
+The default language is got from your system.
+If your language is not localized in Venice, English is choosen as default.</para>
+
+<para>You can reach the language configuration page by:</para>
+<list><item>Clicking on the <highlight>File</highlight> menu item.
+</item>
+<item>Then clicking on the <highlight>Preferences</highlight> menu item.
+</item>
+<item>Then selecting the <highlight>Language</highlight> page.
+</item>
+</list>
+
+<para>When you change the localization language, you should restart Venice,
+so that all menus are refreshed.</para>
 
 <chapter name="Importing Quotes">
 <para>Before you import quotes, you'll need to decide whether Venice will read the
@@ -1046,7 +1092,7 @@ case Venice works out the maximum number of stocks.</para>
 
 <chapter name="Genetic Programming">
 <para>Venice supports using evolutionary computation to create new buy/sell rules
-based on historical data. The way it works is that Venice initially creates a
+based on historical data. The default way it works is that Venice initially creates a
 set of random buy/sell rule equations. A pair of buy/sell rule equations is
 refered to as an individual. It will then use algebraic simplification
 to reduce the size of the individual's equations and also to remove any
@@ -1093,9 +1139,13 @@ come up with any principles that can be generally applied.</para>
 
 <section name="The GP Page">
 <para>The Genetic Programme (GP) page defines the Genetic Programme settings.
-Currently you can set the number of <highlight>Generations</highlight> to run. You can
-set the <highlight>Population</highlight> size, you can set the <highlight>Breeding Population</highlight>
-and you can set the <highlight>Display Population</highlight>. The display population is
+Inside the page there are two selectable tabbed panes.
+The former is the GP parameters page, the latter is the initial population page.</para>
+
+<para>In the GP parameters page you can set the number of <highlight>Generations</highlight>
+to run; you can set the <highlight>Population</highlight> size; you can set
+the <highlight>Breeding Population</highlight>, and you can set
+the <highlight>Display Population</highlight>. The display population is
 the number of highest returning individuals that are displayed when that
 generation has completed.</para>
 <para>Some example values:</para>
@@ -1109,6 +1159,48 @@ generation has completed.</para>
 </item>
 </list>
 </section>
+
+<para>In the initial population page you can set many buy/sell rules as you wish.
+For each of them you need to specify the percentage that it will be used to generate
+the first population of GP algorithm.
+You can set <highlight>Percentage of Random Population</highlight>,
+it is used to know the probability to generate a random individual, during the first
+step of GP algorithm;
+you can set <highlight>Percentage of Initial Population</highlight>,
+it is used to know the probability to generate an individual got from user defined ones,
+during the first step of GP algorithm;
+you can set <highlight>Number of Mutations</highlight>,
+it is the number of mutations that will be applied to the user defined individuals.
+You can click two buttons: the former can be clicked to calculate the values
+so that their sum is 100%, the latter can be clicked to set all the tabbed pane values
+to the default. Normal behaviour should be: put values as you like, then click on
+the former button to transform the inserted values to percentages.</para>
+
+<para>The GP algorithm will generate the first population in this way:
+it will choose between a random individual and an individual got from user defined ones,
+this is done in accordance with the two values
+<highlight>Percentage of Random Population</highlight>
+and <highlight>Percentage of Initial Population</highlight>;
+then if a user defined is choosen, it will be applied on it a number of mutations
+equal to <highlight>Number of Mutations</highlight>;
+then if the individual is not fine for breeding,
+other mutations will be done until it is.
+</para>
+
+<section name="The GP Parameters Page">
+<para>The Genetic Programme (GP) Parameters page defines the Gondola settings.
+Currently you can set the probabilities for each word of Gondola. So the random
+GP algorithm will choose the words in accordance with user defined probabilities.
+If you set any of these values to zero, the GP algorithm will work do not considering
+this word as a Gondola language's word.</para>
+
+<para>To make easy the selection, there are some selectable tabbed panes.
+Each of them has two buttons: the former can be clicked to calculate the values
+so that their sum is 100%, the latter can be clicked to set all the tabbed pane values
+to the default. Normal behaviour should be: put values as you like, then click on
+the former button to transform the inserted values to percentages.</para>
+</section>
+
 </chapter>
 </chapter>
 </document>

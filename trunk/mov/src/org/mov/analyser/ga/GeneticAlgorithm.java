@@ -27,19 +27,15 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.mov.analyser.GPGondolaSelection;
-import org.mov.analyser.GPModuleConstants;
 import org.mov.analyser.OrderCache;
 import org.mov.analyser.PaperTrade;
 
 import org.mov.parser.Expression;
-import org.mov.parser.ExpressionFactory;
 import org.mov.parser.EvaluationException;
 import org.mov.parser.Variables;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
-import org.mov.quote.ScriptQuoteBundle;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;

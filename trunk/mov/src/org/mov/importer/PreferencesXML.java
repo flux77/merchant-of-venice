@@ -18,9 +18,6 @@
 
 package org.mov.importer;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -32,17 +29,10 @@ import java.io.IOException;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
-
 
 import org.mov.util.Locale;
 
@@ -118,7 +108,7 @@ public class PreferencesXML {
     public void importPreferences() {
         // Get the path preferences file that the user wants to import
         JFileChooser chooser;
-        String lastDirectory = this.loadImportPath();
+        String lastDirectory = loadImportPath();
 
         if(lastDirectory != null)
             chooser = new JFileChooser(lastDirectory);
@@ -132,7 +122,7 @@ public class PreferencesXML {
         if(action == JFileChooser.APPROVE_OPTION) {
             // Remember directory
             lastDirectory = chooser.getCurrentDirectory().getAbsolutePath();
-            this.saveImportPath(lastDirectory);
+            saveImportPath(lastDirectory);
 
             File file = chooser.getSelectedFile();
 
@@ -140,7 +130,7 @@ public class PreferencesXML {
             try {
                 InputStream inputStream = new BufferedInputStream(
                     new FileInputStream(file));
-                this.importPreferences(inputStream);
+                importPreferences(inputStream);
                 inputStream.close();
             } catch (IOException ex) {
                 JOptionPane.showInternalMessageDialog(desktop,
@@ -159,7 +149,7 @@ public class PreferencesXML {
     public void exportPreferences() {
         // Set the path preferences file that the user wants to export
         JFileChooser chooser;
-        String lastDirectory = this.loadExportPath();
+        String lastDirectory = loadExportPath();
 
         if(lastDirectory != null)
             chooser = new JFileChooser(lastDirectory);
@@ -173,7 +163,7 @@ public class PreferencesXML {
         if(action == JFileChooser.APPROVE_OPTION) {
             // Remember directory
             lastDirectory = chooser.getCurrentDirectory().getAbsolutePath();
-            this.saveExportPath(lastDirectory);
+            saveExportPath(lastDirectory);
 
             File file = chooser.getSelectedFile();
 
@@ -181,7 +171,7 @@ public class PreferencesXML {
             try {
                 OutputStream outputStream = new BufferedOutputStream(
                     new FileOutputStream(file));
-                this.exportPreferences(outputStream);
+                exportPreferences(outputStream);
                 outputStream.close();
             } catch (IOException ex) {
                 JOptionPane.showInternalMessageDialog(desktop,

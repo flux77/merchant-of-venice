@@ -23,22 +23,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.prefs.Preferences;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
@@ -64,6 +56,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     // Widgets from database pane
     private JRadioButton useDatabase;
     private JComboBox databaseSoftware;
+    private JComboBox databaseDriver;
     private JTextField databaseHost;
 
     // Wigets from internal pane
@@ -90,9 +83,20 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     private PreferencesManager.DatabasePreferences databasePreferences = null;
 
     // Quote source enumeration
-    private final static int SAMPLES = 0;
+    private final static int SAMPLES  = 0;
     private final static int INTERNAL = 1;
     private final static int DATABASE = 2;
+
+    // Database enumeration
+    private final static int MYSQL      = 0;
+    private final static int POSTGRESQL = 1;
+    private final static int HSQL       = 2;
+    private final static int OTHER      = 3;
+    
+    // Database default drivers
+    private final static String[] mysql_drivers      = {"org.gjt.mm.mysql.Driver","com.mysql.jdbc.Driver"};
+    private final static String[] postgresql_drivers = {"org.postgresql.Driver"};
+    private final static String[] hsql_drivers       = {"org.hsqldb.jdbcDriver"};
 
     // Database default ports
     private final static int MYSQL_DEFAULT_PORT = 3306;
@@ -206,46 +210,58 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         databaseSoftware.addItem(Locale.getString("MYSQL"));
         databaseSoftware.addItem(Locale.getString("POSTGRESQL"));
         databaseSoftware.addItem(Locale.getString("HSQLDB"));
-	if(databasePreferences.software.equals("mysql"))
-	    databaseSoftware.setSelectedIndex(DatabaseQuoteSource.MYSQL);
-	else if(databasePreferences.software.equals("postgresql"))
-	    databaseSoftware.setSelectedIndex(DatabaseQuoteSource.POSTGRESQL);
-        else
-	    databaseSoftware.setSelectedIndex(DatabaseQuoteSource.HSQLDB);
-
-        // If the user changes the database....
+        databaseSoftware.addItem(Locale.getString("OTHER"));
+        
+		if(databasePreferences.software.equals(DatabaseQuoteSource.MYSQL_SOFTWARE))
+   	       databaseSoftware.setSelectedIndex(DatabaseQuoteSource.MYSQL);
+	    else if(databasePreferences.software.equals(DatabaseQuoteSource.POSTGRESQL_SOFTWARE))
+	       databaseSoftware.setSelectedIndex(DatabaseQuoteSource.POSTGRESQL);
+		else if(databasePreferences.software.equals(DatabaseQuoteSource.HSQLDB_SOFTWARE))
+	       databaseSoftware.setSelectedIndex(DatabaseQuoteSource.HSQLDB);
+		else
+		   databaseSoftware.setSelectedIndex(DatabaseQuoteSource.OTHER);
+        // If the user changes the database, then update the port
         // field to reflect the default port of the database.
         databaseSoftware.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if(databasePort != null && databaseUsername != null &&
-                       databasePassword != null) {
-
-                        // ... then update the port
+                    if(databasePort != null && databaseDriver != null) {
+                        populateDatabaseDrivers();
+                        databaseUsername.setEnabled(true);
+                        databasePassword.setEnabled(true);
                         if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.MYSQL)
                             databasePort.setText(Integer.toString(MYSQL_DEFAULT_PORT));
                         else if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.POSTGRESQL)
                             databasePort.setText(Integer.toString(POSTGRESQL_DEFAULT_PORT));
-                        else
+                        else if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.HSQLDB) {
                             databasePort.setText(Integer.toString(HSQLDB_DEFAULT_PORT));
-
-                        // And enable/disable the username and password fields if applicable
-                        if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.HSQLDB) {
+                            // And enable/disable the username and password fields if applicable
                             // Hypesonic SQL does not accept the username password fields
                             databaseUsername.setEnabled(false);
                             databasePassword.setEnabled(false);
-                        }
-                        else {
-                            databaseUsername.setEnabled(true);
-                            databasePassword.setEnabled(true);                            
-                        }
                     }
                 }
-            });
+            }});
 
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(databaseSoftware, c);
         borderPanel.add(databaseSoftware);
+
+        // Show known drivers for the selected database software
+        label = new JLabel(Locale.getString("DRIVER"));
+        c.gridwidth = 1;
+        gridbag.setConstraints(label, c);
+        borderPanel.add(label);
         
+        databaseDriver = new JComboBox();
+        databaseDriver.setEditable(true);
+
+        // Only display known drivers that are currently installed.
+        populateDatabaseDrivers();
+
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        gridbag.setConstraints(databaseDriver, c);
+        borderPanel.add(databaseDriver);
+
         // Host
         databaseHost = GridBagHelper.addTextRow(borderPanel, 
 						Locale.getString("HOST"), 
@@ -290,6 +306,44 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         return database;
     }
 
+    /** 
+     * Sets the databaseDriver dropdown to contain the list of valid drivers
+     * for the currently selected software
+     *
+     */
+    private void populateDatabaseDrivers() {
+        String drivers[] = {};
+        databaseDriver.removeAllItems();
+        if(databaseSoftware.getSelectedIndex() == MYSQL)
+            drivers = mysql_drivers;
+		else if(databaseSoftware.getSelectedIndex() == POSTGRESQL)
+		    drivers = postgresql_drivers;
+		else if(databaseSoftware.getSelectedIndex() == HSQL)
+		    drivers = hsql_drivers;
+
+        for(int i = 0; i < drivers.length; i++) {
+	        try {
+	            Class.forName(drivers[i]);
+		        databaseDriver.addItem(drivers[i]);
+	        } catch (ClassNotFoundException e) {}
+	    }
+		    
+		if (databasePreferences.driver != null)
+		    try {
+		        Class.forName(databasePreferences.driver);
+		        databaseDriver.setSelectedItem(databasePreferences.driver);
+		    } catch (ClassNotFoundException e) {}
+		else
+		    databaseDriver.setSelectedIndex(0);
+		
+		if (databaseDriver.getSelectedItem() == null) {
+	        databaseDriver.addItem(Locale.getString("DATABASE_NO_DRIVERS"));
+	        databaseDriver.setToolTipText(Locale.getString("DATABASE_NO_DRIVERS_DETAIL"));
+		    databaseDriver.setSelectedIndex(0);
+		} else {
+		    databaseDriver.setToolTipText(null);
+		}
+    }
     private JPanel createSamplesPanel(int quoteSource, ButtonGroup buttonGroup) {
         useSamples = new JRadioButton(Locale.getString("USE_SAMPLES"), true);
         buttonGroup.add(useSamples);
@@ -332,12 +386,13 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	{
 	    String software = (String)databaseSoftware.getSelectedItem();
 	    if(software.equals(Locale.getString("MYSQL")))
-		databasePreferences.software = "mysql";
+	        databasePreferences.software = "mysql";
 	    else if(software.equals(Locale.getString("POSTGRESQL")))
-		databasePreferences.software = "postgresql";
-            else
-		databasePreferences.software = "hsql";
+		    databasePreferences.software = "postgresql";
+	    else
+			databasePreferences.software = "hsql";
 
+	    databasePreferences.driver = databaseDriver.getSelectedItem().toString();
 	    databasePreferences.host = databaseHost.getText();
 	    databasePreferences.port = databasePort.getText();
 	    databasePreferences.username = databaseUsername.getText();

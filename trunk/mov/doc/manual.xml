@@ -31,6 +31,10 @@ from listing stocks in tables that only match your criteria to creating
 automated buy/sell paper trade rules.
 </para>
 
+<para><link to="Jython Macros">Jython Macros</link> are a way to automate 
+frequently executed tasks in Venice.
+</para>
+
 <para><link to="Analysis">Analysis</link> describes some
 of the more advance technical analysis that is available
 in Venice. For charting see <link to="Graphs">Graphs</link>.
@@ -1090,6 +1094,29 @@ while(sum &lt; 100) {
 <para>Returns the current year, which will be 2004, if it is 2004.</para>
 </section>
 </section>
+</chapter>
+
+<chapter name="Jython Macros">
+<para>Since version 0.5, Venice supports the use of the Jython (http://www.jython.org)
+scripts to automate the operation of the program.  More information and example scripts
+will be available soon.  For the moment, suffice to say that any Java object that can be
+accessed by Venice source code is fair game for macrofication.</para>
+<para>Here's a trivial example of a simple script that displays a progress dialog:</para>
+<para><code><pre>
+import org.mov.ui.ProgressDialogManager as PM
+import java.lang.Thread as T
+p = PM.getProgressDialog()
+p.setMaximum(10)
+p.setProgress(0)
+p.show("performing task");
+p.setProgress(6)
+T.sleep(500);
+p.setProgress(4)
+T.sleep(500);
+p.setProgress(3)
+T.sleep(500);
+p.setProgress(9)
+</pre></code></para>
 </chapter>
 
 <chapter name="Analysis">

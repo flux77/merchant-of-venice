@@ -4,3 +4,5 @@ release
 report
 venice.jar
 .classpath
+.externalToolBuilders
+.project

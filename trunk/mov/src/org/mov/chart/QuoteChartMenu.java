@@ -26,9 +26,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
-import java.awt.Image.*;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics2D;
 import javax.swing.JFileChooser;
 import java.io.File;
 
@@ -43,7 +41,6 @@ import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.util.ImageFilter;
 import org.mov.util.BMPFile;
-import org.mov.util.ImageExporterUI;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.

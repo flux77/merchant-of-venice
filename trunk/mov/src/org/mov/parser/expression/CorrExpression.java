@@ -27,7 +27,6 @@ import org.mov.quote.QuoteBundleFunctionSource;
 import org.mov.quote.QuoteFunctions;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
-import org.mov.util.Locale;
 
 /**
  * An expression which finds the correleation between two stock quotes.

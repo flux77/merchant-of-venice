@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.lang.NoClassDefFoundError;
 import java.lang.reflect.Array;
 import java.util.Hashtable;
 import java.util.List;
@@ -36,10 +37,6 @@ import javax.swing.JOptionPane;
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.DesktopManager;
 import org.mov.util.Locale;
-import org.python.core.PyCode;
-import org.python.core.PyException;
-import org.python.core.PySystemState;
-import org.python.util.PythonInterpreter;
 
 /**
  * @author Dan Makovec venice@makovec.net
@@ -103,120 +100,124 @@ public class MacroManager {
     public static void execute(final StoredMacro m) {
         String name = m.getName();
 
-        PySystemState.initialize();
-
-        /* Try to pull a pre-compiled macro out of the hashtable.
-         * This is faster than having to re-compile the macro every
-         * time we want to execute it.
-         */
-        boolean compiled_available = true;
-        PyCode tmp_compiled = (PyCode)compiled_macros.get(name);
-        if (tmp_compiled == null) {
-            // compile the macro and save it
-            try {
-                tmp_compiled = org.python.core.__builtin__.compile(m.getCode(), m.getFilename(), "exec");
-                compiled_macros.put(name, tmp_compiled);
-            } catch (PyException e) {
-                JOptionPane.showInternalMessageDialog(
-                        DesktopManager.getDesktop(), 
-                        Locale.getString("MACRO_JYTHON_COMPILE_ERROR", m.getName(), e.toString()), 
-                        Locale.getString("ERROR_TITLE"), 
-                        JOptionPane.ERROR_MESSAGE);
-                compiled_available = false;
-            }
-        }
-        if (!compiled_available) {
-            return;
-        }
-
-        final PyCode compiled = tmp_compiled;
-        
-        // Set up the error and output handling streams
-        PipedOutputStream err_os = new PipedOutputStream();
-        PipedOutputStream out_os = new PipedOutputStream();
-
-        /* This class reads the STDOUT/STDERR from Jython so that it can
-         * be displayed in a lovely dialog when the macro is finished.
-         * We may want to extend this later to allow real-time redirecting
-         * of macro output */
-        class Reader extends Thread {
-            BufferedReader br;
-            String text = "";
-
-            Reader(BufferedReader br) { this.br = br; }
-            public String getText() { return text; }
-            public void run() {
-                try {
-                    String line = br.readLine();
-                    while (line != null) {
-                        text = text.concat(line);
-                        line = br.readLine();
-                        if (line != null) {
-                            text = text.concat(System.getProperty("line.separator"));
-                        }
-                    }
-                    br.close();
-                } catch (IOException e) {
-                    System.err.println("MacroManager: Reader thread failed with exception: "+e.toString());
-                }
-            }
-        };
-        
-        Reader err_reader = null, out_reader = null;
         try {
-            err_reader = new Reader(new BufferedReader(new InputStreamReader(new PipedInputStream(err_os))));
-            err_reader.start();
-        
-            out_reader = new Reader(new BufferedReader(new InputStreamReader(new PipedInputStream(out_os))));
-            out_reader.start();
-        } catch (IOException e) {
-            System.err.println("Got IOException starting up readers"+e.getMessage());
-        }
-
-        // Execute the macro
-        PythonInterpreter interp = new PythonInterpreter();
-        try { 
-            interp.setErr(err_os);
-            interp.setOut(out_os);
-            interp.exec(compiled);
-        } catch (PyException e) {
-            JOptionPane.showInternalMessageDialog(
-                    DesktopManager.getDesktop(), 
-                    Locale.getString("MACRO_JYTHON_EXCEPTION", m.getName(), e.toString()), 
-                    Locale.getString("ERROR_TITLE"), 
-                    JOptionPane.ERROR_MESSAGE);
-
-        }
-
-        // Clean up all the threads
-        try {
-            err_os.close();
-            out_os.close();
-            err_reader.join();
-            out_reader.join();
-        } catch (InterruptedException e) {
-            System.err.println("MacroManager: Main thread interrupted");
-        } catch (IOException e) {
-            System.err.println("MacroManager: IOException "+e.getMessage());
-        }
-
-        // Show the output of the macros
-        if (err_reader.getText().length() > 0) {
-            JOptionPane.showInternalMessageDialog(
-                    DesktopManager.getDesktop(), 
-                    Locale.getString("MACRO_OUTPUT_ERROR", m.getName(), 
-                    err_reader.getText()), 
-                    Locale.getString("ERROR_TITLE"), 
-                    JOptionPane.ERROR_MESSAGE);
-        }
-
-        if (out_reader.getText().length() > 0) {
-            JOptionPane.showInternalMessageDialog(
-                    DesktopManager.getDesktop(), 
-                    Locale.getString("MACRO_INFORMATION_OUTPUT", m.getName(), 
-                            out_reader.getText()),
-                    Locale.getString("MACRO_INFORMATION", m.getName()), 
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
+		    org.python.core.PySystemState.initialize();
+		
+		    /* Try to pull a pre-compiled macro out of the hashtable.
+		     * This is faster than having to re-compile the macro every
+		     * time we want to execute it.
+		     */
+		    boolean compiled_available = true;
+		    org.python.core.PyCode tmp_compiled = (org.python.core.PyCode)compiled_macros.get(name);
+		    if (tmp_compiled == null) {
+		        // compile the macro and save it
+		        try {
+		            tmp_compiled = org.python.core.__builtin__.compile(m.getCode(), m.getFilename(), "exec");
+		            compiled_macros.put(name, tmp_compiled);
+		        } catch (org.python.core.PyException e) {
+		            JOptionPane.showInternalMessageDialog(
+		                    DesktopManager.getDesktop(), 
+		                    Locale.getString("MACRO_JYTHON_COMPILE_ERROR", m.getName(), e.toString()), 
+		                    Locale.getString("ERROR_TITLE"), 
+		                    JOptionPane.ERROR_MESSAGE);
+		            compiled_available = false;
+		        }
+		    }
+		    if (!compiled_available) {
+		        return;
+		    }
+		
+		    final org.python.core.PyCode compiled = tmp_compiled;
+		    
+		    // Set up the error and output handling streams
+		    PipedOutputStream err_os = new PipedOutputStream();
+		    PipedOutputStream out_os = new PipedOutputStream();
+		
+		    /* This class reads the STDOUT/STDERR from Jython so that it can
+		     * be displayed in a lovely dialog when the macro is finished.
+		     * We may want to extend this later to allow real-time redirecting
+		     * of macro output */
+		    class Reader extends Thread {
+		        BufferedReader br;
+		        String text = "";
+		
+		        Reader(BufferedReader br) { this.br = br; }
+		        public String getText() { return text; }
+		        public void run() {
+		            try {
+		                String line = br.readLine();
+		                while (line != null) {
+		                    text = text.concat(line);
+		                    line = br.readLine();
+		                    if (line != null) {
+		                        text = text.concat(System.getProperty("line.separator"));
+		                    }
+		                }
+		                br.close();
+		            } catch (IOException e) {
+		                System.err.println("MacroManager: Reader thread failed with exception: "+e.toString());
+		            }
+		        }
+		    };
+		    
+		    Reader err_reader = null, out_reader = null;
+		    try {
+		        err_reader = new Reader(new BufferedReader(new InputStreamReader(new PipedInputStream(err_os))));
+		        err_reader.start();
+		    
+		        out_reader = new Reader(new BufferedReader(new InputStreamReader(new PipedInputStream(out_os))));
+		        out_reader.start();
+		    } catch (IOException e) {
+		        System.err.println("Got IOException starting up readers"+e.getMessage());
+		    }
+		
+		    // Execute the macro
+		    org.python.util.PythonInterpreter interp = new org.python.util.PythonInterpreter();
+		    try { 
+		        interp.setErr(err_os);
+		        interp.setOut(out_os);
+		        interp.exec(compiled);
+		    } catch (org.python.core.PyException e) {
+		        JOptionPane.showInternalMessageDialog(
+		                DesktopManager.getDesktop(), 
+		                Locale.getString("MACRO_JYTHON_EXCEPTION", m.getName(), e.toString()), 
+		                Locale.getString("ERROR_TITLE"), 
+		                JOptionPane.ERROR_MESSAGE);
+		
+		    }
+		
+		    // Clean up all the threads
+		    try {
+		        err_os.close();
+		        out_os.close();
+		        err_reader.join();
+		        out_reader.join();
+		    } catch (InterruptedException e) {
+		        System.err.println("MacroManager: Main thread interrupted");
+		    } catch (IOException e) {
+		        System.err.println("MacroManager: IOException "+e.getMessage());
+		    }
+		
+		    // Show the output of the macros
+		    if (err_reader.getText().length() > 0) {
+		        JOptionPane.showInternalMessageDialog(
+		                DesktopManager.getDesktop(), 
+		                Locale.getString("MACRO_OUTPUT_ERROR", m.getName(), 
+		                err_reader.getText()), 
+		                Locale.getString("ERROR_TITLE"), 
+		                JOptionPane.ERROR_MESSAGE);
+		    }
+		
+		    if (out_reader.getText().length() > 0) {
+		        JOptionPane.showInternalMessageDialog(
+		                DesktopManager.getDesktop(), 
+		                Locale.getString("MACRO_INFORMATION_OUTPUT", m.getName(), 
+		                        out_reader.getText()),
+		                Locale.getString("MACRO_INFORMATION", m.getName()), 
+		                JOptionPane.INFORMATION_MESSAGE);
+		    }
+		} catch (NoClassDefFoundError err) {
+		    System.out.println("Jython ain't happenin, dude");
+		}
     }
 }

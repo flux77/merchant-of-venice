@@ -24,17 +24,9 @@ package org.mov.analyser.ga;
 
 import java.util.Random;
 
-import org.mov.analyser.OrderCache;
-import org.mov.analyser.PaperTrade;
-import org.mov.parser.EvaluationException;
 import org.mov.parser.Expression;
-import org.mov.parser.TypeMismatchException;
-import org.mov.parser.Variables;
 import org.mov.portfolio.Portfolio;
-import org.mov.quote.MissingQuoteException;
-import org.mov.util.Locale;
 import org.mov.util.Money;
-import org.mov.util.TradingDate;
 
 /**
  * A trading individual evolved by the GA.

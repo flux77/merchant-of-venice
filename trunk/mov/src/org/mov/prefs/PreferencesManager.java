@@ -25,15 +25,12 @@ package org.mov.prefs;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
-import org.mov.ui.DesktopManager;
 
 import org.mov.macro.StoredMacro;
 import org.mov.portfolio.Account;
@@ -94,15 +91,15 @@ public class PreferencesManager {
 
         /** Whether we are using the web proxy. */
 	public boolean isEnabled;
-
+	
         /** Is authentication enabled? */
         public boolean authEnabled;
 	
         /** Authentication user name. */
-        public String user;
+    public String user;
 
         /** Authentication password. */
-        public String password;
+    public String password;
     }
 
     /** Database preferences fields. */
@@ -110,6 +107,9 @@ public class PreferencesManager {
 
 	/** Database software (e.g. "mysql"). */
 	public String software;
+
+	/** Database driver class. */
+	public String driver;
 
 	/** Database host. */
 	public String host;
@@ -144,6 +144,7 @@ public class PreferencesManager {
 
     /** Web language preferences fields. */
     public class LanguagePreferences {
+
         /** Language. */
 	public String locale;
     }
@@ -302,7 +303,7 @@ public class PreferencesManager {
             // ignore
         }
     }
-
+    
     //Store the users text made for this symbol     
     public static void saveUserNotes(String symbol, String text) {
 	    String xpath = "/userNotes/" + symbol;
@@ -838,8 +839,8 @@ public class PreferencesManager {
 	    return INTERNAL;
 	else if(quoteSource.equals("database"))
 	    return DATABASE;
-        else
-            return INTERNAL;
+	else 
+        return INTERNAL;
     }
 
     /**
@@ -849,16 +850,16 @@ public class PreferencesManager {
      *                    {@link #SAMPLES}.
      */
     public static void setQuoteSource(int quoteSource) {
-	assert(quoteSource == DATABASE || quoteSource == SAMPLES || quoteSource == INTERNAL);
+        assert(quoteSource == DATABASE || quoteSource == SAMPLES || quoteSource == INTERNAL);
 
-	Preferences prefs = getUserNode("/quote_source");
-        String source;
+	    Preferences prefs = getUserNode("/quote_source");
+            String source;
 
-	if(quoteSource == SAMPLES)
-	    source = "samples";
-	else if(quoteSource == DATABASE)
-	    source = "database";
-        else
+	    if(quoteSource == SAMPLES)
+	        source = "samples";
+	    else if(quoteSource == DATABASE)
+	        source = "database";
+	    else
             source = "internal";
 
         prefs.put("source", source);
@@ -875,9 +876,10 @@ public class PreferencesManager {
         DatabasePreferences databasePreferences =
             preferencesManager.new DatabasePreferences();
         databasePreferences.software = prefs.get("software", "mysql");
-        databasePreferences.host = prefs.get("host", "db");
-        databasePreferences.port = prefs.get("port", "3306");
-	databasePreferences.database = prefs.get("dbname", "shares");
+        databasePreferences.driver   = prefs.get("driver", "com.mysql.jdbc.Driver");
+        databasePreferences.host     = prefs.get("host", "db");
+        databasePreferences.port     = prefs.get("port", "3306");
+        databasePreferences.database = prefs.get("dbname", "shares");
         databasePreferences.username = prefs.get("username", "");
         databasePreferences.password = prefs.get("password", "3306");
         return databasePreferences;
@@ -891,6 +893,7 @@ public class PreferencesManager {
     public static void saveDatabaseSettings(DatabasePreferences databasePreferences) {
 	Preferences prefs = getUserNode("/quote_source/database");
 	prefs.put("software", databasePreferences.software);
+	prefs.put("driver", databasePreferences.driver);
 	prefs.put("host", databasePreferences.host);
 	prefs.put("port", databasePreferences.port);
 	prefs.put("dbname", databasePreferences.database);

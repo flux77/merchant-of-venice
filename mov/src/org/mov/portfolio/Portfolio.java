@@ -237,6 +237,15 @@ public class Portfolio implements Cloneable {
     }
 
     /**
+     * Count the number of transactions.
+     *
+     * @return	the number of transactions
+     */
+    public int countTransactions() {
+	return transactions.size();
+    }
+
+    /**
      * Return the transaction history.
      *
      * @param	transaction history

@@ -10,6 +10,7 @@ package org.mov.util;
 // used)
 
 import java.util.*;
+import java.util.regex.*;
 
 public class TradingDate {
 
@@ -32,32 +33,47 @@ public class TradingDate {
 	this.day = gc.get(Calendar.DATE);
     }
 
-    // Create trading date from date in text file, date should be in format
-    // YYMMDD e.g. "010203" or YYYYMMDD e.g. "20010203". For some reason
-    // both of these formats are used in Metastock? format.
+    // Create a trading date from a string. Can be in one of the following
+    // formats:
+    // YYMMDD, e.g. "010203"
+    // YYYYMMDD, e.g. "20010203"
+    // MM/DD/YY, e.g. "03/02/01"
     public TradingDate(String date) {
-	if(date.length() == 6) {
-	    year = Integer.parseInt(date.substring(0, 2));
-	    month = Integer.parseInt(date.substring(2, 4));
-	    day = Integer.parseInt(date.substring(4, 6));
-	    
-	    // Convert year from 2 digit to 4 digit
-	    if(year > 30)
-		year += 1900;
-	    else
-		year += 2000;
+
+	// Handle DD/MM/YY
+	if(date.lastIndexOf('/') != -1) {
+		month = Integer.parseInt(date.substring(0, 2));
+		day = Integer.parseInt(date.substring(3, 5));
+		year = Integer.parseInt(date.substring(6, 8));
+		
+		year = Converter.twoToFourDigitYear(year);
 	}
-	else if(date.length() == 8) {
-	    year = Integer.parseInt(date.substring(0, 4));
-	    month = Integer.parseInt(date.substring(4, 6));
-	    day = Integer.parseInt(date.substring(6, 8));
+
+	// Handle YYMMDD and YYYYMMDD
+	else {
+
+	    if(date.length() == 6) {
+		year = Integer.parseInt(date.substring(0, 2));
+		month = Integer.parseInt(date.substring(2, 4));
+		day = Integer.parseInt(date.substring(4, 6));
+
+		year = Converter.twoToFourDigitYear(year);
+	    }
+	    else if(date.length() == 8) {
+		year = Integer.parseInt(date.substring(0, 4));
+		month = Integer.parseInt(date.substring(4, 6));
+		day = Integer.parseInt(date.substring(6, 8));
+	    }
 	}
     }
 
-    // Create trading date set to closest trading date to today (e.g.
-    // if today is Saturday, this will be set to last Friday).
+    // Construct trading date set to today
     public TradingDate() {
-
+	GregorianCalendar gc = new GregorianCalendar();
+	gc.setTime(new Date());
+	this.year = gc.get(Calendar.YEAR);
+	this.month = gc.get(Calendar.MONTH) + 1;
+	this.day = gc.get(Calendar.DATE);
     }
 
     public int getYear() {
@@ -164,10 +180,64 @@ public class TradingDate {
 	return 0;
     }
 
+    /**
+     * Convert date to string in specified format. Will convert the date
+     * to a string matching the given format.
+     * The following substitutions will be made:
+     * <p>
+     * <table>
+     * <tr><td><pre>d?</pre></td><td>Replaced with one or two digit day</td></tr>
+     * <tr><td><pre>dd</pre></td><td>Replaced with two digit day</td></tr>
+     * <tr><td><pre>m?</pre></td><td>Replaced with one or two digit month</td></tr>
+     * <tr><td><pre>mm</pre></td><td>Replaced with two digit month</td></tr>
+     * <tr><td><pre>MMM</pre></td><td>Replaced with 3 letter month name</td></tr>
+     * <tr><td><pre>yy</pre></td><td>Replaced with two digit year</td></tr>
+     * <tr><td><pre>yyyy</pre></td><td>Replaced with four digit year</td></tr>
+     * </table>
+     * <p>
+     * E.g.:
+     * <pre>text = date.toString("d?-m?-yyyy");</pre>
+     *
+     * @param	format	the format of the string
+     * @return	the text string 
+     */
+    public String toString(String format) {
+
+	format = replace(format, "d\\?", Integer.toString(getDay())); 
+	format = replace(format, "dd", Converter.toFixedString(getDay(), 2)); 
+	format = replace(format, "m\\?", Integer.toString(getMonth())); 
+	format = replace(format, "mm", 
+			 Converter.toFixedString(getMonth(), 2)); 
+
+	format = replace(format, "MMM", monthToText(getMonth()));
+	format = replace(format, "yyyy", 
+			 Converter.toFixedString(getYear(), 4));	
+	
+	format = replace(format, "yy", 
+			 Integer.toString(getYear()).substring(2));
+	return format;
+    }
+
+    /**
+     * Convert the date to a string. Defaults to the format string "d?/MMM/yy",
+     * e.g. 3/Sep/01.
+     *
+     * @return	the text string
+     */
+    //    public String toString() {
+    //	return toString("d?/MMM/yy");
+    //}
+
+    private String replace(String source, String patternText, String text) {
+	Pattern pattern = Pattern.compile(patternText);
+	Matcher matcher = pattern.matcher(source);
+	return matcher.replaceAll(text);
+    }
+
     // Outputs date in a format SQL can understand "year-month-day"
     public String toString() {
-
-	return getYear() + "-" + getMonth() + "-" + getDay();
+	
+    	return getYear() + "-" + getMonth() + "-" + getDay();
     }
 
     // Outputs date in format "day/month"

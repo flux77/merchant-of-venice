@@ -133,6 +133,7 @@ public class QuoteChartMenu extends JMenu {
 	addMenuItem(graphMenu, Locale.getString("OBV"));
         addMenuItem(graphMenu, Locale.getString("RSI"));
 	addMenuItem(graphMenu, Locale.getString("STANDARD_DEVIATION"));
+	addMenuItem(graphMenu, Locale.getString("SUPPORT_AND_RESISTENCE"));
 
 	// Add all static menus
 	JMenuItem removeMenu = new JMenuItem(Locale.getString("REMOVE"));
@@ -411,6 +412,9 @@ public class QuoteChartMenu extends JMenu {
 
         else if(text == Locale.getString("POINT_AND_FIGURE"))
             graph = new PointAndFigureGraph(getDayClose());
+
+	else if (text == Locale.getString("SUPPORT_AND_RESISTENCE"))
+	    graph = new SupportAndResistenceGraph(getDayClose());
 
         else if(text == Locale.getString("RSI"))
             graph = new RSIGraph(getDayClose());

@@ -24,35 +24,76 @@ import java.util.List;
 
 import org.mov.parser.Expression;
 
+/**
+ * The abstract base class for all expressions in the <i>Gondola</i> language. This
+ * class implements the {@link Expression} interface and provides functions for
+ * managing an expression's child nodes. E.g. the expression <code>4+5</code> would
+ * consist of three nodes. The plus being the root node, which would have two
+ * child nodes of <code>4</code> and <code>5</code>.
+ *
+ * @see Expression
+ */
 public abstract class AbstractExpression implements Expression {
 
+    // Pointer to parent node (if any)
     private Expression parent = null;
+
+    // Array of children.
     private Expression children[];
 
+    /**
+     * Create a new expression.
+     */
     public AbstractExpression() {
         children = new Expression[getChildCount()];
     }
 
+    /**
+     * Get the parent of this node.
+     */
     public Expression getParent() {
         return parent;
     }
 
+    /**
+     * Set the parent of this node.
+     *
+     * @param the new parent.
+     */
     public void setParent(Expression parent) {
         assert parent != this;
 
         this.parent = parent;
     }
 
+    /**
+     * Return the child of this node at the given index.
+     *
+     * @return child at given index.
+     */
     public Expression getChild(int index) {
         assert index <= getChildCount();
 
         return children[index];
     }
 
+    /**
+     * Return whether this node is the root node. The root node has no
+     * parent.
+     * 
+     * @return <code>TRUE</code> iff this node is the root node.
+     */
     public boolean isRoot() {
         return getParent() == null;
     }
 
+    /**
+     * Set this expression's child to the given child. The new child
+     * will be removed from its parent.
+     *
+     * @param child the new child.
+     * @param index the index of the new child.
+     */
     public void setChild(Expression child, int index) {
         assert index <= getChildCount();
         assert child != this;
@@ -188,6 +229,11 @@ public abstract class AbstractExpression implements Expression {
         return count;
     }
 
+    /**
+     * Return an iterator over the node's children.
+     *
+     * @return iterator.
+     */
     public Iterator iterator() {
         List list = new ArrayList();
         buildIterationList(list, this);

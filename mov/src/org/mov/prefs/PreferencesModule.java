@@ -178,12 +178,7 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
 	    }
 
 	    // Flush preference changes to backing store
-	    try {
-		PreferencesManager.userRoot().flush();
-	    }
-	    catch(Exception be) {
-		// ignore it
-	    }
+	    PreferencesManager.flush();
 	}
 
 	// ok or cancel button closes window

@@ -30,11 +30,20 @@ import javax.swing.JTextField;
 import org.mov.quote.QuoteCache;
 import org.mov.ui.GridBagHelper;
 
+/**
+ * Provides a preferences page to let the user view and set tuning
+ * parameters.
+ */
 public class TuningPage extends JPanel implements PreferencesPage
 {
     private JDesktopPane desktop;
     private JTextField maxCachedQuotesTextField;
-    
+   
+    /**
+     * Create a new tuning preferences page.
+     *
+     * @param	desktop	the parent desktop.
+     */
     public TuningPage(JDesktopPane desktop) {
 	this.desktop = desktop;
 

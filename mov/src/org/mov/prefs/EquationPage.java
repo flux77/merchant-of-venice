@@ -36,13 +36,11 @@ import javax.swing.event.ListSelectionListener;
 
 import org.mov.prefs.PreferencesManager;
 
-/*
- * EquationPage.java
- *
- * Created on 24 January 2002, 23:43
- */
-
 /**
+ * Provides a preference page to let the user manage stored equations.
+ * Stored equations are equations which are mapped to names so that
+ * the user does not have to type in the same equations each time they
+ * are required, but can instead reference them with a name.
  *
  * @author  Dan
  */
@@ -56,6 +54,11 @@ public class EquationPage extends JPanel implements PreferencesPage
     private JButton editEquationButton;
     private JButton deleteEquationsButton;
     
+    /**
+     * Create a new stored equation preferences page.
+     *
+     * @param desktop the parent desktop.
+     */
     public EquationPage(JDesktopPane desktop) {
         this.desktop = desktop;
 

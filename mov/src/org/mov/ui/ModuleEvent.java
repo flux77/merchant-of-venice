@@ -18,16 +18,17 @@
 
 package org.mov.ui;
 
-import org.mov.main.*;
+import org.mov.main.Module;
 
-import java.util.*;
+import java.util.EventObject;
 
 /**
  * Representation of an event indicating that a module has been added,
  * removed or renamed.
+ *
+ * @see ModuleListener
  */
 public class ModuleEvent extends EventObject {
-   
     /**
      * Create a new module event based on the given module.
      *

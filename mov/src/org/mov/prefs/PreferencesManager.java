@@ -16,20 +16,14 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-
-/*
- * Preferences.java
- *
- * Created on 29 January 2002, 20:04
- *
- * This class provides a convenient way for all parts of the Venice system to
- * obtain preference information without violating Preferences namespace convention
- */
-
 package org.mov.prefs;
 
-import java.util.*;
-import java.util.prefs.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import org.mov.portfolio.Account;
 import org.mov.portfolio.CashAccount;
@@ -44,31 +38,50 @@ import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 
 /**
+ * The Preferences Manager contains a set of routines for loading and saving all
+ * preferences data for the application. Consolidating these routines in a single
+ * place allows us to maintain preferences namespace convention and also
+ * allows us to easily change the method of storage at a later date if desired.
  *
  * @author  Dan
- * @version 1.0
  */
 public class PreferencesManager {
-
-    /** The base in the prefs tree where all Venice settings are stored */
+    // The base in the prefs tree where all Venice settings are stored
     private final static String base = "org.mov";
     
-    /** The user root from Venice's point of view */
-    private static Preferences user_root = Preferences.userRoot().node(base);
+    // The user root from Venice's point of view
+    private static Preferences userRoot = Preferences.userRoot().node(base);
+
+    // This class cannot be instantiated
+    private PreferencesManager() {
+	// nothing to do
+    }
   
-    /** Fetches the root user node that parts of Venice may access */
-    public static java.util.prefs.Preferences userRoot() {
-        return user_root;
+    /**
+     * Forces the preferences data to be saved to the backend store (e.g. disk).
+     */
+    public static void flush() {
+	try {
+	    userRoot.flush();
+	} catch(BackingStoreException e) {
+	    // ignore
+	}
     }
 
-    /** Fetches the desired user node, based at the <code>base</code> branch
+    /** 
+     * Fetches the desired user node, based at the <code>base</code> branch
      * @param node the path to the node to be fetched
      */
-    public static java.util.prefs.Preferences getUserNode(String node) {
+    public static Preferences getUserNode(String node) {
         if (node.charAt(0) == '/') node = node.substring(1);
-        return user_root.node(node);
+        return userRoot.node(node);
     }
 
+    /**
+     * Load the last directory used when importing quote files.
+     * 
+     * @return the directory.
+     */
     public static String loadLastImportDirectory() {
         Preferences prefs = getUserNode("/importer");
         String directory = prefs.get("directory", "");
@@ -79,11 +92,22 @@ public class PreferencesManager {
             return null;
     }
 
+    /**
+     * Save the directory used to import quote files.
+     *
+     * @param directory the directory.
+     */
     public static void saveLastImportDirectory(String directory) {
         Preferences prefs = getUserNode("/importer");
         prefs.put("directory", directory);
     }
 
+    /**
+     * Load the list of all stored equations.
+     *
+     * @return the list of stored equations.
+     * @see StoredEquation
+     */
     public static List loadStoredEquations() {
 	List storedEquations = new ArrayList();
 	Preferences prefs = getUserNode("/equations");
@@ -100,8 +124,13 @@ public class PreferencesManager {
 	return storedEquations;
     }
 
+    /**
+     * Save the list of all stored equations.
+     *
+     * @param storedEquations the stored equations.
+     * @see StoredEquation
+     */
     public static void saveStoredEquations(List storedEquations) {
-
 	try {
 	    // Remove old equations
 	    Preferences prefs = getUserNode("/equations");
@@ -118,6 +147,13 @@ public class PreferencesManager {
 	}
     }
 
+    /**
+     * Load all saved user input in an Analyser Page.
+     *
+     * @param key a key which identifies which page settings to load.
+     * @return mapping of settings.
+     * @see org.mov.analyser.AnalyserPage
+     */
     public static HashMap loadAnalyserPageSettings(String key) {
 
 	HashMap settings = new HashMap();
@@ -141,26 +177,13 @@ public class PreferencesManager {
 	return settings;
     }
 
-    public static int loadLastPreferencesPage() {
-	Preferences prefs = getUserNode("/prefs");
-	return prefs.getInt("page", 0);
-    }
-    
-    public static void saveLastPreferencesPage(int page) {
-	Preferences prefs = getUserNode("/prefs");
-	prefs.putInt("page", page);
-    }
-
-    public static int loadMaximumCachedQuotes() {
-	Preferences prefs = getUserNode("/cache");
-        return prefs.getInt("maximumQuotes", 100000);
-    }
-
-    public static void saveMaximumCachedQuotes(int maximumCachedQuotes) {
-        Preferences prefs = getUserNode("/cache");
-        prefs.putInt("maximumQuotes", maximumCachedQuotes);
-    }
-
+    /**
+     * Save all user input in an Analyser Page.
+     *
+     * @param key a key which identifies which page settings to save.
+     * @param settings the settings to save.
+     * @see org.mov.analyser.AnalyserPage
+     */
     public static void saveAnalyserPageSettings(String key, HashMap settings) {
 	Preferences p = getUserNode("/analyser/" + key);
 
@@ -174,24 +197,75 @@ public class PreferencesManager {
 	}
     }
 
+    /**
+     * Load the last preferences page visited.
+     *
+     * @return index of the last preferences page visited.
+     */
+    public static int loadLastPreferencesPage() {
+	Preferences prefs = getUserNode("/prefs");
+	return prefs.getInt("page", 0);
+    }
+    
+    /**
+     * Save last preferences page visited.
+     *
+     * @param page index of the last preferences page visited.
+     */
+    public static void saveLastPreferencesPage(int page) {
+	Preferences prefs = getUserNode("/prefs");
+	prefs.putInt("page", page);
+    }
+
+    /**
+     * Load the cache's maximum number of quotes.
+     *
+     * @return the maximum number of quotes.
+     */
+    public static int loadMaximumCachedQuotes() {
+	Preferences prefs = getUserNode("/cache");
+        return prefs.getInt("maximumQuotes", 100000);
+    }
+
+    /**
+     * Save the cache's maximum number of quotes.
+     *
+     * @param maximumCachedQuotes the maximum number of quotes.
+     */
+    public static void saveMaximumCachedQuotes(int maximumCachedQuotes) {
+        Preferences prefs = getUserNode("/cache");
+        prefs.putInt("maximumQuotes", maximumCachedQuotes);
+    }
+
+    /**
+     * Return a list of the names of all the watch screens.
+     *
+     * @return the list of watch screen names.
+     */
     public static String[] getWatchScreenNames() {
 	Preferences p = getUserNode("/watchscreens");
-	String[] watchScreenNames = null;
+	String[] names = null;
 
 	try {
-	    watchScreenNames = p.childrenNames();
+	    names = p.childrenNames();
 	}
 	catch(BackingStoreException e) {
 	    // don't care
 	}
 
-	return watchScreenNames;
+	return names;
     }
 
-    public static WatchScreen loadWatchScreen(String watchScreenName) {
-        WatchScreen watchScreen = new WatchScreen(watchScreenName);
+    /**
+     * Load the watch screen with the given name.
+     *
+     * @param name the name of the watch screen to load.
+     * @return the watch screen.
+     */
+    public static WatchScreen loadWatchScreen(String name) {
+        WatchScreen watchScreen = new WatchScreen(name);
 
-        Preferences p = getUserNode("/watchscreens/" + watchScreenName);
+        Preferences p = getUserNode("/watchscreens/" + name);
 
 	try {
             // Load symbols
@@ -211,6 +285,11 @@ public class PreferencesManager {
         return watchScreen;
     }
 
+    /**
+     * Save the watch screen.
+     *
+     * @param watchScreeen the watch screen.
+     */
     public static void saveWatchScreen(WatchScreen watchScreen) {
         Preferences p = getUserNode("/watchscreens/" + watchScreen.getName());
 	p.put("name", watchScreen.getName());
@@ -229,6 +308,11 @@ public class PreferencesManager {
         }
     }
 
+    /**
+     * Delete the watch screen.
+     *
+     * @param name the watch screen name.
+     */
     public static void deleteWatchScreen(String name) {
 	Preferences p = getUserNode("/watchscreens/" + name);
 
@@ -240,6 +324,11 @@ public class PreferencesManager {
 	}
     }
 
+    /**
+     * Return a  list of the names of all the portfolios.
+     *
+     * @return the list of portfolio names.
+     */
     public static String[] getPortfolioNames() {
 	Preferences p = getUserNode("/portfolio");
 	String[] portfolioNames = null;
@@ -254,6 +343,11 @@ public class PreferencesManager {
 	return portfolioNames;
     }
 
+    /**
+     * Delete the portfolio.
+     *
+     * @param name the portfolio name.
+     */
     public static void deletePortfolio(String name) {
 	Preferences p = getUserNode("/portfolio/" + name);
 
@@ -265,10 +359,16 @@ public class PreferencesManager {
 	}
     }
 
-    public static Portfolio loadPortfolio(String portfolioName) {
-	Portfolio portfolio = new Portfolio(portfolioName);
+    /**
+     * Load the portfolio with the given name.
+     *
+     * @param name the name of the portfolio to load.
+     * @return the portfolio.
+     */
+    public static Portfolio loadPortfolio(String name) {
+	Portfolio portfolio = new Portfolio(name);
 	
-	Preferences p = getUserNode("/portfolio/" + portfolioName);
+	Preferences p = getUserNode("/portfolio/" + name);
 
 	try {
 	    // Load accounts
@@ -364,6 +464,11 @@ public class PreferencesManager {
 	return portfolio;
     }
 
+    /**
+     * Save the portfolio.
+     *
+     * @param portfolio the portfolio.
+     */
     public static void savePortfolio(Portfolio portfolio) {
 	Preferences p = getUserNode("/portfolio/" + portfolio.getName());
 	p.put("name", portfolio.getName());

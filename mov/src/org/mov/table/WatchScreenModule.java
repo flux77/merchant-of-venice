@@ -61,6 +61,13 @@ import org.mov.ui.QuoteModel;
 import org.mov.ui.SymbolListDialog;
 import org.mov.ui.TextDialog;
 
+/**
+ * Venice module for displaying a watch screen to the user. This module allows a
+ * user to build and modify a watch screen which can be used to monior a group
+ * of stocks.
+ *
+ * @see WatchScreen
+ */
 public class WatchScreenModule extends AbstractTable implements Module, ActionListener {
 
     // Main menu items
@@ -93,7 +100,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     private boolean isDeleted = false;
 
     /**
-     * Create a watch screen table.
+     * Create a watch screen module.
      *
      * @param watchScreen the watch screen object
      * @param quoteBundle watch screen quotes

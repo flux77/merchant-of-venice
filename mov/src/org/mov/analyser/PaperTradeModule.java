@@ -46,7 +46,7 @@ public class PaperTradeModule extends JPanel implements Module,
     // Java Widgets
     private JTextField fromDateTextField;
     private JTextField toDateTextField;
-    private JTextField symbolsTextField;
+    private QuoteRangeComboBox quoteRangeComboBox;
     private JTextField aRangeTextField;
     private JTextField bRangeTextField;
     private JTextField cRangeTextField;
@@ -61,7 +61,7 @@ public class PaperTradeModule extends JPanel implements Module,
     // Data parsed from Java Widgets
     private TradingDate fromDate;
     private TradingDate toDate;
-    private SortedSet symbols;
+    private QuoteRange quoteRange;
     private String buyRuleString;
     private String sellRuleString;
     private float initialCapital;
@@ -93,7 +93,6 @@ public class PaperTradeModule extends JPanel implements Module,
 
 	propertySupport = new PropertyChangeSupport(this);
 
-	//	createMenu();
 	layoutPaperTrade();
 
 	// Load GUI settings from preferences
@@ -142,11 +141,17 @@ public class PaperTradeModule extends JPanel implements Module,
 	    c.ipadx = 5;
 	    c.anchor = GridBagConstraints.WEST;
 
-	    symbolsTextField = 
-		addTextRow(symbolPanel, "Symbols", "", gridbag, c, 15);
+            JLabel label = new JLabel("Symbols");
+            c.gridwidth = 1;
+            gridbag.setConstraints(label, c);
+            symbolPanel.add(label);
+
+            quoteRangeComboBox = new QuoteRangeComboBox();
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            gridbag.setConstraints(quoteRangeComboBox, c);
+            symbolPanel.add(quoteRangeComboBox);
 
 	    paperTradeOptions.add(symbolPanel);
-
 	}
 
 	// Equations Panel
@@ -257,7 +262,8 @@ public class PaperTradeModule extends JPanel implements Module,
 	return comboBox;
     }
 
-    public void load() {
+    // Load GUI settings from preferences
+    private void load() {
 	// Load last GUI settings from preferences
 	HashMap settings = PreferencesManager.loadLastPaperTradeSettings();
 
@@ -272,7 +278,7 @@ public class PaperTradeModule extends JPanel implements Module,
 	    else if(setting.equals("to_date"))
 		toDateTextField.setText(value);
 	    else if(setting.equals("symbols"))
-		symbolsTextField.setText(value);
+		quoteRangeComboBox.setText(value);
 	    else if(setting.equals("buy_rule"))
 		buyRuleEquationComboBox.setEquationText(value);
 	    else if(setting.equals("sell_rule"))
@@ -292,13 +298,13 @@ public class PaperTradeModule extends JPanel implements Module,
 	}
     }
 
-    // Save last GUI settings to preferences
+    // Save GUI settings to preferences
     public void save() {
 	HashMap settings = new HashMap();
 
 	settings.put("from_date", fromDateTextField.getText());
 	settings.put("to_date", toDateTextField.getText());
-	settings.put("symbols", symbolsTextField.getText());
+	settings.put("symbols", quoteRangeComboBox.getText());
 	settings.put("buy_rule", buyRuleEquationComboBox.getEquationText());
 	settings.put("sell_rule", sellRuleEquationComboBox.getEquationText());
 	settings.put("initial_capital", initialCapitalTextField.getText());
@@ -356,7 +362,6 @@ public class PaperTradeModule extends JPanel implements Module,
      * @return	the menu bar.
      */
     public JMenuBar getJMenuBar() {
-	//	return menuBar;
 	return null;
     }
 
@@ -384,16 +389,14 @@ public class PaperTradeModule extends JPanel implements Module,
 	else if(e.getSource() == tradeButton) {
 	    Thread t = new Thread(new Runnable() {
 		    public void run() {
+                        // Before we paper trade, save our interface results
+                        // so if the programme crashes etc our stuff is still there
+                        save();
 
 			// Read data from GUI and load quote data
-			if(parseInterface() && loadQuoteBundle()) {
-                            // Before we paper trade, save our interface results
-                            // so if the programme crashes etc our stuff is still there
-                            save();
-
+			if(parseInterface()) 
 			    // If its OK generate and display portfolios
 			    displayPaperTrades(paperTrade());
-			}
 		    }
 		});
 
@@ -402,22 +405,69 @@ public class PaperTradeModule extends JPanel implements Module,
 
     }
 
-    // Read the data from the java widgets and prepare it for paper trading.
-    // Display errors if there were any and return (true) if the data is
-    // valid
+    // Read data from interface and display if there are any errors.
+    // Return true if the data is OK
     private boolean parseInterface() {
-
-	//
-	// Read data from widgets
-	//
+        return (parseDateRange() && parseSymbols() && parseBuySellRules() && 
+                parsePortfolio());
+    }
+    
+    // Read data from date ranges panel and display if there are any errors.
+    // Return true if the data is OK
+    private boolean parseDateRange() {
 
 	fromDate = new TradingDate(fromDateTextField.getText(),
 				   TradingDate.BRITISH);
 	toDate = new TradingDate(toDateTextField.getText(),
 				 TradingDate.BRITISH);
-	symbols = 
-	    Converter.stringToSortedSet(symbolsTextField.getText());
 
+	if(fromDate.getYear() == 0 || toDate.getYear() == 0 ||
+	   fromDate.after(toDate)) {
+	    buildPaperTradeError("Invalid date range");
+	    return false;
+	}
+
+        try {
+            int offset = QuoteCache.getInstance().dateToOffset(fromDate);
+        }
+        catch(WeekendDateException e) {
+            buildPaperTradeError("From date is on a weekend");
+	    return false;
+        }
+
+        try {
+            int offset = QuoteCache.getInstance().dateToOffset(toDate);
+        }
+        catch(WeekendDateException e) {
+            buildPaperTradeError("To date is on a weekend");
+	    return false;
+        }
+
+        return true;
+    }
+
+    // Read data from the symbols panel and display if there are any errors.
+    // Return true if the data is OK
+    private boolean parseSymbols() {
+        // The date range panel must be parsed first!
+        assert fromDate != null && toDate != null;
+
+        quoteRange = quoteRangeComboBox.getQuoteRange();
+
+        // Was there an error? (the combo box will display it if
+        // there was one).
+        if(quoteRange == null)
+            return false;
+
+        quoteRange.setFirstDate(fromDate);
+        quoteRange.setLastDate(toDate);
+
+        return true;
+    }
+
+    // Read data from the buy/sells panel and display if there are any errors.
+    // Return true if the data is OK
+    private boolean parseBuySellRules() {
 	Parser parser = new Parser();
 	
 	buyRuleString = buyRuleEquationComboBox.getEquationText();
@@ -450,12 +500,7 @@ public class PaperTradeModule extends JPanel implements Module,
 	    return false;
 	}
 
-	initialCapital = 0.0F;
-	tradeCost = 0.0F;
-	aRange = 0;
-	bRange = 0;
-	cRange = 0;
-
+        // Now try reading the ranges
 	try {
 	    if(!aRangeTextField.getText().equals(""))
 		aRange = 
@@ -468,7 +513,23 @@ public class PaperTradeModule extends JPanel implements Module,
 	    if(!cRangeTextField.getText().equals(""))
 		cRange =
 		    Integer.parseInt(cRangeTextField.getText());
+        }
+	catch(NumberFormatException e) {
+	    buildPaperTradeError("Can't parse number '" +
+				 e.getMessage() + "'");
+	    return false;
+	}
 
+        return true;
+    }
+
+    // Read data from the portfolio panel and display if there are any errors.
+    // Return true if the data is OK
+    private boolean parsePortfolio() {
+	initialCapital = 0.0F;
+	tradeCost = 0.0F;
+
+	try {
 	    if(!initialCapitalTextField.getText().equals(""))
 		initialCapital = 
 		    Float.parseFloat(initialCapitalTextField.getText());
@@ -477,11 +538,6 @@ public class PaperTradeModule extends JPanel implements Module,
 		tradeCost = 
 		    Float.parseFloat(tradeCostTextField.getText());
 	}
-
-	//
-	// Validate data
-	//
-
 	catch(NumberFormatException e) {
 	    buildPaperTradeError("Can't parse number '" +
 				 e.getMessage() + "'");
@@ -493,50 +549,22 @@ public class PaperTradeModule extends JPanel implements Module,
 	    return false;
 	}
 
-	if(fromDate.getYear() == 0 || toDate.getYear() == 0 ||
-	   fromDate.after(toDate)) {
-	    buildPaperTradeError("Invalid date range");
-	    return false;
-	}
-
-        try {
-            int offset = QuoteCache.getInstance().dateToOffset(fromDate);
-        }
-        catch(WeekendDateException e) {
-            buildPaperTradeError("From date is on a weekend");
-	    return false;
-        }
-
-        try {
-            int offset = QuoteCache.getInstance().dateToOffset(toDate);
-        }
-        catch(WeekendDateException e) {
-            buildPaperTradeError("To date is on a weekend");
-	    return false;
-        }
-
-	if(symbols.size() == 0) {
-	    buildPaperTradeError("Need to specify a commodity to trade");
-	    return false;
-	}
-	else {
-	    String symbol = (String)symbols.first();
-
-	    // Check company exists
-	    if(!QuoteSourceManager.getSource().symbolExists(symbol)) {
-		buildPaperTradeError("No data available for commodity: " +
-				     symbol);
-				     
-		return false;
-	    }
-	}
-
-	// If we got here there were no errors
 	return true;
+
     }
 
     private PaperTradeData[] paperTrade() {
-	String symbol = (String)symbols.first();
+
+        ProgressDialog progress = 
+            ProgressDialogManager.getProgressDialog();
+
+        progress.setIndeterminate(true);
+        progress.show("Paper Trade");
+
+        quoteBundle = new ScriptQuoteBundle(quoteRange);
+
+        Vector symbols = quoteBundle.getSymbols(quoteBundle.getFirstDateOffset());
+	String symbol = (String)symbols.firstElement();
 	symbol = symbol.toLowerCase();
 
 	Parser parser = new Parser();
@@ -550,6 +578,12 @@ public class PaperTradeModule extends JPanel implements Module,
 	    cRange = 1;
 	
 	int numberOfEquations = aRange * bRange * cRange;
+
+        progress.setIndeterminate(false);
+        progress.setMaximum(numberOfEquations);
+        progress.setProgress(0);
+        progress.setNote("Paper Trading...");
+        progress.setMaster(true);
 
 	// Iterate through all possible paper trade equations
 	PaperTradeData[] paperTradeData = 
@@ -601,26 +635,18 @@ public class PaperTradeModule extends JPanel implements Module,
 			sellRule.toString();
 
 		    equationNumber++;
+
+                    // Running the equation means we might need to load in
+                    // more quotes so the note may have changed...
+                    progress.setNote("Paper Trading...");
+                    progress.increment();
 		}
 	    }
 	}
 
+        ProgressDialogManager.closeProgressDialog(progress);
+
 	return paperTradeData;
-    }
-
-    private boolean loadQuoteBundle() {
-	final Thread thread = Thread.currentThread();
-	ProgressDialog progress = 
-	    ProgressDialogManager.getProgressDialog();
-	Portfolio portfolio = null;
-	    
-        progress.show("Paper Trade");
-
-        quoteBundle = new ScriptQuoteBundle(new QuoteRange((String)symbols.first()));	   
-
-	ProgressDialogManager.closeProgressDialog(progress);
-
-	return true;
     }
 
     private void displayPaperTrades(final PaperTradeData[] paperTrades) {
@@ -681,6 +707,7 @@ public class PaperTradeModule extends JPanel implements Module,
 	return string;
     }
 
+    // Convenience method for displaying the given error message
     private void buildPaperTradeError(String message) {
 	JOptionPane.showInternalMessageDialog(desktop, 
 					      message,

@@ -249,8 +249,8 @@ public class GPModule extends JPanel implements Module {
         int numberStocks = portfolioPage.getNumberStocks();
         // number of mutations to be applied to the rules defined in Initial Population Section
         int mutations = GPPageInitialPopulation.getMutations();
-        String tradeCostBuy = tradeValuePage.getTradeValueBuy();
-        String tradeCostSell = tradeValuePage.getTradeValueSell();
+        String tradeValueBuy = tradeValuePage.getTradeValueBuy();
+        String tradeValueSell = tradeValuePage.getTradeValueSell();
         
         // quote bundle needs to load 30 days before quote range.
         GPQuoteBundle quoteBundle =
@@ -278,8 +278,8 @@ public class GPModule extends JPanel implements Module {
                                     numberStocks,
                                     tradeCost,
                                     breedingPopulation,
-                                    tradeCostBuy,
-                                    tradeCostSell);
+                                    tradeValueBuy,
+                                    tradeValueSell);
             
             for(int generation = 1; generation <= numberGenerations; generation++) {
                 if(thread.isInterrupted())

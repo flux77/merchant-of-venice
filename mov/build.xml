@@ -1,5 +1,5 @@
 <!-- Venice Build File -->
-<project name="Venice" default="build" basedir=".">
+<project name="Venice" default="run" basedir=".">
 
   <!-- Current version we are working towards -->
   <property name="VERSION" value="0.1alpha"/>
@@ -7,11 +7,15 @@
   <!-- Paths -->
   <property name="api" value="${basedir}/api"/>
   <property name="backup" value="${basedir}/backup"/>
+  <property name="doc" value="${basedir}/doc"/>
   <property name="release" value="${basedir}/release"/>
   <property name="report" value="${basedir}/report"/>
   <property name="src" value="${basedir}/src"/>
   <property name="test" value="${basedir}/test"/>
   <property name="web" value="${basedir}/web"/>
+
+  <!-- Online help -->
+  <property name="help" value="${src}/org/mov/help/doc"/>
 
   <!-- Generate API documentation -->
   <target name="api">
@@ -52,30 +56,87 @@
     <delete>
       <fileset dir="${src}" includes="**/*.class"/>
     </delete>
+    <delete>
+      <fileset dir="${test}" includes="**/*.class"/>
+    </delete>
     <delete file="venice.jar"/>
     <delete dir="${api}"/>
+    <delete file="${doc}/manual.html"/>
+    <delete file="${doc}/manual.text"/>
     <delete dir="${release}"/>
+    <delete file="${help}/*.html"/>
+    <delete file="${help}/index.xml"/>
     <delete file="${web}/web.tar"/>
     <delete file="${web}/web.tar.gz"/>
+    <delete file="${web}/manual.html"/>
     <delete dir="${web}/api"/>
     <delete dir="${web}/report"/>
   </target>
 
+  <!-- Generate docs -->
+  <target name="doc">
+    <xmlcatalog id="document">
+      <dtd publicID="-//Venice//DTD XML Document V1.0//EN"
+           location="${doc}/document.dtd"/>
+    </xmlcatalog>
+
+    <!-- This will say it's generating manual.html but we override this. -->
+    <!-- and write out files for individual chapters.                    -->
+    <xslt basedir="${doc}" 
+          destdir="${help}"
+          includes="manual.xml"
+          extension=".html" 
+          style="${doc}/manual-help.xsl">
+      <xmlcatalog refid="document"/>
+    </xslt>
+
+    <!-- Generate online help index.                                     -->
+    <xslt in="${doc}/manual.xml"
+          out="${help}/index.xml"
+          style="${doc}/manual-index.xsl">
+      <xmlcatalog refid="document"/>
+    </xslt>
+
+    <!-- Generate online HTML version of manual.                         -->
+    <xslt in="${doc}/manual.xml"
+          out="${web}/manual.html"
+          style="${doc}/manual-web.xsl">
+      <xmlcatalog refid="document"/>
+    </xslt>
+
+    <!-- Generate text version of manual.                                -->
+    <xslt in="${doc}/manual.xml"
+          out="${doc}/manual.txt"
+          style="${doc}/manual-text.xsl">
+      <xmlcatalog refid="document"/>
+    </xslt>
+
+    <!-- Generate local HTML version of manual.                          -->
+    <xslt in="${doc}/manual.xml"
+          out="${doc}/manual.html"
+          style="${doc}/manual-html.xsl">
+      <xmlcatalog refid="document"/>
+    </xslt>
+  </target>
+
   <!-- Generate a jar -->
-  <target name="jar" depends="build">
+  <target name="jar" depends="build, doc">
     <jar jarfile="venice.jar" 
          basedir="${src}"
 	 manifest="${src}/MANIFEST.MF"/>
   </target>
 
   <!-- Package venice up ready for release -->
-  <target name="release" depends="jar, test">
+  <target name="release" depends="doc, jar, test">
 
     <!-- Layout files ready for release -->
     <mkdir dir="${release}"/>
     <mkdir dir="${release}/venice-${VERSION}"/>
     <mkdir dir="${release}/venice-${VERSION}/build"/>
     <mkdir dir="${release}/venice-${VERSION}/build/src/"/>
+    <mkdir dir="${release}/venice-${VERSION}/doc/"/>
+    <copy file="${doc}/manual.txt" todir="${release}/venice-${VERSION}/doc"/>
+    <copy file="${doc}/manual.html" todir="${release}/venice-${VERSION}/doc"/>
     <copy todir="${release}/venice-${VERSION}/build/src/"> 
       <fileset dir="${src}" includes="**/*.java"/>
     </copy>
@@ -136,7 +197,7 @@
         <pathelement path="${src}"/>
         <pathelement path="${test}"/>
       </classpath>
-      <formatter type="plain" />
+      <formatter type="plain"/>
       <batchtest todir="${report}">
         <fileset dir="${test}">
           <include name="**/*.java" />
@@ -146,7 +207,7 @@
   </target>
 
   <!-- Package up the web page ready for deployment -->
-  <target name="web" depends="api">
+  <target name="web" depends="api, doc">
 
     <!-- Copy API files to web page -->
     <copy todir="${web}/api">
@@ -155,8 +216,7 @@
 
     <!-- Make sure permissions are OK -->
     <chmod perm="u=rw,go=r">
-      <fileset dir="${web}/">
-      </fileset>
+      <fileset dir="${web}/"/>
     </chmod>
 
     <!-- Package it up ready for deployment -->

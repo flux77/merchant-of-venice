@@ -187,6 +187,11 @@ public class Portfolio implements Cloneable {
 	}
     }
 
+    /**
+     * Create a clone of this portfolio.
+     *
+     * @return clone
+     */
     public Object clone() {
 
 	// First clone portfolio object
@@ -447,6 +452,11 @@ public class Portfolio implements Cloneable {
  	return value;
      }
 
+    /**
+     * Return a list of all the stocks currently held in the portfolio.
+     *
+     * @return the stock list
+     */
     public List getStocksHeld() {
 	Set stocksHeld = new HashSet();
 
@@ -521,10 +531,31 @@ public class Portfolio implements Cloneable {
 	return value;
     }
 
+    /**
+     * Return an iterator that iterates over every day from the date of
+     * the first transaction to whenever the user chooses to stop
+     * iterating. Each iteration will return the state of the Portfolio
+     * on that date. This allows the user to efficiently query a range of
+     * historical states of the Portfolio.
+     *
+     * @return the portfolio iterator
+     * @see #getPortfolio(TradingDate)
+     */
     public Iterator iterator() {
         return new PortfolioIterator(this);
     }
 
+    /**
+     * Returns the state of the Portfolio on the given date. If the
+     * date is before the last transaction in the Portfolio, then
+     * this function will-reconstruct the Portfolio to how it would
+     * have been on that date. This can be slow, so if you want to
+     * query a range of dates, the {@link #iterator} method is
+     * more efficient.
+     *
+     * @param date the date to query
+     * @return the Portfolio on the given date
+     */
     public Portfolio getPortfolio(TradingDate date) {
         // If the date falls after the date of the last transaction
         // then the current portoflio object is correct.
@@ -556,12 +587,28 @@ public class Portfolio implements Cloneable {
         }
     }
 
+    /**
+     * An iterator which iterates through the states of the Portfolio
+     * from the date of the first transaction to whenever the caller
+     * stops iterating.
+     */
     private class PortfolioIterator implements Iterator {
 
+        // Current state of the Portfolio
         private Portfolio iteratorPortfolio;
+
+        // List of transactions in the final Portfolio
         private ListIterator transactionIterator;
+
+        // Current date
         private TradingDate currentDate;
 
+        /**
+         * Create a new Portfolio Iterator that iterates over the given
+         * portfolio.
+         *
+         * @param referencePortfolio Portfolio to iterate over
+         */
         public PortfolioIterator(Portfolio referencePortfolio) {
             // Create a copy of the portfolio and extract the list of
             // transactions.
@@ -579,14 +626,28 @@ public class Portfolio implements Cloneable {
             currentDate = referencePortfolio.getStartDate();
         }
 
+        /**
+         * Return if we have any more dates to iterator over.
+         *
+         * @return always returns <code>TRUE</code>
+         */
         public boolean hasNext() {
             return true;
         }
 
+        /**
+         * This operation makes no sense in the current context.
+         *
+         * @raises UnsupportedOperationException
+         */
         public void remove() {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * Traverse to the state of the Portfolio on the next trading date.
+         * The state of the Portfolio may be identical to the previous state.
+         */
         public Object next() {
             while(transactionIterator.hasNext()) {
                 Transaction transaction = (Transaction)transactionIterator.next();

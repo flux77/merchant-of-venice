@@ -43,7 +43,7 @@ public abstract class AbstractExpression implements Expression {
     // Constants that manage the USA/Australian/UK localization
     // the goal is forcing that localization also for others languages
     private final static String format = "0.000000#";
-    private final static DecimalFormat decimalFormat = new DecimalFormat(format, new DecimalFormatSymbols(Locale.US));
+    private final static DecimalFormat decimalFormat = new DecimalFormat(format, new DecimalFormatSymbols(Locale.ENGLISH));
 
     // Pointer to parent node (if any)
     private Expression parent = null;
@@ -252,7 +252,7 @@ public abstract class AbstractExpression implements Expression {
         
         NumberFormat format = null;
 
-        format = NumberFormat.getInstance(Locale.US);
+        format = NumberFormat.getInstance(Locale.ENGLISH);
         format.setMinimumIntegerDigits(1);
         format.setMinimumFractionDigits(1);
         format.setMaximumFractionDigits(6);

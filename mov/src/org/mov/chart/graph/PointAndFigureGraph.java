@@ -228,7 +228,9 @@ public class PointAndFigureGraph extends AbstractGraph {
         // Heuristic for a starting value for the default price scale
         Graphable graphable = getSource().getGraphable();
         double[] values = graphable.toArray();
-        defaultPriceReversalScale = QuoteFunctions.sd(values, 1, values.length) / 1.75;
+
+	// Default = 3 box reversal
+	defaultPriceReversalScale = calculateDefaultBoxPriceScale() * 3;
         defaultPriceReversalScale = QuoteFunctions.roundDouble(defaultPriceReversalScale, 2);
         return defaultPriceReversalScale;
     }
@@ -237,9 +239,11 @@ public class PointAndFigureGraph extends AbstractGraph {
         double defaultBoxPriceScale;
 
         // Heuristic for a starting value for the default price scale
+	// Use 1 percent of the current price.
         Graphable graphable = getSource().getGraphable();
         double[] values = graphable.toArray();
-        defaultBoxPriceScale = QuoteFunctions.sd(values, 1, values.length) / 4;
+	
+	defaultBoxPriceScale = values[values.length-1] / 100;
         defaultBoxPriceScale = QuoteFunctions.roundDouble(defaultBoxPriceScale, 2);
         return defaultBoxPriceScale;
     }
@@ -250,8 +254,7 @@ public class PointAndFigureGraph extends AbstractGraph {
         super.setSettings(settings);
 
         // Calculate default price scale from data
-        double defaultPriceReversalScale = calculateDefaultPriceReversalScale();
-        double defaultBoxPriceScale = calculateDefaultBoxPriceScale();
+        double defaultPriceReversalScale = calculateDefaultPriceReversalScale();        double defaultBoxPriceScale = calculateDefaultBoxPriceScale();
 
         // Retrieve values from hashmap
         double priceReversalScale = PointAndFigureGraphUI.getPriceReversalScale(settings, defaultPriceReversalScale);

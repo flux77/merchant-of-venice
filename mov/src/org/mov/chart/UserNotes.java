@@ -40,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JButton;
+import java.awt.Dimension;
 import java.awt.BorderLayout;
 
 import org.mov.ui.GridBagHelper;
@@ -55,15 +56,7 @@ import org.mov.quote.QuoteFunctions;
 import org.mov.prefs.PreferencesManager;
 
 /**
- * Provides a menu which is associated with a stock symbol being graphed.
- * This menu provides a series of options which allow the user to graph related
- * charts and indicators.
- *
- * <p>If you have added a view or indicator graph to Venice, you'll need to
- * add it to this menu. To add the graph, you'll need to make two changes.
- * First add your graph to the <code>JMenu</code> which is created in
- * <code>buildMenu</code>. Then add your graph to the factory method
- * <code>newGraph</code>.
+ * Provides a text area for which a user can make notes regarding thie stock symbol being graphed.
  *
  * @author Mark Hummel
  */
@@ -80,7 +73,7 @@ public class UserNotes extends JInternalFrame {
 
 	String frameTitle = "Notes for " + name;
 	setTitle(frameTitle);		    
-	setSize(250,300);
+	setSize(250,250);
 	setVisible(true);
 	setResizable(true);
 	setClosable(true);
@@ -91,7 +84,7 @@ public class UserNotes extends JInternalFrame {
 	JPanel notePane = new JPanel();
 	JPanel buttonPane = new JPanel();
 	
-	notes = new JTextArea(30,15);
+	notes = new JTextArea(10,15);
 
 	prevText = PreferencesManager.loadUserNotes(symbol);
 	if (prevText != "") {
@@ -99,6 +92,7 @@ public class UserNotes extends JInternalFrame {
 	}
 
 	JScrollPane noteContainer = new JScrollPane(notes);
+		
 	JButton save = new JButton("save");
 	JButton close = new JButton("close");
 	JButton revert = new JButton("revert");
@@ -133,7 +127,7 @@ public class UserNotes extends JInternalFrame {
 	    });
 	
 	
-	notePane.add(noteContainer);
+	notePane.add(noteContainer, BorderLayout.CENTER);
 	buttonPane.add(save, BorderLayout.WEST);
 	buttonPane.add(close, BorderLayout.CENTER);
 	buttonPane.add(revert, BorderLayout.EAST);

@@ -505,8 +505,9 @@ public class Chart extends JComponent implements MouseListener {
 	    graphIterator = graphs.iterator();
 
 	    while(graphIterator.hasNext()) {
-		title += 
-		    ((Graph)graphIterator.next()).getName().toUpperCase();
+		Graph graph = (Graph)graphIterator.next();
+
+		title += graph.getName();
 
 		if(graphIterator.hasNext())
 		    title += ", ";

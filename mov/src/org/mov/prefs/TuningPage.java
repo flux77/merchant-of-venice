@@ -29,6 +29,7 @@ import javax.swing.JTextField;
 
 import org.mov.quote.QuoteCache;
 import org.mov.ui.GridBagHelper;
+import org.mov.util.Locale;
 
 /**
  * Provides a preferences page to let the user view and set tuning
@@ -69,14 +70,14 @@ public class TuningPage extends JPanel implements PreferencesPage
                                    QuoteCache.getInstance().size() :
                                    0);
         GridBagHelper.addLabelRow(borderPanel, 
-                                  "Current Cached Quotes", 
+                                  Locale.getString("CURRENT_CACHED_QUOTES"), 
                                   Integer.toString(currentCachedQuotes),
                                   gridbag, c);
 
         int maximumCachedQuotes = PreferencesManager.loadMaximumCachedQuotes();
         maxCachedQuotesTextField = 
             GridBagHelper.addTextRow(borderPanel, 
-                                     "Maximum Cached Quotes", 
+                                     Locale.getString("MAXIMUM_CACHED_QUOTES"), 
                                      Integer.toString(maximumCachedQuotes),
                                      gridbag, c, 10);
 
@@ -89,7 +90,7 @@ public class TuningPage extends JPanel implements PreferencesPage
     }
 
     public String getTitle() {
-	return "Tuning";
+	return Locale.getString("TUNING_PAGE_TITLE");
     }
 
     public void save() {

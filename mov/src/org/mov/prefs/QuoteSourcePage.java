@@ -57,6 +57,7 @@ import org.mov.prefs.PreferencesManager;
 import org.mov.quote.QuoteFilter;
 import org.mov.quote.QuoteFilterList;
 import org.mov.quote.QuoteSourceManager;
+import org.mov.util.Locale;
 
 /** 
  * Provides a preferences page to let the user modify the quote source.
@@ -108,12 +109,15 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	JTabbedPane pane = new JTabbedPane(JTabbedPane.TOP);
 	// Put all "use this option" radio buttons into group
 	ButtonGroup buttonGroup = new ButtonGroup();
-
+	
         // Add a pane for each quote source the user can select
-        pane.addTab("Database", createDatabasePanel(quoteSource, buttonGroup));
-        pane.addTab("Files", createFilesPanel(quoteSource, buttonGroup));
+        pane.addTab(Locale.getString("DATABASE"), 
+		    createDatabasePanel(quoteSource, buttonGroup));
+        pane.addTab(Locale.getString("FILES"), 
+		    createFilesPanel(quoteSource, buttonGroup));
         //        pane.addTab("Internet", createInternetPanel(quoteSource, buttonGroup));
-        pane.addTab("Samples", createSamplesPanel(quoteSource, buttonGroup));
+        pane.addTab(Locale.getString("SAMPLES"), 
+		    createSamplesPanel(quoteSource, buttonGroup));
 
 	// Raise the select source's pane
         if(quoteSource.equals("database"))
@@ -131,7 +135,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     private JPanel createDatabasePanel(String quoteSource, ButtonGroup buttonGroup) {
         Preferences p = PreferencesManager.getUserNode("/quote_source/database");
 
-        useDatabase = new JRadioButton("Use Database", true);
+        useDatabase = new JRadioButton(Locale.getString("USE_DATABASE"), true);
 	buttonGroup.add(useDatabase);
 
         if(quoteSource.equals("database"))
@@ -139,7 +143,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         else
             useDatabase.setSelected(false);
         
-        TitledBorder titled = new TitledBorder("Database Preferences");
+        TitledBorder titled = new TitledBorder(Locale.getString("DATABASE_PREFERENCES"));
         JPanel databasePreferences = new JPanel();
         databasePreferences.setBorder(titled);
         databasePreferences.setLayout(new BorderLayout()); 
@@ -154,7 +158,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         c.anchor = GridBagConstraints.WEST;
         
         // Database 
-        JLabel label = new JLabel("Database");
+        JLabel label = new JLabel(Locale.getString("DATABASE"));
         gridbag.setConstraints(label, c);
         borderPanel.add(label);
         
@@ -165,25 +169,31 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         borderPanel.add(databaseType);
         
         // Host
-        databaseHost = GridBagHelper.addTextRow(borderPanel, "Host", p.get("host", "db"),
+        databaseHost = GridBagHelper.addTextRow(borderPanel, 
+						Locale.getString("HOST"), 
+						p.get("host", "db"),
                                                 gridbag, c, 15);
         
         // Port
-        databasePort = GridBagHelper.addTextRow(borderPanel, "Port", 
+        databasePort = GridBagHelper.addTextRow(borderPanel, 
+						Locale.getString("PORT"), 
                                                 p.get("port",  "3306"), 
                                                 gridbag, c, 15);
         
         // Username
-        databaseUsername = GridBagHelper.addTextRow(borderPanel, "Username", 
+        databaseUsername = GridBagHelper.addTextRow(borderPanel, 
+						    Locale.getString("USERNAME"), 
                                                     p.get("username", ""), gridbag, c, 15);
         
         // Password
-        databasePassword = GridBagHelper.addPasswordRow(borderPanel, "Password", 
+        databasePassword = GridBagHelper.addPasswordRow(borderPanel, 
+							Locale.getString("PASSWORD"), 
                                                         p.get("password", ""), 
                                                         gridbag, c, 15);
         
         // Database Name
-        databaseName = GridBagHelper.addTextRow(borderPanel, "Database Name", 
+        databaseName = GridBagHelper.addTextRow(borderPanel, 
+						Locale.getString("DATABASE_NAME"), 
                                                 p.get("dbname", "shares"), gridbag, c, 15);
         
         databasePreferences.add(borderPanel, BorderLayout.NORTH);
@@ -199,7 +209,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     private JPanel createFilesPanel(String quoteSource, ButtonGroup buttonGroup) {
         Preferences p = PreferencesManager.getUserNode("/quote_source/files");
 
-        useFiles = new JRadioButton("Use Files", true);
+        useFiles = new JRadioButton(Locale.getString("USE_FILES"), true);
 	buttonGroup.add(useFiles);
 
         if(quoteSource.equals("files"))
@@ -207,7 +217,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         else
             useFiles.setSelected(false);
         
-        TitledBorder titled = new TitledBorder("Files");
+        TitledBorder titled = new TitledBorder(Locale.getString("FILE_PREFERENCES"));
         JPanel filePreferences = new JPanel();
         filePreferences.setBorder(titled);
         filePreferences.setLayout(new BorderLayout());
@@ -224,7 +234,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                 formatComboBox.setSelectedItem((Object)filter.getName());
         }
         
-        box.add(new JLabel("Format"));
+        box.add(new JLabel(Locale.getString("FORMAT")));
         box.add(Box.createHorizontalStrut(5));
         box.add(formatComboBox);
         
@@ -252,7 +262,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         
         // Add, Delete buttons
         JPanel buttonPanel = new JPanel();
-        addFiles = new JButton("Add");
+        addFiles = new JButton(Locale.getString("ADD"));
         addFiles.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     // Get files user wants to import
@@ -285,7 +295,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                     }
                 }
             });
-        deleteFiles = new JButton("Remove");
+        deleteFiles = new JButton(Locale.getString("REMOVE"));
         deleteFiles.setEnabled(false);
         deleteFiles.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -315,6 +325,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         return files;
     }
 
+    /*
     private JPanel createInternetPanel(String quoteSource, ButtonGroup buttonGroup) {
 	// Internet Pane - temporary disabled. I can no longer connect to Sanford
         // using this code. I'll need to find a public site on the web where I can
@@ -372,9 +383,9 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 
         return internet;
     }
-
+    */
     private JPanel createSamplesPanel(String quoteSource, ButtonGroup buttonGroup) {
-        useSamples = new JRadioButton("Use Samples", true);
+        useSamples = new JRadioButton(Locale.getString("USE_SAMPLES"), true);
         buttonGroup.add(useSamples);
 
         if(quoteSource.equals("samples"))
@@ -394,7 +405,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     }
 
     public String getTitle() {
-	return "Quote Source";
+	return Locale.getString("QUOTE_SOURCE_PAGE_TITLE");
     }
 
     public void save() {

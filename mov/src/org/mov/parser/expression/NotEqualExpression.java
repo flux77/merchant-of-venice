@@ -31,11 +31,11 @@ public class NotEqualExpression extends ComparisionExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	if(getLeft().evaluate(quoteBundle, symbol, day) !=
-	   getRight().evaluate(quoteBundle, symbol, day))
+	if(getLeft().evaluate(variables, quoteBundle, symbol, day) !=
+	   getRight().evaluate(variables, quoteBundle, symbol, day))
 	    return TRUE;
 	else
 	    return FALSE;
@@ -43,6 +43,11 @@ public class NotEqualExpression extends ComparisionExpression {
 
     public String toString() {
 	return super.toString("!=");
+    }
+
+    public Object clone() {
+        return new NotEqualExpression((Expression)getLeft().clone(), 
+                                      (Expression)getRight().clone());
     }
 }
 

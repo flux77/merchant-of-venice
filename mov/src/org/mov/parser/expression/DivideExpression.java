@@ -31,18 +31,23 @@ public class DivideExpression extends ArithmeticExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	float right = getRight().evaluate(quoteBundle, symbol, day);
+	float right = getRight().evaluate(variables, quoteBundle, symbol, day);
 
 	if(right != 0.0F)
-	    return getLeft().evaluate(quoteBundle, symbol, day) / right;
+	    return getLeft().evaluate(variables, quoteBundle, symbol, day) / right;
 	else
-	    return 0.0F; // need a divide by 0 exception perhaps
+            throw new EvaluationException("Divide by zero error");
     }
 
     public String toString() {
 	return super.toString("/");
+    }
+
+    public Object clone() {
+        return new DivideExpression((Expression)getLeft().clone(), 
+                                    (Expression)getRight().clone());
     }
 }

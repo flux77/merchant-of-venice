@@ -27,27 +27,52 @@ import org.mov.quote.*;
  */
 public class NumberExpression extends TerminalExpression {
 
-    // The number we represent
+    // The number's value and typey
     private float value;
+    private int type;
 
-    public NumberExpression(float value) {
+    public NumberExpression(float value, int type) {
 	this.value = value;
+        this.type = type;
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) {
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) {
 	return value;
     }
 
     public String toString() {
-	return Float.toString(value);
+        if(getType() == BOOLEAN_TYPE) {
+            if(value >= TRUE_LEVEL)
+                return "true";
+            else
+                return "false";
+        }
+        else if (getType() == FLOAT_TYPE) {
+            return Float.toString(value);
+        }
+        else {
+            assert getType() == INTEGER_TYPE;
+
+            int valueInt = (int)value;
+            return Integer.toString(valueInt);
+        }
+    }
+
+    public int checkType() throws TypeMismatchException {
+	return getType();
     }
 
     /**
-     * A number expression is always a {@link #VALUE_TYPE}. 
+     * Get the type of the expression.
      *
-     * @return	{@link #VALUE_TYPE}
+     * @return one of {@link BOOLEAN_TYPE}, {@link FLOAT_TYPE} or {@link INTEGER_TYPE}.
      */
-    public int checkType() throws TypeMismatchException {
-	return VALUE_TYPE;
+    public int getType() {
+        return type;
     }
+
+    public Object clone() {
+        return new NumberExpression(value, type);
+    }
+
 }

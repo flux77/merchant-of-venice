@@ -50,5 +50,14 @@ abstract public class LogicExpression extends BinaryExpression {
 	else
 	    throw new TypeMismatchException();
     }
+
+    /**
+     * Get the type of the expression.
+     *
+     * @return {@link BOOLEAN_TYPE}.
+     */
+    public int getType() {
+        return BOOLEAN_TYPE;
+    }
 }
 

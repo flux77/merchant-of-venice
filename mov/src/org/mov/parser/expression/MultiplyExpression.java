@@ -31,14 +31,19 @@ public class MultiplyExpression extends ArithmeticExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	return getLeft().evaluate(quoteBundle, symbol, day) *
-	    getRight().evaluate(quoteBundle, symbol, day);
+	return getLeft().evaluate(variables, quoteBundle, symbol, day) *
+	    getRight().evaluate(variables, quoteBundle, symbol, day);
     }
 
     public String toString() {
 	return super.toString("*");
+    }
+
+    public Object clone() {
+        return new MultiplyExpression((Expression)getLeft().clone(), 
+                                      (Expression)getRight().clone());
     }
 }

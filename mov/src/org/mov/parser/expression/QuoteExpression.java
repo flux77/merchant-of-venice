@@ -31,9 +31,6 @@ abstract public class QuoteExpression extends Expression {
     // Quote kind - one of: open, close, low, high
     private int quoteKind;
 
-    // Quote type - one of: PRICE_TYPE or VOLUME_TYPE
-    private int quoteType;
-
     /**
      * Create a new quote expression with the given quote expression.
      * This expression should be either a {@link DayOpenExpression},
@@ -43,10 +40,6 @@ abstract public class QuoteExpression extends Expression {
      * @param	quote	the quote expression
      */
     public QuoteExpression(Expression quote) {
-	// All the quotes are "PRICE_TYPE" except for day volume which is
-	// volume type
-	quoteType = PRICE_TYPE;
-
 	if(quote instanceof DayOpenExpression)
 	    quoteKind = Quote.DAY_OPEN;
 	else if(quote instanceof DayCloseExpression)
@@ -56,8 +49,8 @@ abstract public class QuoteExpression extends Expression {
 	else if(quote instanceof DayHighExpression)
 	    quoteKind = Quote.DAY_HIGH;
 	else {
+            assert quote instanceof DayVolumeExpression;
 	    quoteKind = Quote.DAY_VOLUME;
-	    quoteType = VOLUME_TYPE;
 	}
     }
 
@@ -65,21 +58,11 @@ abstract public class QuoteExpression extends Expression {
      * Get the quote kind. 
      *
      * @return	the quote kind, one of: {@link Quote#DAY_OPEN}, 
-     * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH} or 
-     * {@link Quote#DAY_LOW}
+     * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_LOW}
+     * or {@link Quote#DAY_VOLUME}.
      */
-    protected int getQuoteKind() {
+    public int getQuoteKind() {
 	return quoteKind;
-    }
-
-    /**
-     * Get the quote type.
-     *
-     * @return	the quote type, either {@link #PRICE_TYPE} or
-     * {@link #VOLUME_TYPE}
-     */
-    protected int getQuoteType() {
-	return quoteType;
     }
 
     /**
@@ -91,4 +74,17 @@ abstract public class QuoteExpression extends Expression {
     protected Expression getArg(int arg) {
 	return (Expression)getChildAt(arg);
     }
+
+    /**
+     * Get the type of the expression.
+     *
+     * @return {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
+     */
+    public int getType() {
+        if(getQuoteKind() == Quote.DAY_VOLUME)
+            return INTEGER_TYPE;
+        else
+            return FLOAT_TYPE;
+    }
+
 }

@@ -43,16 +43,16 @@ public class IfExpression extends TernaryExpression {
 	super(arg1, arg2, arg3);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
 	// if(...) then
-	if(getArg(0).evaluate(quoteBundle, symbol, day) 
+	if(getArg(0).evaluate(variables, quoteBundle, symbol, day) 
 	   >= Expression.TRUE_LEVEL)
-	    return getArg(1).evaluate(quoteBundle, symbol, day);
+	    return getArg(1).evaluate(variables, quoteBundle, symbol, day);
 	// else
 	else
-	    return getArg(2).evaluate(quoteBundle, symbol, day);
+	    return getArg(2).evaluate(variables, quoteBundle, symbol, day);
     }
 
     public String toString() {
@@ -82,5 +82,21 @@ public class IfExpression extends TernaryExpression {
 	else
 	    throw new TypeMismatchException();
     }
+
+    /**
+     * Get the type of the expression.
+     *
+     * @return {@link BOOLEAN_TYPE}.
+     */
+    public int getType() {
+        return BOOLEAN_TYPE;
+    }
+
+    public Object clone() {
+        return new IfExpression((Expression)getArg(0).clone(), 
+                                (Expression)getArg(1).clone(),
+                                (Expression)getArg(2).clone());
+    }
+
 }
 

@@ -14,6 +14,12 @@ import java.util.regex.*;
  */
 public class TradingDate implements Cloneable, Comparable {
 
+    /** Date format will be in US format, e.g. mm/dd/yy, mm/dd/yyyy etc. */
+    public final static int US = 0;		
+
+    /** Date format will be in britsh format, e.g. dd/mm/yy, dd/mm/yyyy etc. */
+    public final static int BRITISH = 1;	
+
     private int year;
     private int month;
     private int day;
@@ -51,37 +57,91 @@ public class TradingDate implements Cloneable, Comparable {
      * <table>
      * <tr><td><pre>YYMMDD</pre></td><td>e.g. "010203"</td></tr>
      * <tr><td><pre>YYYYMMDD</pre></td><td>e.g. "20010203"</td></tr>
-     * <tr><td><pre>MM/DD/YY</pre></td><td>e.g. "03/02/01"</td></tr>
+     * <tr><td><pre>DD/MM/YY</pre></td><td>e.g. "3/2/01"</td></tr>
+     * <tr><td><pre>DD/MM/YYYY</pre></td><td>e.g. "3/2/2001"</td></tr>
+     * <tr><td><pre>MM/DD/YY</pre></td><td>e.g. "2/3/01"</td></tr>
+     * <tr><td><pre>MM/DD/YYYY</pre></td><td>e.g. "2/3/2001"</td></tr>
+     * <tr><td><pre>DD-MM-YY</pre></td><td>e.g. "3-2-01"</td></tr>
+     * <tr><td><pre>DD-MM-YYYY</pre></td><td>e.g. "3-2-2001"</td></tr>
+     * <tr><td><pre>MM-DD-YY</pre></td><td>e.g. "2-3-01"</td></tr>
+     * <tr><td><pre>MM-DD-YYYY</pre></td><td>e.g. "2-3-2001"</td></tr>
      * </table>
      *
      * @param	date	the date string to convert from
+     * @param	type	either <code>BRITISH</code> or <code>US</code>
      */
-    public TradingDate(String date) {
+    public TradingDate(String date, int type) {
 
-	// Handle DD/MM/YY
-	if(date.lastIndexOf('/') != -1) {
-		month = Integer.parseInt(date.substring(0, 2));
-		day = Integer.parseInt(date.substring(3, 5));
-		year = Integer.parseInt(date.substring(6, 8));
-		
-		year = Converter.twoToFourDigitYear(year);
-	}
+	try {
+	    // DD/MM/YY, DD/MM/YYYY, DD-MM-YY, DD-MM-YYYY		
+	    if(date.indexOf('/') >= 0 ||
+	       date.indexOf('-') >= 0) {
+		int i = 0;
 
-	// Handle YYMMDD and YYYYMMDD
-	else {
+		// DAY
+		day = 0;
+		day += Integer.parseInt(date.substring(i, ++i));
+		if(date.charAt(i) != '/' &&
+		   date.charAt(i) != '-') {
+		    day *= 10;
+		    day += Integer.parseInt(date.substring(i, ++i));
+		}
 
-	    if(date.length() == 6) {
+		// Skip /, -
+		i++;
+ 
+		// MONTH
+		month = 0;
+		month += Integer.parseInt(date.substring(i, ++i));
+		if(date.charAt(i) != '/' &&
+		   date.charAt(i) != '-') {
+		    month *= 10;
+		    month += Integer.parseInt(date.substring(i, ++i));
+		}
+
+		// Skip /, -
+		i++;
+
+		// YEAR
+		year = 0;
+		year += Integer.parseInt(date.substring(i, ++i));
+		while(i < date.length()) {
+		    year *= 10;
+		    year += Integer.parseInt(date.substring(i, ++i));
+		}
+
+		if(year < 100) {
+		    year = Converter.twoToFourDigitYear(year);
+		}
+
+		// Swap day and month around if expecting US dates
+		if(type == US) {
+		    int temp;
+		    temp = day; day = month; month = temp;
+		}	
+	    }
+    	    
+	    // These formats are not localised...
+
+	    // YYMMDD 
+	    else if(date.length() == 6) {
 		year = Integer.parseInt(date.substring(0, 2));
 		month = Integer.parseInt(date.substring(2, 4));
 		day = Integer.parseInt(date.substring(4, 6));
-
+		
 		year = Converter.twoToFourDigitYear(year);
 	    }
+	    
+	    // YYYYMMDD
 	    else if(date.length() == 8) {
 		year = Integer.parseInt(date.substring(0, 4));
 		month = Integer.parseInt(date.substring(4, 6));
 		day = Integer.parseInt(date.substring(6, 8));
 	    }
+	}
+	catch(NumberFormatException e) {
+	    // If we can't parse, set everything to null
+	    year = month = day = 0;
 	}
     }
 
@@ -290,7 +350,6 @@ public class TradingDate implements Cloneable, Comparable {
      * @return	the text string 
      */
     public String toString(String format) {
-
 	format = replace(format, "d\\?", Integer.toString(getDay())); 
 	format = replace(format, "dd", Converter.toFixedString(getDay(), 2)); 
 	format = replace(format, "m\\?", Integer.toString(getMonth())); 
@@ -300,9 +359,16 @@ public class TradingDate implements Cloneable, Comparable {
 	format = replace(format, "MMM", monthToText(getMonth()));
 	format = replace(format, "yyyy", 
 			 Converter.toFixedString(getYear(), 4));	
-	
-	format = replace(format, "yy", 
-			 Integer.toString(getYear()).substring(2));
+
+	if(getYear() > 99) {
+	    format = replace(format, "yy", 
+			     Integer.toString(getYear()).substring(2));
+	}
+	else {
+	    format = replace(format, "yy", 
+			     Integer.toString(getYear()));
+	}
+
 	return format;
     }
 

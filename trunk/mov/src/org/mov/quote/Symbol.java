@@ -23,6 +23,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.mov.util.Locale;
+
 /**
  * An immutable representation of a stock symbol, e.g. <code>CBA</code> or <code>WBC</code>.
  * Previously the stock symbol was stored as a String but this created the
@@ -65,9 +67,11 @@ public class Symbol implements Cloneable, Comparable {
         throws SymbolFormatException {
 
         if(string.length() > MAXIMUM_SYMBOL_LENGTH)
-            throw new SymbolFormatException("Symbol '" + string + "' is too long.");
+            throw new SymbolFormatException(Locale.getString("SYMBOL_TOO_LONG",
+							     string));
         else if(string.length() < MINIMUM_SYMBOL_LENGTH)
-            throw new SymbolFormatException("Symbol '" + string + "' is too short.");
+            throw new SymbolFormatException(Locale.getString("SYMBOL_TOO_SHORT",
+							     string));
 
         // A symbol can only contain numbers & letters. Yahoo finance adds in
         // full stops and carots. So support them.
@@ -76,8 +80,8 @@ public class Symbol implements Cloneable, Comparable {
 
             if(!Character.isLetter(letter) && !Character.isDigit(letter) &&
                letter != '.' && letter != '^')
-                throw new SymbolFormatException("Symbol '" + string + "' contains non-" +
-                                                "alphabetical characters.");
+                throw new SymbolFormatException(Locale.getString("INVALID_SYMBOL",
+								 string));
         }
 
         symbol = string;
@@ -171,8 +175,7 @@ public class Symbol implements Cloneable, Comparable {
                 Symbol symbol = find(symbols[i]);
                 
                 if(checkExists && !QuoteSourceManager.getSource().symbolExists(symbol))
-                    throw new SymbolFormatException("No quotes available for symbol '" +
-                                                    symbol + "'.");
+                    throw new SymbolFormatException(Locale.getString("NO_QUOTES_AVAILABLE", string));
                 sortedSet.add(symbol);
             }
         }	
@@ -195,9 +198,9 @@ public class Symbol implements Cloneable, Comparable {
         Object[] symbolsArray = symbols.toArray();
 
         if(symbolsArray.length > 1)
-            throw new SymbolFormatException("Expecting only a single symbol.");
+            throw new SymbolFormatException(Locale.getString("EXPECTING_SINGLE_SYMBOL"));
         else if(symbolsArray.length == 0)
-            throw new SymbolFormatException("Missing symbol.");
+            throw new SymbolFormatException(Locale.getString("MISSING_SYMBOL"));
         else
             return (Symbol)symbolsArray[0];
     }

@@ -29,6 +29,7 @@ import javax.swing.event.*;
 import org.mov.chart.*;
 import org.mov.main.*;
 import org.mov.util.*;
+import org.mov.util.Locale;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
@@ -138,109 +139,110 @@ public class MainMenu implements ActionListener, ModuleListener
 	JMenuBar menuBar = new JMenuBar();
 	// File 
 	{	   
-	    JMenu fileMenu = MenuHelper.addMenu(menuBar, "File", 'F');
+	    JMenu fileMenu = MenuHelper.addMenu(menuBar, Locale.getString("FILE"), 'F');
 
 	    // File -> Portfolio
-	    filePortfolioMenu = MenuHelper.addMenu(fileMenu, "Portfolio", 'P');
+	    filePortfolioMenu = MenuHelper.addMenu(fileMenu, Locale.getString("PORTFOLIO"), 'P');
 
 	    fileMenu.addSeparator();
 
 	    // File -> Import
 	    fileImportQuotesMenuItem = MenuHelper.addMenuItem(this, fileMenu, 
-							      "Import Quotes", 
+							      Locale.getString("IMPORT_QUOTES"), 
 							      'I');
 	    // File -> Preferences
 	    filePreferencesMenuItem = MenuHelper.addMenuItem(this, fileMenu, 
-							     "Preferences", 
+							     Locale.getString("PREFERENCES"), 
 							     'R');
 	    fileMenu.addSeparator();
 
 	    // File -> Exit
-	    fileExitMenuItem = MenuHelper.addMenuItem(this, fileMenu, "Exit", 'Q');
+	    fileExitMenuItem = MenuHelper.addMenuItem(this, fileMenu, Locale.getString("EXIT"), 'Q');
 	}
 
 	// Table
 	{
-	    JMenu quoteMenu = MenuHelper.addMenu(menuBar, "Table", 'T');
+	    JMenu quoteMenu = MenuHelper.addMenu(menuBar, Locale.getString("TABLE"), 'T');
 
             // Table -> Watch screens
-            quoteWatchScreenMenu = MenuHelper.addMenu(quoteMenu, "Watch Screen", 'W');
+            quoteWatchScreenMenu = MenuHelper.addMenu(quoteMenu, Locale.getString("WATCH_SCREEN"), 'W');
 
             quoteMenu.addSeparator();
 	    
 	    // Table -> Companies + Funds
 	    JMenu quoteMenuCompany = MenuHelper.addMenu(quoteMenu, 
-							"All Ordinaries",
+							Locale.getString("ALL_ORDINARIES"),
 					     'C');
 
 	    // Table -> Companies + Funds -> List all
 	    quoteCompanyListAllMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuCompany, "List All");
+		MenuHelper.addMenuItem(this, quoteMenuCompany, Locale.getString("LIST_ALL"));
 
 	    // Table -> Companies + Funds -> List by rule
 	    quoteCompanyListRuleMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuCompany, "List by Rule");
+		MenuHelper.addMenuItem(this, quoteMenuCompany, Locale.getString("LIST_BY_RULE"));
 
 	    // Table -> Companies + Funds -> List by date
 	    quoteCompanyListDateMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuCompany, "List by Date");
+		MenuHelper.addMenuItem(this, quoteMenuCompany, Locale.getString("LIST_BY_DATE"));
 	    
 	    // Table -> Indices
 	    JMenu quoteMenuIndices = MenuHelper.addMenu(quoteMenu, 
-							"Market Indices", 'I');
+							Locale.getString("MARKET_INDICES"), 'I');
 
 	    // Table -> Indices -> List All
 	    quoteIndicesListAllMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuIndices, "List All");
+		MenuHelper.addMenuItem(this, quoteMenuIndices, Locale.getString("LIST_ALL"));
 
 	    // Table -> Indices -> List by Rule
 	    quoteIndicesListRuleMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuIndices, "List by Rule");
+		MenuHelper.addMenuItem(this, quoteMenuIndices, Locale.getString("LIST_BY_RULE"));
 
 	    // Table -> Indices -> List by Date
 	    quoteIndicesListDateMenuItem = 
-		MenuHelper.addMenuItem(this, quoteMenuIndices, "List by Date");
+		MenuHelper.addMenuItem(this, quoteMenuIndices, Locale.getString("LIST_BY_DATE"));
 	    
 	    // Table -> All Stocks
 	    JMenu quoteMenuCommodities = MenuHelper.addMenu(quoteMenu, 
-							    "All Stocks",
+							    Locale.getString("ALL_STOCKS"),
 							    'A');
 
 	    // Table -> All Stocks -> List All
 	    quoteCommoditiesListAllMenuItem = 
 		MenuHelper.addMenuItem(this, quoteMenuCommodities, 
-				       "List All", 'L');
+				       Locale.getString("LIST_ALL"), 'L');
 
 	    // Table -> All Stocks -> List by Rule
 	    quoteCommoditiesListRuleMenuItem = 
 		MenuHelper.addMenuItem(this, quoteMenuCommodities, 
-				       "List by Rule",'B');
+				       Locale.getString("LIST_BY_RULE"),'B');
 
 	    // Table -> All Stocks -> List by Date
 	    quoteCommoditiesListDateMenuItem = 
 		MenuHelper.addMenuItem(this, quoteMenuCommodities, 
-				       "List by Date",'D');
+				       Locale.getString("LIST_BY_DATE"),'D');
 
             // Table -> Stocks -> List by Symbols
             JMenu quoteMenuStocks = MenuHelper.addMenu(quoteMenu,
-                                                       "Stocks", 'S');
+                                                       Locale.getString("STOCKS"), 'S');
 
             quoteStocksListSymbolsMenuItem =
-                MenuHelper.addMenuItem(this, quoteMenuStocks, "List by Symbols", 'B');
+                MenuHelper.addMenuItem(this, quoteMenuStocks, 
+				       Locale.getString("LIST_BY_SYMBOLS"), 'B');
 	}
 	
 	// Graph        
 	{
-	    JMenu graphMenu = MenuHelper.addMenu(menuBar, "Graph", 'G');
+	    JMenu graphMenu = MenuHelper.addMenu(menuBar, Locale.getString("GRAPH"), 'G');
 	    
 	    // Graph -> Commodities
 	    JMenu graphCommodityMenu = MenuHelper.addMenu(graphMenu, 
-							  "Stock");
+							  Locale.getString("STOCK"));
 	    
 	    // Graph -> Commodities -> By Codes
 	    graphCommodityCodeMenuItem = 
 		MenuHelper.addMenuItem(this, graphCommodityMenu, 
-				       "Graph by Symbols", 'G');
+				       Locale.getString("GRAPH_BY_SYMBOLS"), 'G');
 	    
 	    // Graph -> Commodities -> By Name
             //	    graphCommodityNameMenuItem = 
@@ -249,53 +251,55 @@ public class MainMenu implements ActionListener, ModuleListener
 
 	    // Graph -> Market Indicator
 	    JMenu graphMarketIndicator = 
-		MenuHelper.addMenu(graphMenu, "Market Indicator");
+		MenuHelper.addMenu(graphMenu, Locale.getString("MARKET_INDICATOR"));
 
 	    // Graph -> Market Indicator -> Advance/Decline
 	    graphMarketAdvanceDeclineMenuItem =
 		MenuHelper.addMenuItem(this, graphMarketIndicator,
-				       "Advance/Decline");
+				       Locale.getString("ADVANCE_DECLINE"));
 
 	    // Graph -> Portfolio
-	    graphPortfolioMenu = MenuHelper.addMenu(graphMenu, "Portfolio");
+	    graphPortfolioMenu = MenuHelper.addMenu(graphMenu, Locale.getString("PORTFOLIO"));
 	}
 
 	// Analysis menu
 	{
 	    JMenu analysisMenu = 
-		MenuHelper.addMenu(menuBar, "Analysis", 'A');
+		MenuHelper.addMenu(menuBar, Locale.getString("ANALYSIS"), 'A');
 
 	    analysisPaperTradeMenuItem = 
 		MenuHelper.addMenuItem(this, analysisMenu,
-				       "Paper Trade");
+				       Locale.getString("PAPER_TRADE"));
 
 	    analysisGPMenuItem = 
 		MenuHelper.addMenuItem(this, analysisMenu,
-				       "Genetic Programming");
+				       Locale.getString("GP"));
 	}
 
 	// Window menu
 	{
-	    windowMenu = MenuHelper.addMenu(menuBar, "Window", 'W');
+	    windowMenu = MenuHelper.addMenu(menuBar, Locale.getString("WINDOW"), 'W');
 	    windowTileHorizontalMenuItem = 
-		MenuHelper.addMenuItem(this, windowMenu, "Tile Horizontally");
+		MenuHelper.addMenuItem(this, windowMenu, Locale.getString("TILE_HORIZONTALLY"));
 	    windowTileHorizontalMenuItem.setEnabled(false);
 	    windowTileVerticalMenuItem = 
-		MenuHelper.addMenuItem(this, windowMenu, "Tile Vertically");
+		MenuHelper.addMenuItem(this, windowMenu, Locale.getString("TILE_VERTICALLY"));
 	    windowTileVerticalMenuItem.setEnabled(false);
 	    windowCascadeMenuItem = 
-		MenuHelper.addMenuItem(this, windowMenu, "Cascade");
+		MenuHelper.addMenuItem(this, windowMenu, Locale.getString("CASCADE"));
 	    windowCascadeMenuItem.setEnabled(false);
 	    windowGridMenuItem = 
-		MenuHelper.addMenuItem(this, windowMenu, "Arrange all");
+		MenuHelper.addMenuItem(this, windowMenu, Locale.getString("ARRANGE_ALL"));
 	    windowGridMenuItem.setEnabled(false);
 	}
 
         // Help menu
         {
-            helpMenu = MenuHelper.addMenu(menuBar, "Help", 'H');
-            helpContentsMenuItem = MenuHelper.addMenuItem(this, helpMenu, "Contents");
-            helpAboutMenuItem = MenuHelper.addMenuItem(this, helpMenu, "About");
+            helpMenu = MenuHelper.addMenu(menuBar, Locale.getString("HELP"), 'H');
+            helpContentsMenuItem = MenuHelper.addMenuItem(this, helpMenu, 
+							  Locale.getString("CONTENTS"));
+            helpAboutMenuItem = MenuHelper.addMenuItem(this, helpMenu, 
+						       Locale.getString("ABOUT"));
         }
 
 	// Build portfolio and watchscreen menus
@@ -538,14 +542,19 @@ public class MainMenu implements ActionListener, ModuleListener
 	// Portfolio menu off of file has the ability to create a new
 	// portfolio
 	filePortfolioNewMenuItem = 
-	    MenuHelper.addMenuItem(this, filePortfolioMenu, "New Portfolio");
+	    MenuHelper.addMenuItem(this, filePortfolioMenu, Locale.getString("NEW_PORTFOLIO"));
 
 	// Build both portfolio menus
 	String[] portfolioNames = PreferencesManager.getPortfolioNames();
 
 	if(portfolioNames.length > 0)
 	    filePortfolioMenu.addSeparator();
-
+	else {
+	    JMenuItem noPortfoliosMenuItem = new JMenuItem(Locale.getString("NO_PORTFOLIOS"));
+	    noPortfoliosMenuItem.setEnabled(false);
+	    graphPortfolioMenu.add(noPortfoliosMenuItem);
+	}
+		
 	portfolioHash = buildMenu(filePortfolioMenu, portfolioNames);
 	portfolioGraphHash = buildMenu(graphPortfolioMenu, portfolioNames);
     }
@@ -559,7 +568,8 @@ public class MainMenu implements ActionListener, ModuleListener
 	quoteWatchScreenMenu.removeAll();
 
 	quoteWatchScreenNewMenuItem = 
-	    MenuHelper.addMenuItem(this, quoteWatchScreenMenu, "New Watch Screen");
+	    MenuHelper.addMenuItem(this, quoteWatchScreenMenu, 
+				   Locale.getString("NEW_WATCH_SCREEN"));
 
 	// Build both portfolio menus
 	String[] watchScreenNames = PreferencesManager.getWatchScreenNames();

@@ -21,6 +21,11 @@ package org.mov.quote;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.net.NoRouteToHostException;
+import java.net.MalformedURLException;
+import java.net.BindException;
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,6 +37,7 @@ import org.mov.util.TradingDate;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
+import org.mov.prefs.PreferencesManager;
 
 /**
  * Provides functionality to obtain stock quotes from the internet. The entire
@@ -55,7 +61,11 @@ public class InternetQuoteSource implements QuoteSource
                                                 "&d=" + END_MONTH + "&e=" + END_DAY +
                                                 "&f=" + END_YEAR + "&g=d&ignore=.csv");
 
-    // A list of the stock exchanges supported
+    /*
+    // Originally I thought you needed to go to each separate country to get
+    // stocks. But it turns out you don't need to because yahoo accepts
+    // prefixes, e.g. .AX for Australia. I've left the original table in because
+    // it may turn out to be useful later.
     private final static String[] sources = 
     {"DAX (Yahoo)", // Frankfurt Stock Exchange
      "http://de.table.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
@@ -84,7 +94,14 @@ public class InternetQuoteSource implements QuoteSource
      "SX (Yahoo)", // Stockholm
      "http://se.table.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
     };
-        
+    */
+  
+    // You can get all the stock quotes from the one URL
+    private final static String[] sources = {
+	"Yahoo",
+	"http://table.finance.yahoo.com/table.csv" + YAHOO_FORMAT,
+    };
+
     private final static int numberExchanges = (sources.length / 2);
 
     // The exchange name and pattern we are using
@@ -281,12 +298,22 @@ public class InternetQuoteSource implements QuoteSource
     // false otherwise.
     private boolean loadSymbol(QuoteCache quoteCache, Symbol symbol, 
                                TradingDate startDate, TradingDate endDate) {
-
         boolean success = true;
         String URLString = constructURL(symbol, startDate, endDate);
+	PreferencesManager.ProxyPreferences proxyPreferences = 
+	    PreferencesManager.loadProxySettings();
 
         try {
-            URL url = new URL(URLString);
+	    URL url;
+
+	    if(proxyPreferences.isEnabled)
+		url = new URL("http", 
+			      proxyPreferences.host, 
+			      Integer.parseInt(proxyPreferences.port),
+			      URLString);
+	    else
+		url = new URL(URLString);
+
             InputStreamReader input = new InputStreamReader(url.openStream());
             BufferedReader bufferedInput = new BufferedReader(input);
             String line;
@@ -301,8 +328,35 @@ public class InternetQuoteSource implements QuoteSource
                 
             bufferedInput.close();
         }
+
+	catch(BindException e) {
+	    DesktopManager.showErrorMessage("Unable to connect: " + e.getMessage() + ".");
+	    success = false;
+	}
+
+	catch(ConnectException e) {
+	    DesktopManager.showErrorMessage("Unable to connect: " + e.getMessage() + ".");
+	    success = false;
+	}
+
+	catch(UnknownHostException e) {
+	    DesktopManager.showErrorMessage("Unknown host: " + e.getMessage() + ".");
+	    success = false;
+	}
+
+	catch(NoRouteToHostException e) {
+	    DesktopManager.showErrorMessage("Destination unreachable: " + e.getMessage() + ".");
+	    success = false;
+	}
+
+	catch(MalformedURLException e) {
+	    DesktopManager.showErrorMessage("Invalid proxy address: " + proxyPreferences.host + 
+					    ":" + proxyPreferences.port + ".");
+	    success = false;
+	}
+
         catch(IOException e) {
-            DesktopManager.showErrorMessage("Error downloading quotes: " + e.getMessage());
+            DesktopManager.showErrorMessage("Error downloading quotes.");
             success = false;
         }
         

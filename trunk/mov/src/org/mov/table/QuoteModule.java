@@ -45,7 +45,9 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 import org.mov.main.*;
-import org.mov.util.*;
+import org.mov.util.ExpressionQuery;
+import org.mov.util.Locale;
+import org.mov.util.TradingDate;
 import org.mov.parser.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
@@ -183,12 +185,12 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
             popupGraphSymbols =
                 MenuHelper.addMenuItem(this, menu,
-                                       "Graph");
+                                       Locale.getString("GRAPH"));
             popupGraphSymbols.setEnabled(getSelectedRowCount() > 0);
 
             popupTableSymbols =
                 MenuHelper.addMenuItem(this, menu,
-                                       "Table");
+                                       Locale.getString("TABLE"));
             popupTableSymbols.setEnabled(getSelectedRowCount() > 0);
 
             menu.show(this, point.x, point.y);
@@ -284,7 +286,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 		showInternalMessageDialog(DesktopManager.getDesktop(),
 					  e.getReason() + ": " +
 					  expression.toString(),
-					  "Error evaluating expression",
+					  Locale.getString("ERROR_EVALUATION_EQUATION"),
 					  JOptionPane.ERROR_MESSAGE);
 	
 	    // delete erroneous expression
@@ -301,7 +303,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
         // Table Menu
         {
-            JMenu tableMenu = MenuHelper.addMenu(menuBar, "Table");
+            JMenu tableMenu = MenuHelper.addMenu(menuBar, Locale.getString("TABLE"));
 
             // Show columns menu
             tableMenu.add(createShowColumnMenu(model));
@@ -310,38 +312,38 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
             applyEquations =
                 MenuHelper.addMenuItem(this, tableMenu,
-                                       "Apply Equations");
+                                       Locale.getString("APPLY_EQUATIONS"));
             
             applyFilter =
                 MenuHelper.addMenuItem(this, tableMenu,
-                                       "Apply Filter");
+                                       Locale.getString("APPLY_FILTER"));
             
             sortByMostActive =
                 MenuHelper.addMenuItem(this, tableMenu,
-                                       "Sort by Most Active");
+                                       Locale.getString("SORT_BY_MOST_ACTIVE"));
             
             tableMenu.addSeparator();
             
             tableClose = MenuHelper.addMenuItem(this, tableMenu,
-                                                "Close");	
+                                                Locale.getString("CLOSE"));	
             
         }
 
         // Symbols Menu
         {
-            JMenu symbolsMenu = MenuHelper.addMenu(menuBar, "Symbols");
+            JMenu symbolsMenu = MenuHelper.addMenu(menuBar, Locale.getString("SYMBOLS"));
             
             findSymbol =
-                MenuHelper.addMenuItem(this, symbolsMenu, "Find");
+                MenuHelper.addMenuItem(this, symbolsMenu, Locale.getString("FIND"));
 
             symbolsMenu.addSeparator();
             
             graphSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
-                                       "Graph");
+                                       Locale.getString("GRAPH"));
             tableSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
-                                       "Table");
+                                       Locale.getString("TABLE"));
         }
 
         // Listen for changes in selection so we can update the menus
@@ -368,8 +370,8 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
 		    String equationString =
 			ExpressionQuery.getExpression(desktop,
-						      "Filter by Rule",
-						      "By Rule",
+						      Locale.getString("FILTER_BY_RULE"),
+						      Locale.getString("BY_RULE"),
 						      filterEquationString);
 
 		    if(equationString != null) {
@@ -401,7 +403,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                     JDesktopPane desktop =
                         org.mov.ui.DesktopManager.getDesktop();
         
-                    Symbol symbol = SymbolListDialog.getSymbol(desktop, "Find Symbol");
+                    Symbol symbol = SymbolListDialog.getSymbol(desktop, Locale.getString("FIND_SYMBOL"));
 
                     if(symbol != null) {
                         List quotes = model.getQuotes();
@@ -421,9 +423,9 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
                         // If we got here the symbol wasn't in the table
                         JOptionPane.showInternalMessageDialog(DesktopManager.getDesktop(),
-                                                              "The symbol '" + symbol + 
-                                                              "' was not found.",
-                                                              "Symbol not found",
+							      Locale.getString("SYMBOL_X_NOT_FOUND",
+									       symbol.toString()),
+                                                              Locale.getString("SYMBOL_NOT_FOUND"),
                                                               JOptionPane.INFORMATION_MESSAGE);
                     }
                 }};
@@ -446,7 +448,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
      */
     public String getTitle() {
         // Title depends on the quote bundle we are listing
-	String title = "Table of " + quoteBundle.getQuoteRange().getDescription();
+	String title = Locale.getString("TABLE_OF", quoteBundle.getQuoteRange().getDescription());
 
         // If there is only one date it makes sense to tell the user it
         if(singleDate)

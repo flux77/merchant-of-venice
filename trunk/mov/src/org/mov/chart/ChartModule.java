@@ -30,7 +30,7 @@ import javax.swing.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.main.*;
-import org.mov.util.*;
+import org.mov.util.Locale;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
@@ -185,17 +185,17 @@ public class ChartModule extends JPanel implements Module,
 	setLayout(new BorderLayout());
 
 	addFunctionToolBar();
-
+	
 	// Add non-company specific menu for graph
-	JMenu menu = new JMenu("Graph");
-	addMenuItem = new JMenuItem("Add");
+	JMenu menu = new JMenu(Locale.getString("GRAPH"));
+	addMenuItem = new JMenuItem(Locale.getString("ADD"));
 	addMenuItem.setAccelerator(KeyStroke.getKeyStroke('A',
 				   java.awt.Event.CTRL_MASK, false));
 	addMenuItem.addActionListener(this);
 	menu.add(addMenuItem);
 	menu.addSeparator();
 
-	closeMenuItem = new JMenuItem("Close");
+	closeMenuItem = new JMenuItem(Locale.getString("CLOSE"));
 	closeMenuItem.setAccelerator(KeyStroke.getKeyStroke('C',
 		  		     java.awt.Event.CTRL_MASK, false));
 	closeMenuItem.addActionListener(this);
@@ -306,7 +306,7 @@ public class ChartModule extends JPanel implements Module,
 
 	while(iterator.hasNext()) {
 	    Symbol symbol = (Symbol)iterator.next();
-	    progress.show("Loading quotes for " + symbol);
+	    progress.show(Locale.getString("LOADING_QUOTES_FOR", symbol.toString()));
 	    
 	    if (!thread.isInterrupted())
 		quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
@@ -607,7 +607,7 @@ public class ChartModule extends JPanel implements Module,
 	    Thread menuAction = new Thread() {
 		    public void run() {
 			SortedSet symbols = 
-			    SymbolListDialog.getSymbols(desktop, "Add Graph");
+			    SymbolListDialog.getSymbols(desktop, Locale.getString("ADD_GRAPH"));
 			// Did the user select anything?
 			if(symbols != null) {
 
@@ -617,9 +617,9 @@ public class ChartModule extends JPanel implements Module,
 
 			    Iterator iterator = symbols.iterator();
 			    while(iterator.hasNext()) {
-				String symbol = (String)iterator.next();
+				Symbol symbol = (Symbol)iterator.next();
 
-				if(!isGraphing(symbol)) 
+				if(!isGraphing(symbol.toString())) 
 				    newSymbols.add(symbol);
 			    }
 

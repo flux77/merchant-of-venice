@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
@@ -154,8 +155,9 @@ public class FileQuoteSource implements QuoteSource
 
 	} catch (IOException e) {
             // This is only a warning message because as long as one file
-            // loaded we can continue.
-	    DesktopManager.showWarningMessage("Can't load " + fileURL.getPath());
+            // loaded we can continue.	    
+	    DesktopManager.showWarningMessage(Locale.getString("ERROR_READING_FROM_FILE",
+							       fileURL.getPath()));
 	}
 
         return quotes;
@@ -169,9 +171,7 @@ public class FileQuoteSource implements QuoteSource
 
             // Still empty after loading all our quote files?
             if(dateToURL == null) {
-                DesktopManager.showErrorMessage("Venice couldn't find any quotes.\n" +
-                                                "You can import quotes using the import\n" +
-                                                "quote tool under the File menu.");
+                DesktopManager.showErrorMessage(Locale.getString("NO_QUOTES_FOUND"));
                 return false;
             }
         }
@@ -197,8 +197,8 @@ public class FileQuoteSource implements QuoteSource
         ProgressDialog p = ProgressDialogManager.getProgressDialog();
         p.setMaster(true);
         p.setMaximum(fileURLs.size());
-        p.setNote("Indexing files");
-        p.show("Indexing files");
+        p.setNote(Locale.getString("INDEXING_FILES"));
+        p.show(Locale.getString("INDEXING_FILES"));
         
         for(Iterator iterator = fileURLs.iterator(); iterator.hasNext();) {
             URL fileURL = (URL)iterator.next();
@@ -220,7 +220,8 @@ public class FileQuoteSource implements QuoteSource
                     if(errorCount++ < MAXIMUM_ERRORS) {
                         // These messages are only warning messages because we
                         // can continue.
-                        String message = "No quotes found in " + fileURL.getPath();
+                        String message = Locale.getString("NO_QUOTES_FOUND_IN_FILE",
+							  fileURL.getPath());
                         DesktopManager.showWarningMessage(message);
                     }
                 }
@@ -229,7 +230,8 @@ public class FileQuoteSource implements QuoteSource
                 if(errorCount++ < MAXIMUM_ERRORS) {
                     // These messages are only warning messages because we
                     // can continue.
-                    String message = "Can't load " + fileURL.getPath();
+                    String message = Locale.getString("ERROR_READING_FROM_FILE",
+						      fileURL.getPath());
                     DesktopManager.showWarningMessage(message);
                 }
             }
@@ -371,7 +373,7 @@ public class FileQuoteSource implements QuoteSource
             // This query might take a while...
             Thread thread = Thread.currentThread();
             ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-            progress.setNote("Loading Quotes...");
+            progress.setNote(Locale.getString("LOADING_QUOTES"));
             progress.setIndeterminate(true);
             
             // Work out date range in quote range

@@ -18,17 +18,29 @@
 
 package org.mov.ui;
 
+import java.awt.Point;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import javax.swing.JComboBox;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+
 import org.mov.main.CommandManager;
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.PreferencesModule;
 import org.mov.prefs.StoredEquation;
-
-import java.awt.Point;
-import java.awt.Component;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import org.mov.util.Locale;
 
 /**
  * Extension of JComboBox used for displaying an editable equation field
@@ -240,7 +252,8 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
                         isDialogUp = true;
 
 			StoredEquation storedEquation = 
-                            ExpressionEditorDialog.showAddDialog(storedEquations, "Add Equation",
+                            ExpressionEditorDialog.showAddDialog(storedEquations, 
+								 Locale.getString("ADD_EQUATION"),
 								 getText());
 
 			if(storedEquation != null) {
@@ -265,9 +278,9 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
 	    if(storedEquation != null) {
 		int option = 
 		    JOptionPane.showInternalConfirmDialog(DesktopManager.getDesktop(),
-							  "Are you sure you wish to delete '" +
-							  getText() + "' equation?",
-							  "Delete Equation",
+							  Locale.getString("SURE_DELETE_EQUATION",
+									   getText()),
+							  Locale.getString("DELETE_EQUATION"),
 							  JOptionPane.YES_NO_OPTION);
 		if(option == JOptionPane.YES_OPTION) {
 		    storedEquations.remove(storedEquation);
@@ -294,7 +307,7 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
 			    if (storedEquation != null) {
 				storedEquation = 
 				    ExpressionEditorDialog.showEditDialog(storedEquations,
-									  "Edit Equation",
+									  Locale.getString("EDIT_EQUATION"),
 									  storedEquation);
 				setEquationText(storedEquation.equation);
 				PreferencesManager.saveStoredEquations(storedEquations);
@@ -306,7 +319,7 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
 			    // equation.
 			    String equationText = getEquationText();
 			    String newEquationText = 
-				ExpressionEditorDialog.showEditDialog("Edit Equation",
+				ExpressionEditorDialog.showEditDialog(Locale.getString("EDIT_EQUATION"),
 								      equationText);
 
 			    setEquationText(newEquationText);
@@ -331,7 +344,7 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
         if(event.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu menu = new JPopupMenu();
             
-            JMenuItem editMenuItem = new JMenuItem("Edit");
+            JMenuItem editMenuItem = new JMenuItem(Locale.getString("EDIT"));
             editMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         showEditDialog();
@@ -341,7 +354,7 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
 
             boolean isStoredEquation = isStoredEquation();
 
-            JMenuItem addMenuItem = new JMenuItem("Add");
+            JMenuItem addMenuItem = new JMenuItem(Locale.getString("ADD"));
             addMenuItem.setEnabled(!isStoredEquation);
             addMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -349,7 +362,7 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
                     }});
             menu.add(addMenuItem);
             
-            JMenuItem deleteMenuItem = new JMenuItem("Delete");
+            JMenuItem deleteMenuItem = new JMenuItem(Locale.getString("DELETE"));
             deleteMenuItem.setEnabled(isStoredEquation);
             deleteMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -359,7 +372,7 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
 
 	    menu.addSeparator();
 	    
-	    JMenuItem manageMenuItem = new JMenuItem("Manage");
+	    JMenuItem manageMenuItem = new JMenuItem(Locale.getString("MANAGE"));
 	    manageMenuItem.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
 			CommandManager commandManager = CommandManager.getInstance();

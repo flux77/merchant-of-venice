@@ -21,6 +21,7 @@ package org.mov.portfolio;
 import java.util.*;
 
 import org.mov.quote.Symbol;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
@@ -34,7 +35,9 @@ import org.mov.util.TradingDate;
  */
 public class Transaction implements Cloneable, Comparable {
 
-    // Transaction types on any account
+    // Transaction types on any account. Do not change the
+    // value mapping! Otherwise the new version won't be 
+    // backwards compatible.
    
     /** Withdrawl cash */
     public static final int WITHDRAWAL = 0;
@@ -272,16 +275,21 @@ public class Transaction implements Cloneable, Comparable {
      * @return	string representation of transaction
      */
     public static String typeToString(int type) {
-	String[] typeNames = {"Withdrawal", "Deposit", "Interest", "Fee",
-			      "Accumulate", "Reduce", "Dividend", 
-			      "Dividend DRP", "Transfer"};
+	String[] typeNames = {Locale.getString("WITHDRAWAL_TRANSACTION"), 
+			      Locale.getString("DEPOSIT_TRANSACTION"), 
+			      Locale.getString("INTEREST_TRANSACTION"), 
+			      Locale.getString("FEE_TRANSACTION"),
+			      Locale.getString("ACCUMULATE_TRANSACTION"), 
+			      Locale.getString("REDUCE_TRANSACTION"),
+			      Locale.getString("DIVIDEND_TRANSACTION"), 
+			      Locale.getString("DIVIDEND_DRP_TRANSACTION"), 
+			      Locale.getString("TRANSFER_TRANSACTION")};
 
-	if(type < typeNames.length) {
+	if(type < typeNames.length)
 	    return typeNames[type];
-	}
 	else {
 	    assert false;
-	    return "Withdrawal";
+	    return Locale.getString("TRANSFER");
 	}
     }
 
@@ -292,24 +300,24 @@ public class Transaction implements Cloneable, Comparable {
      * @return	the transaction type
      */
     public static int stringToType(String type) {
-	if(type.equals("Accumulate"))
+	if(type.equals(Locale.getString("ACCUMULATE_TRANSACTION")))
 	    return Transaction.ACCUMULATE;
-	else if(type.equals("Reduce")) 
+	else if(type.equals(Locale.getString("REDUCE_TRANSACTION"))) 
 	    return Transaction.REDUCE;
-	else if(type.equals("Deposit")) 
+	else if(type.equals(Locale.getString("DEPOSIT_TRANSACTION"))) 
 	    return Transaction.DEPOSIT;
-	else if(type.equals("Fee")) 
+	else if(type.equals(Locale.getString("FEE_TRANSACTION"))) 
 	    return Transaction.FEE;
-	else if(type.equals("Interest")) 
+	else if(type.equals(Locale.getString("INTEREST_TRANSACTION"))) 
 	    return Transaction.INTEREST;
-	else if(type.equals("Withdrawal"))
+	else if(type.equals(Locale.getString("WITHDRAWAL_TRANSACTION")))
 	    return Transaction.WITHDRAWAL;
-	else if(type.equals("Dividend")) 
+	else if(type.equals(Locale.getString("DIVIDEND_TRANSACTION"))) 
 	    return Transaction.DIVIDEND;
-	else if(type.equals("Dividend DRP"))
+	else if(type.equals(Locale.getString("DIVIDEND_DRP_TRANSACTION")))
 	    return Transaction.DIVIDEND_DRP;
 	else {
-	    assert type.equals("Transfer");
+	    assert type.equals(Locale.getString("TRANSFER_TRANSACTION"));
 	    return Transaction.TRANSFER;
 	}
     }

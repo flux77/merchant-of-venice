@@ -502,18 +502,17 @@ public class ImporterModule extends JPanel
 	    QuoteBundle quoteBundle = null;
 	    
 	    if(fromInternet.isSelected())
-		quoteBundle = 
-		    new ScriptQuoteBundle(new QuoteRange(symbols, date));
+		quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbols, date));
 	    else if(isToDatabase || fromDatabase.isSelected())
-		quoteBundle = 
-		    new ScriptQuoteBundle(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
+		quoteBundle = new ScriptQuoteBundle(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
 	    
 	    // file -> file
 	    if(fromFiles.isSelected() && isToFiles) {
-		FileQuoteSource fileQuoteSource =
-		    (FileQuoteSource)source;
-		importFileToFile(fileQuoteSource.
-				 getURLForDate(date).getPath());
+		FileQuoteSource fileQuoteSource = (FileQuoteSource)source;
+
+                // If the quote file is empty then skip it
+                if(fileQuoteSource.getURLForDate(date) != null)
+                    importFileToFile(fileQuoteSource.getURLForDate(date).getPath());
 	    }			
 	    
 	    // anything but file -> file

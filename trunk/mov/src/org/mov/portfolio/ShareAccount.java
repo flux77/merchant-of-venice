@@ -75,15 +75,16 @@ public class ShareAccount implements Account, Cloneable {
 								   shares));
 	}
 	else if(type == Transaction.REDUCE) {
-	    // ignore trying to sell stock we dont own
-	    if(holding != null) {
-		holding.reduce(shares);
 
-		// do we have any left? if not remove stock holding from
-		// holdings
-		if(holding.getShares() <= 0)
-		    stockHoldings.remove((Object)symbol);
-	    }
+	    // We shouldnt be selling stuff we don't own
+	    assert holding != null;
+	    
+	    holding.reduce(shares);
+	    
+	    // do we have any left? if not remove stock holding from
+	    // holdings
+	    if(holding.getShares() <= 0)
+		stockHoldings.remove((Object)symbol);
 	}
     }
 

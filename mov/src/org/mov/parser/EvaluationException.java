@@ -55,6 +55,9 @@ public class EvaluationException extends ExpressionException {
     private static EvaluationException rangeForRSIException =
         new EvaluationException(Locale.getString("RSI_RANGE_ERROR"));
 
+    private static EvaluationException rangeForLagException =
+        new EvaluationException(Locale.getString("LAG_RANGE_ERROR"));
+
     private static EvaluationException squareRootNegativeNumberException =
         new EvaluationException(Locale.getString("SQUARE_ROOT_NEGATIVE_ERROR"));
 
@@ -149,7 +152,7 @@ public class EvaluationException extends ExpressionException {
         return rangeForRSIException;
     }
 
-    /**
+   /**
      * Returns an instance where the caller tried to take the
      * square root of a negative number.
      *
@@ -158,5 +161,4 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException squareRootNegativeNumber() {
         return squareRootNegativeNumberException;
     }
-
 }

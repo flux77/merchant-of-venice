@@ -2,10 +2,11 @@
    Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
 
    This program is free software; you can redistribute it and/or modify
+
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,6 +23,7 @@ import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
 import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
+import org.mov.prefs.PreferencesManager;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
@@ -51,11 +53,21 @@ public class SumExpression extends TernaryExpression {
 	int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
 
-        if(days <= 0)
+        int maximumYears = PreferencesManager.loadMaximumYears();
+       
+        if (days<=0)
             throw EvaluationException.rangeForSum();
 
+        if (days>maximumYears*365)
+            throw EvaluationException.pastDate();
+
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+
+        if ((offset<-maximumYears*365) || (offset>maximumYears*365))
+            throw EvaluationException.pastDate();
+                
 	return sum(quoteBundle, symbol, quoteKind, days, day, offset);
+
     }
 
     public String toString() {
@@ -95,7 +107,8 @@ public class SumExpression extends TernaryExpression {
 	for(int i = offset - days + 1; i <= offset; i++) {
             try {
                 sum += quoteBundle.getQuote(symbol, quote, day, i);
-            }
+               
+           }
             catch(MissingQuoteException e) {
                 // nothing to do
             }
@@ -110,4 +123,3 @@ public class SumExpression extends TernaryExpression {
                                  (Expression)getChild(2).clone());
     }
 }
-

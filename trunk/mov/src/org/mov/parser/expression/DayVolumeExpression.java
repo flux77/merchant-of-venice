@@ -34,7 +34,7 @@ public class DayVolumeExpression extends TerminalExpression {
     }
  
     public String toString() {
-	return "day_volume";
+	return "volume";
     }
 
     public int checkType() throws TypeMismatchException {

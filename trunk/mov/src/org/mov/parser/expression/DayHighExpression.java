@@ -34,7 +34,7 @@ public class DayHighExpression extends TerminalExpression {
     }
  
     public String toString() {
-	return "day_high";
+	return "high";
     }
 
     public int checkType() throws TypeMismatchException {

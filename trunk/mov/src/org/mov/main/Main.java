@@ -22,6 +22,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
+import java.text.*;
+import java.util.*;
 import java.util.prefs.*;
 import javax.swing.*;
 
@@ -35,26 +37,23 @@ import org.mov.ui.*;
  * The top level class which contains the main() function. This class builds 
  * the outer frame and creates the desktop.
  */
-public class Main extends JFrame implements WindowListener {
+public class Main extends JFrame {
     
     private JDesktopPane desktop;
     private org.mov.ui.DesktopManager desktopManager;
 
     private static Main venice;
 
-    // Is skinlf.jar installed?
-    private static boolean skinsAvailable;
-
     // Release date and version information
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.1a";
+    public static String SHORT_VERSION = "0.2a";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION  = "0.1 alpha";
+    public static String LONG_VERSION  = "0.2 alpha";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE  = "13/Apr/2003";
+    public static String RELEASE_DATE  = "14/Apr/2003";
 
     /**
      * Get the main frame for the current application
@@ -92,24 +91,22 @@ public class Main extends JFrame implements WindowListener {
 	MainMenu.getInstance(this, desktopManager, desktop);
 
 	setContentPane(desktop);
-	addWindowListener(this);
+	addWindowListener(new WindowListener() {
+		public void windowActivated(WindowEvent e) {}
+		public void windowClosing(WindowEvent e) {
+		    // User closed window by hitting "X" button
+		    saveSettingsAndExit();
+		}
+		public void windowClosed(WindowEvent e) {
+		    // User closed window by selecting exit from the menu
+		    saveSettingsAndExit();
+		}
+		public void windowDeactivated(WindowEvent e) {}
+		public void windowDeiconified(WindowEvent e) {}
+		public void windowIconified(WindowEvent e) {}
+		public void windowOpened(WindowEvent e) {}
+	    });
     }
-
-    public void windowActivated(WindowEvent e) {}
-    public void windowClosing(WindowEvent e) {
-	// User closed window by hitting "X" button
-	saveSettingsAndExit();
-    }
-
-    public void windowClosed(WindowEvent e) {
-	// User closed window by selecting exit from the menu
-	saveSettingsAndExit();
-
-    }
-    public void windowDeactivated(WindowEvent e) {}
-    public void windowDeiconified(WindowEvent e) {}
-    public void windowIconified(WindowEvent e) {}
-    public void windowOpened(WindowEvent e) {}
 
     // Save settings and exit!
     private void saveSettingsAndExit() {
@@ -133,27 +130,16 @@ public class Main extends JFrame implements WindowListener {
      * command line arguments.
      */
     public static void main(String[] args) {
+	// Set the look and feel to be the default for the current platform
+	try {
+	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	}
+	catch(Exception e) {
+	    // Shouldn't happen, but if it does just keep going
+	}
 	venice = new Main();
 
 	venice.setVisible(true);
-
-	// skinlf.jar may not be available so cope with this error
-	try {
-	    SkinManager.loadSkin();
-	    skinsAvailable = true;
-	}
-	catch(java.lang.NoClassDefFoundError e) {
-	    skinsAvailable = false;
-	}
-    }
-
-    /**
-     * Return whether the skins module is available
-     *
-     * @return	true or false
-     */
-    public static boolean isSkinsAvailable() {
-	return skinsAvailable;
     }
 }
 

@@ -89,12 +89,6 @@ public class PreferencesModule extends JPanel
         pageListModel.addElement((Object)new String("Quote Source"));
 	pages.addElement(new QuoteSourcePage(desktop));
 
-	// Only add the skins page if skinlf.jar is available
-	if(Main.isSkinsAvailable()) {
-	    pageListModel.addElement((Object)new String("Skins"));
-	    pages.addElement(new SkinPage(desktop));
-	}
-
 	final JList pageList = new JList(pageListModel);
 
 	MouseListener mouseListener = new MouseAdapter() {

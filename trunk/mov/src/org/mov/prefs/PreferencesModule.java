@@ -69,11 +69,14 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
     /** Refers to the proxy preferences page */
     public final static int PROXY_PAGE = 3;
 
+    /** Refers to the proxy macros page */
+    public final static int MACROS_PAGE = 4;
+
     /** Refers to the windows' preferences preferences page */
-    public final static int WINDOW_PREFERENCE_PAGE = 4;
+    public final static int WINDOW_PREFERENCE_PAGE = 5;
 
     /** Refers to the language preferences page */
-    public final static int LANGUAGE_PAGE = 5;
+    public final static int LANGUAGE_PAGE = 6;
 
     private Vector pages;
     private DefaultListModel pageListModel;
@@ -116,8 +119,9 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
         
 	addPage(new EquationPage(desktop));
 	addPage(new LanguagePage(desktop));
-        addPage(new ProxyPage(desktop));
+    addPage(new ProxyPage(desktop));
 	addPage(new QuoteSourcePage(desktop));	
+	addPage(new MacrosPage(desktop));
 	addPage(new TuningPage(desktop));
 	addPage(new WindowPreferencePage(desktop, this.cancelButton));
 

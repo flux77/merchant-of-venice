@@ -28,6 +28,7 @@ import javax.swing.UIManager;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
+import org.mov.macro.MacroManager;
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.ProxyPage;
 import org.mov.ui.DesktopManager;
@@ -137,18 +138,19 @@ public class Main extends JFrame {
      */
     public static void main(String[] args) {
 	// Set the look and feel to be the default for the current platform
-	try {
+        try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             //In win2000, below display is better then default
             //MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
             //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-
-	}
-	catch(Exception e) {
-	    // Shouldn't happen, but if it does just keep going
-	}
-	venice = new Main();
-	venice.setVisible(true);
+            
+        }
+        catch(Exception e) {
+            // Shouldn't happen, but if it does just keep going
+        }
+        venice = new Main();
+        venice.setVisible(true);
+        MacroManager.executeStartupMacros();
     }
 }
 

@@ -18,6 +18,8 @@
 
 package org.mov.prefs;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +34,7 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import org.mov.ui.DesktopManager;
 
+import org.mov.macro.StoredMacro;
 import org.mov.portfolio.Account;
 import org.mov.portfolio.CashAccount;
 import org.mov.portfolio.ShareAccount;
@@ -185,10 +188,11 @@ public class PreferencesManager {
     /**
      * Load the last directory used when importing quote files.
      *
+     * @param  the directory type (e.g. macros, importer, etc)
      * @return the directory.
      */
-    public static String loadLastImportDirectory() {
-        Preferences prefs = getUserNode("/importer");
+    public static String loadDirectoryLocation(String dirtype) {
+        Preferences prefs = getUserNode("/"+dirtype);
         String directory = prefs.get("directory", "");
 
         if(directory.length() != 0)
@@ -200,10 +204,11 @@ public class PreferencesManager {
     /**
      * Save the directory used to import quote files.
      *
+     * @param dirtype the directory type (e.g. macros, importer, etc)
      * @param directory the directory.
      */
-    public static void saveLastImportDirectory(String directory) {
-        Preferences prefs = getUserNode("/importer");
+    public static void saveDirectoryLocation(String dirtype, String directory) {
+        Preferences prefs = getUserNode("/"+dirtype);
         prefs.put("directory", directory);
     }
 
@@ -252,6 +257,69 @@ public class PreferencesManager {
 	}
     }
 
+    /**
+     * Load the list of all registered macros.
+     * 
+     * @return the list of registered macros
+     * @see StoredMacro
+     */
+
+    public static List loadStoredMacros() {
+        List stored_macros = new ArrayList();
+        Preferences prefs = getUserNode("/macros/info");
+
+	    String dirname = PreferencesManager.loadDirectoryLocation("macros");
+	    if (dirname == null) return stored_macros;
+	    File directory = new File(dirname);
+	    if (!directory.isDirectory())
+	        return null;
+
+	    String[] list = directory.list(new FilenameFilter() {
+	        public boolean accept(File dir, String filename) {
+	            return (dir.getAbsolutePath().equals(PreferencesManager.loadDirectoryLocation("macros")) &&
+	                    filename.indexOf(".py") == filename.length()-3);
+	        }
+	    });
+	    
+        for(int i = 0; i < list.length; i++) {
+            String name = list[i].substring(0,list[i].length()-3);
+            Preferences macro_node = getUserNode("/macros/info/"+list[i]);
+            stored_macros.add(new StoredMacro(macro_node.get("name", name), 
+                    		  list[i],
+                 			  macro_node.getBoolean("on_startup",false),
+                       		  macro_node.getInt("start_sequence",0),
+                       		  macro_node.getBoolean("in_menu", false)));
+        }
+        return stored_macros;
+    }
+
+    /**
+     * Save the list of all registered macros.
+     *
+     * @param storedEquations the registered macros.
+     * @see StoredMacro
+     */
+    public static void saveStoredMacros(List stored_macros) {
+        try {
+            // Remove old macro definitions
+            Preferences prefs = getUserNode("/macros_info");
+            prefs.removeNode();
+            prefs = getUserNode("/macros_info");
+            
+            for(Iterator iterator = stored_macros.iterator(); iterator.hasNext();) {
+                StoredMacro stored_macro = (StoredMacro)iterator.next();
+                Preferences macro_node = getUserNode("/macros/info/"+stored_macro.getFilename());
+                macro_node.put("name", stored_macro.getName());
+                macro_node.putBoolean("on_startup", stored_macro.isOn_startup());
+                macro_node.putInt("start_sequence", stored_macro.getStart_sequence());
+                macro_node.putBoolean("in_menu", stored_macro.isIn_menu());
+            }
+        }
+        catch(BackingStoreException e) {
+            // ignore
+        }
+    }
+    
     /**
      * Load all saved user input in an Analyser Page.
      *
@@ -770,7 +838,7 @@ public class PreferencesManager {
 	// Replace this check with a dialog saying the 
 	// path hasn't been set. 
 	if (windowPreferencePreferences.path != null &&
-	    windowPreferencePreferences.path != null) {
+	    windowPreferencePreferences.XMLfile != null) {
 	    prefs.put("path", windowPreferencePreferences.path);
 	    prefs.put("file", windowPreferencePreferences.XMLfile);
 	} else {

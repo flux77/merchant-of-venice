@@ -366,7 +366,7 @@ implements Module, ActionListener {
         if(fromFiles.isSelected()) {
             // Get files user wants to import
             JFileChooser chooser;
-            String lastDirectory = PreferencesManager.loadLastImportDirectory();
+            String lastDirectory = PreferencesManager.loadDirectoryLocation("importer");
             
             if(lastDirectory != null)
                 chooser = new JFileChooser(lastDirectory);
@@ -379,7 +379,7 @@ implements Module, ActionListener {
             if(action == JFileChooser.APPROVE_OPTION) {
                 // Remember directory
                 lastDirectory = chooser.getCurrentDirectory().getAbsolutePath();
-                PreferencesManager.saveLastImportDirectory(lastDirectory);
+                PreferencesManager.saveDirectoryLocation("importer",lastDirectory);
                 
                 File files[] = chooser.getSelectedFiles();
                 List fileURLs = toURLList(files);

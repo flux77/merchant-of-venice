@@ -21,6 +21,7 @@ package org.mov.quote;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
 
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
@@ -87,6 +88,21 @@ public class QuoteRange implements Cloneable {
      * @param symbols   list of symbols
      */
     public QuoteRange(List symbols) {
+	this.symbols = new ArrayList(symbols);
+	this.type = GIVEN_SYMBOLS;
+	this.firstDate = null;
+	this.lastDate = null;
+
+	assert symbols.size() > 0;
+    }
+
+    /**
+     * Create a quote range that represents all the given symbols for all the 
+     * dates we have quotes.
+     *
+     * @param symbols   list of symbols
+     */
+    public QuoteRange(SortedSet symbols) {
 	this.symbols = new ArrayList(symbols);
 	this.type = GIVEN_SYMBOLS;
 	this.firstDate = null;

@@ -70,9 +70,7 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
     public static final int PERCENT_COLUMN = 2;
     public static final int NUMBER_COLUMN = 3;
 
-    // use "\u000B" as separator char in the preferences
     private final static String separatorString = GPModuleConstants.separatorString;
-    // use "\u0000" as null string
     private final static String nullString = GPModuleConstants.nullString;
     // empty string
     private final static String emptyString = nullString + separatorString + nullString  + separatorString + nullString;

@@ -26,10 +26,10 @@ public final class GPModuleConstants {
     public final static double PERCENT_DOUBLE = 100.0;
     public final static int PERCENT_INT = 10000;
     
-    // use "\u000B" as separator char in the preferences
-    public final static String separatorString = "\u0001";
-    // use "\u0000" as null string
-    public final static String nullString = "\u0000";
+    // use "@" as separator char in the preferences
+    public final static String separatorString = "@";
+    // use " " as null string
+    public final static String nullString = " ";
     
     // Number of rules (buy rule and sell rule)
     public final static int BUY_RULE = 0;

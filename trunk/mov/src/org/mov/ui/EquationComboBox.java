@@ -18,7 +18,10 @@
 
 package org.mov.ui;
 
-import org.mov.prefs.*;
+import org.mov.main.CommandManager;
+import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.PreferencesModule;
+import org.mov.prefs.StoredEquation;
 
 import java.awt.Point;
 import java.awt.Component;
@@ -38,14 +41,13 @@ import javax.swing.event.*;
  *	panel.add(comboBox);
  * </pre>
  */
-public class EquationComboBox extends JComboBox
-    implements FocusListener, PopupMenuListener {
+public class EquationComboBox extends JComboBox implements PopupMenuListener {
 
-    // Map between equation names and their equations entered in by
-    // the user in the preferences page or elsewhere
-    static HashMap storedEquations;
+    // Array of user's stored equations, entered via the prefs page or elsewhere
+    static List storedEquations;
 
     private boolean isDialogUp = false;
+    private JTextField textField;
 
     /**
      * Create a new equation combo box.
@@ -71,7 +73,6 @@ public class EquationComboBox extends JComboBox
 	// equations are not stored per instance
 	if(storedEquations == null)
 	    updateEquations();
-	updateItems();
 
 	setEquationText(equationText);
 
@@ -83,21 +84,23 @@ public class EquationComboBox extends JComboBox
 	// so we can update them
 	addPopupMenuListener(this);
 
-	// We want to know when the combo box loses focus. We need this
-	// to remember the last few equations that the user typed in.
-	addFocusListener(this);
-
-        // We want to catch right mouse buttons on the text field
+	// Locate the JTextField so we can catch menu events on it and
+	// also so we can read the text directly from it.
         for(int i = 0; i < getComponentCount(); i++) {
             Component component = getComponent(i);
 
             if(component instanceof JTextField)
-                component.addMouseListener(new MouseAdapter() {
-                        public void mouseClicked(MouseEvent event) {
-                            handleMouseClicked(event);
-                        }
-                    });
-        }
+		textField = (JTextField)component;
+	}
+
+        // We want to catch right mouse buttons on the text field
+	textField.addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent event) {
+		    handleMouseClicked(event);
+		}
+	    });
+
+	updateItems();
    }
 
     /**
@@ -109,12 +112,14 @@ public class EquationComboBox extends JComboBox
     public String getEquationText() {
 
 	// Get text displayed in combo box
-	String text = (String)getSelectedItem();
+	String text = getText();
 
 	// Check to see if its a stored equation name - if it is
 	// well return the actual equation - not its name
-	if(storedEquations.containsKey(text))
-	    return (String)storedEquations.get(text);
+	StoredEquation storedEquation = findStoredEquationByName(text);
+
+	if(storedEquation != null)
+	    return storedEquation.equation;
 	else
 	    return text;
     }
@@ -127,7 +132,7 @@ public class EquationComboBox extends JComboBox
      * @return <code>true</code> if it is a stored equation.
      */
     public boolean isStoredEquation() {
-        return storedEquations.containsKey(getSelectedItem());
+	return findStoredEquationByName(getText()) != null;
     }
 
     /**
@@ -138,25 +143,14 @@ public class EquationComboBox extends JComboBox
      * @param	equationText	equation text to display
      */
     public void setEquationText(String equationText) {
-
 	// Check to see if the equation has a name. If it has then
 	// display the name instead of the equation
-	Set entries = storedEquations.entrySet();
-
-	Iterator iterator = entries.iterator();
-	while(iterator.hasNext()) {
-	    Map.Entry mapEntry = (Map.Entry)iterator.next();
-
-	    // Has this equation a name?
-	    if(mapEntry.getValue().equals(equationText)) {
-		setSelectedItem(mapEntry.getKey());
-		return;
-	    }
-	}
-
-	// If we got here the equation has no name so just print the
-	// equation text
-	setSelectedItem(equationText);
+	StoredEquation storedEquation = findStoredEquationByEquation(equationText);
+	
+	if(storedEquation != null)
+	    setSelectedItem(storedEquation.name);
+	else
+	    setSelectedItem(equationText);
     }
 
     /**
@@ -166,19 +160,64 @@ public class EquationComboBox extends JComboBox
      */
     public static void updateEquations() {
 	// Load equations from preferences
-	storedEquations = PreferencesManager.loadEquations();
+	storedEquations = PreferencesManager.loadStoredEquations();
+    }
+
+    // Searches through list of equations for the one with the given name
+    private StoredEquation findStoredEquationByName(String name) {
+	for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
+	    StoredEquation storedEquation = (StoredEquation)iterator.next();
+	    if(storedEquation.name.equals(name))
+		return storedEquation;
+	}
+
+	// If we got here we couldn't find it
+	return null;
+    }
+
+    // Searches through list of equations for the one with the given equation
+    private StoredEquation findStoredEquationByEquation(String equation) {
+	for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
+	    StoredEquation storedEquation = (StoredEquation)iterator.next();
+	    if(storedEquation.equation.equals(equation))
+		return storedEquation;
+	}
+
+	// If we got here we couldn't find it
+	return null;
     }
 
     // Rebuild option items in this combo box
     private void updateItems() {
+	// First construct a new menu that begins with the current equation
+	// shown, then a sorted list of all the stored equations. If the
+	// current equation is a stored equation, make sure we don't show it
+	// twice.
+
+	// Construct menu items
+	List menuItems = new ArrayList();
+
+	String current = getText();
+	menuItems.add(current);
+
+	List stored = new ArrayList();
+	
+	for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
+	    StoredEquation storedEquation = (StoredEquation)iterator.next();
+
+	    if(!storedEquation.name.equals(current))
+		stored.add(storedEquation.name);
+	}
+
+	Collections.sort(stored);
+	menuItems.addAll(stored);
+
+	// Remove previous menu items
 	removeAllItems();
 
-	Set keys = storedEquations.keySet();
-	Iterator iterator = keys.iterator();
-
-	while(iterator.hasNext()) {
+	// Display new menu items
+	for(Iterator iterator = menuItems.iterator(); iterator.hasNext();)
 	    addItem((String)iterator.next());
-	}
     }
 
     public void popupMenuCanceled(PopupMenuEvent e) {
@@ -194,13 +233,51 @@ public class EquationComboBox extends JComboBox
 	updateItems();
     }
 
-    public void focusGained(FocusEvent e) {
-	// nothing to do
-	System.out.println("gained: equation is " + getEquationText());
+    private void showAddDialog() {
+        Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    if(!isDialogUp) {
+                        isDialogUp = true;
+
+			StoredEquation storedEquation = 
+                            ExpressionEditorDialog.showAddDialog(storedEquations, "Add Equation",
+								 getText());
+
+			if(storedEquation != null) {
+			    setEquationText(storedEquation.name);
+			    storedEquations.add(storedEquation);
+			    PreferencesManager.saveStoredEquations(storedEquations);
+			}
+
+                        isDialogUp = false;
+                    }
+                }});
+                                   
+        thread.start();
     }
 
-    public void focusLost(FocusEvent e) {
-	System.out.println("lost: equation is " + getEquationText());
+    private void showDeleteDialog() {
+	if(!isDialogUp) {
+	    isDialogUp = true;
+
+	    StoredEquation storedEquation = findStoredEquationByName(getText());
+
+	    if(storedEquation != null) {
+		int option = 
+		    JOptionPane.showInternalConfirmDialog(DesktopManager.getDesktop(),
+							  "Are you sure you wish to delete '" +
+							  getText() + "' equation?",
+							  "Delete Equation",
+							  JOptionPane.YES_NO_OPTION);
+		if(option == JOptionPane.YES_OPTION) {
+		    storedEquations.remove(storedEquation);
+		    PreferencesManager.saveStoredEquations(storedEquations);
+		    setEquationText("");
+		}       
+	    }		
+
+	    isDialogUp = false;
+	}       
     }
 
     private void showEditDialog() {
@@ -209,19 +286,43 @@ public class EquationComboBox extends JComboBox
                     if(!isDialogUp) {
                         isDialogUp = true;
 
-                        String equationText = getEquationText();
-                        String newEquationText;
+			if(isStoredEquation()) {
+			    // Edit the stored equation - provides an equation
+			    // name field as well as the equation field.
+			    StoredEquation storedEquation = 
+				findStoredEquationByName(getText());
+			    if (storedEquation != null) {
+				storedEquation = 
+				    ExpressionEditorDialog.showEditDialog(storedEquations,
+									  "Edit Equation",
+									  storedEquation);
+				setEquationText(storedEquation.equation);
+				PreferencesManager.saveStoredEquations(storedEquations);
+			    }
+			}
+			else {
+			    // Edit the equation - but do not provide an
+			    // equation name field as this isn't a stored
+			    // equation.
+			    String equationText = getEquationText();
+			    String newEquationText = 
+				ExpressionEditorDialog.showEditDialog("Edit Equation",
+								      equationText);
 
-                        newEquationText = 
-                            ExpressionEditorDialog.showEditDialog("Edit Expression",
-                                                                  equationText);
-
-                        setEquationText(newEquationText);
+			    setEquationText(newEquationText);
+			}
                         isDialogUp = false;
                     }
                 }});
                                    
         thread.start();
+    }
+
+    // When we want to read the text displayed in this widget we read
+    // directly from the textfield. We do this because the getSelectedItem()
+    // function sometimes does not return the currently displayed text.
+    private String getText() {
+	return textField.getText();
     }
 
     private void handleMouseClicked(final MouseEvent event) {
@@ -238,14 +339,13 @@ public class EquationComboBox extends JComboBox
             
             menu.add(editMenuItem);
 
-            /*            
             boolean isStoredEquation = isStoredEquation();
 
             JMenuItem addMenuItem = new JMenuItem("Add");
             addMenuItem.setEnabled(!isStoredEquation);
             addMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        
+			showAddDialog();
                     }});
             menu.add(addMenuItem);
             
@@ -253,10 +353,19 @@ public class EquationComboBox extends JComboBox
             deleteMenuItem.setEnabled(isStoredEquation);
             deleteMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        
+			showDeleteDialog();
                     }});
             menu.add(deleteMenuItem);
-            */              
+
+	    menu.addSeparator();
+	    
+	    JMenuItem manageMenuItem = new JMenuItem("Manage");
+	    manageMenuItem.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+			CommandManager commandManager = CommandManager.getInstance();
+			commandManager.openPreferences(PreferencesModule.EQUATION_PAGE);
+		    }});
+	    menu.add(manageMenuItem);
           
             Point point = event.getPoint();
             menu.show(this, point.x, point.y);

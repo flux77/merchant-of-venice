@@ -26,7 +26,6 @@
 ./org.mov/chart/VerticalAxis.java
 ./org.mov/main/Analyser.java
 ./org.mov/main/AnalyserFrame.java
-./org.mov/main/AnalyserMenu.java
 ./org.mov/main/AnalyserModule.java
 ./org.mov.util/Change.java
 ./org.mov.util/CommodityListQuery.java
@@ -101,4 +100,11 @@
 ./org.mov/quote/DatabaseLookup.java
 ./org.mov/quote/QuoteCache.java
 ./org.mov/quote/QuoteFunctions.java
+./org.mov/quote/QuoteFilter.java
+./org.mov/quote/QuoteFilterList.java
+./org.mov/quote/SanfordQuoteSource.java
+./org.mov/quote/EzyChartQuoteFilter.java
+./org.mov/quote/MetaStockQuoteFilter.java
+./org.mov/quote/MetaStock2QuoteFilter.java
+./org.mov/quote/InsightTraderQuoteFilter.java
 

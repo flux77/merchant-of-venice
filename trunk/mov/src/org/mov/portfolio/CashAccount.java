@@ -28,7 +28,7 @@ import org.mov.quote.QuoteBundle;
  *
  * @author Andrew Leppard
  */
-public class CashAccount implements Account, Cloneable {
+public class CashAccount extends AbstractAccount implements Cloneable {
 
     // Amount of cash available
     private Money capital;
@@ -86,6 +86,23 @@ public class CashAccount implements Account, Cloneable {
 	CashAccount clonedCashAccount = new CashAccount(getName());
 
 	return clonedCashAccount;
+    }
+
+    /**
+     * Compares this cash account to another.
+     *
+     * @param object another cash account
+     * @return <code>true</code> if the cash accounts are equal; <code>false</code> otherwise
+     */
+    public boolean equals(Object object) {
+        if(object instanceof CashAccount) {
+            CashAccount account = (CashAccount)object;
+
+            return(account.getName().equals(getName()) &&
+                   account.getValue().equals(getValue()));
+        }
+        else
+            return false;
     }
 
     public String getName() {

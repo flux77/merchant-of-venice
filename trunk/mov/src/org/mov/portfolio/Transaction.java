@@ -336,6 +336,51 @@ public class Transaction implements Cloneable, Comparable {
 	return(getDate().compareTo(transaction.getDate()));
     }
 
+    /**
+     * Compares this transaction to another.
+     *
+     * @param object another transaction
+     * @return <code>true</code> if the transactions are equal; <code>false</code> otherwise
+     */
+    public boolean equals(Object object) {
+        Transaction transaction = (Transaction)object;
+
+        // Test the fields that are always present
+        if(!transaction.getDate().equals(getDate()) ||
+           transaction.getType() != getType() &&
+           !transaction.getAmount().equals(getAmount()) ||
+           transaction.getShares() != getShares() ||
+           !transaction.getTradeCost().equals(getTradeCost()))
+            return false;
+
+        // The following fields might be null, so check they are either both null or not
+        if((transaction.getSymbol() == null) != (getSymbol() == null) ||
+           (transaction.getCashAccount() == null) != (getCashAccount() == null) ||
+           (transaction.getCashAccount2() == null) != (getCashAccount2() == null) ||
+           (transaction.getShareAccount() == null) != (getShareAccount() == null))
+            return false;
+
+        // Now check if the fields contain the same value
+        if(transaction.getSymbol() != null &&
+           !transaction.getSymbol().equals(getSymbol()))
+            return false;
+
+        if(transaction.getCashAccount() != null &&
+           !transaction.getCashAccount().getName().equals(getCashAccount().getName()))
+            return false;
+
+        if(transaction.getCashAccount2() != null &&
+           !transaction.getCashAccount2().getName().equals(getCashAccount2().getName()))
+            return false;
+
+        if(transaction.getShareAccount() != null &&
+           !transaction.getShareAccount().getName().equals(getShareAccount().getName()))
+            return false;
+
+        // If we got here they are the same
+        return true;
+    }
+
     public Object clone() {
 	Transaction clonedTransaction =
 	    new Transaction(getType(),
@@ -352,14 +397,15 @@ public class Transaction implements Cloneable, Comparable {
     }
 
     /**
-     * Convert this transaction to a CSV string.
+     * Convert this transaction to a tab-separated value string.
      *
-     * @return	CSV representation of transaction
+     * @return	text version
      */
     public String toString() {
 	String cashAccountName = "";
 	String cashAccountName2 = "";
 	String shareAccountName = "";
+        String symbol = "-";
 
 	if(getCashAccount() != null)
 	    cashAccountName = getCashAccount().getName();
@@ -370,17 +416,20 @@ public class Transaction implements Cloneable, Comparable {
 	if(getShareAccount() != null)
 	    shareAccountName = getShareAccount().getName();
 	
+        if(getSymbol() != null)
+            symbol = getSymbol().toString();
+
 	// Write in CSV format
 	// date, type, amount, symbol, shares, tradeCost,
 	// cashAccount, shareAccount
-	return new String(getDate().toString("dd/mm/yyyy") + "," +
-			  Transaction.typeToString(getType()) + "," +
-			  getAmount() + "," +
-			  getSymbol() + "," +
-			  getShares() + "," +
-			  getTradeCost() + "," +
-			  cashAccountName + "," +
-			  cashAccountName2 + "," +
+	return new String(getDate().toString("dd/mm/yyyy") + "\t" +
+			  Transaction.typeToString(getType()) + "\t" +
+			  getAmount() + "\t" +
+			  symbol + "\t" +
+			  getShares() + "\t" +
+			  getTradeCost() + "\t" +
+			  cashAccountName + "\t" +
+			  cashAccountName2 + "\t" +
 			  shareAccountName);
     }
 

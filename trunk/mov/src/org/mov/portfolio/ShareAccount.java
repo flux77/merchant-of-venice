@@ -36,7 +36,7 @@ import org.mov.quote.WeekendDateException;
  *
  * @author Andrew Leppard
  */
-public class ShareAccount implements Account, Cloneable {
+public class ShareAccount extends AbstractAccount implements Cloneable {
 
     // Current stock holdings
     private HashMap stockHoldings = new HashMap();
@@ -62,6 +62,22 @@ public class ShareAccount implements Account, Cloneable {
 	ShareAccount clonedShareAccount = new ShareAccount(getName());
 
 	return clonedShareAccount;
+    }
+
+    /**
+     * Compares this share account to another.
+     *
+     * @param object another share account
+     * @return <code>true</code> if the share accounts are equal; <code>false</code> otherwise
+     */
+    public boolean equals(Object object) {
+        if(object instanceof ShareAccount) {
+            ShareAccount account = (ShareAccount)object;
+            return(account.getName().equals(getName()) &&
+                   account.getStockHoldings().equals(getStockHoldings()));
+        }
+        else
+            return false;
     }
 
     public String getName() {

@@ -110,4 +110,18 @@ public class StockHolding {
     public TradingDate getDate() {
         return date;
     }
+
+    /**
+     * Compares this stock holding to another.
+     *
+     * @param object another stock holding
+     * @return <code>true</code> if the stock holdings are equal; <code>false</code> otherwise
+     */
+    public boolean equals(Object object) {
+        StockHolding holding = (StockHolding)object;
+        return(holding.getSymbol().equals(getSymbol()) &&
+               holding.getShares() == getShares() &&
+               holding.getCost() == getCost() &&
+               holding.getDate().equals(getDate()));
+    }
 }

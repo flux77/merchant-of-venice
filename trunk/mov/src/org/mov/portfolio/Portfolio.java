@@ -21,10 +21,21 @@ package org.mov.portfolio;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteCache;
+import org.mov.quote.Symbol;
+import org.mov.quote.SymbolFormatException;
 import org.mov.quote.WeekendDateException;
-import org.mov.util.TradingDate;
 import org.mov.util.Money;
+import org.mov.util.MoneyFormatException;
+import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -584,6 +595,156 @@ public class Portfolio implements Cloneable {
             assert false;
             return this;
         }
+    }
+
+    /**
+     * Builds the portfolio by adding the list of transactions from the file.
+     * Any referenced accounts not contained in the portfolio will be created.
+     * No existing transactions in the portfolio will be removed.
+     *
+     * @param file the source file
+     * @exception IOException if there was an error
+     */
+    public void read(File file) throws IOException {
+
+        // Read file
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader reader = new BufferedReader(fileReader);		
+            String line = reader.readLine();
+            
+            // ... one line at a time
+            while(line != null) {
+                // Separate around tabs
+                String[] parts = line.split("\t");
+                
+                int i = 0;
+                TradingDate date = new TradingDate(parts[i++],
+                                                   TradingDate.BRITISH);
+                
+                int type = Transaction.stringToType(parts[i++]);
+                Money amount = new Money(parts[i++]);
+                String symbolField = parts[i++];
+                Symbol symbol = symbolField.equals("-")? null : Symbol.find(symbolField);
+                
+                int shares = Integer.valueOf(parts[i++]).intValue();
+                Money tradeCost = new Money(parts[i++]);
+                String cashAccountName = parts[i++];
+                String cashAccountName2 = "";
+                String shareAccountName = "";
+                
+                // When the line ends in ",," the split doesn't take the
+                // last values. So be prepared for a ArrayIndexOutOfBounds
+                // which is OK.
+                try {
+                    cashAccountName2 = parts[i++];
+                    shareAccountName = parts[i++];
+                }
+                catch(ArrayIndexOutOfBoundsException e) {
+                    // OK
+                }
+                
+                // Convert the cash/share accounts to a string - if
+                // we don't have the account in the portfolio, create it
+                CashAccount cashAccount = null;
+                CashAccount cashAccount2 = null;
+                ShareAccount shareAccount = null;
+                
+                if(!cashAccountName.equals("")) {
+                    cashAccount = (CashAccount)findAccountByName(cashAccountName);
+                    
+                    // If its not found then create it
+                    if(cashAccount == null) {
+                        cashAccount = new CashAccount(cashAccountName);
+                        addAccount(cashAccount);
+                    }
+                }
+                
+                
+                if(!cashAccountName2.equals("")) {
+                    cashAccount2 = (CashAccount)findAccountByName(cashAccountName2);
+                    
+                    // If its not found then create it
+                    if(cashAccount2 == null) {
+                        cashAccount2 = new CashAccount(cashAccountName2);
+                        addAccount(cashAccount2);
+                    }
+                }
+                
+                if(!shareAccountName.equals("")) {
+                    shareAccount = (ShareAccount)findAccountByName(shareAccountName);
+                    
+                    // If its not found then create it
+                    if(shareAccount == null) {
+                        shareAccount = new ShareAccount(shareAccountName);
+                        addAccount(shareAccount);
+                    }
+                }
+		
+                Transaction transaction =
+                    new Transaction(type, date, amount, symbol, shares,
+                                    tradeCost, cashAccount, cashAccount2, shareAccount);
+                addTransaction(transaction);
+                
+                line = reader.readLine();
+            }
+
+            reader.close();
+        }
+        catch(MoneyFormatException e) {
+            throw new IOException();
+        }
+        catch(NumberFormatException e) {
+            throw new IOException();
+        }
+        catch(SymbolFormatException e) {
+            throw new IOException();
+        }
+        catch(TradingDateFormatException e) {
+            throw new IOException();
+        }
+    }
+
+    /**
+     * Writes a list of all transactions in the Portfolio to the file.
+     *
+     * @param file the destination file
+     * @exception IOExpection if there was an error
+     */
+    public void write(File file) throws IOException {
+        FileWriter fileWriter = new FileWriter(file);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        PrintWriter printWriter = new PrintWriter(bufferedWriter);
+		
+        // Iterate through transactions printing one each on every line
+        for(Iterator iterator = getTransactions().iterator(); iterator.hasNext();) {
+            Transaction transaction = (Transaction)iterator.next();
+            printWriter.println(transaction);
+        }
+	
+        printWriter.close();
+    }
+
+    /**
+     * Compares this portfolio to another.
+     *
+     * @param object another portfolio
+     * @return <code>true</code> if the portfolios are equal; <code>false</code> otherwise
+     */
+    public boolean equals(Object object) {
+        Portfolio portfolio = (Portfolio)object;
+
+        // The accounts, unlike the transactions, are not stored in any order.
+        // So to do an array comparision we will need to sort them by name.
+        List accounts = getAccounts();
+        Collections.sort(accounts);
+        List portfolioAccounts = portfolio.getAccounts();
+        Collections.sort(portfolioAccounts);
+
+        return(portfolio.getName().equals(getName()) &&
+               portfolioAccounts.equals(accounts) &&
+               portfolio.getTransactions().equals(getTransactions()) &&
+               portfolio.isTransient() == isTransient());
     }
 
     /**

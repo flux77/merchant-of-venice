@@ -35,15 +35,14 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.*;
+
 import org.mov.main.*;
 import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
 import org.mov.prefs.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
@@ -52,6 +51,8 @@ import org.mov.ui.*;
  * Venice module for displaying a portfolio to the user. This module
  * allows a user to view a portfolio and, manage the accounts and transactions
  * in that portfolio.
+ *
+ * @author Andrew Leppard
  */
 public class PortfolioModule extends JPanel implements Module,
 						       ActionListener {
@@ -537,41 +538,34 @@ public class PortfolioModule extends JPanel implements Module,
 
     // Export this portfolio to a CSV file
     private void exportPortfolio() {
+
 	// Select file to export to
 	JFileChooser chooser = new JFileChooser();
 	int action = chooser.showSaveDialog(desktop);
 
 	if(action == JFileChooser.APPROVE_OPTION) {
 	    File file = chooser.getSelectedFile();
-	    String fileName = file.getName();
-		
-	    try {
-		FileWriter fileOut = new FileWriter(file);
-		PrintWriter out = new PrintWriter(new BufferedWriter(fileOut));
-		
-		// Iterate through transactions printing one each on every line
-		List transactions = portfolio.getTransactions();
-		Iterator iterator = transactions.iterator();
 
-		while(iterator.hasNext()) {
-		    Transaction transaction = (Transaction)iterator.next();
+            try {
+                // Write the portfolio to the given file
+                portfolio.write(file);
 
-		    // Save in CVS format
-		    out.println(transaction);
-		}
-		
-		out.close();
-	
-	    }
+                // Let the user know the export has completed
+                JOptionPane.showInternalMessageDialog(desktop, 
+                                                      Locale.getString("EXPORT_COMPLETE"),
+                                                      Locale.getString("EXPORT_COMPLETE_TITLE"),
+                                                      JOptionPane.INFORMATION_MESSAGE);
+            }
 	    catch(java.io.IOException e) {
 		DesktopManager.showErrorMessage(Locale.getString("ERROR_WRITING_TO_FILE",
-								 fileName));
+								 file.getName()));
 	    }
 	}
     }
 
     // Import from a CSV file into this portfolio
     private void importPortfolio() {
+
 	// Select file to import from
 	JFileChooser chooser = new JFileChooser();
 	chooser.setMultiSelectionEnabled(false);
@@ -579,104 +573,20 @@ public class PortfolioModule extends JPanel implements Module,
 
 	if(action == JFileChooser.APPROVE_OPTION) {
 	    File file = chooser.getSelectedFile();
-	    String fileName = file.getName();
 
 	    try {
-		// Read file
-		FileReader fr = new FileReader(file);
-		BufferedReader br = new BufferedReader(fr);		
-		String line = br.readLine();
+                // Read the portfolio from the given file
+                portfolio.read(file);
 
-		// ... one line at a time
-		while(line != null) {
-		    // Uncomma separate
-		    String[] parts = line.split(",");
-
-		    int i = 0;
-		    TradingDate date = new TradingDate(parts[i++],
-						       TradingDate.BRITISH);
-
-		    int type = Transaction.stringToType(parts[i++]);
-		    Money amount = new Money(Float.valueOf(parts[i++]).floatValue());
-		    Symbol symbol = Symbol.find(parts[i++]);
-
-		    int shares = Integer.valueOf(parts[i++]).intValue();
-		    Money tradeCost = new Money(Float.valueOf(parts[i++]).floatValue());
-		    String cashAccountName = parts[i++];
-		    String cashAccountName2 = "";
-		    String shareAccountName = "";
-
-                    // When the line ends in ",," the split doesn't take the
-                    // last values. So be prepared for a ArrayIndexOutOfBounds
-                    // which is OK.
-                    try {
-                        cashAccountName2 = parts[i++];
-                        shareAccountName = parts[i++];
-                    }
-                    catch(ArrayIndexOutOfBoundsException e) {
-                        // OK
-                    }
-
-		    // Convert the cash/share accounts to a string - if
-		    // we don't have the account in the portfolio, create it
-		    CashAccount cashAccount = null;
-		    CashAccount cashAccount2 = null;
-		    ShareAccount shareAccount = null;
-
-		    if(!cashAccountName.equals("")) {
-			cashAccount = (CashAccount)
-			    portfolio.findAccountByName(cashAccountName);
-
-			// If its not found then create it
-			if(cashAccount == null) {
-			    cashAccount = new CashAccount(cashAccountName);
-			    portfolio.addAccount(cashAccount);
-			}
-		    }
-
-
-		    if(!cashAccountName2.equals("")) {
-			cashAccount2 = (CashAccount)
-			    portfolio.findAccountByName(cashAccountName2);
-
-			// If its not found then create it
-			if(cashAccount2 == null) {
-			    cashAccount2 = new CashAccount(cashAccountName2);
-			    portfolio.addAccount(cashAccount2);
-			}
-		    }
-
-		    if(!shareAccountName.equals("")) {
-			shareAccount = (ShareAccount)
-			    portfolio.findAccountByName(shareAccountName);
-
-			// If its not found then create it
-			if(shareAccount == null) {
-			    shareAccount = new ShareAccount(shareAccountName);
-			    portfolio.addAccount(shareAccount);
-			}
-		    }
-		
-		    Transaction transaction =
-			new Transaction(type, date, amount, symbol, shares,
-					tradeCost, cashAccount, cashAccount2, shareAccount);
-		    portfolio.addTransaction(transaction);
-
-		    line = br.readLine();
-		}
+                // Let the user know the import has completed
+                JOptionPane.showInternalMessageDialog(desktop, 
+                                                      Locale.getString("IMPORT_COMPLETE"),
+                                                      Locale.getString("IMPORT_COMPLETE_TITLE"),
+                                                      JOptionPane.INFORMATION_MESSAGE);
 	    }
-	    catch(TradingDateFormatException e) {
+            catch(IOException e) {
 		DesktopManager.showErrorMessage(Locale.getString("ERROR_READING_FROM_FILE",
-								 fileName));
-            }
-
-	    catch(IOException e) {
-		DesktopManager.showErrorMessage(Locale.getString("ERROR_READING_FROM_FILE",
-								 fileName));
-	    }
-            catch(SymbolFormatException e) {
-                DesktopManager.showErrorMessage(Locale.getString("ERROR_PARSING)SYMBOL") + "\n" +
-                                                e.getMessage());
+								 file.getName()));
             }
 	}
 

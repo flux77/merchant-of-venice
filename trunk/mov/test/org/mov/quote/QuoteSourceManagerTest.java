@@ -41,20 +41,18 @@ public class QuoteSourceManagerTest extends TestCase {
     }
 
     public void testSetSource() {
-        FileQuoteSource qs1 = QuoteSourceFactory.createFileQuoteSource();
-        FileQuoteSource qs2 = QuoteSourceFactory.createFileQuoteSource();
+        FileQuoteSource qs1 = QuoteSourceFactory.createSamplesQuoteSource();
+        FileQuoteSource qs2 = QuoteSourceFactory.createSamplesQuoteSource();
         QuoteSourceManager.flush();
         QuoteSourceManager.setSource(qs1);
         assertEquals(QuoteSourceManager.getSource(),qs1);
         QuoteSourceManager.flush();
         QuoteSourceManager.setSource(qs2);
         assertEquals(QuoteSourceManager.getSource(),qs2);
-        QuoteSourceManager.setSource(qs1);
-        assertEquals(QuoteSourceManager.getSource(),qs2);
     }
 
-    public void testCreateFileQuoteSource() {
-        assertTrue(QuoteSourceFactory.createFileQuoteSource() instanceof FileQuoteSource);
+    public void testCreateInternalQuoteSource() {
+        assertTrue(QuoteSourceFactory.createInternalQuoteSource() instanceof DatabaseQuoteSource);
     }
 
     public void testCreateSamplesQuoteSource() {

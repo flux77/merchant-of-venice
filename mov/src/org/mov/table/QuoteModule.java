@@ -124,8 +124,8 @@ public class QuoteModule extends AbstractTable
 	    this.symbols = symbols;
 	    this.equationSlots = equationSlots;
 
-	    // Pull latest date from quoteBundle
-	    date = quoteBundle.getLastDate();
+	    // Pull first date from quoteBundle
+	    date = quoteBundle.getFirstDate();
 	}
 
         public Vector getSymbols() {
@@ -327,7 +327,7 @@ public class QuoteModule extends AbstractTable
     }
 
     private Vector extractSymbolsUsingRule(String filterEquation,
-                                           ScriptQuoteBundle quoteBundle) {
+                                           ScriptQuoteBundle quoteBundle) {      
 
 	Vector symbols = quoteBundle.getSymbols(quoteBundle.getFirstDate());
 
@@ -599,7 +599,7 @@ public class QuoteModule extends AbstractTable
     }
 
     public String getTitle() {
-	return "Quotes for " + quoteBundle.getLastDate().toString("dd/mm/yyyy");
+	return "Quotes for " + quoteBundle.getFirstDate().toString("dd/mm/yyyy");
     }
 
     /**

@@ -63,6 +63,9 @@ public class PreferencesManager {
     // The user root from Venice's point of view
     private static Preferences userRoot = Preferences.userRoot().node(base);
 
+    // Default name of internal database file
+    private static String DEFAULT_INTERNAL_FILE_NAME = "venice_quotes.bin";
+
     // This class cannot be instantiated
     private PreferencesManager() {
 	// nothing to do
@@ -71,11 +74,14 @@ public class PreferencesManager {
     /** Indicates the quote source is using the inbuilt sample quotes. */
     public static int SAMPLES = 0;
 
-    /** Indicates the quote source is accessing quotes in files. */
+    /** @deprecated Indicates the quote source is accessing quotes in files. */
     public static int FILES = 1;
 
     /** Indicates the quote source is accessing quotes in a database */
     public static int DATABASE = 2;
+
+    /** Indicates the quote source is accessing the internal database */
+    public static int INTERNAL = 3;
 
     /** Web proxy preferences fields. */
     public class ProxyPreferences {
@@ -88,11 +94,15 @@ public class PreferencesManager {
 
         /** Whether we are using the web proxy. */
 	public boolean isEnabled;
-	
-    public String user;
-    public String password;
-    public boolean authEnabled;
 
+        /** Is authentication enabled? */
+        public boolean authEnabled;
+	
+        /** Authentication user name. */
+        public String user;
+
+        /** Authentication password. */
+        public String password;
     }
 
     /** Database preferences fields. */
@@ -134,7 +144,6 @@ public class PreferencesManager {
 
     /** Web language preferences fields. */
     public class LanguagePreferences {
-
         /** Language. */
 	public String locale;
     }
@@ -162,7 +171,7 @@ public class PreferencesManager {
     /**
      * Load the last directory used when importing quote files.
      *
-     * @param  the directory type (e.g. macros, importer, etc)
+     * @param  dirtype the directory type (e.g. macros, importer, etc)
      * @return the directory.
      */
     public static String loadDirectoryLocation(String dirtype) {
@@ -270,7 +279,7 @@ public class PreferencesManager {
     /**
      * Save the list of all registered macros.
      *
-     * @param storedEquations the registered macros.
+     * @param stored_macros the registered macros.
      * @see StoredMacro
      */
     public static void saveStoredMacros(List stored_macros) {
@@ -825,28 +834,34 @@ public class PreferencesManager {
 	if(quoteSource.equals("samples"))
 	    return SAMPLES;
 	else if(quoteSource.equals("files"))
-	    return FILES;
-	else 
+            // File quote source is deprecated. Switch to internal quote source.
+	    return INTERNAL;
+	else if(quoteSource.equals("database"))
 	    return DATABASE;
+        else
+            return INTERNAL;
     }
 
     /**
      * Set quote source setting.
      *
-     * @param quoteSource the quote source, one of {@link #DATABASE}, {@link #FILES} or 
+     * @param quoteSource the quote source, one of {@link #DATABASE}, {@link #INTERNAL} or 
      *                    {@link #SAMPLES}.
      */
     public static void setQuoteSource(int quoteSource) {
-	assert(quoteSource == DATABASE || quoteSource == FILES ||
-	       quoteSource == SAMPLES);
+	assert(quoteSource == DATABASE || quoteSource == SAMPLES || quoteSource == INTERNAL);
 
 	Preferences prefs = getUserNode("/quote_source");
+        String source;
+
 	if(quoteSource == SAMPLES)
-	    prefs.put("source", "samples");
-	else if(quoteSource == FILES)
-	    prefs.put("source", "files");
-	else
-	    prefs.put("source", "database");
+	    source = "samples";
+	else if(quoteSource == DATABASE)
+	    source = "database";
+        else
+            source = "internal";
+
+        prefs.put("source", source);
     }
 
     /**
@@ -881,6 +896,40 @@ public class PreferencesManager {
 	prefs.put("dbname", databasePreferences.database);
 	prefs.put("username", databasePreferences.username);
 	prefs.put("password", databasePreferences.password);
+    }
+
+    /**
+     * Load the file name to store the internal database.
+     *
+     * @return internal database file name
+     */
+    public static String loadInternalFileName() {
+        Preferences prefs = getUserNode("/quote_source/internal");
+        String defaultFileName = DEFAULT_INTERNAL_FILE_NAME;
+
+        try {
+            File defaultFile = new File(System.getProperty("user.home"),
+                                            DEFAULT_INTERNAL_FILE_NAME);
+            defaultFileName = defaultFile.getCanonicalPath();
+        }
+        catch(IOException e) {
+            // don't care
+        }
+        catch(SecurityException e) {
+            // don't care
+        }
+
+        return prefs.get("file_name", defaultFileName);
+    }
+
+    /**
+     * Save the file name to store the internal database.
+     *
+     * @param fileName the file name
+     */
+    public static void saveInternalFileName(String fileName) {
+        Preferences prefs = getUserNode("/quote_source/internal");
+        prefs.put("file_name", fileName);
     }
 
     /**

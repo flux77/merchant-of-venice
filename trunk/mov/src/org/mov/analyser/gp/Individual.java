@@ -51,8 +51,11 @@ public class Individual implements Comparable {
     }
 
     public Individual(Mutator mutator) {
-        buyRule = mutator.createRandom(Expression.BOOLEAN_TYPE);
-        sellRule = mutator.createRandom(Expression.BOOLEAN_TYPE);
+        buyRule = mutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE);
+        sellRule = mutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE);
+
+        buyRule = buyRule.simplify();
+        sellRule = sellRule.simplify();
 
         checkType();
     }
@@ -62,7 +65,7 @@ public class Individual implements Comparable {
 
         buyRule = (Expression)father.getBuyRule().clone();
 
-        // Retrieve buy/sell rules from appropriate parent (swapping)
+        // SWAP
         {
             if(breedType == BREED_BY_SWAPPING || 
                breedType == BREED_BY_SWAPPING_AND_RECOMBINING)
@@ -71,7 +74,7 @@ public class Individual implements Comparable {
                 sellRule = (Expression)father.getSellRule().clone();
         }
 
-        // Perform recombining if necessary
+        // RECOMBINE
         {
             // Single
             if(breedType == BREED_BY_RECOMBINING ||
@@ -85,14 +88,18 @@ public class Individual implements Comparable {
             }
         }
 
-        // Perform mutations
+        // MUTATE
         {
             if(breedType == BREED_BY_CLONING) {
                 // If it is a clone, at least one of the rules must mutate otherwise
                 // we've created a duplicate individual which is a waste of processing
                 // power.
-                buyRule = mutator.mutate(buyRule, 100);
-                sellRule = mutator.mutate(sellRule, 100);
+                int randomNumber = random.nextInt(3);
+
+                if(randomNumber == 0 || randomNumber == 2)
+                    buyRule = mutator.mutate(buyRule, 100);
+                if(randomNumber == 1 || randomNumber == 2)
+                    sellRule = mutator.mutate(sellRule, 100);
             }
             else {
                 buyRule = mutator.mutate(buyRule);
@@ -100,7 +107,18 @@ public class Individual implements Comparable {
             }
         }
 
+        sellRule = sellRule.simplify();
+        buyRule = buyRule.simplify();
+
         checkType();        
+    }
+
+    public boolean isValid(int min, int max) {
+        int sellRuleDepth = sellRule.getDepth();
+        int buyRuleDepth = buyRule.getDepth();
+
+        return (sellRuleDepth >= min && sellRuleDepth <= max &&
+                buyRuleDepth >= min && buyRuleDepth <= max);
     }
 
     public float paperTrade(QuoteBundle quoteBundle) 
@@ -132,8 +150,17 @@ public class Individual implements Comparable {
             return 0;
     }
 
-    public int getMaxDepth() {
-        return Math.max(sellRule.getDepth(), buyRule.getDepth());
+    public boolean equals(Object object) {
+        Individual other = (Individual)object;
+
+        return getValue() == other.getValue();
+    }
+
+    public int hashCode() {
+        // If you implement equals you should implement hashCode().
+        // Since I don't need it I haven't bothered to implement a very
+        // good hash.
+        return getBuyRule().hashCode() + getSellRule().hashCode();
     }
 
     private int getRandomBreedType(Random random) {

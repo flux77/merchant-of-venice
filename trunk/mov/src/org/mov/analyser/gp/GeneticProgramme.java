@@ -30,7 +30,8 @@ import org.mov.quote.QuoteBundle;
 
 public class GeneticProgramme {
 
-    private final int MAX_DEPTH = 10;
+    private final int MIN_DEPTH = 3;
+    private final int MAX_DEPTH = 15;
 
     private int breedingPopulationSize;
     private SortedSet breedingPopulation;
@@ -56,7 +57,7 @@ public class GeneticProgramme {
     public boolean nextIndividual() {
         Individual individual = createIndividual();
 
-        if(individual.getMaxDepth() <= MAX_DEPTH) {
+        if(individual.isValid(MIN_DEPTH, MAX_DEPTH)) {
             try {
                 float newIndividualValue = individual.paperTrade(quoteBundle);
                 

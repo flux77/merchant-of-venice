@@ -165,6 +165,9 @@ public class ChartModule extends JPanel implements Module,
     // ToolBar Images - these are from jlfgr-1.0.jar
     private String defaultZoomImage = "toolbarButtonGraphics/general/Zoom24.gif";
     private String zoomInImage = "toolbarButtonGraphics/general/ZoomIn24.gif";
+    
+    //Index chart indicator - Index charts have aggregate graph sources
+    private boolean indexChart = false;
 
     /**
      * Create a new Chart.
@@ -174,6 +177,7 @@ public class ChartModule extends JPanel implements Module,
     public ChartModule(JDesktopPane desktop) {
 
 	this.desktop = desktop;
+	indexChart = false;
 
 	propertySupport = new PropertyChangeSupport(this);
 
@@ -206,6 +210,49 @@ public class ChartModule extends JPanel implements Module,
 	
 	add(scrollPane, BorderLayout.CENTER);
     }
+
+    /**
+     * Create a new Chart.
+     *
+     * @param	desktop	the parent desktop.
+     */
+    public ChartModule(JDesktopPane desktop, boolean indexChart) {
+
+	this.desktop = desktop;
+	this.indexChart = indexChart;
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	chart = new Chart();
+	chart.addMouseListener(this);
+	chart.addMouseMotionListener(this);
+
+	setLayout(new BorderLayout());
+
+	addFunctionToolBar();
+	
+	// Add non-company specific menu for graph
+	JMenu menu = new JMenu(Locale.getString("GRAPH"));
+	addMenuItem = new JMenuItem(Locale.getString("ADD"));
+	addMenuItem.setAccelerator(KeyStroke.getKeyStroke('A',
+				   java.awt.Event.CTRL_MASK, false));
+	addMenuItem.addActionListener(this);
+	menu.add(addMenuItem);
+	menu.addSeparator();
+
+	closeMenuItem = new JMenuItem(Locale.getString("CLOSE"));
+	closeMenuItem.setAccelerator(KeyStroke.getKeyStroke('C',
+		  		     java.awt.Event.CTRL_MASK, false));
+	closeMenuItem.addActionListener(this);
+	menu.add(closeMenuItem);
+
+	menuBar.add(menu);
+
+	scrollPane = new JScrollPane(chart);
+	
+	add(scrollPane, BorderLayout.CENTER);
+    }   
+
 
     // Adds the toolbar that gives the user the options to zoom in and out
     // of the chart
@@ -288,7 +335,7 @@ public class ChartModule extends JPanel implements Module,
 	chart.add(graph, level);
 
 	// Add menu for this quote
-	QuoteChartMenu menu = new QuoteChartMenu(this, quoteBundle, symbol, graph);
+	QuoteChartMenu menu = new QuoteChartMenu(this, quoteBundle, symbol, graph,indexChart);
 
 	addMenu(menu);
     }

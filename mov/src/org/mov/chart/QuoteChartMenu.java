@@ -35,6 +35,7 @@ import java.io.File;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.GraphSource;
 import org.mov.chart.source.OHLCVQuoteGraphSource;
+import org.mov.chart.source.OHLCVIndexQuoteGraphSource;
 import org.mov.ui.DesktopManager;
 import org.mov.util.Locale;
 import org.mov.quote.Quote;
@@ -85,6 +86,13 @@ public class QuoteChartMenu extends JMenu {
     private GraphSource dayCloseGraphSource = null;
     private GraphSource dayVolumeGraphSource = null;
 
+    /*
+      Is the data constitute and index?
+      Indices data is many symbols data averaged and thus has have their 
+      own source.      
+    */
+    private boolean indexChart = false;
+
     /**
      * Create a new menu allowing the user to graph related graphs
      * for the given graph. The symbol we are associated with will be
@@ -96,7 +104,7 @@ public class QuoteChartMenu extends JMenu {
      * @param	graph		the graph we are associated with
      */
     public QuoteChartMenu(final ChartModule listener, QuoteBundle quoteBundle,
-			  Symbol symbol, Graph graph) {
+			  Symbol symbol, Graph graph, boolean indexChart) {
 	super(graph.getSourceName());
 	menuName = graph.getSourceName();
 
@@ -104,6 +112,7 @@ public class QuoteChartMenu extends JMenu {
         this.symbol = symbol;
 	this.listener = listener;
         this.currentViewGraph = graph;
+	this.indexChart = indexChart;
 
         buildMenu();
     }
@@ -310,7 +319,11 @@ public class QuoteChartMenu extends JMenu {
      */
     private GraphSource getDayOpen() {
         if(dayOpenGraphSource == null)
-            dayOpenGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
+	    if (indexChart) {
+		dayOpenGraphSource = new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
+	    } else {
+		dayOpenGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
+	    }
         return dayOpenGraphSource;
     }
 
@@ -321,7 +334,12 @@ public class QuoteChartMenu extends JMenu {
      */
     private GraphSource getDayHigh() {
         if(dayHighGraphSource == null)
-            dayHighGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_HIGH);
+	    if (indexChart) {
+		dayHighGraphSource = new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_HIGH); 
+	    } else {		
+		dayHighGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_HIGH); 
+	    }
+	
         return dayHighGraphSource;
     }
 
@@ -332,7 +350,11 @@ public class QuoteChartMenu extends JMenu {
      */
     private GraphSource getDayLow() {
         if(dayLowGraphSource == null)
-            dayLowGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_LOW);
+	    if (indexChart) {
+		dayLowGraphSource = new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_LOW); 
+	    } else {	    
+		dayLowGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_LOW); 
+	    }
         return dayLowGraphSource;
     }
 
@@ -343,7 +365,11 @@ public class QuoteChartMenu extends JMenu {
      */
     private GraphSource getDayClose() {
         if(dayCloseGraphSource == null)
-            dayCloseGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+	    if (indexChart) {
+		dayCloseGraphSource = new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+	    } else {
+		dayCloseGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+	    }
         return dayCloseGraphSource;
     }
 
@@ -353,8 +379,11 @@ public class QuoteChartMenu extends JMenu {
      * @return graph souce
      */
     private GraphSource getDayVolume() {
-        if(dayVolumeGraphSource == null)
+        if(dayVolumeGraphSource == null) {
+	    dayVolumeGraphSource = new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
+	} else {
             dayVolumeGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
+	}
         return dayVolumeGraphSource;
     }
 
@@ -465,7 +494,7 @@ public class QuoteChartMenu extends JMenu {
         else if(text == Locale.getString("OBV"))
             graph = new OBVGraph(getDayOpen(), getDayClose(), getDayVolume());
 
-        else if(text == Locale.getString("POINT_AND_FIGURE"))
+        else if(text == Locale.getString("POINT_AND_FIGURE")) 
             graph = new PointAndFigureGraph(getDayClose());
 
 	else if (text == Locale.getString("SUPPORT_AND_RESISTENCE"))

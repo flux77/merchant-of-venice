@@ -778,7 +778,7 @@ public class CommandManager {
                             }
                         }
                     }
-
+		    
                     graphIndex(symbolsCopy);
                 }
             });
@@ -850,7 +850,7 @@ public class CommandManager {
     private void graphIndex(SortedSet symbols) {
 
         if(symbols != null) {
-            ChartModule chart = new ChartModule(desktop);
+            ChartModule chart = new ChartModule(desktop,true);
             Thread thread = Thread.currentThread();
             ProgressDialog progress = ProgressDialogManager.getProgressDialog();
             Iterator iterator = symbols.iterator();
@@ -877,9 +877,15 @@ public class CommandManager {
 
 	    dayClose =
 		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
-	    graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
-            // PUT ME BACK IN!!!!
-            //	    chart.add(graph, symbol, quoteBundle, 0);
+
+	    graph = new LineGraph(dayClose, Locale.getString("GRAPH_INDEX"), true);
+	    
+	    /* Has data is aggregate of all symbols, the actual
+	       symbol used to mark the chart is irrelevant. 
+	    */
+	    Symbol symbol = (Symbol)iterator.next();
+	    chart.add(graph, symbol, quoteBundle, 0);
+	    
 	    chart.redraw();
 	
 	    if(symbols.size() > 1)

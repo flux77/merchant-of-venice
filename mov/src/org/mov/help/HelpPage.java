@@ -122,12 +122,13 @@ public class HelpPage extends DefaultMutableTreeNode {
 
         if(!isLoaded) {
             String fileName = BASE_PATH.concat(link);            
+            URL fileURL = ClassLoader.getSystemResource(fileName);
             StringBuffer stringBuffer = new StringBuffer();
 
             // Read file
             try {
-                FileReader fr = new FileReader(fileName);
-                BufferedReader br = new BufferedReader(fr);		
+                InputStreamReader isr = new InputStreamReader(fileURL.openStream());
+                BufferedReader br = new BufferedReader(isr);		
                 
                 // ... one line at a time
                 String line = br.readLine();
@@ -138,7 +139,6 @@ public class HelpPage extends DefaultMutableTreeNode {
                 }
                 
                 br.close();
-                fr.close();
             }
             catch(java.io.IOException e) {
                 text = "<html><h2>Sorry, help page is missing!</h2></html>";
@@ -205,14 +205,11 @@ public class HelpPage extends DefaultMutableTreeNode {
             URL fileURL = ClassLoader.getSystemResource(INDEX_DOCUMENT);
 
             if(fileURL != null) {
-                File file = new File(fileURL.getFile());
-
                 DocumentBuilderFactory documentBuilderFactory = 
                     DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = 
                     documentBuilderFactory.newDocumentBuilder();
-            
-                document = documentBuilder.parse(file);
+                document = documentBuilder.parse(fileURL.openStream());
             }
         }
         

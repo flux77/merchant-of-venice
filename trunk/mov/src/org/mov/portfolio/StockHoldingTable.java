@@ -18,23 +18,27 @@
 
 package org.mov.portfolio;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.text.*;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
-import org.mov.ui.*;
+import org.mov.ui.AbstractTable;
+import org.mov.ui.QuoteModel;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
-import org.mov.main.*;
-import org.mov.table.*;
-import org.mov.quote.*;
+import org.mov.main.CommandManager;
+import org.mov.quote.Quote;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.Symbol;
 
 /**
  * Display stock holdings in a swing table for a ShareAccount. This table
@@ -44,26 +48,19 @@ import org.mov.quote.*;
  * @see ShareAccount
  */
 public class StockHoldingTable extends AbstractTable {
-    private static final int SYMBOL_COLUMN = 0;
-    private static final int SHARES_COLUMN = 1;
-    private static final int AVERAGE_COST_COLUMN = 2;
-    private static final int DAY_CLOSE_COLUMN = 3;
-    private static final int MARKET_VALUE_COLUMN = 4;
-    private static final int POINT_CHANGE_COLUMN = 5;
-    private static final int PERCENT_CHANGE_COLUMN = 6;
-    private static final int PERCENT_RETURN_COLUMN = 7;
 
     private JMenu showColumnsMenu;
+    private Model model;
     
     class Model extends AbstractTableModel {
 	private QuoteBundle quoteBundle;
 	private HashMap stockHoldings;
 	private Object[] symbols;
 	private TradingDate date;
-        private List columns;
 
 	public Model(List columns, HashMap stockHoldings, QuoteBundle quoteBundle) {
-            this.columns = columns;
+            super(columns);
+
 	    this.stockHoldings = stockHoldings;
 	    this.quoteBundle = quoteBundle;
 
@@ -79,20 +76,6 @@ public class StockHoldingTable extends AbstractTable {
 	    return symbols.length;
 	}
 
-	public int getColumnCount() {
-	    return columns.size();
-	}
-	
-	public String getColumnName(int c) {
-            Column column = (Column)columns.get(c);
-            return column.shortName;
-	}
-
-	public Class getColumnClass(int c) {
-            Column column = (Column)columns.get(c);
-            return column.type;
-	}
-	
 	public Object getValueAt(int row, int column) {
 	    if(row >= getRowCount())
 		return "";
@@ -213,23 +196,24 @@ public class StockHoldingTable extends AbstractTable {
     public StockHoldingTable(HashMap stockHoldings, QuoteBundle quoteBundle) {
         List columns = new ArrayList();
         columns.add(new Column(SYMBOL_COLUMN, "Symbol", "Symbol",
-                               Symbol.class, true));
+                               Symbol.class, Column.VISIBLE));
         columns.add(new Column(SHARES_COLUMN, "Shares", "Shares",
-                               Integer.class, true));
+                               Integer.class, Column.VISIBLE));
         columns.add(new Column(AVERAGE_COST_COLUMN, "Average Cost per Share", "Avg Cost",
-                               QuoteFormat.class, false));
+                               QuoteFormat.class, Column.HIDDEN));
         columns.add(new Column(DAY_CLOSE_COLUMN, "Day Close", "Day Close",
-                               QuoteFormat.class, true));
+                               QuoteFormat.class, Column.VISIBLE));
         columns.add(new Column(MARKET_VALUE_COLUMN, "Market Value", "Mkt Value",
-                               Money.class, true));
+                               Money.class, Column.VISIBLE));
         columns.add(new Column(POINT_CHANGE_COLUMN, "Point Change", "+/-",
-                               PointChangeFormat.class, false));
+                               PointChangeFormat.class, Column.HIDDEN));
         columns.add(new Column(PERCENT_CHANGE_COLUMN, "Percent Change", "Change",
-                               ChangeFormat.class, true));
+                               ChangeFormat.class, Column.VISIBLE));
         columns.add(new Column(PERCENT_RETURN_COLUMN, "Percent Return", "Return",
-                               ChangeFormat.class, false));
+                               ChangeFormat.class, Column.HIDDEN));
 
-	setModel(new Model(columns, stockHoldings, quoteBundle));
+        model = new Model(columns, stockHoldings, quoteBundle);
+	setModel(model);
 
 	// If the user double clicks on a row then graph the stock
 	addMouseListener(new MouseAdapter() {
@@ -238,8 +222,8 @@ public class StockHoldingTable extends AbstractTable {
                 }
             });
 
-        showColumns(columns);
-        showColumnsMenu = createShowColumnMenu(columns);
+        showColumns(model);
+        showColumnsMenu = createShowColumnMenu(model);
     }
 
     // If the user double clicks on a stock with the LMB, graph the stock.

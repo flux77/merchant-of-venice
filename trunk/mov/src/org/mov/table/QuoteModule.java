@@ -52,35 +52,8 @@ import org.mov.ui.*;
 
 public class QuoteModule extends AbstractTable implements Module, ActionListener {
 
-    private static final int EQUATION_SLOTS = 5;
-
-    /* Column order */
-    private static final int SYMBOL_COLUMN         = 0;
-    private static final int DATE_COLUMN           = 1;
-    private static final int VOLUME_COLUMN         = 2;
-    private static final int DAY_LOW_COLUMN        = 3;
-    private static final int DAY_HIGH_COLUMN       = 4;
-    private static final int DAY_OPEN_COLUMN       = 5;
-    private static final int DAY_CLOSE_COLUMN      = 6;
-    private static final int POINT_CHANGE_COLUMN   = 7;
-    private static final int PERCENT_CHANGE_COLUMN = 8;
-    private static final int ACTIVITY_COLUMN       = 9;
-    private static final int EQUATION_COLUMN       = 10;
-
-    private JMenuBar menuBar;
-    private JCheckBoxMenuItem showSymbolColumn;
-    private JCheckBoxMenuItem showDateColumn;
-    private JCheckBoxMenuItem showVolumeColumn;
-    private JCheckBoxMenuItem showDayLowColumn;
-    private JCheckBoxMenuItem showDayHighColumn;
-    private JCheckBoxMenuItem showDayOpenColumn;
-    private JCheckBoxMenuItem showDayCloseColumn;
-    private JCheckBoxMenuItem showPointChangeColumn;
-    private JCheckBoxMenuItem showPercentChangeColumn;
-    private JCheckBoxMenuItem[] showEquationColumns =
-	new JCheckBoxMenuItem[EQUATION_SLOTS];
-
     // Main menu items
+    private JMenuBar menuBar;
     private JMenuItem findSymbol;
     private JMenuItem graphSymbols;
     private JMenuItem tableSymbols;
@@ -96,7 +69,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     private PropertyChangeSupport propertySupport;
     private ScriptQuoteBundle quoteBundle;
 
-    private Model model;
+    private QuoteModel model;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
@@ -112,171 +85,6 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     //    DragSource dragSource;
     //DragGestureListener dragGestureListener;
     //DragSourceListener dragSourceListener;
-
-    public class EquationSlot {
-	String columnName;
-	String equation;
-        Expression expression;
-        List results;
-
-	public Object clone() {
-	    EquationSlot clone = new EquationSlot();
-	    clone.columnName = new String(columnName);
-	    clone.equation = new String(equation);
-
-	    return clone;
-	}
-    }
-
-    private EquationSlot[] equationSlots;
-
-    private class Model extends AbstractTableModel {
-	private String[] headers = {
-	    "Symbol", "Date", "Volume", "Day Low", "Day High", "Day Open",
-	    "Day Close", "+/-", "Change", "Activity"};
-
-	private Class[] columnClasses = {
-	    Symbol.class, TradingDate.class, Integer.class, QuoteFormat.class, QuoteFormat.class,
-	    QuoteFormat.class, QuoteFormat.class, PointChangeFormat.class,
-            ChangeFormat.class, Double.class};
-
-	private ScriptQuoteBundle quoteBundle;
-	private List quotes;
-	private EquationSlot[] equationSlots;
-
-	public Model(ScriptQuoteBundle quoteBundle, List quotes, EquationSlot[] equationSlots) {
-            this.quoteBundle = quoteBundle;
-	    this.quotes = quotes;
-	    this.equationSlots = equationSlots;
-	}
-
-        public List getQuotes() {
-            return quotes;
-        }
-
-	public void setQuotes(List quotes) {
-	    this.quotes = quotes;
-	}
-
-	public void setEquationColumns(EquationSlot[] equationSlots) {
-	    this.equationSlots = equationSlots;
-	}
-	
-	public int getRowCount() {
-	    return quotes.size();
-	}
-
-	public int getColumnCount() {
-	    return headers.length + EQUATION_SLOTS;
-	}
-	
-	public String getColumnName(int c) {
-	    if(c < headers.length)
-		return headers[c];
-	    else
-		return equationSlots[c - headers.length].columnName;
-	}
-
-	public Class getColumnClass(int c) {
-	    if(c < headers.length)
-		return columnClasses[c];
-	    else
-		return String.class;
-	}
-	
-	public Object getValueAt(int row, int column) {
-
-	    if(row >= getRowCount())
-		return "";
-
-            Quote quote = (Quote)quotes.get(row);
-
-            switch(column) {
-            case(SYMBOL_COLUMN):
-                return quote.getSymbol();
-
-            case(DATE_COLUMN):
-                return quote.getDate();
-		
-            case(VOLUME_COLUMN):
-                return new Integer(quote.getDayVolume());
-		
-            case(DAY_LOW_COLUMN):
-                return new QuoteFormat(quote.getDayLow());
-		
-            case(DAY_HIGH_COLUMN):
-                return new QuoteFormat(quote.getDayHigh());
-		
-            case(DAY_OPEN_COLUMN):
-                return new QuoteFormat(quote.getDayOpen());
-		
-            case(DAY_CLOSE_COLUMN):
-                return new QuoteFormat(quote.getDayClose());
-		
-            case(POINT_CHANGE_COLUMN):
-                // Change is calculated by the percent gain between
-                // yesterday's day close and today's day close. If we don't
-                // have yesterday's day close available, we just use today's
-                // day open.
-                double finalQuote = quote.getDayClose();
-                double initialQuote = quote.getDayOpen();
-
-                try {
-                    initialQuote = 
-                        quoteBundle.getQuote(quote.getSymbol(),
-                                             Quote.DAY_CLOSE, 
-                                             quote.getDate().previous(1));
-                }
-                catch(MissingQuoteException e) {
-                    // No big deal - we default to day open
-                }
-
-                return new PointChangeFormat(initialQuote, finalQuote);
-
-            case(PERCENT_CHANGE_COLUMN):
-                finalQuote = quote.getDayClose();
-                initialQuote = quote.getDayOpen();
-
-                try {
-                    initialQuote = 
-                        quoteBundle.getQuote(quote.getSymbol(),
-                                             Quote.DAY_CLOSE, 
-                                             quote.getDate().previous(1));
-                }
-                catch(MissingQuoteException e) {
-                    // No big deal - we default to day open
-                }
-
-                return new ChangeFormat(initialQuote, finalQuote);
-                
-            case(ACTIVITY_COLUMN):
-                // This column is never visible but is used to determine
-                // the most active stocks - I don't actually know how to
-                // calculate "the most active stocks" or whether we even
-                // have enough data to do it. But this seems to be roughly
-                // right.
-                return new Double(quote.getDayHigh() * quote.getDayVolume());
-            }
-            
-            if(column >= EQUATION_COLUMN) {
-                int equationColumn = column - EQUATION_COLUMN;
-                List results = equationSlots[equationColumn].results;
-                
-                // If the list doesn't exist then we haven't created any
-                // equations. If it is empty, we haven't created an
-                // equation in that column.
-                if(results != null && results.size() > row)
-                    return (Double)results.get(row);
-
-                // No equation? Just display 0.
-                else
-                    return new Double(0.0D);
-            }
-
-            assert false;
-	    return "";
-	}
-    }
 
     /**
      * Create a new table that lists all the quotes in the given quote bundle.
@@ -311,54 +119,26 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	this.filterEquationString = filterEquationString;
 	this.quoteBundle = quoteBundle;
         this.singleDate = singleDate;
-
 	propertySupport = new PropertyChangeSupport(this);
-
-	// Set up equation columns
-	equationSlots = new EquationSlot[EQUATION_SLOTS];
-
-	for(int i = 0; i < EQUATION_SLOTS; i++) {
-	    equationSlots[i] = new EquationSlot();
-	    equationSlots[i].columnName = new String("Eqn. " + (i + 1));
-	    equationSlots[i].equation = new String();
-	}
 
 	// Get list of quotes to display
 	List quotes = extractQuotesUsingRule(filterEquationString, quoteBundle);
 
-	model = new Model(quoteBundle, quotes, equationSlots);
-	setModel(model, ACTIVITY_COLUMN, SORT_UP);
-	addMenu();
-
-	model.addTableModelListener(this);
-
-	// Set menu items to hide equation columns
-	for(int i = 0; i < EQUATION_SLOTS; i++) {
-	    showColumn(EQUATION_COLUMN + i, false);
-	}
-	
-	// Activity column is always hidden - its just used for
-	// sorting purposes
-	showColumn(ACTIVITY_COLUMN, false);
-
         // If we are listing stocks on a single day then don't bother showing
         // the date column. On the other hand if we are only listing a single
         // stock then don't bother showing the symbol column
-        if(singleDate) {
-            showColumn(DATE_COLUMN, false);
-	    showDateColumn.setState(false);
-            setColumnSortStatus(ACTIVITY_COLUMN, SORT_UP);
-        }
-        if(quoteBundle.getAllSymbols().size() == 1) {
-            showColumn(SYMBOL_COLUMN, false);
-	    showSymbolColumn.setState(false);
-            setColumnSortStatus(DATE_COLUMN, SORT_UP);
-        }
-
-        // By default we don't show this one
-	showColumn(POINT_CHANGE_COLUMN, false);
-
+        model = new QuoteModel(quoteBundle, quotes, 
+                               singleDate? Column.HIDDEN : Column.VISIBLE,
+                               quoteBundle.getAllSymbols().size() == 1? 
+                               Column.HIDDEN : Column.VISIBLE);
+	setModel(model, 
+                 quoteBundle.getAllSymbols().size() == 1? QuoteModel.DATE_COLUMN :
+                 QuoteModel.ACTIVITY_COLUMN, SORT_UP);
+	model.addTableModelListener(this);
+        showColumns(model);
         resort();
+
+	addMenu();
 
         // If the user clicks on the table trap it.
 	addMouseListener(new MouseAdapter() {
@@ -417,7 +197,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
             // Get symbol at row
             Symbol symbol =
-                (Symbol)getModel().getValueAt(row, SYMBOL_COLUMN);
+                (Symbol)getModel().getValueAt(row, QuoteModel.SYMBOL_COLUMN);
 
             List symbols = new ArrayList();
             symbols.add(symbol);
@@ -515,96 +295,58 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     private void addMenu() {
 	menuBar = new JMenuBar();
 
-	JMenu tableMenu = MenuHelper.addMenu(menuBar, "Table");
+        // Table Menu
+        {
+            JMenu tableMenu = MenuHelper.addMenu(menuBar, "Table");
 
-        findSymbol =
-            MenuHelper.addMenuItem(this, tableMenu, "Find");
+            // Show columns menu
+            tableMenu.add(createShowColumnMenu(model));
+            
+            tableMenu.addSeparator();
 
-	graphSymbols =
-	    MenuHelper.addMenuItem(this, tableMenu,
-				   "Graph");
-	tableSymbols =
-	    MenuHelper.addMenuItem(this, tableMenu,
-				   "Table");
+            applyEquations =
+                MenuHelper.addMenuItem(this, tableMenu,
+                                       "Apply Equations");
+            
+            applyFilter =
+                MenuHelper.addMenuItem(this, tableMenu,
+                                       "Apply Filter");
+            
+            sortByMostActive =
+                MenuHelper.addMenuItem(this, tableMenu,
+                                       "Sort by Most Active");
+            
+            tableMenu.addSeparator();
+            
+            tableClose = MenuHelper.addMenuItem(this, tableMenu,
+                                                "Close");	
+            
+        }
 
-	tableMenu.addSeparator();
+        // Symbols Menu
+        {
+            JMenu symbolsMenu = MenuHelper.addMenu(menuBar, "Symbols");
+            
+            findSymbol =
+                MenuHelper.addMenuItem(this, symbolsMenu, "Find");
 
-	JMenu columnMenu =
-	    MenuHelper.addMenu(tableMenu, "Show Columns");
-	{
-	    showSymbolColumn =
-		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-					       "Symbol");
-	    showDateColumn =
-		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-					       "Date");
-	    showVolumeColumn =
-		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-					       "Volume");
-	    showDayLowColumn =
-		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-					       "Day Low");
-	    showDayHighColumn =
-		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-					       "Day High");
-	    showDayOpenColumn =
-		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-					       "Day Open");
-	    showDayCloseColumn =
-		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-					       "Day Close");
-	    showPointChangeColumn =
-		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-					       "Point Change");
-	    showPercentChangeColumn =
-		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-					       "Percent Change");
-	    columnMenu.addSeparator();
+            symbolsMenu.addSeparator();
+            
+            graphSymbols =
+                MenuHelper.addMenuItem(this, symbolsMenu,
+                                       "Graph");
+            tableSymbols =
+                MenuHelper.addMenuItem(this, symbolsMenu,
+                                       "Table");
+        }
 
-	    // Set menu items to hide equation columns
-	    for(int i = 0; i < EQUATION_SLOTS; i++) {
-		showEquationColumns[i] =
-		    MenuHelper.addCheckBoxMenuItem(this, columnMenu,
-						   "Equation Slot " + (i + 1));
-	    }
-
-	    // Put ticks next to the columns that are visible
-	    showSymbolColumn.setState(true);
-	    showDateColumn.setState(true);
-	    showVolumeColumn.setState(true);
-	    showDayLowColumn.setState(true);
-	    showDayHighColumn.setState(true);
-	    showDayOpenColumn.setState(true);
-	    showDayCloseColumn.setState(true);
-	    showPointChangeColumn.setState(false);
-	    showPercentChangeColumn.setState(true);
-	}
-
-	applyEquations =
-	    MenuHelper.addMenuItem(this, tableMenu,
-				   "Apply Equations");
-
-	applyFilter =
-	    MenuHelper.addMenuItem(this, tableMenu,
-				   "Apply Filter");
-
-	sortByMostActive =
-	    MenuHelper.addMenuItem(this, tableMenu,
-				   "Sort by Most Active");
-	
-	tableMenu.addSeparator();
-
-	tableClose = MenuHelper.addMenuItem(this, tableMenu,
-					    "Close");	
-
-	// Listen for changes in selection so we can update the menus
-	getSelectionModel().addListSelectionListener(new ListSelectionListener() {		
-
-		public void valueChanged(ListSelectionEvent e) {
-		    checkMenuDisabledStatus();
-		}
-
-	});
+        // Listen for changes in selection so we can update the menus
+        getSelectionModel().addListSelectionListener(new ListSelectionListener() {		
+                
+                public void valueChanged(ListSelectionEvent e) {
+                        checkMenuDisabledStatus();
+                }
+            });
 
 	checkMenuDisabledStatus();
     }
@@ -637,7 +379,6 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 				    model.setQuotes(quotes);
-				    model.fireTableDataChanged();
 				}});
 		    }
 		}};
@@ -669,7 +410,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                             if(symbol.equals(quote.getSymbol())) {
                                 // Select row and make it visible
                                 setRowSelectionInterval(i, i);
-                                setVisible(i, SYMBOL_COLUMN);
+                                setVisible(i, QuoteModel.SYMBOL_COLUMN);
                                 return;
                             }
                         }
@@ -684,102 +425,6 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 }};
         
         thread.start();
-    }
-
-    // Allow the user to enter in equations which will be run on every displayed quote
-    private void applyEquations() {
-	// Handle all action in a separate thread so we dont
-	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
-	Thread thread = new Thread() {
-
-		public void run() {
-		
-		    JDesktopPane desktop =
-			org.mov.ui.DesktopManager.getDesktop();
-
-		    final EquationsDialog dialog =
-			new EquationsDialog(desktop,
-					    EQUATION_SLOTS);
-
-		    // Did the user modify the equation columns?
-		    if(dialog.showDialog(equationSlots)) {
-
-                        equationSlots = dialog.getEquationSlots();
-
-                        // Load equation columns with data
-                        model.setEquationColumns(equationSlots);
-                        loadEquationColumns();
-
-                        SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-
-				    // Make sure all columns with an equation
-				    // are visible and all without are not.
-				    // Also update check box menus
-				    for(int i = 0; i < EQUATION_SLOTS; i++) {
-					boolean containsEquation = false;
-					
-					if(equationSlots[i].equation.length() > 0)
-					    containsEquation = true;
-					
-					showColumn(EQUATION_COLUMN + i,
-						   containsEquation);
-					
-					showEquationColumns[i].setState(containsEquation);
-				    }
-                                }});
-		    }
-		}
-	    };
-
-	thread.start();
-    }
-
-    // Runs out equation in each equation slot on every stock in the table
-    private void loadEquationColumns() {
-        List quotes = model.getQuotes();
-        Thread thread = Thread.currentThread();
-        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-        progress.setIndeterminate(true);
-        progress.show("Applying Equations");
-
-        for(int i = 0; i < EQUATION_SLOTS; i++) {
-            List results = new ArrayList();
-            Expression expression = equationSlots[i].expression;
-
-            if(expression != null) {
-                Iterator iterator = quotes.iterator();
-
-                while(iterator.hasNext()) {
-                    Quote quote = (Quote)iterator.next();
-
-                    try {
-                        int dateOffset = quoteBundle.dateToOffset(quote.getDate());
-                        double result = expression.evaluate(new Variables(), 
-                                                            quoteBundle, quote.getSymbol(), 
-                                                            dateOffset);
-                        results.add(new Double(result));
-                    }
-                    catch(EvaluationException e) {
-                        // Should display error message to user
-                        assert false;
-                        results.add(new Double(0.0D));
-                    }
-                    catch(WeekendDateException e) {
-                        // Shouldn't happen
-                        assert false;
-                        results.add(new Double(0.0D));
-                    }
-                }
-            }
-
-            equationSlots[i].results = results;
-
-            if(thread.isInterrupted())
-                break;
-        }
-
-        ProgressDialogManager.closeProgressDialog(progress);
     }
 
     /**
@@ -872,7 +517,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	}
 
 	else if(e.getSource() == applyEquations) {
-	    applyEquations();
+	    applyEquations(quoteBundle, model);
 	}
 
 	else if(e.getSource() == applyFilter) {
@@ -880,7 +525,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	}
 
 	else if(e.getSource() == sortByMostActive) {
-	    setColumnSortStatus(ACTIVITY_COLUMN, SORT_UP);
+	    setColumnSortStatus(QuoteModel.ACTIVITY_COLUMN, SORT_UP);
 	    resort();
 	    validate();
 	    repaint();
@@ -898,7 +543,8 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
-                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], SYMBOL_COLUMN);
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
+                                                         QuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
             }
@@ -915,7 +561,8 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
-                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], SYMBOL_COLUMN);
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
+                                                         QuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
             }
@@ -924,52 +571,8 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             CommandManager.getInstance().tableStocks(symbols);
         }
 
-	else {
-	    // Otherwise its a checkbox menu item
-            assert e.getSource() instanceof JCheckBoxMenuItem;
-
-	    JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)e.getSource();
-	    boolean state = menuItem.getState();
-	    int column = SYMBOL_COLUMN;
-
-	    if(menuItem == showSymbolColumn)
-		column = SYMBOL_COLUMN;
-
-	    else if(menuItem == showDateColumn)
-		column = DATE_COLUMN;
-
-	    else if(menuItem == showVolumeColumn)
-		column = VOLUME_COLUMN;
-
-	    else if(menuItem == showDayLowColumn)
-		column = DAY_LOW_COLUMN;
-
-	    else if(menuItem == showDayHighColumn)
-		column = DAY_HIGH_COLUMN;
-
-	    else if(menuItem == showDayOpenColumn)
-		column = DAY_OPEN_COLUMN;
-
-	    else if(menuItem == showDayCloseColumn)
-		column = DAY_CLOSE_COLUMN;
-
-	    else if(menuItem == showPointChangeColumn)
-		column = POINT_CHANGE_COLUMN;
-
-	    else if(menuItem == showPercentChangeColumn)
-		column = PERCENT_CHANGE_COLUMN;
-
-	    // Otherwise its an equation slot column
-	    else {
-		for(int i = 0; i < EQUATION_SLOTS; i++) {
-		    if(menuItem == showEquationColumns[i]) {
-			column = EQUATION_COLUMN + i;
-		    }
-		}
-	    }
-
-	    showColumn(column, state);
-	}
+	else
+            assert false;
     }
 
 }

@@ -37,7 +37,6 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
 
 import org.mov.main.CommandManager;
 import org.mov.main.Module;
@@ -45,6 +44,8 @@ import org.mov.main.ModuleFrame;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.ui.AbstractTable;
+import org.mov.ui.AbstractTableModel;
+import org.mov.ui.Column;
 import org.mov.ui.ChangeFormat;
 import org.mov.ui.ExpressionEditorDialog;
 import org.mov.ui.MenuHelper;
@@ -77,10 +78,9 @@ public class GPResultModule extends AbstractTable implements Module {
 
     private class Model extends AbstractTableModel {
 	private List results;
-        private List columns;
 
 	public Model(List columns) {
-            this.columns = columns;
+            super(columns);
 	    results = new ArrayList();
 	}
 
@@ -115,20 +115,6 @@ public class GPResultModule extends AbstractTable implements Module {
 	
 	public int getRowCount() {
 	    return results.size();
-	}
-
-	public int getColumnCount() {
-	    return columns.size();
-	}
-	
-	public String getColumnName(int c) {
-            Column column = (Column)columns.get(c);
-            return column.shortName;
-	}
-
-	public Class getColumnClass(int c) {
-            Column column = (Column)columns.get(c);
-            return column.type;
 	}
 
 	public Object getValueAt(int row, int column) {
@@ -180,23 +166,27 @@ public class GPResultModule extends AbstractTable implements Module {
     public GPResultModule() {
         List columns = new ArrayList();
         columns.add(new Column(START_DATE_COLUMN, "Start Date", "Start Date", 
-                               TradingDate.class, false));
-        columns.add(new Column(END_DATE_COLUMN, "End Date", "End Date", TradingDate.class, false));
-        columns.add(new Column(SYMBOLS_COLUMN, "Symbols", "Symbols", String.class, true));
-        columns.add(new Column(BUY_RULE_COLUMN, "Buy Rule", "Buy Rule", String.class, true));
-        columns.add(new Column(SELL_RULE_COLUMN, "Sell Rule", "Sell Rule", String.class, true));
+                               TradingDate.class, Column.HIDDEN));
+        columns.add(new Column(END_DATE_COLUMN, "End Date", "End Date", TradingDate.class, 
+                               Column.HIDDEN));
+        columns.add(new Column(SYMBOLS_COLUMN, "Symbols", "Symbols", String.class, 
+                               Column.VISIBLE));
+        columns.add(new Column(BUY_RULE_COLUMN, "Buy Rule", "Buy Rule", String.class, 
+                               Column.VISIBLE));
+        columns.add(new Column(SELL_RULE_COLUMN, "Sell Rule", "Sell Rule", String.class, 
+                               Column.VISIBLE));
         columns.add(new Column(TRADE_COST_COLUMN, "Trade Cost", "Trade Cost", 
-                               Money.class, false));
+                               Money.class, Column.HIDDEN));
         columns.add(new Column(NUMBER_OF_TRADES_COLUMN, "Number of Trades", "No. Trades", 
-                               Integer.class, false));
+                               Integer.class, Column.HIDDEN));
         columns.add(new Column(GENERATION_COLUMN, "Generation Number", "Generation", 
-                               Integer.class, true));
+                               Integer.class, Column.VISIBLE));
         columns.add(new Column(INITIAL_CAPITAL_COLUMN, "Initial Capital", "Initial Capital", 
-                               Money.class, false));
+                               Money.class, Column.HIDDEN));
         columns.add(new Column(FINAL_CAPITAL_COLUMN, "Final Capital", "Final Capital", 
-                               Money.class, false));
+                               Money.class, Column.HIDDEN));
         columns.add(new Column(PERCENT_RETURN_COLUMN, "Return", "Return", 
-                               ChangeFormat.class, true));
+                               ChangeFormat.class, Column.VISIBLE));
 
 	model = new Model(columns);
 	setModel(model);
@@ -205,7 +195,7 @@ public class GPResultModule extends AbstractTable implements Module {
 
 	propertySupport = new PropertyChangeSupport(this);
 
-	addMenu(columns);
+	addMenu();
 
         // If the user clicks on the table trap it. 
 	addMouseListener(new MouseAdapter() {
@@ -214,7 +204,7 @@ public class GPResultModule extends AbstractTable implements Module {
                 }
 	    });
 
-        showColumns(columns);
+        showColumns(model);
     }
 
     // If the user double clicks on a result with the LMB, graph the portfolio.
@@ -399,7 +389,7 @@ public class GPResultModule extends AbstractTable implements Module {
     }
 
     // Add a menu
-    private void addMenu(List columns) {
+    private void addMenu() {
 	menuBar = new JMenuBar();
 
 	JMenu resultMenu = MenuHelper.addMenu(menuBar, "Result");
@@ -454,7 +444,7 @@ public class GPResultModule extends AbstractTable implements Module {
 
 	resultMenu.addSeparator();
 
-	JMenu columnMenu = createShowColumnMenu(columns);
+	JMenu columnMenu = createShowColumnMenu(model);
         resultMenu.add(columnMenu);
 
 	resultMenu.addSeparator();

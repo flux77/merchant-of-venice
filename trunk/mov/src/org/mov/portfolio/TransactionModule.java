@@ -20,21 +20,23 @@ package org.mov.portfolio;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.*;
-import java.text.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.table.*;
 
 import org.mov.main.*;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.quote.*;
 import org.mov.table.*;
-import org.mov.ui.*;
+import org.mov.ui.AbstractTable;
+import org.mov.ui.AbstractTableModel;
+import org.mov.ui.Column;
+import org.mov.ui.MenuHelper;
 
 /** 
  * Venice module for displaying a portfolio's transaction history to
@@ -42,6 +44,12 @@ import org.mov.ui.*;
  */
 public class TransactionModule extends AbstractTable implements Module,
 								ActionListener {
+
+    // Column ennumeration
+    private static final int DATE_COLUMN = 0;
+    private static final int TRANSACTION_COLUMN = 1;
+    private static final int CREDIT_COLUMN = 2;
+    private static final int DEBIT_COLUMN = 3;
 
     // Menu items
     private JMenuBar menuBar;
@@ -63,22 +71,10 @@ public class TransactionModule extends AbstractTable implements Module,
 
     class Model extends AbstractTableModel {
 
-	private static final int DATE_COLUMN = 0;
-	private static final int TRANSACTION_COLUMN = 1;
-	private static final int CREDIT_COLUMN = 2;
-	private static final int DEBIT_COLUMN = 3;
-
-	private String[] headers = {
-	    "Date", "Transaction", "Credit", "Debit"
-	};
-
-	private Class[] columnClasses = {
-	    TradingDate.class, String.class, Money.class, Money.class
-	};
-
 	private List transactions;
 
-	public Model(List transactions) {
+	public Model(List columns, List transactions) {
+            super(columns);
 	    this.transactions = transactions;
 	}
 
@@ -93,18 +89,6 @@ public class TransactionModule extends AbstractTable implements Module,
 
 	public int getRowCount() {
 	    return transactions.size();
-	}
-
-	public int getColumnCount() {
-	    return headers.length;
-	}
-
-	public String getColumnName(int c) {
-	    return headers[c];
-	}
-
-	public Class getColumnClass(int c) {
-	    return columnClasses[c];
 	}
 	
 	public Object getValueAt(int row, int column) {
@@ -209,13 +193,22 @@ public class TransactionModule extends AbstractTable implements Module,
     public TransactionModule(final PortfolioModule portfolioModule, 
 			     final Portfolio portfolio) {
 
+        List columns = new ArrayList();
+        columns.add(new Column(DATE_COLUMN, "Date", "Date", TradingDate.class, Column.VISIBLE));
+        columns.add(new Column(TRANSACTION_COLUMN, "Transaction", "Transaction", String.class, 
+                               Column.VISIBLE));
+        columns.add(new Column(CREDIT_COLUMN, "Credit", "Credit", Money.class, Column.VISIBLE));
+        columns.add(new Column(CREDIT_COLUMN, "Debit", "Debit", Money.class, Column.VISIBLE));
+
 	this.portfolioModule = portfolioModule;
 	this.portfolio = portfolio;
 
+	model = new Model(columns, portfolio.getTransactions());
+	setModel(model);
+
 	propertySupport = new PropertyChangeSupport(this);
 
-	model = new Model(portfolio.getTransactions());
-	setModel(model);
+
 
 	// If the user double clicks on a row then edit that transaction
 	addMouseListener(new MouseAdapter() {

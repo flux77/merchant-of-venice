@@ -66,7 +66,7 @@ public class PaperTrade {
     // tip() format for output numbers
     public final static String format = "0.00000#";
     public final static DecimalFormat decimalFormat = new DecimalFormat(format);
-    public final static int STOCKS_PER_LINES = 5;
+    public final static int STOCKS_PER_LINES = 1;
     
     // Information to get the next day trading prices
     private static String[] symbolStock;
@@ -797,7 +797,7 @@ public class PaperTrade {
                 retValue.append(symbolStock[i]);
                 
                 if (sellValue[i]!=0)
-                    retValue.append("(@ " + decimalFormat.format(sellValue[i]) + ")");
+                    retValue.append(" (@ " + decimalFormat.format(sellValue[i]) + ")");
                 
                 found++;
            }

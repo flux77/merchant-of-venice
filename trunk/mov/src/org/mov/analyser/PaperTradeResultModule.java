@@ -32,11 +32,14 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -47,6 +50,7 @@ import org.mov.ui.AbstractTable;
 import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
 import org.mov.ui.ChangeFormat;
+import org.mov.ui.EditorDialog;
 import org.mov.ui.ExpressionEditorDialog;
 import org.mov.ui.MenuHelper;
 import org.mov.util.Locale;
@@ -502,11 +506,10 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
             PaperTradeResult result = model.getResult(row);
-
-            JOptionPane.showInternalMessageDialog(this.desktop,
-                                                  new String(result.getTip()),
-                                                  Locale.getString("GET_TIP"),
-                                                  JOptionPane.INFORMATION_MESSAGE);
+            
+            EditorDialog.showViewDialog(Locale.getString("GET_TIP"),
+                                        Locale.getString("SHORT_GET_TIP"),
+                                        new String(result.getTip()));
         }
     }
 

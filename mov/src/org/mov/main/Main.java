@@ -89,10 +89,10 @@ public class Main extends JFrame {
         // strong blue colour that looks horrible. So this light green
         // which is the Venice theme will be the default.
         desktop.setBackground(new Color(238, 241,238));
-	CommandManager.getInstance().setDesktop(desktop);
+	CommandManager.getInstance().setDesktopManager(desktopManager);
 
 	// Instantiate main menu singleton
-	MainMenu.getInstance(this, desktopManager, desktop);
+	MainMenu.getInstance(this, desktopManager);
 
 	setContentPane(desktop);
 	addWindowListener(new WindowAdapter() {
@@ -131,7 +131,7 @@ public class Main extends JFrame {
     public static void main(String[] args) {
 	// Set the look and feel to be the default for the current platform
 	try {
-	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	}
 	catch(Exception e) {
 	    // Shouldn't happen, but if it does just keep going

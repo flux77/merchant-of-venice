@@ -133,7 +133,13 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
      * @return	the graph name
      */
     public String getName() {
-	return graph.getName();
+        // Under Java 1.5 beta if I don't check against graph being NULL I get
+        // a NULL pointer exception. I don't understand why. This whole module
+        // will be upgraded soon so I am not too concerned.
+        if(graph != null)
+            return graph.getName();
+        else
+            return "";
     }
 
     /**

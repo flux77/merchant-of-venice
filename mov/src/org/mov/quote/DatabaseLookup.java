@@ -8,13 +8,26 @@ import java.util.prefs.*;
 
 public class DatabaseLookup {
 
+    private static DatabaseLookup instance = null;
+
     /**
      * Factory method for generating new Database lookup engine */
 
     public static DatabaseLookup getInstance() {
-	return new DatabaseLookup();
+	if(instance == null)
+	    instance = new DatabaseLookup();
+
+	return instance;
     }
     
+    /**
+     * Flush database lookup singleton instance and force re-reading of
+     * preference file
+     */
+    public static void flush() {
+	instance = null;
+    }
+
     Hashtable hash;
 
     /** Private constructor */

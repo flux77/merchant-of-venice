@@ -36,7 +36,7 @@ public class ProgressDialog extends javax.swing.JDialog implements ActionListene
 
         actionListeners = new Vector();
         initComponents();
-        progressBar.setUI(new org.liquid.misc.ProgressBarUI());
+        progressBar.setUI(new org.mov.ui.ProgressBarUI());
         setIndeterminate(true);
         cancelButton.addActionListener(this);
     }

@@ -234,7 +234,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    }
 	}
 
-	return toolTipText;
+	return toolTipText;	
     }
 
     /**
@@ -280,6 +280,9 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	
 	// Finally highlight region
 	highlightRegion(g, (Chart)c, height);
+
+	//or draw any lines
+	drawLines(g, (Chart)c, height);
     }
 
     public BufferedImage getImage() {
@@ -359,6 +362,42 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    g.setPaintMode();
 	}
     }
+
+
+    //Paint any lines which have been drawn on the chart. 
+    private void drawLines(Graphics g, Chart chart, int height) {
+	
+	if (chart.getDrawnLineStartX() != null &&
+	    chart.getDrawnLineStartY() != null &&
+	    chart.getDrawnLineEndX() != null &&
+	    chart.getDrawnLineEndY() != null) {
+	    
+	    int i;
+
+	    Vector startXs, startYs, endXs, endYs;
+
+	    startXs = chart.getDrawnLineStartX();
+	    startYs = chart.getDrawnLineStartY();
+	    endXs = chart.getDrawnLineEndX();
+	    endYs = chart.getDrawnLineEndY();
+
+	    for (i = 0; i < endXs.size(); i++) {
+		int startX = ((Integer)startXs.elementAt(i)).intValue();
+		int startY = ((Integer)startYs.elementAt(i)).intValue();
+		int endX = ((Integer)endXs.elementAt(i)).intValue();
+		int endY = ((Integer)endYs.elementAt(i)).intValue();
+
+		Color prev = g.getColor();
+
+		g.setColor(Color.MAGENTA);
+		g.drawLine(startX,startY, endX, endY);
+		g.setColor(prev);
+	    }
+
+	    g.setPaintMode();
+	    
+	}
+}
 
     // For the given X value, return the X coordinate
     private int getXCoordinate(Chart chart, Comparable x) {

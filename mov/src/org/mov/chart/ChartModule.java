@@ -148,6 +148,8 @@ public class ChartModule extends JPanel implements Module,
     // Function Toolbar
     private JButton defaultZoom = null;
     private JButton zoomIn = null;
+    private JButton paintOnChart = null;
+    private JButton eraseOnChart = null;
 
     // Menus
     private JMenuItem addMenuItem = null;
@@ -155,7 +157,15 @@ public class ChartModule extends JPanel implements Module,
 
     // Enabled?
     private boolean defaultZoomEnabled = false;
+    private boolean previousDefaultZoomState = false;
     private boolean zoomInEnabled = false;
+
+    //Perhaps we can combine the following two indicators
+    // into one variable to simplify the interface logic:
+    // e.g integer EditingMode = {none, drawing, erasing} 
+    private boolean inDrawMode = false;  
+    private boolean inEraseMode = false; 
+    private boolean newLine = false;
 
     private JDesktopPane desktop;
 
@@ -163,8 +173,11 @@ public class ChartModule extends JPanel implements Module,
     private String frameIcon = "org/mov/images/TableIcon.gif";
 
     // ToolBar Images - these are from jlfgr-1.0.jar
+    // Editing images (paint, erase ) aren't quite appropriate
     private String defaultZoomImage = "toolbarButtonGraphics/general/Zoom24.gif";
     private String zoomInImage = "toolbarButtonGraphics/general/ZoomIn24.gif";
+    private String paintInImage = "toolbarButtonGraphics/general/Edit24.gif";
+    private String eraseInImage = "toolbarButtonGraphics/general/Remove24.gif";
     
     //Index chart indicator - Index charts have aggregate graph sources
     private boolean indexChart = false;
@@ -261,6 +274,8 @@ public class ChartModule extends JPanel implements Module,
 	// Create image on toolbar to zoom to default zoom level
         URL defaultZoomURL = ClassLoader.getSystemResource(defaultZoomImage);
         URL zoomInImageURL = ClassLoader.getSystemResource(zoomInImage);
+	URL paintInImageURL = ClassLoader.getSystemResource(paintInImage);
+	URL eraseInImageURL = ClassLoader.getSystemResource(eraseInImage);
 
         // If either image is not available, then do not create the
         // toolbar
@@ -280,6 +295,20 @@ public class ChartModule extends JPanel implements Module,
             zoomIn.addActionListener(this);
             zoomIn.setEnabled(zoomInEnabled);
             toolBar.add(zoomIn);
+
+	    // Create image on toolbar to paint lines on graph
+	    ImageIcon paintOnChartIcon = new ImageIcon(paintInImageURL);
+	    paintOnChart = new JButton(paintOnChartIcon);
+	    paintOnChart.addActionListener(this);
+	    paintOnChart.setEnabled(true);
+	    toolBar.add(paintOnChart);
+
+	    // Create image on toolbar to delete lines on graph
+	    ImageIcon eraseOnChartIcon = new ImageIcon(eraseInImageURL);
+	    eraseOnChart = new JButton(eraseOnChartIcon);
+	    eraseOnChart.addActionListener(this);
+	    eraseOnChart.setEnabled(true);
+	    toolBar.add(eraseOnChart);
 
             add(toolBar, BorderLayout.WEST);
         }
@@ -602,27 +631,68 @@ public class ChartModule extends JPanel implements Module,
     public void mouseClicked(MouseEvent e) {
 	chart.clearHighlightedRegion();
 
-        if(zoomIn != null)
+        if(zoomIn != null) {
             zoomIn.setEnabled(zoomInEnabled = false);
+	}
     }
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
     public void mousePressed(MouseEvent e) {
 	Comparable x = chart.getXAtPoint(e.getX());
-
-	if(x != null)
+	Integer y = new Integer(e.getY());
+	
+	if(x != null && !inDrawMode && !inEraseMode) {
 	    chart.setHighlightedStart(x);
-    }
-    public void mouseReleased(MouseEvent e) { }
-    public void mouseDragged(MouseEvent e) {
-	Comparable x = chart.getXAtPoint(e.getX());
+	}
 
-	if(x != null)
-	    chart.setHighlightedEnd(x);
+	/* FIXME: These coordinates won't work at all
+	   zoom levels - so when user zooms the lines stay fixed.
+	*/
+
+	if (x != null && inDrawMode) {
+	    chart.setDrawnLineStart(new Integer(e.getX()),y);
+	    newLine = true;
+	}
+	
+    }
+    public void mouseReleased(MouseEvent e) { 
+ 	Comparable x = chart.getXAtPoint(e.getX());
+	Integer y = new Integer(e.getY());
+
+	if (x != null && inDrawMode) {
+	    chart.setDrawnLineEnd(new Integer(e.getX()),y, newLine);
+	    if (newLine) {
+		newLine = false;
+	    }
+	}
+
+    }
+    public void mouseDragged(MouseEvent e) {
+
+	Comparable x = chart.getXAtPoint(e.getX());
+	Integer y = new Integer(e.getY());
 
 	// can now zoom in!
-        if(zoomIn != null)
+	// As long as we're not in an editing mode.
+        if(zoomIn != null && !inDrawMode && !inEraseMode) {
             zoomIn.setEnabled(zoomInEnabled = true);
+	}
+
+	if(x != null && !inDrawMode)
+	    chart.setHighlightedEnd(x);
+	
+	if (x != null && inDrawMode) {
+	    chart.setDrawnLineEnd(new Integer(e.getX()),y, newLine);
+	    
+	    if (newLine) {
+		newLine = false;
+	    }
+	}
+	
+	if (x != null && inEraseMode) {
+	    chart.setErase(new Integer(e.getX()),y);
+	}
+
     }
     public void mouseMoved(MouseEvent e) {}
 
@@ -649,6 +719,39 @@ public class ChartModule extends JPanel implements Module,
 	    // the horizontal scrollbar now
 	    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	    repaint();
+	}
+	/* paintOnChart and eraseOnChart are "toggle switches" - they toggle
+	   the editing and zoom functions. Ie While in editing mode, 
+	   a user won't be able to select portions of the chart.
+	*/
+	
+	/*
+	   FIXME: Change interface to reflect this. 
+	   Either identify the mode or make the buttons depressed or 
+	   something. 
+	*/
+
+	else if(paintOnChart != null && e.getSource() == paintOnChart) {
+	    if (!inDrawMode) {	
+		previousDefaultZoomState = defaultZoomEnabled;
+		defaultZoom.setEnabled(defaultZoomEnabled = false);
+		inDrawMode = true;
+		inEraseMode = false;
+	    } else {		
+		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
+		inDrawMode = false;
+	    }
+	}
+	else if(eraseOnChart != null && e.getSource() == eraseOnChart) {  
+	    if (!inEraseMode) {	
+		previousDefaultZoomState = defaultZoomEnabled;
+		defaultZoom.setEnabled(defaultZoomEnabled = false);
+		inEraseMode = true;
+		inDrawMode = false;
+	    } else {		
+		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
+		inEraseMode = false;		
+	    }
 	}
 
 	else if(e.getSource() == closeMenuItem) {

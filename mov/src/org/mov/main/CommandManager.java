@@ -3,6 +3,7 @@ package org.mov.main;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.JDesktopPane;
+import javax.swing.JOptionPane;
 import org.mov.chart.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
@@ -205,6 +206,11 @@ public class CommandManager {
         }
     }
 
+    /**
+     * Display the portfolio with the given name to the user.
+     *
+     * @param	portfolioName	name of portfolio to display
+     */
     public void openPortfolio(String portfolioName) {
 
 	final Thread thread = Thread.currentThread();
@@ -238,6 +244,9 @@ public class CommandManager {
         }
     }
 
+    /**
+     * Open up a dialog to create and then display a new portfolio.
+     */
     public void newPortfolio() {
 	// Get name for portfolio
 	TextDialog dialog = new TextDialog(desktop_instance, 
@@ -257,26 +266,83 @@ public class CommandManager {
 	}
     }
 
+    /**
+     * Graph the given portfolio.
+     *
+     * @param	portfolio	the portfolio to graph
+     */
     public void graphPortfolio(Portfolio portfolio) {
-	// If no portfolio was given - ask for one
-	if(portfolio == null) {
 
+	// Can only graph if portfolio has at least one transaction
+	if(portfolio.getTransactions().size() == 0) {
+	    JOptionPane.showInternalMessageDialog(desktop_instance,
+						  "Can't graph an empty portfolio: " + portfolio.getName(),
+						  "Graph " + 
+						  portfolio.getName(),
+						  JOptionPane.ERROR_MESSAGE);
+	    return;
 	}
 
-	// crap need to instantiate a quote cache with
-	// multiple stocks with multiple dates. need to ein venice,
-	// ein quote cache. need to update sources so they can load
-	// in multiple quotes at once. buffer!!
+        final ChartModule chart = new ChartModule(desktop_instance);
 
+	final Thread thread = Thread.currentThread();
+	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+	progress.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    thread.interrupt();
+		}
+	    });
 
+	try {
+	    progress.setTitle("Loading quotes for portfolio");
+	    progress.show();
 
+	    TradingDate startDate = portfolio.getStartDate();
+	    TradingDate endDate = null;
+	    QuoteCache cache = null;
+	    PortfolioGraphSource portfolioGraphSource = null;
+	    Graph graph = null;
+
+            if (!thread.isInterrupted()) {
+		startDate = portfolio.getStartDate();
+		endDate = QuoteSourceManager.getSource().getLatestQuoteDate();
+		
+		Vector symbols = portfolio.getSymbolsTraded();
+		cache = new QuoteCache(symbols, startDate, endDate);
+	    }
+
+            if (!thread.isInterrupted()) {
+		portfolioGraphSource =
+		    new PortfolioGraphSource(portfolio, cache, 
+					     PortfolioGraphSource.MARKET_VALUE);
+	    }
+
+            if (!thread.isInterrupted()) {	       
+		graph = new LineGraph(portfolioGraphSource);
+	    }
+
+            if (!thread.isInterrupted()) {	       
+		chart.add(graph, portfolio, cache, 0);
+
+		chart.redraw();
+		((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart);
+	    }
+
+	    if (!Thread.currentThread().interrupted())
+		ProgressDialogManager.closeProgressDialog();
+	    
+	} catch (Exception e) {
+	    ProgressDialogManager.closeProgressDialog();
+	}
     }
 
     /** Displays a graph closing prices for stock(s), based on their code. The stock(s) is/are determined by a user prompt */
     public void graphStockByCode() {
+
         final Thread t = new Thread(new Runnable() {
             public void run() {
                 SortedSet s = CommodityListQuery.getCommoditiesByCode(desktop_instance, "Graph stocks by code");
+
                 String str = s.toString();
                 str = str.substring(1,str.length()-1);
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();

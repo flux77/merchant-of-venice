@@ -55,6 +55,12 @@ public class Main extends JFrame implements WindowListener {
 
     // Go!
     private Main() {
+        // Display a brief copyright message
+        System.out.println("Merchant of Venice, 0.1 alpha *pre-release* / 13/Jan/2003");
+        System.out.println("---------------------------------------------------------");
+        System.out.println("Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)");
+        System.out.println("See COPYING.txt for license terms.");
+
 	Preferences p = PreferencesManager.getUserNode("/display");
 	setSize(p.getInt("default_width", 800),
 		p.getInt("default_height", 600));

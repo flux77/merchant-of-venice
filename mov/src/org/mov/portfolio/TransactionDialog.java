@@ -822,7 +822,7 @@ public class TransactionDialog extends JInternalFrame
             date = new TradingDate(dateTextField.getText(),
                                    TradingDate.BRITISH);
         } catch(TradingDateFormatException e) {
-	    String message = new String(Locale.getString("CANT_PARSE_DATE",
+	    String message = new String(Locale.getString("ERROR_PARSING_DATE",
 							 dateTextField.getText()));
 	    JOptionPane.showInternalMessageDialog(desktop, 
 						  message,

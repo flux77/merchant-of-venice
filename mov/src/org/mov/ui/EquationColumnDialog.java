@@ -37,6 +37,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.mov.parser.ExpressionException;
 import org.mov.parser.Parser;
+import org.mov.util.Locale;
 
 public class EquationColumnDialog extends JInternalFrame implements ActionListener {
 
@@ -59,8 +60,8 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
     private boolean OKButtonPressed;
 
     public EquationColumnDialog(int equationColumnCount) {
-	super("Apply Equations");
-
+	super(Locale.getString("APPLY_EQUATIONS"));
+        
 	// Make sure we can't be hidden behind other windows
 	setLayer(JLayeredPane.MODAL_LAYER);
 
@@ -76,14 +77,18 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 
-	JLabel typeLabel = new JLabel("Equation Column");
+	JLabel typeLabel = new JLabel(Locale.getString("EQUATION_COLUMN"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(typeLabel, c);
 	mainPanel.add(typeLabel);
 
 	equationColumnComboBox = new JComboBox();
 
-	String[] numbers = {"One", "Two", "Three", "Four", "Five"};
+	String[] numbers = {Locale.getString("ONE"), 
+                            Locale.getString("TWO"), 
+                            Locale.getString("THREE"), 
+                            Locale.getString("FOUR"), 
+                            Locale.getString("FIVE")};
 
 	for(int i = 0; i < equationColumnCount; i++)
 	    equationColumnComboBox.addItem(numbers[i]);
@@ -97,15 +102,17 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
         c.fill = GridBagConstraints.HORIZONTAL;
 
 	columnNameTextField = 
-	    GridBagHelper.addTextRow(mainPanel, "Column name", "", gridbag, c, 18);
+	    GridBagHelper.addTextRow(mainPanel, Locale.getString("COLUMN_NAME"), "", 
+                                     gridbag, c, 18);
 
 	equationComboBox =
-	    GridBagHelper.addEquationRow(mainPanel, "Equation", "", gridbag, c);
+	    GridBagHelper.addEquationRow(mainPanel, Locale.getString("EQUATION"), "", 
+                                         gridbag, c);
 
 	JPanel buttonPanel = new JPanel();
-	okButton = new JButton("OK");
+	okButton = new JButton(Locale.getString("OK"));
 	okButton.addActionListener(this);
-	cancelButton = new JButton("Cancel");
+	cancelButton = new JButton(Locale.getString("CANCEL"));
 	cancelButton.addActionListener(this);
 	buttonPanel.add(okButton);
 	buttonPanel.add(cancelButton);
@@ -180,8 +187,9 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
         }
         catch(ExpressionException e) {
             JOptionPane.
-                showInternalMessageDialog(this, "Error parsing equation", 
+                showInternalMessageDialog(this, 
                                           e.getReason(),
+                                          Locale.getString("ERROR_PARSING_EQUATION"), 
                                           JOptionPane.ERROR_MESSAGE);
             success = false;
         }

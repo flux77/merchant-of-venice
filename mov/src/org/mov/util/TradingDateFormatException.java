@@ -24,10 +24,23 @@ package org.mov.util;
  */
 public class TradingDateFormatException extends Throwable {
 
+    private String date;
+
     /** 
      * Create a new trading date format exception.
+     *
+     * @param date the date being parsed.
      */
-    public TradingDateFormatException() {
-        // nothing to do
+    public TradingDateFormatException(String date) {
+        this.date = date;
+    }
+
+    /**
+     * Return the date string being parsed.
+     *
+     * @return the date being parsed.
+     */
+    public String getDate() {
+        return date;
     }
 }

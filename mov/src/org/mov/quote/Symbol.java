@@ -175,7 +175,7 @@ public class Symbol implements Cloneable, Comparable {
                 Symbol symbol = find(symbols[i]);
                 
                 if(checkExists && !QuoteSourceManager.getSource().symbolExists(symbol))
-                    throw new SymbolFormatException(Locale.getString("NO_QUOTES_AVAILABLE", string));
+                    throw new SymbolFormatException(Locale.getString("NO_QUOTES_SYMBOL", string));
                 sortedSet.add(symbol);
             }
         }	

@@ -19,9 +19,17 @@
 package org.mov.ui;
 
 import java.awt.BorderLayout;
-import java.awt.event.*;
-import java.beans.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import org.mov.util.Locale;
 
 /**
  * Dialog for querying the user for an equation string.
@@ -71,8 +79,8 @@ public class EquationDialog implements ActionListener
     {
 	this.parent = parent;
 
-	OKButton = new JButton("OK");
-	CancelButton = new JButton("Cancel");
+	OKButton = new JButton(Locale.getString("OK"));
+	CancelButton = new JButton(Locale.getString("CANCEL"));
 	equationComboBox = new EquationComboBox(defaultEquation);
 
 	JPanel panel = new JPanel();

@@ -431,8 +431,9 @@ public class ImporterModule extends JPanel
             }
             catch(TradingDateFormatException e) {
                 JOptionPane.showInternalMessageDialog(desktop, 
+                                                      Locale.getString("ERROR_PARSING_DATE",
+                                                                       e.getDate()),
                                                       Locale.getString("INVALID_DATE"),
-                                                      Locale.getString("INVALID_DATE_RANGE"),
                                                       JOptionPane.ERROR_MESSAGE);
                 return;
             }

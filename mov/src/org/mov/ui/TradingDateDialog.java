@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.WeekendDateException;
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 
@@ -99,8 +100,9 @@ public class TradingDateDialog {
         }
         catch(TradingDateFormatException e) {
             JOptionPane.showInternalMessageDialog(parent, 
-                                                  "Can't parse date '" + dateText + "'",
-                                                  "Invalid Trading Date",
+                                                  Locale.getString("ERROR_PARSING_DATE",
+                                                                   dateText),
+                                                  Locale.getString("INVALID_DATE"),
                                                   JOptionPane.ERROR_MESSAGE);
             return null;
         }
@@ -111,8 +113,9 @@ public class TradingDateDialog {
         }
         catch(WeekendDateException e) {
             JOptionPane.showInternalMessageDialog(parent, 
-                                                  "Date falls on a weekend '" + dateText + "'",
-                                                  "Invalid Trading Date",
+                                                  Locale.getString("DATE_ON_WEEKEND",
+                                                                   dateText),
+                                                  Locale.getString("INVALID_DATE"),
                                                   JOptionPane.ERROR_MESSAGE);
             return null;
         }
@@ -120,8 +123,9 @@ public class TradingDateDialog {
         // Finally make sure we have data for this date
         if(!QuoteSourceManager.getSource().containsDate(date)) {
             JOptionPane.showInternalMessageDialog(parent,
-                                                  "No data available for date '" + dateText + "'",
-                                                  "Invalid Trading Date",
+                                                  Locale.getString("NO_QUOTES_DATE",
+                                                                   dateText),
+                                                  Locale.getString("INVALID_DATE"),
                                                   JOptionPane.ERROR_MESSAGE);
             return null;
         }

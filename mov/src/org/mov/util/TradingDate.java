@@ -142,14 +142,14 @@ public class TradingDate implements Cloneable, Comparable {
 		// DAY
                 separatorIndex = date.indexOf(separator, i);
                 if(separatorIndex == -1)
-                    throw new TradingDateFormatException();
+                    throw new TradingDateFormatException(date);
                 day = Integer.parseInt(date.substring(i, separatorIndex));
 		i = separatorIndex + 1;
  
 		// MONTH
                 separatorIndex = date.indexOf(separator, i);
                 if(separatorIndex == -1)
-                    throw new TradingDateFormatException();
+                    throw new TradingDateFormatException(date);
 
                 // Is the month numeric? e.g. 10?
                 if(Character.isDigit(date.charAt(i))) {
@@ -161,7 +161,7 @@ public class TradingDate implements Cloneable, Comparable {
                 else {
                     month = textToMonth(date.substring(i, separatorIndex));
                     if(month == -1) 
-                        throw new TradingDateFormatException();
+                        throw new TradingDateFormatException(date);
                     isMonthNumeric = false;
                 }
 
@@ -200,20 +200,20 @@ public class TradingDate implements Cloneable, Comparable {
 		day = Integer.parseInt(date.substring(6, 8));
 	    }
             else
-                throw new TradingDateFormatException();
+                throw new TradingDateFormatException(date);
 	}
 
         // If we can't parse, throw an exception
 	catch(NumberFormatException e) {
-            throw new TradingDateFormatException();
+            throw new TradingDateFormatException(date);
         }
         catch(StringIndexOutOfBoundsException e) {
-            throw new TradingDateFormatException();
+            throw new TradingDateFormatException(date);
         }
 
         // Simple range checking.
         if(month == 0 || month > 12 || day == 0 || day > 31)
-            throw new TradingDateFormatException();
+            throw new TradingDateFormatException(date);
     }
 
     /**

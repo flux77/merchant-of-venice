@@ -50,7 +50,11 @@ public class TransactionDialog extends JInternalFrame
 
     private Portfolio portfolio;
 
+    // Results of dialog. Has it finished. What button was pressed. What is the transaction
+    // on the screen.
     private boolean isDone = false;
+    private boolean okButtonPressed = false;
+    private Transaction transaction;
 
     /**
      * Create a new transaction dialog.
@@ -59,7 +63,7 @@ public class TransactionDialog extends JInternalFrame
      * @param	portfolio	portfolio to add new transaction
      */
     public TransactionDialog(JDesktopPane desktop, Portfolio portfolio) {
-	super("New Transaction");
+	super();
 
 	this.desktop = desktop;
 	this.portfolio = portfolio;
@@ -88,20 +92,20 @@ public class TransactionDialog extends JInternalFrame
 	// If the portfolio only has a cash account then dont display
 	// the share transactions
 	if(portfolio.hasAccount(Account.SHARE_ACCOUNT)) {
-	    typeComboBox.addItem("Accumulate");
-	    typeComboBox.addItem("Deposit");
-	    typeComboBox.addItem("Dividend");
-	    typeComboBox.addItem("Dividend (DRP)");
-	    typeComboBox.addItem("Fee");
-	    typeComboBox.addItem("Interest");
-	    typeComboBox.addItem("Reduce");
-	    typeComboBox.addItem("Withdrawal");
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.ACCUMULATE));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.DEPOSIT));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.DIVIDEND));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.DIVIDEND_DRP));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.FEE));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.INTEREST));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.REDUCE));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.WITHDRAWAL));
 	}
 	else {
-	    typeComboBox.addItem("Deposit");
-	    typeComboBox.addItem("Fee");
-	    typeComboBox.addItem("Interest");
-	    typeComboBox.addItem("Withdrawal");
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.DEPOSIT));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.FEE));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.INTEREST));
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.WITHDRAWAL));
 	}
 
 	typeComboBox.addActionListener(this);
@@ -412,8 +416,12 @@ public class TransactionDialog extends JInternalFrame
     /**
      * Display a dialog letting the user enter a new transaction.
      * Add the transaction to the portfolio.
+     *
+     * @return	whether the OK button was pressed
      */
-    public void newTransaction() {
+    public boolean newTransaction() {
+
+	setTitle("New Transaction");
 
 	desktop.add(this);
 	show();
@@ -426,51 +434,162 @@ public class TransactionDialog extends JInternalFrame
 	catch(Exception e) {
 	    // ignore
 	}
+
+	// If the user pressed the OK button then add the transaction to the
+	// portfolio
+	if(okButtonPressed)
+	    portfolio.addTransaction(transaction);
+		
+
+	return okButtonPressed;
+    }
+
+    /**
+     * Display a dialog letting the user edit an existing transaction.
+     *
+     * @param	transaction	transaction to edit
+     * @return	whether the OK button was pressed
+     */
+    public boolean editTransaction(Transaction oldTransaction) {
+
+	setTitle("Edit Transaction");
+	displayTransaction(oldTransaction);
+
+	desktop.add(this);
+	show();
+
+	try {
+	    while(isDone == false) {
+		Thread.sleep(10);
+	    }
+	}
+	catch(Exception e) {
+	    // ignore
+	}
+
+	// To the user pressed the OK button then add the transaction. To do this remove all 
+	// the old transactions and then re-add them with the new one.
+	if(okButtonPressed) {
+	    Vector transactions = (Vector)portfolio.getTransactions().clone();
+
+	    // Remove old transaction from list
+	    Iterator iterator = transactions.iterator();
+	    while(iterator.hasNext()) {
+		Transaction traverseTransaction = (Transaction)iterator.next();
+
+		if(traverseTransaction == oldTransaction) {
+		    iterator.remove();
+		    break;
+		}
+	    }
+
+	    // Replace it with the new transaction
+	    transactions.add(transaction);
+
+	    // Remove and add transactions
+	    portfolio.removeAllTransactions();
+	    portfolio.addTransactions(transactions);
+	}
+	
+	return okButtonPressed;
+    }
+
+    // Display the given transaction's details in the dialog box
+    private void displayTransaction(Transaction transaction) {
+
+	// Make sure we are displaying the right panel
+	int type = transaction.getType();
+	setTransactionPanel(type);
+
+	// Set type and date fields
+	typeComboBox.setSelectedItem(Transaction.typeToString(type));
+	dateTextField.setText(transaction.getDate().toString("dd/mm/yyyy"));
+	
+	// Now fill in the fields for this panel (depending on type)
+	if(type == Transaction.ACCUMULATE ||
+	   type == Transaction.REDUCE) {
+
+	    cashAccountComboBox.setSelectedItem(transaction.getCashAccount().getName());
+	    shareAccountComboBox.setSelectedItem(transaction.getShareAccount().getName());
+	    symbolTextField.setText(transaction.getSymbol());
+	    sharesTextField.setText(String.valueOf(transaction.getShares()));
+	    amountTextField.setText(String.valueOf(transaction.getAmount()));
+	    tradeCostTextField.setText(String.valueOf(transaction.getTradeCost()));
+	}
+	else if(type == Transaction.DEPOSIT ||
+		type == Transaction.FEE ||
+		type == Transaction.INTEREST ||
+		type == Transaction.WITHDRAWAL) {
+
+	    amountTextField.setText(String.valueOf(transaction.getAmount()));
+	    cashAccountComboBox.setSelectedItem(transaction.getCashAccount().getName());
+	}
+	else if(type == Transaction.DIVIDEND) {
+
+	    cashAccountComboBox.setSelectedItem(transaction.getCashAccount().getName());
+	    shareAccountComboBox.setSelectedItem(transaction.getShareAccount().getName());
+	    symbolTextField.setText(transaction.getSymbol());
+	    amountTextField.setText(String.valueOf(transaction.getAmount()));
+	}
+	else { 
+	    assert type == Transaction.DIVIDEND_DRP;
+	    shareAccountComboBox.setSelectedItem(transaction.getShareAccount().getName());
+	    symbolTextField.setText(transaction.getSymbol());
+	    sharesTextField.setText(String.valueOf(transaction.getShares()));
+	}       
+    }
+
+    // Changes the transaction panel we are displaying depending on the type
+    private void setTransactionPanel(int type) {
+	getContentPane().remove(transactionPanel);
+	
+	if(type == Transaction.ACCUMULATE ||
+	   type == Transaction.REDUCE) {
+	    transactionPanel = getTradePanel();
+	}
+	else if(type == Transaction.DEPOSIT ||
+		type == Transaction.FEE ||
+		type == Transaction.INTEREST ||
+		type == Transaction.WITHDRAWAL) {
+	    transactionPanel = getCashPanel();
+	}
+	else if(type == Transaction.DIVIDEND) {
+	    transactionPanel = getDividendPanel();
+	}
+	else { 
+	    assert type == Transaction.DIVIDEND_DRP;
+	    transactionPanel = getDividendDRPPanel();
+	}
+	
+	getContentPane().add(transactionPanel, BorderLayout.CENTER);
+	
     }
 
     public void actionPerformed(ActionEvent e) {
 
 	if(e.getSource() == okButton) {
-	    Transaction transaction = buildTransaction();
+	    transaction = buildTransaction();
 	    
 	    // Add it to portfolio and exit if we managed to
 	    // build a complete transaction
 	    if(transaction != null) {
-		portfolio.addTransaction(transaction);
 		dispose();
 		isDone = true;
+		okButtonPressed = true;
 	    }
 	}
 	else if(e.getSource() == cancelButton) {
+	    transaction = null;
 	    dispose();
 	    isDone = true;
+	    okButtonPressed = false;
 	}
 	else if(e.getSource() == typeComboBox) {
 	    // Change panel depending on transaction type
 	    String selected = (String)typeComboBox.getSelectedItem();
-
-	    getContentPane().remove(transactionPanel);
-
 	    int type = Transaction.stringToType(selected);
 
-	    if(type == Transaction.ACCUMULATE ||
-	       type == Transaction.REDUCE) {
-		transactionPanel = getTradePanel();
-	    }
-	    else if(type == Transaction.DEPOSIT ||
-		    type == Transaction.FEE ||
-		    type == Transaction.INTEREST ||
-		    type == Transaction.WITHDRAWAL) {
-	        transactionPanel = getCashPanel();
-	    }
-	    else if(type == Transaction.DIVIDEND) {
-		transactionPanel = getDividendPanel();
-	    }
-	    else { // if(type = Transaction.DIVIDEND_DRP)
-		transactionPanel = getDividendDRPPanel();
-	    }
-
-	    getContentPane().add(transactionPanel, BorderLayout.CENTER);
+	    setTransactionPanel(type);
 
 	    validate();
 	    repaint();

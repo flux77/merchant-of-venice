@@ -18,7 +18,12 @@
 
 package org.mov.quote;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import org.mov.prefs.PreferencesManager;
 
 /**
  * This class is responsible for caching quote bundles. When a {@link QuoteBundle} is created it
@@ -50,10 +55,6 @@ public class QuoteBundleCache {
 
     // For speed reasons keep copy of quote cache instance
     private QuoteCache quoteCache;
-
-    // TEMPORARY. Should be set in preferences. Maximum quotes that the cache
-    // can have before we throw some old quote bundles away.
-    private final static int MAX_QUOTES = 100000;
 
     // Class should only be constructed once by this class
     private QuoteBundleCache() {
@@ -89,12 +90,12 @@ public class QuoteBundleCache {
         assert expandedQuoteRange.getFirstDate().before(oldQuoteRange.getFirstDate()) ||
                expandedQuoteRange.getLastDate().after(oldQuoteRange.getLastDate());
 
-        // Load the quotes from the expanded quote bundle
-        load(expandedQuoteRange);
-
         // If the quote bundle isn't in our loaded list, put it there
         if(!isLoaded(quoteBundle)) 
             loadedQuoteBundles.add(quoteBundle);
+
+        // Load the quotes from the expanded quote bundle
+        forceLoad(expandedQuoteRange);
 
         // Update quote range
         quoteBundle.setQuoteRange(expandedQuoteRange);
@@ -107,28 +108,37 @@ public class QuoteBundleCache {
      * @see QuoteCache
      */
     public void load(QuoteBundle quoteBundle) {
-        // If the bundle isn't loaded, then load it. If we successfully loaded it
-        // then add it to the list.
-	if(!isLoaded(quoteBundle) && load(quoteBundle.getQuoteRange()))
+	if(!isLoaded(quoteBundle)) {
             loadedQuoteBundles.add(quoteBundle);
+
+            if(!forceLoad(quoteBundle.getQuoteRange()))
+                loadedQuoteBundles.remove(quoteBundle);
+        }
     }
     
     // Make sure all the quotes in the given quote range into the quote cache.
-    private boolean load(QuoteRange quoteRange) {
+    private boolean forceLoad(QuoteRange quoteRange) {
         // Go thorugh all loaded quote bundles to reduce the
         // possibility of reloading quotes that are already in
         // the cache
-        Iterator iterator = loadedQuoteBundles.iterator();
+        synchronized(loadedQuoteBundles) {
+            Iterator iterator = loadedQuoteBundles.iterator();
         
-        while(iterator.hasNext()) {
-            QuoteBundle traverse = (QuoteBundle)iterator.next();            
-            quoteRange = traverse.getQuoteRange().clip(quoteRange);
-
-            // If the quote range is null it means that the range
-            // contains no quotes, meaning its entirely contained
-            // by already loaded quote ranges
-            if(quoteRange == null)
-                break;
+            while(iterator.hasNext()) {
+                QuoteBundle traverse = (QuoteBundle)iterator.next();            
+                
+                // Don't check against last entry - that one contains the
+                // new quote bundle
+                if(iterator.hasNext()) {
+                    quoteRange = traverse.getQuoteRange().clip(quoteRange);
+                    
+                    // If the quote range is null it means that the range
+                    // contains no quotes, meaning its entirely contained
+                    // by already loaded quote ranges
+                    if(quoteRange == null)
+                        break;
+                }
+            }
         }
         
         if(quoteRange != null) { 
@@ -136,15 +146,19 @@ public class QuoteBundleCache {
             // we couldn't load it.
             if(!QuoteSourceManager.getSource().loadQuoteRange(quoteRange))
                 return false;
-            
+           
             // If the quote cache has too many quotes then keep
-            // freeing the oldest bundle
-            while(quoteCache.size() > MAX_QUOTES &&
-                  loadedQuoteBundles.size() > 0) {
-                free((QuoteBundle)loadedQuoteBundles.get(0));
+            // freeing the oldest bundle - but don't free the
+            // newest bundle, since that is the one we are loading.
+            int maximumCachedQuotes = PreferencesManager.loadMaximumCachedQuotes();
+
+            synchronized(loadedQuoteBundles) {
+                while(quoteCache.size() > maximumCachedQuotes &&
+                      loadedQuoteBundles.size() > 1) {
+                    free((QuoteBundle)loadedQuoteBundles.get(0));
+                }
             }
         }
-
         return true;
     }
 
@@ -155,20 +169,7 @@ public class QuoteBundleCache {
      * @return <code>true</code> if the quote bundle is loaded
      */
     public boolean isLoaded(QuoteBundle quoteBundle) {
-	// Check to see if its loaded - if it is make it the most recent one
-	int index = loadedQuoteBundles.indexOf(quoteBundle);
-
-	// Not loaded
-	if(index == -1) 
-	    return false;
-
-	// Make sure its at the top of the stack (if its not already there)
-	if(index != (loadedQuoteBundles.size() - 1)) {
-	    loadedQuoteBundles.remove(index);
-	    loadedQuoteBundles.add(quoteBundle);
-	}
-
-	return true;
+        return loadedQuoteBundles.contains(quoteBundle);
     }
 
     /**
@@ -178,20 +179,18 @@ public class QuoteBundleCache {
      *
      * @param quoteBundle       the quote bundle to free
      */
-    public void free(QuoteBundle quoteBundle) {
+    private void free(QuoteBundle quoteBundle) {
 	// Now traverse each quote in bundle, check to see if its used by any other
 	// bundle. If not, then free.
 	int firstDateOffset = quoteBundle.getFirstDateOffset();
 	int lastDateOffset = quoteBundle.getLastDateOffset();
 
-	for(int dateOffset = firstDateOffset; 
-	    dateOffset <= lastDateOffset; dateOffset++) {
+	for(int dateOffset = firstDateOffset; dateOffset <= lastDateOffset; dateOffset++) {
 
 	    List symbols = quoteBundle.getSymbols(dateOffset);
 	    Iterator iterator = symbols.iterator();
 
-	    while(iterator.hasNext()) {
-	    
+	    while(iterator.hasNext()) {	    
 		Symbol symbol = (Symbol)iterator.next();
 
 		if(!isQuoteUsedElsewhere(symbol, dateOffset))

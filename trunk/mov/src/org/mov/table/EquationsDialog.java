@@ -209,7 +209,6 @@ public class EquationsDialog extends JInternalFrame
     // any of the equations do not parse then display an error dialog to
     // the user.
     private boolean parseEquations() {
-        Parser parser = new Parser();
         boolean success = true;
         int i = 0;
 
@@ -219,7 +218,7 @@ public class EquationsDialog extends JInternalFrame
                     equationSlots[i].equation;
                 
                 if(equationString != null && equationString.length() > 0) 
-                    equationSlots[i].expression = parser.parse(equationString);
+                    equationSlots[i].expression = Parser.parse(equationString);
                 else
                     equationSlots[i].expression = null;
             }

@@ -222,5 +222,12 @@ public class QuoteFunctions {
 	}	
 	return avg;
     }
+
+    public static final double roundDouble(double d, int places) {
+        return Math.round(d * Math.pow(10, (double) places)) / Math.pow(10,
+            (double) places);
+    }
+    
+
 }
 

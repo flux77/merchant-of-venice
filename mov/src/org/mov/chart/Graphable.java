@@ -117,16 +117,14 @@ public class Graphable {
     public float getHighestY(Vector xRange) {
 	Iterator iterator = xRange.iterator();
 	Float y = null;
-	Float highestY = new Float(Float.MIN_VALUE);
-	
+	Float highestY = new Float(Float.NEGATIVE_INFINITY);
+
 	while(iterator.hasNext()) {
 	    y = getY((Comparable)iterator.next());
 
-            if(highestY == null && y != null)
-                highestY = y;
-	    else if(y != null && y.compareTo(highestY) > 0)
+	    if(y != null && y.compareTo(highestY) > 0)
             	highestY = y;
-	}
+        }
 	
 	return highestY.floatValue();
     }
@@ -148,9 +146,7 @@ public class Graphable {
 
 	    y = getY((Comparable)iterator.next());
 	    
-	    if(lowestY == null && y != null)
-		lowestY = y;
-	    else if(y != null && y.compareTo(lowestY) < 0)
+	    if(y != null && y.compareTo(lowestY) < 0)
 		lowestY = y;
 	}
 

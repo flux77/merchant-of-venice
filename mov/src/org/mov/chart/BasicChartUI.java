@@ -698,7 +698,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     private float getLowestY(Vector x, Vector graphs) {
 	Iterator iterator = graphs.iterator();
 	float y;
-	float lowestY = Integer.MAX_VALUE;
+	float lowestY = Float.MAX_VALUE;
 
 	while(iterator.hasNext()) {
 		
@@ -715,15 +715,14 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     private float getHighestY(Vector x, Vector graphs) {
 	Iterator iterator = graphs.iterator();
 	float y;
-	float highestY = Integer.MIN_VALUE;
-	
+	float highestY = Float.NEGATIVE_INFINITY;
+
 	while(iterator.hasNext()) {
 
 	    y = ((Graph)iterator.next()).getHighestY(x);
 
 	    if(y > highestY)
 		highestY = y;
-
 	}
 
 	return highestY;

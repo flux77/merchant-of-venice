@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart;
@@ -49,7 +49,7 @@ public class VerticalAxis {
     private float[] minor;
     private float[] major;
 
-    // Graph dimensions 
+    // Graph dimensions
     private int height = 0;
     private int horizontalLines;
     private int horizontalLineSpacing;
@@ -59,7 +59,7 @@ public class VerticalAxis {
     private int heightOfGraph;
     private float scale;
 
-    public VerticalAxis(float lowest, float highest, 
+    public VerticalAxis(float lowest, float highest,
 			float[] minor, float[] major) {
 	this.lowest = lowest;
 	this.highest = highest;
@@ -82,36 +82,38 @@ public class VerticalAxis {
     private void calculateHorizontalLinesAndSpacing() {
 	horizontalLines = MINIMUM_HORIZONTAL_LINES;
 	
-	do {	    
+	do {	
 	    horizontalLineSpacing = height / (++horizontalLines - 1);
 	} while(horizontalLineSpacing > MAX_HORIZONTAL_LINE_SPACING);
     }
-    
+
     private void calculateOptimumValueDelta() {
 	
 	// Get the *exact* amount to fit the graph perfectly but we hardly
 	// want to draw a line every 2.531c
-	float exactWorth = (highest - lowest) / (horizontalLines - 1);
+	float exactWorth = Math.abs((highest - lowest) / (horizontalLines - 1));
 
-	// Get the smallest valueDelta that is bigger than the exact 
-	// needed valueDelta AND such that the top line value would be 
+	// Get the smallest valueDelta that is bigger than the exact
+	// needed valueDelta AND such that the top line value would be
 	// greater than the highest share value
 	for(int i = 0; i < major.length; i++) {
 	    for(int j = 0; j < minor.length; j++) {
 
 		valueDelta = major[i] * minor[j];
 
-		bottomLineValue = (float)Math.floor(lowest / valueDelta) * 
+		bottomLineValue = (float)Math.floor(lowest / valueDelta) *
 		    valueDelta;
-		topLineValue = bottomLineValue + (horizontalLines - 1) * 
+		topLineValue = bottomLineValue + (horizontalLines - 1) *
 		    valueDelta;
 
-		if(valueDelta > exactWorth && topLineValue > highest) 
+		if(valueDelta > exactWorth && topLineValue > highest)
 		    return;
-	    }	    
+	    }	
 	}
 
 	// shouldnt get here
+        assert false;
+
 	valueDelta = 10000000.0F;
     }
 
@@ -164,9 +166,9 @@ public class VerticalAxis {
 	    yLabelVerticalOffset = 0;
 	}
 
-	// If its still too small and weve absolutely no room left 
+	// If its still too small and weve absolutely no room left
 	// only print every second line
-	if(g.getFontMetrics().getHeight() > horizontalLineSpacing + 2)  
+	if(g.getFontMetrics().getHeight() > horizontalLineSpacing + 2)
 	    everySecondLine = true;
 
 	// Finally if theres no room at all well only print it on the first
@@ -177,10 +179,10 @@ public class VerticalAxis {
 	}
 
 	for(int i = 0; i < horizontalLines; i++) {
-	    
+	
 	    y = i*horizontalLineSpacing + yoffset;
 
-	    yLabel = 
+	    yLabel =
 		graph.getYLabel(topLineValue - valueDelta * i);
 
 	    yLabelWidth = g.getFontMetrics().stringWidth(yLabel);
@@ -199,13 +201,13 @@ public class VerticalAxis {
 		continue;
 
 	    g.drawString(yLabel, xoffset + width + Y_LABEL_WIDTH -
-			 yLabelWidth - Y_LABEL_HORIZONTAL_OFFSET, 
+			 yLabelWidth - Y_LABEL_HORIZONTAL_OFFSET,
 			 y - yLabelVerticalOffset);
 
 	    // draw title
-	    if(i == 0) 
-		g.drawString(title, 
-			     xoffset + Y_LABEL_HORIZONTAL_OFFSET, 
+	    if(i == 0)
+		g.drawString(title,
+			     xoffset + Y_LABEL_HORIZONTAL_OFFSET,
 			     y - yLabelVerticalOffset);
 	}
 	

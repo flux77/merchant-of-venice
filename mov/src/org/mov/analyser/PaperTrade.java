@@ -26,24 +26,76 @@ import java.util.Set;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
-import org.mov.parser.*;
-import org.mov.portfolio.*;
-import org.mov.quote.*;
+import org.mov.parser.EvaluationException;
+import org.mov.parser.Expression;
+import org.mov.parser.Variable;
+import org.mov.parser.Variables;
+import org.mov.portfolio.CashAccount;
+import org.mov.portfolio.Portfolio;
+import org.mov.portfolio.ShareAccount;
+import org.mov.portfolio.StockHolding;
+import org.mov.portfolio.Transaction;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.Quote;
+import org.mov.quote.QuoteCache;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.Symbol;
+import org.mov.quote.WeekendDateException;
 
+/**
+ * Paper trades stocks using historical quote data and buy and sell indicators.
+ * Paper or back trading is a good way of testing the effectiveness of
+ * indicators without risking money. This class allows the user to
+ * supply historical quote data and buy and sell indicators.
+ * The class will then trade using the given indicators and return the
+ * final portfolio.
+ *
+ * <p>The final portfolio will contain a single cash and a single share account.
+ *
+ * @author Andrew Leppard
+ */
 public class PaperTrade {
 
+    // Generic name to call all the cash accounts in all generated portfolios
     private final static String CASH_ACCOUNT_NAME = Locale.getString("CASH_ACCOUNT");
+
+    // Generic name to call all the share accounts in all generated portfolios
     private final static String SHARE_ACCOUNT_NAME = Locale.getString("SHARE_ACCOUNT");
 
+    // Since this process uses so many temporary variables, it makes sense
+    // grouping them all together.
     private class Environment {
+
+        // Direct access to quote cache to avoid calling getInstance() method
         public QuoteCache quoteCache;
+
+        // Historical quote data
         public QuoteBundle quoteBundle;
+
+        // Current portfolio
         public Portfolio portfolio;
+
+        // Direct reference to portfolio's only cash account
         public CashAccount cashAccount;
+
+        // Direct reference to portfolio's only share account
         public ShareAccount shareAccount;
+
+        // Start date of paper trading
         public int startDateOffset;
+
+        // Last date of paper trading
         public int endDateOffset;
 
+        /**
+         * Create a new environment for paper trading.
+         *
+         * @param quoteBundle the historical quote data
+         * @param portfolioName the name of the portfolio
+         * @param startDate start date of trading
+         * @param endDate last date of trading
+         * @param capital initial capital for trading
+         */
         public Environment(QuoteBundle quoteBundle,
                            String portfolioName,
                            TradingDate startDate,
@@ -82,10 +134,20 @@ public class PaperTrade {
         }
     }
 
+    // Users shouldn't instantiate this class
     private PaperTrade() {
-        // users shouldn't instantiate this class
+        // nothing to do
     }
 
+    /**
+     * Attempt to sell the given stock holding. If we could not meet the trade
+     * cost, the stock will not be sold.
+     *
+     * @param environment the paper trade environment
+     * @param stockHolding the stock holding to sell
+     * @param tradeCost the cost of a trade
+     * @param day date of trade
+     */
     private static void sell(Environment environment,
                              StockHolding stockHolding,
                              Money tradeCost,
@@ -115,7 +177,16 @@ public class PaperTrade {
 	}
     }
 
-    // Returns false if it isn't enough money to buy a single share.
+    /**
+     * Attempt to buy the given symbol.
+     *
+     * @param environment the paper trade environment
+     * @param symbol the stock to buy
+     * @param amount the amount to spend on the stock
+     * @param tradeCost the cost of a trade (not including the stock price)
+     * @param day date of trade
+     * @return <code>true</code> if we had enough money to acquire the stock.
+     */
     private static boolean buy(Environment environment,
                                Symbol symbol,
                                Money amount,				
@@ -147,6 +218,19 @@ public class PaperTrade {
         return false;
     }
 
+    /**
+     * Iterate through our stock holdings on the given date and decide
+     * whether to sell any stock.
+     *
+     * @param environment the paper trade environment
+     * @param quoteBundle the historical quote data
+     * @param variables any Gondola variables set
+     * @param sell the sell indicator
+     * @param dateOffset date to examine
+     * @param tradeCost the cost of a trade
+     * @param symbols ordered list of symbols on that date
+     * @param orderCache cache of ordered symbols
+     */
     private static void sellTrades(Environment environment,
                                    QuoteBundle quoteBundle,
                                    Variables variables,
@@ -187,6 +271,20 @@ public class PaperTrade {
         }
     }
 
+    /**
+     * Iterate through all the stocks on the market on the given date and
+     * decide whether to buy any stock.
+     *
+     * @param environment the paper trade environment
+     * @param quoteBundle the historical quote data
+     * @param variables any Gondola variables set
+     * @param buy the buy indicator
+     * @param dateOffset date to examine
+     * @param tradeCost the cost of a trade
+     * @param symbols ordered list of symbols on that date
+     * @param orderCache cache of ordered symbols
+     * @param stockValue amount of money to spend on stock
+     */
     private static void buyTrades(Environment environment,
                                   QuoteBundle quoteBundle,
                                   Variables variables,
@@ -245,6 +343,13 @@ public class PaperTrade {
         }
     }
 
+    /**
+     * Return the number of days we have held the given stock.
+     *
+     * @param environment the paper trade environment
+     * @param stockHolding to query
+     * @param dateOffset current date
+     */
     private static int getHoldingTime(Environment environment, StockHolding stockHolding,
                                       int dateOffset) {
         try {
@@ -258,6 +363,23 @@ public class PaperTrade {
         }
     }
 
+    /**
+     * Perform paper trading using a fixed stock value. This method will try to keep
+     * the value of each stock holding equal to <code>stockValue</code>.
+     *
+     * @param portfolioName name to call portfolio
+     * @param quoteBundle historical quote data
+     * @param variables any Gondola variables set
+     * @param orderCache cache of ordered symbols
+     * @param startDate start date of trading
+     * @param endDate last date of trading
+     * @param buy the buy indicator
+     * @param sell the sell indicator
+     * @param capital initial capital in the portfolio
+     * @param stockValue the rough value of each stock holding
+     * @param tradeCost the cost of a trade
+     * @return the portfolio at the close of the last day's trade
+     */
     public static Portfolio paperTrade(String portfolioName,
                                        QuoteBundle quoteBundle,
                                        Variables variables,
@@ -305,6 +427,24 @@ public class PaperTrade {
         return environment.portfolio;
     }
 
+    /**
+     * Perform paper trading keeping the number of stocks in the portfolio roughly constant.
+     * This method will try to keep the number of stocks in the portfolio roughly equal
+     * to <code>numberStocks</code>, and will try to have all of them at roughly the same value.
+     *
+     * @param portfolioName name to call portfolio
+     * @param quoteBundle historical quote data
+     * @param variables any Gondola variables set
+     * @param orderCache cache of ordered symbols
+     * @param startDate start date of trading
+     * @param endDate last date of trading
+     * @param buy the buy indicator
+     * @param sell the sell indicator
+     * @param capital initial capital in the portfolio
+     * @param numberStocks try to keep this number of stocks in the portfolio
+     * @param tradeCost the cost of a trade
+     * @return the portfolio at the close of the last day's trade
+     */
     public static Portfolio paperTrade(String portfolioName,
                                        QuoteBundle quoteBundle,
                                        Variables variables,

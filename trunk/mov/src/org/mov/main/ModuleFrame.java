@@ -24,6 +24,8 @@ public class ModuleFrame extends JInternalFrame
     // Each module frame contains a single module
     private Module module;
 
+    private DesktopManager desktopManager;
+
     // Preferred width and height of frame
     static private int DEFAULT_FRAME_WIDTH = 535;
     static private int DEFAULT_FRAME_HEIGHT = 475;
@@ -37,7 +39,8 @@ public class ModuleFrame extends JInternalFrame
      *				size or should we override it with the 
      *				default?
      */
-    public ModuleFrame(Module module, boolean centre, boolean honourSize) {
+    public ModuleFrame(DesktopManager desktopManager, 
+		       Module module, boolean centre, boolean honourSize) {
 
 	super(module.getTitle(), 
 	      honourSize? false : true, // resizable
@@ -46,6 +49,7 @@ public class ModuleFrame extends JInternalFrame
 	      true);  // iconifiable
 
 	this.module = module;
+	this.desktopManager = desktopManager;
 
 	JDesktopPane desktop = DesktopManager.getDesktop();
 
@@ -130,25 +134,27 @@ public class ModuleFrame extends JInternalFrame
     public void propertyChange(PropertyChangeEvent event) {
 	String property = event.getPropertyName();
 
-	System.out.println("property change");
-
-	if(property.equals(WINDOW_CLOSE_PROPERTY))
+	// Window closed? Close window!
+	if(property.equals(WINDOW_CLOSE_PROPERTY)) {
 	    dispose();
+	}
+
+	// Title changed? Change title!
 	else if(property.equals(TITLEBAR_CHANGED_PROPERTY)) {
-	    System.out.println("title change: " +
-			       module.getTitle());
-
-
 	    setTitle(module.getTitle());
 
+	    // Update menu containing list of windows
+	    desktopManager.fireModuleRenamed(module);
 	}
     }
-
 
     /* Make sure the internal modules saves its information before destroying it
      */
     public void internalFrameClosed(InternalFrameEvent e) { 
 	module.save();
+
+	// Update menu containing list of windows
+	desktopManager.fireModuleRemoved(module);
     }
     /**
      * Standard InternalFrame functions

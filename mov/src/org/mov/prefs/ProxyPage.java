@@ -28,6 +28,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
@@ -160,5 +163,41 @@ public class ProxyPage extends JPanel implements PreferencesPage {
         boolean useProxy = useProxyCheckBox.isSelected();
 	hostTextField.setEnabled(useProxy);
 	portTextField.setEnabled(useProxy);
+    }
+    
+    /**
+     * Setup the networking to handle authentication requests and work http
+     * proxies correctly
+     */
+    public static void setupNetworking() {
+        PreferencesManager.ProxyPreferences proxyPreferences = PreferencesManager
+                .loadProxySettings();
+        if (proxyPreferences.isEnabled) {
+            System.getProperties().put("http.proxyHost", proxyPreferences.host);
+            System.getProperties().put("http.proxyPort", proxyPreferences.port);
+            // this will deal with any authentication requests properly
+            if (proxyPreferences.authEnabled) {
+            	//bryan
+            	java.net.Authenticator.setDefault(new ProxyAuthenticator(proxyPreferences.user,proxyPreferences.password));
+            }
+        }
+    }
+}
+
+/**
+ * Provides the function of handle authentication requests in proxy.
+ * 
+ * @author Bryan Lin 2004-11-19
+ */
+class ProxyAuthenticator extends Authenticator {
+    String ProxyUserName;
+    char[] ProxyPassword;
+    ProxyAuthenticator(String _proxyUserName,String _proxyPassword)
+	{   super();
+    	ProxyUserName=_proxyUserName;
+    	ProxyPassword=_proxyPassword.toCharArray();
+    	}
+    protected PasswordAuthentication getPasswordAuthentication() {
+        return new PasswordAuthentication(ProxyUserName, ProxyPassword);
     }
 }

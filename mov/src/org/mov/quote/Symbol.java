@@ -35,32 +35,24 @@ import java.util.regex.Pattern;
  *
  * <p>By creating a single class we reduce the amount of <code>toUpperCase()</code> and
  * <code>toLowerCase()</code> calls required, and have a single place to store symbol 
- * parsing code. Also this implementation uses a single <code>int</code> to store the 
- * symbol, which is designed to reduce memory and also increase speed of <code>hashCode()</code>
- * calls. These calls are used extensively in the {@link QuoteCache}.
+ * parsing code. 
  *
- * <p>To further reduce memory symbols are stored canonically. That is there is a single
+ * <p>To reduce memory symbols are stored canonically. That is there is a single
  * object for each symbol. For example the string symbol "CBA" would be represented by
  * a single class, no matter where it was used. So instead of instantiating a new
  * symbol class, you find the canonical object using the find method.
  */
 public class Symbol implements Cloneable, Comparable {
-    
-    // Pack symbol string, e.g. "ABCDE" into single int to save space.
-    // This was written before I thought about making the object canonical
-    // so it can be removed now if necessary.
-    private int symbol;
+
+    private String symbol;
     
     /** The minimum valid length for a symbol */
     public final static int MINIMUM_SYMBOL_LENGTH = 3;
 
     /** The maximum valid length for a symbol. This cannot be more than 6 */
-    public final static int MAXIMUM_SYMBOL_LENGTH = 6;
+    public final static int MAXIMUM_SYMBOL_LENGTH = 9;
     
-    // A-Z contains 26 letters which fit in 5 bits
-    private final static int BITS_PER_CHARACTER = 5;
-
-    // Hashmap of linking strings to canonical symbol class
+    // Hashmap of linking strings to their canonical symbol instance
     private static HashMap registry = new HashMap();
 
     /**
@@ -77,20 +69,17 @@ public class Symbol implements Cloneable, Comparable {
         else if(string.length() < MINIMUM_SYMBOL_LENGTH)
             throw new SymbolFormatException("Symbol '" + string + "' is too short.");
 
-        symbol = 0;
-        
+        // A symbol can only contain letters and a full stop. Check that it doesn't
+        // contain anything else.
         for(int i = 0; i < string.length(); i++) {
-            
-            // 1..26 (A..Z)
-            int characterNumber = ((int)string.charAt(i) + 1 - 
-                                   (int)'A');
-            
-            if(characterNumber < 1 || characterNumber > BITS_PER_CHARACTER * 8) 
+            char letter = string.charAt(i);
+
+            if(!Character.isLetter(letter) && letter != '.')
                 throw new SymbolFormatException("Symbol '" + string + "' contains non-" +
                                                 "alphabetical characters.");
-
-            symbol += characterNumber << (BITS_PER_CHARACTER * i);
         }
+
+        symbol = string;
     }
 
     /**
@@ -131,23 +120,7 @@ public class Symbol implements Cloneable, Comparable {
      * @return an upper case symbol string
      */
     public String get() {
-        int i = 0;
-        boolean isMoreCharacters = true;
-	char[] characters = new char[MAXIMUM_SYMBOL_LENGTH];
-	
-        while(isMoreCharacters) {
-	    
-            // 1..26 (A..Z)
-            int characterNumber = symbol >> (BITS_PER_CHARACTER * i);
-            characterNumber &= ((2 << BITS_PER_CHARACTER - 1) - 1);
-	    
-            if(characterNumber == 0)
-                isMoreCharacters = false;
-            else 
-		characters[i++] = (char)(characterNumber - 1 + (int)'A');
-        }
-	
-	return String.copyValueOf(characters, 0, i);
+        return symbol;
     }
 
     /**
@@ -156,12 +129,7 @@ public class Symbol implements Cloneable, Comparable {
      * @return the symbol length.
      */
     public int length() {
-        String string = get();
-        int length = string.length();
-
-        assert length >= MINIMUM_SYMBOL_LENGTH && length <= MAXIMUM_SYMBOL_LENGTH;
-
-        return length;
+        return symbol.length();
     }
 
     /**
@@ -172,9 +140,7 @@ public class Symbol implements Cloneable, Comparable {
      * @return the character at the given offset
      */
     public char charAt(int offset) {
-        String string = get();
-
-        return string.charAt(offset);
+        return symbol.charAt(offset);
     }
 
     /**
@@ -198,7 +164,7 @@ public class Symbol implements Cloneable, Comparable {
 	TreeSet sortedSet = new TreeSet();
 
         for(int i = 0; i < symbols.length; i++) {
-            if(symbols[0].length() > 0) {
+            if(symbols[i].length() > 0) {
                 Symbol symbol = find(symbols[i]);
                 
                 if(!QuoteSourceManager.getSource().symbolExists(symbol))
@@ -272,7 +238,7 @@ public class Symbol implements Cloneable, Comparable {
      * @return the hash code
      */
     public int hashCode() {
-        return symbol;
+        return symbol.hashCode();
     }
     
     /**
@@ -282,7 +248,7 @@ public class Symbol implements Cloneable, Comparable {
      * @return the symbol string
      */
     public String toString() {
-        return get();
+        return symbol;
     }
 }
 

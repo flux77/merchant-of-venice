@@ -483,8 +483,9 @@ public class Chart extends JComponent implements MouseListener {
      * Reset the double buffer, forcing the graph to redraw.
      */
     public void resetBuffer() {
-	if(gui != null)
+	if(gui != null) 
 	    gui.resetBuffer();
+
 	setSize();
     }
 

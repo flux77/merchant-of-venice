@@ -14,6 +14,7 @@ import org.mov.main.*;
 import org.mov.util.*;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
+import org.mov.ui.*;
 
 /**
  * The charting module for venice. This class provides the user interface
@@ -135,9 +136,6 @@ public class ChartModule extends JPanel implements Module,
     private JMenuItem addMenuItem = null;
     private JMenuItem closeMenuItem = null;
 
-    // Vector containing menus for each symbol
-    Vector menus = new Vector();
-
     // Enabled?
     private boolean defaultZoomEnabled = false;
     private boolean zoomInEnabled = false;
@@ -185,18 +183,6 @@ public class ChartModule extends JPanel implements Module,
 	add(scrollPane, BorderLayout.CENTER);
     }
 
-    /*
-    public void show() {
-	System.out.println("show!");
-
-	JScrollBar horizontal = scrollPane.getHorizontalScrollBar();
-	System.out.println("maximum is " + horizontal.getMaximum());
-	horizontal.setValue(horizontal.getMaximum());
-
-	super.show();
-    }
-    */
-
     // Adds the toolbar that gives the user the options to zoom in and out
     // of the chart
     private void addFunctionToolBar() {
@@ -225,7 +211,35 @@ public class ChartModule extends JPanel implements Module,
      */
     public void redraw() {
 	chart.resetBuffer();
+	chart.validate();
 	chart.repaint();       
+    }
+
+    // Inserts the menu such that all the menus are in alphabetical
+    // order
+    private void addMenu(JMenu menu) {
+
+	int menus = menuBar.getMenuCount();
+
+	for(int i = 1; i < menus; i++) {
+	    JMenu currentMenu = menuBar.getMenu(i);
+	    // Should it go before this menu item? If so insert
+	    if(menu.getText().compareTo(currentMenu.getText()) <= 0) {
+		menuBar.add(menu, i); 
+		return;
+	    }
+	}
+
+	// If its after all the above then append
+	menuBar.add(menu);	    
+
+	// Send signal that our frame name has changed
+
+	//	System.out.println("title changed!");
+	//propertySupport.
+	//   firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1); 
+	//propertySupport.
+	//    firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
     }
 
     /**
@@ -241,8 +255,56 @@ public class ChartModule extends JPanel implements Module,
 
 	// Add menu for this quote
 	QuoteChartMenu menu = new QuoteChartMenu(this, cache, graph);
-	menus.add(menu);
-	menuBar.add(menu);
+
+	addMenu(menu);
+    }
+
+    // Add the given symbols to the graph - should be run in a separate
+    // thread from the graphics dispatch thread
+    public void add(SortedSet symbols) {
+	Iterator iterator = symbols.iterator();
+
+        final Thread thread = Thread.currentThread();
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+        progress.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {thread.interrupt();}
+        });
+
+	QuoteCache cache = null;
+	Graph graph = null;
+	GraphSource dayClose = null;
+
+	while(iterator.hasNext()) {
+	    String symbol = (String)iterator.next();
+	    progress.setTitle("Loading quotes for " + symbol);
+	    
+	    progress.show();
+	    
+	    if (!thread.isInterrupted())
+		cache = new QuoteCache(symbol);
+	    
+	    if (!thread.isInterrupted())
+		dayClose = 
+		    new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
+	    
+	    if (!thread.isInterrupted())
+		graph = new LineGraph(dayClose);
+	    
+	    if (!thread.isInterrupted())
+		add(graph, cache, 0);
+
+	    if (!thread.isInterrupted()) {
+		redraw();		  
+
+		// For some reason I have to validate from the
+		// top level??
+		getTopLevelAncestor().validate();
+		getTopLevelAncestor().repaint();
+	    }
+	}
+
+	if (!thread.isInterrupted())
+	    ProgressDialogManager.closeProgressDialog();
     }
 
     /**
@@ -262,8 +324,7 @@ public class ChartModule extends JPanel implements Module,
 	// Add menu for this portfolio
 	PortfolioChartMenu menu = new PortfolioChartMenu(this, cache,
 							 portfolio, graph);
-	menus.add(menu);
-	menuBar.add(menu);
+	addMenu(menu);
     }
 
     /** 
@@ -438,12 +499,19 @@ public class ChartModule extends JPanel implements Module,
 		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
 	}
 	else if(e.getSource() == addMenuItem) {
-	    SortedSet companies = 
-		CommodityListQuery.getCommoditiesByCode(desktop, "Add Graph");
-								
-	}
-	
 
+	    Thread menuAction = new Thread() {
+		    public void run() {
+			SortedSet symbols = 
+			    CommodityListQuery.getCommoditiesByCode(desktop, "Add Graph");
+			// Did the user select anything?
+			if(symbols != null) 
+			    add(symbols);
+		    }
+		};
+	    
+	    menuAction.start();
+	}
     }
 
     /**

@@ -1,10 +1,10 @@
-package org.mov.util;
+ package org.mov.util;
 
 import java.awt.*;
 import javax.swing.*;
 
 import org.mov.parser.*;
-import org.mov.ui.TextDialog;
+import org.mov.ui.*;
 
 /**
  * A dialog used for querying the user for an expression string.
@@ -23,15 +23,32 @@ public class ExpressionQuery {
      *
      * @param	parent	the parent desktop
      * @param	title	the title of the dialog
-     * @return	the expression the user entered; parsed or <code>null</code>
+     * @return	the expression the user entered or <code>null</code>
      * if the user cancelled the dialog
      */
-    public static Expression getExpression(JDesktopPane parent, String title,
-					   String prompt) {
+    public static String getExpression(JDesktopPane parent, String title,
+				       String prompt) {
+	return getExpression(parent, title, prompt, "");
+    }
+
+    /**
+     * Open a new <code>ExpressionQuery</code> dialog. Ask the user to
+     * enter an expression string. Parse this string and check for validity,
+     * if the string is not valid the user will be asked to enter a valid
+     * string. 
+     *
+     * @param	parent	the parent desktop
+     * @param	title	the title of the dialog
+     * @param	default	default expression string
+     * @return	the expression the user entered or <code>null</code>
+     * if the user cancelled the dialog
+     */
+    public static String getExpression(JDesktopPane parent, String title,
+				       String prompt, String defaultExpression) {
 	
 	Expression expression = null;
 	boolean invalidResponse;
-	String expressionString = "";
+	String expressionString = defaultExpression;
 	Parser parser = new Parser();
 
 	do {
@@ -39,8 +56,8 @@ public class ExpressionQuery {
 	    invalidResponse = false;
 
 	    // Prompt user for expression
-	    TextDialog dlg = new TextDialog(parent, prompt, title,
-					    expressionString);
+	    EquationDialog dlg = new EquationDialog(parent, prompt, title,
+						    expressionString);
 	    expressionString = dlg.showDialog();
 
 	    // Parse expression checking for type errors
@@ -63,6 +80,6 @@ public class ExpressionQuery {
 	    
 	} while(invalidResponse);
 
-	return expression;
+	return expressionString;
     }
 }

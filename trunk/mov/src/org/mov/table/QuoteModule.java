@@ -13,8 +13,8 @@ import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
 
-public class QuoteModule extends AbstractAnalyserTable
-    implements AnalyserModule {
+public class QuoteModule extends AbstractTable
+    implements Module {
 
     private static final int SYMBOL_COLUMN = 0;
     private static final int VOLUME_COLUMN = 1;
@@ -140,7 +140,7 @@ public class QuoteModule extends AbstractAnalyserTable
 	propertySupport = new PropertyChangeSupport(this);
 	setModel(new Model(this.cache, symbols));
 
-	// The analyser table allows several new properties to customise
+	// The table allows several new properties to customise
 	// the column entries
 	setRedColumn(DAY_LOW_COLUMN);
 	setGreenColumn(DAY_HIGH_COLUMN);

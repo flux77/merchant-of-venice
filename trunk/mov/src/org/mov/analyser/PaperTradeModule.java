@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.util.*;
+import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -24,9 +25,13 @@ public class PaperTradeModule extends JPanel implements Module,
     
     private JDesktopPane desktop;
 
+    // Java Widgets
     private JTextField fromDateTextField;
     private JTextField toDateTextField;
     private JTextField symbolsTextField;
+    private JTextField aRangeTextField;
+    private JTextField bRangeTextField;
+    private JTextField cRangeTextField;
     private JTextField buyRuleTextField;
     private JTextField sellRuleTextField;
     private JTextField initialCapitalTextField;
@@ -35,8 +40,29 @@ public class PaperTradeModule extends JPanel implements Module,
     private JButton tradeButton;
     private JButton closeButton;
 
+    // Data parsed from Java Widgets
+    private TradingDate fromDate;
+    private TradingDate toDate;
+    private SortedSet symbols;
+    private String buyRuleString;
+    private String sellRuleString;
+    private float initialCapital;
+    private float tradeCost;
+    private int aRange;
+    private int bRange;
+    private int cRange;
+
+    private QuoteCache cache;
+
     // Single result table for entire application
     private static ModuleFrame resultsFrame = null;
+
+    // Group all data together needed to make a paper trade
+    private class PaperTradeData {
+	public Portfolio portfolio;
+	public String buyRuleString;
+	public String sellRuleString;
+    }
 
     /**
      * Create a new paper trade module.
@@ -118,6 +144,16 @@ public class PaperTradeModule extends JPanel implements Module,
 	    c.weightx = 1.0;
 	    c.ipadx = 5;
 	    c.anchor = GridBagConstraints.WEST;
+
+	    aRangeTextField = 
+		addTextRow(equationPanel, "Range $A: 1 to", "", 
+			   gridbag, c, 3);
+	    bRangeTextField = 
+		addTextRow(equationPanel, "Range $B: 1 to", "", 
+			   gridbag, c, 3);
+	    cRangeTextField = 
+		addTextRow(equationPanel, "Range $C: 1 to", "", 
+			   gridbag, c, 3);
 
 	    buyRuleTextField = 
 		addTextRow(equationPanel, "Buy Rule", "", gridbag, c, 18);
@@ -301,7 +337,12 @@ public class PaperTradeModule extends JPanel implements Module,
 	else if(e.getSource() == tradeButton) {
 	    Thread t = new Thread(new Runnable() {
 		    public void run() {
-			paperTrade();
+
+			// Read data from GUI and load quote data
+			if(parseInterface() && loadQuoteCache()) {
+			    // If its OK generate and display portfolios
+			    displayPaperTrades(paperTrade());
+			}
 		    }
 		});
 
@@ -309,46 +350,74 @@ public class PaperTradeModule extends JPanel implements Module,
 	}
 
     }
-    
-    private void paperTrade() {
 
-	// 
-	// Extract data from GUI
+    // Read the data from the java widgets and prepare it for paper trading.
+    // Display errors if there were any and return (true) if the data is
+    // valid
+    private boolean parseInterface() {
+
+	//
+	// Read data from widgets
 	//
 
-	TradingDate fromDate = new TradingDate(fromDateTextField.getText(),
-					       TradingDate.BRITISH);
-	TradingDate toDate = new TradingDate(toDateTextField.getText(),
-					     TradingDate.BRITISH);
-	SortedSet symbols = 
+	fromDate = new TradingDate(fromDateTextField.getText(),
+				   TradingDate.BRITISH);
+	toDate = new TradingDate(toDateTextField.getText(),
+				 TradingDate.BRITISH);
+	symbols = 
 	    Converter.stringToSortedSet(symbolsTextField.getText());
 
 	Parser parser = new Parser();
-	Expression buyRule = null;
-	Expression sellRule = null;
+	
+	buyRuleString = buyRuleTextField.getText();
+	sellRuleString = sellRuleTextField.getText();
+
+	// Create copies so we can remove $A, $B, $C - they aren't needed
+	// for parsing. We only want to check the equation is OK so set
+	// $A, $B, $C to 1, 1, 1 if present
+	String buyRuleStringCopy = new String(buyRuleString);
+	String sellRuleStringCopy = new String(sellRuleString);
+
+	buyRuleStringCopy = substituteVariables(buyRuleStringCopy, 1, 1, 1);
+	sellRuleStringCopy = substituteVariables(sellRuleStringCopy, 1, 1, 1);
 
 	try {
-	    buyRule = parser.parse(buyRuleTextField.getText());
+	    Expression buyRule = parser.parse(buyRuleStringCopy);
 	}
 	catch(ExpressionException e) {	   
 	    buildPaperTradeError("Error parsing buy rule: " +
 				 e.getReason());
-	    return;
+	    return false;
 	}
 
 	try {
-	    sellRule = parser.parse(sellRuleTextField.getText());
+	    Expression sellRule = parser.parse(sellRuleStringCopy);
 	}
 	catch(ExpressionException e) {
 	    buildPaperTradeError("Error parsing sell rule: " +
 				 e.getReason());
-	    return;
+	    return false;
 	}
 
-	float initialCapital = 0.0F;
-	float tradeCost = 0.0F;
+	initialCapital = 0.0F;
+	tradeCost = 0.0F;
+	aRange = 0;
+	bRange = 0;
+	cRange = 0;
 
 	try {
+	    if(!aRangeTextField.getText().equals(""))
+		aRange = 
+		    Integer.parseInt(aRangeTextField.getText());
+
+	    if(!bRangeTextField.getText().equals(""))
+		bRange =
+		    Integer.parseInt(bRangeTextField.getText());
+
+	    if(!cRangeTextField.getText().equals(""))
+		cRange =
+		    Integer.parseInt(cRangeTextField.getText());
+
 	    if(!initialCapitalTextField.getText().equals(""))
 		initialCapital = 
 		    Float.parseFloat(initialCapitalTextField.getText());
@@ -365,23 +434,23 @@ public class PaperTradeModule extends JPanel implements Module,
 	catch(NumberFormatException e) {
 	    buildPaperTradeError("Can't parse number '" +
 				 e.getMessage() + "'");
-	    return;
+	    return false;
 	}
 
 	if(initialCapital <= 0) {
 	    buildPaperTradeError("Cannot trade without some initial capital");
-	    return;
+	    return false;
 	}
 
 	if(fromDate.getYear() == 0 || toDate.getYear() == 0 ||
 	   fromDate.after(toDate)) {
 	    buildPaperTradeError("Invalid date range");
-	    return;
+	    return false;
 	}
 
 	if(symbols.size() == 0) {
 	    buildPaperTradeError("Need to specify a commodity to trade");
-	    return;
+	    return false;
 	}
 	else {
 	    String symbol = (String)symbols.first();
@@ -391,20 +460,94 @@ public class PaperTradeModule extends JPanel implements Module,
 		buildPaperTradeError("No data available for commodity: " +
 				     symbol);
 				     
-		return;
+		return false;
 	    }
-
 	}
 
-	//
-	// Trade
-	//
+	// If we got here there were no errors
+	return true;
+    }
 
+    private PaperTradeData[] paperTrade() {
+	String symbol = (String)symbols.first();
+	symbol = symbol.toLowerCase();
+
+	Parser parser = new Parser();
+
+	// Normalise ranges
+	if(aRange <= 0)
+	    aRange = 1;
+	if(bRange <= 0)
+	    bRange = 1;
+	if(cRange <= 0)
+	    cRange = 1;
+	
+	int numberOfEquations = aRange * bRange * cRange;
+
+	// Iterate through all possible paper trade equations
+	PaperTradeData[] paperTradeData = 
+	    new PaperTradeData[numberOfEquations];
+
+	int equationNumber = 0;
+
+	for(int a = 1; a <= aRange; a++) {
+	    for(int b = 1; b <= bRange; b++) {
+		for(int c = 1; c <= cRange; c++) {
+		    Expression buyRule = null;
+		    Expression sellRule = null;
+
+		    System.out.println("equation " + equationNumber);		   
+		    // Put in $A, $B, $C substitutes
+		    String buyRuleStringCopy = new String(buyRuleString);
+		    String sellRuleStringCopy = new String(sellRuleString);
+
+		    buyRuleStringCopy = 
+			substituteVariables(buyRuleStringCopy, a, b, c);
+		    sellRuleStringCopy = 
+			substituteVariables(sellRuleStringCopy, a, b, c);
+
+		    try {
+			buyRule = parser.parse(buyRuleStringCopy);
+			sellRule = parser.parse(sellRuleStringCopy);
+		    }
+		    catch(ExpressionException e) {	   
+			// Should not happen - they've already been checked
+		    }
+		    
+		    Portfolio portfolio = 
+			PaperTrade.paperTrade("Paper Trade of " + 
+					      symbol.toUpperCase(),
+					      cache,
+					      symbol,
+					      fromDate,
+					      toDate,
+					      buyRule,
+					      sellRule,
+					      initialCapital,
+					      tradeCost);
+
+		    paperTradeData[equationNumber] = new PaperTradeData();
+		    paperTradeData[equationNumber].portfolio = portfolio;
+		    paperTradeData[equationNumber].buyRuleString = 
+			buyRule.toString();
+		    paperTradeData[equationNumber].sellRuleString = 
+			sellRule.toString();
+
+		    equationNumber++;
+		}
+	    }
+	}
+
+	return paperTradeData;
+    }
+
+    private boolean loadQuoteCache() {
 	final Thread thread = Thread.currentThread();
 	ProgressDialog progress = 
 	    ProgressDialogManager.getProgressDialog();
 	progress.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 		    thread.interrupt();
 		}
 	    });
@@ -415,70 +558,81 @@ public class PaperTradeModule extends JPanel implements Module,
 	    progress.setTitle("Loading quotes for paper trade");
 	    progress.show();
 		
-	    QuoteCache cache = new QuoteCache((String)symbols.first());
+	    cache = new QuoteCache((String)symbols.first());
 
-            if (!thread.isInterrupted()) {	       
-
-		// Skip non trading days. Non trading days wont be in
-		// the cache and will have positive offsets.
-		while(cache.dateToOffset(fromDate) > 0 &&
-		      fromDate.before(toDate))
-		    fromDate = fromDate.next(1);
-
-		while(cache.dateToOffset(toDate) > 0 &&
-		      toDate.after(fromDate))
-		    toDate = toDate.previous(1);
-
-		// This error will happen if the entire date range does
-		// not cover a single trading day
-		if(cache.dateToOffset(fromDate) > 0 ||
-		   cache.dateToOffset(toDate) > 0) {
-		    buildPaperTradeError("Invalid date range");
-		    return;
-		}
-
-		String symbol = (String)symbols.first();
-		symbol = symbol.toLowerCase();
-
-		portfolio = 
-		    PaperTrade.paperTrade("Paper Trade of " + 
-					  symbol.toUpperCase(),
-					  cache,
-					  symbol,
-					  fromDate,
-					  toDate,
-					  buyRule,
-					  sellRule,
-					  initialCapital,
-					  tradeCost);
-	    }
-
-	    if (!Thread.currentThread().interrupted()) {
-		ProgressDialogManager.closeProgressDialog();
-
-		// Dispaly results table if its not already up (or if it
-		// was closed we need to create a new one)
-		if(resultsFrame == null || resultsFrame.isClosed()) {
-		    resultsFrame = 
-			CommandManager.getInstance().newPaperTradeResultTable();
-		}
-
-		// Send result to result table for display
-		PaperTradeResultModule resultsModule = 
-		    (PaperTradeResultModule)resultsFrame.getModule();
-
-		resultsModule.addResult(portfolio, cache, initialCapital,
-					tradeCost,
-					buyRule.toString(), 
-					sellRule.toString(), 
-					fromDate, toDate);
-	    }
+	    // Skip non trading days. Non trading days wont be in
+	    // the cache and will have positive offsets.
+	    while(cache.dateToOffset(fromDate) > 0 &&
+		  fromDate.before(toDate))
+		fromDate = fromDate.next(1);
+	    
+	    while(cache.dateToOffset(toDate) > 0 &&
+		  toDate.after(fromDate))
+		toDate = toDate.previous(1);
+	    
+	    // This error will happen if the entire date range does
+	    // not cover a single trading day
+	    if(cache.dateToOffset(fromDate) > 0 ||
+	       cache.dateToOffset(toDate) > 0) {
+		buildPaperTradeError("Invalid date range");
+		return false;
+	}
 
 	} catch (Exception e) {
-	    ProgressDialogManager.closeProgressDialog();
+	    // nothing to do
 	}
+
+	ProgressDialogManager.closeProgressDialog();
+
+	return true;
     }
 
+    private void displayPaperTrades(final PaperTradeData[] paperTrades) {
+
+	// Invokes on dispatch thread
+	SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+
+		    // Dispaly results table if its not already up (or if it
+		    // was closed we need to create a new one)
+		    if(resultsFrame == null || resultsFrame.isClosed()) {
+			resultsFrame = 
+			    CommandManager.getInstance().newPaperTradeResultTable();
+		    }
+		    
+		    // Send result to result table for display
+		    PaperTradeResultModule resultsModule = 
+			(PaperTradeResultModule)resultsFrame.getModule();
+		    
+		    // Add each portfolio separately
+		    for(int i = 0; i < paperTrades.length; i++) {	
+			resultsModule.addResult(paperTrades[i].portfolio,
+						cache,
+						initialCapital,
+						tradeCost,
+						paperTrades[i].buyRuleString,
+						paperTrades[i].sellRuleString,
+						fromDate, toDate);
+		    }
+		}});
+    }
+
+    // In the given source string replace all occurences of patternText with
+    // text.
+    private String replace(String source, String patternText, String text) {
+	Pattern pattern = Pattern.compile(patternText);
+	Matcher matcher = pattern.matcher(source);
+	return matcher.replaceAll(text);
+    }
+
+    // Substitute $A, $B & $C for their given values
+    private String substituteVariables(String string, int a, int b, int c) {
+	string = replace(string, "\\$A", String.valueOf(a));
+	string = replace(string, "\\$B", String.valueOf(b));
+	string = replace(string, "\\$C", String.valueOf(c));
+
+	return string;
+    }
 
     private void buildPaperTradeError(String message) {
 	JOptionPane.showInternalMessageDialog(desktop, 

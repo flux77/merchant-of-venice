@@ -6,6 +6,7 @@ import java.util.*;
 import javax.swing.*;
 
 import org.mov.quote.*;
+import org.mov.ui.TextDialog;
 
 public class CommodityListQuery {
 
@@ -21,11 +22,10 @@ public class CommodityListQuery {
 	    invalidResponse = false; // assume user does OK
 
 	    // First prompt user for list
-	    company =  JOptionPane.
-		showInternalInputDialog(parent, 
-					"Please enter commodity name",
-					title,
-					JOptionPane.QUESTION_MESSAGE); 
+	    TextDialog dlg = new TextDialog(parent, 
+					    "Please enter commodity name",
+					    "Graphing company share price");
+	    company = dlg.showDialog();
 	    
 	    // Parse what the user inputed
 	    if(company != null) {
@@ -77,12 +77,12 @@ public class CommodityListQuery {
 	    invalidResponse = false; // assume user does OK
 
 	    // First prompt user for list
-	    companies =  JOptionPane.
-		showInternalInputDialog(parent, 
-					"Please enter commodity symbols",
-					title,
-					JOptionPane.QUESTION_MESSAGE); 
-	    
+	    TextDialog dlg = new TextDialog(parent, 
+					    "Please enter commodity symbols",
+					    "Graphing symbol(s)");
+	    companies = dlg.showDialog();
+					    
+
 	    // Parse what the user inputed
 	    if(companies != null) {
 		
@@ -165,3 +165,4 @@ public class CommodityListQuery {
 	return sortedSet;
     }
 }
+

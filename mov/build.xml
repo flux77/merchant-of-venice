@@ -28,23 +28,23 @@
     <header><![CDATA[<b>Venice ${VERSION}</b>]]></header>
     <footer><![CDATA[<b>Venice ${VERSION}</b>]]></footer>
     <doctitle>Venice ${VERSION}</doctitle>
-  </javadoc>           
+  </javadoc>
   </target>
 
   <!-- Get a backup of the CVS tree from sourceforge -->
   <target name="backup">
     <tstamp>
       <format property="today" pattern="ddmmyyyy"/>
-    </tstamp> 
+    </tstamp>
     <mkdir dir="${backup}"/>
     <get src="http://cvs.sourceforge.net/cvstarballs/mov-cvsroot.tar.gz"
          dest="${backup}/backup-${today}.tar.gz"
-	 verbose="true"/>        
+	 verbose="true"/>
   </target>
 
   <!-- Build venice -->
   <target name="build">
-    <javac srcdir="${src}" 
+    <javac srcdir="${src}"
 	   debug="on"
   	   optimize="on"
 	   source="1.4"
@@ -84,10 +84,10 @@
 
     <!-- This will say it's generating manual.html but we override this. -->
     <!-- and write out files for individual chapters.                    -->
-    <xslt basedir="${doc}" 
+    <xslt basedir="${doc}"
           destdir="${help}"
           includes="manual.xml"
-          extension=".html" 
+          extension=".html"
           style="${doc}/manual-help.xsl">
       <xmlcatalog refid="document"/>
     </xslt>
@@ -123,8 +123,8 @@
 
   <!-- Generate a jar -->
   <target name="jar" depends="build, doc">
-    <jar jarfile="venice.jar" 
-         includes="**/*.class, **/*.gif, **/*.png, org/mov/help/doc/*.html, 
+    <jar jarfile="venice.jar"
+         includes="**/*.class, **/*.gif, **/*.png, org/mov/help/doc/*.html,
                    org/mov/util/locale/*.properties,
                    org/mov/help/doc/index.xml, org/mov/quote/samples/*.txt"
          basedir="${src}"
@@ -132,7 +132,7 @@
   </target>
 
   <!-- Package venice up ready for release -->
-  <target name="release" depends="doc, jar">
+  <target name="release" depends="doc, jar, test">
 
     <!-- Layout files ready for release -->
     <mkdir dir="${release}"/>
@@ -142,7 +142,7 @@
     <mkdir dir="${release}/venice-${VERSION}/doc/"/>
     <copy file="${doc}/manual.txt" todir="${release}/venice-${VERSION}/doc"/>
     <copy file="${doc}/manual.html" todir="${release}/venice-${VERSION}/doc"/>
-    <copy todir="${release}/venice-${VERSION}/build/src/"> 
+    <copy todir="${release}/venice-${VERSION}/build/src/">
       <fileset dir="${src}" includes="**/*.java, **/*.png, **/*.gif, **/*.properties"/>
     </copy>
     <copy file="build.xml" todir="${release}/venice-${VERSION}/build/"/>
@@ -150,15 +150,15 @@
     <copy file="changelog.txt" todir="${release}/venice-${VERSION}/"/>
     <copy file="readme.txt" todir="${release}/venice-${VERSION}/"/>
     <copy file="venice" todir="${release}/venice-${VERSION}/"/>
-    <copy file="venice.jar" todir="${release}/venice-${VERSION}/"/>   
+    <copy file="venice.jar" todir="${release}/venice-${VERSION}/"/>
 
     <!-- Create release files for unix -->
     <tar tarfile="${release}/venice-${VERSION}.tar">
       <tarfileset dir="${release}/" includes="venice-${VERSION}/**"/>
     </tar>
-    <gzip zipfile="${release}/venice-${VERSION}.tar.gz" 
+    <gzip zipfile="${release}/venice-${VERSION}.tar.gz"
       src="${release}/venice-${VERSION}.tar"/>
-    <bzip2 zipfile="${release}/venice-${VERSION}.tar.bz2" 
+    <bzip2 zipfile="${release}/venice-${VERSION}.tar.bz2"
       src="${release}/venice-${VERSION}.tar"/>
 
     <!-- Fix CRLF issues on text files for windows -->
@@ -183,7 +183,7 @@
 
   <!-- Run Venice -->
   <target name="run" depends="build">
-    <java classname="org.mov.main.Main" 
+    <java classname="org.mov.main.Main"
           dir="${src}"
           fork="yes">
       <jvmarg value="-ea"/>
@@ -199,7 +199,7 @@
     <mkdir dir="${report}"/>
 
     <!-- Build Tests -->
-    <javac srcdir="${test}" 
+    <javac srcdir="${test}"
 	   debug="on"
   	   optimize="on"
 	   source="1.4"
@@ -212,10 +212,9 @@
     </javac>
 
     <!-- Run Tests -->
-    <junit printsummary="on" 
-           dir="${test}"
-           fork="yes" 
-           haltonfailure="yes">
+    <junit printsummary="on"
+           fork="no"
+           haltonfailure="no">
       <classpath>
         <pathelement path="${java.class.path}"/>
         <pathelement path="${src}"/>
@@ -250,7 +249,7 @@
     <tar tarfile="${web}/web.tar">
       <tarfileset dir="${web}/" excludes="web.tar*"/>
     </tar>
-    <gzip zipfile="${web}/web.tar.gz" 
+    <gzip zipfile="${web}/web.tar.gz"
       src="${web}/web.tar"/>
   </target>
 

@@ -28,6 +28,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
+import org.mov.analyser.GPPageInitialPopulation;
 import org.mov.analyser.GPModule;
 import org.mov.analyser.GPResultModule;
 import org.mov.analyser.PaperTradeModule;
@@ -368,9 +369,9 @@ public class CommandManager {
      *
      * @return	frame containing genetic programmes
      */
-    public ModuleFrame newGPResultTable() {
-	GPResultModule results = new GPResultModule();
-	return desktopManager.newFrame(results);	
+    public ModuleFrame newGPResultTable(GPPageInitialPopulation  GPPageInitialPopulation) {
+	GPResultModule results = new GPResultModule(GPPageInitialPopulation);
+	return desktopManager.newFrame(results);
     }
 
     /**

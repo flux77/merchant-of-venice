@@ -160,7 +160,7 @@ public class ChartModule extends JPanel implements Module,
     private JDesktopPane desktop;
 
     // Frame Icon
-    private String frameIcon = "org.mov/images/TableIcon.gif";
+    private String frameIcon = "org/mov/images/TableIcon.gif";
 
     // ToolBar Images - these are from jlfgr-1.0.jar
     private String defaultZoomImage = "toolbarButtonGraphics/general/Zoom24.gif";

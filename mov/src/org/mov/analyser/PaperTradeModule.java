@@ -25,7 +25,6 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -45,7 +44,6 @@ import org.mov.parser.EvaluationException;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.portfolio.Portfolio;
-import org.mov.prefs.PreferencesManager;
 import org.mov.quote.ScriptQuoteBundle;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -68,6 +66,7 @@ public class PaperTradeModule extends JPanel implements Module {
     private QuoteRangePage quoteRangePage;
     private RulesPage rulesPage;
     private PortfolioPage portfolioPage;
+    private BuySellSystemPage buySellSystemPage;
 
     /**
      * Create a new paper trade module.
@@ -97,6 +96,9 @@ public class PaperTradeModule extends JPanel implements Module {
 
         portfolioPage = new PortfolioPage(desktop);
         tabbedPane.addTab(portfolioPage.getTitle(), portfolioPage.getComponent());
+        
+        buySellSystemPage = new BuySellSystemPage(desktop);
+        tabbedPane.addTab(buySellSystemPage.getTitle(), buySellSystemPage.getComponent());
 
 	// Run, close buttons
 	JPanel buttonPanel = new JPanel();
@@ -130,6 +132,7 @@ public class PaperTradeModule extends JPanel implements Module {
         quoteRangePage.load(getClass().getName());
         rulesPage.load(getClass().getName());
         portfolioPage.load(getClass().getName());
+        buySellSystemPage.load(getClass().getName());
     }
 
     // Save GUI settings to preferences
@@ -137,6 +140,7 @@ public class PaperTradeModule extends JPanel implements Module {
         quoteRangePage.save(getClass().getName());
         rulesPage.save(getClass().getName());
         portfolioPage.save(getClass().getName());
+        buySellSystemPage.save(getClass().getName());
     }
 
     public String getTitle() {
@@ -234,6 +238,10 @@ public class PaperTradeModule extends JPanel implements Module {
             tabbedPane.setSelectedComponent(portfolioPage.getComponent());
             return false;
         }
+        else if(!buySellSystemPage.parse()) {
+            tabbedPane.setSelectedComponent(buySellSystemPage.getComponent());
+            return false;
+        }
         else
             return true;
     }
@@ -252,7 +260,9 @@ public class PaperTradeModule extends JPanel implements Module {
                                         int numberStocks,
                                         Money tradeCost,
                                         Variables variables,
-                                        int a, int b, int c)
+                                        int a, int b, int c,
+                                        String buySystemRule,
+                                        String sellSystemRule)
         throws EvaluationException {
 
         Portfolio portfolio;
@@ -269,7 +279,9 @@ public class PaperTradeModule extends JPanel implements Module {
                                               sellRule,
                                               initialCapital,
                                               stockValue,
-                                              tradeCost);
+                                              tradeCost,
+                                              buySystemRule,
+                                              sellSystemRule);
         }
         else {
             assert portfolioPage.getMode() == PortfolioPage.NUMBER_STOCKS_MODE;
@@ -284,7 +296,9 @@ public class PaperTradeModule extends JPanel implements Module {
                                               sellRule,
                                               initialCapital,
                                               numberStocks,
-                                              tradeCost);
+                                              tradeCost,
+                                              buySystemRule,
+                                              sellSystemRule);
         }
 
         // Running the equation means we might need to load in
@@ -336,6 +350,10 @@ public class PaperTradeModule extends JPanel implements Module {
         // If we are using a rule family, how many equations are in the family?
         // Otherwise it's just a single equation.
         int numberEquations = (isFamilyEnabled ? aRange * bRange * cRange : 1);
+        
+        // We get the formulas that rule at which price the stock is sold or bought
+        String buySystemRule = buySellSystemPage.getBuySystemRule();
+        String sellSystemRule = buySellSystemPage.getSellSystemRule();
 
         progress.setIndeterminate(false);
         progress.setMaximum(numberEquations);
@@ -389,7 +407,9 @@ public class PaperTradeModule extends JPanel implements Module {
                                                              numberStocks,
                                                              tradeCost,
                                                              variables,
-                                                             a, b, c));
+                                                             a, b, c,
+                                                             buySystemRule,
+                                                             sellSystemRule));
                         }
                     }
                 }
@@ -411,7 +431,9 @@ public class PaperTradeModule extends JPanel implements Module {
                                                  numberStocks,
                                                  tradeCost,
                                                  variables,
-                                                 0, 0, 0));
+                                                 0, 0, 0,
+                                                 buySystemRule,
+                                                 sellSystemRule));
 
         } catch(EvaluationException e) {
             ProgressDialogManager.closeProgressDialog(progress);

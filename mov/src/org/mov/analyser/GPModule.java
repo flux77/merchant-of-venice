@@ -32,11 +32,7 @@ import org.mov.analyser.gp.GPQuoteBundle;
 import org.mov.main.CommandManager;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
-import org.mov.parser.Expression;
-import org.mov.parser.ExpressionException;
-import org.mov.parser.Parser;
-import org.mov.parser.Variable;
-import org.mov.parser.Variables;
+import org.mov.parser.ExpressionFactory;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.ScriptQuoteBundle;
 import org.mov.ui.ProgressDialog;
@@ -320,8 +316,8 @@ public class GPModule extends JPanel implements Module {
                         String sellRuleString = GPPageInitialPopulation.getSellRule(randomRow);
                         // Call the nextIndividual method to put
                         geneticProgramme.nextIndividual(
-                            this.generateExpression(buyRuleString),
-                            this.generateExpression(sellRuleString),
+                            ExpressionFactory.newExpression(buyRuleString),
+                            ExpressionFactory.newExpression(sellRuleString),
                             mutations);
                     }
                     
@@ -395,28 +391,5 @@ public class GPModule extends JPanel implements Module {
                 
                 resultsModule.addResults(GPResults);
             }});
-    }
-    
-    // return null if an Expression can't be correctly generated from the input String
-    private Expression generateExpression(String inputRuleString) {
-        Expression rule = null;
-        
-        // We need to specify the variables that are given to the buy/sell rule
-        // expressions so they can be parsed properly.
-        Variables variables = new Variables();
-        variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        
-        if(inputRuleString.length() == 0) {
-            rule = null;
-        } else {
-            try {
-                rule = Parser.parse(variables, inputRuleString);
-            }
-            catch(ExpressionException e) {
-                rule = null;
-            }
-        }
-        return rule;
     }
 }

@@ -31,6 +31,7 @@ public class MainMenu implements ActionListener, ContainerListener {
 
     private JMenuItem graphCommodityCodeMenuItem;
     private JMenuItem graphCommodityNameMenuItem;
+    private JMenuItem graphMarketAdvanceDeclineMenuItem;
 
     private JMenuItem tableCompanyListAllMenuItem;
     private JMenuItem tableCompanyListRuleMenuItem;
@@ -173,6 +174,15 @@ public class MainMenu implements ActionListener, ContainerListener {
 		MenuHelper.addMenuItem(this, graphCommodityMenu, 
 				       "By Name",'N');
 
+	    // Graph -> Market Indicator
+	    JMenu graphMarketIndicator = 
+		MenuHelper.addMenu(graphMenu, "Market Indicator");
+
+	    // Graph -> Market Indicator -> Advance/Decline
+	    graphMarketAdvanceDeclineMenuItem =
+		MenuHelper.addMenuItem(this, graphMarketIndicator,
+				       "Advance/Decline");
+
 	    // Graph -> Portfolio
 	    graphPortfolioMenu = MenuHelper.addMenu(graphMenu, "Portfolio");
 	}
@@ -266,11 +276,12 @@ public class MainMenu implements ActionListener, ContainerListener {
 			CommandManager.getInstance().tableListIndicesByRule();
 		    
 		    // Graph Menu *******************************************************************************
-		    else if (menu == graphCommodityCodeMenuItem) {
-			CommandManager.getInstance().graphStockByCode();
-		    }
+		    else if (menu == graphCommodityCodeMenuItem) 
+			CommandManager.getInstance().graphStockBySymbol(null);
 		    else if (menu == graphCommodityNameMenuItem)
 			CommandManager.getInstance().graphStockByName();
+		    else if (menu == graphMarketAdvanceDeclineMenuItem)
+			CommandManager.getInstance().graphAdvanceDecline();
 
 		    // Maybe its a portfolio?
 		    else if(portfolioGraphHash.get(menu) != null) {

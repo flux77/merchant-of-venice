@@ -261,25 +261,25 @@ public class DesktopManager
 	};
 
     /**
-     * Display a new frame upon the current desktop
+     * Display a new frame upon the current desktop. Frame will be
+     * displayed at (0,0) and not centred.
      * 
      * @param module the module to render in the frame
      */
     public void newFrame(Module module) {
-	newFrame(module, false);
+	newFrame(module, false, false);
     }
 
     /**
      * Display a new frame upon the current desktop
      *
      * @param module the module to render in the frame
-     * @param isPreferences Is the frame a preferences frame that should
-     *                      be centred and size honoured?
+     * @param centre should the frame be centred?
+     * @param honourSize should we honour the frame's preferred size?
      */
-    public void newFrame(Module module, boolean isPreferences) {
-	// Make sure new frame is within window bounds
-	
-	ModuleFrame frame = new ModuleFrame(module, isPreferences);
+    public void newFrame(Module module, boolean centre, boolean honourSize) {
+
+	ModuleFrame frame = new ModuleFrame(module, centre, honourSize);
 	desktop_instance.add(frame);
 	
 	try {

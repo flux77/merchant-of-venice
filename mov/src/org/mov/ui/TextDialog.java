@@ -5,18 +5,22 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- * This class implements a standard text input dialog, with OK and Cancel buttons working correctly.  
- * This probably will not be required once JDK1.4 works properly, but for now gives the correct functionality
+ * Replacement dialog for Java's JOptionPane dialog for querying the user to enter a
+ * text field. It provides two fixes for the existing Java code.
+ *
+ * Firstly it allows for default text to be placed in the text input field, secondly it
+ * allows the user to press return to exit the dialog.
  */
 public class TextDialog implements ActionListener
 {
-    
     String option;
     JButton OKButton, CancelButton;
     JTextField DataTextField;
     JDialog textDialog;
     JInternalFrame textFrame;
     JPanel optionPanel;
+
+    boolean isDone;
 
     /**
      * Create new text dialog.
@@ -83,13 +87,17 @@ public class TextDialog implements ActionListener
      */
     public String showDialog()
     {
+	isDone = false;
+
 	textFrame.show();
+
 	try {
-	    while(option == null) {
+	    while(!isDone) 
 		Thread.sleep(10);
-	    }
-	} catch (Exception e) {
+
+	} catch (InterruptedException e) {
 	}
+
 	return option;
     }
     
@@ -100,9 +108,11 @@ public class TextDialog implements ActionListener
     {
 	if (e.getSource () == OKButton) {
 	    option = DataTextField.getText();
+	    isDone = true;
 	}
 	else if (e.getSource () == CancelButton) {
 	    option = null;
+	    isDone = true;
 	}
 	textFrame.dispose();
     }

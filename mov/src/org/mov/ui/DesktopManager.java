@@ -18,6 +18,7 @@
 
 package org.mov.ui;
 
+import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.Comparator;
 import java.awt.Dimension;
@@ -187,8 +188,38 @@ public class DesktopManager
         // hidden behind the progress dialog.
         Thread thread = new Thread(new Runnable() {
             public void run() {
+                // If message is a one really long line, break it up
+                StringTokenizer tokeniser = new StringTokenizer(message, " \n", true);
+                String multiLineMessage = "";
+
+                // This isn't hard and fast but a rough maximum.
+                final int MAX_LINE_LENGTH = 40;
+                int lineLength = 0;
+
+                while(tokeniser.hasMoreTokens()) {
+                    String token = tokeniser.nextToken();
+
+                    // If the token is a newline, the line length is now 0
+                    if(token.equals("\n"))
+                        lineLength = 0;
+
+                    // Are we about due for anothe rnew line?
+                    if(lineLength > MAX_LINE_LENGTH) {
+                        multiLineMessage = multiLineMessage.concat("\n");
+                        lineLength = 0;
+                    }
+
+                    // Don't add spaces at the start of a line!
+                    if(lineLength > 0 || !token.equals(" "))
+                        multiLineMessage = multiLineMessage.concat(token);
+
+                    // Don't count "\n" as a string length
+                    if(!token.equals("\n"))
+                        lineLength += token.length();
+                }
+
                 JOptionPane.showInternalMessageDialog(desktop_instance,
-                                                      message, 
+                                                      multiLineMessage,
                                                       "Venice problem!",
                                                       JOptionPane.ERROR_MESSAGE);
             }

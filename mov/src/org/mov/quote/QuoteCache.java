@@ -368,8 +368,15 @@ public class QuoteCache {
 	    // the cache, so that our size count is correct. Its OK for the caller
             // to try to delete a quote that's not in the cache - if it wasn't
             // then the quote bundles would have to keep track of holidays etc...
-	    if(quote != null)
+	    if(quote != null) {
 		size--;
+
+                // If the hashmap is empty then resize it to the minimum size.
+                // Otherwise we may have 1,000s of large hash maps taking up
+                // a *LOT* of memory. 
+                if(quotesForDate.isEmpty())
+                    cache.set(-dateOffset, new HashMap());
+            }
 
 	    assert size >= 0;
 	}

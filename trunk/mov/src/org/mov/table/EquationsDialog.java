@@ -30,7 +30,7 @@ public class EquationsDialog extends JInternalFrame
     // Fields of a transaction
     private JComboBox equationSlotComboBox;
     private JTextField columnNameTextField;
-    private JTextField equationTextField;
+    private EquationComboBox equationComboBox;
 
     private boolean isDone = false;
 
@@ -82,10 +82,10 @@ public class EquationsDialog extends JInternalFrame
 	mainPanel.add(equationSlotComboBox);
 
 	columnNameTextField = 
-	    addTextRow(mainPanel, "Column name", "", gridbag, c, 20);
+	    addTextRow(mainPanel, "Column name", "", gridbag, c, 18);
 
-	equationTextField =
-	    addTextRow(mainPanel, "Equation", "", gridbag, c, 20);
+	equationComboBox =
+	    addEquationRow(mainPanel, "Equation", "", gridbag, c);
 
 	JPanel buttonPanel = new JPanel();
 	okButton = new JButton("OK");
@@ -103,6 +103,25 @@ public class EquationsDialog extends JInternalFrame
 	int x = (desktop.getWidth() - size.width) / 2;
 	int y = (desktop.getHeight() - size.height) / 2;
 	setBounds(x, y, size.width, size.height);
+    }
+
+    // Helper method which adds a new text field in a new row to the given 
+    // grid bag layout.
+    private EquationComboBox addEquationRow(JPanel panel, String field, 
+					    String value,
+					    GridBagLayout gridbag,
+					    GridBagConstraints c) {
+	JLabel label = new JLabel(field);
+	c.gridwidth = 1;
+	gridbag.setConstraints(label, c);
+	panel.add(label);
+
+	EquationComboBox comboBox = new EquationComboBox(value);
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(comboBox, c);
+	panel.add(comboBox);
+
+	return comboBox;
     }
 
     // Helper method which adds a new text field in a new row to the given 
@@ -157,14 +176,14 @@ public class EquationsDialog extends JInternalFrame
     private void saveEquationSlot(int slot) {
 	// Store new values the user has typed in
 	equationSlots[slot].columnName = columnNameTextField.getText();
-	equationSlots[slot].equation = equationTextField.getText();
+	equationSlots[slot].equation = equationComboBox.getEquationText();
     }
 
     private void displayEquationSlot(int slot) {
 	currentEquationSlot = slot;
 
 	columnNameTextField.setText(equationSlots[slot].columnName);
-	equationTextField.setText(equationSlots[slot].equation);
+	equationComboBox.setEquationText(equationSlots[slot].equation);
     }
 
     public void actionPerformed(ActionEvent e) {

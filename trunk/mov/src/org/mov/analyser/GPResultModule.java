@@ -72,6 +72,7 @@ public class GPResultModule extends AbstractTable implements Module {
     private JMenuBar menuBar;
     private JMenuItem openMenuItem;
     private JMenuItem graphMenuItem;
+    private JMenuItem transactionsMenuItem;
     private JMenuItem viewBuyRuleMenuItem;
     private JMenuItem viewSellRuleMenuItem;
     private JMenuItem storeBuyRuleMenuItem;
@@ -268,6 +269,14 @@ public class GPResultModule extends AbstractTable implements Module {
                     }});
             menu.add(popupGraphMenuItem);
 
+            JMenuItem popupTransactionsMenuItem = new JMenuItem(Locale.getString("TRANSACTIONS"));
+            popupTransactionsMenuItem.setEnabled(getSelectedRowCount() == 1);
+            popupTransactionsMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        transactionsSelectedResult();
+                    }});
+            menu.add(popupTransactionsMenuItem);
+            
             menu.addSeparator();
 
             JMenuItem popupViewBuyRuleMenuItem =
@@ -367,6 +376,20 @@ public class GPResultModule extends AbstractTable implements Module {
         }
     }
 
+    // Transactions first selected result
+    private void transactionsSelectedResult() {
+        // Get result at row
+        int row = getSelectedRow();
+
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            GPResult result = model.getResult(row);
+
+            CommandManager.getInstance().tableTransactions(result.getPortfolio(),
+                                                           result.getQuoteBundle());
+        }
+    }
+    
     // Displays the buy rule in a small window
     private void viewBuyRule() {
         // Get result at row
@@ -505,7 +528,14 @@ public class GPResultModule extends AbstractTable implements Module {
                 }});
         resultMenu.add(graphMenuItem);
 
-	resultMenu.addSeparator();
+        transactionsMenuItem = new JMenuItem(Locale.getString("TRANSACTIONS"));
+        transactionsMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    transactionsSelectedResult();
+                }});
+        resultMenu.add(transactionsMenuItem);
+
+        resultMenu.addSeparator();
 
         viewBuyRuleMenuItem = new JMenuItem(Locale.getString("VIEW_BUY_RULE"));
         viewBuyRuleMenuItem.addActionListener(new ActionListener() {

@@ -47,7 +47,7 @@ public class Symbol implements Cloneable, Comparable {
     private String symbol;
     
     /** The minimum valid length for a symbol */
-    public final static int MINIMUM_SYMBOL_LENGTH = 3;
+    public final static int MINIMUM_SYMBOL_LENGTH = 2;
 
     /** The maximum valid length for a symbol. This cannot be more than 6 */
     public final static int MAXIMUM_SYMBOL_LENGTH = 9;

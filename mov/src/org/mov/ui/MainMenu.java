@@ -16,7 +16,7 @@ import org.mov.table.*;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
-import org.mov.ui.DesktopManager;
+import org.mov.ui.*;
 
 /**
  * The main menu of the application.
@@ -25,6 +25,7 @@ public class MainMenu implements ActionListener, ContainerListener {
 
     // All the menu items
     private JMenuItem fileImportQuotesMenuItem;
+    private JMenuItem filePortfolioNewMenuItem;
     private JMenuItem filePreferencesMenuItem;
     private JMenuItem fileExitMenuItem;
     private JMenuItem graphCommodityCodeMenuItem;
@@ -40,9 +41,15 @@ public class MainMenu implements ActionListener, ContainerListener {
     private JMenuItem windowCascadeMenuItem;
     private JMenuItem windowGridMenuItem;
 
+    private JMenu filePortfolioMenu;
     private JMenu windowMenu;
+
     private JDesktopPane desktop;
     private JFrame frame;
+
+    private HashMap portfolioHash = new HashMap();
+
+    private static MainMenu instance = null;
 
     /**
      * Construct a new main menu and attach it to the given frame.
@@ -50,7 +57,24 @@ public class MainMenu implements ActionListener, ContainerListener {
      * @param	frame	the window frame
      * @param	desktop	the desktop to lunch internal frames on
      */
-    public MainMenu(JFrame frame, JDesktopPane desktop) {
+    public static MainMenu getInstance(JFrame frame, JDesktopPane desktop) {
+	if(instance == null) {
+	    instance = new MainMenu(frame, desktop);
+	}
+	return instance;
+    }
+
+    /**
+     * Return the instance of the main menu. Will return null if not
+     * yet created.
+     * 
+     * @return	the main menu instance
+     */
+    public static MainMenu getInstance() {
+	return instance;
+    }
+
+    private MainMenu(JFrame frame, JDesktopPane desktop) {
 
 	this.frame = frame;
 	this.desktop = desktop;
@@ -58,168 +82,119 @@ public class MainMenu implements ActionListener, ContainerListener {
 	JMenuBar menuBar = new JMenuBar();
 	// File 
 	{	   
-	    JMenu fileMenu = addMenu(menuBar, "File", 'F');
+	    JMenu fileMenu = MenuHelper.addMenu(menuBar, "File", 'F');
 
-	    // File -> Import
-	    fileImportQuotesMenuItem = addMenuItem(fileMenu, "Import Quotes", 
-						   'I');
+	    // File -> Portfolio
+	    filePortfolioMenu = MenuHelper.addMenu(fileMenu, "Portfolio", 'P');
 
-	    // File -> Preferences
-	    filePreferencesMenuItem = addMenuItem(fileMenu, "Preferences", 'P');
-	    filePreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-									  KeyEvent.VK_R, 
-									  ActionEvent.CTRL_MASK));
+	    // File -> Portfolio -> New
+	    updatePortfolioMenu();
 
 	    fileMenu.addSeparator();
 
+	    // File -> Import
+	    fileImportQuotesMenuItem = MenuHelper.addMenuItem(this, fileMenu, 
+							      "Import Quotes", 
+							      'I');
+	    // File -> Preferences
+	    filePreferencesMenuItem = MenuHelper.addMenuItem(this, fileMenu, 
+							     "Preferences", 
+							     'R');
+	    fileMenu.addSeparator();
+
 	    // File -> Exit
-	    fileExitMenuItem = addMenuItem(fileMenu, "Exit", 'x');
-	    fileExitMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-								   KeyEvent.VK_Q, 
-								   ActionEvent.CTRL_MASK));
+	    fileExitMenuItem = MenuHelper.addMenuItem(this, fileMenu, "Exit", 'Q');
 	}
 
 	// Table
 	{
-	    JMenu tableMenu = addMenu(menuBar, "Table", 'T');
+	    JMenu tableMenu = MenuHelper.addMenu(menuBar, "Table", 'T');
 	    
 	    // Table -> Companies + Funds
-	    JMenu tableMenuCompany = addMenu(tableMenu, "Companies + Funds", 'f');
+	    JMenu tableMenuCompany = MenuHelper.addMenu(tableMenu, 
+							"Companies + Funds",
+					     'C');
 
 	    // Table -> Companies + Funds -> List all
 	    tableCompanyListAllMenuItem = 
-		addMenuItem(tableMenuCompany, "List all", 'l');
+		MenuHelper.addMenuItem(this, tableMenuCompany, "List all");
 
 	    // Table -> Companies + Funds -> List by rule
 	    tableCompanyListRuleMenuItem = 
-		addMenuItem(tableMenuCompany, "List by rule", 'r');
+		MenuHelper.addMenuItem(this, tableMenuCompany, "List by rule");
 	    
 	    // Table -> Indices
-	    JMenu tableMenuIndices = addMenu(tableMenu, "Indices",'i');
+	    JMenu tableMenuIndices = MenuHelper.addMenu(tableMenu, 
+							"Indices", 'I');
 
 	    // Table -> Indices -> List All
 	    tableIndicesListAllMenuItem = 
-		addMenuItem(tableMenuIndices, "List all", 'l');
+		MenuHelper.addMenuItem(this, tableMenuIndices, "List all");
 
 	    // Table -> Indices -> List by Rule
 	    tableIndicesListRuleMenuItem = 
-		addMenuItem(tableMenuIndices, "List by rule",'r');
+		MenuHelper.addMenuItem(this, tableMenuIndices, "List by rule");
 	    
 	    // Table -> All Commodities
-	    JMenu tableMenuCommodities = addMenu(tableMenu, "All Commodities", 'l');
+	    JMenu tableMenuCommodities = MenuHelper.addMenu(tableMenu, 
+							    "All Commodities",
+							    'A');
 
 	    // Table -> All Commodities -> List All
 	    tableCommoditiesListAllMenuItem = 
-		addMenuItem(tableMenuCommodities, "List all", 'l');
-	    tableCommoditiesListAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-									     KeyEvent.VK_L, 
-									     ActionEvent.CTRL_MASK));
+		MenuHelper.addMenuItem(this, tableMenuCommodities, 
+				       "List all", 'L');
 
 	    // Table -> All Commodities -> List by Rule
 	    tableCommoditiesListRuleMenuItem = 
-		addMenuItem(tableMenuCommodities, "List by rule",'r');
+		MenuHelper.addMenuItem(this, tableMenuCommodities, 
+				       "List by rule",'B');
 	}
 	
 	// Graph        
 	{
-	    JMenu graphMenu = addMenu(menuBar, "Graph", 'r');
+	    JMenu graphMenu = MenuHelper.addMenu(menuBar, "Graph", 'G');
 	    
 	    // Graph -> Commodities
-	    JMenu graphCommodityMenu = addMenu(graphMenu, "Commodities", 'c');
+	    JMenu graphCommodityMenu = MenuHelper.addMenu(graphMenu, 
+							  "Commodities");
 	    
 	    // Graph -> Commodities -> By Codes
 	    graphCommodityCodeMenuItem = 
-		addMenuItem(graphCommodityMenu, "By Symbols", 's');
-	    graphCommodityCodeMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-									     KeyEvent.VK_G, 
-									     ActionEvent.CTRL_MASK));
+		MenuHelper.addMenuItem(this, graphCommodityMenu, 
+				       "By Symbols", 'G');
 	    
 	    // Graph -> Commodities -> By Name
 	    graphCommodityNameMenuItem = 
-		addMenuItem(graphCommodityMenu, "By Name",'n');
-	}
-     
-	// Portfolio menu
-	{
-	    JMenu portfolioMenu = addMenu(menuBar, "Portfolio", 'o');
-	}
-
-	// Paper-trade menu
-	{
-	    JMenu paperTradeMenu = addMenu(menuBar, "Paper Trade", 'a');
+		MenuHelper.addMenuItem(this, graphCommodityMenu, 
+				       "By Name",'N');
 	}
 
 	// Genetic Algorithm menu
 	{
-	    JMenu geneticAlgorithmMenu = addMenu(menuBar, "GA", 'G');
+	    JMenu geneticAlgorithmMenu = 
+		MenuHelper.addMenu(menuBar, "GA", 'A');
 	}
 
 	// Window menu
 	{
-	    windowMenu = addMenu(menuBar, "Window", 'W');
-	    windowTileHorizontalMenuItem = addMenuItem(windowMenu, "Tile Horizontally");
+	    windowMenu = MenuHelper.addMenu(menuBar, "Window", 'W');
+	    windowTileHorizontalMenuItem = 
+		MenuHelper.addMenuItem(this, windowMenu, "Tile Horizontally");
 	    windowTileHorizontalMenuItem.setEnabled(false);
-	    windowTileVerticalMenuItem = addMenuItem(windowMenu, "Tile Vertically");
+	    windowTileVerticalMenuItem = 
+		MenuHelper.addMenuItem(this, windowMenu, "Tile Vertically");
 	    windowTileVerticalMenuItem.setEnabled(false);
-	    windowCascadeMenuItem = addMenuItem(windowMenu, "Cascade");
+	    windowCascadeMenuItem = 
+		MenuHelper.addMenuItem(this, windowMenu, "Cascade");
 	    windowCascadeMenuItem.setEnabled(false);
-	    windowGridMenuItem = addMenuItem(windowMenu, "Arrange all");
+	    windowGridMenuItem = 
+		MenuHelper.addMenuItem(this, windowMenu, "Arrange all");
 	    windowGridMenuItem.setEnabled(false);
 	    windowMenu.addSeparator();
 	}
 
 	frame.setJMenuBar(menuBar);
-    }
-
-    /**
-     * Creates a menu item and attaches it to a menu
-     * @param parent The menu to attach the menu item to
-     * @param title The title of the menu item
-     */
-    private JMenuItem addMenuItem(JMenuItem parent, String title) {
-	return addMenuItem(parent, title, (char)0);
-    }
-
-    /**
-     * Creates a menu item and attaches it to a menu
-     * @param parent The menu to attach the menu item to
-     * @param title The title of the menu item
-     */
-    private JMenuItem addMenuItem(JMenuItem parent, String title, char key) {
-	JMenuItem menuItem;
-	if (key != 0) {
-	    menuItem = new JMenuItem(title, key);
-	} else {
-	    menuItem = new JMenuItem(title);
-	}
-	menuItem.addActionListener(this);
-	parent.add(menuItem);
-
-	return menuItem;
-    } 
-
-    /**
-     * Creates a menu and attaches it to a component
-     * @param parent The component to attach the menu to
-     * @param title The title of the menu
-     */
-    private JMenu addMenu(JComponent parent, String title) {
-	return addMenu(parent, title, (char)0);
-    }
-
-    /**
-     * Creates a menu and attaches it to a component
-     * @param parent The component to attach the menu to
-     * @param title The title of the menu
-     * @param key The accelerator key for the menu
-     */
-    private JMenu addMenu(JComponent parent, String title, char key) {
-	JMenu menu = new JMenu(title);
-	if (key != 0)
-	    menu.setMnemonic(key);
-	parent.add(menu);
-	
-	return menu;
     }
 
     /**
@@ -242,12 +217,23 @@ public class MainMenu implements ActionListener, ContainerListener {
 		    if(menu == fileImportQuotesMenuItem) {
 			CommandManager.getInstance().importQuotes();
 		    }
+		    else if(menu == filePortfolioNewMenuItem)
+			CommandManager.getInstance().newPortfolio();
+
+		    // Maybe its a portfolio?
+		    else if(portfolioHash.get(menu) != null) {
+			String portfolioName =
+			    (String)portfolioHash.get(menu);
+
+			CommandManager.getInstance().openPortfolio(portfolioName);
+		    }
+
 		    else if(menu == fileExitMenuItem)
 			System.exit(0);
 		    else if(menu == filePreferencesMenuItem) {
 			// Display preferences
 			((DesktopManager)(desktop.getDesktopManager()))
-			    .newFrame(new PreferencesModule(desktop), true);
+			    .newFrame(new PreferencesModule(desktop), true, true);
 		    }
 		    
 		    // Table Menu *******************************************************************************
@@ -280,25 +266,23 @@ public class MainMenu implements ActionListener, ContainerListener {
 		    else if (menu == windowGridMenuItem)
 			CommandManager.getInstance().tileFramesArrange();
 
-		    // Must be a window selection action
-		    else {
-			Component c = (Component)menu_frame_hash.get(menu);
-			if(c != null) {
-			    JInternalFrame f = null;
-			    if (menu.getText().substring(0,1).equals("(")) {
-				JInternalFrame.JDesktopIcon icon = (JInternalFrame.JDesktopIcon)c;
-				f = icon.getInternalFrame();
-			    } else {
-				f = (JInternalFrame) c;
-			    }
-
-			    try {
-				f.setIcon(false);
-				desktop.setSelectedFrame(f);
-				f.setSelected(true);
-				f.toFront();
-			    } catch (PropertyVetoException e) {}
+		    // Maybe its a window ??
+		    Component c = (Component)menu_frame_hash.get(menu);
+		    if(c != null) {
+			JInternalFrame f = null;
+			if (menu.getText().substring(0,1).equals("(")) {
+			    JInternalFrame.JDesktopIcon icon = (JInternalFrame.JDesktopIcon)c;
+			    f = icon.getInternalFrame();
+			} else {
+			    f = (JInternalFrame) c;
 			}
+			
+			try {
+			    f.setIcon(false);
+			    desktop.setSelectedFrame(f);
+			    f.setSelected(true);
+			    f.toFront();
+			} catch (PropertyVetoException e) {}
 		    }
 		}
 	    };
@@ -334,7 +318,7 @@ public class MainMenu implements ActionListener, ContainerListener {
 		title = "Unknown";
 
 	    // Store the menu item in a hash referenced by the window's name
-	    JMenuItem i = addMenuItem(windowMenu, title);
+	    JMenuItem i = MenuHelper.addMenuItem(this, windowMenu, title);
 	    frame_menu_hash.put(o, i);
 	    menu_frame_hash.put(i, o);
 	    if (frame_menu_hash.size() == 1) {
@@ -363,6 +347,28 @@ public class MainMenu implements ActionListener, ContainerListener {
 		windowTileVerticalMenuItem.setEnabled(false);
 		windowCascadeMenuItem.setEnabled(false);
 		windowGridMenuItem.setEnabled(false);
+	    }
+	}
+    }
+
+    public void updatePortfolioMenu() {
+	// Remove old menu items from portfolio menu (if there were any)
+	filePortfolioMenu.removeAll();
+	portfolioHash.clear();
+
+	// Now rebuild menu listing all portfolios
+	filePortfolioNewMenuItem = 
+	    MenuHelper.addMenuItem(this, filePortfolioMenu, "New Portfolio");
+	
+	String[] portfolioNames = PreferencesManager.getPortfolioNames();
+	if(portfolioNames.length > 0) {
+	    filePortfolioMenu.addSeparator();
+	    
+	    for(int i = 0; i < portfolioNames.length; i++) {
+		    JMenuItem menu = MenuHelper.addMenuItem(this, 
+							    filePortfolioMenu,
+							    portfolioNames[i]);
+		    portfolioHash.put(menu, portfolioNames[i]);
 	    }
 	}
     }

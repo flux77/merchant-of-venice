@@ -20,12 +20,11 @@ import org.mov.ui.*;
 public class Main extends JFrame implements WindowListener {
     
     private JDesktopPane desktop;
-    private static MainMenu menu;
     private static Main venice;
 
     /**
      * Get the main frame for the current application
-     * @returns The frame
+     * @return The frame
      */
     public static JFrame getApplicationFrame() {
 	return Main.venice;
@@ -44,7 +43,9 @@ public class Main extends JFrame implements WindowListener {
 	desktop.setDesktopManager(new org.mov.ui.DesktopManager(desktop));
 	CommandManager.getInstance().setDesktop(desktop);
 
-	menu = new MainMenu(this, desktop);
+	// Instantiate main menu singletons
+	MainMenu.getInstance(this, desktop);
+
 	setContentPane(desktop);
 	addWindowListener(this);
     }

@@ -115,7 +115,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     public class EquationSlot {
 	String columnName;
 	String equation;
-        org.mov.parser.Expression expression;
+        Expression expression;
         List results;
 
 	public Object clone() {
@@ -261,8 +261,15 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 int equationColumn = column - EQUATION_COLUMN;
                 List results = equationSlots[equationColumn].results;
                 
-                if(results != null)
+                // If the list doesn't exist then we haven't created any
+                // equations. If it is empty, we haven't created an
+                // equation in that column.
+                if(results != null && results.size() > row)
                     return (Float)results.get(row);
+
+                // No equation? Just display 0.
+                else
+                    return new Float(0.0F);
             }
 
             assert false;
@@ -432,7 +439,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             if(!singleDate || (lastDate.equals(quote.getDate())))
                 quotes.add(quote);
         }
-        
+
         return quotes;
     }
 
@@ -447,7 +454,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             return extractAllQuotes(quoteBundle);
 
         // First parse the equation
-        org.mov.parser.Expression expression = null;
+        Expression expression = null;
         
         try {
             expression = Parser.parse(filterEquationString);
@@ -479,7 +486,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
                 if(!singleDate || (lastDate.equals(quote.getDate()))) {
                     if(expression.evaluate(new Variables(), quoteBundle, symbol, dateOffset) >=
-                       org.mov.parser.Expression.TRUE_LEVEL)
+                       Expression.TRUE_LEVEL)
                         quotes.add(quote);
                 }
 	    }
@@ -625,7 +632,6 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 			// Update table
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-
 				    model.setQuotes(quotes);
 				    model.fireTableDataChanged();
 				}});
@@ -668,8 +674,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 				    for(int i = 0; i < EQUATION_SLOTS; i++) {
 					boolean containsEquation = false;
 					
-					if(equationSlots[i].equation.length() >
-					   0)
+					if(equationSlots[i].equation.length() > 0)
 					    containsEquation = true;
 					
 					showColumn(EQUATION_COLUMN + i,
@@ -695,8 +700,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
         for(int i = 0; i < EQUATION_SLOTS; i++) {
             List results = new ArrayList();
-
-            org.mov.parser.Expression expression = equationSlots[i].expression;
+            Expression expression = equationSlots[i].expression;
 
             if(expression != null) {
                 Iterator iterator = quotes.iterator();

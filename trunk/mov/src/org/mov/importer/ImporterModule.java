@@ -449,20 +449,31 @@ public class ImporterModule extends JPanel
 
 	Thread thread = Thread.currentThread();
 
-        // Get a list of all dates between the first and last
-        List dateRange = TradingDate.dateRangeToList(source.getFirstDate(),
-                                                     source.getLastDate());
-
         // Now set up progress dialog to display date by date progress
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setIndeterminate(false);
-        progress.setMaximum(dateRange.size());
         progress.setProgress(0);
         progress.setMaster(true);
         progress.show("Importing");
 
+        TradingDate firstDate = source.getFirstDate();
+        TradingDate lastDate;
+
+        // If the file source is empty, then this thread will be interrupted.
+        // and an error message printed. All we need to do is exit now.
+        if(thread.isInterrupted()) {
+            ProgressDialogManager.closeProgressDialog(progress);	
+            return;
+        }
+
+        lastDate = source.getLastDate();
+
+        // Get a list of all dates between the first and last
+        List dateRange = TradingDate.dateRangeToList(firstDate, lastDate);
 	boolean isToFiles = toFiles.isSelected() && toFiles.isEnabled();
 	boolean isToDatabase = toDatabase.isSelected() && toDatabase.isEnabled();
+
+        progress.setMaximum(dateRange.size());
 
         // Set the application quote's source to be the quotes we are about
         // to import

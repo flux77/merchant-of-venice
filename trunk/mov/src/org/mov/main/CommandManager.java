@@ -134,7 +134,8 @@ public class CommandManager {
                     else
                         symbolsCopy = new TreeSet(symbols);
 
-                    tableStocks(title, QuoteRange.GIVEN_SYMBOLS, null, symbolsCopy, null);
+                    if(symbolsCopy != null && symbolsCopy.size() > 0)
+                        tableStocks(title, QuoteRange.GIVEN_SYMBOLS, null, symbolsCopy, null);
                 }
             });
         thread.start();
@@ -197,8 +198,13 @@ public class CommandManager {
                 if(date == null)
                     date = QuoteSourceManager.getSource().getLastDate();
 
-                if (!thread.isInterrupted())
+                if(!thread.isInterrupted()) {
+                    // If we couldn't load a date, the quote source will have interrupted
+                    // the thead. So this shouldn't be null here.
+                    assert date != null;
+
                     quoteRange = new QuoteRange(type, date.previous(1), date);
+                }
 
                 singleDate = true;
             }

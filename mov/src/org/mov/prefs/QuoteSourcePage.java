@@ -421,8 +421,8 @@ public class QuoteSourcePage extends JPanel
 	    PreferencesManager.getUserNode("/quote_source");
 	if(useFiles.isSelected())
 	    p.put("source", "files");
-	else if(useInternet.isSelected())
-	    p.put("source", "internet");
+	//else if(useInternet.isSelected())
+	//    p.put("source", "internet");
 	else 
 	    p.put("source", "database");
 
@@ -453,9 +453,9 @@ public class QuoteSourcePage extends JPanel
 
 	// Save internet preferences
 	{
-	    p = PreferencesManager.getUserNode("/quote_source/internet");
-	    p.put("username", internetUsername.getText());
-	    p.put("password", new String(internetPassword.getPassword()));
+	    //p = PreferencesManager.getUserNode("/quote_source/internet");
+	    //p.put("username", internetUsername.getText());
+	    //p.put("password", new String(internetPassword.getPassword()));
 	}
 
 	// This makes the next query use our new settings

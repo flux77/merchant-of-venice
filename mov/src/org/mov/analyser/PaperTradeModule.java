@@ -387,6 +387,10 @@ public class PaperTradeModule extends JPanel implements Module,
 
 			// Read data from GUI and load quote data
 			if(parseInterface() && loadQuoteBundle()) {
+                            // Before we paper trade, save our interface results
+                            // so if the programme crashes etc our stuff is still there
+                            save();
+
 			    // If its OK generate and display portfolios
 			    displayPaperTrades(paperTrade());
 			}
@@ -607,25 +611,13 @@ public class PaperTradeModule extends JPanel implements Module,
 	final Thread thread = Thread.currentThread();
 	ProgressDialog progress = 
 	    ProgressDialogManager.getProgressDialog();
-	progress.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e)
-		{
-		    thread.interrupt();
-		}
-	    });
-
 	Portfolio portfolio = null;
 	    
-	try {
-	    progress.setTitle("Loading quotes for paper trade");
-	    progress.show();
+        progress.show("Paper Trade");
 
-	    quoteBundle = new ScriptQuoteBundle(new QuoteRange((String)symbols.first()));	   
-	} catch (Exception e) {
-	    // nothing to do
-	}
+        quoteBundle = new ScriptQuoteBundle(new QuoteRange((String)symbols.first()));	   
 
-	ProgressDialogManager.closeProgressDialog();
+	ProgressDialogManager.closeProgressDialog(progress);
 
 	return true;
     }

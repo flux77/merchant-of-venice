@@ -21,8 +21,6 @@ package org.mov.chart.source;
 import org.mov.chart.*;
 import org.mov.util.*;
 import org.mov.quote.*;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
 
 import java.util.*;
 
@@ -58,10 +56,6 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	graphable = new Graphable();
 	Float value;
 
-        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-        progress.setProgress(0);
-        progress.setNote("Graphing dates");
-
 	for(TradingDate date = quoteBundle.getLastDate();
 	    date.compareTo(quoteBundle.getFirstDate()) >= 0;
 	    date = date.previous(1)) {
@@ -69,7 +63,6 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    try {
 		value = new Float(quoteBundle.getQuote(symbol, quote, date));
 		graphable.putY((Comparable)date, value);
-                if (progress != null) progress.increment();
 	    }
 	    catch(MissingQuoteException e) {
 		// ignore

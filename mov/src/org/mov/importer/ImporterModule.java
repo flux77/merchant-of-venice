@@ -426,9 +426,10 @@ public class ImporterModule extends JPanel
     // Perform actual import given source and/or file list
     private void performImport(QuoteSource source, Set dates) {
         ProgressDialog p = ProgressDialogManager.getProgressDialog();
-        p.setTitle("Importing");
+        p.setIndeterminate(false);
         p.setProgress(0);
         p.setMaximum(dates.size());
+        p.show("Importing");
 	
 	TradingDate date;
 	Iterator iterator = dates.iterator();
@@ -472,7 +473,7 @@ public class ImporterModule extends JPanel
 	// quotes
 	QuoteSourceManager.flush();	
 
-	ProgressDialogManager.closeProgressDialog();
+	ProgressDialogManager.closeProgressDialog(p);
     }
 
     // Import file name containing a day's quotes into the file list

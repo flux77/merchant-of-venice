@@ -73,6 +73,9 @@ public class ProgressBarUI extends javax.swing.plaf.ProgressBarUI implements Ima
             timer.start();
 	}
 	else {
+            if (timer != null)
+                timer.stop();
+
             paintProgress(g, x, y, width, height, minimum, maximum, value);
 	}
         if (((JProgressBar)c).isBorderPainted()) {
@@ -166,5 +169,13 @@ public class ProgressBarUI extends javax.swing.plaf.ProgressBarUI implements Ima
     public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
         if (c != null)
             c.repaint();
+    }
+
+    public Dimension getMinimumSize(JComponent component) {
+        return new Dimension(50, 15);
+    }
+
+    public Dimension getPreferredSize(JComponent component) {
+        return new Dimension(50, 15);
     }
 }

@@ -65,14 +65,11 @@ public class QuoteBundleCache {
      *
      * @return  singleton instance of this class
      */
-    public static QuoteBundleCache getInstance() {
-	if(instance != null) {
-	    return instance;
-	}
-	else {
+    public static synchronized QuoteBundleCache getInstance() {
+	if(instance == null)
 	    instance = new QuoteBundleCache();
-	    return instance;	
-	}
+
+        return instance;
     }
 
     /**

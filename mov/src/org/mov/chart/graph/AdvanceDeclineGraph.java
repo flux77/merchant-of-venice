@@ -196,16 +196,13 @@ public class AdvanceDeclineGraph extends AbstractGraph {
 	System.out.println("GOT DATES");
 
 	int cumulativeAdvanceDecline = START_VALUE;
+	int progress = 0;
 
 	ProgressDialog p = ProgressDialogManager.getProgressDialog();
-	p.setTitle("Calculating advance/decline");
 	p.setIndeterminate(false);
 	p.setMaximum(dates.size());
-	p.show();
-
-	int progress = 0;
 	p.setProgress(progress);
-	p.show();
+	p.show("Calculating advance/decline");
 
 	// Iterate over every date 
 	while(iterator.hasNext()) {

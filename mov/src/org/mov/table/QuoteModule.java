@@ -288,14 +288,15 @@ public class QuoteModule extends AbstractTable
 	    assert false;
 	}
 
+        ProgressDialog p = ProgressDialogManager.getProgressDialog();
+
 	// Add symbols to vector when expression proves true
 	try {
 	    Vector extractedSymbols = new Vector();
 	    String symbol;
 
-            ProgressDialog p = ProgressDialogManager.getProgressDialog();
             p.setMaximum(symbols.size());
-            p.setTitle("Filtering quotes");
+            p.setNote("Filtering quotes");
             
             // Traverse symbols
 	    Iterator iterator = symbols.iterator();
@@ -329,7 +330,7 @@ public class QuoteModule extends AbstractTable
 	    return quoteBundle.getSymbols(quoteBundle.getFirstDate());
 	}
 	finally {
-	    ProgressDialogManager.closeProgressDialog();
+	    ProgressDialogManager.closeProgressDialog(p);
 	}
     }
 

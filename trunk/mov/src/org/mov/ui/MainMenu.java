@@ -126,7 +126,7 @@ public class MainMenu implements ActionListener, ModuleListener
 		     org.mov.ui.DesktopManager desktopManager) {
 	this.frame = frame;
 	this.desktopManager = desktopManager;
-	this.desktop = desktopManager.getDesktop();
+	this.desktop = DesktopManager.getDesktop();
 
 	// Listens for modules being added, delete or having their names
 	// changed

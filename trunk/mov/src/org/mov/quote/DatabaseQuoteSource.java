@@ -492,7 +492,7 @@ public class DatabaseQuoteSource implements QuoteSource
                     while(true) {
 
                         try {
-                            currentThread.sleep(1000); // 1s
+                            Thread.sleep(1000); // 1s
                         }
                         catch(InterruptedException e) {
                             break;

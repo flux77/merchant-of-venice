@@ -49,7 +49,7 @@ public class QuoteBundleIterator implements Iterator {
 
         nextDate = quoteBundle.getFirstDate();
 
-        Vector symbols = quoteBundle.getSymbols(nextDate);
+        List symbols = quoteBundle.getSymbols(nextDate);
         symbolsIterator = symbols.iterator();
 
         // go to next quote
@@ -78,7 +78,7 @@ public class QuoteBundleIterator implements Iterator {
                 nextDate = nextDate.next(1);
 
                 while(nextDate.compareTo(quoteBundle.getLastDate()) <= 0) {
-                    Vector symbols = quoteBundle.getSymbols(nextDate);
+                    List symbols = quoteBundle.getSymbols(nextDate);
                     
                     // Are there symbols in the cache?
                     if(symbols.size() > 0) {

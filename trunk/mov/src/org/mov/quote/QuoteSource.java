@@ -18,8 +18,9 @@
 
 package org.mov.quote;
 
-import java.util.*;
-import org.mov.util.*;
+import java.util.List;
+
+import org.mov.util.TradingDate;
 
 /**
  * Provides a generic interface in which we can query stock quotes from
@@ -88,7 +89,7 @@ public interface QuoteSource {
      *
      * @return	a vector of dates
      */
-    public Vector getDates();
+    public List getDates();
 
     /**
      * Is the given symbol a market index?

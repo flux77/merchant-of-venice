@@ -17,11 +17,15 @@
 */
 
 package org.mov.analyser;
-import java.awt.*;
+
+import java.awt.Point;
 import java.awt.event.*;
 import java.beans.*;
 import java.text.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -88,35 +92,35 @@ public class PaperTradeResultModule extends AbstractTable
 	    String.class, PriceFormat.class, Integer.class, PriceFormat.class, 
 	    PriceFormat.class, ChangeFormat.class};
 	
-	private Vector results;
+	private List results;
 
 	public Model() {
-	    results = new Vector();
+	    results = new ArrayList();
 	}
 
 	public PaperTradeResult getPaperTradeResult(int row) {
-	    return (PaperTradeResult)results.elementAt(row);
+	    return (PaperTradeResult)results.get(row);
 	}
 
         public void removeAllResults() {
-            results.removeAllElements();
+            results.clear();
 
             // Notify table that the whole data has changed
             fireTableDataChanged();
         }
 
-        public Vector getResults() {
+        public List getResults() {
             return results;
         }
 
-        public void setResults(Vector results) {
+        public void setResults(List results) {
             this.results = results;
 
             // Notify table that the whole data has changed
             fireTableDataChanged();
         }
 
-        public void addResults(Vector results) {
+        public void addResults(List results) {
             this.results.addAll(results);
 
             // Notify table that the whole data has changed
@@ -144,7 +148,7 @@ public class PaperTradeResultModule extends AbstractTable
 		return "";
 
 	    PaperTradeResult result = 
-		(PaperTradeResult)results.elementAt(row);
+		(PaperTradeResult)results.get(row);
 
 	    if(column == START_DATE_COLUMN) {
 		return result.getStartDate();
@@ -290,16 +294,17 @@ public class PaperTradeResultModule extends AbstractTable
 
         // Get selected rows and put them in order from highest to lowest
         int[] rows = getSelectedRows();
-        Vector rowIntegers = new Vector();
+        List rowIntegers = new ArrayList();
         for(int i = 0; i < rows.length; i++) 
-            rowIntegers.addElement(new Integer(rows[i]));
-        Vector sortedRows = new Vector(rowIntegers);
+            rowIntegers.add(new Integer(rows[i]));
+
+        List sortedRows = new ArrayList(rowIntegers);
         Collections.sort(sortedRows);
         Collections.reverse(sortedRows);
 
         // Now remove them from the results list starting from the highest row
         // to the lowest
-        Vector results = model.getResults();
+        List results = model.getResults();
         Iterator iterator = sortedRows.iterator();
 
         while(iterator.hasNext()) {
@@ -411,7 +416,7 @@ public class PaperTradeResultModule extends AbstractTable
         checkMenuDisabledStatus();
     }
 
-    public void addResults(Vector results) {
+    public void addResults(List results) {
         model.addResults(results);
         checkMenuDisabledStatus();
 	validate();

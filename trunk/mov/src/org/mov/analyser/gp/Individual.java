@@ -121,8 +121,11 @@ public class Individual implements Comparable {
                 buyRuleDepth >= min && buyRuleDepth <= max);
     }
 
-    public float paperTrade(QuoteBundle quoteBundle) 
+    public float paperTrade(GPQuoteBundle quoteBundle) 
         throws EvaluationException {
+        
+
+
 
         throw new EvaluationException("hiya");
     }

@@ -48,12 +48,12 @@ import org.mov.util.*;
  */
 public class QuoteCache {
 
-    // Cache is organised by a vector of hashmaps, each hashmap
+    // Cache is organised by a list of hashmaps, each hashmap
     // corresponds to a trading day. The hashmap's keys are stock symbols.
-    private Vector cache = new Vector();
+    private List cache;
 
     // Keep list of dates in cache
-    private ArrayList dates = new ArrayList();
+    private List dates;
 
     // Number of quotes in cache
     private int size = 0;
@@ -63,6 +63,9 @@ public class QuoteCache {
 
     // Class should only be constructed once by this class
     private QuoteCache() {
+        cache = Collections.synchronizedList(new ArrayList());
+        dates = Collections.synchronizedList(new ArrayList());
+
         TradingDate lastDate = 
             QuoteSourceManager.getSource().getLastDate();
 
@@ -116,7 +119,7 @@ public class QuoteCache {
      * @param dateOffset        fast access date offset
      * @return list of symbols
      */
-    public Vector getSymbols(int dateOffset) {
+    public List getSymbols(int dateOffset) {
         HashMap quotesForDate;
 
 	try {
@@ -127,7 +130,7 @@ public class QuoteCache {
 	    quotesForDate = new HashMap(0);
 	}
 	
-	return new Vector(quotesForDate.keySet());
+	return new ArrayList(quotesForDate.keySet());
     }
 
     /**
@@ -138,13 +141,13 @@ public class QuoteCache {
      * @param lastDateOffset fast access offset of last date
      * @return list of symbols
      */
-    public Vector getSymbols(int firstDateOffset, int lastDateOffset) {
+    public List getSymbols(int firstDateOffset, int lastDateOffset) {
         HashMap symbols = new HashMap();
 
         // Go through each day, collecting symbols. We put them all in
         // a hashmap to quickly weed out the numerous duplicates.
         for(int date = firstDateOffset; date <= lastDateOffset; date++) {
-            Vector datesSymbols = getSymbols(date);
+            List datesSymbols = getSymbols(date);
 
             for(Iterator iterator = datesSymbols.iterator(); iterator.hasNext();) {
                 String symbol = (String)iterator.next();
@@ -153,7 +156,7 @@ public class QuoteCache {
             }
         }
 
-        return new Vector(symbols.keySet());
+        return new ArrayList(symbols.keySet());
     }
 
     // Returns a HashMap containing quotes for that date
@@ -165,7 +168,7 @@ public class QuoteCache {
 	if(dateOffset <= -dates.size())
 	    throw new QuoteNotLoadedException();
 	
-	HashMap quotesForDate = (HashMap)cache.elementAt(-dateOffset);
+	HashMap quotesForDate = (HashMap)cache.get(-dateOffset);
 
 	if(quotesForDate == null)
 	    throw new QuoteNotLoadedException();

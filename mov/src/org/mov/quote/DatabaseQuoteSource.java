@@ -472,10 +472,10 @@ public class DatabaseQuoteSource implements QuoteSource
 	String filterString = new String("");
 
 	if(quoteRange.getType() == QuoteRange.GIVEN_SYMBOLS) {
-	    Vector symbols = quoteRange.getAllSymbols();
+	    List symbols = quoteRange.getAllSymbols();
 
 	    if(symbols.size() == 1) {
-		String symbol = ((String)symbols.firstElement()).toUpperCase();
+		String symbol = ((String)symbols.get(0)).toUpperCase();
 
 		filterString =
 		    filterString.concat(SYMBOL_FIELD + " = '" + symbol + "' ");
@@ -754,10 +754,10 @@ public class DatabaseQuoteSource implements QuoteSource
     /**
      * Return all the dates which we have quotes for. REALLY SLOW.
      *
-     * @return	a vector of dates
+     * @return	a list of dates
      */
-    public Vector getDates() {
-	Vector dates = new Vector();
+    public List getDates() {
+	List dates = new ArrayList();
 
 	if(checkConnection()) {
 

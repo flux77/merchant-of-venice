@@ -18,11 +18,13 @@
 
 package org.mov.analyser;
 
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.*;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -188,7 +190,7 @@ public class PaperTradeModule extends JPanel implements Module {
                     
                     // Read data from GUI and load quote data
                     if(parse()) {
-                        Vector paperTradeResults = getPaperTradeResults();
+                        List paperTradeResults = getPaperTradeResults();
 
                         if(paperTradeResults != null)
                             display(paperTradeResults);
@@ -254,12 +256,12 @@ public class PaperTradeModule extends JPanel implements Module {
 
     }
  
-    private PaperTradeResult paperTradeSymbol(ProgressDialog progress, Vector symbols, 
+    private PaperTradeResult paperTradeSymbol(ProgressDialog progress, List symbols, 
                                               ScriptQuoteBundle quoteBundle,
                                               Variables variables)
         throws EvaluationException {
 
-        String firstSymbol = (String)symbols.firstElement();
+        String firstSymbol = (String)symbols.get(0);
         Portfolio portfolio = 
             PaperTrade.paperTrade("Paper Trade of " + 
                                   firstSymbol.toLowerCase(),
@@ -288,7 +290,7 @@ public class PaperTradeModule extends JPanel implements Module {
                                          quoteRangePage.getQuoteRange().getLastDate());
     }
    
-    private PaperTradeResult paperTradeForEachSymbol(ProgressDialog progress, Vector symbols, 
+    private PaperTradeResult paperTradeForEachSymbol(ProgressDialog progress, List symbols, 
                                                      ScriptQuoteBundle quoteBundle,
                                                      Variables variables)
         throws EvaluationException {
@@ -349,7 +351,7 @@ public class PaperTradeModule extends JPanel implements Module {
                                            quoteRangePage.getQuoteRange().getLastDate());
     }
 
-    private PaperTradeResult getPaperTradeResult(ProgressDialog progress, Vector symbols, 
+    private PaperTradeResult getPaperTradeResult(ProgressDialog progress, List symbols, 
                                                  ScriptQuoteBundle quoteBundle,
                                                  Variables variables)
         throws EvaluationException {
@@ -373,7 +375,7 @@ public class PaperTradeModule extends JPanel implements Module {
         return paperTradeResult;
     }
                                 
-    private Vector getPaperTradeResults() {
+    private List getPaperTradeResults() {
         ProgressDialog progress = 
             ProgressDialogManager.getProgressDialog();
 
@@ -381,7 +383,7 @@ public class PaperTradeModule extends JPanel implements Module {
         progress.show("Paper Trade");
 
         quoteBundle = new ScriptQuoteBundle(quoteRangePage.getQuoteRange());
-        Vector symbols = quoteBundle.getAllSymbols();
+        List symbols = quoteBundle.getAllSymbols();
         
         // If we are using a rule family, how many equations are in the family?
         // Otherwise it's just a single equation.
@@ -403,7 +405,7 @@ public class PaperTradeModule extends JPanel implements Module {
         progress.setMaster(true);
 
 	// Iterate through all possible paper trade equations
-        Vector paperTradeResults = new Vector(numberEquations);
+        List paperTradeResults = new ArrayList(numberEquations);
 
         try {
             Variables variables = new Variables();
@@ -455,7 +457,7 @@ public class PaperTradeModule extends JPanel implements Module {
 	return paperTradeResults;
     }
 
-    private void display(final Vector paperTradeResults) {
+    private void display(final List paperTradeResults) {
 
 	// Invokes on dispatch thread
 	SwingUtilities.invokeLater(new Runnable() {

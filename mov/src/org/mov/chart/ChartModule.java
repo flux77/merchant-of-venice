@@ -40,7 +40,7 @@ import org.mov.ui.*;
  * used to draw any of the required charts.
  * Example:
  * <pre>
- *	QuoteBundle quoteBundle = new QuoteBundle(new QuoteRange(symbol));
+ *	QuoteBundle quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
  *	GraphSource dayClose = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
  *	Graph graph = new LineGraph(dayClose);
  *
@@ -309,7 +309,7 @@ public class ChartModule extends JPanel implements Module,
 	    progress.show("Loading quotes for " + symbol);
 	    
 	    if (!thread.isInterrupted())
-		quoteBundle = new QuoteBundle(new QuoteRange(symbol));
+		quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
 	    
 	    if (!thread.isInterrupted())
 		dayClose = 

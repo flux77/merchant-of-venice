@@ -45,7 +45,7 @@ public class QuoteBundleCache {
     private static QuoteBundleCache instance = null;
 
     // Loaded quote bundle stack
-    private Vector loadedQuoteBundles;
+    private List loadedQuoteBundles;
 
     // For speed reasons keep copy of quote cache instance
     private QuoteCache quoteCache;
@@ -57,7 +57,7 @@ public class QuoteBundleCache {
     // Class should only be constructed once by this class
     private QuoteBundleCache() {
 	quoteCache = QuoteCache.getInstance();
-	loadedQuoteBundles = new Vector();
+	loadedQuoteBundles = Collections.synchronizedList(new ArrayList());
     }
 
     /**
@@ -140,7 +140,7 @@ public class QuoteBundleCache {
             // freeing the oldest bundle
             while(quoteCache.size() > MAX_QUOTES &&
                   loadedQuoteBundles.size() > 0) {
-                free((QuoteBundle)loadedQuoteBundles.firstElement());
+                free((QuoteBundle)loadedQuoteBundles.get(0));
             }
         }
 
@@ -186,7 +186,7 @@ public class QuoteBundleCache {
 	for(int dateOffset = firstDateOffset; 
 	    dateOffset <= lastDateOffset; dateOffset++) {
 
-	    Vector symbols = quoteBundle.getSymbols(dateOffset);
+	    List symbols = quoteBundle.getSymbols(dateOffset);
 	    Iterator iterator = symbols.iterator();
 
 	    while(iterator.hasNext()) {

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import org.mov.util.TradingDate;
 import org.mov.ui.DesktopManager;
@@ -337,13 +336,13 @@ public class FileQuoteSource implements QuoteSource
     /**
      * Return all the dates which we have quotes for (SLOW0.
      *
-     * @return a vector of dates
+     * @return a list of dates
      */
-    public Vector getDates() {
+    public List getDates() {
         if(checkFiles()) 
-            return new Vector(dateToURL.keySet());
+            return new ArrayList(dateToURL.keySet());
         else
-            return new Vector();
+            return new ArrayList();
     }
 
     /**

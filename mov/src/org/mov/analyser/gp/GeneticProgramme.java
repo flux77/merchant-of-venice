@@ -38,11 +38,11 @@ public class GeneticProgramme {
     private SortedSet nextBreedingPopulation;
     private Mutator mutator;
     private Random random;
-    private QuoteBundle quoteBundle;
+    private GPQuoteBundle quoteBundle;
 
     private int generation;
 
-    public GeneticProgramme(QuoteBundle quoteBundle, int breedingPopulationSize, int seed) {
+    public GeneticProgramme(GPQuoteBundle quoteBundle, int breedingPopulationSize, int seed) {
         this.breedingPopulationSize = breedingPopulationSize;
         this.quoteBundle = quoteBundle;
 

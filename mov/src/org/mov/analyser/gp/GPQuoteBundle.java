@@ -16,33 +16,30 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.quote;
+package org.mov.analyser.gp;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.mov.parser.EvaluationException;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.WeekendDateException;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteBundleIterator;
+import org.mov.quote.QuoteRange;
 import org.mov.util.TradingDate;
 
-/** 
- * This interface provides a set of functions to allow Venice to access stock quotes
- * and entities that can be treated like stock quotes, e.g. user indices and portfolios.
- * Typically the caller will want to use the {@link ScriptQuoteBundle} implementation
- * which allows dynamic resizing if the user tries to access older quotes not in the
- * quote bundle.
- *
- * @see GPQuoteBundle
- * @see ScriptQuoteBundle
- * @see PortfolioQuoteBundle
- * @see Quote
- * @see QuoteRange
- * @see QuoteBundleCache
- * @see QuoteCache
- */
-public interface QuoteBundle {
+public class GPQuoteBundle implements QuoteBundle {
+
+    private QuoteBundle quoteBundle;
+
+    public GPQuoteBundle(QuoteBundle quoteBundle) {
+        this.quoteBundle = quoteBundle;
+    }
 
     /** 
-     * Get a stock quote. 
+     * Get a stock quote. If the stock is earlier than the first date in the bundle, the
+     * bundle will be expand to include the new date given.
      *
      * @param symbol  the stock symbol
      * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
@@ -52,7 +49,10 @@ public interface QuoteBundle {
      * @exception MissingQuoteException if the quote was not found
      */
     public float getQuote(String symbol, int quoteType, int dateOffset)
-	throws MissingQuoteException;
+	throws MissingQuoteException {
+        assert false;
+        return 0.0F;
+    }
 
     /** 
      * Get a stock quote. This function has been primarily created for Gondola
@@ -69,7 +69,27 @@ public interface QuoteBundle {
      * @exception EvaluationException if the script isn't allow access to the quote.
      */
     public float getQuote(String symbol, int quoteType, int today, int offset)
-	throws EvaluationException;
+	throws EvaluationException {
+        
+        // Trying to access a future quote?
+        if(offset > 0)
+            throw new EvaluationException("future date");
+
+        int dateOffset = today + offset;
+
+        // If the date is before our first date - don't expand the quote bundle
+        // there might not be enough memory for that. Just use the first date
+        // in the bundle
+        if(dateOffset < getFirstDateOffset())
+            dateOffset = getFirstDateOffset();
+        
+        try {
+            return quoteBundle.getQuote(symbol, quoteType, dateOffset);
+        }
+        catch(MissingQuoteException e) {
+            return 0.0F;
+        }
+    }
 
     /** 
      * Get a stock quote. 
@@ -82,7 +102,10 @@ public interface QuoteBundle {
      * @exception MissingQuoteException if the quote was not found
      */
     public float getQuote(String symbol, int quoteType, TradingDate date) 
-	throws MissingQuoteException;
+        throws MissingQuoteException {
+        assert false;
+        return 0.0F;
+    }
 
     /**
      * Return whether the given quote should be in this quote bundle.
@@ -92,7 +115,9 @@ public interface QuoteBundle {
      * @return  <code>true</code> if this symbol should be in the quote bundle, 
      *          <code>false</code> otherwise
      */
-    public boolean containsQuote(String symbol, int dateOffset);
+    public boolean containsQuote(String symbol, int dateOffset) {
+        return quoteBundle.containsQuote(symbol, dateOffset);
+    }
 
     /**
      * Return whether the given quote should be in this quote bundle.
@@ -102,7 +127,9 @@ public interface QuoteBundle {
      * @return  <code>true</code> if this symbol should be in the quote bundle, 
      *          <code>false</code> otherwise
      */
-    public boolean containsQuote(String symbol, TradingDate date);
+    public boolean containsQuote(String symbol, TradingDate date) {
+        return quoteBundle.containsQuote(symbol, date);
+    }
 
     /**
      * Return an iterator over this quote bundle. The iterator will return, in order,
@@ -111,35 +138,45 @@ public interface QuoteBundle {
      * @return iterator over the quotes
      * @see Quote
      */
-    public Iterator iterator();
+    public Iterator iterator() {
+        return new QuoteBundleIterator(this);
+    }
 
     /**
      * Return the quote range which specifies this quote bundle.
      *
      * @return the quote range
      */
-    public QuoteRange getQuoteRange();
+    public QuoteRange getQuoteRange() {
+	return quoteBundle.getQuoteRange();
+    }
 
     /**
      * Set the qutoe range which specifies this quote bundle.
      *
      * @param quoteRange        the new quote range
      */
-    public void setQuoteRange(QuoteRange quoteRange);
+    public void setQuoteRange(QuoteRange quoteRange) {
+        assert false;
+    }
 
     /**
      * Return the first symbol in the quote bundle. 
      * 
      * @return the first symbol
      */
-    public String getFirstSymbol();
+    public String getFirstSymbol() {
+        return quoteBundle.getFirstSymbol();
+    }
 
     /**
      * Returns all the symbols in the quote bundle.
      *
      * @return all symbols
      */
-    public List getAllSymbols();
+    public List getAllSymbols() {
+        return quoteBundle.getAllSymbols();
+    }
 
     /**
      * Returns all the symbols listed in this quote bundle for the given date.
@@ -147,7 +184,9 @@ public interface QuoteBundle {
      * @param dateOffset fast access date offset, see {@link QuoteCache}
      * @return all symbols
      */
-    public List getSymbols(int dateOffset);
+    public List getSymbols(int dateOffset) {	
+        return quoteBundle.getSymbols(dateOffset);
+    }
 
     /**
      * Returns all the symbols listed in this quote bundle for the given date.
@@ -155,35 +194,45 @@ public interface QuoteBundle {
      * @param date the date
      * @return all symbols
      */
-    public List getSymbols(TradingDate date);
+    public List getSymbols(TradingDate date) {
+        return quoteBundle.getSymbols(date);
+    }
 
     /**
      * Return the first date in this quote bundle.
      *
      * @return the earliest date
      */
-    public TradingDate getFirstDate();
+    public TradingDate getFirstDate() {
+        return quoteBundle.getFirstDate();
+    }
 
     /**
      * Return the last date in this quote bundle.
      *
      * @return the latest date
      */
-    public TradingDate getLastDate();
+    public TradingDate getLastDate() {
+        return quoteBundle.getLastDate();
+    }
 
     /**
      * Return the fast access date offset of the first date in this quote bundle
      *
      * @return the first date offset, see {@link QuoteCache}
      */
-    public int getFirstDateOffset();
+    public int getFirstDateOffset() {
+        return quoteBundle.getFirstDateOffset();
+    }
 
     /**
      * Return the fast access date offset of the last date in this quote bundle
      *
      * @return the first date offset, see {@link QuoteCache}
      */
-    public int getLastDateOffset();
+    public int getLastDateOffset() {
+        return quoteBundle.getLastDateOffset();
+    }
 
     /**
      * Convert between a fast access date offset to an actual date.
@@ -191,7 +240,9 @@ public interface QuoteBundle {
      * @param dateOffset        fast access date offset, see {@link QuoteCache}
      * @return the date
      */
-    public TradingDate offsetToDate(int dateOffset);
+    public TradingDate offsetToDate(int dateOffset) {
+        return quoteBundle.offsetToDate(dateOffset);
+    }
 
     /**
      * Convert between a date and a fast access date offset.
@@ -199,14 +250,17 @@ public interface QuoteBundle {
      * @param date the date
      * @return fast access date offset, see {@link QuoteCache}
      */
-    public int dateToOffset(TradingDate date)
-        throws WeekendDateException;
+    public int dateToOffset(TradingDate date) 
+        throws WeekendDateException {
+        return quoteBundle.dateToOffset(date);
+    }
 
     /**
      * Free the quote bundle. This will remove the quote bundle from the 
      * {@link QuoteBundleCache}. This method is optional - quote bundles do not need
      * to call this when they are done. 
      */
-    public void free();
+    public void free() {
+	quoteBundle.free();
+    }    
 }
-

@@ -33,6 +33,7 @@ import org.mov.quote.QuoteFilterList;
 import org.mov.quote.QuoteRange;
 import org.mov.quote.QuoteSource;
 import org.mov.quote.QuoteSourceManager;
+import org.mov.quote.ScriptQuoteBundle;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
 
@@ -483,7 +484,7 @@ public class ImporterModule extends JPanel
 
                 if(isToDatabase || fromDatabase.isSelected())
                     quoteBundle = 
-                        new QuoteBundle(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
+                        new ScriptQuoteBundle(new QuoteRange(QuoteRange.ALL_SYMBOLS, date));
 
                 // file -> file
                 if(fromFiles.isSelected() && isToFiles) {

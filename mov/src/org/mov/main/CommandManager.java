@@ -249,7 +249,7 @@ public class CommandManager {
                         QuoteRange quoteRange =
                             new QuoteRange(QuoteRange.ALL_SYMBOLS, lastDate.previous(1), lastDate);
                         
-                        quoteBundle = new QuoteBundle(quoteRange);
+                        quoteBundle = new ScriptQuoteBundle(quoteRange);
                     }
                     
                     if(!thread.isInterrupted()) {
@@ -365,7 +365,7 @@ public class CommandManager {
         // Only need to load from quote bundle if there are any stocks
         // in the portfolio
         if(quoteBundle == null && symbols.size() > 0) {
-            quoteBundle = new QuoteBundle(new QuoteRange(symbols, startDate, endDate));
+            quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbols, startDate, endDate));
         }
 
         if (!thread.isInterrupted()) {
@@ -481,7 +481,7 @@ public class CommandManager {
             while(iterator.hasNext() && !thread.isInterrupted()) {
                 symbol = (String)iterator.next();
 
-                quoteBundle = new QuoteBundle(new QuoteRange(symbol));
+                quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
 
                 if(thread.isInterrupted())
                     break;

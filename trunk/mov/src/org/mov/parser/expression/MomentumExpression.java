@@ -94,7 +94,7 @@ public class MomentumExpression extends TernaryExpression {
 
     public Object clone() {
         return new MomentumExpression((Expression)getChild(0).clone(), 
-                                 (Expression)getChild(1).clone(),
-                                 (Expression)getChild(2).clone());
+                                      (Expression)getChild(1).clone(),
+                                      (Expression)getChild(2).clone());
     }
 }

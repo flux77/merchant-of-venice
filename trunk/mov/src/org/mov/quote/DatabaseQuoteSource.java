@@ -72,6 +72,9 @@ public class DatabaseQuoteSource implements QuoteSource
     /** PostgreSQL Database. */
     public final static int POSTGRESQL = 1;
 
+    /** Hypersonic SQL Database. */
+    public final static int HSQLDB      = 2;
+
     // MySQL driver info
     private final static String MYSQL_DRIVER_NAME = "mysql";
     private final static String MM_MYSQL_DRIVER   = "org.gjt.mm.mysql.Driver";
@@ -80,6 +83,10 @@ public class DatabaseQuoteSource implements QuoteSource
     // PostgreSQL driver info
     private final static String POSTGRESQL_DRIVER_NAME = "postgresql";
     private final static String POSTGRESQL_DRIVER      = "org.postgresql.Driver";
+
+    // Hypersonic SQL driver info
+    private final static String HSQLDB_DRIVER_NAME = "hsqldb:hsql";
+    private final static String HSQLDB_DRIVER      = "org.hsqldb.jdbcDriver";
 
     // Shares table
     private final static String SHARE_TABLE_NAME  = "shares";
@@ -111,8 +118,8 @@ public class DatabaseQuoteSource implements QuoteSource
      * Creates a new quote source using the database information specified
      * in the user preferences.
      *
-     * @param   software        the database software, either {@link #MYSQL} or
-     *                          {@link #POSTGRESQL}.
+     * @param   software        the database software, either {@link #MYSQL},
+     *                          {@link #POSTGRESQL} or {@link #HSQLDB}.
      * @param	host	the host location of the database
      * @param	port	the port of the database
      * @param	database	the name of the database
@@ -121,7 +128,7 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public DatabaseQuoteSource(int software, String host, String port, 
 			       String database, String username, String password) {
-	assert software == MYSQL || software == POSTGRESQL;
+	assert software == MYSQL || software == POSTGRESQL || software == HSQLDB;
 
         connection = null;
         firstDate = null;
@@ -144,9 +151,11 @@ public class DatabaseQuoteSource implements QuoteSource
             // Connect
             if(software == MYSQL)
                 success = connectMySQL();
-            else {
-                assert software == POSTGRESQL;
+            else if(software == POSTGRESQL)
                 success = connectPostgreSQL();
+            else {
+                assert software == HSQLDB;
+                success = connectHSQLDB();
             }
         }
 
@@ -195,6 +204,32 @@ public class DatabaseQuoteSource implements QuoteSource
 	}
     }
 
+    // Connect to a Hypersonic database
+    private boolean connectHSQLDB() {
+	// Get driver
+	try {
+	    Class.forName(HSQLDB_DRIVER).newInstance();
+
+            try {
+                connection =
+                    DriverManager.getConnection("jdbc:" + HSQLDB_DRIVER_NAME + "://"+ host +
+                                                ":" + port +
+                                                "/"+ database);
+                return true;
+            }
+            catch (SQLException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_CONNECTING_TO_DATABASE",
+                                                                 e.getMessage()));
+                return false;
+            }
+	}
+	catch (Exception e) {
+	    // Couldn't find the driver!
+	    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_LOAD_HSQLDB_DRIVER"));
+	    return false;
+	}    
+    }
+
     // Connect to the database
     private boolean connect() {
 	try {
@@ -203,8 +238,8 @@ public class DatabaseQuoteSource implements QuoteSource
 	    if(software == MYSQL)
 		driverName = MYSQL_DRIVER_NAME;
 	    else {
-		assert software == POSTGRESQL;
-		driverName = POSTGRESQL_DRIVER_NAME;
+                assert software == POSTGRESQL;
+                driverName = POSTGRESQL_DRIVER_NAME;
 	    }
 
 	    connection =
@@ -318,16 +353,11 @@ public class DatabaseQuoteSource implements QuoteSource
 		// Return the first date found matching the given symbol.
 		// If no dates are found - the symbol is unknown to us.
 		// This should take << 1s
-                String query =
-                    new String("SELECT " + DATE_FIELD + " FROM " +
-                               SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
-                               + symbol + "' " +
-                               "LIMIT 1");
+                String query = buildSymbolPresentQuery(symbol);
 		ResultSet RS = statement.executeQuery(query);
 
                 // Find out if it has any rows
-                RS.last();
-                symbolExists = RS.getRow() > 0;
+                symbolExists = RS.next();
 
 		// Clean up after ourselves
 		RS.close();
@@ -487,13 +517,6 @@ public class DatabaseQuoteSource implements QuoteSource
                 Thread thread = Thread.currentThread();
 		ResultSet RS = statement.executeQuery(SQLString);
 
-		// All this to find out how many rows in the result set
-		RS.last();
-		progress.setMaximum(RS.getRow());
-		progress.setProgress(0);
-		progress.setIndeterminate(false);
-		RS.beforeFirst();
-
                 // Monitor thread is no longer needed
                 monitor.interrupt();
 
@@ -508,9 +531,6 @@ public class DatabaseQuoteSource implements QuoteSource
                                         RS.getFloat(DAY_HIGH_FIELD),
                                         RS.getFloat(DAY_OPEN_FIELD),
                                         RS.getFloat(DAY_CLOSE_FIELD));
-                        
-                        // Update the progress bar per row
-                        progress.increment();
                     }
                 }                    
 
@@ -695,8 +715,13 @@ public class DatabaseQuoteSource implements QuoteSource
 	    success = true;
 	}
 	catch (SQLException e) {
-	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-							     e.getMessage()));
+            // Since hypersonic won't let us check if the table is already created,
+            // we need to ignore the inevitable error about the table already being present.
+            if(software != HSQLDB)
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                                 e.getMessage()));
+            else
+                success = true;
 	}
 
 	return success;	
@@ -705,36 +730,39 @@ public class DatabaseQuoteSource implements QuoteSource
     private boolean checkDatabase() {
 	boolean success = true;
 
-	try {
-	    DatabaseMetaData meta = connection.getMetaData();
-
-	    // Check database exists
-	    {
-		ResultSet RS = meta.getCatalogs();
-		String traverseDatabaseName;
-		boolean foundDatabase = false;
-		
-		while(RS.next()) {
-		    traverseDatabaseName = RS.getString(1);
-		
-		    if(traverseDatabaseName.equals(database)) {
-			foundDatabase = true;
-			break;
-		    }
-		}
-		
-		if(!foundDatabase) {
-		    DesktopManager.showErrorMessage(Locale.getString("CANT_FIND_DATABASE",
-								     database));
-		    return false;
-		}
-	    }
-	}
-	catch (SQLException e) {
-	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-							     e.getMessage()));
-	    return false;
-	}
+        // Skip this check for hypersonic - it doesn't support it
+        if(software != HSQLDB) {
+            try {
+                DatabaseMetaData meta = connection.getMetaData();
+                
+                // Check database exists
+                {
+                    ResultSet RS = meta.getCatalogs();
+                    String traverseDatabaseName;
+                    boolean foundDatabase = false;
+                    
+                    while(RS.next()) {
+                        traverseDatabaseName = RS.getString(1);
+                        
+                        if(traverseDatabaseName.equals(database)) {
+                            foundDatabase = true;
+                            break;
+                        }
+                    }
+                    
+                    if(!foundDatabase) {
+                        DesktopManager.showErrorMessage(Locale.getString("CANT_FIND_DATABASE",
+                                                                         database));
+                        return false;
+                    }
+                }
+            }
+            catch (SQLException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                                 e.getMessage()));
+                return false;
+            }
+        }
 
 	// If we got here the database is available
 	return success;
@@ -744,20 +772,24 @@ public class DatabaseQuoteSource implements QuoteSource
         boolean success = false;
 
 	try {
-	    DatabaseMetaData meta = connection.getMetaData();
-            ResultSet RS = meta.getTables(database, null, "%", null);
-            String traverseTables;
             boolean foundTable = false;
-            
-            while(RS.next()) {
-                traverseTables = RS.getString(3);
-		
-                if(traverseTables.equals(SHARE_TABLE_NAME)) {
-                    foundTable = true;
-                    break;
+
+            // Skip this check for hypersonic - it doesn't support it
+            if(software != HSQLDB) {
+                DatabaseMetaData meta = connection.getMetaData();
+                ResultSet RS = meta.getTables(database, null, "%", null);
+                String traverseTables;
+                
+                while(RS.next()) {
+                    traverseTables = RS.getString(3);
+                    
+                    if(traverseTables.equals(SHARE_TABLE_NAME)) {
+                        foundTable = true;
+                        break;
+                    }
                 }
-            }
-            
+            }                
+
             // No table? Well have to go create it
             if(!foundTable)
                 success = createTables();
@@ -782,14 +814,79 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public void importQuotes(String databaseName, QuoteBundle quoteBundle,
 			     TradingDate date) {
+        if(checkConnection()) {
+            if(software == HSQLDB)
+                importQuoteMultipleStatements(databaseName, quoteBundle, date);
+            else
+                importQuoteSingleStatement(databaseName, quoteBundle, date);
+        }
+    }
 
-	if(!checkConnection()) 
-            return;
+    /**
+     * Import quotes into the database using a separate insert statement for
+     * each row. Use this function when the database does not support
+     * multi-row inserts.
+     *
+     * @param	databaseName	the name of the database
+     * @param	quoteBundle	bundle of quotes to import
+     * @param	date		the date for the day quotes
+     */
+    private void importQuoteMultipleStatements(String databaseName, QuoteBundle quoteBundle,
+                                               TradingDate date) {
+        String dateString = date.toString();
+        
+        // Get a list of all the symbols for the given date that are
+        // already in the database
+        List existingSymbols = getSymbols(date);
+        
+        // Build single query to insert stocks for a whole day into
+        // the table
+        Iterator iterator = quoteBundle.iterator();
+        
+        try {
+            while(iterator.hasNext()) {
+                Quote quote = (Quote)iterator.next();
+                
+                // Don't import quotes that are already in the database
+                if(!existingSymbols.contains(quote.getSymbol())) {
+                    String insertQuery = new String("INSERT INTO " + SHARE_TABLE_NAME +
+                                                    " VALUES (" +
+                                                    "'" + dateString           + "', " +
+                                                    "'" + quote.getSymbol()    + "', " +
+                                                    "'" + quote.getDayOpen()   + "', " +
+                                                    "'" + quote.getDayClose()  + "', " +
+                                                    "'" + quote.getDayHigh()   + "', " +
+                                                    "'" + quote.getDayLow()    + "', " +
+                                                    "'" + quote.getDayVolume() + 
+                                                    "')");
+                    
+                    // Now insert the quote into database
+                    Statement statement = connection.createStatement();
+                    statement.executeUpdate(insertQuery);
+                }
+            }
+        }
+        catch (SQLException e) {
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                             e.getMessage()));
+        }
+    }
 
+    /**
+     * Import quotes into the database using a single insert statement for
+     * all rows. Use this function when the database supports
+     * multi-row inserts.
+     *
+     * @param	databaseName	the name of the database
+     * @param	quoteBundle	bundle of quotes to import
+     * @param	date		the date for the day quotes
+     */
+    private void importQuoteSingleStatement(String databaseName, QuoteBundle quoteBundle,
+                                            TradingDate date) {
         StringBuffer insertString = new StringBuffer();
         boolean firstQuote = true;
         String dateString = date.toString();
-        
+
         // Get a list of all the symbols for the given date that are
         // already in the database
         List existingSymbols = getSymbols(date);
@@ -851,15 +948,11 @@ public class DatabaseQuoteSource implements QuoteSource
 		// Return the first date found matching the given date.
 		// If no dates are found - the date is not in the source.
 		// This should take << 1s.
-                String query =
-                    new String("SELECT " + DATE_FIELD + " FROM " +
-                               SHARE_TABLE_NAME + " WHERE " + DATE_FIELD + " = '"
-                               + date + "' " + "LIMIT 1");
+                String query = buildDatePresentQuery(date);
 		ResultSet RS = statement.executeQuery(query);
 
                 // Find out if it has any rows
-                RS.last();
-                containsDate = RS.getRow() > 0;
+                containsDate = RS.next();
 
 		// Clean up after ourselves
 		RS.close();
@@ -943,12 +1036,10 @@ public class DatabaseQuoteSource implements QuoteSource
                            left(SYMBOL_FIELD ,1)  + " != 'X' ");
 
             ResultSet RS = statement.executeQuery(query);
-
-            // Find out if it has any rows
-            RS.last();
+            boolean isDatePresent = RS.next();
             int advanceDecline = 0;
 
-            if(RS.getRow() > 0) {
+            if(isDatePresent) {
                 advanceDecline = RS.getInt(1);
 
                 // Clean up after ourselves
@@ -977,11 +1068,9 @@ public class DatabaseQuoteSource implements QuoteSource
                            left(SYMBOL_FIELD, 1) + " != 'X' ");
 
             RS = statement.executeQuery(query);
+            isDatePresent = RS.next();
 
-            // Find out if it has any rows
-            RS.last();
-
-            if(RS.getRow() > 0) {
+            if(isDatePresent) {
                 advanceDecline -= RS.getInt(1);
 
                 // Clean up after ourselves
@@ -1037,32 +1126,70 @@ public class DatabaseQuoteSource implements QuoteSource
 	return symbols;
     }
 
-    // This function shows an error message if there are no quotes in the
-    // database. We generally only care about this when trying to get the
-    // the current date or the lowest or highest. This method will also
-    // interrupt the current thread. This way calling code only needs to
-    // check for cancellation, rather than each individual fault.
+    /**
+     * This function shows an error message if there are no quotes in the
+     * database. We generally only care about this when trying to get the
+     * the current date or the lowest or highest. This method will also
+     * interrupt the current thread. This way calling code only needs to
+     * check for cancellation, rather than each individual fault.
+     */
     private void showEmptyDatabaseError() {
         DesktopManager.showErrorMessage(Locale.getString("NO_QUOTES_FOUND"));
     }
 
     /**
-     * Return the SQL operator for returning the left most characters in
+     * Return the SQL clause for returning the left most characters in
      * a string. This function is needed because there seems no portable
      * way of doing this.
      *
      * @param field the field to extract
      * @param length the number of left most characters to extract
-     * @return the SQL operator for performing LEFT(string, letters)
+     * @return the SQL clause for performing <code>LEFT(string, letters)</code>
      */
     private String left(String field, int length) {
         if(software == MYSQL)
             return new String("LEFT(" + field + ", " + length + ")");
         else {
             // This is probably more portable than the above
-            assert software == POSTGRESQL;
-            return new String("SUBSTR(" + field + ", 0, " + length + ")");
+            assert software == POSTGRESQL || software == HSQLDB;
+            return new String("SUBSTR(" + field + ", 1, " + length + ")");
         }        
+    }
+
+    /**
+     * Return the SQL clause for detecting whether the given date appears
+     * in the table.
+     *
+     * @param data the date
+     * @return the SQL clause
+     */
+    private String buildDatePresentQuery(TradingDate date) {
+        if(software == HSQLDB)
+            return new String("SELECT TOP 1 " + DATE_FIELD + " FROM " +
+                              SHARE_TABLE_NAME + " WHERE " + DATE_FIELD + " = '"
+                              + date + "' ");
+        else
+            return new String("SELECT " + DATE_FIELD + " FROM " +
+                              SHARE_TABLE_NAME + " WHERE " + DATE_FIELD + " = '"
+                              + date + "' LIMIT 1");
+    }
+
+    /**
+     * Return the SQL clause for detecting whether the given symbol appears
+     * in the table.
+     *
+     * @param symbol the symbol
+     * @return the SQL clause
+     */
+    private String buildSymbolPresentQuery(Symbol symbol) {
+        if(software == HSQLDB)
+            return new String("SELECT TOP 1 " + SYMBOL_FIELD + " FROM " +
+                              SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
+                              + symbol + "' ");
+        else
+            return new String("SELECT " + SYMBOL_FIELD + " FROM " +
+                              SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
+                              + symbol + "' LIMIT 1");
     }
 }
 

@@ -36,7 +36,7 @@ import org.mov.quote.Symbol;
 public class OBVExpression extends TernaryExpression {
 
     /**
-     * Create a new Bollinger Band Lower expression for the given <code>quote</code> kind,
+     * Create a new On Balance Volume (OBV) expression for the given <code>quote</code> kind,
      * for the given number of <code>days</code>, starting with <code>lag</code> days away.
      *
      * @param	initialValue	the initialValue the OBV start with

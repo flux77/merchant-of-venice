@@ -35,10 +35,11 @@ import org.mov.quote.*;
 
 /**
  * The main menu of the application.
+ *
+ * @author Daniel Makovec
  */
 public class MainMenu implements ActionListener, ModuleListener
 {
-    
     // All the menu items
     private JMenuItem fileImportQuotesMenuItem;
     private JMenuItem filePortfolioNewMenuItem;

@@ -5,26 +5,16 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-
-
-
-// THIS IS INSANE!! It requires us to load in ALL the quotes from the database! Better way
-// would be to use this SQL query (or one that loads in multiples of these at a time):
-//
-// select count(*) from shares where date = "xxxxxx" and close > open;
-//
-// the above query takes 0.10 sec (or 0.20 for both) vs 0.94. Meaning its 5 times
-// faster. thats not included java processing etc...
 
 package org.mov.chart.graph;
 
@@ -39,16 +29,23 @@ import org.mov.prefs.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
 
-public class AdvanceDeclineGraph extends AbstractGraph {
+/**
+ * Advance/Decline graph. This graphs the Advance/Decline market indicator. This
+ * graph is used to indicate whether trends in the market are short or long lived.
+ * If the market is going up and the advance/decline line is going down, there
+ * is something wrong.
+ */
+public class AdvanceDeclineGraph implements Graph {
 
     private Graphable advanceDecline;
 
     // Graph starts at an arbitary value
-    private static final int START_VALUE = 1000;
+    private static final int START_VALUE = 0;
 
+    /**
+     * Create a new Advance/Decline graph.
+     */
     public AdvanceDeclineGraph() {
-
-	super(null);
 	advanceDecline = createAdvanceDecline();
     }
 
@@ -56,7 +53,7 @@ public class AdvanceDeclineGraph extends AbstractGraph {
 		       float horizontalScale, float verticalScale,
 		       float bottomLineValue, Vector xRange) {
 
-	GraphTools.renderLine(g, advanceDecline, xoffset, yoffset, 
+	GraphTools.renderLine(g, advanceDecline, xoffset, yoffset,
 			      horizontalScale,
 			      verticalScale, bottomLineValue, xRange);
     }
@@ -74,7 +71,7 @@ public class AdvanceDeclineGraph extends AbstractGraph {
     /**
      * Get the first X value that this graph will draw.
      *
-     * @return	X value of the first x coordinate in the default 
+     * @return	X value of the first x coordinate in the default
      *		<code>GraphSource</code>'s <code>Graphable</code>
      */
     public Comparable getStartX() {
@@ -84,7 +81,7 @@ public class AdvanceDeclineGraph extends AbstractGraph {
     /**
      * Get the last X value that this graph will draw.
      *
-     * @return	X value of the last x coordinate in the default 
+     * @return	X value of the last x coordinate in the default
      *		<code>GraphSource</code>'s <code>Graphable</code>
      */
     public Comparable getEndX() {
@@ -94,7 +91,7 @@ public class AdvanceDeclineGraph extends AbstractGraph {
     /**
      * Get all X values that this graph will draw.
      *
-     * @return	X values in the default <code>GraphSource</code>'s 
+     * @return	X values in the default <code>GraphSource</code>'s
      *		<code>Graphable</code>
      */
     public Set getXRange() {
@@ -157,9 +154,9 @@ public class AdvanceDeclineGraph extends AbstractGraph {
      * Return an array of acceptable major deltas for the vertical
      * axis.
      *
-     * @return	an array of floats representing the minor deltas 
+     * @return	an array of floats representing the minor deltas
      *		of the default <code>GraphSource</code>
-     */ 
+     */
     public float[] getAcceptableMajorDeltas() {
 	float[] major = {1.0F, // 1 point
 			 10.0F, // 10 points
@@ -167,7 +164,7 @@ public class AdvanceDeclineGraph extends AbstractGraph {
 			 1000.0F, // 1000 points
 			 10000.0F, // 10,000 points
 			 100000.0F}; // 100,000 points
-	return major;	    
+	return major;	
     }
 
     /**
@@ -177,103 +174,84 @@ public class AdvanceDeclineGraph extends AbstractGraph {
      * @return	an array of floats representing the minor deltas
      *		of the default <code>GraphSource</code>
      * @see	Graph#getAcceptableMajorDeltas
-     */ 
+     */
     public float[] getAcceptableMinorDeltas() {
-	float[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F, 
-			 2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F, 
+	float[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F,
+			 2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F,
 			 8F, 9F};
 	return minor;
     }
 
-    private Graphable createAdvanceDecline() {
-	Graphable advanceDecline = new Graphable();
-
-	System.out.println("GET DATES");
-
-	Vector dates = QuoteSourceManager.getSource().getDates();
-	Iterator iterator = dates.iterator();
-
-	System.out.println("GOT DATES");
-
-	int cumulativeAdvanceDecline = START_VALUE;
-	int progress = 0;
-
-	ProgressDialog p = ProgressDialogManager.getProgressDialog();
-	p.setIndeterminate(false);
-	p.setMaximum(dates.size());
-	p.setProgress(progress);
-	p.show("Calculating advance/decline");
-
-	// Iterate over every date 
-	while(iterator.hasNext()) {
-	    TradingDate date = (TradingDate)iterator.next();
-
-	    // Use cached version if we can
-	    int advance = 
-		PreferencesManager.loadCachedAdvance(date);
-	    int decline =
-		PreferencesManager.loadCachedDecline(date);
-	    int todayAdvanceDecline = 0;
-
-	    if(advance == PreferencesManager.UNDEFINED_INT) {
-		todayAdvanceDecline = calculateAdvanceDecline(date);
-
-		    // Cache values
-		    //		    PreferencesManager.saveCachedAdvanceDecline(date, 
-		    //						todayAdvanceDecline);
-
-
-		System.out.println("SAVE date " + date + " value is " +
-				   todayAdvanceDecline);
-
-	    }
-	    else {
-		//		System.out.println("LOAD date " + date + " value is " +
-		//		   todayAdvanceDecline);
-	    }
-
-	    if(todayAdvanceDecline != PreferencesManager.UNDEFINED_INT) {
-		cumulativeAdvanceDecline += todayAdvanceDecline;
-
-		advanceDecline.putY((Comparable)date, 
-				    new Float(cumulativeAdvanceDecline));
-
-		System.out.println("a/d " + cumulativeAdvanceDecline);
-	    }
-
-	    p.setProgress(progress++);
-	}
-
-	return advanceDecline;
+    /**
+     * Return the annotations for this graph or <code>null</code> if it
+     * does not have any. The annotations should be in a map of X values
+     * to <code>String</code> values.
+     *
+     * @return	map of annotations
+     */
+    public HashMap getAnnotations() {
+        return null;
     }
 
-    private int calculateAdvanceDecline(TradingDate date) {
-	int todayAdvanceDecline = 0;
-	QuoteBundle quoteBundle = new QuoteBundle(new QuoteRange(QuoteRange.ALL_ORDINARIES, date));
-	Vector symbols = quoteBundle.getSymbols(date);
+    /**
+     * Return if this graph has any annotations.
+     *
+     * @return	<code>true</code> if this graph has annotations;
+     *		<code>false</code> otherwise
+     */
+    public boolean hasAnnotations() {
+        return false;
+    }
 
-	try {
-	    
-	    // Iterate over every three letter symbol
-	    Iterator iterator = symbols.iterator();
-	    while(iterator.hasNext()) {
-		String symbol = (String)iterator.next();
-		
-		float dayOpen = quoteBundle.getQuote((String)symbol, 
-						     Quote.DAY_OPEN, date);
-		float dayClose = quoteBundle.getQuote((String)symbol, 
-						      Quote.DAY_CLOSE, date);
-		if(dayClose > dayOpen)
-		    todayAdvanceDecline++;
-		else if(dayClose < dayOpen)
-		    todayAdvanceDecline--;
-	    }
+    /**
+     * Create Advance/Decline graphable.
+     */
+    public static Graphable createAdvanceDecline() {
+	Graphable advanceDecline = new Graphable();
+
+        // Get a list of all dates between the first and last
+        TradingDate firstDate = QuoteSourceManager.getSource().getFirstDate();
+        TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
+        Vector dates =
+            Converter.dateRangeToTradingDateVector(firstDate, lastDate);
+
+	Thread thread = Thread.currentThread();
+	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+	progress.setIndeterminate(false);
+	progress.setMaximum(dates.size());
+	progress.setProgress(0);
+        progress.setMaster(true);
+	progress.show("Calculating advance/decline");
+
+	int cumulativeAdvanceDecline = START_VALUE;
+
+	// Iterate over every date
+        for(Iterator iterator = dates.iterator(); iterator.hasNext();) {
+	    TradingDate date = (TradingDate)iterator.next();
+
+            try {
+                int todayAdvanceDecline =
+                    QuoteSourceManager.getSource().getAdvanceDecline(date);
+
+		cumulativeAdvanceDecline += todayAdvanceDecline;
+
+		advanceDecline.putY((Comparable)date,
+				    new Float(cumulativeAdvanceDecline));
+            }
+            catch(MissingQuoteException e) {
+                // Don't have this date in the quote source... no problem
+            }
+
+            // Stop if the user hit cancel
+            if(thread.isInterrupted())
+                break;
+
+	    progress.increment();
 	}
-	catch(MissingQuoteException e) {
-	    // safe to ignore
-	}
-	
-	return todayAdvanceDecline;
+
+	ProgressDialogManager.closeProgressDialog(progress);	
+
+	return advanceDecline;
     }
 }
 

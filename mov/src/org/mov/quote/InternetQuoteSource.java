@@ -307,15 +307,7 @@ public class InternetQuoteSource implements QuoteSource
 	    PreferencesManager.loadProxySettings();
 
         try {
-	    URL url;
-
-	    if(proxyPreferences.isEnabled)
-		url = new URL("http", 
-			      proxyPreferences.host, 
-			      Integer.parseInt(proxyPreferences.port),
-			      URLString);
-	    else
-		url = new URL(URLString);
+	    URL url = new URL(URLString);
 
             InputStreamReader input = new InputStreamReader(url.openStream());
             BufferedReader bufferedInput = new BufferedReader(input);

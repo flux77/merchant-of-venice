@@ -49,6 +49,7 @@ import org.mov.ui.AbstractTable;
 import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
 import org.mov.ui.MenuHelper;
+import org.mov.ui.TextsEditorDialog;
 import org.mov.util.Locale;
 
 public class GARulesPageModule extends AbstractTable implements Module {
@@ -148,6 +149,23 @@ public class GARulesPageModule extends AbstractTable implements Module {
             // Notify table that the whole data has changed
             fireTableDataChanged();
         }
+        
+        public boolean setValueAt(int row, int column, String value) {
+            if(row >= getRowCount())
+                return false;
+            
+            String[] result = (String[])results.get(row);
+            String[] object = new String[NUMBER_COLUMN];
+            object[PARAMETER_COLUMN] = new String(result[PARAMETER_COLUMN]);
+            object[MIN_PARAMETER_COLUMN] = new String(result[MIN_PARAMETER_COLUMN]);
+            object[MAX_PARAMETER_COLUMN] = new String(result[MAX_PARAMETER_COLUMN]);
+            object[column] = new String(value);
+            
+            result = (String[])results.set(row, object);
+            result = null;
+            
+            return true;
+        }
     }
     
     public GARulesPageModule(JDesktopPane desktop) {
@@ -213,7 +231,7 @@ public class GARulesPageModule extends AbstractTable implements Module {
     }
     
     // Removes all the selected results from the table
-    private void removeSelectedResults() {
+    public void removeSelectedResults() {
         
         // Get selected rows and put them in order from highest to lowest
         int[] rows = getSelectedRows();
@@ -237,6 +255,57 @@ public class GARulesPageModule extends AbstractTable implements Module {
         }
         
         model.setResults(results);
+    }
+    
+    // Display a dialog allowing the user to edit the selected parameter.
+    public void editParameter() {
+        // Get result at row
+        final int row = getSelectedRow();
+        
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            final String[] result = model.getResult(row);
+            
+            Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    String[] labels = {Locale.getString("PARAMETER_COLUMN_HEADER"),
+                        Locale.getString("MIN_PARAMETER_COLUMN_HEADER"),
+                        Locale.getString("MAX_PARAMETER_COLUMN_HEADER")};
+                    boolean[] areas = {false,
+                        false,
+                        false};
+                    String[] newRules = TextsEditorDialog.showEditDialog(Locale.getString("EDIT"),
+                        labels, areas, result);
+                    model.setValueAt(row, PARAMETER_COLUMN, newRules[PARAMETER_COLUMN]);
+                    model.setValueAt(row, MIN_PARAMETER_COLUMN, newRules[MIN_PARAMETER_COLUMN]);
+                    model.setValueAt(row, MAX_PARAMETER_COLUMN, newRules[MAX_PARAMETER_COLUMN]);
+                    model.fireTableDataChanged();
+                    repaint();
+                }});
+                
+                thread.start();
+        }
+    }
+    
+    // Display a dialog allowing the user to add a parameter.
+    public void addParameter() {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                String[] labels = {Locale.getString("PARAMETER_COLUMN_HEADER"),
+                    Locale.getString("MIN_PARAMETER_COLUMN_HEADER"),
+                    Locale.getString("MAX_PARAMETER_COLUMN_HEADER")};
+                boolean[] areas = {false,
+                    false,
+                    false};
+                String[] newRules = TextsEditorDialog.showAddDialog(Locale.getString("ADD"),
+                    labels, areas);
+                if (newRules[0]!=null)
+                    addRow(newRules[PARAMETER_COLUMN], newRules[MIN_PARAMETER_COLUMN], newRules[MAX_PARAMETER_COLUMN]);
+                model.fireTableDataChanged();
+                repaint();
+            }});
+
+            thread.start();
     }
     
     // Some menu items are only enabled/disabled depending on what is

@@ -142,23 +142,58 @@ public class StockHoldingTable extends AbstractTable {
 	// If the user double clicks on a row then graph the stock
 	addMouseListener(new MouseAdapter() {
 
-		public void mouseClicked(MouseEvent evt) {
-		    
-		    Point point = evt.getPoint();
-		    if (evt.getClickCount() == 2) {
-			int row = rowAtPoint(point);
-			
-			// Get symbol at row
-			String symbol = 
-			    (String)getModel().getValueAt(row, SYMBOL_COLUMN);
-			
-			Vector symbols = new Vector();
-			symbols.add((Object)symbol);
-			    
-			CommandManager.getInstance().graphStockBySymbol(symbols);
-		    }
-		}
-	    });
+		public void mouseClicked(MouseEvent event) {
+                    handleMouseClicked(event);
+                }
+            });
+    }
 
+    // If the user double clicks on a stock with the LMB, graph the stock.
+    // If the user right clicks over the table, open up a popup menu.
+    private void handleMouseClicked(MouseEvent event) {
+        Point point = event.getPoint();
+    
+        // Right click on the table - raise menu
+        if(event.getButton() == MouseEvent.BUTTON3) {
+            JPopupMenu menu = new JPopupMenu();
+
+            JMenuItem popupGraphSymbols = new JMenuItem("Graph");
+            popupGraphSymbols.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        int[] selectedRows = getSelectedRows();
+                        Vector symbols = new Vector();
+
+                        for(int i = 0; i < selectedRows.length; i++) {
+                            String symbol = 
+                                (String)getModel().getValueAt(selectedRows[i], SYMBOL_COLUMN);
+                            
+                            symbols.add(symbol.toLowerCase());
+                        }
+
+                        // Graph the highlighted symbols
+                        CommandManager.getInstance().graphStockBySymbol(symbols);
+                    }
+                });
+
+            popupGraphSymbols.setEnabled(getSelectedRowCount() > 0);
+            menu.add(popupGraphSymbols);
+            menu.show(this, point.x, point.y);
+        }
+            
+        // Left double click on the table - graph stock
+        else if(event.getButton() == MouseEvent.BUTTON1 && event.getClickCount() == 2) {
+
+            int row = rowAtPoint(point);
+			
+            // Get symbol at row
+            String symbol = 
+                (String)getModel().getValueAt(row, SYMBOL_COLUMN);
+            symbol = symbol.toLowerCase();
+            
+            Vector symbols = new Vector();
+            symbols.add((Object)symbol);
+            
+            CommandManager.getInstance().graphStockBySymbol(symbols);
+        }
     }
 }

@@ -5,6 +5,8 @@ import java.text.*;
 import java.util.*;
 import javax.swing.*;
 
+import org.mov.quote.*;
+
 public class CommodityListQuery {
 
     public static SortedSet getCommodityByName(JDesktopPane parent, 
@@ -28,7 +30,7 @@ public class CommodityListQuery {
 	    // Parse what the user inputed
 	    if(company != null) {
 		String symbol = 
-		    Database.getInstance().getCompanySymbol(company);
+		    Quote.getSource().getCompanySymbol(company);
 		
 		// Not recognised?
 		if(symbol == null) {
@@ -92,8 +94,7 @@ public class CommodityListQuery {
 		    symbol = (String)iterator.next();
 		    
 		    // See if company exists
-		    if(Database.getInstance().getEarliestQuoteDate(symbol) ==
-		       null) { // no
+		    if(!Quote.getSource().symbolExists(symbol)) {
 			
 			// Add to list of companies we don't know
 			if(unknownCompanies.length() > 0)

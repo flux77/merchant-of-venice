@@ -3,6 +3,7 @@ package org.mov.parser;
 import javax.swing.tree.*;
 
 import org.mov.util.*;
+import org.mov.quote.*;
 
 public abstract class Expression extends DefaultMutableTreeNode {
 

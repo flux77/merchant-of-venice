@@ -22,7 +22,6 @@ import org.mov.parser.EvaluationException;
 import org.mov.parser.Expression;
 import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
-import org.mov.prefs.PreferencesManager;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
@@ -50,11 +49,6 @@ public class LagExpression extends BinaryExpression {
 
         int lag = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-
-        int maximumYears = PreferencesManager.loadMaximumYears();
-       
-        if ((lag<=-maximumYears*365) || (lag>maximumYears*365))
-            throw EvaluationException.pastDate();
 
         try {
             return quoteBundle.getQuote(symbol, quoteKind, day, lag);

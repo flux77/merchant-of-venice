@@ -23,7 +23,6 @@ import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
 import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variables;
-import org.mov.prefs.PreferencesManager;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
@@ -53,19 +52,11 @@ public class SumExpression extends TernaryExpression {
 	int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
 
-        int maximumYears = PreferencesManager.loadMaximumYears();
-       
         if (days<=0)
             throw EvaluationException.rangeForSum();
 
-        if (days>maximumYears*365)
-            throw EvaluationException.pastDate();
-
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
 
-        if ((offset<-maximumYears*365) || (offset>maximumYears*365))
-            throw EvaluationException.pastDate();
-                
 	return sum(quoteBundle, symbol, quoteKind, days, day, offset);
 
     }

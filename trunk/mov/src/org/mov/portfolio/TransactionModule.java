@@ -208,8 +208,6 @@ public class TransactionModule extends AbstractTable implements Module,
 
 	propertySupport = new PropertyChangeSupport(this);
 
-
-
 	// If the user double clicks on a row then edit that transaction
 	addMouseListener(new MouseAdapter() {
 		public void mouseClicked(MouseEvent evt) {
@@ -219,7 +217,6 @@ public class TransactionModule extends AbstractTable implements Module,
 
 	// Listen for changes in selection so we can update the menus
 	getSelectionModel().addListSelectionListener(new ListSelectionListener() {		
-
 		public void valueChanged(ListSelectionEvent e) {
 		    checkMenuDisabledStatus();
 		}
@@ -415,8 +412,7 @@ public class TransactionModule extends AbstractTable implements Module,
 	    JOptionPane.showInternalConfirmDialog(desktop,
 						  "Are you sure you wish to delete the selected transactions?",
 						  "Delete Transactions",
-						  JOptionPane.YES_NO_OPTION,
-						  JOptionPane.WARNING_MESSAGE);
+						  JOptionPane.YES_NO_OPTION);
 	if(option == JOptionPane.YES_OPTION) {
 	    // Update display
 	    SwingUtilities.invokeLater(new Runnable() {

@@ -114,7 +114,7 @@ public interface Expression extends Cloneable {
     /**
      * Return the parent of this node.
      *
-     * @returns the parent.
+     * @return the parent.
      */
     public Expression getParent();
 
@@ -130,7 +130,7 @@ public interface Expression extends Cloneable {
     /**
      * Return whether this node is the root node.
      *
-     * @returns <code>TRUE</code> if this node has no parent.
+     * @return <code>TRUE</code> if this node has no parent.
      */
     public boolean isRoot();
 

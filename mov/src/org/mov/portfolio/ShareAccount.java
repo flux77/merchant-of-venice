@@ -89,7 +89,8 @@ public class ShareAccount implements Account, Cloneable {
 		holding.accumulate(shares);
 	    else // otherwise add new stock to portfolio
 		stockHoldings.put((Object)symbol, new StockHolding(symbol,
-								   shares));
+								   shares,
+                                                                   transaction.getDate()));
 	}
 	else if(type == Transaction.REDUCE) {
 

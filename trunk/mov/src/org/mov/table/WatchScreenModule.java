@@ -404,8 +404,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 	    JOptionPane.showInternalConfirmDialog(DesktopManager.getDesktop(),
 						  "Are you sure you wish to delete this watch screen?",
 						  "Delete Watch Screen",
-						  JOptionPane.YES_NO_OPTION,
-						  JOptionPane.WARNING_MESSAGE);
+						  JOptionPane.YES_NO_OPTION);
 	if(option == JOptionPane.YES_OPTION) {
 	    PreferencesManager.deleteWatchScreen(watchScreen.getName());
 
@@ -470,7 +469,6 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
                             watchScreen.addSymbol((Symbol)iterator.next());
 
                         model.setQuotes(getQuotes());
-                        model.fireTableDataChanged();
                     }
                 }};
 

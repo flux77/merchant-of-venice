@@ -18,54 +18,55 @@
 
 package org.mov.ui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.text.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableCellRenderer;
 
+import org.mov.parser.EvaluationException;
+import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
-import org.mov.util.*;
-import org.mov.ui.*;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
 
 public class AbstractTable extends SortedTable {
 
-    public class Column {
-        public int     number;
-        public String  fullName;
-        public String  shortName;
-        public Class   type;
-        public boolean isEnabled;
-
-        public Column(int number, String fullName, String shortName, Class type, 
-                      boolean isEnabled) {
-            this.number = number;
-            this.fullName = fullName;
-            this.shortName = shortName;
-            this.type = type;
-            this.isEnabled = isEnabled;
-        }
-    }
-    
     // Default values for rendering table rows
     private static final Color backgroundColor = Color.white;
-    private static final Color alternativeBackgroundColor = 
-	new Color(237, 237, 237);
+    private static final Color alternativeBackgroundColor = new Color(237, 237, 237);
 
     // Images used for arrows representing when stock has gone up, down or is unchanged
     private String upImage = "org/mov/images/Up.png";
     private String downImage = "org/mov/images/Down.png";
     private String unchangedImage = "org/mov/images/Unchanged.png";
 
-    // Keep instance of number format handy
+    // Keep a single instance of the following so we don't have to instantiate
+    // for each cell that is drawn
     private NumberFormat format;
+    private ImageIcon upImageIcon;
+    private ImageIcon downImageIcon;
+    private ImageIcon unchangedImageIcon;
+
+    // List of show equation column menu items
+    private List showEquationColumnMenuItems;
 
     class StockQuoteRenderer extends JPanel implements TableCellRenderer
     {
-
 	private JLabel textLabel = new JLabel();
 	private JLabel iconLabel = new JLabel();
 	private Component glue = Box.createHorizontalGlue();
@@ -130,25 +131,14 @@ public class AbstractTable extends SortedTable {
             text = text.concat("%");
 	    textLabel.setText(text);
 
-	    if(changePercent > 0) {
-		// Create up arrow image
-		ImageIcon upImageIcon = 
-		    new ImageIcon(ClassLoader.getSystemResource(upImage));
+	    if(changePercent > 0 && upImageIcon != null)
 		iconLabel.setIcon(upImageIcon);
-	    }
 
-	    else if(changePercent < 0) {
-		// Create down arrow image
-		ImageIcon downImageIcon = 
-		    new ImageIcon(ClassLoader.getSystemResource(downImage));
+	    else if(changePercent < 0 && downImageIcon != null)
 		iconLabel.setIcon(downImageIcon);
-	    }
-	    else {
-		// Create unchanged image
-		ImageIcon unchangedImageIcon = 
-		    new ImageIcon(ClassLoader.getSystemResource(unchangedImage));
+
+	    else if(changePercent == 0 && unchangedImageIcon != null)
 		iconLabel.setIcon(unchangedImageIcon);
-	    }
 
 	    add(glue);
 	    add(textLabel);
@@ -171,46 +161,110 @@ public class AbstractTable extends SortedTable {
 	setDefaultRenderer(QuoteFormat.class, new StockQuoteRenderer());
         setDefaultRenderer(PointChangeFormat.class, new StockQuoteRenderer());
         setDefaultRenderer(Symbol.class, new StockQuoteRenderer());
-
+        setDefaultRenderer(EquationResult.class, new StockQuoteRenderer());
+        
         // Set up number formatter for rendering ChangeFormat.java
         format = NumberFormat.getInstance();
         format.setMinimumIntegerDigits(1);
         format.setMinimumFractionDigits(2);
         format.setMaximumFractionDigits(2);
+
+        // Add create the image icons for the up, down & unchanged images
+        URL upImageResource = ClassLoader.getSystemResource(upImage);
+        upImageIcon = (upImageResource != null? new ImageIcon(upImageResource) : null);
+
+        URL downImageResource = ClassLoader.getSystemResource(downImage);
+        downImageIcon = (downImageResource != null? new ImageIcon(downImageResource) : null);
+
+        URL unchangedImageResource = ClassLoader.getSystemResource(unchangedImage);
+        unchangedImageIcon = (unchangedImageResource != null? 
+                              new ImageIcon(unchangedImageResource) : null);
     }
 
-    public void setModel(TableModel model) {
-	super.setModel(model);        
-    }
+    protected void showColumns(AbstractTableModel model) {
+        for(int i = 0; i < model.getColumnCount(); i++) {
+            Column column = model.getColumn(i);
 
-    protected void showColumns(List columns) {
-        for(Iterator iterator = columns.iterator(); iterator.hasNext();) {
-            Column column = (Column)iterator.next();
-
-            showColumn(column.number, column.isEnabled);
+            showColumn(column.number, column.getVisible() == Column.VISIBLE);
         }
     }
 
-    protected JMenu createShowColumnMenu(List columns) {
+    protected JMenu createShowColumnMenu(AbstractTableModel model) {
+        boolean foundEquationColumn = false;
+
         JMenu showColumnsMenu = new JMenu("Show Columns");
+        showEquationColumnMenuItems = new ArrayList();
 
-        for(Iterator iterator = columns.iterator(); iterator.hasNext();) {
-            final Column column = (Column)iterator.next();
+        for(int i = 0; i < model.getColumnCount(); i++) {
+            final Column column = model.getColumn(i);
 
-            JCheckBoxMenuItem showMenuItem = 
-                MenuHelper.addCheckBoxMenuItem(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)e.getSource();
-                            showColumn(column.number, menuItem.getState());
-                        }
-                    }, showColumnsMenu, column.fullName);
-
-            showMenuItem.setState(column.isEnabled);
+            if(column.getVisible() != Column.ALWAYS_HIDDEN) {
+                boolean isEquationColumn = (column instanceof EquationColumn);
+                
+                // Insert a bar between the ordinary columns and the equation
+                // columns
+                if(!foundEquationColumn && isEquationColumn) {
+                    foundEquationColumn = true;
+                    showColumnsMenu.addSeparator();                
+                }
+                
+                JCheckBoxMenuItem showMenuItem = 
+                    MenuHelper.addCheckBoxMenuItem(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)e.getSource();
+                                showColumn(column.number, menuItem.getState());
+                            }
+                        }, showColumnsMenu, column.fullName);
+                
+                showMenuItem.setState(column.getVisible() == Column.VISIBLE);
+                
+                if(isEquationColumn)
+                    showEquationColumnMenuItems.add(showMenuItem);
+            }
         }
 
         return showColumnsMenu;
     }
 
+    protected void applyEquations(final QuoteBundle quoteBundle,
+                                  final QuoteModel model) {
+	// Handle all action in a separate thread so we dont
+	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+	Thread thread = new Thread() {
+
+		public void run() {
+		    final EquationColumnDialog dialog = 
+                        new EquationColumnDialog(model.getEquationColumns().length);
+
+		    // Did the user modify the equation columns?
+		    if(dialog.showDialog(model.getEquationColumns())) {
+                        final EquationColumn[] equationColumns = dialog.getEquationColumns();
+
+                        // Load equation columns with data
+                        model.setEquationColumns(quoteBundle, equationColumns);
+
+                        SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+				    // Make sure all columns with an equation
+				    // are visible and all without are not.
+				    // Also update check box menus
+				    for(int i = 0; i < equationColumns.length; i++) {
+                                        boolean containsEquation = 
+                                            equationColumns[i].getEquation().length() > 0;
+                                        JCheckBoxMenuItem menuItem = 
+                                            (JCheckBoxMenuItem)showEquationColumnMenuItems.get(i);
+			
+                                        showColumn(equationColumns[i].getNumber(),
+                                                   containsEquation);
+                                        menuItem.setState(containsEquation);
+                                    }
+                                }});
+		    }
+		}
+	    };
+
+	thread.start();
+    }    
 }
 
 

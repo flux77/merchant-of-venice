@@ -18,19 +18,17 @@
 
 package org.mov.portfolio;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.text.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.table.*;
 
-import org.mov.ui.*;
-import org.mov.util.*;
-import org.mov.table.*;
-import org.mov.quote.*;
+import org.mov.ui.AbstractTable;
+import org.mov.ui.AbstractTableModel;
+import org.mov.ui.Column;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.QuoteBundle;
 
 /**
  * Display an account summary in a swing table for a portfolio. The table
@@ -40,23 +38,19 @@ import org.mov.quote.*;
  */
 public class AccountTable extends AbstractTable {
 
+    private static final int ACCOUNT_COLUMN = 0;
+    private static final int VALUE_COLUMN = 1;
+
     class Model extends AbstractTableModel {
-
-	private static final int ACCOUNT_COLUMN = 0;
-	private static final int VALUE_COLUMN = 1;
-
-	private String[] headers = {
-	    "Account", "Value"};
-
-	private Class[] columnClasses = {
-	    String.class, Money.class};
 
 	private QuoteBundle quoteBundle;
 	private Portfolio portfolio;
 	private Object[] accounts;
 	private int dateOffset;
 
-	public Model(Portfolio portfolio, QuoteBundle quoteBundle) {
+	public Model(List columns, Portfolio portfolio, QuoteBundle quoteBundle) {
+            super(columns);
+
 	    this.quoteBundle = quoteBundle;
 	    this.portfolio = portfolio;
 
@@ -69,18 +63,6 @@ public class AccountTable extends AbstractTable {
 	public int getRowCount() {
 	    // One row per account plus a total row
 	    return accounts.length + 1;
-	}
-
-	public int getColumnCount() {
-	    return headers.length;
-	}
-	
-	public String getColumnName(int c) {
-	    return headers[c];
-	}
-
-	public Class getColumnClass(int c) {
-	    return columnClasses[c];
 	}
 	
 	public Object getValueAt(int row, int column) {
@@ -145,6 +127,10 @@ public class AccountTable extends AbstractTable {
      * @param	quoteBundle	the quote bundle
      */
     public AccountTable(Portfolio portfolio, QuoteBundle quoteBundle) {
-	setModel(new Model(portfolio, quoteBundle));
+        List columns = new ArrayList();
+        columns.add(new Column(ACCOUNT_COLUMN, "Account", "Account", String.class, Column.VISIBLE));
+        columns.add(new Column(VALUE_COLUMN, "Value", "Value", Money.class, Column.VISIBLE));
+
+	setModel(new Model(columns, portfolio, quoteBundle));
     }
 }

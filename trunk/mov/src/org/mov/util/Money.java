@@ -32,7 +32,13 @@ import java.text.NumberFormat;
  */
 public class Money implements Cloneable, Comparable {
 
-    // Converter to display currency
+    // WARNING: Do not convert doubles to long by:
+    // amountLong = (long)(amountDouble * 100.0D)
+    // because it performs a floor operation. Round by:
+    // amountLong = Math.round(amountDouble * 100.0D)
+
+    // Converter to display currency. Create a single instance so we don't
+    // have to keep instantiating it.
     private static NumberFormat format = NumberFormat.getCurrencyInstance();
 
     /** A representation of no money, e.g. $0. */
@@ -60,7 +66,7 @@ public class Money implements Cloneable, Comparable {
      * @param amount the amount of money.
      */
     public Money(double amount) {
-        this.amount = (long)(amount * 100.0F);
+        this.amount = Math.round(amount * 100.0D);
     }
 
     /**
@@ -75,13 +81,13 @@ public class Money implements Cloneable, Comparable {
         try {
             // Try parsing currency format, e.g. $32.00
             Number number = format.parse(string);
-            this.amount = (long)(number.doubleValue() * 100.0F);
+            this.amount = Math.round(number.doubleValue() * 100.0D);
         }
         catch(ParseException e2) {
             // If that doesn't work try parsing it as a simple double
             try {
                 double doubleValue = Double.parseDouble(string);
-                this.amount = (long)(doubleValue * 100.0F);
+                this.amount = Math.round(doubleValue * 100.0D);
             }
             catch(NumberFormatException e) {
                 throw new MoneyFormatException(string);
@@ -106,7 +112,7 @@ public class Money implements Cloneable, Comparable {
      * @return the resultant <code>Money</code>.
      */
     public Money add(double money) {
-        return new Money(amount + (long)(money * 100.0F));
+        return new Money(amount + Math.round(money * 100.0D));
     }
 
     /**
@@ -230,7 +236,7 @@ public class Money implements Cloneable, Comparable {
      */
     public double doubleValue() {
         double cents = (double)amount;
-        return cents / 100.0F;
+        return cents / 100.0D;
     }
 
     /**

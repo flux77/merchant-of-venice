@@ -2,6 +2,9 @@ package org.mov.quote;
 
 import java.util.*;
 
+import org.mov.portfolio.Stock;
+import org.mov.util.TradingDate;
+
 /**
  * Provides a list of quote filters available to us. This class is used
  * as a single point of reference to find and use all of the available
@@ -28,10 +31,10 @@ public class QuoteFilterList {
     private QuoteFilterList() {
 	filters = new Vector();
 
-	filters.add(new MetaStockQuoteFilter());
-	filters.add(new MetaStock2QuoteFilter());
 	filters.add(new EzyChartQuoteFilter());
 	filters.add(new InsightTraderQuoteFilter());
+	filters.add(new MetaStockQuoteFilter());
+	filters.add(new MetaStock2QuoteFilter());
     }
 
     /**
@@ -94,5 +97,38 @@ public class QuoteFilterList {
 	}
 
 	return false;
+    }
+
+    /**
+     * Perform unit tests on the filters to make sure they are reading and
+     * writing properly.
+     */
+    public static void main(String[] args) {
+	QuoteFilterList filters = new QuoteFilterList();
+	Vector list = filters.getList();
+	Iterator iterator = list.iterator();
+	QuoteFilter filter;
+	Stock quote = new Stock("AAA", new TradingDate(), 10000,
+				10.00F, 20.00F, 30.00F, 40.00F);
+	Stock filteredQuote;
+	String filteredString;
+
+	// For each filter, convert the quote to text then back to
+	// the quote and make sure they match.
+	while(iterator.hasNext()) {
+	    filter = (QuoteFilter)iterator.next();
+
+	    filteredString = filter.toString(quote);
+	    filteredQuote = filter.toQuote(filteredString);
+
+	    if(filteredQuote.equals(quote))
+		System.out.println("PASS: " + filter.getName() + " " +
+				   filteredString);
+	    else {
+		System.out.println("FAIL: " + filter.getName()); 
+		System.out.println("> " + quote.toString());
+		System.out.println("< " + filteredQuote.toString());
+	    }
+	}       
     }
 }

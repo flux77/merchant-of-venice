@@ -18,12 +18,15 @@
 
 package org.mov.portfolio;
 
-import java.util.*;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
 
-import org.mov.util.*;
-import org.mov.quote.*;
+import org.mov.quote.QuoteBundle;
 
-/** Representation of a cash account in a portfolio.
+/**
+ * Representation of a cash account in a portfolio.
+ *
+ * @author Andrew Leppard
  */
 public class CashAccount implements Account, Cloneable {
 
@@ -74,6 +77,11 @@ public class CashAccount implements Account, Cloneable {
 	}
     }
 
+    /**
+     * Create a clone of this account.
+     *
+     * @return the clone
+     */
     public Object clone() {
 	CashAccount clonedCashAccount = new CashAccount(getName());
 

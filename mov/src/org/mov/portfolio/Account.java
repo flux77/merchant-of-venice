@@ -27,8 +27,11 @@ import org.mov.util.TradingDate;
  * Generic interface for all financial account objects. This interface
  * defines some generic properties that all accounts need to have such
  * as name, type and value.
+ *
+ * @author Andrew Leppard
  */
 public interface Account {
+
     /** Account is a cash account (bank account, cash management account etc)
      */
     public static final int CASH_ACCOUNT = 0;
@@ -60,10 +63,14 @@ public interface Account {
     public Money getValue(QuoteBundle quoteBundle, int dateOffset)
 	throws MissingQuoteException;
 
+    /**
+     * Return the value of this account on the given day.
+     *
+     * @param quoteBundle the quote bundle
+     * @param date        the date
+     */
     public Money getValue(QuoteBundle quoteBundle, TradingDate date)
 	throws MissingQuoteException;
-
-
 
     /**
      * Perform a transaction on this account.

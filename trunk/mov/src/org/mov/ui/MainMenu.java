@@ -66,6 +66,7 @@ public class MainMenu
     private JMenuItem windowCascadeMenuItem;
     private JMenuItem windowGridMenuItem;
 
+    private JMenuItem helpContentsMenuItem;
     private JMenuItem helpAboutMenuItem;
 
     private JMenu helpMenu;
@@ -150,7 +151,7 @@ public class MainMenu
 
 	// Quote
 	{
-	    JMenu quoteMenu = MenuHelper.addMenu(menuBar, "Quote", 'Q');
+	    JMenu quoteMenu = MenuHelper.addMenu(menuBar, "Table", 'T');
 	    
 	    // Quote -> Companies + Funds
 	    JMenu quoteMenuCompany = MenuHelper.addMenu(quoteMenu, 
@@ -207,9 +208,9 @@ public class MainMenu
 				       "By Symbols", 'G');
 	    
 	    // Graph -> Commodities -> By Name
-	    graphCommodityNameMenuItem = 
-		MenuHelper.addMenuItem(this, graphCommodityMenu, 
-				       "By Name",'N');
+            //	    graphCommodityNameMenuItem = 
+            //		MenuHelper.addMenuItem(this, graphCommodityMenu, 
+            //			       "By Name",'N');
 
 	    // Graph -> Market Indicator
 	    JMenu graphMarketIndicator = 
@@ -254,6 +255,7 @@ public class MainMenu
         // Help menu
         {
             helpMenu = MenuHelper.addMenu(menuBar, "Help", 'H');
+            helpContentsMenuItem = MenuHelper.addMenuItem(this, helpMenu, "Contents");
             helpAboutMenuItem = MenuHelper.addMenuItem(this, helpMenu, "About");
         }
 
@@ -323,8 +325,8 @@ public class MainMenu
 		    // Graph Menu
 		    else if (menu == graphCommodityCodeMenuItem) 
 			CommandManager.getInstance().graphStockBySymbol(null);
-		    else if (menu == graphCommodityNameMenuItem)
-			CommandManager.getInstance().graphStockByName();
+                    //		    else if (menu == graphCommodityNameMenuItem)
+                    //	CommandManager.getInstance().graphStockByName();
 		    else if (menu == graphMarketAdvanceDeclineMenuItem)
 			CommandManager.getInstance().graphAdvanceDecline();
 
@@ -354,6 +356,8 @@ public class MainMenu
 			CommandManager.getInstance().tileFramesArrange();
 
                     // Help Menu
+                    else if (menu == helpContentsMenuItem)
+                        CommandManager.getInstance().openHelp();
                     else if (menu == helpAboutMenuItem)
                         CommandManager.getInstance().openAboutDialog();
 

@@ -32,16 +32,16 @@ public class MovingAverageGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector dates) {
+		       float bottomLineValue, Vector xRange) {
 
 	// We ignore the graph colours and use our own custom colours
 	g.setColor(Color.green.darker());
 	GraphTools.renderLine(g, movingAverage, xoffset, yoffset, 
 			      horizontalScale,
-			      verticalScale, bottomLineValue, dates);
+			      verticalScale, bottomLineValue, xRange);
     }
 
-    public String getToolTipText(TradingDate date, int y, int yoffset,
+    public String getToolTipText(Comparable x, int y, int yoffset,
 				 float verticalScale,
 				 float bottomLineValue)
     {
@@ -59,13 +59,13 @@ public class MovingAverageGraph extends AbstractGraph {
     }
 
     // Override base class method
-    public float getHighestValue(Vector dates) {
-	return movingAverage.getHighestValue(dates);
+    public float getHighestY(Vector x) {
+	return movingAverage.getHighestY(x);
     }
 
     // Override base class method
-    public float getLowestValue(Vector dates) {
-	return movingAverage.getLowestValue(dates);
+    public float getLowestY(Vector x) {
+	return movingAverage.getLowestY(x);
     }
 
     // Override base class method
@@ -78,21 +78,21 @@ public class MovingAverageGraph extends AbstractGraph {
 
 	// Date set and value array will be in sync
 	float[] values = source.toArray();
-	Set dates = source.getDates();
-	Iterator iterator = dates.iterator();
+	Set xRange = source.getXRange();
+	Iterator iterator = xRange.iterator();
 
 	int i = 0;	
 	float average;
 
 	while(iterator.hasNext()) {
-	    TradingDate date = (TradingDate)iterator.next();
+	    Comparable x = (Comparable)iterator.next();
 
 	    average = QuoteFunctions.avg2(values,  
 					  i - Math.min(period, i),
 					  i + 1);
 	    i++;
 
-	    movingAverage.putValue(date, new Float(average));
+	    movingAverage.putY(x, new Float(average));
 	}
 
 	return movingAverage;

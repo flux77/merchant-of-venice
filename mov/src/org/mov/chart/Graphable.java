@@ -4,80 +4,146 @@ import java.util.*;
 
 import org.mov.util.*;
 
+/**
+ * Represents a graphable set of X points and their associated Y points.
+ * <p>
+ * Example, loading up the class with an exponential graph:
+ * <pre>
+ * Graphable graphable = new Graphable();
+ * graphable.putY(new Float(1), new Float(1));
+ * graphable.putY(new Float(2), new Float(4));
+ * graphable.putY(new Float(3), new Float(9));
+ * graphable.putY(new Float(4), new Float(16));
+ * </pre>
+ * Find the square of 3:
+ * <pre>
+ * Float squareOfThree = graphable.getY(new Float(3));
+ * </pre>
+ */
 public class Graphable {
 
-    private TradingDate start;
-    private TradingDate end;
+    private Comparable startX;
+    private Comparable endX;
     private LinkedHashMap map;
 
+    /**
+     * Create an empty graphable.
+     */
     public Graphable() {
 	map = new LinkedHashMap();
     }
 
-    public TradingDate getEndDate() {
-	return end;
+    /**
+     * Get the last X value where we have an associated Y value.
+     *
+     * @return	the last x value which we contain data
+     */
+    public Comparable getEndX() {
+	return endX;
     }
 
-    public TradingDate getStartDate() {
-	return start;
+    /**
+     * Get the first X value where we have an associated Y value.
+     *
+     * @return	the first x value which we contain data
+     */
+    public Comparable getStartX() {
+	return startX;
     }
 
-    public Float getValue(TradingDate date) {
-	return (Float)map.get(date);
+    /**
+     * Get the Y value for the given X value.
+     *
+     * @param	x	the x value
+     * @return	y	the associated y value
+     */
+    public Float getY(Comparable x) {
+	return (Float)map.get(x);
     }
 
-    public void putValue(TradingDate date, Float value) {
+    /**
+     * Associate the given X value with the given Y value. This
+     * function is used to "load" up the graphable with data.
+     * 
+     * @param	x	the x value
+     * @param	y	the associated y value
+     */
+    public void putY(Comparable x, Float y) {
+	// Make sure out start and end X values are consistent
+	if(startX == null || x.compareTo(startX) < 0)
+	    startX = x;
+	if(endX == null || x.compareTo(endX) > 0)
+	    endX = x;
 
-	// Make sure out start and end dates are consistent
-	if(start == null || date.before(start))
-	    start = (TradingDate)date.clone();
-	if(end == null || date.after(end))
-	    end = (TradingDate)date.clone();
-
-	map.put(date, (Object)value);
+	map.put(x, (Object)y);
     }
 
-    // Given a range of dates and an implemented getValue() method
-    // we can calculate the highest and lowest values
-    public float getHighestValue(Vector dates) {
-	Iterator iterator = dates.iterator();
-	Float value = null;
-	Float highest = new Float(Float.MIN_VALUE);
+    /**
+     * Given an X range, inspect all the associated Y values and return the 
+     * highest.
+     *
+     * @param	xRange	a <code>Vector</code> of <code>Comparable</code> 
+     *			objects
+     * @return	the highest Y value
+     */
+    public float getHighestY(Vector xRange) {
+	Iterator iterator = xRange.iterator();
+	Float y = null;
+	Float highestY = new Float(Float.MIN_VALUE);
 	
 	while(iterator.hasNext()) {
-	    value = getValue((TradingDate)iterator.next());
+	    y = getY((Comparable)iterator.next());
 
-	    if(highest == null && value != null)
-		highest = value;
-	    else if(value != null && value.compareTo(highest) > 0)
-		highest = value;
+	    if(highestY == null && y != null)
+		highestY = y;
+	    else if(y != null && y.compareTo(highestY) > 0)
+		highestY = y;
 	}
 	
-	return highest.floatValue();
+	return highestY.floatValue();
     }
 
-    public float getLowestValue(Vector dates) {
-	Iterator iterator = dates.iterator();
-	Float value = null;
-	Float lowest = new Float(Float.MAX_VALUE);
+    /**
+     * Given an X range, inspect all the associated Y values and return the 
+     * lowest.
+     *
+     * @param	xRange	a <code>Vector</code> of <code>Comparable</code> 
+     *			objects
+     * @return	the lowest Y value
+     */
+    public float getLowestY(Vector xRange) {
+	Iterator iterator = xRange.iterator();
+	Float y = null;
+	Float lowestY = new Float(Float.MAX_VALUE);
 	
 	while(iterator.hasNext()) {
 
-	    value = getValue((TradingDate)iterator.next());
+	    y = getY((Comparable)iterator.next());
 	    
-	    if(lowest == null && value != null)
-		lowest = value;
-	    else if(value != null && value.compareTo(lowest) < 0)
-		lowest = value;
+	    if(lowestY == null && y != null)
+		lowestY = y;
+	    else if(y != null && y.compareTo(lowestY) < 0)
+		lowestY = y;
 	}
 
-	return lowest.floatValue();
+	return lowestY.floatValue();
     }
 
-    public Set getDates() {
+    /**
+     * Get all the X values for where we have an associated Y value.
+     *
+     * @return	the set of all X values which have associated Y values
+     */
+    public Set getXRange() {
 	return map.keySet();
     }
 
+    /**
+     * Return all the Y values as an array. The array will be ordered
+     * by the X values.
+     *
+     * @return	array of Y values
+     */
     public float[] toArray() {
 	Collection valueCollection = map.values();
 	Iterator iterator = valueCollection.iterator();
@@ -87,9 +153,6 @@ public class Graphable {
 	int i = 0;
 
 	while(iterator.hasNext()) {
-	    //	    System.out.println("object type is " +
-	    //		       (Object)iterator.next());
-
 	    value = (Float)iterator.next();	   
 	    values[i++] = value.floatValue();
 	}

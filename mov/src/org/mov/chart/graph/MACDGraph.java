@@ -57,7 +57,7 @@ public class MACDGraph extends AbstractGraph {
 			      verticalScale, bottomLineValue, dates);
     }
 
-    public String getToolTipText(TradingDate date, int y, int yoffset,
+    public String getToolTipText(Comparable x, int y, int yoffset,
 				 float verticalScale,
 				 float bottomLineValue)
     {
@@ -75,25 +75,25 @@ public class MACDGraph extends AbstractGraph {
     }
 
     // Override base class method
-    public float getHighestValue(Vector dates) {
-	float fastHighestValue = fastMovingAverage.getHighestValue(dates);
-	float slowHighestValue = slowMovingAverage.getHighestValue(dates);
+    public float getHighestY(Vector x) {
+	float fastHighestY = fastMovingAverage.getHighestY(x);
+	float slowHighestY = slowMovingAverage.getHighestY(x);
 
 	return 
-	    fastHighestValue > slowHighestValue? 
-	    fastHighestValue :
-	    slowHighestValue;
+	    fastHighestY > slowHighestY? 
+	    fastHighestY :
+	    slowHighestY;
     }
 
     // Override base class method
-    public float getLowestValue(Vector dates) {
-	float fastLowestValue = fastMovingAverage.getLowestValue(dates);
-	float slowLowestValue = slowMovingAverage.getLowestValue(dates);
+    public float getLowestY(Vector x) {
+	float fastLowestY = fastMovingAverage.getLowestY(x);
+	float slowLowestY = slowMovingAverage.getLowestY(x);
 
 	return 
-	    fastLowestValue < slowLowestValue? 
-	    fastLowestValue :
-	    slowLowestValue;
+	    fastLowestY < slowLowestY? 
+	    fastLowestY :
+	    slowLowestY;
     }
 
     // Override base class method

@@ -15,27 +15,27 @@ public class LineGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector dates) {
+		       float bottomLineValue, Vector xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderLine(g, getSource().getGraphable(), xoffset, yoffset, 
 			      horizontalScale,
-			      verticalScale, bottomLineValue, dates);
+			      verticalScale, bottomLineValue, xRange);
     }
 
-    public String getToolTipText(TradingDate date, int y, int yoffset,
+    public String getToolTipText(Comparable x, int yCoordinate, int yoffset,
 				 float verticalScale,
 				 float bottomLineValue)
     {
-	Float value = getValue(date);
+	Float y = getY(x);
 	
-	if(value != null) {
+	if(y != null) {
 	    int yOfGraph = yoffset - 
-		GraphTools.scaleAndFitPoint(value.floatValue(),
+		GraphTools.scaleAndFitPoint(y.floatValue(),
 					    bottomLineValue, verticalScale);
 	    // Its our graph *only* if its within 5 pixels	    
-	    if(Math.abs(y - yOfGraph) < Graph.TOOL_TIP_BUFFER) 
-		return getSource().getToolTipText(date);
+	    if(Math.abs(yCoordinate - yOfGraph) < Graph.TOOL_TIP_BUFFER) 
+		return getSource().getToolTipText(x);
 	}
 	return null;
     }

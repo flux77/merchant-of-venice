@@ -15,21 +15,23 @@ public interface Graph {
 		       int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
 		       float bottomLineValue, Vector dates);
-    public String getToolTipText(TradingDate date, int y, int yoffset,
+    public String getToolTipText(Comparable x, int y, int yoffset,
 				 float verticalScale,
 				 float bottomLineValue);
-    public TradingDate getStartDate();
-    public TradingDate getEndDate();
+    public Comparable getStartX();
+    public Comparable getEndX();
+    public Set getXRange();
     public String getYLabel(float value);
     public String getName();
-    public Float getValue(TradingDate date);
-    public float getHighestValue(Vector dates);
-    public float getLowestValue(Vector dates);
+    public Float getY(Comparable x);
+    public float getHighestY(Vector x);
+    public float getLowestY(Vector x);
     public float[] getAcceptableMajorDeltas();
     public float[] getAcceptableMinorDeltas();
+
     public HashMap getAnnotations();
     public boolean hasAnnotations();
-    public String getAnnotationToolTipText(TradingDate date);
+    public String getAnnotationToolTipText(Comparable x);
 }
 
 

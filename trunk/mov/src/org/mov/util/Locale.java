@@ -105,8 +105,6 @@ public class Locale {
     /**
      * Set the localization as got from saved preferences.
      * If no preference is set for the language it get the current system language.
-     *
-     * @param newLocale the new localization
      */
     public static void setLocale() {
         PreferencesManager.LanguagePreferences languagePreferences = null;

@@ -26,10 +26,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.mov.chart.Graphable;
+import org.mov.chart.GraphableQuoteFunctionSource;
 import org.mov.chart.GraphTools;
 import org.mov.chart.source.GraphSource;
-import org.mov.util.Locale;
+import org.mov.parser.EvaluationException;
 import org.mov.quote.QuoteFunctions;
+import org.mov.util.Locale;
+import org.mov.util.TradingDate;
 
 /**
  * Bollinger Bands graph. This graph is used to show the volatility
@@ -115,39 +118,37 @@ public class BollingerBandsGraph extends AbstractGraph {
     public void setSettings(HashMap settings) {
         super.setSettings(settings);
 
+        Graphable source = getSource().getGraphable();
+
         // Retrieve period from settings hashmap
         int period = PeriodGraphUI.getPeriod(settings);
 
-	// create bollinger bands
+	// Create bollinger bands
 	upperBand = new Graphable();
 	lowerBand = new Graphable();	
 
-	// Date set and value array will be in sync
-	double[] values = getSource().getGraphable().toArray();
-	Iterator iterator = getSource().getGraphable().getXRange().iterator();
+        TradingDate date = (TradingDate)source.getStartX();
+        GraphableQuoteFunctionSource quoteFunctionSource 
+            = new GraphableQuoteFunctionSource(source, date, period);
 
-	int i = 0;	
-	double average;
-	double sd;
+        for(Iterator iterator = source.iterator(); iterator.hasNext();) {
+            date = (TradingDate)iterator.next();
+            quoteFunctionSource.setDate(date);
 
-	while(iterator.hasNext()) {
-	    Comparable x = (Comparable)iterator.next();
+            try {
+                double bollingerTop = QuoteFunctions.bollingerUpper(quoteFunctionSource, period);
+                upperBand.putY(date, new Double(bollingerTop));
 
-	    sd = QuoteFunctions.sd(values,
-				   i - Math.min(period - 1, i),
-				   i + 1);
-	    average = QuoteFunctions.avg(values,
-                                         i - Math.min(period - 1, i),
-                                         i + 1);
-
-	    upperBand.putY(x, new Double(average + 2 * sd));
-	    lowerBand.putY(x, new Double(average - 2 * sd));
-
-	    i++;
-	}
+                double bollingerBottom = QuoteFunctions.bollingerLower(quoteFunctionSource, 
+                                                                       period);
+                lowerBand.putY(date, new Double(bollingerBottom));
+            }
+            catch(EvaluationException e) {
+                // This can't happen since our source does not throw this exception
+                assert false;
+            }
+        }
     }
-
-
 }
 
 

@@ -26,9 +26,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.mov.chart.Graphable;
+import org.mov.chart.GraphableQuoteFunctionSource;
 import org.mov.chart.GraphTools;
 import org.mov.chart.source.GraphSource;
 import org.mov.util.Locale;
+import org.mov.util.TradingDate;
+import org.mov.parser.EvaluationException;
 import org.mov.quote.QuoteFunctions;
 
 /**
@@ -92,7 +95,7 @@ public class ExpMovingAverageGraph extends AbstractGraph {
     }
 
     /**
-     * Creates a new moving average based on the given data source.
+     * Creates a new Exponential Moving Average based on the given data source.
      *
      * @param	source	the graph source to average
      * @param	period	the desired period of the averaged data
@@ -101,28 +104,26 @@ public class ExpMovingAverageGraph extends AbstractGraph {
     public static Graphable createMovingAverage(Graphable source, int period,
                                                 double smoothingConstant) {
 	Graphable movingAverage = new Graphable();
+        TradingDate date = (TradingDate)source.getStartX();
+        GraphableQuoteFunctionSource quoteFunctionSource 
+            = new GraphableQuoteFunctionSource(source, date, period);
 
-	// Date set and value array will be in sync
-	double[] values = source.toArray();
-	Set xRange = source.getXRange();
-	Iterator iterator = xRange.iterator();
+        for(Iterator iterator = source.iterator(); iterator.hasNext();) {
+            date = (TradingDate)iterator.next();
+            quoteFunctionSource.setDate(date);
 
-	int i = 0;
-	double average;
+            try {
+                double average = QuoteFunctions.ema(quoteFunctionSource, period,
+                                                    smoothingConstant);
+                movingAverage.putY(date, new Double(average));
+            }
+            catch(EvaluationException e) {
+                // This can't happen since our source does not throw this exception
+                assert false;
+            }
+        }
 
-	while(iterator.hasNext()) {
-	    Comparable x = (Comparable)iterator.next();
-
-	    average = QuoteFunctions.ema(values,
-                                         i - Math.min(period - 1, i),
-                                         i + 1,
-					 smoothingConstant);
-	    i++;
-
-	    movingAverage.putY(x, new Double(average));
-	}
-
-	return movingAverage;
+        return movingAverage;
     }
 
     public boolean isPrimary() {

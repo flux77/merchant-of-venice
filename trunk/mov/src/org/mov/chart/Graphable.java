@@ -18,9 +18,11 @@
 
 package org.mov.chart;
 
-import java.util.*;
-
-import org.mov.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a graphable set of X points and their associated Y points.
@@ -207,6 +209,15 @@ public class Graphable {
 	}
 	
 	return values;
+    }
+
+    /**
+     * Return an interator which iterates over the X values.
+     *
+     * @return iterator
+     */
+    public Iterator iterator() {
+        return map.keySet().iterator();
     }
 
     public LinkedHashMap getMap() {

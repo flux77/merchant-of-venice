@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.quote;
@@ -39,7 +39,7 @@ import org.mov.util.TradingDate;
  * all market indices.
  * <p>
  * A quote range represents a range or set of quotes. It does not represent the actual
- * quotes themselves. The class that represents the quotes in a quote range is 
+ * quotes themselves. The class that represents the quotes in a quote range is
  * {@link QuoteBundle}.
  */
 public class QuoteRange implements Cloneable {
@@ -82,7 +82,7 @@ public class QuoteRange implements Cloneable {
     private int type = 0;
 
     /**
-     * Create a quote range that represents all the given symbols for all the 
+     * Create a quote range that represents all the given symbols for all the
      * dates we have quotes.
      *
      * @param symbols   list of symbols
@@ -97,7 +97,7 @@ public class QuoteRange implements Cloneable {
     }
 
     /**
-     * Create a quote range that represents all the given symbols for all the 
+     * Create a quote range that represents all the given symbols for all the
      * dates we have quotes.
      *
      * @param symbols   list of symbols
@@ -145,7 +145,7 @@ public class QuoteRange implements Cloneable {
     }
 
     /**
-     * Create a quote range that represents the given symbol for all the 
+     * Create a quote range that represents the given symbol for all the
      * dates we have quotes.
      *
      * @param   symbol  the symbol
@@ -160,7 +160,7 @@ public class QuoteRange implements Cloneable {
     }
 
     /**
-     * Create a quote range that represents the given symbol between 
+     * Create a quote range that represents the given symbol between
      * the first and the last dates given (inclusive).
      *
      * @param symbol  the symbol
@@ -177,14 +177,14 @@ public class QuoteRange implements Cloneable {
 	this.lastDate = lastDate;
     }
 
-    /** 
+    /**
      * Create a quote range that represents all the symbols of the given
      * type on the given date.
      *
      * @param type      the type, one of {@link #ALL_ORDINARIES}, {@link #ALL_SYMBOLS},
      *                  {@link #MARKET_INDICES}
      * @param date      the date
-     */ 
+     */
     public QuoteRange(int type, TradingDate date) {
 
         assert type != GIVEN_SYMBOLS;
@@ -195,7 +195,7 @@ public class QuoteRange implements Cloneable {
 	this.lastDate = date;
     }
 
-    /** 
+    /**
      * Create a quote range that represents all the symbols of the given
      * type between the first and the last dates given (inclusive).
      *
@@ -203,7 +203,7 @@ public class QuoteRange implements Cloneable {
      *                  {@link #MARKET_INDICES}
      * @param firstDate earliest date
      * @param lastDate  latest date
-     */ 
+     */
     public QuoteRange(int type, TradingDate firstDate, TradingDate lastDate) {
 
         assert type != GIVEN_SYMBOLS;
@@ -214,7 +214,7 @@ public class QuoteRange implements Cloneable {
 	this.lastDate = lastDate;
     }
 
-    /** 
+    /**
      * Create a quote range that represents all the symbols of the given
      * type for all the dates we have quotes.
      * This might use up a lot of memory!
@@ -223,7 +223,7 @@ public class QuoteRange implements Cloneable {
      *                  {@link #MARKET_INDICES}
      */
     public QuoteRange(int type) {
-        
+
         assert type != GIVEN_SYMBOLS;
 
 	this.symbols = null;
@@ -240,7 +240,7 @@ public class QuoteRange implements Cloneable {
     public Object clone() {
 	QuoteRange cloned;
 
-	if(type == GIVEN_SYMBOLS) 
+	if(type == GIVEN_SYMBOLS)
 	    cloned = new QuoteRange(symbols, firstDate, lastDate);
         else
 	    cloned = new QuoteRange(type, firstDate, lastDate);
@@ -279,7 +279,7 @@ public class QuoteRange implements Cloneable {
     }
 
     /**
-     * Get the first date of the quote range. 
+     * Get the first date of the quote range.
      *
      * @return  the earliest date of the quote range, <code>null</code> indicates
      *          that the quote range encompasses all available dates
@@ -287,9 +287,9 @@ public class QuoteRange implements Cloneable {
     public TradingDate getFirstDate() {
 	return firstDate;
     }
-    
+
     /**
-     * Get the last date of the quote range. 
+     * Get the last date of the quote range.
      *
      * @return  the latest date of the quote range, <code>null</code> indicates
      *          that the quote range encompasses all available dates
@@ -308,7 +308,7 @@ public class QuoteRange implements Cloneable {
 	return type;
     }
 
-    /** 
+    /**
      * Returns whether the quote range contains the given symbol.
      *
      * @param   symbol  the symbol
@@ -326,16 +326,16 @@ public class QuoteRange implements Cloneable {
 	else if(type == GIVEN_SYMBOLS)
 	    return symbols.contains(symbol);
 
-	else if(type == ALL_ORDINARIES) 
+	else if(type == ALL_ORDINARIES)
             if(!QuoteSourceManager.getSource().isMarketIndex(symbol) &&
                symbol.length() <= 3)
                 return true;
             else
                 return false;
-       
+
 	else {
 	    assert type == MARKET_INDICES;
-	    
+	
 	    return QuoteSourceManager.getSource().isMarketIndex(symbol);
 	}
     }
@@ -354,12 +354,12 @@ public class QuoteRange implements Cloneable {
 	if(type == ALL_SYMBOLS)
 	    return true;
 
-	else if(type == GIVEN_SYMBOLS) 
+	else if(type == GIVEN_SYMBOLS)
 	    return symbols.containsAll(containedSymbols);
 
 	else if(type == ALL_ORDINARIES) {
 	    Iterator iterator = containedSymbols.iterator();
-	    
+	
 	    while(iterator.hasNext()) {
 		Symbol symbol = (Symbol)iterator.next();
 
@@ -375,7 +375,7 @@ public class QuoteRange implements Cloneable {
 	    assert type == MARKET_INDICES;
 
 	    Iterator iterator = containedSymbols.iterator();
-	    
+	
 	    while(iterator.hasNext()) {
 		Symbol symbol = (Symbol)iterator.next();
 
@@ -387,7 +387,7 @@ public class QuoteRange implements Cloneable {
 	}
     }
 
-    /** 
+    /**
      * Creates a string representation of the quote range without referring
      * to the dates.
      *
@@ -406,11 +406,11 @@ public class QuoteRange implements Cloneable {
                 Symbol symbol = (Symbol)iterator.next();
 
                 string = string.concat(symbol.toString());
-                
-                if(iterator.hasNext()) 
+
+                if(iterator.hasNext())
                     string = string.concat(", ");
             }
-            
+
             return string;
         }
         else
@@ -425,9 +425,9 @@ public class QuoteRange implements Cloneable {
      * @return string representation, e.g. "All Ordinaries"
      */
     public static String getDescription(int type) {
-        if(type == ALL_SYMBOLS) 
+        if(type == ALL_SYMBOLS)
             return Locale.getString("ALL_SYMBOLS");
-        else if(type == GIVEN_SYMBOLS) 
+        else if(type == GIVEN_SYMBOLS)
             return Locale.getString("GIVEN_SYMBOLS");
         else if(type == ALL_ORDINARIES)
             return Locale.getString("ALL_ORDINARIES");
@@ -449,12 +449,12 @@ public class QuoteRange implements Cloneable {
         String string = getDescription();
 
         // Between what dates? (This locale code might need some work).
-        if(getFirstDate() == null) 
+        if(getFirstDate() == null)
             string = Locale.getString("FOR_ALL_DATES", string);
         else if(getFirstDate().equals(getLastDate()))
             string = Locale.getString("ON_DATE", string, getFirstDate().toString());
-        else 
-            string = Locale.getString("BETWEEN_DATES", string, getFirstDate().toString(), 
+        else
+            string = Locale.getString("BETWEEN_DATES", string, getFirstDate().toString(),
                                       getLastDate().toString());
 
         return string;
@@ -472,7 +472,7 @@ public class QuoteRange implements Cloneable {
      *                                               new TradingDate(2000, 12, 1));
      * QuoteRange quoteRange2 = new QuoteRange("CBA", new TradingDate(1999, 1, 1),
      *                                                new TradingDate(2000, 6, 6));
-     * QuoteRange clippedQuoteRange = quoteRange.clipRange(quoteRange2); 
+     * QuoteRange clippedQuoteRange = quoteRange.clipRange(quoteRange2);
      *
      * System.out.println(clippedQuoteRange);
      *
@@ -491,7 +491,7 @@ public class QuoteRange implements Cloneable {
 	    if((getType() == ALL_ORDINARIES && quoteRange.getType() == ALL_ORDINARIES) ||
 	       (getType() == MARKET_INDICES && quoteRange.getType() == MARKET_INDICES) ||
 	       getType() == ALL_SYMBOLS ||
-	       
+	
 	       (getType() == ALL_ORDINARIES && quoteRange.getType() == GIVEN_SYMBOLS &&
 		containsAllSymbols(quoteRange.getAllSymbols())) ||
 
@@ -503,15 +503,15 @@ public class QuoteRange implements Cloneable {
 		    QuoteRange clipped = (QuoteRange)quoteRange.clone();
 
 		    // this:        [----------]    -> [----------]
-		    // quote range:    [----------]                [-]    
+		    // quote range:    [----------]                [-]
  		    if(getFirstDate().compareTo(quoteRange.getFirstDate()) <= 0 &&
                        getLastDate().compareTo(quoteRange.getLastDate()) <= 0)
                         clipped.setFirstDate(getLastDate().next(1));
 
 		    // this:           [----------] ->    [----------]
-		    // quote range: [----------]       [-]  
+		    // quote range: [----------]       [-]
 		    else {
-			assert 
+			assert
 			    getFirstDate().compareTo(quoteRange.getFirstDate()) >= 0 &&
 			    getLastDate().compareTo(quoteRange.getLastDate()) >= 0;
                         clipped.setLastDate(getFirstDate().previous(1));
@@ -528,7 +528,7 @@ public class QuoteRange implements Cloneable {
 	    else
 		return quoteRange;
 	}
-	else 
+	else
 	    return quoteRange;
     }
 
@@ -549,11 +549,11 @@ public class QuoteRange implements Cloneable {
 	    return NO_OVERLAP;
 	
 	else if(getFirstDate().compareTo(quoteRange.getFirstDate()) <= 0 &&
-		getLastDate().compareTo(quoteRange.getLastDate()) >= 0) 
+		getLastDate().compareTo(quoteRange.getLastDate()) >= 0)
 	    return CONTAINS;
 
 	else if(getFirstDate().compareTo(quoteRange.getFirstDate()) > 0 &&
-		getLastDate().compareTo(quoteRange.getLastDate()) < 0) 
+		getLastDate().compareTo(quoteRange.getLastDate()) < 0)
 	    return CONTAINED;
 	
 	return PARTIAL_OVERLAP;

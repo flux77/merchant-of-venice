@@ -34,7 +34,7 @@ import org.mov.prefs.PreferencesManager;
  * 
  * @see FileQuoteSource
  * @see DatabaseQuoteSource
- * @see PreferenceManager
+ * @see org.mov.prefs.PreferencesManager
  */
 public class QuoteSourceFactory {
     

@@ -807,7 +807,7 @@ public class CommandManager {
                 dayClose =
                     new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
                 graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
-                chart.add(graph, quoteBundle, 0);
+                chart.add(graph, symbol, quoteBundle, 0);
                 chart.redraw();
 
                 if(symbols.size() > 1)
@@ -857,7 +857,8 @@ public class CommandManager {
 	    dayClose =
 		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
 	    graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
-	    chart.add(graph, quoteBundle, 0);
+            // PUT ME BACK IN!!!!
+            //	    chart.add(graph, symbol, quoteBundle, 0);
 	    chart.redraw();
 	
 	    if(symbols.size() > 1)

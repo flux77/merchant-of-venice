@@ -280,7 +280,7 @@ public class ChartModule extends JPanel implements Module,
      * @param	graph	the new graph to add
      * @param	level	graph level to add the new graph
      */
-    public void add(Graph graph, QuoteBundle quoteBundle, int level) {
+    public void add(Graph graph, Symbol symbol, QuoteBundle quoteBundle, int level) {
 
 	// Make sure it has at least one value
         assert graph.getXRange().size() > 0;
@@ -289,7 +289,7 @@ public class ChartModule extends JPanel implements Module,
 	chart.add(graph, level);
 
 	// Add menu for this quote
-	QuoteChartMenu menu = new QuoteChartMenu(this, quoteBundle, graph);
+	QuoteChartMenu menu = new QuoteChartMenu(this, quoteBundle, symbol, graph);
 
 	addMenu(menu);
     }
@@ -306,7 +306,7 @@ public class ChartModule extends JPanel implements Module,
 	GraphSource dayClose = null;
 
 	while(iterator.hasNext()) {
-	    Symbol symbol = (Symbol)iterator.next();
+	    final Symbol symbol = (Symbol)iterator.next();
 	    progress.show(Locale.getString("LOADING_QUOTES_FOR", symbol.toString()));
 	
 	    if (!thread.isInterrupted())
@@ -328,7 +328,7 @@ public class ChartModule extends JPanel implements Module,
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 		
-			    add(finalGraph, finalQuoteBundle, 0);
+			    add(finalGraph, symbol, finalQuoteBundle, 0);
 
 			    // This makes sure the menu updates OK
 			    getTopLevelAncestor().validate();

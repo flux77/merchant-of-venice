@@ -335,7 +335,7 @@ public class QuoteCache {
             // OK
         }
 
-        if(yesterdayQuote != null && 
+        if(yesterdayQuote != null &&
            yesterdayQuote.equals(day_volume, day_low, day_high, day_open, day_close))
             todayQuote = yesterdayQuote;
         else
@@ -345,7 +345,7 @@ public class QuoteCache {
         // Put stock in map and remove symbol and date to reduce memory
         // (they are our indices so we already know them)
         Object previousQuote = quotesForDate.put(symbol, todayQuote);
-                                              
+
         // If the quote wasn't already there then increase size counter
         if(previousQuote == null)
             size++;
@@ -360,7 +360,7 @@ public class QuoteCache {
     public synchronized void free(Symbol symbol, int dateOffset) {
 
 	try {
-	    HashMap quotesForDate = getQuotesForDate(dateOffset);       
+	    HashMap quotesForDate = getQuotesForDate(dateOffset);
 	    Object quote = quotesForDate.remove(symbol);
 
 	    // If we actually deleted a quote, then reduce our quote counter.
@@ -373,7 +373,7 @@ public class QuoteCache {
 
                 // If the hashmap is empty then resize it to the minimum size.
                 // Otherwise we may have 1,000s of large hash maps taking up
-                // a *LOT* of memory. 
+                // a *LOT* of memory.
                 if(quotesForDate.isEmpty())
                     cache.set(-dateOffset, new HashMap());
             }
@@ -405,9 +405,9 @@ public class QuoteCache {
 	int dateOffset = -Collections.binarySearch(dates, date, comparator);
 
 	// If the date isn't yet in the cache because its too old, then binary search
-	// will return the negative size of dates. 
+	// will return the negative size of dates.
         // If the date isn't yet in the cache because its too new, then binary search
-        // will return 1. 
+        // will return 1.
         // In either case expand the cache.
 	if(dateOffset > dates.size() || dateOffset == 1) {
 	    expandToDate(date);
@@ -484,9 +484,9 @@ public class QuoteCache {
         return -(dates.size() - 1);
     }
 
-    // Add one date to cache. The date should be one trading day older than the 
+    // Add one date to cache. The date should be one trading day older than the
     // oldest date in the cache.
-    private void addDate(TradingDate date) {       
+    private void addDate(TradingDate date) {
 	// Create a map with 0 initial capacity. I.e. we create an empty one
 	// because we might not even use it
 	HashMap map = new HashMap(0);
@@ -503,7 +503,7 @@ public class QuoteCache {
 	// because we might not even use it
 	HashMap map = new HashMap(0);
 	cache.add(0, map);
-	dates.add(0, date);       
+	dates.add(0, date);
     }
 
     // Expand the quote cache to encompass the given date
@@ -537,7 +537,7 @@ public class QuoteCache {
                 insertDate(lastDate);
             }
         }
-    
+
         // The remaining case is the date is already in our range...
     }
 }

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.util;
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 import org.mov.util.Locale;
 
 /**
- * A replacement date for java.util.Date, java.util.Calendar & 
+ * A replacement date for java.util.Date, java.util.Calendar &
  * java.sql.Date.
  *
  * The main principles of this date class are speed (as fast as possible)
@@ -39,11 +39,11 @@ import org.mov.util.Locale;
  */
 public class TradingDate implements Cloneable, Comparable {
 
-    /** Date format will be in US format, e.g. <code>mm/dd/yy</code>, <code>mm/dd/yyyy</code> 
+    /** Date format will be in US format, e.g. <code>mm/dd/yy</code>, <code>mm/dd/yyyy</code>
         etc. */
     public final static int US = 0;		
 
-    /** Date format will be in britsh format, e.g. <code>dd/mm/yy</code>, <code>dd/mm/yyyy</code> 
+    /** Date format will be in britsh format, e.g. <code>dd/mm/yy</code>, <code>dd/mm/yyyy</code>
         etc. */
     public final static int BRITISH = 1;	
 
@@ -114,7 +114,7 @@ public class TradingDate implements Cloneable, Comparable {
      * @param	type	either <code>BRITISH</code> or <code>US</code>
      * @exception   TradingDateException if the date couldn't be parsed
      */
-    public TradingDate(String date, int type) 
+    public TradingDate(String date, int type)
         throws TradingDateFormatException {
 
 	try {
@@ -133,10 +133,10 @@ public class TradingDate implements Cloneable, Comparable {
             }
             else
                 isSeparator = false;
-                
+
 	    // DD/MM/YY, DD/MM/YYYY, DD-MM-YY, DD-MM-YYYY		
             // DD/MONTH/YY, DD/MONTH/YYYY, DD-MONTH-YY, DD-MONTH-YYYY
-	    if(isSeparator) {	       
+	    if(isSeparator) {	
 		int i = 0;
 
 		// DAY
@@ -145,7 +145,7 @@ public class TradingDate implements Cloneable, Comparable {
                     throw new TradingDateFormatException(date);
                 day = Integer.parseInt(date.substring(i, separatorIndex));
 		i = separatorIndex + 1;
- 
+
 		// MONTH
                 separatorIndex = date.indexOf(separator, i);
                 if(separatorIndex == -1)
@@ -160,7 +160,7 @@ public class TradingDate implements Cloneable, Comparable {
                 // Or by name? e.g. Oct?
                 else {
                     month = textToMonth(date.substring(i, separatorIndex));
-                    if(month == -1) 
+                    if(month == -1)
                         throw new TradingDateFormatException(date);
                     isMonthNumeric = false;
                 }
@@ -181,10 +181,10 @@ public class TradingDate implements Cloneable, Comparable {
 		    temp = day; day = month; month = temp;
 		}	
 	    }
-    	    
+    	
 	    // These formats are not localised...
 
-	    // YYMMDD 
+	    // YYMMDD
 	    else if(date.length() == 6) {
 		year = Integer.parseInt(date.substring(0, 2));
 		month = Integer.parseInt(date.substring(2, 4));
@@ -192,7 +192,7 @@ public class TradingDate implements Cloneable, Comparable {
 		
 		year = twoToFourDigitYear(year);
 	    }
-	    
+	
 	    // YYYYMMDD
 	    else if(date.length() == 8) {
 		year = Integer.parseInt(date.substring(0, 4));
@@ -281,38 +281,29 @@ public class TradingDate implements Cloneable, Comparable {
      * @return	<code>true</code> if the given date is before this one
      */
     public boolean before(Object date) {
-	if(compareTo(date) > 0)
-	    return false;
-	else 
-	    return true;
+	return (compareTo(date) < 0);
     }
 
     /**
      * Tests if this date is after the specified date.
      *
      * @param	date the specified date to compare
-     * @return	<code>true</code> if the specified date is before this one; 
+     * @return	<code>true</code> if the specified date is before this one;
      *		<code>false</code> otherwise.
      */
     public boolean after(Object date) {
-	if(compareTo(date) > 0)
-	    return true;
-	else 
-	    return false;
+	return (compareTo(date) > 0);
     }
 
     /**
      * Compares this date with the specified object.
      *
      * @param	date the specified date to compare
-     * @return	<code>true</code> if the specified date is equal; 
+     * @return	<code>true</code> if the specified date is equal;
      * <code>false</code> otherwise.
      */
     public boolean equals(Object date) {
-	if(compareTo(date) == 0)
-	    return true;
-	else
-	    return false;
+	return (compareTo(date) == 0);
     }
 
     /**
@@ -437,25 +428,25 @@ public class TradingDate implements Cloneable, Comparable {
      * <pre>text = date.toString("d?-m?-yyyy");</pre>
      *
      * @param	format	the format of the string
-     * @return	the text string 
+     * @return	the text string
      */
     public String toString(String format) {
-	format = replace(format, "d\\?", Integer.toString(getDay())); 
-	format = replace(format, "dd", Converter.toFixedString(getDay(), 2)); 
-	format = replace(format, "m\\?", Integer.toString(getMonth())); 
-	format = replace(format, "mm", 
-			 Converter.toFixedString(getMonth(), 2)); 
+	format = replace(format, "d\\?", Integer.toString(getDay()));
+	format = replace(format, "dd", Converter.toFixedString(getDay(), 2));
+	format = replace(format, "m\\?", Integer.toString(getMonth()));
+	format = replace(format, "mm",
+			 Converter.toFixedString(getMonth(), 2));
 
 	format = replace(format, "MMM", monthToText(getMonth()));
-	format = replace(format, "yyyy", 
+	format = replace(format, "yyyy",
 			 Converter.toFixedString(getYear(), 4));	
 
 	if(getYear() > 99) {
-	    format = replace(format, "yy", 
+	    format = replace(format, "yy",
 			     Integer.toString(getYear()).substring(2));
 	}
 	else {
-	    format = replace(format, "yy", 
+	    format = replace(format, "yy",
 			     Integer.toString(getYear()));
 	}
 
@@ -505,17 +496,17 @@ public class TradingDate implements Cloneable, Comparable {
      * @return	the 3 digit month string
      */
     public static String monthToText(int month) {
-	String months[] = {Locale.getString("JAN"), 
-			   Locale.getString("FEB"), 
-			   Locale.getString("MAR"), 
-			   Locale.getString("APR"), 
-			   Locale.getString("MAY"), 
+	String months[] = {Locale.getString("JAN"),
+			   Locale.getString("FEB"),
+			   Locale.getString("MAR"),
+			   Locale.getString("APR"),
+			   Locale.getString("MAY"),
 			   Locale.getString("JUN"),
-			   Locale.getString("JUL"), 
-			   Locale.getString("AUG"), 
-			   Locale.getString("SEP"), 
-			   Locale.getString("OCT"), 
-			   Locale.getString("NOV"), 
+			   Locale.getString("JUL"),
+			   Locale.getString("AUG"),
+			   Locale.getString("SEP"),
+			   Locale.getString("OCT"),
+			   Locale.getString("NOV"),
 			   Locale.getString("DEC")};
 	
 	month--;
@@ -537,7 +528,7 @@ public class TradingDate implements Cloneable, Comparable {
 
         // Missing words in the language mean that they are the same as a preceeding
         // language.
-        String months[][] = 
+        String months[][] =
             {{"jan", "january", "janvier", "enero", "januar", "gennaio", "januari"},
              {"feb", "february", "février", "febrero", "februar", "febbraio", "februari"},
              {"mar", "march", "mars", "marzo", "marts", "märz", "marzo"},
@@ -587,9 +578,9 @@ public class TradingDate implements Cloneable, Comparable {
 
     /**
      * Converts a two digit year to four digit year. The year 0 to 30
-     * are transformed to 2000 to 2030 respecitvely; the years 31 to 99 to 
+     * are transformed to 2000 to 2030 respecitvely; the years 31 to 99 to
      * 1931 and 1999 respectively.
-     * 
+     *
      * @param	year	a two digit year
      * @return	a four digit year
      */

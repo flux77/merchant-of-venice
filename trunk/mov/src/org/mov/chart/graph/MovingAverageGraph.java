@@ -26,10 +26,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.mov.chart.Graphable;
+import org.mov.chart.GraphableQuoteFunctionSource;
 import org.mov.chart.GraphTools;
 import org.mov.chart.source.GraphSource;
-import org.mov.util.Locale;
+import org.mov.parser.EvaluationException;
 import org.mov.quote.QuoteFunctions;
+import org.mov.util.Locale;
+import org.mov.util.TradingDate;
 
 /**
  * Simple Moving Average graph. This graph draws a single moving
@@ -89,27 +92,25 @@ public class MovingAverageGraph extends AbstractGraph {
      */
     public static Graphable createMovingAverage(Graphable source, int period) {
 	Graphable movingAverage = new Graphable();
+        TradingDate date = (TradingDate)source.getStartX();
+        GraphableQuoteFunctionSource quoteFunctionSource 
+            = new GraphableQuoteFunctionSource(source, date, period);
 
-	// Date set and value array will be in sync
-	double[] values = source.toArray();
-	Set xRange = source.getXRange();
-	Iterator iterator = xRange.iterator();
+        for(Iterator iterator = source.iterator(); iterator.hasNext();) {
+            date = (TradingDate)iterator.next();
+            quoteFunctionSource.setDate(date);
 
-	int i = 0;	
-	double average;
+            try {
+                double average = QuoteFunctions.avg(quoteFunctionSource, period);
+                movingAverage.putY(date, new Double(average));
+            }
+            catch(EvaluationException e) {
+                // This can't happen since our source does not throw this exception
+                assert false;
+            }
+        }
 
-	while(iterator.hasNext()) {
-	    Comparable x = (Comparable)iterator.next();
-
-	    average = QuoteFunctions.avg(values,
-                                         i - Math.min(period - 1, i),
-                                         i + 1);
-	    i++;
-
-	    movingAverage.putY(x, new Double(average));
-	}
-
-	return movingAverage;
+        return movingAverage;
     }
 
     public void setSettings(HashMap settings) {

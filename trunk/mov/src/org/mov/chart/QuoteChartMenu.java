@@ -39,6 +39,7 @@ import org.mov.util.TradingDate;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteFunctions;
+import org.mov.quote.Symbol;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.
@@ -68,8 +69,8 @@ public class QuoteChartMenu extends JMenu {
     private Graph currentViewGraph = null;
     private JRadioButtonMenuItem currentViewMenuItem = null;
 
-    // Name of menu / graph source
-    private String menuName = null;
+    // Symbol being graphed
+    private Symbol symbol = null;
 
     // Cached graph sources shared between indicators
     private GraphSource dayOpenGraphSource = null;
@@ -85,14 +86,15 @@ public class QuoteChartMenu extends JMenu {
      *
      * @param	listener	the chart module associated with the menu
      * @param   quoteBundle     graph's quote data
+     * @param   symbol          the symbol being graphed
      * @param	graph		the graph we are associated with
      */
     public QuoteChartMenu(final ChartModule listener, QuoteBundle quoteBundle,
-			  Graph graph) {
+			  Symbol symbol, Graph graph) {
 	super(graph.getSourceName());
-        menuName = graph.getSourceName();
 
 	this.quoteBundle = quoteBundle;
+        this.symbol = symbol;
 	this.listener = listener;
         this.currentViewGraph = graph;
 
@@ -123,6 +125,7 @@ public class QuoteChartMenu extends JMenu {
         // the user wishes. For example, the user can display bollinger bands and
         // Moving Average in the same graph.
         addMenuItem(graphMenu, Locale.getString("BOLLINGER_BANDS"));
+        addMenuItem(graphMenu, Locale.getString("CUSTOM"));
         addMenuItem(graphMenu, Locale.getString("DAY_OPEN"));
         addMenuItem(graphMenu, Locale.getString("DAY_HIGH"));
 	addMenuItem(graphMenu, Locale.getString("DAY_LOW"));
@@ -251,7 +254,7 @@ public class QuoteChartMenu extends JMenu {
      * @return	the menu name
      */
     public String getName() {
-        return menuName;
+        return symbol.toString();
     }
 
     /**
@@ -385,6 +388,8 @@ public class QuoteChartMenu extends JMenu {
 
         else if(text == Locale.getString("CANDLE_STICK"))
             graph = new CandleStickGraph(getDayOpen(), getDayLow(), getDayHigh(), getDayClose());
+        else if(text == Locale.getString("CUSTOM"))
+            graph = new CustomGraph(getDayClose(), symbol, quoteBundle);
 
         else if(text == Locale.getString("DAY_HIGH"))
             graph = new LineGraph(getDayHigh(), text, true);

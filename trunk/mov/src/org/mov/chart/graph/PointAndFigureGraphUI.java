@@ -172,7 +172,7 @@ public class PointAndFigureGraphUI implements GraphUI {
      * is empty, then return the default box scale.
      *
      * @param settings the settings
-     * @param defaultBoxScale the default price scale
+     * @param defaultBoxPrice the default price scale
      * @return the box price
      */
     public static double getBoxPriceScale(HashMap settings, double defaultBoxPrice) {

@@ -66,6 +66,7 @@ public class QuoteChartMenu extends JMenu {
 
     // Current view graph displayed
     private Graph currentViewGraph = null;
+    private JRadioButtonMenuItem currentViewMenuItem = null;
 
     // Name of menu / graph source
     private String menuName = null;
@@ -109,7 +110,8 @@ public class QuoteChartMenu extends JMenu {
         // one of these at a time. So if they do, unselect the other members of
         // the group.
         ButtonGroup group = new ButtonGroup();
-	addViewMenuItem(graphMenu, group, Locale.getString("LINE_CHART"), true); // selected
+        currentViewMenuItem =
+            addViewMenuItem(graphMenu, group, Locale.getString("LINE_CHART"), true); // selected
         addViewMenuItem(graphMenu, group, Locale.getString("BAR_CHART"), false);
 	addViewMenuItem(graphMenu, group, Locale.getString("CANDLE_STICK"), false);
 	addViewMenuItem(graphMenu, group, Locale.getString("HIGH_LOW_BAR"), false);
@@ -158,31 +160,47 @@ public class QuoteChartMenu extends JMenu {
      * @param group menu buttom group
      * @param label name of graph
      * @param isSelected is this the initial view?
+     * @return menu item
      */
-    private void addViewMenuItem(JMenu menu, ButtonGroup group, String label,
-                                 boolean isSelected) {
+    private JRadioButtonMenuItem addViewMenuItem(JMenu menu, ButtonGroup group, String label,
+                                                 boolean isSelected) {
         JRadioButtonMenuItem item = new JRadioButtonMenuItem(label);
         group.add(item);
         item.setSelected(isSelected);
         item.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Graph graph;
-                    JRadioButtonMenuItem menuItem = (JRadioButtonMenuItem)e.getSource();
-                    String text = menuItem.getText();
+                    final JRadioButtonMenuItem menuItem = (JRadioButtonMenuItem)e.getSource();
+                    final String text = menuItem.getText();
 
-                    // First remove last view graph displayed
-                    if(currentViewGraph != null)
-                        listener.remove(currentViewGraph);
+                    // NOTE: the menu will be auto-checked which might mess things up!!!
 
-                    graph = newGraph(text);
+                    // Handle all action in a separate thread so we dont
+                    // hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+                    Thread thread = new Thread() {
+                            public void run() {
+                                Graph graph = getGraph(text);
+                                if (graph != null) {
 
-                    listener.append(graph, 0);
-                    listener.redraw();
+                                    // Remove last graph first
+                                    if(currentViewGraph != null)
+                                        listener.remove(currentViewGraph);
 
-                    currentViewGraph = graph;
+                                    addGraph(graph);
+                                    currentViewGraph = graph;
+                                    currentViewMenuItem = menuItem;
+                                }
+
+                                // Reset last selected menu item if the user cancelled
+                                else if(currentViewMenuItem != null)
+                                    currentViewMenuItem.setSelected(true);
+                            }};
+
+                    thread.start();
                 }});
 
         menu.add(item);
+
+        return item;
     }
 
     /**
@@ -380,7 +398,7 @@ public class QuoteChartMenu extends JMenu {
             graph = new BarGraph(getDayVolume(), text, false);
 	
         else if(text == Locale.getString("EXP_MOVING_AVERAGE"))
-            graph = new ExpMovingAverageGraph(getDayClose(), 40, 0.1);
+            graph = new ExpMovingAverageGraph(getDayClose());
 
         else if(text == Locale.getString("HIGH_LOW_BAR"))
             graph = new HighLowBarGraph(getDayLow(), getDayHigh(), getDayClose());
@@ -392,7 +410,7 @@ public class QuoteChartMenu extends JMenu {
             graph = new OBVGraph(getDayOpen(), getDayClose(), getDayVolume());
 
         else if(text == Locale.getString("POINT_AND_FIGURE"))
-            graph = new PointAndFigureGraph(getDayClose(), 20, 0.05);
+            graph = new PointAndFigureGraph(getDayClose());
 
         else if(text == Locale.getString("RSI"))
             graph = new RSIGraph(getDayClose());

@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
  * <p>
  * The internationalisation files are kept in src/org/mov/util/locale/.
  * <p>
+ * @author Andrew Leppard
  * @see java.util.ResourceBundle
  */
 public class Locale {
@@ -124,7 +125,7 @@ public class Locale {
     /**
      * Return the current langauge translation of the text associated
      * with the given key. Insert the given argument into the text
-     * translation. For example if the text object in the internationalisation 
+     * translation. For example if the text object in the internationalisation
      * file looks like:
      *
      * <pre>Generation %1</pre>
@@ -144,7 +145,7 @@ public class Locale {
     /**
      * Return the current langauge translation of the text associated
      * with the given key. Insert the given arguments into the text
-     * translation. For example if the text object in the internationalisation 
+     * translation. For example if the text object in the internationalisation
      * file looks like:
      *
      * <pre>Generation %1 of %2</pre>
@@ -167,7 +168,7 @@ public class Locale {
     /**
      * Return the current langauge translation of the text associated
      * with the given key. Insert the given arguments into the text
-     * translation. For example if the text object in the internationalisation 
+     * translation. For example if the text object in the internationalisation
      * file looks like:
      *
      * <pre>%1 of %2 (%3%)</pre>
@@ -193,7 +194,7 @@ public class Locale {
     /**
      * Return the current langauge translation of the text associated
      * with the given key. Insert the given argument into the text
-     * translation. For example if the text object in the internationalisation 
+     * translation. For example if the text object in the internationalisation
      * file looks like:
      *
      * <pre>Generation %1</pre>
@@ -211,7 +212,7 @@ public class Locale {
     /**
      * Return the current langauge translation of the text associated
      * with the given key. Insert the given arguments into the text
-     * translation. For example if the text object in the internationalisation 
+     * translation. For example if the text object in the internationalisation
      * file looks like:
      *
      * <pre>Generation %1 of %2</pre>
@@ -226,5 +227,25 @@ public class Locale {
      */
     public static String getString(String key, int arg1, int arg2) {
 	return getString(key, Integer.toString(arg1), Integer.toString(arg2));
+    }
+
+    /**
+     * Return the current langauge translation of the text associated
+     * with the given key. Insert the given arguments into the text
+     * translation. For example if the text object in the internationalisation
+     * file looks like:
+     *
+     * <pre>Generation %1 of %2</pre>
+     *
+     * The first argument will replace <code>%1</code> and the second
+     * argument will replace <code>%2</code>.
+     *
+     * @param key a key which represents a line of text
+     * @param arg1 the first argument
+     * @param arg2 the second argument
+     * @return the text
+     */
+    public static String getString(String key, double arg1, double arg2) {
+	return getString(key, Double.toString(arg1), Double.toString(arg2));
     }
 }

@@ -28,42 +28,38 @@ import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
 /**
- * The RSI graph user interface.
+ * The exponential smoothed moving average graph user interface.
  *
  * @author Andrew Leppard
- * @see RSIGraph
+ * @see ExpMovingAverageGraph
  */
-public class RSIGraphUI implements GraphUI {
+public class ExpMovingAverageGraphUI implements GraphUI {
 
     // The graph's user interface
     private JPanel panel;
     private JTextField periodTextField;
-    private JTextField overSoldTextField;
-    private JTextField overBoughtTextField;
+    private JTextField smoothingConstantTextField;
 
     // String name of settings
     private final static String PERIOD = "period";
-    private final static String OVER_SOLD = "oversold";
-    private final static String OVER_BOUGHT = "overbought";
+    private final static String SMOOTHING_CONSTANT = "smoothing_constant";
 
     // Limits
     private final static int MINIMUM_PERIOD = 2;
-    private final static int MINIMUM_OVER_SOLD = 1;
-    private final static int MAXIMUM_OVER_SOLD = 49;
-    private final static int MINIMUM_OVER_BOUGHT = 51;
-    private final static int MAXIMUM_OVER_BOUGHT = 99;
+    private final static double MINIMUM_SMOOTHING_CONSTANT = 0.01D;
+    private final static double MAXIMUM_SMOOTHING_CONSTANT = 1.00D;
 
-    // Default values from Technical Analysis Explained by Martin J. Pring.
-    private final static int DEFAULT_PERIOD = 14;
-    private final static int DEFAULT_OVER_SOLD = 32;
-    private final static int DEFAULT_OVER_BOUGHT = 72;
+    // Default values
+    private final static int DEFAULT_PERIOD = 40;
+    private final static double DEFAULT_SMOOTHING_CONSTANT = 0.1;
 
     /**
-     * Create a new RSI user interface with the initial settings.
+     * Create a new exponential smoothed moving average user interface with the
+     * initial settings.
      *
      * @param settings the initial settings
      */
-    public RSIGraphUI(HashMap settings) {
+    public ExpMovingAverageGraphUI(HashMap settings) {
         buildPanel();
         setSettings(settings);
     }
@@ -83,10 +79,10 @@ public class RSIGraphUI implements GraphUI {
 
         periodTextField = GridBagHelper.addTextRow(panel, Locale.getString("PERIOD"), "",
                                                    layout, c, 8);
-        overSoldTextField = GridBagHelper.addTextRow(panel, Locale.getString("OVER_SOLD"), "",
-                                                     layout, c, 8);
-        overBoughtTextField = GridBagHelper.addTextRow(panel, Locale.getString("OVER_BOUGHT"),
-                                                       "", layout, c, 8);
+        smoothingConstantTextField =
+            GridBagHelper.addTextRow(panel,
+                                     Locale.getString("SMOOTHING_CONSTANT"), "",
+                                     layout, c, 8);
     }
 
     public String checkSettings() {
@@ -106,37 +102,24 @@ public class RSIGraphUI implements GraphUI {
         if (period < MINIMUM_PERIOD)
             return Locale.getString("PERIOD_TOO_SMALL");
 
-        // Check over sold
-        String overSoldString = (String)settings.get(OVER_SOLD);
-        int overSold;
+        // Check smoothing constant
+        String smoothingConstantString =
+            (String)settings.get(SMOOTHING_CONSTANT);
+        double smoothingConstant;
 
         try {
-            overSold = Integer.parseInt(overSoldString);
+            smoothingConstant = Double.parseDouble(smoothingConstantString);
         }
         catch(NumberFormatException e) {
-            return Locale.getString("ERROR_PARSING_NUMBER", overSoldString);
+            return Locale.getString("ERROR_PARSING_NUMBER",
+                                    smoothingConstantString);
         }
 
-        if (overSold < MINIMUM_OVER_SOLD || overSold > MAXIMUM_OVER_SOLD)
-            return Locale.getString("ERROR_OVER_SOLD_LIMITS",
-                                    MINIMUM_OVER_SOLD,
-                                    MAXIMUM_OVER_SOLD);
-
-        // Check over bought
-        String overBoughtString = (String)settings.get(OVER_BOUGHT);
-        int overBought;
-
-        try {
-            overBought = Integer.parseInt(overBoughtString);
-        }
-        catch(NumberFormatException e) {
-            return Locale.getString("ERROR_PARSING_NUMBER", overBoughtString);
-        }
-
-        if (overBought < MINIMUM_OVER_BOUGHT || overBought > MAXIMUM_OVER_BOUGHT)
-            return Locale.getString("ERROR_OVER_BOUGHT_LIMITS",
-                                    MINIMUM_OVER_BOUGHT,
-                                    MAXIMUM_OVER_BOUGHT);
+        if (smoothingConstant < MINIMUM_SMOOTHING_CONSTANT ||
+            smoothingConstant > MAXIMUM_SMOOTHING_CONSTANT)
+            return Locale.getString("ERROR_SMOOTHING_CONSTANT",
+                                    MINIMUM_SMOOTHING_CONSTANT,
+                                    MAXIMUM_SMOOTHING_CONSTANT);
 
         // Settings are OK
         return null;
@@ -145,15 +128,13 @@ public class RSIGraphUI implements GraphUI {
     public HashMap getSettings() {
         HashMap settings = new HashMap();
         settings.put(PERIOD, periodTextField.getText());
-        settings.put(OVER_SOLD, overSoldTextField.getText());
-        settings.put(OVER_BOUGHT, overBoughtTextField.getText());
+        settings.put(SMOOTHING_CONSTANT, smoothingConstantTextField.getText());
         return settings;
     }
 
     public void setSettings(HashMap settings) {
         periodTextField.setText(Integer.toString(getPeriod(settings)));
-        overSoldTextField.setText(Integer.toString(getOverSold(settings)));
-        overBoughtTextField.setText(Integer.toString(getOverBought(settings)));
+        smoothingConstantTextField.setText(Double.toString(getSmoothingConstant(settings)));
     }
 
     public JPanel getPanel() {
@@ -185,19 +166,19 @@ public class RSIGraphUI implements GraphUI {
     }
 
     /**
-     * Retrieve the over sold line from the settings hashmap. If the hashmap
-     * is empty, then return the default.
+     * Retrieve the smoothing constant from the settings hashmap. If the hashmap
+     * is empty, then return the default smoothing constant.
      *
      * @param settings the settings
-     * @return the over sold line
+     * @return the smoothign constant
      */
-    public static int getOverSold(HashMap settings) {
-        int overSold = DEFAULT_OVER_SOLD;
-        String text = (String)settings.get(OVER_SOLD);
+    public static double getSmoothingConstant(HashMap settings) {
+        double smoothingConstant = DEFAULT_SMOOTHING_CONSTANT;
+        String text = (String)settings.get(SMOOTHING_CONSTANT);
 
         if(text != null) {
             try {
-                overSold = Integer.parseInt(text);
+                smoothingConstant = Double.parseDouble(text);
             }
             catch(NumberFormatException e) {
                 // Value should already be checked
@@ -205,30 +186,6 @@ public class RSIGraphUI implements GraphUI {
             }
         }
 
-        return overSold;
-    }
-
-    /**
-     * Retrieve the over bought line from the settings hashmap. If the hashmap
-     * is empty, then return the default.
-     *
-     * @param settings the settings
-     * @return the over bought line
-     */
-    public static int getOverBought(HashMap settings) {
-        int overBought = DEFAULT_OVER_BOUGHT;
-        String text = (String)settings.get(OVER_BOUGHT);
-
-        if(text != null) {
-            try {
-                overBought = Integer.parseInt(text);
-            }
-            catch(NumberFormatException e) {
-                // Value should already be checked
-                assert false;
-            }
-        }
-
-        return overBought;
+        return smoothingConstant;
     }
 }

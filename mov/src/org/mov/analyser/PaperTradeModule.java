@@ -425,7 +425,7 @@ public class PaperTradeModule extends JPanel implements Module {
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Total time (s) " + (endTime - startTime));
+	//        System.out.println("Total time (s) " + (endTime - startTime));
 
 
         ProgressDialogManager.closeProgressDialog(progress);

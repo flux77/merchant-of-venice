@@ -146,6 +146,14 @@ public class ExpressionTest extends TestCase {
         assertEquals("b", simplify("if(false) {a} else {b}"));
         assertEquals("b", simplify("if(a) {b} else {b}"));
         assertEquals("if(a) {a} else {b}", simplify("if(a) {a} else {b}"));
+        assertEquals("if(a) {b} else {a}", simplify("if(not(a)) {a} else {b}"));
+
+        // Sqrt
+        assertEquals("5", simplify("sqrt(25)"));
+
+        // Abs
+        assertEquals("10", simplify("abs(10)"));
+        assertEquals("10", simplify("abs(-10)"));
     }
 
     private Expression parse(String string) {

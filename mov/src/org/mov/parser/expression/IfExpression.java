@@ -112,6 +112,12 @@ public class IfExpression extends TernaryExpression {
         else if(get(1).equals(get(2)))
             return get(1);
 
+        // If the first argument is not, create a new If expression that
+        // reverses argument 1 and 2. I.e.
+        // if(not(c)) {a} else {b}")) => if(c) {b} else {a}
+        else if(get(0) instanceof NotExpression)
+            return new IfExpression(get(0).get(0), get(2), get(1));
+
         else
             return this;
     }

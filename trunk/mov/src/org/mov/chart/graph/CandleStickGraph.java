@@ -69,6 +69,8 @@ public class CandleStickGraph extends AbstractGraph {
         Double dayLowY, dayHighY, dayCloseY, dayOpenY;
         Iterator iterator = xRange.iterator();
         int i = 0;
+        int halfbarWidth=(int)(0.309 * horizontalScale);//bryan
+        int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
 
         while (iterator.hasNext()) {
 
@@ -110,24 +112,22 @@ public class CandleStickGraph extends AbstractGraph {
                         bottomLineValue, verticalScale);
 
                 // Draw bar
-                int halfbarWidth=(int)(0.382 * horizontalScale);
                 if (closeY > openY) { // red candle : open higher than close
                     g.setColor(Color.RED);
-                    g.drawRect(xCoordinate - halfbarWidth, openY,
-                            2*halfbarWidth, closeY-openY);
-                    g.drawLine(xCoordinate, lowY, xCoordinate, closeY);
-                    g.drawLine(xCoordinate, openY, xCoordinate, highY);
+                    g.drawRect(xCoordinate +halfBlankWidth, openY,	halfbarWidth*2+1, closeY-openY);
+                    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, lowY, xCoordinate+halfbarWidth+1 +halfBlankWidth, closeY);
+                    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, openY, xCoordinate+halfbarWidth+1 +halfBlankWidth, highY);
                 } else if (closeY < openY) { // green candle : close higher than open
                     g.setColor(Color.GREEN);
-                    g.drawRect(xCoordinate - halfbarWidth, closeY,
-                            2*halfbarWidth, openY-closeY);
-                    g.drawLine(xCoordinate, lowY, xCoordinate, openY);
-                    g.drawLine(xCoordinate, closeY, xCoordinate, highY);
+                    g.drawRect(xCoordinate +halfBlankWidth, closeY, halfbarWidth*2+1, openY-closeY);
+                    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, lowY, xCoordinate+halfbarWidth+1 +halfBlankWidth, openY);
+                    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, closeY, xCoordinate+halfbarWidth+1 +halfBlankWidth, highY);
                 } else { // no candle
                     g.setColor(Color.RED);
-                    g.drawLine(xCoordinate, lowY, xCoordinate, highY);
-                    g.drawLine(xCoordinate - halfbarWidth, openY,
-                            xCoordinate+halfbarWidth, openY);
+                    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, lowY, xCoordinate+halfbarWidth+1 +halfBlankWidth, highY);
+                   g.drawLine(xCoordinate +halfBlankWidth , openY,
+                    		xCoordinate+halfbarWidth*2+1 +halfBlankWidth, openY);
+
                 }
             }
             i++;
@@ -163,9 +163,11 @@ public class CandleStickGraph extends AbstractGraph {
 	
 	    // Its our graph if its within TOOL_TIP_BUFFER pixels of the
 	    // line from day low to day high
-	    if(y >= (dayLowYCoordinate - Graph.TOOL_TIP_BUFFER) &&
-	       y <= (dayHighYCoordinate + Graph.TOOL_TIP_BUFFER))
-		return getSource().getToolTipText(x);
+//	    if(y >= (dayLowYCoordinate - Graph.TOOL_TIP_BUFFER) &&
+//	       y <= (dayHighYCoordinate + Graph.TOOL_TIP_BUFFER))
+	    if(y <= (dayLowYCoordinate + Graph.TOOL_TIP_BUFFER) &&
+		 	       y >= (dayHighYCoordinate - Graph.TOOL_TIP_BUFFER))
+	    return getSource().getToolTipText(x);
 	}
 	return null;
     }

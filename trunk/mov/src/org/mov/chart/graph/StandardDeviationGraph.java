@@ -56,8 +56,8 @@ public class StandardDeviationGraph extends AbstractGraph {
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderLine(g, standardDeviation, xoffset, yoffset, 
@@ -66,25 +66,25 @@ public class StandardDeviationGraph extends AbstractGraph {
     }
 
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue)
+				 double verticalScale,
+				 double bottomLineValue)
     {
 	return null; // we never give tool tip information
     }
 
     // Highest Y value is in the standard deviation graph
-    public float getHighestY(List x) {
+    public double getHighestY(List x) {
 	return standardDeviation.getHighestY(x);
     }
 
     // Lowest Y value is in the standard deviation graph
-    public float getLowestY(List x) {
+    public double getLowestY(List x) {
 	return standardDeviation.getLowestY(x);
     }
 
     // Override vertical axis
-    public float[] getAcceptableMajorDeltas() {
-	float[] major = {0.1F,
+    public double[] getAcceptableMajorDeltas() {
+	double[] major = {0.1F,
 			 0.5F,
 			 1F,
 			 10F,
@@ -93,8 +93,8 @@ public class StandardDeviationGraph extends AbstractGraph {
     }
 
     // Override vertical axis
-    public float[] getAcceptableMinorDeltas() {
-	float[] minor = {1F, 
+    public double[] getAcceptableMinorDeltas() {
+	double[] minor = {1F, 
 			 2F,
 			 3F,
 			 4F,
@@ -107,8 +107,8 @@ public class StandardDeviationGraph extends AbstractGraph {
     }
 
     // Override vertical axis
-    public String getYLabel(float value) {
-	return Float.toString(value);
+    public String getYLabel(double value) {
+	return Double.toString(value);
     }
 
     /**
@@ -123,11 +123,11 @@ public class StandardDeviationGraph extends AbstractGraph {
 	Graphable standardDeviation = new Graphable();
 
 	// Date set and value array will be in sync
-	float[] values = source.toArray();
+	double[] values = source.toArray();
 	Iterator iterator = source.getXRange().iterator();
 
 	int i = 0;	
-	float sd;
+	double sd;
 
 	while(iterator.hasNext()) {
 	    Comparable x = (Comparable)iterator.next();
@@ -137,7 +137,7 @@ public class StandardDeviationGraph extends AbstractGraph {
 				   i + 1);
 	    i++;
 
-	    standardDeviation.putY(x, new Float(sd));
+	    standardDeviation.putY(x, new Double(sd));
 	}
 
 	return standardDeviation;

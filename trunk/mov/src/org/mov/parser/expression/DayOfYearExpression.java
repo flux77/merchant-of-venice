@@ -34,7 +34,7 @@ public class DayOfYearExpression extends TerminalExpression {
         // nothing to do
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) {
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) {
         TradingDate date = quoteBundle.offsetToDate(day);
         return date.getDayOfYear();
     }

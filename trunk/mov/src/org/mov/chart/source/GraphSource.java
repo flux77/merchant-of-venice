@@ -52,25 +52,25 @@ public interface GraphSource {
      * @param	value	y value
      * @return	the label text
      */
-    public String getYLabel(float value);
+    public String getYLabel(double value);
 
     /**
      * Return an array of acceptable major deltas for the vertical
      * axis.
      *
-     * @return	array of floats
+     * @return	array of doubles
      * @see	org.mov.chart.graph.Graph#getAcceptableMajorDeltas
      */ 
-    public float[] getAcceptableMajorDeltas();
+    public double[] getAcceptableMajorDeltas();
 
     /**
      * Return an array of acceptable minor deltas for the vertical
      * axis.
      *
-     * @return	array of floats
+     * @return	array of doubles
      * @see	org.mov.chart.graph.Graph#getAcceptableMajorDeltas
      */ 
-    public float[] getAcceptableMinorDeltas();
+    public double[] getAcceptableMinorDeltas();
 
     /**
      * Get the actual graphable data.

@@ -31,15 +31,15 @@ public class DivideExpression extends ArithmeticExpression {
 	super(left, right);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	float right = getRight().evaluate(variables, quoteBundle, symbol, day);
+	double right = getRight().evaluate(variables, quoteBundle, symbol, day);
 
 	if(right != 0.0F)
 	    return getLeft().evaluate(variables, quoteBundle, symbol, day) / right;
 	else
-            throw new EvaluationException("Divide by zero error");
+            throw EvaluationException.divideByZero();
     }
 
     public Expression simplify() {

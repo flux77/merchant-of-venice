@@ -24,7 +24,7 @@ import org.mov.util.Money;
  * An abstract representation of the concept of Change. This class stores the
  * change of a value (in percent). It is currently used as a place holder
  * for the class <code>SortedTable</code> to allow us to differentiate it
- * from the other <code>float</code> values used in that object. This way
+ * from the other <code>double</code> values used in that object. This way
  * we can format it differently.
  */
 public class ChangeFormat implements Comparable {
@@ -47,7 +47,7 @@ public class ChangeFormat implements Comparable {
      * @param finalValue the final amount
      */
     public ChangeFormat(Money initialValue, Money finalValue) {
-        this(initialValue.floatValue(), finalValue.floatValue());
+        this(initialValue.doubleValue(), finalValue.doubleValue());
     }
 
     /**
@@ -57,7 +57,7 @@ public class ChangeFormat implements Comparable {
      * @param initialValue the initial amount
      * @param finalValue the final amount
      */
-    public ChangeFormat(float initialValue, float finalValue) {
+    public ChangeFormat(double initialValue, double finalValue) {
 	change = 0.0;
 
 	if(initialValue != 0.0) 

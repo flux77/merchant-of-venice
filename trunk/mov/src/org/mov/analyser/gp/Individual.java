@@ -20,7 +20,7 @@ package org.mov.analyser.gp;
 
 import java.util.Random;
 
-import org.mov.analyser.OrderComparator;
+import org.mov.analyser.OrderCache;
 import org.mov.analyser.PaperTrade;
 import org.mov.parser.EvaluationException;
 import org.mov.parser.Expression;
@@ -143,7 +143,7 @@ public class Individual implements Comparable {
     }
 
     public Money paperTrade(GPQuoteBundle quoteBundle,
-                            OrderComparator orderComparator,
+                            OrderCache orderCache,
                             TradingDate startDate,
                             TradingDate endDate,
                             Money initialCapital,
@@ -157,7 +157,7 @@ public class Individual implements Comparable {
             portfolio = PaperTrade.paperTrade(PORTFOLIO_NAME,
                                               quoteBundle,
                                               new Variables(),
-                                              orderComparator,
+                                              orderCache,
                                               startDate,
                                               endDate,
                                               getBuyRule(),
@@ -170,7 +170,7 @@ public class Individual implements Comparable {
             portfolio = PaperTrade.paperTrade(PORTFOLIO_NAME,
                                               quoteBundle,
                                               new Variables(),
-                                              orderComparator,
+                                              orderCache,
                                               startDate,
                                               endDate,
                                               getBuyRule(),

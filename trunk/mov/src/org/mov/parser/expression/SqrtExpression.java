@@ -34,15 +34,15 @@ public class SqrtExpression extends UnaryExpression {
         super(number);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-        float number = get().evaluate(variables, quoteBundle, symbol, day);
+        double number = get().evaluate(variables, quoteBundle, symbol, day);
 
         if(number >= 0)
-            return (float)Math.sqrt(number);
+            return (double)Math.sqrt(number);
         else
-            throw new EvaluationException("Square root of a negative number");
+            throw EvaluationException.squareRootNegativeNumber();
     }
 
     public String toString() {

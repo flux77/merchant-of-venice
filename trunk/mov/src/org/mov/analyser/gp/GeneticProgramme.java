@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.mov.analyser.OrderComparator;
+import org.mov.analyser.OrderCache;
 
 import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
@@ -31,14 +31,14 @@ import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
 public class GeneticProgramme {
-    // TODO: Chance of breeding should be related to size,value somehow?
-    // i.e. the smaller, richer should breed more often?
-    // need some sort of negative for being massive. 
-
+    // An individual with less nodes than this will be dropped
     private final int MIN_SIZE = 12;
+
+    // An individual with more nodes than this will be dropped
     private final int MAX_SIZE = 48;
 
     private int breedingPopulationSize;
+    private double breedingPopulationSum;
     private TreeMap breedingPopulation;
     private TreeMap nextBreedingPopulation;
     private Mutator buyRuleMutator;
@@ -46,7 +46,7 @@ public class GeneticProgramme {
     private Random random;
 
     private GPQuoteBundle quoteBundle;
-    private OrderComparator orderComparator;
+    private OrderCache orderCache;
     private TradingDate startDate;
     private TradingDate endDate;
     private Money initialCapital;
@@ -57,7 +57,7 @@ public class GeneticProgramme {
     private int generation;
 
     public GeneticProgramme(GPQuoteBundle quoteBundle, 
-                            OrderComparator orderComparator,
+                            OrderCache orderCache,
                             TradingDate startDate,
                             TradingDate endDate,
                             Money initialCapital,
@@ -68,7 +68,7 @@ public class GeneticProgramme {
                             int seed) {
 
         this.quoteBundle = quoteBundle;
-        this.orderComparator = orderComparator;
+        this.orderCache = orderCache;
         this.startDate = startDate;
         this.endDate = endDate;
         this.initialCapital = initialCapital;
@@ -83,10 +83,8 @@ public class GeneticProgramme {
 
         // Create a mutator for the buy and sell rules. Buy rules shouldn't
         // use the "held" variable (buy rules won't be evaluated if held > 0).
-        // Only use the "order" variable if the user has applied any ordering
-        // to the data.
-        buyRuleMutator = new Mutator(random, false, orderComparator != null);
-        sellRuleMutator = new Mutator(random, true, orderComparator != null);
+        buyRuleMutator = new Mutator(random, false, orderCache.isOrdered());
+        sellRuleMutator = new Mutator(random, true, orderCache.isOrdered());
 
         generation = 1;
     }
@@ -102,7 +100,7 @@ public class GeneticProgramme {
                 try {
                     Money value =
                         individual.paperTrade(quoteBundle,
-                                              orderComparator,
+                                              orderCache,
                                               startDate,
                                               endDate,
                                               initialCapital,
@@ -131,6 +129,17 @@ public class GeneticProgramme {
         // the same - to ensure that the next population's strongest individuals
         // will be at least as good as the previous ones.
         breedingPopulation = new TreeMap(nextBreedingPopulation);
+        
+        // Calculate sum of portfolio values of each individual. We use this
+        // when choosing who gets to breed next. The bigger the value compared
+        // to other individuals, the greater chance of breeding.
+        breedingPopulationSum = 0.0F;
+
+        for(Iterator iterator = breedingPopulation.keySet().iterator(); iterator.hasNext();) {
+            Money value = (Money)iterator.next();
+            breedingPopulationSum += value.doubleValue();
+        }
+
         return ++generation;
     }
 
@@ -150,6 +159,29 @@ public class GeneticProgramme {
         return null;
     }
 
+    // This function is used to return a breeding individuals. We keep a sum of
+    // the values of all the breeding individuals. To choose an individual to
+    // breed we pick a random number between 0 and the sum of the values.
+    // That random number is passed to this function. The individuals with
+    // the largest values will be more likely to breed.
+    private Individual getBreedingIndividual(double value) {
+        assert value <= breedingPopulationSum;
+
+        for(Iterator iterator = breedingPopulation.values().iterator(); iterator.hasNext();) {
+            Individual individual = (Individual)iterator.next();
+
+            value -= individual.getValue().doubleValue();
+
+            if(value <= 0.0F)
+                return individual;
+        }
+
+        // It's possible but unlikely we get here. If so return the best performing 
+        // individual to give it a little more chance.
+        return (Individual)breedingPopulation.get(breedingPopulation.lastKey());
+        
+    }
+
     public int getBreedingPopulationSize() {
         return breedingPopulation.size();
     }
@@ -162,12 +194,14 @@ public class GeneticProgramme {
         if(generation == 1) 
             return new Individual(buyRuleMutator, sellRuleMutator);
         else {
-            // Otherwise breed two parent individuals
-            int motherIndex = random.nextInt(breedingPopulation.size());
-            int fatherIndex = random.nextInt(breedingPopulation.size());
+            // Otherwise breed two parent individuals. We do these by calculating
+            // a random value between 0 and the sum of all the individual values.
+            // See getBreedingIndividual(double) for details.
+            double motherValue = random.nextDouble() * breedingPopulationSum;
+            double fatherValue = random.nextDouble() * breedingPopulationSum;
 
-            Individual mother = getBreedingIndividual(motherIndex);
-            Individual father = getBreedingIndividual(fatherIndex);
+            Individual mother = getBreedingIndividual(motherValue);
+            Individual father = getBreedingIndividual(fatherValue);
 
             return new Individual(random, buyRuleMutator, sellRuleMutator, mother, father);
         }
@@ -180,7 +214,7 @@ public class GeneticProgramme {
         if(value.isGreaterThan(initialCapital)) {
             // If there is another individual with exactly the same value -
             // we assume it made the same trades. Replace this individual
-            // ONLY if the new individual is smaller. This puts a small
+            // ONLY if the new individual is smaller in size. This puts a small
             // pressure for equations to be as tight as possible.
             Individual sameTradeIndividual = 
                 (Individual)nextBreedingPopulation.get(value);

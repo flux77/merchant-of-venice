@@ -213,10 +213,10 @@ public class PreferencesManager {
 		    new TradingDate(transactionPrefs.get("date", 
 							 "01/01/2000"),
 				    TradingDate.BRITISH);
-		Money amount = new Money(transactionPrefs.getFloat("amount", 0.0F));
+		Money amount = new Money(transactionPrefs.getDouble("amount", 0.0F));
 		Symbol symbol = null;
 		int shares = transactionPrefs.getInt("shares", 0);
-		Money tradeCost = new Money(transactionPrefs.getFloat("trade_cost", 0.0F));
+		Money tradeCost = new Money(transactionPrefs.getDouble("trade_cost", 0.0F));
 
                 try {
                     symbol = Symbol.find(transactionPrefs.get("symbol", ""));
@@ -306,14 +306,14 @@ public class PreferencesManager {
 			     Transaction.typeToString(transaction.getType()));
 	    transactionPrefs.put("date", 
 			     transaction.getDate().toString("dd/mm/yyyy"));
-	    transactionPrefs.putFloat("amount", transaction.getAmount().floatValue());
+	    transactionPrefs.putDouble("amount", transaction.getAmount().doubleValue());
 
 	    if(transaction.getSymbol() != null) 
 		transactionPrefs.put("symbol", transaction.getSymbol().toString());
 
 	    transactionPrefs.putInt("shares", transaction.getShares());
-	    transactionPrefs.putFloat("trade_cost", 
-				      transaction.getTradeCost().floatValue());
+	    transactionPrefs.putDouble("trade_cost", 
+				      transaction.getTradeCost().doubleValue());
 
 	    CashAccount cashAccount = transaction.getCashAccount();
 	    if(cashAccount != null) 

@@ -24,7 +24,7 @@ import org.mov.parser.*;
 /**
  * An expression which finds the average quote over a given trading period.
  */
-public class AvgExpression extends QuoteExpression {
+public class AvgExpression extends TernaryExpression {
    
     /**
      * Create a new average expression for the given <code>quote</code> kind,
@@ -37,25 +37,20 @@ public class AvgExpression extends QuoteExpression {
      */
     public AvgExpression(Expression quote, Expression days,
 			 Expression lag) {
-	super(quote);
-
-        assert quote != null && days != null && lag != null;
-
-	add(quote);
-	add(days);
-	add(lag);
+	super(quote, days, lag);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 	
 	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = ((QuoteExpression)get(0)).getQuoteKind();
 
         if(days <= 0)
-            throw new EvaluationException("Range for avg() needs to be >0");
+            throw EvaluationException.rangeForAvg();
 
         int offset = (int)get(2).evaluate(variables, quoteBundle, symbol, day);
-	return avg(quoteBundle, symbol, getQuoteKind(), days, day, offset);
+	return avg(quoteBundle, symbol, quoteKind, days, day, offset);
     }
 
     public String toString() {
@@ -76,15 +71,20 @@ public class AvgExpression extends QuoteExpression {
 	    throw new TypeMismatchException();
     }
 
-    public int getNeededChildren() {
-	return 3;
+    public int getType() {
+        if(get(0).getType() == FLOAT_QUOTE_TYPE)
+            return FLOAT_TYPE;
+        else {
+            assert get(0).getType() == INTEGER_QUOTE_TYPE;
+            return INTEGER_TYPE;
+        }
     }
 
-    private float avg(QuoteBundle quoteBundle, Symbol symbol, 
+    private double avg(QuoteBundle quoteBundle, Symbol symbol, 
                       int quote, int days, int day, int offset)
         throws EvaluationException {
 
-	float avg = 0.0F;
+	double avg = 0.0F;
         int daysAveraged = 0;
 
 	// Sum quotes

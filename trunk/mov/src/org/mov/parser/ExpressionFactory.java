@@ -19,6 +19,7 @@
 package org.mov.parser;
 
 import org.mov.parser.expression.*;
+import org.mov.quote.Quote;
 
 /**
  * Create an executable expression from the given token and arguments.
@@ -118,19 +119,19 @@ public class ExpressionFactory {
 	    expression = new DivideExpression(arg1, arg2);
 	    break;
 	case(Token.DAY_OPEN_TOKEN):
-	    expression = new DayOpenExpression();
+	    expression = new QuoteExpression(Quote.DAY_OPEN);
 	    break;
 	case(Token.DAY_CLOSE_TOKEN):
-	    expression = new DayCloseExpression();
+	    expression = new QuoteExpression(Quote.DAY_CLOSE);
 	    break;
 	case(Token.DAY_LOW_TOKEN):
-	    expression = new DayLowExpression();
+	    expression = new QuoteExpression(Quote.DAY_LOW);
 	    break;
 	case(Token.DAY_HIGH_TOKEN):
-	    expression = new DayHighExpression();
+	    expression = new QuoteExpression(Quote.DAY_HIGH);
 	    break;
 	case(Token.DAY_VOLUME_TOKEN):
-	    expression = new DayVolumeExpression();
+	    expression = new QuoteExpression(Quote.DAY_VOLUME);
 	    break;
 	case(Token.LAG_TOKEN):
 	    expression = new LagExpression(arg1, arg2);

@@ -32,7 +32,7 @@ public class AndExpression extends LogicExpression {
 	super(left, right);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
 	if(getLeft().evaluate(variables, quoteBundle, symbol, day) >= TRUE_LEVEL &&

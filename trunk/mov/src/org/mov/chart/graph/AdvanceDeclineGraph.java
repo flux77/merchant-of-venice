@@ -56,8 +56,8 @@ public class AdvanceDeclineGraph implements Graph {
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange) {
 
 	GraphTools.renderLine(g, advanceDecline, xoffset, yoffset,
 			      horizontalScale,
@@ -65,8 +65,8 @@ public class AdvanceDeclineGraph implements Graph {
     }
 
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue)
+				 double verticalScale,
+				 double bottomLineValue)
     {
 	// we will give out the number that advanced and the number that
 	// declined
@@ -112,7 +112,7 @@ public class AdvanceDeclineGraph implements Graph {
      * @return	the Y label text that the default <code>GraphSource</code>
      *		would display
      */
-    public String getYLabel(float value) {
+    public String getYLabel(double value) {
 	return Integer.toString((int)value);
     }
 
@@ -131,7 +131,7 @@ public class AdvanceDeclineGraph implements Graph {
      * @param	x value
      * @return	Y value of the default <code>GraphSource</code>
      */
-    public Float getY(Comparable x) {
+    public Double getY(Comparable x) {
 	return advanceDecline.getY(x);
     }
 
@@ -141,7 +141,7 @@ public class AdvanceDeclineGraph implements Graph {
      * @param	x	range of X values
      * @return	the highest Y value of the default <code>GraphSource</code>
      */
-    public float getHighestY(List x) {
+    public double getHighestY(List x) {
 	return advanceDecline.getHighestY(x);
     }
 
@@ -152,7 +152,7 @@ public class AdvanceDeclineGraph implements Graph {
      * @return	the lowest Y value of the default <code>GraphSource</code>
      */
 
-    public float getLowestY(List x) {
+    public double getLowestY(List x) {
 	return advanceDecline.getLowestY(x);
     }
 
@@ -160,11 +160,11 @@ public class AdvanceDeclineGraph implements Graph {
      * Return an array of acceptable major deltas for the vertical
      * axis.
      *
-     * @return	an array of floats representing the minor deltas
+     * @return	an array of doubles representing the minor deltas
      *		of the default <code>GraphSource</code>
      */
-    public float[] getAcceptableMajorDeltas() {
-	float[] major = {1.0F, // 1 point
+    public double[] getAcceptableMajorDeltas() {
+	double[] major = {1.0F, // 1 point
 			 10.0F, // 10 points
 			 100.0F, // 100 points
 			 1000.0F, // 1000 points
@@ -177,12 +177,12 @@ public class AdvanceDeclineGraph implements Graph {
      * Return an array of acceptable minor deltas for the vertical
      * axis.
      *
-     * @return	an array of floats representing the minor deltas
+     * @return	an array of doubles representing the minor deltas
      *		of the default <code>GraphSource</code>
      * @see	Graph#getAcceptableMajorDeltas
      */
-    public float[] getAcceptableMinorDeltas() {
-	float[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F,
+    public double[] getAcceptableMinorDeltas() {
+	double[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F,
 			 2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F,
 			 8F, 9F};
 	return minor;
@@ -241,7 +241,7 @@ public class AdvanceDeclineGraph implements Graph {
 		cumulativeAdvanceDecline += todayAdvanceDecline;
 
 		advanceDecline.putY((Comparable)date,
-				    new Float(cumulativeAdvanceDecline));
+				    new Double(cumulativeAdvanceDecline));
             }
             catch(MissingQuoteException e) {
                 // Don't have this date in the quote source... no problem

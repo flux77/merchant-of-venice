@@ -71,8 +71,8 @@ abstract public class AbstractGraph implements Graph {
      * @return	the tool tip text for the default <code>GraphSource</code>
      */
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue) {
+				 double verticalScale,
+				 double bottomLineValue) {
 	return source.getToolTipText(x);
     }
 
@@ -114,7 +114,7 @@ abstract public class AbstractGraph implements Graph {
      * @return	the Y label text that the default <code>GraphSource</code>
      *		would display
      */
-    public String getYLabel(float value) {
+    public String getYLabel(double value) {
 	return source.getYLabel(value);
     }
 
@@ -133,7 +133,7 @@ abstract public class AbstractGraph implements Graph {
      * @param	x value
      * @return	Y value of the default <code>GraphSource</code>
      */
-    public Float getY(Comparable x) {
+    public Double getY(Comparable x) {
 	return source.getGraphable().getY(x);
     }
 
@@ -143,7 +143,7 @@ abstract public class AbstractGraph implements Graph {
      * @param	xRange	range of X values
      * @return	the highest Y value of the default <code>GraphSource</code>
      */
-    public float getHighestY(List xRange) {
+    public double getHighestY(List xRange) {
 	return source.getGraphable().getHighestY(xRange);
     }
 
@@ -153,7 +153,7 @@ abstract public class AbstractGraph implements Graph {
      * @param	xRange	range of X values
      * @return	the lowest Y value of the default <code>GraphSource</code>
      */
-    public float getLowestY(List xRange) {
+    public double getLowestY(List xRange) {
 	return source.getGraphable().getLowestY(xRange);
     }
 
@@ -161,10 +161,10 @@ abstract public class AbstractGraph implements Graph {
      * Return an array of acceptable major deltas for the vertical
      * axis.
      *
-     * @return	an array of floats representing the minor deltas 
+     * @return	an array of doubles representing the minor deltas 
      *		of the default <code>GraphSource</code>
      */ 
-    public float[] getAcceptableMajorDeltas() {
+    public double[] getAcceptableMajorDeltas() {
 	return source.getAcceptableMajorDeltas();
     }
 
@@ -172,11 +172,11 @@ abstract public class AbstractGraph implements Graph {
      * Return an array of acceptable minor deltas for the vertical
      * axis.
      *
-     * @return	an array of floats representing the minor deltas
+     * @return	an array of doubles representing the minor deltas
      *		of the default <code>GraphSource</code>
      * @see	Graph#getAcceptableMajorDeltas
      */ 
-    public float[] getAcceptableMinorDeltas() {
+    public double[] getAcceptableMinorDeltas() {
 	return source.getAcceptableMinorDeltas();
     }
 

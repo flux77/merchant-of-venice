@@ -63,8 +63,8 @@ public interface Graph {
      */
     public void render(Graphics g, Color colour, 
 		       int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange);
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange);
 
     /**
      * Get the tool tip text for the given X value and y coordinate.
@@ -77,8 +77,8 @@ public interface Graph {
      * @return	the tooltip text
      */
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue);
+				 double verticalScale,
+				 double bottomLineValue);
     /**
      * Get the first X value that this graph will draw.
      *
@@ -107,7 +107,7 @@ public interface Graph {
      * @param	value	y value
      * @return	the label text
      */
-    public String getYLabel(float value);
+    public String getYLabel(double value);
 
     /**
      * Return the name of the graph we are drawing.
@@ -122,7 +122,7 @@ public interface Graph {
      * @param	xRange value
      * @return	Y value
      */
-    public Float getY(Comparable xRange);
+    public Double getY(Comparable xRange);
 
     /**
      * Return the highest Y value in the given X range.
@@ -130,7 +130,7 @@ public interface Graph {
      * @param	xRange	range of X values
      * @return	the highest Y value
      */
-    public float getHighestY(List xRange);
+    public double getHighestY(List xRange);
 
     /**
      * Return the loweset Y value in the given X range.
@@ -138,7 +138,7 @@ public interface Graph {
      * @param	xRange	range of X values
      * @return	the lowest Y value
      */
-    public float getLowestY(List xRange);
+    public double getLowestY(List xRange);
 
     /**
      * Return an array of acceptable major deltas for the vertical
@@ -162,18 +162,18 @@ public interface Graph {
      * values are calculated by the cross product of Major Deltas x
      * Minor Deltas.
      *
-     * @return	an array of floats representing the major deltas
+     * @return	an array of doubles representing the major deltas
      */
-    public float[] getAcceptableMajorDeltas();
+    public double[] getAcceptableMajorDeltas();
 
     /**
      * Return an array of acceptable minor deltas for the vertical
      * axis.
      *
-     * @return	an array of floats representing the minor deltas
+     * @return	an array of doubles representing the minor deltas
      * @see	#getAcceptableMajorDeltas
      */ 
-    public float[] getAcceptableMinorDeltas();
+    public double[] getAcceptableMinorDeltas();
 
     /**
      * Return the annotations for this graph or <code>null</code> if it

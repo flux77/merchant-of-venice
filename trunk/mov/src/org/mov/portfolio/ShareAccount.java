@@ -85,8 +85,8 @@ public class ShareAccount implements Account, Cloneable {
 	   type == Transaction.DIVIDEND_DRP) {
             assert shares > 0;
 
-            float averageCost = (transaction.getAmount().floatValue() / 
-                                 transaction.getShares());
+            double averageCost = (transaction.getAmount().doubleValue() / 
+                                  transaction.getShares());
 
 	    // Do we already own the stock? If so accumulate
 	    if(holding != null)

@@ -56,13 +56,13 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
     public static final int INTEGER_QUOTE_TYPE = 4;
 
     /** Threshold level where a number is registered as <code>TRUE</code> */
-    public final static float TRUE_LEVEL = 0.1F;
+    public final static double TRUE_LEVEL = 0.1F;
 
     /** Value of <code>TRUE</code> */
-    public final static float TRUE = 1.0F;
+    public final static double TRUE = 1.0F;
 
     /** Value of <code>FALSE</code> */
-    public final static float FALSE = 0.0F;
+    public final static double FALSE = 0.0F;
     
     /**
      * Create a new expression.
@@ -82,8 +82,8 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
      * @throws	EvaluationException if the expression performs an illegal
      *          operation such as divide by zero.
      */
-    abstract public float evaluate(Variables variables, QuoteBundle quoteBundle, 
-                                   Symbol symbol, int day)
+    abstract public double evaluate(Variables variables, QuoteBundle quoteBundle, 
+                                    Symbol symbol, int day)
 	throws EvaluationException;
 
     /**

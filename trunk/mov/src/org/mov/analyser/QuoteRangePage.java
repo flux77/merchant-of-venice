@@ -242,15 +242,11 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 
     public OrderComparator getOrderComparator(QuoteBundle quoteBundle) {
         if(orderByKeyButton.isSelected()) {
-            // If the user has told us not to order, then don't return a comparator as
-            // we don't need one. Passing null as a comparator into the paper trading
-            // routines will signal we don't care about the order.
-            if(orderByKeyComboBox.getSelectedIndex() == 0)
-                return null;
-            else
-                return new OrderComparator(quoteBundle, orderByKeyComboBox.getSelectedIndex());
+            // Set order (e.g. by volume).
+            return new OrderComparator(quoteBundle, orderByKeyComboBox.getSelectedIndex());
         }
         else {
+            // Order by equation
             assert orderByEquationButton.isSelected();
             return new OrderComparator(quoteBundle, orderByEquation);
         }

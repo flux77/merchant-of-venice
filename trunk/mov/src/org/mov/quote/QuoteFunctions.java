@@ -38,7 +38,7 @@ public class QuoteFunctions {
      * @param end    to end
      * @return the standard deviation
      */
-    static public float sd(float[] values, int start, int end) {
+    static public double sd(double[] values, int start, int end) {
 	double average = avg(values, start, end);
 	int period = end - start;
 
@@ -47,7 +47,7 @@ public class QuoteFunctions {
 	    deviationSum += (values[i] - average)*(values[i] - average);
 	}
 
-	return (float)Math.sqrt(deviationSum / period);
+	return Math.sqrt(deviationSum / period);
     }
 
     /**
@@ -60,8 +60,8 @@ public class QuoteFunctions {
      * @param end    to end
      * @return the average
      */
-    static public float avg(float[] values, int start, int end) {
-	float avg = 0;
+    static public double avg(double[] values, int start, int end) {
+	double avg = 0;
 	int period = end - start;
 
 	// Sum quotes
@@ -84,18 +84,18 @@ public class QuoteFunctions {
      * @param	lastDay	fast access date offset in cache.
      * @return  the RSI value
      */
-    static public float rsi(QuoteBundle quoteBundle, Symbol symbol, 
+    static public double rsi(QuoteBundle quoteBundle, Symbol symbol, 
 			    int quote, int days, int lastDay) {
 	System.err.println("Entering RSI for symbol "+symbol);
 
 	//	Vector v = new Vector();
 
 	// Determine the average up and down values for the days, divide by <period>
-	float upvalues   = 0;
-	float downvalues = 0;
+	double upvalues   = 0;
+	double downvalues = 0;
 	
-	float last = 0;
-	float current;
+	double last = 0;
+	double current;
 	for(int i = lastDay - days + 1; i <= lastDay; i++) {
 	    //	for(int i = 0; i < v.size(); i++) {
 
@@ -115,12 +115,12 @@ public class QuoteFunctions {
 	    }
 	}
 
-	float up_average = upvalues / days;
-	float down_average = downvalues / days;
+	double up_average = upvalues / days;
+	double down_average = downvalues / days;
 	System.out.println(" up: "+up_average+
 			   " down: "+down_average);
 	// RS = (up average / down average) + 1
-	float strength = (up_average / down_average) + 1;
+	double strength = (up_average / down_average) + 1;
 	System.err.println("s1: "+strength);
 	// N = 100 / RS
 	strength = 100 / strength;

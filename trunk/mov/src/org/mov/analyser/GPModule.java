@@ -204,6 +204,8 @@ public class GPModule extends JPanel implements Module {
         // quote bundle needs to load 30 days before quote range.
         GPQuoteBundle quoteBundle =
             new GPQuoteBundle(new ScriptQuoteBundle(quoteRangePage.getQuoteRange()), 30);
+        OrderComparator orderComparator = quoteRangePage.getOrderComparator(quoteBundle);
+        OrderCache orderCache = new OrderCache(quoteBundle, orderComparator);
 
         if(!thread.isInterrupted()) {
             int numberGenerations = GPPage.getGenerations();
@@ -216,7 +218,7 @@ public class GPModule extends JPanel implements Module {
 
             GeneticProgramme geneticProgramme =
                 new GeneticProgramme(quoteBundle,
-                                     quoteRangePage.getOrderComparator(quoteBundle),
+                                     orderCache,
                                      startDate,
                                      endDate,
                                      initialCapital,

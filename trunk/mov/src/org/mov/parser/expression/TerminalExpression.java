@@ -42,4 +42,9 @@ abstract public class TerminalExpression extends Expression {
     public int getNeededChildren() {
 	return 0;
     }
+
+    // A terminal expression cannot have a type mismatch
+    public int checkType() throws TypeMismatchException {
+        return getType();
+    }
 }

@@ -28,14 +28,14 @@ import org.mov.util.*;
  * Example, loading up the class with an exponential graph:
  * <pre>
  * Graphable graphable = new Graphable();
- * graphable.putY(new Float(1), new Float(1));
- * graphable.putY(new Float(2), new Float(4));
- * graphable.putY(new Float(3), new Float(9));
- * graphable.putY(new Float(4), new Float(16));
+ * graphable.putY(new Double(1), new Double(1));
+ * graphable.putY(new Double(2), new Double(4));
+ * graphable.putY(new Double(3), new Double(9));
+ * graphable.putY(new Double(4), new Double(16));
  * </pre>
  * Find the square of 3:
  * <pre>
- * Float squareOfThree = graphable.getY(new Float(3));
+ * Double squareOfThree = graphable.getY(new Double(3));
  * </pre>
  */
 public class Graphable {
@@ -89,8 +89,8 @@ public class Graphable {
      * @param	x	the x value
      * @return	y	the associated y value
      */
-    public Float getY(Comparable x) {
-	return (Float)map.get(x);
+    public Double getY(Comparable x) {
+	return (Double)map.get(x);
     }
 
     /**
@@ -100,7 +100,7 @@ public class Graphable {
      * @param	x	the x value
      * @param	y	the associated y value
      */
-    public void putY(Comparable x, Float y) {
+    public void putY(Comparable x, Double y) {
         startX = endX = null;
 
 	map.put(x, (Object)y);
@@ -114,10 +114,10 @@ public class Graphable {
      *			objects
      * @return	the highest Y value
      */
-    public float getHighestY(List xRange) {
+    public double getHighestY(List xRange) {
 	Iterator iterator = xRange.iterator();
-	Float y = null;
-	Float highestY = new Float(Float.NEGATIVE_INFINITY);
+	Double y = null;
+	Double highestY = new Double(Double.NEGATIVE_INFINITY);
 
 	while(iterator.hasNext()) {
 	    y = getY((Comparable)iterator.next());
@@ -126,7 +126,7 @@ public class Graphable {
             	highestY = y;
         }
 	
-	return highestY.floatValue();
+	return highestY.doubleValue();
     }
 
     /**
@@ -137,10 +137,10 @@ public class Graphable {
      *			objects
      * @return	the lowest Y value
      */
-    public float getLowestY(List xRange) {
+    public double getLowestY(List xRange) {
 	Iterator iterator = xRange.iterator();
-	Float y = null;
-	Float lowestY = new Float(Float.MAX_VALUE);
+	Double y = null;
+	Double lowestY = new Double(Double.MAX_VALUE);
 	
 	while(iterator.hasNext()) {
 
@@ -150,7 +150,7 @@ public class Graphable {
 		lowestY = y;
 	}
 
-	return lowestY.floatValue();
+	return lowestY.doubleValue();
     }
 
     /**
@@ -168,17 +168,17 @@ public class Graphable {
      *
      * @return	array of Y values
      */
-    public float[] toArray() {
+    public double[] toArray() {
 	Collection valueCollection = map.values();
 	Iterator iterator = valueCollection.iterator();
 
-	float[] values = new float[map.size()];
-	Float value;
+	double[] values = new double[map.size()];
+	Double value;
 	int i = 0;
 
 	while(iterator.hasNext()) {
-	    value = (Float)iterator.next();	   
-	    values[i++] = value.floatValue();
+	    value = (Double)iterator.next();	   
+	    values[i++] = value.doubleValue();
 	}
 	
 	return values;

@@ -28,27 +28,27 @@ import org.mov.quote.*;
 public class NumberExpression extends TerminalExpression {
 
     // The number's value and typey
-    private float value;
+    private double value;
     private int type;
 
-    private final static float EPSILON = 0.001F;
+    private final static double EPSILON = 0.001F;
 
     public NumberExpression(boolean value) {
         this.value = value? TRUE: FALSE;
         this.type = BOOLEAN_TYPE;
     }
 
-    public NumberExpression(float value) {
+    public NumberExpression(double value) {
         this.value = value;
         this.type = FLOAT_TYPE;
     }
 
     public NumberExpression(int value) {
-        this.value = (float)value;
+        this.value = (double)value;
         this.type = INTEGER_TYPE;
     }
 
-    public NumberExpression(float value, int type) {
+    public NumberExpression(double value, int type) {
         assert(type == Expression.BOOLEAN_TYPE || type == Expression.FLOAT_TYPE ||
                type == Expression.INTEGER_TYPE);
 
@@ -56,7 +56,7 @@ public class NumberExpression extends TerminalExpression {
         this.type = type;
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) {
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) {
 	return value;
     }
 
@@ -68,7 +68,7 @@ public class NumberExpression extends TerminalExpression {
                 return "false";
         }
         else if (getType() == FLOAT_TYPE) {
-            return Float.toString(value);
+            return Double.toString(value);
         }
         else {
             assert getType() == INTEGER_TYPE;
@@ -78,11 +78,7 @@ public class NumberExpression extends TerminalExpression {
         }
     }
 
-    public int checkType() throws TypeMismatchException {
-	return getType();
-    }
-
-    public boolean equals(float value) {
+    public boolean equals(double value) {
         return (Math.abs(this.value - value) < EPSILON);
     }
 
@@ -103,7 +99,7 @@ public class NumberExpression extends TerminalExpression {
      *
      * @return value
      */
-    public float getValue() {
+    public double getValue() {
         return value;
     }
 
@@ -112,7 +108,7 @@ public class NumberExpression extends TerminalExpression {
      *
      * @param value the new value
      */
-    public void setValue(float value) {
+    public void setValue(double value) {
         this.value = value;
     }
 

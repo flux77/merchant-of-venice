@@ -25,7 +25,7 @@ import org.mov.quote.*;
 /**
  * An expression which returns a quote.
  */
-public class LagExpression extends QuoteExpression {
+public class LagExpression extends BinaryExpression {
    
     /**
      * Create a new average expression for the given <code>quote</code> kind,
@@ -35,21 +35,17 @@ public class LagExpression extends QuoteExpression {
      * @param	lag	the offset from the current day
      */
     public LagExpression(Expression quote, Expression lag) {
-	super(quote);
-
-        assert quote != null && lag != null;
-
-	add(quote);
-	add(lag);
+        super(quote, lag);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
         int lag = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = ((QuoteExpression)get(0)).getQuoteKind();
 
         try {
-            return quoteBundle.getQuote(symbol, getQuoteKind(), day, lag);
+            return quoteBundle.getQuote(symbol, quoteKind, day, lag);
         }
         catch(MissingQuoteException e) {
             // What should I do in this case?
@@ -63,7 +59,6 @@ public class LagExpression extends QuoteExpression {
     }
 
     public int checkType() throws TypeMismatchException {
-
 	// Left type must be quote and right type must be number type
 	if((get(0).checkType() == FLOAT_QUOTE_TYPE ||
             get(0).checkType() == INTEGER_QUOTE_TYPE) &&
@@ -73,8 +68,13 @@ public class LagExpression extends QuoteExpression {
 	    throw new TypeMismatchException();
     }
 
-    public int getNeededChildren() {
-	return 2;
+    public int getType() {
+        if(get(0).getType() == FLOAT_QUOTE_TYPE)
+            return FLOAT_TYPE;
+        else {
+            assert get(0).getType() == INTEGER_QUOTE_TYPE;
+            return INTEGER_TYPE;
+        }
     }
 
     public Object clone() {

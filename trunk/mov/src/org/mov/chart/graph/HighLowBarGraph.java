@@ -61,13 +61,13 @@ public class HighLowBarGraph extends AbstractGraph {
 
     // See Graph.java
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 
 	int xCoordinate, lowY, highY, closeY;
-	Float dayLowY, dayHighY, dayCloseY;
+	Double dayLowY, dayHighY, dayCloseY;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
 
@@ -97,15 +97,15 @@ public class HighLowBarGraph extends AbstractGraph {
 		xCoordinate = (int)(xoffset + horizontalScale * i);
 
 		lowY = yoffset - 
-		    GraphTools.scaleAndFitPoint(dayLowY.floatValue(), 
+		    GraphTools.scaleAndFitPoint(dayLowY.doubleValue(), 
 						bottomLineValue, 
 						verticalScale);
 		highY = yoffset - 
-		    GraphTools.scaleAndFitPoint(dayHighY.floatValue(), 
+		    GraphTools.scaleAndFitPoint(dayHighY.doubleValue(), 
 						bottomLineValue, 
 						verticalScale);
 		closeY = yoffset - 
-		    GraphTools.scaleAndFitPoint(dayCloseY.floatValue(), 
+		    GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(), 
 						bottomLineValue, 
 						verticalScale);
 		
@@ -134,20 +134,20 @@ public class HighLowBarGraph extends AbstractGraph {
      *		quotes
      */
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue)
+				 double verticalScale,
+				 double bottomLineValue)
     {
-	Float dayLowY = dayLow.getY(x);
-	Float dayHighY = dayHigh.getY(x);
+	Double dayLowY = dayLow.getY(x);
+	Double dayHighY = dayHigh.getY(x);
 	
 	if(dayLowY != null && dayHighY != null) {
 
 	    int dayLowYCoordinate = yoffset - 
-		GraphTools.scaleAndFitPoint(dayLowY.floatValue(),
+		GraphTools.scaleAndFitPoint(dayLowY.doubleValue(),
 					    bottomLineValue, verticalScale);
 
 	    int dayHighYCoordinate = yoffset - 
-		GraphTools.scaleAndFitPoint(dayHighY.floatValue(),
+		GraphTools.scaleAndFitPoint(dayHighY.doubleValue(),
 					    bottomLineValue, verticalScale);
 	    
 	    // Its our graph if its within TOOL_TIP_BUFFER pixels of the 
@@ -160,12 +160,12 @@ public class HighLowBarGraph extends AbstractGraph {
     }
 
     // Highest value will always be in the day high source
-    public float getHighestY(List x) {
+    public double getHighestY(List x) {
 	return dayHigh.getHighestY(x);
     }
 
     // Lowest value will always be in the day low source
-    public float getLowestY(List x) {
+    public double getLowestY(List x) {
         return dayLow.getLowestY(x);
     }
 }

@@ -20,10 +20,10 @@ package org.mov.parser;
 
 public class Variable {
     String name;
-    float value;
+    double value;
     int type;
 
-    public Variable(String name, int type, float value) {
+    public Variable(String name, int type, double value) {
         assert(type == Expression.BOOLEAN_TYPE || type == Expression.FLOAT_TYPE ||
                type == Expression.INTEGER_TYPE);
 
@@ -40,15 +40,15 @@ public class Variable {
         return type;
     }
 
-    public float getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(float value) {
+    public void setValue(double value) {
         this.value = value;
     }
 
     public void setValue(int value) {
-        this.value = (float)value;
+        this.value = (double)value;
     }
 }

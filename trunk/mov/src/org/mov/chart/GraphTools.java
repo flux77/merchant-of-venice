@@ -32,12 +32,12 @@ public class GraphTools {
 
     public static void renderLine(Graphics g, Graphable source, 
 				  int xoffset, int yoffset,
-				  float horizontalScale, float verticalScale,
-				  float bottomLineValue, List xRange) {
+				  double horizontalScale, double verticalScale,
+				  double bottomLineValue, List xRange) {
 	
 	int xCoordinate, yCoordinate;
 	int lastXCoordinate = -1 , lastYCoordinate = -1;
-	Float y;
+	Double y;
 	Comparable x;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
@@ -62,7 +62,7 @@ public class GraphTools {
 	    // The graph is allowed to skip points
 	    if(y != null) {
 		xCoordinate = (int)(xoffset + horizontalScale * i);
-		yCoordinate = yoffset - scaleAndFitPoint(y.floatValue(), 
+		yCoordinate = yoffset - scaleAndFitPoint(y.doubleValue(), 
 							 bottomLineValue, 
 							 verticalScale);
 		
@@ -83,12 +83,12 @@ public class GraphTools {
 
     public static void renderBar(Graphics g, Graphable source, 
 				 int xoffset, int yoffset,
-				 float horizontalScale, float verticalScale,
-				 float bottomLineValue, List xRange) {
+				 double horizontalScale, double verticalScale,
+				 double bottomLineValue, List xRange) {
 	int x2, y1, y2;
 	int x1 = -1;
-	Float y;
-	float floatValue;
+	Double y;
+	double doubleValue;
 	Comparable x;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
@@ -114,12 +114,12 @@ public class GraphTools {
 
 	    // The graph is allowed to skip points
 	    if(y == null) 
-		floatValue = 0;
+		doubleValue = 0;
 	    else
-		floatValue = y.floatValue();
+		doubleValue = y.doubleValue();
 
 	    x2 = (int)(xoffset + horizontalScale * i);
-	    y1 = yoffset - scaleAndFitPoint(floatValue, 
+	    y1 = yoffset - scaleAndFitPoint(doubleValue, 
 	    				    bottomLineValue, verticalScale);
 	  
 	    if(x1 != -1) 
@@ -132,10 +132,10 @@ public class GraphTools {
 	}
     }
 
-    // Given the float y value of a point, the verticale offset and the
+    // Given the double y value of a point, the verticale offset and the
     // vertical scale, return the y coordinate where the point should be.
-    public static int scaleAndFitPoint(float point, 
-				       float offset, float scale) {
+    public static int scaleAndFitPoint(double point, 
+				       double offset, double scale) {
 	return (int)((point - offset) * scale);
     }
 
@@ -162,9 +162,9 @@ public class GraphTools {
 	// been over the second).
 	Set xRange = graph1.getXRange();
 	Iterator iterator = xRange.iterator();
-	Float graph1Y, graph2Y;
-	Float lastGraph1Y = null;
-	Float lastGraph2Y = null;
+	Double graph1Y, graph2Y;
+	Double lastGraph1Y = null;
+	Double lastGraph2Y = null;
 
 	while(iterator.hasNext()) {
 
@@ -183,7 +183,7 @@ public class GraphTools {
 		
 		// Sell
 		else if(graph1Y.compareTo(graph2Y) < 0 &&
-		   lastGraph1Y.compareTo(lastGraph2Y) >= 0)
+                        lastGraph1Y.compareTo(lastGraph2Y) >= 0)
 		    annotations.put((Object)x, "Sell");
 	    }
 

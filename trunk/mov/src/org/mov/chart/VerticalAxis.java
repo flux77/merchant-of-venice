@@ -44,23 +44,23 @@ public class VerticalAxis {
     // Space assigned for Y label text
     static final int Y_LABEL_WIDTH = 60;
 
-    private float lowest;
-    private float highest;
-    private float[] minor;
-    private float[] major;
+    private double lowest;
+    private double highest;
+    private double[] minor;
+    private double[] major;
 
     // Graph dimensions
     private int height = 0;
     private int horizontalLines;
     private int horizontalLineSpacing;
-    private float valueDelta;
-    private float bottomLineValue;
-    private float topLineValue;
+    private double valueDelta;
+    private double bottomLineValue;
+    private double topLineValue;
     private int heightOfGraph;
-    private float scale;
+    private double scale;
 
-    public VerticalAxis(float lowest, float highest,
-			float[] minor, float[] major) {
+    public VerticalAxis(double lowest, double highest,
+			double[] minor, double[] major) {
 	this.lowest = lowest;
 	this.highest = highest;
 	this.minor = minor;
@@ -91,7 +91,7 @@ public class VerticalAxis {
 	
 	// Get the *exact* amount to fit the graph perfectly but we hardly
 	// want to draw a line every 2.531c
-	float exactWorth = Math.abs((highest - lowest) / (horizontalLines - 1));
+	double exactWorth = Math.abs((highest - lowest) / (horizontalLines - 1));
 
 	// Get the smallest valueDelta that is bigger than the exact
 	// needed valueDelta AND such that the top line value would be
@@ -101,7 +101,7 @@ public class VerticalAxis {
 
 		valueDelta = major[i] * minor[j];
 
-		bottomLineValue = (float)Math.floor(lowest / valueDelta) *
+		bottomLineValue = (double)Math.floor(lowest / valueDelta) *
 		    valueDelta;
 		topLineValue = bottomLineValue + (horizontalLines - 1) *
 		    valueDelta;
@@ -125,11 +125,11 @@ public class VerticalAxis {
 	scale = heightOfGraph / (topLineValue - bottomLineValue);
     }
 
-    public float getBottomLineValue() {
+    public double getBottomLineValue() {
 	return bottomLineValue;
     }
 
-    public float getTopLineValue() {
+    public double getTopLineValue() {
 	return topLineValue;
     }
 
@@ -137,7 +137,7 @@ public class VerticalAxis {
 	return heightOfGraph;
     }
 
-    public float getScale() {
+    public double getScale() {
 	return scale;
     }
 

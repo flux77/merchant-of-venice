@@ -24,9 +24,9 @@ import org.mov.util.*;
 
 public class QuoteFormat implements Comparable {
 
-    private float quote;
+    private double quote;
 
-    public QuoteFormat(float quote) {
+    public QuoteFormat(double quote) {
         this.quote = quote;
     }
 
@@ -36,7 +36,7 @@ public class QuoteFormat implements Comparable {
      * @param	quote	the quote
      * @return	the quote string
      */
-    public static String quoteToString(float quote) {
+    public static String quoteToString(double quote) {
         NumberFormat format = NumberFormat.getInstance();
         format.setMinimumIntegerDigits(1);
         format.setMinimumFractionDigits(3);
@@ -49,7 +49,7 @@ public class QuoteFormat implements Comparable {
         return quoteToString(getQuote());
     }
 
-    public float getQuote() {
+    public double getQuote() {
         return quote;
     }
 

@@ -31,7 +31,7 @@ import org.mov.quote.Symbol;
 
 public class OrderComparator implements Comparator {
 
-    public final static int NO_REAL_ORDER         = 0;
+    public final static int NO_ORDER              = 0;
     public final static int STOCK_SYMBOL          = 1;
     public final static int DAY_VOLUME_DECREASING = 2;
     public final static int DAY_VOLUME_INCREASING = 3;
@@ -74,6 +74,10 @@ public class OrderComparator implements Comparator {
         return orderByKey;
     }
 
+    public boolean isOrdered() {
+        return orderByKey == NO_ORDER;
+    }
+
     public void setDateOffset(int dateOffset) {
         this.dateOffset = dateOffset;
 
@@ -89,7 +93,7 @@ public class OrderComparator implements Comparator {
 
         try {
             switch(orderByKey) {
-            case(NO_REAL_ORDER):
+            case(NO_ORDER):
                 return 0;
             case(STOCK_SYMBOL):
                 return symbol1.compareTo(symbol2);
@@ -150,10 +154,10 @@ public class OrderComparator implements Comparator {
         assert orderByKey == EQUATION;
         
         try {
-            float valueOne = orderByEquation.evaluate(new Variables(), quoteBundle, symbol1, 
-                                                      dateOffset);
-            float valueTwo = orderByEquation.evaluate(new Variables(), quoteBundle, symbol2, 
-                                                      dateOffset);
+            double valueOne = orderByEquation.evaluate(new Variables(), quoteBundle, symbol1, 
+                                                       dateOffset);
+            double valueTwo = orderByEquation.evaluate(new Variables(), quoteBundle, symbol2, 
+                                                       dateOffset);
 
             return compare(valueTwo, valueOne);
         }
@@ -163,7 +167,7 @@ public class OrderComparator implements Comparator {
         }
     }
 
-    private int compare(float one, float two) {
+    private int compare(double one, double two) {
         if(one < two)
             return -1;
         else if(one > two)

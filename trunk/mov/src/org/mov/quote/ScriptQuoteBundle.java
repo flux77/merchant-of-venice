@@ -43,7 +43,7 @@ import org.mov.util.TradingDate;
  *      QuoteRange quoteRange = new QuoteRange("CBA");
  *      QuoteBundle quoteBundle = new ScriptQuoteBundle(quoteRange);
  *      try {
- *	    float = quoteBundle.getQuote("CBA", Quote.DAY_OPEN, 0);
+ *	    double = quoteBundle.getQuote("CBA", Quote.DAY_OPEN, 0);
  *      }
  *      catch(QuoteNotLoadedException e) {
  *          //...
@@ -101,10 +101,10 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(Symbol symbol, int quoteType, int dateOffset)
+    public double getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException {
      
-	float quote;
+	double quote;
 
         try {
             quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
@@ -152,7 +152,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception EvaluationException if the script isn't allow access to the quote.
      */
-    public float getQuote(Symbol symbol, int quoteType, int today, int offset)
+    public double getQuote(Symbol symbol, int quoteType, int today, int offset)
 	throws EvaluationException {
 
         try {
@@ -173,10 +173,10 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(Symbol symbol, int quoteType, TradingDate date) 
+    public double getQuote(Symbol symbol, int quoteType, TradingDate date) 
 	throws MissingQuoteException {
 	
-	float quote;
+	double quote;
 
 	try {
 	    quote = getQuote(symbol, quoteType, quoteCache.dateToOffset(date));
@@ -507,7 +507,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception QuoteNotLoaded if the quote was not found
      */
-    private float tryReload(Symbol symbol, int quoteType, int dateOffset) 
+    private double tryReload(Symbol symbol, int quoteType, int dateOffset) 
         throws QuoteNotLoadedException {
 
         // Perhaps our quote packet is not loaded - if so load
@@ -522,7 +522,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 
     // Try to expand the quote bundle so that it includes the current date.
     // Now reload the quote from the cache and return.
-    private float tryExpand(Symbol symbol, int quoteType, int dateOffset) 
+    private double tryExpand(Symbol symbol, int quoteType, int dateOffset) 
         throws QuoteNotLoadedException {
 
         QuoteRange expandedQuoteRange = (QuoteRange)getQuoteRange().clone();

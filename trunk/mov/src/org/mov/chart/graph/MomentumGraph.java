@@ -57,8 +57,8 @@ public class MomentumGraph extends AbstractGraph {
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderBar(g, momentum, xoffset, yoffset, 
@@ -67,26 +67,26 @@ public class MomentumGraph extends AbstractGraph {
     }
 
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue)
+				 double verticalScale,
+				 double bottomLineValue)
     {
 	return null; // we never give tool tip information
     }
 
     // Centre momentum graph
-    public float getHighestY(List x) {
+    public double getHighestY(List x) {
 	return Math.max(Math.abs(momentum.getHighestY(x)),
 			Math.abs(momentum.getLowestY(x)));
     }
 
     // Centre momentum graph
-    public float getLowestY(List x) {
+    public double getLowestY(List x) {
 	return -getHighestY(x);
     }
 
     // Override vertical axis
-    public float[] getAcceptableMajorDeltas() {
-	float[] major = {0.01F,
+    public double[] getAcceptableMajorDeltas() {
+	double[] major = {0.01F,
 			 0.1F,
 			 1F,
 			 10F,
@@ -96,8 +96,8 @@ public class MomentumGraph extends AbstractGraph {
     }
 
     // Override vertical axis
-    public float[] getAcceptableMinorDeltas() {
-	float[] minor = {1F, 
+    public double[] getAcceptableMinorDeltas() {
+	double[] minor = {1F, 
 			 2F,
 			 3F,
 			 4F,
@@ -110,8 +110,8 @@ public class MomentumGraph extends AbstractGraph {
     }
 
     // Override vertical axis
-    public String getYLabel(float value) {
-	return Float.toString(value);
+    public String getYLabel(double value) {
+	return Double.toString(value);
     }
 
     /**
@@ -126,17 +126,17 @@ public class MomentumGraph extends AbstractGraph {
 	Graphable momentum = new Graphable();
 
 	// Date set and value array will be in sync
-	float[] values = source.toArray();
+	double[] values = source.toArray();
 	Iterator iterator = source.getXRange().iterator();
 
 	int i = 0;	
 
 	while(iterator.hasNext()) {
 	    Comparable x = (Comparable)iterator.next();
-	    float todaysMomentum = 
+	    double todaysMomentum = 
 		values[i] - values[Math.max(1 + i - period, 0)];
 
-	    momentum.putY(x, new Float(todaysMomentum));
+	    momentum.putY(x, new Double(todaysMomentum));
 
 	    i++;
 	}

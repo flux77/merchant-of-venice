@@ -70,8 +70,8 @@ public class MACDGraph extends AbstractGraph {
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List dates) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List dates) {
 
 	// We ignore the graph colours and use our own custom colours
 
@@ -89,8 +89,8 @@ public class MACDGraph extends AbstractGraph {
     }
 
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue)
+				 double verticalScale,
+				 double bottomLineValue)
     {
 	return null; // we never give tool tip information
     }
@@ -115,9 +115,9 @@ public class MACDGraph extends AbstractGraph {
     }
 
     // Highest Y value is the highest of both the moving averages
-    public float getHighestY(List x) {
-	float fastHighestY = fastMovingAverage.getHighestY(x);
-	float slowHighestY = slowMovingAverage.getHighestY(x);
+    public double getHighestY(List x) {
+	double fastHighestY = fastMovingAverage.getHighestY(x);
+	double slowHighestY = slowMovingAverage.getHighestY(x);
 
 	return 
 	    fastHighestY > slowHighestY? 
@@ -126,9 +126,9 @@ public class MACDGraph extends AbstractGraph {
     }
 
     // Lowest Y value is the lowest of both the moving averages
-    public float getLowestY(List x) {
-	float fastLowestY = fastMovingAverage.getLowestY(x);
-	float slowLowestY = slowMovingAverage.getLowestY(x);
+    public double getLowestY(List x) {
+	double fastLowestY = fastMovingAverage.getLowestY(x);
+	double slowLowestY = slowMovingAverage.getLowestY(x);
 
 	return 
 	    fastLowestY < slowLowestY? 

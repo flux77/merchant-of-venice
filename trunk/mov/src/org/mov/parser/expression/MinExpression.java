@@ -24,7 +24,7 @@ import org.mov.parser.*;
 /**
  * An expression which finds the minimum quote over a given trading period.
  */
-public class MinExpression extends QuoteExpression {
+public class MinExpression extends TernaryExpression {
 
     /**
      * Create a new minimum expression for the given <code>quote</code> kind,
@@ -37,25 +37,20 @@ public class MinExpression extends QuoteExpression {
      */
     public MinExpression(Expression quote, Expression days,
 			 Expression lag) {
-	super(quote);
-
-        assert quote != null && days != null && lag != null;
-
-	add(quote);
-	add(days);
-	add(lag);
+	super(quote, days, lag);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
 	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = ((QuoteExpression)get(0)).getQuoteKind();
 
         if(days <= 0)
-            throw new EvaluationException("Range for min() needs to be >0");
+            throw EvaluationException.rangeForMin();
 
         int offset = (int)get(2).evaluate(variables, quoteBundle, symbol, day);
-	return min(quoteBundle, symbol, getQuoteKind(), days, day, offset);
+	return min(quoteBundle, symbol, quoteKind, days, day, offset);
     }
 
     public String toString() {
@@ -76,19 +71,24 @@ public class MinExpression extends QuoteExpression {
 	    throw new TypeMismatchException();
     }
 
-    public int getNeededChildren() {
-	return 3;
+    public int getType() {
+        if(get(0).getType() == FLOAT_QUOTE_TYPE)
+            return FLOAT_TYPE;
+        else {
+            assert get(0).getType() == INTEGER_QUOTE_TYPE;
+            return INTEGER_TYPE;
+        }
     }
 
-    private float min(QuoteBundle quoteBundle, Symbol symbol, 
+    private double min(QuoteBundle quoteBundle, Symbol symbol, 
                       int quote, int days, int day, int offset)
         throws EvaluationException {
 
-	float min = Float.MAX_VALUE;
+	double min = Double.MAX_VALUE;
 
 	for(int i = offset - days + 1; i <= offset; i++) {
             try {
-                float value = quoteBundle.getQuote(symbol, quote, day, i);
+                double value = quoteBundle.getQuote(symbol, quote, day, i);
 
                 if(value < min)
                     min = value;

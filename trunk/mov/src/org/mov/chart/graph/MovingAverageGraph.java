@@ -61,8 +61,8 @@ public class MovingAverageGraph extends AbstractGraph {
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange) {
 
 	// We ignore the graph colours and use our own custom colours
 	g.setColor(Color.green.darker());
@@ -72,8 +72,8 @@ public class MovingAverageGraph extends AbstractGraph {
     }
 
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue)
+				 double verticalScale,
+				 double bottomLineValue)
     {
 	return null; // we never give tool tip information
     }
@@ -98,12 +98,12 @@ public class MovingAverageGraph extends AbstractGraph {
     }
 
     // Highest Y value is in the moving average graph
-    public float getHighestY(List x) {
+    public double getHighestY(List x) {
 	return movingAverage.getHighestY(x);
     }
 
     // Lowest Y value is in the moving average graph
-    public float getLowestY(List x) {
+    public double getLowestY(List x) {
 	return movingAverage.getLowestY(x);
     }
 
@@ -127,12 +127,12 @@ public class MovingAverageGraph extends AbstractGraph {
 	Graphable movingAverage = new Graphable();
 
 	// Date set and value array will be in sync
-	float[] values = source.toArray();
+	double[] values = source.toArray();
 	Set xRange = source.getXRange();
 	Iterator iterator = xRange.iterator();
 
 	int i = 0;	
-	float average;
+	double average;
 
 	while(iterator.hasNext()) {
 	    Comparable x = (Comparable)iterator.next();
@@ -142,7 +142,7 @@ public class MovingAverageGraph extends AbstractGraph {
                                          i + 1);
 	    i++;
 
-	    movingAverage.putY(x, new Float(average));
+	    movingAverage.putY(x, new Double(average));
 	}
 
 	return movingAverage;

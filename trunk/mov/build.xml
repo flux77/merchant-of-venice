@@ -146,6 +146,7 @@
     </copy>
     <copy file="build.xml" todir="${release}/venice-${VERSION}/build/"/>
     <copy file="COPYING.txt" todir="${release}/venice-${VERSION}/"/>
+    <copy file="changelog.txt" todir="${release}/venice-${VERSION}/"/>
     <copy file="readme.txt" todir="${release}/venice-${VERSION}/"/>
     <copy file="venice" todir="${release}/venice-${VERSION}/"/>
     <copy file="venice.jar" todir="${release}/venice-${VERSION}/"/>   
@@ -229,7 +230,10 @@
   </target>
 
   <!-- Package up the web page ready for deployment -->
-  <target name="web" depends="api, doc">
+  <target name="web" depends="api, doc, jar">
+
+    <!-- Copy venice.jar to web page for WebStart -->
+    <copy file="venice.jar" todir="${web}"/>
 
     <!-- Copy API files to web page -->
     <copy todir="${web}/api">

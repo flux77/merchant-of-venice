@@ -1,4 +1,4 @@
-Merchant of Venice, 0.1 alpha 13/Apr/2003
+Merchant of Venice, 0.2 alpha 24/Aug/2003
 =========================================
 
 Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
@@ -8,21 +8,18 @@ See COPYING.txt for license terms.
 
 Thank you for trying Merchant of Venice (Venice).
 
-Project Venice was started with the question of how well could
-Genetic Programming be applied to generating successful buy/sell rules on the 
-stock market? With some promising preliminary results, the project scope 
-expanded and Venice was re-written.
-
-Venice now supports portfolio management, charting, technical analysis all
-within a graphical user interface with online help. The current direction
-of the project is to re-implement Genetic Programming.
+Venice is a stock market trading programme that supports portfolio
+management, charting, technical analysis, paper trading and
+experimental methods like genetic programming. Venice runs in a
+graphical user interface with online help and has full documentation.
+Venice runs on UNIX, including MacOSX and Windows.
 
 2 Running
 
-To run Venice you will need Java J2SE 1.4 or higher, available from the
+To run Venice you will need Java J2SE JRE 1.4 or higher, available from the
 following location:
    
-        http://java.sun.com/j2se/1.4.1/download.html
+        http://java.sun.com/j2se/1.4.2/download.html
 
 The following packages are optional:
 
@@ -35,12 +32,6 @@ The following packages are optional:
    Venice allows you to access stock quotes through a MySQL database or
    directly from text files. Reading from text files is easy to set up,
    but the database is much faster.
-
-   Java Skin Look & Feel
-        http://www.l2fprod.com/download.php
-
-   This package allows Venice to look more closely like a native
-   Windows XP or MacOS X application.
 
 Once they are set up, you can run Venice by typing from the command prompt:
 

@@ -19,6 +19,7 @@ Section "Venice"
   File "venice.jar"
   File "readme.txt"
   File "COPYING.txt"
+  File "changelog.txt"
   File /r "doc"
   WriteUninstaller "uninstall.exe"
 SectionEnd
@@ -42,6 +43,7 @@ UninstallText "This will remove Venice from your computer."
 Section "Uninstall"
   Delete $INSTDIR\venice.jar
   Delete $INSTDIR\COPYING.txt
+  Delete $INSTDIR\changelog.txt
   Delete $INSTDIR\readme.txt
   Delete $INSTDIR\uninstall.exe
   Delete $INSTDIR\doc\*.*

@@ -1,5 +1,5 @@
-Changes for Venice 0.2 (18/Aug/2003)
-------------------------------------
+Changes for Venice, 0.2 alpha 24/Aug/2003
+=========================================
 
 * Updates to Gondola Language:
   - Strong type checking between INTEGER, BOOLEAN, FLOAT & QUOTE types.
@@ -50,3 +50,6 @@ Changes for Venice 0.2 (18/Aug/2003)
   - Canceling an operation now also cancels the underlying database 
     transaction.
   - UNIX shell script now uses full path of Java to run Venice.
+
+Initial Venice, 0.1 alpha 13/Apr/2003
+=====================================

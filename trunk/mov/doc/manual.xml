@@ -25,9 +25,9 @@ that Venice can generate.</para>
 <para><link to="Portfolio">Portfolio</link> describes how to keep track
 of your portfolios in Venice.</para>
 
-<para><link to="Gondola Language">Gondola Language</link> is a language for 
-analysing stock market data. The language allows you to do a variety of tasks 
-from listing stocks in tables that only match your criteria to creating 
+<para><link to="Gondola Language">Gondola Language</link> is a language for
+analysing stock market data. The language allows you to do a variety of tasks
+from listing stocks in tables that only match your criteria to creating
 automated buy/sell paper trade rules.
 </para>
 
@@ -37,7 +37,7 @@ in Venice. For charting see <link to="Graphs">Graphs</link>.
 </para>
 </help>
 
-<text>Merchant of Venice, 0.1 alpha / 13/Apr/2003
+<text>Merchant of Venice, 0.2 alpha / 24/Aug/2003
 ===========================================
 
 Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
@@ -48,14 +48,11 @@ See COPYING.txt for license terms.
 <chapter name="Introduction">
 <para>Thank you for trying Merchant of Venice (Venice).</para>
 
-<para>Project Venice was started with the question of how well could
-Genetic Programming be applied to generating successful buy/sell rules on the 
-stock market? With some promising preliminary results, the project scope 
-expanded and Venice was re-written.</para>
-
-<para>Venice now supports portfolio management, charting, technical analysis all
-within a graphical user interface with on-line help. The current direction
-of the project is to re-implement Genetic Programming.</para>
+<para>Venice is a stock market trading programme that supports portfolio
+management, charting, technical analysis, paper trading and
+experimental methods like genetic programming. Venice runs in a
+graphical user interface with online help and has full documentation.
+Venice runs on UNIX, including MacOSX and Windows.</para>
 
 </chapter>
 
@@ -72,23 +69,41 @@ a short name instead.</para>
 configure Venice to read stock quotes from either files or from
 a database.</para>
 
-<para><link to="Skins">Skins</link> describes how to customise the look for
-Venice. Skins allow you to make Venice look more like a Windows XP, MacOS or
-Gnome application rather than the default Java look.</para>
+<para><link to="Tuning">Tuning</link> describes how to
+configure Venice for optimal performance.</para>
 </help>
 
 <chapter name="Functions">
-<para>This section hasn't been written yet.</para>
+<para>You can store commonly used functions, such as indicators, so you do not
+need to retype them. Once an equation is stored, you can access it from
+any equation entry field by clicking on the small down arrow, which
+appears next to all the equation entry fields. It will then display a list 
+of your stored functions.</para>
+
+<para>You can reach the functions page by:</para>
+<list><item>Clicking on the <highlight>File</highlight> menu item.
+</item>
+<item>Then clicking on the <highlight>Preferences</highlight> menu item.
+</item>
+<item>Then selecting the <highlight>Functions</highlight> page.
+</item>
+</list>
 </chapter>
 
 <chapter name="Quote Source">
-<para>Venice currently supports two methods for reading in quotes. It can either
-read in the quotes directly from files containing quotes in MetaStock, 
-EzyChart or Insight Trader. Or it can read in quotes stored in a MySQL
-database. Reading from files is quick and easy to set up - but access is much
-slower than from database. It is recommended that you set up access for files 
-to start with and if you plan to use Venice to switch to the database.</para>
-<para>You can reach quote source configuration by:</para>
+<para>Venice currently supports three methods for reading in quotes. It can
+read in quotes directly from files containing quotes in MetaStock,
+EzyChart or Insight Trader. It can read in quotes stored in a MySQL
+database. And finally it can read in some inbuilt sample quotes, so you
+can test out Venice. Reading from files is quick and easy to set up - but
+access is much slower than from database. It is recommended that you set up
+access for files to start with and if you plan to use Venice to switch to the
+database. </para>
+<para>You can only access quotes directly from files, if each file
+contains only a single day's worth of quotes. If any of your quote
+files contain more than one date, you'll need to access your quote
+files from the <link to="Database Quote Source">Database Quote Source</link> instead</para>
+<para>You can reach the quote source configuration page by:</para>
 <list><item>Clicking on the <highlight>File</highlight> menu item.
 </item>
 <item>Then clicking on the <highlight>Preferences</highlight> menu item.
@@ -98,8 +113,8 @@ to start with and if you plan to use Venice to switch to the database.</para>
 </list>
 <section name="File Quote Source">
 <para>Once you have reached the quote source page, to tell Venice to read quotes
-directly from files click on the <highlight>Files</highlight> tab and select the <highlight>Use Files</highlight> 
-radio button. You'll need to know the format of your quote files. 
+directly from files click on the <highlight>Files</highlight> tab and select the <highlight>Use Files</highlight>
+radio button. You'll need to know the format of your quote files.
 Venice supports the following:</para>
 <list><item><para><highlight>MetaStock</highlight></para>
 <para>      This format has 4 digit years and the quotes are in dollars. The first
@@ -107,22 +122,26 @@ Venice supports the following:</para>
 <para>      Example:</para>
 <para><code>      XXX,19990715,1.73,1.82,1.71,1.81,3648921</code></para></item>
 <item><para><highlight>MetaStock (volume/100)</highlight></para>
-<para>      This format is the same as <highlight>MetaStock</highlight> above but the volume is divided 
+<para>      This format is the same as <highlight>MetaStock</highlight> above but the volume is divided
       by 100.</para>
 <para>      Example:</para>
 <para><code>      XXX,19990715,1.73,1.82,1.71,1.81,36489</code></para></item>
 <item><para><highlight>Insight Trader</highlight></para>
 <para>      This format has 2 digit years and quotes are in cents and volume is
-      divided by 100. The first column is the symbol, then the date, open, 
+      divided by 100. The first column is the symbol, then the date, open,
       high, low, close and volume.</para>
 <para>      Example:</para>
 <para><code>      XXX 07/15/99 173 182 171 181 36489</code></para></item>
 <item><para><highlight>EzyChart</highlight></para>
-<para>      This format has 2 digit years and quotes are in cents. The first column 
+<para>      This format has 2 digit years and quotes are in cents. The first column
       is the symbol, then the date, open, high, low, close and volume.</para>
 <para><code>      XXX,990715,173,182,171,181,3648921</code></para></item></list>
 <para>You can then tell Venice where the quotes files are by either adding them
 here with the <highlight>Add</highlight> button or by using the <link to="Importing Quotes">Import Quotes</link> dialog.</para>
+<para>You can only access quotes directly from files, if each file
+contains only a single day's worth of quotes. If any of your quote
+files contain more than one date, you'll need to access your quote
+files from the <link to="Database Quote Source">Database Quote Source.</link> instead</para>
 </section>
 <section name="Database Quote Source">
 <para>Once you have played with Venice for a while you might get annoyed at the time
@@ -141,13 +160,13 @@ set all this up. Once MySQL is set up you'll need to create a database for
 Venice, call the database <highlight>shares</highlight>.</para>
 
 <para>Once all that is done, you'll need to configure Venice to use the database.
-From the quote source page, to tell Venice to read quotes from the database 
+From the quote source page, to tell Venice to read quotes from the database
 click on the <highlight>Database</highlight> tab and select the <highlight>Use Database</highlight>
 radio button. You'll be confronted with several fields you need to fill in:</para>
-<list><item><highlight>Database</highlight> - The only database supported is MySQL, so you can leave 
+<list><item><highlight>Database</highlight> - The only database supported is MySQL, so you can leave
       this alone.
 </item>
-<item><highlight>Host</highlight> - This is the IP address of the computer that the database is 
+<item><highlight>Host</highlight> - This is the IP address of the computer that the database is
       running on. If it is running on the same machine as Venice, you can just
       put <highlight>localhost</highlight> here if you want.
 </item>
@@ -159,20 +178,41 @@ radio button. You'll be confronted with several fields you need to fill in:</par
       up the database.
 </item>
 <item><highlight>Password</highlight> - This is the password that Venice will connect with in
-      the database. You should have created a user/password pair when setting 
+      the database. You should have created a user/password pair when setting
       up the database.
 </item>
 <item><highlight>Database Name</highlight> - This is the name of the database that you created
       earlier. You shouldn't need to touch this.
 </item></list>
-<para>Finally you'll need to import the quotes into the database, you can do this by 
+<para>Finally you'll need to import the quotes into the database, you can do this by
 using the <link to="Importing Quotes">Import Quotes</link> dialog.</para>
 <para>Good luck!</para>
 </section>
+<section name="Sample Quote Source">
+<para>Venice has some inbuilt sample quotes, so you can test out Venice without
+going to all the trouble of importing stock quotes. It contains a small
+selection of quotes from the Australian Stock Exchange (ASX) from 1986.</para>
+</section>
 </chapter>
 
-<chapter name="Skins">
-<para>This section hasn't been written yet.</para>
+<chapter name="Tuning">
+<para>The tuning page allows you to configure Venice for optimal performance.</para>
+<para>You can reach the tuning configuration page by:</para>
+<list><item>Clicking on the <highlight>File</highlight> menu item.
+</item>
+<item>Then clicking on the <highlight>Preferences</highlight> menu item.
+</item>
+<item>Then selecting the <highlight>Tuning</highlight> page.
+</item>
+</list>
+
+<para>Loading quotes from files or database can sometimes take a while. For
+this reason Venice caches the quotes it reads in. That is, it keeps them in
+memory so that if you want to view them again, they come up much faster.
+By default Venice keeps up to about 100,000 quotes in memory at one time.
+On this page you can view the number of quotes Venice is currently
+caching and set the maximum amount. From time to time, Venice may need
+to go a little higher than this amount.</para>
 </chapter></chapter>
 
 <chapter name="Importing Quotes">
@@ -192,8 +232,8 @@ operations:</para>
 <para>To perform this operation:</para>
 <para>Click on <highlight>Files</highlight> in the <highlight>Import From</highlight> area and on <highlight>Database</highlight>
 in the <highlight>Import To</highlight> area.</para>
-<para>This allows you to import multiple quote files into the database in one 
-operation. Importing quotes into the database can take a while, so please be 
+<para>This allows you to import multiple quote files into the database in one
+operation. Importing quotes into the database can take a while, so please be
 patient. You need to select the quote type you are importing, see
 <link to="Quote Source">Quote Source</link> for an explanation of these types.
 When you click <highlight>Import</highlight> a dialog will come up and you can select
@@ -206,7 +246,7 @@ multiple quote files.</para>
 in the <highlight>Import To</highlight> area.</para>
 <para>This allows you to import multiple quote files into Venice in one
 operation. This operation only tells Venice about the quote files, it doesn't
-copy them in anyway - so if you delete the original quote files, Venice 
+copy them in anyway - so if you delete the original quote files, Venice
 obviously won't be able to access them anymore.</para>
 </section>
 
@@ -224,17 +264,17 @@ cope if the database goes down.</para>
 <para>To perform this operation:</para>
 <para>Click on <highlight>Database</highlight> in the <highlight>Import From</highlight> area and on <highlight>Files</highlight>
 in the <highlight>Import To</highlight> area.</para>
-<para>This allows you to export all the quote files from the database back into text 
-files. Each file will contain quotes for a single day. You'll need to specify 
-the format of the quotes in the file you want, see <link to="Quote Source">Quote Source</link> 
-for more details. You'll also need to specify the path and file name for the 
+<para>This allows you to export all the quote files from the database back into text
+files. Each file will contain quotes for a single day. You'll need to specify
+the format of the quotes in the file you want, see <link to="Quote Source">Quote Source</link>
+for more details. You'll also need to specify the path and file name for the
 generated files in the text box showing. Each file is named with the date
 as part of it's file name, you'll need to specify the format of the date.</para>
 <para>E.g.</para>
 <list><item>/home/aleppard/quotes-mm-dd-yyyy.txt
       -> /home/aleppard/quotes-12-31-2002.txt
 </item>
-<item>/home/aleppard/market_ddMMMyy.txt 
+<item>/home/aleppard/market_ddMMMyy.txt
       -> /home/aleppard/market_31dec02.txt
 </item>
 <item>C:\Quotes\Quotes_d?_m?_yy.txt
@@ -247,45 +287,55 @@ work.</para>
 </chapter>
 
 <chapter name="Tables">
-<para>Venice has the ability to list quote prices for a single day's trading into a
-table. When listing the day's trading you need to decide which stocks you
-are interested in. Currently you can select from <highlight>All Ordinaries</highlight>, 
-<highlight>Market Indices</highlight> and <highlight>All Symbols</highlight>. These categories
-are based on the ASX (Australian Stock Exchange) so might not be very relevant
-for other exchanges. Currently Venice is very ASX-centric. At the moment 
-Venice does not have access to any data relating to the symbols it is given, so
-it has to guess which category the symbol falls in. All Ordinaries lists all 
-3 letter symbols except those starting with an <emphasis>X</emphasis>. 
-Market Indices lists all symbols starting with an <emphasis>X</emphasis>, on 
+<para>Venice has the ability to list quote prices for a single day's trading in a
+table, and the ability to list all quote prices for a list of given stocks. 
+When listing you need to decide which stocks you are interested in. Currently 
+you can select from <highlight>All Ordinaries</highlight>, <highlight>Market Indices</highlight> and <highlight>All Symbols</highlight>. 
+These categories are based on the ASX (Australian Stock Exchange) so might not
+be very relevant for other exchanges. Currently Venice is very ASX-centric. At
+the moment Venice does not have access to any data relating to the symbols it
+is given, so it has to guess which category the symbol falls in. All 
+Ordinaries lists all 3 letter symbols except those starting with an <emphasis>X</emphasis>.
+Market Indices lists all symbols starting with an <emphasis>X</emphasis>, on
 the ASX almost all of these are market indices. All Symbols lists all the
 symbols.</para>
 
 <para>You can display a table by doing the following:</para>
 <list><item>Clicking on the <highlight>Table</highlight> menu item.
 </item>
-<item>Then clicking on either <highlight>All Ordinaries</highlight>, <highlight>Market Indices</highlight> or
-      <highlight>All Symbols</highlight>.
+<item>Then clicking on either <highlight>All Ordinaries</highlight>, <highlight>Market Indices</highlight>,
+      <highlight>All Stocks</highlight> or <highlight>Stocks</highlight>.
 </item>
-<item>Then clicking on either <highlight>List All</highlight> or <highlight>List By Rule</highlight>.
+<item>Then clicking on either <highlight>List All</highlight>, <highlight>List By Date</highlight>, <highlight>List By Rule</highlight> or 
+      <highlight>List By Symbols</highlight>.
 </item>
 </list>
+
+<para>The <highlight>List All</highlight> option allows you to list all the stock quotes
+on the given date.</para>
+
+<para>The <highlight>List By Date</highlight> option allows you to specify the date of the stock
+quotes to list.</para>
 
 <para>The <highlight>List By Rule</highlight> option allows you to specify the initial
 filter. The filter is an equation which specifies which stocks should be
 listed and which hidden, see below for more details about this, also see the
-<link to="Gondola Language">Gondola Language</link> for details about the format of 
+<link to="Gondola Language">Gondola Language</link> for details about the format of
 the equations.</para>
+
+<para>The <highlight>List By Symbols</highlight> option allows you to specify the stock symbols
+to list. Then all the quotes for those stock symbols will be listed.</para>
 
 <section name="Apply Equations">
 <para>You can run multiple equations against every stock listed in the table and
-list the result of the equation. Click on the <highlight>Quote</highlight> menu item, then 
-click on the <highlight>Apply Equations</highlight> menu item. This will bring up a dialog 
-where you can enter up to 5 equations that can be run against each stock. For 
-each you can enter the name of the column and the equation to be run. See 
-<link to="Gondola Language">Gondola Language</link> for details about the format of these equations. 
-Also see <link to="Preferences">Preferences</link> for how to get Venice to remember equations 
-so you don't have to keep typing them in all the time. To get you started, an 
-example equation is <code>avg(day_close, 30, 0)</code> which will calculate the average 
+list the result of the equation. Click on the <highlight>Table</highlight> menu item, then
+click on the <highlight>Apply Equations</highlight> menu item. This will bring up a dialog
+where you can enter up to 5 equations that can be run against each stock. For
+each you can enter the name of the column and the equation to be run. See
+<link to="Gondola Language">Gondola Language</link> for details about the format of these equations.
+Also see <link to="Preferences">Preferences</link> for how to get Venice to remember equations
+so you don't have to keep typing them in all the time. To get you started, an
+example equation is <code>avg(close, 30, 0)</code> which will calculate the average
 day close value over the last 30 days, including today.</para>
 </section>
 
@@ -294,25 +344,25 @@ day close value over the last 30 days, including today.</para>
 filter. This equation is run against each stock listed in the table, if the
 equation equates to true for a stock, then that stock is listed. Otherwise it
 is hidden. You can reach this by clicking on the <highlight>Apply Filter</highlight> menu item.
-Again, see <link to="Gondola Language">Gondola Language</link> for details about the format of these equations. 
-Also see <link to="Preferences">Preferences</link> for how to get Venice to remember equations so 
-you don't have to keep typing them in all the time. To get you started, an 
-example equation filter is <code>lag(day_close, 0) > lag(day_close, -1)</code> which will 
-list all quotes where the day close of today is higher than the day close of 
+Again, see <link to="Gondola Language">Gondola Language</link> for details about the format of these equations.
+Also see <link to="Preferences">Preferences</link> for how to get Venice to remember equations so
+you don't have to keep typing them in all the time. To get you started, an
+example equation filter is <code>lag(close, 0) > lag(close, -1)</code> which will
+list all quotes where the day close of today is higher than the day close of
 the last trading day.</para>
 </section>
 
 <section name="General Table Features">
 <para>Every table in Venice supports the following:</para>
 
-<para>By clicking on a column header you can sort by that column, click again and 
-you reverse the sort. You can change the order of the columns by dragging a 
+<para>By clicking on a column header you can sort by that column, click again and
+you reverse the sort. You can change the order of the columns by dragging a
 column and dropping it into a new position.</para>
 
 <para>Some tables in Venice support the following:</para>
-<para>By right clicking on a row you can raise a context sensitive menu. If you 
-double click on a row the most common operation is invoked, typically 
-Graphing. Some tables also have a menu item <highlight>Show Columns</highlight> which lets 
+<para>By right clicking on a row you can raise a context sensitive menu. If you
+double click on a row the most common operation is invoked, typically
+Graphing. Some tables also have a menu item <highlight>Show Columns</highlight> which lets
 you specify which columns are shown.</para>
 </section>
 </chapter>
@@ -334,18 +384,17 @@ traded for every day of the portfolio.</para>
 
 <para>Apart from graphing the value of the portfolio over time, you can also graph
 the profit/loss of the portfolio. To do this, graph the portfolio as above,
-then click on the menu item with the same name as your portfolio, then select 
-the <highlight>Graph</highlight> menu item and then click on <highlight>Profit/Loss</highlight>. The profit and loss 
-graph is calculated by ignoring any deposits and withdrawals made to the 
-portfolio, the balance of that portfolio over time will reflect the profit and 
+then click on the menu item with the same name as your portfolio, then select
+the <highlight>Graph</highlight> menu item and then click on <highlight>Profit/Loss</highlight>. The profit and loss
+graph is calculated by ignoring any deposits and withdrawals made to the
+portfolio, the balance of that portfolio over time will reflect the profit and
 loss made.</para>
 </section>
 
 <section name="Market Indicator Charts">
 <para>A market indicator is an indicator that can be used to help determine the
 state of the market. They are calculated using multiple stocks on the market,
-for example <highlight>Advance/Decline</highlight> uses all ordinary stocks
-in its calculations.</para>
+for example <highlight>Advance/Decline</highlight> uses all ordinary stocks in its calculations.</para>
 
 <section name="Advance/Decline">
 <para>Currently the only market indicator that Venice can graph is the
@@ -354,24 +403,26 @@ advance/decline indicator. You can graph this indicator by:</para>
 <list><item>Clicking on <highlight>Graph</highlight> menu item.
 </item>
 <item>Then clicking on the <highlight>Market Indicator</highlight> menu item.
-</item> 
+</item>
 <item>Then clicking on the <highlight>Advance/Decline</highlight> menu item.
 </item>
 </list>
 <para>This operation reads in almost all of the available stock quotes, so it might
 be very slow.</para>
-<para>The advance/decline indicator is calculated by taking an arbitrary start value 
-(currently 0). Each day's value is calculated by taking the number of stocks 
+<para>The advance/decline indicator is calculated by taking an arbitrary start value
+(currently 0). Each day's value is calculated by taking the number of stocks
 that advanced (i.e. have a higher day close than day open) minus the number of
 stocks that declined and adding that to the previous day's value. This creates
-a cumulative graph whose trend may be used to give an indication of possible 
+a cumulative graph whose trend may be used to give an indication of possible
 future direction of the market.</para>
 </section>
 </section>
 
 <section name="Stock Charts">
 
-<para>This section hasn't been written yet.</para>
+<para>Venice supports a variety of technical charts. Currently you cannot 
+configure any parameters, such as the period in the moving average chart. 
+Hopefully this will be improved in the next version.</para>
 
 </section>
 </chapter>
@@ -390,9 +441,9 @@ trading. You can create a new portfolio by:</para>
 <para>A portfolio is made up of several <highlight>Cash Accounts</highlight> and several
 <highlight>Share Accounts</highlight>. A <highlight>Cash Account</highlight> can be a bank account, a term deposit,
 a Cash Management Account or any account which stores money. A <highlight>Share Account</highlight>
-is any account where you can trade shares. To create a trading account you 
+is any account where you can trade shares. To create a trading account you
 will need at least one of each.</para>
-<para>A portfolio is made up of several accounts and also transactions. A 
+<para>A portfolio is made up of several accounts and also transactions. A
 transaction is any financial transaction that involves one or more of the
 accounts. See transactions for more details.</para>
 <section name="Import/Export">
@@ -400,48 +451,48 @@ accounts. See transactions for more details.</para>
 these files can then be read by an Excel spreadsheet and other tools. This
 can be useful for backup purposes. Venice is alpha after all! The format of
 the output files is:</para>
-<para><code>dd/mm/yyyy,transaction name,value,symbol,share number,trade cost,cash 
+<para><code>dd/mm/yyyy,transaction name,value,symbol,share number,trade cost,cash
 account1,cash account2,share account</code></para>
 <para>Not all of these fields will be present, an example exported line is:</para>
 <para><code>02/01/2003,Accumulate,4000.00,XYZ,100,20.50,Bank,,Broker</code></para>
 </section>
 
 <section name="Graph">
-<para>You can graph the value of a portfolio over time. See <link to="Graphs">Graphs</link> 
+<para>You can graph the value of a portfolio over time. See <link to="Graphs">Graphs</link>
 for more details.</para>
 </section>
 
 <section name="Transaction History">
-<para>You can view a list of all the transactions that have occurred in the 
+<para>You can view a list of all the transactions that have occurred in the
 portfolio. You can reach this by clicking on the <highlight>Transaction</highlight> menu
 item and then clicking on the <highlight>Show History</highlight> menu item.</para>
 </section>
 
 <section name="Transactions">
 <para>Venice currently supports several common transactions:
-<highlight>Accumulate Transaction</highlight>, <highlight>Deposit Transaction</highlight>, <highlight>Dividend Transaction</highlight>, 
-<highlight>Dividend DRP Transaction</highlight>, <highlight>Fee Transaction</highlight>, <highlight>Interest Transaction</highlight>, 
+<highlight>Accumulate Transaction</highlight>, <highlight>Deposit Transaction</highlight>, <highlight>Dividend Transaction</highlight>,
+<highlight>Dividend DRP Transaction</highlight>, <highlight>Fee Transaction</highlight>, <highlight>Interest Transaction</highlight>,
 <highlight>Reduce Transaction</highlight>, <highlight>Transfer Transaction</highlight> and <highlight>Withdrawal Transaction</highlight>.</para>
 
-<para>Once a portfolio is open, you can add a transaction by clicking on the 
-<highlight>Transaction</highlight> menu item, then clicking on the <highlight>New</highlight> menu item. 
-You will see in a drop down box a list of the transactions available. Some of 
-these might not be available yet, e.g. you cannot enter a Reduce Transaction 
+<para>Once a portfolio is open, you can add a transaction by clicking on the
+<highlight>Transaction</highlight> menu item, then clicking on the <highlight>New</highlight> menu item.
+You will see in a drop down box a list of the transactions available. Some of
+these might not be available yet, e.g. you cannot enter a Reduce Transaction
 (sell shares) without having bought any.</para>
 
 <subsection name="Accumulate Transaction">
 <para>The accumulate transaction is the "buy shares" transaction. To enter this
-transaction you will need the date the transaction took place, the cash 
-account where you withdrew the money from, the share account that accumulated 
-the shares, the symbol of the stock you accumulated (e.g. CBA), the number of 
+transaction you will need the date the transaction took place, the cash
+account where you withdrew the money from, the share account that accumulated
+the shares, the symbol of the stock you accumulated (e.g. CBA), the number of
 shares you accumulated, the total value of the shares at the time of purchase
-and finally the cost of the trade. This information should all be available 
+and finally the cost of the trade. This information should all be available
 from your broker.</para>
 </subsection>
 
 <subsection name="Deposit Transaction">
 <para>The deposit transaction is the transaction where you
-deposit money into a cash account such as a bank account. To enter this 
+deposit money into a cash account such as a bank account. To enter this
 transaction you will need the date the transaction took place, the cash
 account you deposited the money to and the amount you deposited.</para>
 </subsection>
@@ -450,15 +501,15 @@ account you deposited the money to and the amount you deposited.</para>
 <para>The dividend transaction is the transaction when you receive a share
 dividend. To enter this transaction you will need the date the transaction
 took place, the cash account that received the money, the share account
-containing the stock, the symbol of the stock and the dividend amount paid to 
+containing the stock, the symbol of the stock and the dividend amount paid to
 you.</para>
 </subsection>
 
 <subsection name="Dividend DRP Transaction">
 <para>The dividend DRP (dividend re-investment programme) transaction is the
-transaction when you receive a share dividend that is automatically 
+transaction when you receive a share dividend that is automatically
 re-invested back into the company by buying more shares. To enter this
-transaction you will need the date the transaction took place, the 
+transaction you will need the date the transaction took place, the
 share account containing the stock, the symbol of the stock and the amount
 of shares acquired.</para>
 </subsection>
@@ -475,17 +526,17 @@ received the fee and the amount that you were charged.</para>
 interest in one of your cash accounts. To enter this transaction you will
 need the date the transaction took place, the cash account that received
 the interest and the amount that you were credited. If your account is in
-the negative and this was the interest that was debited from your account, 
+the negative and this was the interest that was debited from your account,
 then put a minus sign in front of the value.</para>
 </subsection>
 
 <subsection name="Reduce Transaction">
 <para>The reduce transaction is the "sell shares" transaction. To enter this
-transaction you will need the date the transaction took place, the cash 
+transaction you will need the date the transaction took place, the cash
 account where the money from the sale will go, the share account that
 reduced the shares, the symbol of the stock you reduced (e.g. CBA), the
 number of shares you reduced, the total value of the shares at the time of
-sale and finally the cost of the trade. This information should all be 
+sale and finally the cost of the trade. This information should all be
 available from your broker.</para>
 </subsection>
 
@@ -499,7 +550,7 @@ to enter this as a separate transaction.</para>
 
 <subsection name="Withdrawal Transaction">
 <para>The withdrawal transaction is the transaction where you
-withdraw money from a cash account such as a bank account. To enter this 
+withdraw money from a cash account such as a bank account. To enter this
 transaction you will need the date the transaction took place, the cash
 account you withdrew the money from and the amount you withdrew.</para>
 </subsection>
@@ -517,7 +568,7 @@ are always set: the current date and the current stock. For example if
 you are displaying a <link to="Tables">Table</link> of stock quotes, you can execute an
 equation for each stock. If you entered the current line:</para>
 
-<para><code>avg(day_close, 30, 0)</code></para>
+<para><code>avg(close, 30, 0)</code></para>
 
 <para>It would display, for each stock, the average day close value over the last
 30 days starting with today. Here the current date would be set to the most
@@ -527,7 +578,7 @@ current stock.</para>
 <para>You can also enter equations when performing <link to="Analysis">Paper Trading</link>. If you
 entered the following as a buy rule:</para>
 
-<para><code>avg(day_close, 15, 0) &gt; avg(day_close, 30, -1)</code></para>
+<para><code>avg(close, 15, 0) &gt; avg(close, 30, -1)</code></para>
 
 <para>It would only buy the stock when the average day close over the last 15 days
 was higher than the average day close of over the last 30 days, where the
@@ -535,57 +586,98 @@ was higher than the average day close of over the last 30 days, where the
 backwards. So here the current date would be set to whatever date the trade
 was to be analysed for.</para>
 
+<para>The Gondola language is very type strict. What this means is that each value
+has a given type, whether it is an <highlight>integer</highlight>, <highlight>real</highlight> or <highlight>boolean</highlight>. This means 
+that the numbers <code>12</code> and <code>12.0</code> are different, and <code>1</code> and <code>true</code>
+are different. If you get a type mismatch error, you've probably entered an
+<highlight>integer</highlight> number (e.g. <code>12</code>) instead of a <highlight>real</highlight> number (e.g. <code>12.0</code>).</para>
+
 <section name="Gondola Operators">
 <para>The gondola language supports the following boolean operators: <highlight>and</highlight>, <highlight>or</highlight>
 and <highlight>not</highlight>. For example:</para>
 
-<list><item><code>lag(day_close, 0) &gt; 12 or lag(day_open, 0) &gt; 12
+<list><item><code>lag(close, 0) &gt; 12.0 or lag(open, 0) &gt; 12.0
 </code></item>
-<item><code>lag(day_close, 0) &gt; 12 and lag(day_open, 0) &gt; 12
+<item><code>lag(close, 0) &gt; 12.0 and lag(open, 0) &gt; 12.0
 </code></item>
-<item><code>not(avg(day_open, 15, 0) &gt; 12)
+<item><code>not(avg(open, 15, 0) &gt; 12.0)
 </code></item>
 </list>
 
 <para>It also supports basic arithmetic: +, -, * and /. For example:</para>
-<list><item><code>lag(day_close, 0) + lag(day_close, -1)
+<list><item><code>lag(close, 0) + lag(close, -1)
 </code></item>
-<item><code>lag(day_close, 0) - lag(day_close, -1)
+<item><code>lag(close, 0) - lag(close, -1)
 </code></item>
-<item><code>lag(day_close, 0) / lag(day_close, -1)
+<item><code>lag(close, 0) / lag(close, -1)
 </code></item>
-<item><code>lag(day_close, 0) * lag(day_close, -1)
+<item><code>lag(close, 0) * lag(close, -1)
 </code></item>
 </list>
-<para>And finally it also supports the relational operators: <highlight>==</highlight>, <highlight>&gt;</highlight>, <highlight>&gt;=</highlight>, <highlight>&lt;</highlight>, 
+<para>And finally it also supports the relational operators: <highlight>==</highlight>, <highlight>&gt;</highlight>, <highlight>&gt;=</highlight>, <highlight>&lt;</highlight>,
 <highlight>&lt;=</highlight> and <highlight>!=</highlight>. For example:</para>
-<list><item><code>lag(day_close, 0) == lag(day_close, -1)
+<list><item><code>lag(volume, 0) == lag(volume, -1)
 </code></item>
-<item><code>lag(day_close, 0) &gt; lag(day_close, -1)
+<item><code>lag(close, 0) &gt; lag(close, -1)
 </code></item>
-<item><code>lag(day_close, 0) &gt;= lag(day_close, -1)
+<item><code>lag(close, 0) &gt;= lag(close, -1)
 </code></item>
-<item><code>lag(day_close, 0) &lt; lag(day_close, -1)
+<item><code>lag(close, 0) &lt; lag(close, -1)
 </code></item>
-<item><code>lag(day_close, 0) &lt;= lag(day_close, -1)
+<item><code>lag(close, 0) &lt;= lag(close, -1)
 </code></item>
-<item><code>lag(day_close, 0) != lag(day_close, -1)
+<item><code>lag(volume, 0) != lag(volume, -1)
 </code></item>
 </list>
 </section>
 
 <section name="Gondola Functions">
+<section name="Absolute Value">
+<para>The absoluate value function returns the absolute value of the given value.
+The absolute value is the positive value of a number. For example the absolute
+value of -12 is 12, and the absolute value of 12 is 12.</para>
+<para><code>abs(VALUE)</code></para>
+<para>Where VALUE is the initial value.</para>
+<para>Example:</para>
+<para><code>abs(-28.0)</code></para>
+<para>Returns the absolute value of -28.0 which is 28.0.</para>
+</section>
+
 <section name="Average">
 <para>The average function averages a series of stock quotes.</para>
 <para><code>avg(QUOTE, DAYS, START_OFFSET)</code></para>
-<para>Where QUOTE is <highlight>day_open</highlight>, <highlight>day_close</highlight>, <highlight>day_low</highlight>, <highlight>day_high</highlight> or <highlight>day_volume</highlight>.
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where DAYS is the number of days to average.
-Where START_OFFSET is the most recent date to average, 0 means the current 
+Where START_OFFSET is the most recent date to average, 0 means the current
 trading date, -1 means the previous trading date, etc.</para>
 <para>Example:</para>
-<para><code>avg(day_open, 15, -1)</code></para>
-<para>Returns the average of the day open value for the current stock for the last 
+<para><code>avg(open, 15, -1)</code></para>
+<para>Returns the average of the day open value for the current stock for the last
 15 days, ending with yesterday.</para>
+</section>
+
+<section name="Day">
+<para>The day function returns the current day of the month.</para>
+<para><code>day()</code></para>
+<para>Example:</para>
+<para><code>day()</code></para>
+<para>Returns the current day, which will be 31, if it is the 31st.</para>
+</section>
+
+<section name="Day of Week">
+<para>The day of week function returns the current day of the week.</para>
+<para><code>dayofweek()</code></para>
+<para>Example:</para>
+<para><code>dayofweek()</code></para>
+<para>Returns the current day of the week, which will be 1, if it is a Sunday.</para>
+</section>
+
+<section name="Day of Year">
+<para>The day of year function returns the current day of the year.</para>
+<para><code>dayofyear()</code></para>
+<para>Example:</para>
+<para><code>dayofyear()</code></para>
+<para>Returns the current day of the year, which might be 365, if it is New Years Eve.</para>
 </section>
 
 <section name="If">
@@ -594,48 +686,56 @@ trading date, -1 means the previous trading date, etc.</para>
 <para>If the value of the VALUE expression renders to true, then the TRUE expression
 will be executed, otherwise the FALSE expression will be.</para>
 <para>Example:</para>
-<para><code>if(lag(day_open, 0) &gt; lag(day_open, -1)) 
-    { lag(day_open, 0) } 
-else 
-    { lag(day_open, -1) }</code></para>
+<para><code>if(lag(open, 0) &gt; lag(open, -1))
+    { lag(open, 0) }
+else
+    { lag(open, -1) }</code></para>
 <para>Returns the greater of today and yesterday's day open values.</para>
 </section>
 
 <section name="Lag">
 <para>The lag function returns a stock quote.</para>
 <para><code>lag(QUOTE, OFFSET)</code></para>
-<para>Where QUOTE is <highlight>day_open</highlight>, <highlight>day_close</highlight>, <highlight>day_low</highlight>, <highlight>day_high</highlight> or <highlight>day_volume</highlight>.
-Where OFFSET is the date to retrieve the stock quote, 0 means the current 
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
+Where OFFSET is the date to retrieve the stock quote, 0 means the current
 trading date, -1 means the previous trading date, etc.</para>
 <para>Example:</para>
-<para><code>lag(day_high, -5)</code></para>
+<para><code>lag(high, -5)</code></para>
 <para>Returns the day high value of the current stock, 5 days previous.</para>
 </section>
 
 <section name="Minimum">
 <para>The minimum function finds the minimum of a series of stock quotes.</para>
 <para><code>min(QUOTE, DAYS, START_OFFSET)</code></para>
-<para>Where QUOTE is <highlight>day_open</highlight>, <highlight>day_close</highlight>, <highlight>day_low</highlight>, <highlight>day_high</highlight> or <highlight>day_volume</highlight>.
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where DAYS is the number of days to search.
-Where START_OFFSET is the most recent date to search, 0 means the current 
+Where START_OFFSET is the most recent date to search, 0 means the current
 trading date, -1 means the previous trading date, etc.</para>
 <para>Example:</para>
-<para><code>min(day_volume, 15, -1)</code></para>
-<para>Returns the minimum volume of trade for the current stock for the last 
+<para><code>min(volume, 15, -1)</code></para>
+<para>Returns the minimum volume of trade for the current stock for the last
 15 days, ending with yesterday.</para>
 </section>
 
 <section name="Maximum">
 <para>The maximum function finds the maximum of a series of stock quotes.</para>
 <para><code>max(QUOTE, DAYS, START_OFFSET)</code></para>
-<para>Where QUOTE is <highlight>day_open</highlight>, <highlight>day_close</highlight>, <highlight>day_low</highlight>, <highlight>day_high</highlight> or <highlight>day_volume</highlight>.
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
 Where DAYS is the number of days to search.
-Where START_OFFSET is the most recent date to search, 0 means the current 
+Where START_OFFSET is the most recent date to search, 0 means the current
 trading date, -1 means the previous trading date, etc.</para>
 <para>Example:</para>
-<para><code>max(day_volume, 15, -1)</code></para>
-<para>Returns the maximum volume of trade for the current stock for the last 
+<para><code>max(volume, 15, -1)</code></para>
+<para>Returns the maximum volume of trade for the current stock for the last
 15 days, ending with yesterday.</para>
+</section>
+
+<section name="Month">
+<para>The month function returns the current month.</para>
+<para><code>month()</code></para>
+<para>Example:</para>
+<para><code>month()</code></para>
+<para>Returns the current month, which will be 8, if it is August.</para>
 </section>
 
 <section name="Percent">
@@ -646,18 +746,57 @@ trading date, -1 means the previous trading date, etc.</para>
 <para><code>percent(200, 10)</code></para>
 <para>Returns 10% of 200 which is 20.</para>
 </section>
+
+<section name="Square Root">
+<para>The square root function returns the square root of the given value.</para>
+<para><code>sqrt(VALUE)</code></para>
+<para>Where VALUE is the initial value.</para>
+<para>Example:</para>
+<para><code>sqrt(144)</code></para>
+<para>Returns the square root of 144 which is 12.</para>
+</section>
+
+<section name="Sum">
+<para>The sum function sums a series of stock quotes.</para>
+<para><code>sum(QUOTE, DAYS, START_OFFSET)</code></para>
+<para>Where QUOTE is <highlight>open</highlight>, <highlight>close</highlight>, <highlight>low</highlight>, <highlight>high</highlight> or <highlight>volume</highlight>.
+Where DAYS is the number of days to sum.
+Where START_OFFSET is the most recent date to sum, 0 means the current
+trading date, -1 means the previous trading date, etc.</para>
+<para>Example:</para>
+<para><code>sum(open, 15, -1)</code></para>
+<para>Returns the sum of the day open value for the current stock for the last
+15 days, ending with yesterday.</para>
+</section>
+
+<section name="Year">
+<para>The year function returns the current year.</para>
+<para><code>year()</code></para>
+<para>Example:</para>
+<para><code>year()</code></para>
+<para>Returns the current year, which will be 2003, if it is 2003.</para>
+</section>
 </section>
 </chapter>
 
 <chapter name="Analysis">
-<para>Currently the only special analysis tool that Venice has is paper trading.</para>
+<help><para>The analysis section describes the various analysis functions that Venice
+provides.</para>
 
-<section name="Paper Trade">
+<para><link to="Paper Trade">Paper Trade</link> describes how to perform historical
+paper trading, this allows you to test buy/sell rules using historical share
+data.</para>
+
+<para><link to="Genetic Programming">Genetic Programming</link> describes how to use
+evolutionary computation to evovle new buy/sell rules.</para>
+</help>
+
+<chapter name="Paper Trade">
 <para>Venice allows you to perform historical paper trading, this allows you to test
-buy/sell rules using historical share data. You need to enter basic data such 
-as which shares you wish to trade (either from a select list or say all 
-ordinary shares), the buy/sell rules you wish to trigger the trades, the date 
-range over which to trade, and the initial capital. Venice will then pretend 
+buy/sell rules using historical share data. You need to enter basic data such
+as which shares you wish to trade (either from a select list or say all
+ordinary shares), the buy/sell rules you wish to trigger the trades, the date
+range over which to trade, and the initial capital. Venice will then pretend
 to buy and sell shares over that time range and will generate a portfolio
 detailing all its trades and the final portfolio value. You can bring up
 the paper trade dialogue by:</para>
@@ -666,40 +805,151 @@ the paper trade dialogue by:</para>
 <item>Then clicking on the <highlight>Paper Trade</highlight> menu item.
 </item>
 </list>
-<para>First you need to enter the date range for which to perform the paper trade.
-For example you could enter the starting date <highlight>3/1/1997</highlight> and the ending
-date <highlight>5/1/1998</highlight>. Next select which symbols you wish to trade, you can
-select either <highlight>All Ordinaries</highlight>, <highlight>All Symbols</highlight>, <highlight>Market Indices</highlight>
-or type in a list of stock quotes. For example you could type in <highlight>CBA</highlight>.
-Next you need to enter in the buy/sell rules. These rules are written in the
-<link to="Gondola">Gondola Language</link> so see that section for details. The range
-fields allow you to test multiple equations at once, if you enter a value in
-one of the fields, say the <highlight>Range $A: 1 to</highlight>, it will run separate paper 
-trades using the buy/sell rules where each occurrence of <highlight>$A</highlight> will be
-replaced by 1, then 2, then 3 etc up to the number entered. You can leave these
-empty if you only wish to test a single equation. An example of a (bad) 
-buy/sell rule pair is buy on <code>avg(day_close, 15, 0) &gt; avg(day_close, 30, 0)</code> and 
-sell on <code>avg(day_close, 15, 0) &lt; avg(day_close, 30, 0)</code>. The <highlight>Initial Capital</highlight>
-is the amount of cash started with the portfolio and the <highlight>Trade Cost</highlight> is
-the amount of money lost per trade. Once these values are filled in you can
-hit the <highlight>Paper Trade</highlight> button to initialise the trade. It will
-load the quotes, perform the calculations and bring up the <highlight>Paper Trade 
-Results</highlight> table.</para>
+<section name="The Range Page">
+<para>The range page defines the range and order of the paper trade. The 
+<highlight>Date Range</highlight> defines the range of dates that the paper trade will be
+active. The <highlight>Symbols</highlight> field defines which symbols the paper trade will be
+restricted to. You can either use the set groups such as <highlight>All Ordinaries</highlight>
+or you can enter any specific set of symbols. For each day that the paper
+trade runs, it will iterate through all the symbols it is allowed to
+trade. For each symbol, it will run the buy rule to see if it triggers a
+trade. If the paper trade has no more money left to purchase shares for
+that day, it will move to the next day. If you want to control the order
+that the paper trade iterates through the symbols, you can using the
+<highlight>Order Symbols</highlight> options. You can either order the
+symbols by the given options, or by entering an equation.</para>
+<para>Some example values:</para>
+<list><item>Start Date: 3/1/2000
+</item>
+<item>End Date: 24/1/2001
+</item>
+<item>Symbols: ANZ WBC CBA NAB
+</item>
+<item>By: Change Decreasing
+</item>
+</list>
+</section>
+<section name="The Rules Page">
+<para>The rules page defines the buy/sell rules that trigger trades. Venice 
+supports the concept of <highlight>Rule Famillies</highlight>. The idea is that you 
+might want to try several hundred very similar equations.
+For example, if you wanted to trigger a buy on a moving average, you might
+have the following buy equation: 
+<code>avg(close, 15, 0) > avg(close, 30, 0)</code>. But what if you wanted
+to try not only 15 and 30, but all the values up to 100? You could do this
+by entering the equation: <code>avg(close, a, 0) > avg(close, b, 0)</code>.
+Then making sure the <highlight>Enable multiple rules</highlight> checkbox is ticked.
+Then entering the maximum values for <code>a</code> and <code>b</code> into the <highlight>Range</highlight> entries.</para>
+<para>Venice makes two additional variables available to paper trade equations:</para>
+<list><item><code>held</code> - defines the number of days that the stock has been
+      held.
+</item>
+<item><code>order</code> - if you selected any order besides <highlight>No Real Order</highlight> this variable
+      will be available. It will be set to the order that the symbol is
+      analysed by the paper trade. If it is the first symbol analysed, then 
+      <code>order</code> will be set to 0. For example, if you are ordering
+      by volume decreasing, the stock with the highest volume will be
+      analysed first, and the <code>order</code> variable will be set to 0.
+</item>
+</list>
+<para>Some example values:</para>
+<list><item>Buy Rule: <code>order == 0
+</code></item>
+<item>Sell Rule: <code>order &lt; a || held &gt; b
+</code></item>
+<item>Enable multiple fules: Ticked
+</item>
+<item>Range a: 1 to: 10
+</item>
+<item>Range b: 1 to: 50
+</item>
+<item>Range c: 1 to: leave empty
+</item>
+</list>
+</section>
+<section name="The Portfolio Page">
+<para>The portfolio page defines the portfolio that is used when paper trading. You
+need to enter the <highlight>initial capital</highlight> that the portfolio has before it starts 
+trading, and a value for a fixed <highlight>Trade Cost</highlight>.
+Next you need to decide how many stocks the portfolio can contain. You
+can specify either a fixed <highlight>Number of Stocks</highlight>, in which case Venice works out
+the average value of each stock. Or you can specify the <highlight>Stock Value</highlight>, in which
+case Venice works out the maximum number of stocks.</para>
+<para>Some example values:</para>
+<list><item>Initial Capital: 400000
+</item>
+<item>Trade Cost: 25
+</item>
+<item>Number of Stocks: 1
+</item>
+</list>
+</section>
+</chapter>
 
-<para>You can perform subsequent paper trades while the paper trade result table is
-up. If you modify the values in the dialogue and hit the <highlight>Paper Trade</highlight> button
-again it will perform another paper trade and add the results to the table.</para>
-<section name="Paper Trade Results">
-<para>The paper trade results table lists all the result of the paper trades. The 
-result of each paper trade performed by the paper trade dialogue will come up 
-in a new single row - except if you are running through a family of equations,
-in which case multiple rows will be added - a new row for each equation. From
-the table you can open the portfolio generated by the paper trade, from
-here you can list all the trades performed, see how many and which shares
-are currently held and see how much money is left in cash and how much is
-in shares. From here for from the table you can also graph the portfolio
-which will show you how the portfolio performed over time.</para>
+<chapter name="Genetic Programming">
+<para>Venice supports using evolutionary computation to create new buy/sell rules
+based on historial data. The way it works is that Venice initially creates a
+set of random buy/sell rule equations. A pair of buy/sell rule equations is 
+refered to as an individual. It will then use algebraic simplification
+to reduce the size of the individual's equations and also to remove any 
+unecessary computation. It will then check the individual's equations using a
+few simple rules, e.g. is the equation big enough to be meaningful? 
+is the equation not too large? If the individual's equations look like they 
+could be  meaningful, it will paper trade with them, in the same method as the
+<link to="Paper Trade">Paper Trade Module</link>. If the individual makes a loss or beaks even,
+then it will be immediately rejected.</para>
+
+<para>Once Venice has created a set of these random individuals, it will then
+move onto the second generation. For this generation is will pick two
+random individuals and combine them, using a combination of cross-over
+and mutation, to create a new individual. This process is refered to as
+breeding. It will again apply algebraic simplification to the resultant
+individual's equations. It will then paper trade this new individual. If the
+new individual has a greater return than any of the previous individuals, it 
+will be recorded. Venice will then repeat this process, creating several new 
+individuals. The number of individuals created is refered to as the
+popluation. The number of the highest returning individuals created which
+are bred in the next generation is refered to as the breeding population.</para>
+
+<para>Once a given number of individuals have been created, Venice will then move
+onto the third generation. Here, it is the same as the second generation, 
+except that instead of breeding from the random individuals that were
+initially created, it will breed from individuals created that were bred
+from the random individuals. Each generation then breeds from the 
+individuals bred from the last generation.</para>
+
+<para>While equations created from Genetic Programming can give fantastic
+returns on historical data, they unfortunately do not transfer directly to
+different date and symbol ranges, than the ones that they were created with.
+However, it is an experimental technique to see whether they can actually 
+come up with any principles that can be generally applied.</para>
+
+<section name="The Range Page">
+<para>This is the same as the range page in the <link to="Paper Trade">Paper Trade Module</link>.</para>
 </section>
+
+<section name="The Portfolio Page">
+<para>This is the same as the portfolio page in the <link to="Paper Trade">Paper Trade Module</link>.</para>
 </section>
+
+<section name="The GP Page">
+<para>The Genetic Programme (GP) page defines the Genetic Programme settings.
+Currently you can set the number of <highlight>Generations</highlight> to run. You can
+set the <highlight>Population</highlight> size, you can set the <highlight>Breeding Population</highlight>
+and you can set the <highlight>Display Population</highlight>. The display population is
+the number of highest returning individuals that are displayed when that
+generation has completed.</para>
+<para>Some example values:</para>
+<list><item>Generations: 50
+</item>
+<item>Population: 10000
+</item>
+<item>Breeding Population: 250
+</item>
+<item>Display Population: 5
+</item>
+</list>
+</section>
+</chapter>
 </chapter>
 </document>

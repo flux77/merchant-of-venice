@@ -18,12 +18,14 @@
 
 package org.mov.main;
 
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
 import org.mov.analyser.GPModule;
@@ -45,7 +47,13 @@ import org.mov.table.QuoteModule;
 import org.mov.table.WatchScreen;
 import org.mov.table.WatchScreenModule;
 import org.mov.importer.ImporterModule;
-import org.mov.ui.*;
+import org.mov.ui.DesktopManager;
+import org.mov.ui.MainMenu;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
+import org.mov.ui.SymbolListDialog;
+import org.mov.ui.TextDialog;
+import org.mov.ui.TradingDateDialog;
 
 /**
  * This class manages the tasks that can be initiated from menus and toolbars. Each
@@ -58,12 +66,15 @@ public class CommandManager {
     private DesktopManager desktopManager;
     private JDesktopPane desktop;
 
-    // Is the about dialog showing?
-    private boolean isAboutDialogUp;
+    // Keep track of dialogs/modules to make sure the user doesn't open
+    // two about dialogs, two preferences etc.
+    private boolean isAboutDialogUp = false;
+    private JInternalFrame importModuleFrame = null;
+    private JInternalFrame preferencesModuleFrame = null;
 
     // Class should only be constructed once by this class
     private CommandManager() {
-        isAboutDialogUp = false;
+        // nothing to do
     }
 
     /**
@@ -412,7 +423,14 @@ public class CommandManager {
      * Opens up an instance of the preferences module at the last visited page.
      */
     public void openPreferences() {
-	desktopManager.newFrame(new PreferencesModule(desktop), true, false);
+	// Only allow one copy of the preferences module to be displayed
+	synchronized(this) {
+	    if(!wakeIfPresent(preferencesModuleFrame)) {
+		PreferencesModule preferencesModule = new PreferencesModule(desktop);
+
+		preferencesModuleFrame = desktopManager.newFrame(preferencesModule, true, false);
+	    }
+	}
     }
 
     /**
@@ -421,7 +439,14 @@ public class CommandManager {
      * @param page the preference page to view.
      */
     public void openPreferences(int page ) {
-	desktopManager.newFrame(new PreferencesModule(desktop, page), true, false);
+	// Only allow one copy of the preferences module to be displayed
+	synchronized(this) {
+	    if(!wakeIfPresent(preferencesModuleFrame)) {
+		PreferencesModule preferencesModule = new PreferencesModule(desktop, page);
+
+		preferencesModuleFrame = desktopManager.newFrame(preferencesModule, true, false);
+	    }
+	}
     }
 
     /**
@@ -694,15 +719,56 @@ public class CommandManager {
      * Opens the help module at the default page.
      */
     public void openHelp() {
+	// Let the user open multiple instances of help if they wish. This
+	// enables them to have multiple pages open and doesn't affect
+	// correctness.
         HelpModule helpModule = new HelpModule(desktop);
 
         desktopManager.newFrame(helpModule, false, false);
     }
 
     /**
-     * Shows a dialog and imports quotes into Venice
+     * Displays the import quotes modules that allows the user to import
+     * quotes into the application.
      */
     public void importQuotes() {
-        desktopManager.newFrame(new ImporterModule(desktop), true, true);
+	// Only allow one copy of the import module to be displayed.
+	synchronized(this) {
+	    if(!wakeIfPresent(importModuleFrame)) {
+		ImporterModule importerModule = new ImporterModule(desktop);
+		
+		importModuleFrame = desktopManager.newFrame(importerModule, true, true);
+	    }
+	}
+    }
+
+    /**
+     * Checks to see if the current frame is open. If so it will make sure the 
+     * frame is visible and move it to the front of the screen. This function
+     * has too purposes: (1) To re-use previously created frames (2) To prevent
+     * multiple instances of the frames being displayed.
+     *
+     * @param frame the frame to check (may be null)
+     * @returns <code>TRUE</code> if the frame is now displayed; <code>FALSE</code> otherwise
+     */
+    private boolean wakeIfPresent(JInternalFrame frame) {
+	// If we have already opened the frame, and it hasn't been closed
+	// then move it to the front, deiconify it and select it.
+	if(frame != null && !frame.isClosed()) {
+	    frame.toFront();
+
+	    try {
+		frame.setIcon(false);
+		frame.setSelected(true);
+	    }
+	    catch(PropertyVetoException e) {
+		// No frame should veto this action.
+		assert false;
+	    }
+
+	    return true;
+	}	
+
+	return false;
     }
 }

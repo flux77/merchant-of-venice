@@ -28,4 +28,13 @@ public class ExpressionException extends java.lang.Throwable {
 	return reason;
     }
 
+    /**
+     * Convert the exception to a string
+     *
+     * @return	string version of the exception
+     */
+    public String toString() {
+	return getReason();
+    }
+
 }

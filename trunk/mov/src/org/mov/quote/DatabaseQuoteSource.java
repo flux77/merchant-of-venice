@@ -51,7 +51,7 @@ import org.mov.ui.ProgressDialogManager;
  */
 public class DatabaseQuoteSource implements QuoteSource
 {
-    private Connection connection = null;
+    private Connection connection;
 
     // Buffer first and last trading date in database
     private TradingDate firstDate;
@@ -83,8 +83,12 @@ public class DatabaseQuoteSource implements QuoteSource
     private final static String LOOKUP_TABLE_NAME = "lookup";
     private final static String NAME_FIELD        = "name";
 
-    // Keep list of dates in database when importing
-    private Vector allDates = null;
+    // Connection details
+    private String host;
+    private String port;
+    private String database;
+    private String username;
+    private String password;
 
     /**
      * Creates a new quote source using the database information specified
@@ -99,33 +103,50 @@ public class DatabaseQuoteSource implements QuoteSource
     public DatabaseQuoteSource(String host, String port, String database,
 			       String username, String password) {
 
+        connection = null;
+        firstDate = null;
 	lastDate = null;
+
+        this.host = host;
+        this.port = port;
+        this.database = database;
+        this.username = username;
+        this.password = password;
+
+        checkConnection();
+    }
+
+    // Get the driver and connect to the database. Return FALSE if failed.
+    private boolean checkConnection() {
+
+        // Are we already connected?
+        if(connection != null)
+            return true;
 
 	// Get driver
 	try {
             // Try MM MySql driver first as if anything it seems a little
             // faster and it's the one I used first
 	    Class.forName(MM_MYSQL_DRIVER).newInstance();
-            connect(host, port, database, username, password);
+            return connect();
 	}
 	catch (Exception e) {
             // If the MM mysql driver doesn't work, we can try the
             // official driver from MySql
             try {
                 Class.forName(MYSQL_DRIVER).newInstance();
-                connect(host, port, database, username, password);
+                return connect();
             }
             catch(Exception e2) {
                 // Neither worked!
-                DesktopManager.showErrorMessage("Unable to load MySQL driver");
+                DesktopManager.showErrorMessage("Unable to load MySQL driver.");
+                return false;
             }
 	}
     }
 
     // Connect to the database
-    private void connect(String host, String port, String database,
-			 String username, String password){
-
+    private boolean connect() {
 	try {
 	    connection =
 		DriverManager.
@@ -134,9 +155,11 @@ public class DatabaseQuoteSource implements QuoteSource
 			      "/"+ database +
 			      "?user=" + username +
 			      "&password=" + password);
+            return true;
 	}
-	catch (SQLException E) {
-	    DesktopManager.showErrorMessage("Can't connect to database");
+	catch (SQLException e) {
+	    DesktopManager.showErrorMessage("Can't connect to database.");
+            return false;
 	}
     }
 
@@ -150,7 +173,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	String name = new String("");
 
-	if(connection != null) {
+	if(checkConnection()) {        
 	    try {
 		Statement statement = connection.createStatement();
 		
@@ -187,7 +210,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	String symbol = new String("");
 
-	if(connection != null) {
+	if(checkConnection()) {
 	    try {
 		Statement statement = connection.createStatement();
 		
@@ -227,7 +250,7 @@ public class DatabaseQuoteSource implements QuoteSource
     public boolean symbolExists(String symbol) {
         boolean symbolExists = false;
 
-	if(connection != null) {
+	if(checkConnection()) {
 	    try {
 		Statement statement = connection.createStatement();
 		
@@ -250,7 +273,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database");
+		DesktopManager.showErrorMessage("Error talking to database.");
 	    }
 	}
 
@@ -270,7 +293,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	java.util.Date date = null;
 
-	if(connection != null) {
+	if(checkConnection()) {
 	    try {
 		Statement statement = connection.createStatement();
 		
@@ -289,7 +312,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database");
+		DesktopManager.showErrorMessage("Error talking to database.");
 	    }
 	}
 
@@ -314,7 +337,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	java.util.Date date = null;
 
-	if(connection != null) {
+	if(checkConnection()) {
 	    try {
 		Statement statement = connection.createStatement();
 		
@@ -333,7 +356,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database");
+		DesktopManager.showErrorMessage("Error talking to database.");
 	    }
 	}
 
@@ -384,7 +407,8 @@ public class DatabaseQuoteSource implements QuoteSource
     // Takes a string containing an SQL statement and then executes it. Returns
     // a vector of quotes.
     private void executeSQLString(ProgressDialog progress, String SQLString) {
-	if(connection != null) {
+
+	if(checkConnection()) {
 	    try {
 		Statement statement = connection.createStatement();	
 		ResultSet RS = statement.executeQuery(SQLString);
@@ -416,7 +440,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database");
+		DesktopManager.showErrorMessage("Error talking to database.");
 	    }
 	}
     }
@@ -546,7 +570,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	    success = true;
 	}
 	catch (SQLException E) {
-	    DesktopManager.showErrorMessage("Error creating table");
+	    DesktopManager.showErrorMessage("Error creating table.");
 	}
 
 	return success;	
@@ -579,7 +603,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		if(!foundDatabase) {
 		    DesktopManager.showErrorMessage("Can't find " +
 						    databaseName +
-						    " database");
+						    " database.");
 		    return false;
 		}
 	    }
@@ -605,7 +629,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	}
 	catch (SQLException E) {
-	    DesktopManager.showErrorMessage("Error talking to database");
+	    DesktopManager.showErrorMessage("Error talking to database.");
 	    return false;
 	}
 
@@ -623,8 +647,8 @@ public class DatabaseQuoteSource implements QuoteSource
     public void importQuotes(String databaseName, QuoteBundle quoteBundle,
 			     TradingDate date) {
 
-	if(connection == null)
-	    return;
+	if(!checkConnection()) 
+            return;
 
 	if(!readyForImport)
 	    readyForImport = prepareForImport(databaseName);
@@ -667,7 +691,7 @@ public class DatabaseQuoteSource implements QuoteSource
                     ResultSet RS = statement.executeQuery(insertString.toString());
                 }
                 catch (SQLException E) {
-                    DesktopManager.showErrorMessage("Error talking to database");
+                    DesktopManager.showErrorMessage("Error talking to database.");
                 }
             }
 	}
@@ -682,7 +706,7 @@ public class DatabaseQuoteSource implements QuoteSource
     public boolean containsDate(TradingDate date) {
         boolean containsDate = false;
 
-	if(connection != null) {
+	if(checkConnection()) {
 	    try {
 		Statement statement = connection.createStatement();
 		
@@ -704,7 +728,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		statement.close();
 	    }
 	    catch (SQLException E) {
-		DesktopManager.showErrorMessage("Error talking to database");
+		DesktopManager.showErrorMessage("Error talking to database.");
 	    }
 	}
 
@@ -719,33 +743,33 @@ public class DatabaseQuoteSource implements QuoteSource
     public Vector getDates() {
 	Vector dates = new Vector();
 
-	if(connection == null)
-	    return dates;
-	
-	// This might take a while
-        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-        progress.setIndeterminate(true);
-        progress.show("Getting dates...");
-        progress.setNote("Getting dates...");
+	if(checkConnection()) {
 
-	try {
-	    // 1. Create the table
-	    Statement statement = connection.createStatement();
-	    ResultSet RS = statement.executeQuery
-		("SELECT DISTINCT(" + DATE_FIELD + ") FROM " +
-		 SHARE_TABLE_NAME);
-
-	    while(RS.next()) {
-		dates.add(new TradingDate(RS.getDate(1)));
-                progress.increment();
-	    }
-
-	}
-	catch (SQLException E) {
-	    DesktopManager.showErrorMessage("Error talking to database");
-	}
-
-	ProgressDialogManager.closeProgressDialog(progress);
+            // This might take a while
+            ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+            progress.setIndeterminate(true);
+            progress.show("Getting dates...");
+            progress.setNote("Getting dates...");
+            
+            try {
+                // 1. Create the table
+                Statement statement = connection.createStatement();
+                ResultSet RS = statement.executeQuery
+                    ("SELECT DISTINCT(" + DATE_FIELD + ") FROM " +
+                     SHARE_TABLE_NAME);
+                
+                while(RS.next()) {
+                    dates.add(new TradingDate(RS.getDate(1)));
+                    progress.increment();
+                }
+                
+            }
+            catch (SQLException E) {
+                DesktopManager.showErrorMessage("Error talking to database.");
+            }
+            
+            ProgressDialogManager.closeProgressDialog(progress);
+        }
 
 	return dates;
     }
@@ -760,8 +784,8 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public int getAdvanceDecline(TradingDate date)
         throws MissingQuoteException {
-
-	if(connection == null)
+       
+	if(!checkConnection())
             return 0;
 
         try {
@@ -836,7 +860,7 @@ public class DatabaseQuoteSource implements QuoteSource
             return advanceDecline;
         }
         catch (SQLException e) {
-            DesktopManager.showErrorMessage("Error talking to database");
+            DesktopManager.showErrorMessage("Error talking to database.");
             return 0;
         }
     }

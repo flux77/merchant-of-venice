@@ -115,7 +115,7 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
                                 defaultTextFieldValuesBoolean,
                                 Locale.getString("GP_GONDOLA_SELECTION_TITLE_BOOLEAN_LONG"));
         // Expression
-        int[] defaultValuesExpression = {715, 714, 714, 714, 714, 714, 714, 714, 715, 715, 714, 714, 714, 715};
+        int[] defaultValuesExpression = {667, 667, 667, 667, 667, 667, 667, 667, 667, 667, 666, 666, 666, 666, 666};
         String[] defaultTextFieldValuesExpression = {Locale.getString("PERCENTAGE_TERMINAL"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "+"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "-"),
@@ -129,9 +129,10 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "sum()"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "sqrt()"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "abs()"),
+                                  Locale.getString("PERCENTAGE_FUNCTIONS", "rsi()"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "avg()")
         };
-        GPGondolaSelectionPanel[4] = new GPGondolaSelectionPanel(14,
+        GPGondolaSelectionPanel[4] = new GPGondolaSelectionPanel(15,
                                 desktop,
                                 defaultValuesExpression,
                                 defaultTextFieldValuesExpression,

@@ -261,8 +261,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                         Money tradeCost,
                                         Variables variables,
                                         int a, int b, int c,
-                                        String tradeCostBuy,
-                                        String tradeCostSell)
+                                        String tradeValueBuy,
+                                        String tradeValueSell)
         throws EvaluationException {
 
         Portfolio portfolio;
@@ -280,8 +280,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                               initialCapital,
                                               stockValue,
                                               tradeCost,
-                                              tradeCostBuy,
-                                              tradeCostSell);
+                                              tradeValueBuy,
+                                              tradeValueSell);
         }
         else {
             assert portfolioPage.getMode() == PortfolioPage.NUMBER_STOCKS_MODE;
@@ -297,8 +297,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                               initialCapital,
                                               numberStocks,
                                               tradeCost,
-                                              tradeCostBuy,
-                                              tradeCostSell);
+                                              tradeValueBuy,
+                                              tradeValueSell);
         }
         
         // Running the equation means we might need to load in
@@ -354,8 +354,8 @@ public class PaperTradeModule extends JPanel implements Module {
         int numberEquations = (isFamilyEnabled ? aRange * bRange * cRange : 1);
         
         // We get the formulas that rule at which price the stock is sold or bought
-        String tradeCostBuy = tradeValuePage.getTradeCostBuy();
-        String tradeCostSell = tradeValuePage.getTradeCostSell();
+        String tradeValueBuy = tradeValuePage.getTradeValueBuy();
+        String tradeValueSell = tradeValuePage.getTradeValueSell();
 
         progress.setIndeterminate(false);
         progress.setMaximum(numberEquations);
@@ -410,8 +410,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                                              tradeCost,
                                                              variables,
                                                              a, b, c,
-                                                             tradeCostBuy,
-                                                             tradeCostSell));
+                                                             tradeValueBuy,
+                                                             tradeValueSell));
                         }
                     }
                 }
@@ -434,8 +434,8 @@ public class PaperTradeModule extends JPanel implements Module {
                                                  tradeCost,
                                                  variables,
                                                  0, 0, 0,
-                                                 tradeCostBuy,
-                                                 tradeCostSell));
+                                                 tradeValueBuy,
+                                                 tradeValueSell));
 
         } catch(EvaluationException e) {
             ProgressDialogManager.closeProgressDialog(progress);

@@ -152,21 +152,21 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
         return Locale.getString("TRADE_VALUE_PAGE_SHORT_TITLE");
     }
 
-    public String getTradeCostBuy() {
+    public String getTradeValueBuy() {
         JRadioButton generalTradeCostByKeyButton = tradeCostBuyByKeyButton;
         JComboBox generalTradeCostComboBox = tradeCostBuyComboBox;
         JTextField generalTradeCostTextField = tradeCostBuyTextField;
-        return getTradeCost(generalTradeCostByKeyButton, generalTradeCostComboBox, generalTradeCostTextField);
+        return getTradeValue(generalTradeCostByKeyButton, generalTradeCostComboBox, generalTradeCostTextField);
     }
     
-    public String getTradeCostSell() {
+    public String getTradeValueSell() {
         JRadioButton generalTradeCostByKeyButton = tradeCostSellByKeyButton;
         JComboBox generalTradeCostComboBox = tradeCostSellComboBox;
         JTextField generalTradeCostTextField = tradeCostSellTextField;
-        return getTradeCost(generalTradeCostByKeyButton, generalTradeCostComboBox, generalTradeCostTextField);
+        return getTradeValue(generalTradeCostByKeyButton, generalTradeCostComboBox, generalTradeCostTextField);
     }
     
-    private String getTradeCost(JRadioButton radio, JComboBox combo, JTextField text) {
+    private String getTradeValue(JRadioButton radio, JComboBox combo, JTextField text) {
         String retValue = "open";
         if (radio.isSelected()) {
             if (combo.getSelectedIndex()==0) {

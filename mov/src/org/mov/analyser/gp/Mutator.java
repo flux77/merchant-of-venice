@@ -410,8 +410,11 @@ public class Mutator {
 
         else if(randomNumber == 12)
             return new AbsExpression(getChild(model, level, 0, Expression.FLOAT_TYPE));
+        else if(randomNumber == 13)
+            return new RSIExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE));
         else {
-            assert randomNumber == 13;
+            assert randomNumber == 14;
             return new AvgExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
@@ -488,8 +491,11 @@ public class Mutator {
 
         else if(randomNumber == 12)
             return new AbsExpression(getChild(model, level, 0, Expression.INTEGER_TYPE));
+        else if(randomNumber == 13)
+            return new RSIExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE));
         else {
-            assert randomNumber == 13;
+            assert randomNumber == 14;
             return new AvgExpression(new QuoteExpression(Quote.DAY_VOLUME),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));

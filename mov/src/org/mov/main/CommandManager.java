@@ -531,9 +531,12 @@ public class CommandManager {
     public void openAboutDialog() {
         if(!isAboutDialogUp) {
             isAboutDialogUp = true;
-            String aboutMessage = ("Merchant of Venice 0.1alpha *pre-release*\n\n"+
+            String aboutMessage = ("Merchant of Venice, " + Main.LONG_VERSION + " / " + 
+                                   Main.RELEASE_DATE + "\n\n" +
+
                                    "Andrew Leppaprd (aleppard@picknow.com.au)\n" +
                                    "Daniel Makovec\n\n" +
+
                                    "Copyright (C) 2003, Andrew Leppard\n" +
                                    "See COPYING.txt for license terms.");
             

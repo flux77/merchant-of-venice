@@ -14,6 +14,7 @@ import org.mov.parser.*;
 import org.mov.table.*;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
+import org.mov.quote.*;
 import org.mov.ui.InternalFrameHandler;
 
 public class AnalyserMenu implements ActionListener, PropertyChangeListener {
@@ -259,14 +260,14 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	int searchRestriction;       
 	if(menu == tableCommoditiesListAllMenuItem ||
 	   menu == tableCommoditiesListRuleMenuItem)
-	    searchRestriction = Database.ALL_COMMODITIES;
+	    searchRestriction = QuoteSource.ALL_COMMODITIES;
 
 	else if(menu == tableCompanyListAllMenuItem ||
 		menu == tableCompanyListRuleMenuItem)
-	    searchRestriction = Database.COMPANIES_AND_FUNDS;
+	    searchRestriction = QuoteSource.COMPANIES_AND_FUNDS;
 
 	else 
-	    searchRestriction = Database.INDICES;
+	    searchRestriction = QuoteSource.INDICES;
 
 	// Get restriction expression if necessary
 	org.mov.parser.Expression expression = null;
@@ -301,8 +302,8 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	if(!askedForExpression || expression != null) {
 
 	    // Create cache with stock quotes for this day
-	    QuoteCache cache = 
-		new QuoteCache(Database.getInstance().getLatestQuoteDate(),
+	    QuoteCache cache =
+		new QuoteCache(Quote.getSource().getLatestQuoteDate(),
 			       searchRestriction);
 
 	    // Display table of quotes
@@ -311,7 +312,7 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
     }
 
     private void newFrame(AnalyserModule module) {
-	AnalyserFrame frame = new AnalyserFrame(module, 0, 0, 400, 300);
+	AnalyserFrame frame = new AnalyserFrame(module, 0, 0, 400, 350);
 	desktop.add(frame);
 	int numframes = (new Integer(System.getProperty("number_of_frames", "0"))).intValue();
 	//	System.setProperty();

@@ -7,6 +7,11 @@ import org.mov.quote.*;
 
 import java.util.*;
 
+/**
+ * Provides a <code>QuoteCache</code> graph source. This class
+ * allows graph sources for day Open, High, Low, Close and
+ * Volume (OHLCV).
+ */
 public class OHLCVQuoteGraphSource implements GraphSource {
 
     private QuoteCache cache;
@@ -14,6 +19,13 @@ public class OHLCVQuoteGraphSource implements GraphSource {
     private String symbol;
     private Graphable graphable;
 
+    /**
+     * Create a new graph source from the cache with the given
+     * quote type.
+     *
+     * @param	cache	the cache containing stock quotes
+     * @param	quote	day open, close, high, low or volume
+     */
     public OHLCVQuoteGraphSource(QuoteCache cache, int quote) {
 	this.quote = quote;
 	this.cache = cache;
@@ -108,11 +120,11 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    final float MILLION = 1000000F;
 	    String extension = "";
 	    
-	    if(value >= BILLION) {
+	    if(Math.abs(value) >= BILLION) {
 		value /= BILLION;
 		extension = "B";
 	    }
-	    else if(value >= MILLION) {
+	    else if(Math.abs(value) >= MILLION) {
 		value /= MILLION;
 		extension = "M";
 	    }
@@ -135,7 +147,8 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 			     1000000F, // 1M
 			     10000000F,
 			     100000000F,
-			     1000000000F}; // 1B
+			     1000000000F, // 1B
+			     10000000000F}; 
 	    return major;
 	}
 	else {

@@ -228,8 +228,11 @@ public class MainMenu implements ActionListener, ContainerListener {
 			CommandManager.getInstance().openPortfolio(portfolioName);
 		    }
 
-		    else if(menu == fileExitMenuItem)
-			System.exit(0);
+		    else if(menu == fileExitMenuItem) {
+			// This exits the application
+			frame.dispose();
+			return;
+		    }
 		    else if(menu == filePreferencesMenuItem) {
 			// Display preferences
 			((DesktopManager)(desktop.getDesktopManager()))

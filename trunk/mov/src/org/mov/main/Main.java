@@ -20,6 +20,8 @@ import org.mov.ui.*;
 public class Main extends JFrame implements WindowListener {
     
     private JDesktopPane desktop;
+    private org.mov.ui.DesktopManager desktopManager;
+
     private static Main venice;
 
     /**
@@ -40,7 +42,8 @@ public class Main extends JFrame implements WindowListener {
 	setTitle("Venice");
 
 	desktop = new JDesktopPane();
-	desktop.setDesktopManager(new org.mov.ui.DesktopManager(desktop));
+	desktopManager = new org.mov.ui.DesktopManager(desktop);
+	desktop.setDesktopManager(desktopManager);
 	CommandManager.getInstance().setDesktop(desktop);
 
 	// Instantiate main menu singletons
@@ -52,6 +55,22 @@ public class Main extends JFrame implements WindowListener {
 
     public void windowActivated(WindowEvent e) {}
     public void windowClosing(WindowEvent e) {
+	// User closed window by hitting "X" button
+	saveSettingsAndExit();
+    }
+
+    public void windowClosed(WindowEvent e) {
+	// User closed window by selecting exit from the menu
+	saveSettingsAndExit();
+
+    }
+    public void windowDeactivated(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {}
+    public void windowOpened(WindowEvent e) {}
+
+    // Save settings and exit!
+    private void saveSettingsAndExit() {
 	// Save window dimensions in prefs file
 	Preferences p = PreferencesManager.getUserNode("/display");
 	p.putInt("default_width", getWidth());
@@ -59,14 +78,13 @@ public class Main extends JFrame implements WindowListener {
 	p.putInt("default_x", getX());
 	p.putInt("default_y", getY());
 
+	// Call save() on each module so they can save their
+	// preferences data
+	desktopManager.save();
+
 	dispose();	
 	System.exit(0);
     }
-    public void windowClosed(WindowEvent e) {}
-    public void windowDeactivated(WindowEvent e) {}
-    public void windowDeiconified(WindowEvent e) {}
-    public void windowIconified(WindowEvent e) {}
-    public void windowOpened(WindowEvent e) {}
 
     /**
      * Start the application. Currently the application ignores all 

@@ -259,6 +259,7 @@ public class PaperTrade {
      * @param quoteBundle the historical quote data
      * @param variables any Gondola variables set
      * @param sell the sell indicator
+     * @param buy the buy indicator
      * @param dateOffset date to examine
      * @param tradeCost the cost of a trade
      * @param symbols ordered list of symbols on that date
@@ -268,6 +269,7 @@ public class PaperTrade {
                                    QuoteBundle quoteBundle,
                                    Variables variables,
                                    Expression sell,
+                                   Expression buy,
                                    int dateOffset,
                                    Money tradeCost,
                                    List symbols,
@@ -295,8 +297,11 @@ public class PaperTrade {
             variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
 
             try {
-                if(sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE) {
-                    sell(environment, variables, stockHolding, tradeCost, dateOffset + 1);
+                // If you want to buy the stock, do not sell it.
+                if(!(buy.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE)) {
+                    if(sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE) {
+                        sell(environment, variables, stockHolding, tradeCost, dateOffset + 1);
+                    }
                 }
             }
             catch(MissingQuoteException e) {
@@ -460,7 +465,7 @@ public class PaperTrade {
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);
 
-            sellTrades(environment, quoteBundle, variables, sell, dateOffset, tradeCost,
+            sellTrades(environment, quoteBundle, variables, sell, buy, dateOffset, tradeCost,
                        symbols, orderCache);
             buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost,
                       symbols, orderCache, stockValue);
@@ -532,7 +537,7 @@ public class PaperTrade {
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);
 
-            sellTrades(environment, quoteBundle, variables, sell, dateOffset, tradeCost,
+            sellTrades(environment, quoteBundle, variables, sell, buy, dateOffset, tradeCost,
                        symbols, orderCache);
             try {
                 // stockValue = (portfolio / numberStocks) - (2 * tradeCost)
@@ -593,17 +598,13 @@ public class PaperTrade {
                                       
         // Count the sell tip for the next day
                                       
-        // Iterate through our stock holdings and see if we should sell any
-        List stockHoldings = new ArrayList(environment.shareAccount.getStockHoldings().values());
-
         int order = 0;
 
         int index = 0;
         
         // Iterate through stocks available today - should we sell any of it?
-        for(Iterator iterator = stockHoldings.iterator(); iterator.hasNext();) {
-            StockHolding stockHolding = (StockHolding)iterator.next();
-            Symbol symbol = stockHolding.getSymbol();
+        for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
+            Symbol symbol = (Symbol)iterator.next();
 
             // If we care about the order, make sure the "order" variable is set.
             if(orderCache.isOrdered()) {
@@ -616,7 +617,18 @@ public class PaperTrade {
                 variables.setValue("order", order);
             }
 
-            variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
+            // Check if the stock is hold, so that held variable is set.
+            List stockHoldings = new ArrayList(environment.shareAccount.getStockHoldings().values());
+            for(Iterator iteratorHolding = stockHoldings.iterator(); iteratorHolding.hasNext();) {
+                StockHolding stockHolding = (StockHolding)iteratorHolding.next();
+                Symbol symbolHolding = stockHolding.getSymbol();
+                if (symbolHolding.toString().compareTo(symbol.toString())==0) {
+                    variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
+                    break;
+                } else {
+                    variables.setValue("held", 0);
+                }
+            }
 
             try {
                 sellRule[index] = (sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE);
@@ -652,7 +664,7 @@ public class PaperTrade {
         
         int index = 0;
         
-        // Iterate through stocks available today - should we buy or sell any of it?
+        // Iterate through stocks available today
         for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
             Symbol symbol = (Symbol)iterator.next();
 
@@ -667,13 +679,13 @@ public class PaperTrade {
                 buyRule[index] = (buy.evaluate(variables, quoteBundle, symbol,
                             dateOffset) >= Expression.TRUE);
                 
-                // If you own the stock and you want to continue to own it,
+                // If you own the stock and both sell and buy rule fire,
                 // you wouldn't sell it, neither would you buy it.
                 // So it is necessary set the buyRule and sellRule to false.
-                if(environment.shareAccount.isHolding(symbol) && buyRule[index]) {
-                    sellRule[index] = false;
-                    buyRule[index] = false;
-                }
+                //if(environment.shareAccount.isHolding(symbol) && sellRule[index] && buyRule[index]) {
+                //    sellRule[index] = false;
+                //    buyRule[index] = false;
+                //}
 
                 // price to buy
                 Expression tradeValueBuyExpression = ExpressionFactory.newExpression(environment.tradeValueBuy);

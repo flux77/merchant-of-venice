@@ -27,8 +27,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneLayout;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.ConfirmDialog;
@@ -261,13 +259,7 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
         
         this.setBorder(titledBorder);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        
-        JPanel upDownPanel = new JPanel();
-        upDownPanel.setLayout(new BoxLayout(upDownPanel, BoxLayout.Y_AXIS));
-        
-        JScrollPane all = new JScrollPane(upDownPanel);
-        all.setLayout(new ScrollPaneLayout());
-        all.setPreferredSize(preferredSize);
+        this.setPreferredSize(preferredSize);
 
         TitledBorder[] titledBorderSections = new TitledBorder[maxPanels];
         titledBorderSections[0] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_INTEGER_SHORT"));
@@ -277,9 +269,7 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
         titledBorderSections[4] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_EXPRESSION_SHORT"));
         for (int i=0; i<maxPanels; i++) {
             GPGondolaSelectionPanel[i].setBorder(titledBorderSections[i]);
-            upDownPanel.add(GPGondolaSelectionPanel[i]);
+            this.add(GPGondolaSelectionPanel[i]);
         }
-        
-        this.add(upDownPanel);
     }
 }

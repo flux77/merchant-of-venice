@@ -275,7 +275,7 @@ public class CommandManager {
 
                 if (!thread.isInterrupted()) {
                     QuoteRange quoteRange =
-                        new QuoteRange(portfolio.getSymbolsTraded(),
+                        new QuoteRange(QuoteRange.ALL_SYMBOLS,
                                        QuoteSourceManager.getSource().getLastDate());
                     quoteBundle = new QuoteBundle(quoteRange);
                 }

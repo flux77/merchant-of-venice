@@ -44,10 +44,13 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
     private static final String MACD           = Locale.getString("MACD");
     private static final String MOMENTUM       = Locale.getString("MOMENTUM");
     private static final String MOVING_AVERAGE = Locale.getString("MOVING_AVERAGE");
+    private static final String EXP_MOVING_AVERAGE = Locale.getString("EXP_MOVING_AVERAGE");
     private static final String OBV	       = Locale.getString("OBV");
     private static final String RSI	       = Locale.getString("RSI");
     private static final String STANDARD_DEVIATION = Locale.getString("STANDARD_DEVIATION");
     private static final String DAY_VOLUME     = Locale.getString("VOLUME");
+    private static final String POINTANDFIGURE = Locale.getString("POINTANDFIGURE");
+    
 
     JMenu graphMenu;
     JMenu annotateMenu;
@@ -96,9 +99,11 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	addMenuItem(MACD);
 	addMenuItem(MOMENTUM);
 	addMenuItem(MOVING_AVERAGE);
+	addMenuItem(EXP_MOVING_AVERAGE);
 	addMenuItem(OBV);
         addMenuItem(RSI);
 	addMenuItem(STANDARD_DEVIATION);
+	addMenuItem(POINTANDFIGURE);
 
 	// Add annotation menu items
 	addAnnotateMenuItem(MACD, Locale.getString("BUY_SELL"));
@@ -113,6 +118,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 
     // Add a graph menu item, e.g. "Day Close", "Bollinger Bands"
     private void addMenuItem(String label) {
+
 	// Add graph menu
 	JMenuItem item = new JCheckBoxMenuItem(label);
 	// Grey out menu item for when quoteBundle is null since
@@ -210,6 +216,10 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 		addGraph(new MovingAverageGraph(getDayClose(), 40),
 			 MOVING_AVERAGE, 0);
 
+	    else if(text == EXP_MOVING_AVERAGE)
+		addGraph(new ExpMovingAverageGraph(getDayClose(), 40),
+			 EXP_MOVING_AVERAGE, 0);	    
+
 	    else if(text == OBV)
 		addGraph(new OBVGraph(getDayOpen(), getDayClose(),
 				      getDayVolume(),
@@ -223,6 +233,12 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    else if(text == STANDARD_DEVIATION)
 		addGraph(new StandardDeviationGraph(getDayClose(), 20),
 			 STANDARD_DEVIATION);
+
+	    else if(text == POINTANDFIGURE) {
+		//coming soon hopefully
+		//addGraph(new PointAndFigureGraph(getDayClose(), 20),
+		//	 POINTANDFIGURE);
+	    }
 	}
     }
 

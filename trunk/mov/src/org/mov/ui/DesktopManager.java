@@ -76,7 +76,13 @@ public class DesktopManager
 	boolean areIcons=false;
 	int tempy=0,tempx=0;
 	for (int i =0; i< frameCount; i++) {
-	    if (frames[i].isVisible() && !frames[i].isIcon()) {
+
+	    // Only layout frames that are visible, arent icons and
+	    // aren't resizble. Non resizable frames should be left alone as 
+	    // they will always be centred and generally take little screen
+	    // room and get in the way of the frames the user wants to see
+	    if (frames[i].isVisible() && !frames[i].isIcon() &&
+		frames[i].isResizable()) {
 		frameVec.addElement(frames[i]);
 		frameCounter++;
 	    }      
@@ -91,10 +97,7 @@ public class DesktopManager
 		JInternalFrame temp = (JInternalFrame) frameVec.elementAt(i);
 		frameWidth = deskWidth;
 		frameHeight = (int)(deskHeight/frameCounter);
-		if (temp.isResizable()) 
-		    temp.reshape(xpos, ypos, frameWidth, frameHeight);
-		else 
-		    temp.setLocation(xpos,ypos);
+		temp.reshape(xpos, ypos, frameWidth, frameHeight);
 		ypos = ypos+frameHeight;
 		temp.moveToFront();
 	    }        

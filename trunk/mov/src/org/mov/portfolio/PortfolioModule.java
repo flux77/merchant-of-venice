@@ -111,12 +111,16 @@ public class PortfolioModule extends JPanel implements Module,
 		MenuHelper.addMenuItem(this, portfolioMenu,
 				       "Import");
 
-	    portfolioMenu.addSeparator();
+            // If the portfolio is transient it won't be saved anyway - so
+            // you can't delete it.
+            if(!portfolio.isTransient()) {
+                portfolioMenu.addSeparator();
+                
+                portfolioDelete = MenuHelper.addMenuItem(this, portfolioMenu, 
+                                                         "Delete");
+            }
 
-	    portfolioDelete = MenuHelper.addMenuItem(this, portfolioMenu, 
-						     "Delete");
-	    portfolioMenu.addSeparator();
-
+            portfolioMenu.addSeparator();
 
 	    portfolioClose = MenuHelper.addMenuItem(this, portfolioMenu, 
 						    "Close");
@@ -278,9 +282,9 @@ public class PortfolioModule extends JPanel implements Module,
     }
 
     public void save() {
-	// Dont save it if the user just deleted it otherwise save
-	// the portfolio state
-	if(!isDeleted) {
+        // Don't save if the portfolio is transient or the user just
+        // deleted it.
+	if(!portfolio.isTransient() && !isDeleted) {
 	    PreferencesManager.savePortfolio(portfolio);
 	    MainMenu.getInstance().updatePortfolioMenu();
 	}
@@ -362,7 +366,7 @@ public class PortfolioModule extends JPanel implements Module,
 			    firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
 		    }
 		    else if(e.getSource() == portfolioGraph) {
-			CommandManager.getInstance().graphPortfolio(portfolio);
+                        graphPortfolio();
 		    }
 		    else if(e.getSource() == portfolioDelete) {
 			deletePortfolio();
@@ -416,6 +420,20 @@ public class PortfolioModule extends JPanel implements Module,
 	    historyFrame = 
                 ((org.mov.ui.DesktopManager)(desktop.getDesktopManager())).newFrame(historyModule);
 	}
+    }
+
+    // Graph this portfolio
+    private void graphPortfolio() {
+
+        // If this portfolio has been given to us from a paper trade we will
+        // also get a fully loaded quote bundle ready for graphing.
+        // We do a simple check to see if we can graph using that quote bundle:
+        // If the quote bundle has quotes before or at the first trade in the
+        // portfolio then we will use the quote bundle given.
+        if(quoteBundle.getFirstDate().compareTo(portfolio.getStartDate()) <= 0)             
+            CommandManager.getInstance().graphPortfolio(portfolio, quoteBundle);
+        else 
+            CommandManager.getInstance().graphPortfolio(portfolio);
     }
 
     // Delete this portfolio

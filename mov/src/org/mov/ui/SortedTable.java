@@ -20,6 +20,7 @@ package org.mov.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -599,6 +600,16 @@ public class SortedTable extends JTable
 	    if(sortedIndex != -1)
                 super.setRowSelectionInterval(sortedIndex, sortedIndex);
 	}
+    }
+
+    public void setVisible(int row, int column) 
+    {
+        int sortedRow = model.getSortedRow(row);
+        
+        if(sortedRow != -1) {
+            Rectangle rectangle = super.getCellRect(sortedRow, column, true);
+            scrollRectToVisible(rectangle);
+        }
     }
 
     public void addRowSelectionInterval(int index0, int index1)

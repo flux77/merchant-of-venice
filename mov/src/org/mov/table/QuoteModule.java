@@ -81,6 +81,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	new JCheckBoxMenuItem[EQUATION_SLOTS];
 
     // Main menu items
+    private JMenuItem findSymbol;
     private JMenuItem graphSymbols;
     private JMenuItem tableSymbols;
     private JMenuItem applyEquations;
@@ -516,6 +517,9 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
 	JMenu tableMenu = MenuHelper.addMenu(menuBar, "Table");
 
+        findSymbol =
+            MenuHelper.addMenuItem(this, tableMenu, "Find");
+
 	graphSymbols =
 	    MenuHelper.addMenuItem(this, tableMenu,
 				   "Graph");
@@ -639,6 +643,47 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 		}};
 	
 	thread.start();
+    }
+
+    // Allow the user to type in a symbol string, then make sure the symbol
+    // is visible and highlighted in the table
+    private void findSymbol() {
+	// Handle all action in a separate thread so we dont
+	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+	Thread thread = new Thread() {
+
+		public void run() {
+                    JDesktopPane desktop =
+                        org.mov.ui.DesktopManager.getDesktop();
+        
+                    Symbol symbol = SymbolListDialog.getSymbol(desktop, "Find Symbol");
+
+                    if(symbol != null) {
+                        List quotes = model.getQuotes();
+                        int i = 0;
+
+                        for(Iterator iterator = quotes.iterator(); 
+                            iterator.hasNext(); i++) {
+                            Quote quote = (Quote)iterator.next();
+
+                            if(symbol.equals(quote.getSymbol())) {
+                                // Select row and make it visible
+                                setRowSelectionInterval(i, i);
+                                setVisible(i, SYMBOL_COLUMN);
+                                return;
+                            }
+                        }
+
+                        // If we got here the symbol wasn't in the table
+                        JOptionPane.showInternalMessageDialog(DesktopManager.getDesktop(),
+                                                              "The symbol '" + symbol + 
+                                                              "' was not found.",
+                                                              "Symbol not found",
+                                                              JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }};
+        
+        thread.start();
     }
 
     // Allow the user to enter in equations which will be run on every displayed quote
@@ -840,6 +885,10 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	    validate();
 	    repaint();
 	}
+
+        // Find symbol
+        else if(e.getSource() == findSymbol)
+            findSymbol();
 
         // Graph symbols, either by the popup menu or the main menu
         else if((popupGraphSymbols != null && e.getSource() == popupGraphSymbols) ||

@@ -102,6 +102,56 @@ public class SymbolListDialog {
 
     /**
      * Open a new <code>SymbolListDialog</code> dialog. Ask the user
+     * to enter a single symbol. It will test to make sure it is
+     * a valid symbol.
+     *
+     * @param	parent	the parent desktop
+     * @param	title	the title of the dialog
+     * @return	a symbol or <code>null</code> if the user cancelled
+     *          the dialog.
+     */
+    public static Symbol getSymbol(JDesktopPane parent, String title) {
+        Symbol symbol;
+	String symbolString;
+	boolean invalidResponse;
+
+	do {
+	    symbol = null;
+	    symbolString = "";
+	    invalidResponse = false; // assume user does OK
+
+	    // First prompt user for symbol
+	    TextDialog dialog = new TextDialog(parent, 
+                                               "Please enter symbol",
+                                               title);
+	    symbolString = dialog.showDialog();
+					    
+	    // Parse what the user inputed
+	    if(symbolString != null) {
+		
+                // Parse
+                try {
+                    symbol = Symbol.toSymbol(symbolString);
+                }
+                catch(SymbolFormatException e) {
+                    invalidResponse = true;
+
+                    JOptionPane.showInternalMessageDialog(parent, 
+                                                          e.getReason(),
+                                                          "Error parsing symbol",
+                                                          JOptionPane.ERROR_MESSAGE);
+                }
+	    }
+
+	    // Keep going while user hasnt entered a valid symbol and
+	    // is selecting "ok"
+	} while(invalidResponse); 
+
+	return symbol;
+    }
+
+    /**
+     * Open a new <code>SymbolListDialog</code> dialog. Ask the user
      * to enter a list of symbol symbols. It will test to make each is
      * a valid symbol.
      *

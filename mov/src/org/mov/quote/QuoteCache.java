@@ -129,6 +129,33 @@ public class QuoteCache {
 	return new Vector(quotesForDate.keySet());
     }
 
+    /** 
+     * Return all the symbols in the cache between the given date range
+     * (inclusive).
+     *
+     * @param firstDateOffset fast access offset of first date
+     * @param lastDateOffset fast access offset of last date
+     * @return list of symbols
+     */
+    public Vector getSymbols(int firstDateOffset, int lastDateOffset) {
+        HashMap symbols = new HashMap();
+
+        // Go through each day, collecting symbols. We put them all in
+        // a hashmap to quickly weed out the numerous duplicates.
+        for(int date = firstDateOffset; date < lastDateOffset; date++) {
+            Vector datesSymbols = getSymbols(date);
+            Iterator iterator = datesSymbols.iterator();
+
+            while(iterator.hasNext()) {
+                String symbol = (String)iterator.next();
+
+                symbols.put(symbol, symbol);
+            }
+        }
+
+        return new Vector(symbols.keySet());
+    }
+
     // Returns a HashMap containing quotes for that date
     private HashMap getQuotesForDate(int dateOffset) 
 	throws QuoteNotLoadedException {

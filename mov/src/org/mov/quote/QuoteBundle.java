@@ -220,15 +220,9 @@ public class QuoteBundle {
     	assert symbols.size() > 0;
     	return (String)symbols.firstElement();
     }
-
-    /**
-     * Returns all the symbols listed in this quote bundle for the given date.
-     *
-     * @param dateOffset fast access date offset, see {@link QuoteCache}
-     * @return all symbols
-     */
-    public Vector getSymbols(int dateOffset) {	
-        // THIS SHOULD BE CACHED FOR SPEED?? maybe, the code is fast enough!
+    
+    // Returns all the symbols in the quote bundle between the two dates
+    private Vector getSymbols(int firstDateOffset, int lastDateOffset) {
 	if(getQuoteRange().getType() == QuoteRange.GIVEN_SYMBOLS) {
 	    return getQuoteRange().getAllSymbols();
 	}
@@ -238,13 +232,13 @@ public class QuoteBundle {
 	    quoteBundleCache.load(this);
 	
 	if(getQuoteRange().getType() == QuoteRange.ALL_SYMBOLS) {
-	    return quoteCache.getSymbols(dateOffset);
+	    return quoteCache.getSymbols(firstDateOffset, lastDateOffset);
 	}
 	
 	else if(getQuoteRange().getType() == QuoteRange.ALL_ORDINARIES) {
 	    
 	    Vector ourSymbols = new Vector();
-	    Vector symbols = quoteCache.getSymbols(dateOffset);
+	    Vector symbols = quoteCache.getSymbols(firstDateOffset, lastDateOffset);
 	    
 	    // Weed out ones that aren't ours
 	    Iterator iterator = symbols.iterator();
@@ -262,7 +256,7 @@ public class QuoteBundle {
 	    assert getQuoteRange().getType() == QuoteRange.MARKET_INDICES;
 	    
 	    Vector ourSymbols = new Vector();
-	    Vector symbols = quoteCache.getSymbols(dateOffset);
+	    Vector symbols = quoteCache.getSymbols(firstDateOffset, lastDateOffset);
 	    
 	    // Weed out ones that aren't ours
 	    Iterator iterator = symbols.iterator();
@@ -275,6 +269,25 @@ public class QuoteBundle {
 	    
 	    return ourSymbols;
 	}
+    }
+
+    /**
+     * Returns all the symbols in the quote bundle.
+     *
+     * @return all symbols
+     */
+    public Vector getAllSymbols() {
+        return getSymbols(getFirstDateOffset(), getLastDateOffset());
+    }
+
+    /**
+     * Returns all the symbols listed in this quote bundle for the given date.
+     *
+     * @param dateOffset fast access date offset, see {@link QuoteCache}
+     * @return all symbols
+     */
+    public Vector getSymbols(int dateOffset) {	
+        return getSymbols(dateOffset, dateOffset);
     }
 
     /**

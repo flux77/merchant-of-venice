@@ -18,7 +18,6 @@
 
 package org.mov.analyser;
 
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
@@ -60,8 +59,7 @@ public class GPGondolaSelectionPanel extends JPanel {
                                    JDesktopPane desktop,
                                    int[] defaultValues,
                                    String[] defaultTextFieldValues,
-                                   String titledBorderText,
-                                   Dimension preferredSize) {
+                                   String titledBorderText) {
         
         this.desktop = desktop;
         
@@ -70,7 +68,7 @@ public class GPGondolaSelectionPanel extends JPanel {
         defValues = defaultValues;
         defTextFieldValues = defaultTextFieldValues;
         
-        setGraphic(titledBorderText, preferredSize);
+        setGraphic(titledBorderText);
         
     }
     
@@ -83,14 +81,19 @@ public class GPGondolaSelectionPanel extends JPanel {
     }
     
     public int getRandom(boolean allowHeld, boolean allowOrder) {
+        int retValue = 0;
+        
         int total = 0;
         int totalLength = perc.length;
-        if (!allowHeld)
+        if (!allowHeld) {
             totalLength--;
-        if (!allowOrder)
+        }
+        if (!allowOrder) {
             totalLength--;
-        for (int i=0; i<totalLength; i++)
+        }
+        for (int i=0; i<totalLength; i++) {
             total += perc[i];
+        }
         int randomValue = random.nextInt(total);
         
         int totalMin = 0;
@@ -98,43 +101,44 @@ public class GPGondolaSelectionPanel extends JPanel {
         for (int i=0; i<totalLength; i++) {
             totalMax = totalMin + perc[i];
             if ((randomValue >= totalMin) && (randomValue < totalMax)) {
-                return i;
+                retValue = i;
             }
             totalMin += perc[i];
         }
-        
-        JOptionPane.showInternalMessageDialog(desktop,
-                                              Locale.getString("ERROR GENERATING RANDOM NUMBER"),
-                                              Locale.getString("INVALID_GP_ERROR"),
-                                              JOptionPane.ERROR_MESSAGE);
-        return 0;
+        return retValue;
     }
 
     public void save(HashMap settings, String idStr) {
-	for (int i=0; i<percTextField.length; i++)
+	for (int i=0; i<percTextField.length; i++) {
             settings.put(idStr + (new Integer(i)).toString(), percTextField[i].getText());
+        }
     }
     
     public void load(String setting, String idStr, String value) {
-	for (int i=0; i<percTextField.length; i++)
-            if(setting.equals(idStr + (new Integer(i)).toString()))
+	for (int i=0; i<percTextField.length; i++) {
+            if(setting.equals(idStr + (new Integer(i)).toString())) {
                 percTextField[i].setText(value);
+            }
+        }
     }
     
     // Fit the values, if they differ
     public void fit() {
         if (isAllValuesAcceptable()) {
             int total = 0;
-            for (int i=0; i<perc.length; i++)
+            for (int i=0; i<perc.length; i++) {
                 total += perc[i];
+            }
 
             // Set dummy values according to PERCENT_INT that is the maximum
             int[] dummyPerc = new int[perc.length];
-            for (int i=0; i<perc.length; i++)
+            for (int i=0; i<perc.length; i++) {
                 dummyPerc[i] = Math.round((perc[i] * PERCENT_INT) / total);
+            }
             int dummyTotal = 0;
-            for (int i=0; i<perc.length; i++)
+            for (int i=0; i<perc.length; i++) {
                 dummyTotal += dummyPerc[i];
+            }
             // Adjust approximations of Math.round method
             int count=0;
             while (dummyTotal!=PERCENT_INT) {
@@ -148,8 +152,9 @@ public class GPGondolaSelectionPanel extends JPanel {
                 count++;
             }
             // Set new values
-            for (int i=0; i<perc.length; i++)
+            for (int i=0; i<perc.length; i++) {
                 perc[i] = dummyPerc[i];
+            }
             // Update the text in the user interface
             setTexts();
         }
@@ -157,17 +162,21 @@ public class GPGondolaSelectionPanel extends JPanel {
 
     // Return true if values already fit to percentage
     public boolean isFit() {
+        boolean retValue = false;
         if (isAllValuesAcceptable()) {
             int total = 0;
-            for (int i=0; (i<perc.length); i++)
+            for (int i=0; (i<perc.length); i++) {
                 total += perc[i];
-            if (total==PERCENT_INT)
-                return true;
+            }
+            if (total==PERCENT_INT) {
+                retValue = true;
+            }
         }
-        return false;
+        return retValue;
     }
 
     public boolean isAllValuesAcceptable() {
+        boolean retValue = true;
         try {
             setNumericalValues();
         }
@@ -177,7 +186,7 @@ public class GPGondolaSelectionPanel extends JPanel {
                                                                    e.getMessage()),
                                                   Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
-	    return false;
+	    retValue = false;
 	}
 
         if(!isAllValuesPositive()) {
@@ -185,15 +194,15 @@ public class GPGondolaSelectionPanel extends JPanel {
                                                   Locale.getString("NO_POSITIVE_VALUES_ERROR"),
                                                   Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
-	    return false;
+	    retValue = false;
         }
 
         if(!isTotalOK()) {
             // Messages inside the isTotalOK method
-	    return false;
+	    retValue = false;
         }
 
-        return true;
+        return retValue;
     }
     
     private void setNumericalValues() throws ParseException {
@@ -211,48 +220,55 @@ public class GPGondolaSelectionPanel extends JPanel {
     
     private boolean isAllValuesPositive() {
         boolean returnValue = true;
-        for (int i=0; i<perc.length; i++)
+        for (int i=0; i<perc.length; i++) {
             returnValue = returnValue && (perc[i]>=0);
+        }
         return returnValue;
     }
     
     private boolean isTotalOK() {
+        boolean retValue=true;
         // We should consider the absence of held and order -> totalIntegerModified
         long total = 0;
         int totalLength = perc.length;
-        if (heldAndOrder)
+        if (heldAndOrder) {
             totalLength -= 2;
-        for (int i=0; (i<totalLength); i++)
+        }
+        for (int i=0; (i<totalLength); i++) {
             total += perc[i];
+        }
         // Check total == 0
         if (total==0) {
             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("NO_TOTAL_GREATER_THAN_ZERO_ERROR"),
                                                   Locale.getString("INVALID_GP_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
-            return false;
+            retValue=false;
         }
-        return true;
+        return retValue;
     }
     
     public void setDefaultsValuesOnly() {
-        for (int i=0; i<perc.length; i++)
+        for (int i=0; i<perc.length; i++) {
             perc[i]=defValues[i];
+        }
     }
         
     public void setDefaults() {
-        for (int i=0; i<perc.length; i++)
+        for (int i=0; i<perc.length; i++) {
             perc[i]=defValues[i];
+        }
         this.setTexts();
     }
         
     public void setTexts() {
         DecimalFormat decimalFormat = new DecimalFormat(format);
-        for (int i=0; i<percTextField.length; i++)
+        for (int i=0; i<percTextField.length; i++) {
             percTextField[i].setText(decimalFormat.format(perc[i]/PERCENT_DOUBLE));
+        }
     }
         
-    private void setGraphic(String titledBorderText, Dimension preferredSize) {
+    private void setGraphic(String titledBorderText) {
         
         GridBagLayout gridbag = new GridBagLayout();
         
@@ -266,7 +282,6 @@ public class GPGondolaSelectionPanel extends JPanel {
         
         JScrollPane upDownScrollPane = new JScrollPane(upDownPanel);
         upDownScrollPane.setLayout(new ScrollPaneLayout());
-        upDownScrollPane.setPreferredSize(preferredSize);
         
         JPanel innerPanel = new JPanel();
         innerPanel.setLayout(gridbag);

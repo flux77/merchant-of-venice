@@ -18,7 +18,6 @@
 
 package org.mov.analyser;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,7 +27,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneLayout;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.ConfirmDialog;
@@ -36,11 +36,13 @@ import org.mov.util.Locale;
 
 public class GPGondolaSelection extends JPanel implements AnalyserPage {
 
+    private final int maxPanels = 5;
+    
     private JDesktopPane desktop;
     private Random random;
     
-    // Panel inside the tabs
-    GPGondolaSelectionPanel[] GPGondolaSelectionPanel = new GPGondolaSelectionPanel[5];
+    // Panel inside the section (Titled Panels)
+    GPGondolaSelectionPanel[] GPGondolaSelectionPanel = new GPGondolaSelectionPanel[maxPanels];
 
     public GPGondolaSelection(JDesktopPane desktop, double maxHeight) {
         this.desktop = desktop;
@@ -68,8 +70,7 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
                                 desktop,
                                 defaultValuesIntegers,
                                 defaultTextFieldValuesIntegers,
-                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_INTEGER_LONG"),
-                                preferredSize);
+                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_INTEGER_LONG"));
         GPGondolaSelectionPanel[0].setHeldAndOrder();
 
         // Float or Integer
@@ -81,8 +82,7 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
                                 desktop,
                                 defaultValuesFloatInteger,
                                 defaultTextFieldValuesFloatInteger,
-                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_FLOAT_INTEGER_LONG"),
-                                preferredSize);
+                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_FLOAT_INTEGER_LONG"));
 
         // Float Quote
         int[] defaultValuesFloatQuote = {2500, 2500, 2500, 2500};
@@ -95,8 +95,7 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
                                 desktop,
                                 defaultValuesFloatQuote,
                                 defaultTextFieldValuesFloatQuote,
-                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_FLOAT_QUOTE_LONG"),
-                                preferredSize);
+                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_FLOAT_QUOTE_LONG"));
 
         // Boolean
         int[] defaultValuesBoolean = {1112, 1111, 1111, 1111, 1111, 1111, 1111, 1111, 1111};
@@ -114,8 +113,7 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
                                 desktop,
                                 defaultValuesBoolean,
                                 defaultTextFieldValuesBoolean,
-                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_BOOLEAN_LONG"),
-                                preferredSize);
+                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_BOOLEAN_LONG"));
         // Expression
         int[] defaultValuesExpression = {715, 714, 714, 714, 714, 714, 714, 714, 715, 715, 714, 714, 714, 715};
         String[] defaultTextFieldValuesExpression = {Locale.getString("PERC_CREATE_RANDOM_TERMINAL_TEXT_FIELD"),
@@ -137,10 +135,9 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
                                 desktop,
                                 defaultValuesExpression,
                                 defaultTextFieldValuesExpression,
-                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_EXPRESSION_LONG"),
-                                preferredSize);
+                                Locale.getString("GP_GONDOLA_SELECTION_TITLE_EXPRESSION_LONG"));
 
-        layoutPage();
+        setGraphic(preferredSize);
         
         setDefaults();
     }
@@ -199,21 +196,24 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
     }
 
     public boolean parse() {
+        boolean retValue = true;
         if(!isAllValuesAcceptable()) {
-            return false;
+            retValue = false;
         } else {
             if(!isFitAll()) {
                 ConfirmDialog dialog = new ConfirmDialog(desktop,
                                                          Locale.getString("GP_FIT"),
                                                          Locale.getString("GP_FIT_TITLE"));
                 boolean returnConfirm = dialog.showDialog();
-                if (returnConfirm)
+                if (returnConfirm) {
                     fitAll();
-                else
-                    return false;
+                    retValue = true;
+                } else {
+                    retValue = false;
+                }
             }
         }
-        return true;
+        return retValue;
     }
 
     public JComponent getComponent() {
@@ -225,70 +225,61 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
     }
 
     private void setDefaults() {
-        GPGondolaSelectionPanel[0].setDefaults();
-        GPGondolaSelectionPanel[1].setDefaults();
-        GPGondolaSelectionPanel[2].setDefaults();
-        GPGondolaSelectionPanel[3].setDefaults();
-        GPGondolaSelectionPanel[4].setDefaults();
+        for (int i=0; i<maxPanels; i++) {
+            GPGondolaSelectionPanel[i].setDefaults();
+        }
     }
     
     private void fitAll() {
         // Fit all values one after another (only if previous one was fitted without error)
-        GPGondolaSelectionPanel[0].fit();
-        GPGondolaSelectionPanel[1].fit();
-        GPGondolaSelectionPanel[2].fit();
-        GPGondolaSelectionPanel[3].fit();
-        GPGondolaSelectionPanel[4].fit();
+        for (int i=0; i<maxPanels; i++) {
+            GPGondolaSelectionPanel[i].fit();
+        }
     }
 
     private boolean isFitAll() {
-        // Fit all values one after another (only if previous one was fitted without error)
-        if (GPGondolaSelectionPanel[0].isFit()) {
-            if (GPGondolaSelectionPanel[1].isFit()) {
-                if (GPGondolaSelectionPanel[2].isFit()) {
-                    if (GPGondolaSelectionPanel[3].isFit()) {
-                        if (GPGondolaSelectionPanel[4].isFit())
-                            return true;
-                    }
-                }
-            }
+        boolean retValue = true;
+        // Fit all values one after another and exit when false is found
+        for (int i=0; retValue && (i<maxPanels); i++) {
+            retValue = GPGondolaSelectionPanel[i].isFit();
         }
-        return false;
+        return retValue;
     }
 
     private boolean isAllValuesAcceptable() {
-        // Fit all values one after another (only if previous one was fitted without error)
-        if (GPGondolaSelectionPanel[0].isAllValuesAcceptable()) {
-            if (GPGondolaSelectionPanel[1].isAllValuesAcceptable()) {
-                if (GPGondolaSelectionPanel[2].isAllValuesAcceptable()) {
-                    if (GPGondolaSelectionPanel[3].isAllValuesAcceptable()) {
-                        if (GPGondolaSelectionPanel[4].isAllValuesAcceptable())
-                            return true;
-                    }
-                }
-            }
+        boolean retValue = true;
+        // Fit all values one after another and exit when false is found
+        for (int i=0; retValue && (i<maxPanels); i++) {
+            retValue = GPGondolaSelectionPanel[i].isAllValuesAcceptable();
         }
-        return false;
+        return retValue;
     }
 
-    private void layoutPage() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    private void setGraphic(Dimension preferredSize) {
 
         TitledBorder titledBorder = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE"));
-        JPanel panel = new JPanel();
-        panel.setBorder(titledBorder);
-        panel.setLayout(new BorderLayout());
         
-        JTabbedPane tabbedPane = new JTabbedPane();
+        this.setBorder(titledBorder);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
-        tabbedPane.addTab(Locale.getString("GP_GONDOLA_SELECTION_TITLE_INTEGER_SHORT"), GPGondolaSelectionPanel[0]);
-        tabbedPane.addTab(Locale.getString("GP_GONDOLA_SELECTION_TITLE_FLOAT_INTEGER_SHORT"), GPGondolaSelectionPanel[1]);
-        tabbedPane.addTab(Locale.getString("GP_GONDOLA_SELECTION_TITLE_FLOAT_QUOTE_SHORT"), GPGondolaSelectionPanel[2]);
-        tabbedPane.addTab(Locale.getString("GP_GONDOLA_SELECTION_TITLE_BOOLEAN_SHORT"), GPGondolaSelectionPanel[3]);
-        tabbedPane.addTab(Locale.getString("GP_GONDOLA_SELECTION_TITLE_EXPRESSION_SHORT"), GPGondolaSelectionPanel[4]);
+        JPanel upDownPanel = new JPanel();
+        upDownPanel.setLayout(new BoxLayout(upDownPanel, BoxLayout.Y_AXIS));
+        
+        JScrollPane all = new JScrollPane(upDownPanel);
+        all.setLayout(new ScrollPaneLayout());
+        all.setPreferredSize(preferredSize);
 
-        // The last panel (the GP Gondola Selection one)
-        panel.add(tabbedPane, BorderLayout.NORTH);
-        this.add(panel);
+        TitledBorder[] titledBorderSections = new TitledBorder[maxPanels];
+        titledBorderSections[0] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_INTEGER_SHORT"));
+        titledBorderSections[1] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_FLOAT_INTEGER_SHORT"));
+        titledBorderSections[2] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_FLOAT_QUOTE_SHORT"));
+        titledBorderSections[3] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_BOOLEAN_SHORT"));
+        titledBorderSections[4] = new TitledBorder(Locale.getString("GP_GONDOLA_SELECTION_TITLE_EXPRESSION_SHORT"));
+        for (int i=0; i<maxPanels; i++) {
+            GPGondolaSelectionPanel[i].setBorder(titledBorderSections[i]);
+            upDownPanel.add(GPGondolaSelectionPanel[i]);
+        }
+        
+        this.add(upDownPanel);
     }
 }

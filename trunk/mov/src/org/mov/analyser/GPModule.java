@@ -22,9 +22,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
 
@@ -60,13 +58,10 @@ public class GPModule extends JPanel implements Module {
     private QuoteRangePage quoteRangePage;
     private PortfolioPage portfolioPage;
     private GPPage GPPage;
+    private GPPageInitialPopulation GPPageInitialPopulation;
     private GPGondolaSelection GPGondolaSelection;
     
-    // Number of rules (buy rule and sell rule)
-    private final int BUY_RULE = GPModuleConstants.BUY_RULE;
-    private final int SELL_RULE = GPModuleConstants.SELL_RULE;
-    private final int NUMBER_RULES = GPModuleConstants.NUMBER_RULES;
-    
+   
     public GPModule(JDesktopPane desktop) {
         this.desktop = desktop;
         
@@ -100,6 +95,18 @@ public class GPModule extends JPanel implements Module {
             maxHeight = portfolioPage.getPreferredSize().getHeight();
         if (GPPage.getPreferredSize().getHeight()>maxHeight)
             maxHeight = GPPage.getPreferredSize().getHeight();
+        
+        GPPageInitialPopulation = new GPPageInitialPopulation(desktop, maxHeight);
+        tabbedPane.addTab(GPPageInitialPopulation.getTitle(), GPPageInitialPopulation.getComponent());
+        
+        // Get the max height
+        if (portfolioPage.getPreferredSize().getHeight()>maxHeight)
+            maxHeight = portfolioPage.getPreferredSize().getHeight();
+        if (GPPage.getPreferredSize().getHeight()>maxHeight)
+            maxHeight = GPPage.getPreferredSize().getHeight();
+        if (GPPageInitialPopulation.getPreferredSize().getHeight()>maxHeight)
+            maxHeight = GPPageInitialPopulation.getPreferredSize().getHeight();
+        
         GPGondolaSelection = new GPGondolaSelection(desktop, maxHeight);
         tabbedPane.addTab(GPGondolaSelection.getTitle(), GPGondolaSelection.getComponent());
         
@@ -134,6 +141,7 @@ public class GPModule extends JPanel implements Module {
         quoteRangePage.load(getClass().getName());
         portfolioPage.load(getClass().getName());
         GPPage.load(getClass().getName());
+        GPPageInitialPopulation.load(getClass().getName());
         GPGondolaSelection.load(getClass().getName());
     }
     
@@ -141,6 +149,7 @@ public class GPModule extends JPanel implements Module {
         quoteRangePage.save(getClass().getName());
         portfolioPage.save(getClass().getName());
         GPPage.save(getClass().getName());
+        GPPageInitialPopulation.save(getClass().getName());
         GPGondolaSelection.save(getClass().getName());
     }
     
@@ -205,6 +214,10 @@ public class GPModule extends JPanel implements Module {
             tabbedPane.setSelectedComponent(GPPage.getComponent());
             return false;
         }
+        else if(!GPPageInitialPopulation.parse()) {
+            tabbedPane.setSelectedComponent(GPPageInitialPopulation.getComponent());
+            return false;
+        }
         else if(!GPGondolaSelection.parse()) {
             tabbedPane.setSelectedComponent(GPGondolaSelection.getComponent());
             return false;
@@ -232,7 +245,7 @@ public class GPModule extends JPanel implements Module {
         Money stockValue = portfolioPage.getStockValue();
         int numberStocks = portfolioPage.getNumberStocks();
         // number of mutations to be applied to the rules defined in Initial Population Section
-        int mutations = GPPage.getMutations();
+        int mutations = GPPageInitialPopulation.getMutations();
         
         // quote bundle needs to load 30 days before quote range.
         GPQuoteBundle quoteBundle =
@@ -287,9 +300,9 @@ public class GPModule extends JPanel implements Module {
                     if(individual < population)
                         progress.increment();
                     
-                    // GPPage.getIfRandom()==0 is true
+                    // GPPageInitialPopulation.getIfRandom()==0 is true
                     // if we must create a random individual.
-                    // GPPage.getIfRandom()==0 is false
+                    // GPPageInitialPopulation.getIfRandom()==0 is false
                     // if we must create an individual according to
                     // the user defined buy/sell rules
                     // (defined in the Initial Population Section).
@@ -298,13 +311,13 @@ public class GPModule extends JPanel implements Module {
                     // get new inidividuals from their parents,
                     // so it can be applied geneticProgramme.nextIndividual(null, null);
                     // with no input rules.
-                    if ((GPPage.getIfRandom()==0) || (generation!=1)) {
+                    if ((GPPageInitialPopulation.getIfRandom()==0) || (generation!=1)) {
                         geneticProgramme.nextIndividual(null, null, mutations);
                     } else {
                         // Get a random buy/sell rules from initial population
-                        int randomRow = GPPage.getRandomFromInitialPopulation();
-                        String buyRuleString = GPPage.getBuyRuleFromInitialPopulation(randomRow);
-                        String sellRuleString = GPPage.getSellRuleFromInitialPopulation(randomRow);
+                        int randomRow = GPPageInitialPopulation.getIfRandom();
+                        String buyRuleString = GPPageInitialPopulation.getBuyRule(randomRow);
+                        String sellRuleString = GPPageInitialPopulation.getSellRule(randomRow);
                         // Call the nextIndividual method to put
                         geneticProgramme.nextIndividual(
                             this.generateExpression(buyRuleString),

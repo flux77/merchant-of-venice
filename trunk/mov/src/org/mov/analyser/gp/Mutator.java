@@ -18,7 +18,7 @@
 
 package org.mov.analyser.gp;
 
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Random;
 
 import org.mov.parser.Expression;
@@ -27,8 +27,8 @@ import org.mov.quote.Quote;
 
 public class Mutator {
 
-    private final static int BRANCH_FACTOR = 75;
-    private final static int FAVOUR_NUMBER_PERCENT = 90;
+    private final static int BRANCH_FACTOR = 80;
+    private final static int FAVOUR_NUMBER_PERCENT = 85;
 
     private final static int MUTATION_PERCENT       = 10;
     private final static int EXTRA_MUTATION_PERCENT = 10;
@@ -51,20 +51,33 @@ public class Mutator {
         return createRandom(null, type, 1);
     }
 
+    public Expression createRandom(int type, int level) {
+        return createRandom(null, type, level);
+    }
+
     // hmm i think the mutate is going to want better percent controls on the
     // terminal/non-terminal relationship?
+    // Describe how if you set level < 1 you can force the top nodes to
+    // be non-terminal
     public Expression createRandom(Expression model, int type, int level) {
-        assert level > 0;
+        boolean terminal = true;
 
-        // Work out percent chance of non-terminate symbol
-        double branchPercent = (double)BRANCH_FACTOR / (double)level;
-        double percent = random.nextDouble() * 100;
+        if(level < 1)
+            terminal = false;
+        else {
+            // Work out percent chance of non-terminate symbol
+            double branchPercent = (double)BRANCH_FACTOR / (double)level;
+            double percent = random.nextDouble() * 100;
+
+            if(branchPercent > percent)
+                terminal = false;
+        }
 
         // If the type is a boolean then there isn't much point generating
         // the boolean terminal expressions TRUE or FALSE because our
         // simplification code will just simplify it out of existence,
         // e.g. "and or a" would just become "a".
-        if(type == Expression.BOOLEAN_TYPE || branchPercent > percent)
+        if(type == Expression.BOOLEAN_TYPE || !terminal)
             return createRandomNonTerminal(model, type, level + 1);
         else
             return createRandomTerminal(type);
@@ -74,9 +87,11 @@ public class Mutator {
         return createRandomNonTerminal(null, type, 1);
     }
 
-    public Expression createRandomNonTerminal(Expression model, int type, int level) {
-        assert level > 0;
+    public Expression createRandomNonTerminal(int type, int level) {
+        return createRandomNonTerminal(null, type, level);
+    }
 
+    public Expression createRandomNonTerminal(Expression model, int type, int level) {
         if(type == Expression.BOOLEAN_TYPE)
             return createRandomNonTerminalBoolean(model, level);
         else if(type == Expression.FLOAT_TYPE)
@@ -231,8 +246,8 @@ public class Mutator {
            FAVOUR_NUMBER_PERCENT > random.nextInt(100)) {
 
             NumberExpression numberExpression = (NumberExpression)model;
-            double step = random.nextDouble() * 6.0F;
-            double value = Math.pow(10.0F, step);
+            double step = random.nextDouble() * 6.0D;
+            double value = Math.pow(10.0D, step);
 
             if(random.nextBoolean())
                 value = -value;
@@ -302,8 +317,8 @@ public class Mutator {
            FAVOUR_NUMBER_PERCENT > random.nextInt(100)) {
 
             NumberExpression numberExpression = (NumberExpression)model;
-            double step = random.nextDouble() * 6.0F;
-            double value = Math.pow(10.0F, step);
+            double step = random.nextDouble() * 6.0D;
+            double value = Math.pow(10.0D, step);
 
             if(random.nextBoolean())
                 value = -value;
@@ -366,15 +381,14 @@ public class Mutator {
         // Case 1: The expression doesn't have this many children or
         // it has a child here but it is a different type. So create
         // a new argument.
-        if(model == null ||
-           arg >= model.getNeededChildren() ||
-           model.get(arg).getType() != type) {
+        if(model == null || arg >= model.getChildCount() ||
+           model.getChild(arg).getType() != type) {
             return createRandom(null, type, level);
         }
 
         // Case 2: It has an argument of the right type
         else
-            return model.get(arg);
+            return model.getChild(arg);
     }
 
     // creates a float or integer type
@@ -383,10 +397,9 @@ public class Mutator {
         // Case 1: The expression doesn't have this many children or
         // it has a child here but it is a different type. So create
         // a new argument.
-        if(model == null ||
-           arg >= model.getNeededChildren() ||
-           (model.get(arg).getType() != Expression.FLOAT_TYPE &&
-            model.get(arg).getType() != Expression.INTEGER_TYPE)) {
+        if(model == null || arg >= model.getChildCount() ||
+           (model.getChild(arg).getType() != Expression.FLOAT_TYPE &&
+            model.getChild(arg).getType() != Expression.INTEGER_TYPE)) {
 
             int randomNumber = random.nextInt(2);
 
@@ -400,17 +413,17 @@ public class Mutator {
 
         // Case 2: It has an argument of the right type
         else
-            return model.get(arg);
+            return model.getChild(arg);
     }
 
     public Expression findRandomSite(Expression expression) {
         int randomNumber = random.nextInt(expression.size());
         Expression randomSite = null;
 
-        for(Enumeration enumeration = expression.breadthFirstEnumeration();
-            enumeration.hasMoreElements();) {
+        for(Iterator iterator = expression.iterator();
+            iterator.hasNext();) {
 
-            randomSite = (Expression)enumeration.nextElement();
+            randomSite = (Expression)iterator.next();
 
             // Return if this is the xth random element
             if(randomNumber-- <= 0)
@@ -430,10 +443,10 @@ public class Mutator {
         if(possibleSites > 0) {
             int randomNumber = random.nextInt(possibleSites);
 
-            for(Enumeration enumeration = expression.breadthFirstEnumeration();
-                enumeration.hasMoreElements();) {
+            for(Iterator iterator = expression.iterator();
+                iterator.hasNext();) {
 
-                randomSite = (Expression)enumeration.nextElement();
+                randomSite = (Expression)iterator.next();
 
                 // Return if this is the xth random element of the
                 // given type
@@ -464,9 +477,7 @@ public class Mutator {
         }
         else {
             int childNumber = parent.getIndex(destination);
-            parent.remove(childNumber);
-            parent.insert(source, childNumber);
-            assert parent.getNeededChildren() == parent.getChildCount();
+            parent.setChild(source, childNumber);
             return root;
         }
     }

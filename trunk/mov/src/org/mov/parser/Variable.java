@@ -47,4 +47,8 @@ public class Variable {
     public void setValue(float value) {
         this.value = value;
     }
+
+    public void setValue(int value) {
+        this.value = (float)value;
+    }
 }

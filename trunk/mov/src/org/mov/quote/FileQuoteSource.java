@@ -147,73 +147,92 @@ public class FileQuoteSource implements QuoteSource
         this.fileNames = fileNames;
     }
 
+    // Checks that we actually have any quotes files and that we have any quotes
+    // in those files. Returns TRUE if we have at least one quote, FALSE otherwise.
+    private synchronized boolean checkFiles() {
+        if(dateToFile == null) {
+            createIndex();
+
+            // Still empty after loading all our quote files?
+            if(dateToFile == null) {
+                DesktopManager.showErrorMessage("Venice couldn't find any quotes.\n" +
+                                                "You can import quotes using the import\n" +
+                                                "quote tool under the File menu.");
+                return false;
+            }
+        }
+        return true;
+    }
+
     // Ensure that the date to file map has been created. Also make sure the latest
     // and earliest quote dates have been stored. This allows us speed up various
     // functions.
-    private synchronized void createIndex() {
+    private void createIndex() {
+        Thread thread = Thread.currentThread();
 
-        if(dateToFile == null) {
-            Thread thread = Thread.currentThread();
-
-            // Create map
-            dateToFile = new HashMap();
-
-            TradingDate date;
-
-            // Make sure we don't pop up 1000 error messages if all the files
-            // have been moved :)
-            int errorCount = 0;
-
-            // Indexing might take a while
-            ProgressDialog p = ProgressDialogManager.getProgressDialog();
-            p.setMaster(true);
-            p.setMaximum(fileNames.size());
-            p.setNote("Indexing files");
-            p.show("Indexing files");
-
-            Iterator iterator = fileNames.iterator();
-            String fileName;
-
-            while(iterator.hasNext()) {
-
-                fileName = (String)iterator.next();
-
-                try {
-                    date = getContainedDate(fileName);
-
-                    if(date != null) {
-                        // Buffer the first and last quote dates
-                        if(lastDate == null || date.after(lastDate))
-                            lastDate = date;
-                        if(firstDate == null || date.before(firstDate))
-                            firstDate = date;
-
-                        // Associate this date with this file
-                        dateToFile.put(date, fileName);
-                    }		
-                    else {
-                        if(errorCount < 5) {
-                            DesktopManager.
-                                showErrorMessage("No quotes found in " +
-                                                 fileName);
-                            errorCount++;
-                        }
-                    }
-
-                } catch (java.io.IOException ioe) {
+        // Create map
+        dateToFile = new HashMap();
+        
+        TradingDate date;
+        
+        // Make sure we don't pop up 1000 error messages if all the files
+        // have been moved :)
+        int errorCount = 0;
+        
+        // Indexing might take a while
+        ProgressDialog p = ProgressDialogManager.getProgressDialog();
+        p.setMaster(true);
+        p.setMaximum(fileNames.size());
+        p.setNote("Indexing files");
+        p.show("Indexing files");
+        
+        Iterator iterator = fileNames.iterator();
+        String fileName;
+        
+        while(iterator.hasNext()) {
+            
+            fileName = (String)iterator.next();
+            
+            try {
+                date = getContainedDate(fileName);
+                
+                if(date != null) {
+                    // Buffer the first and last quote dates
+                    if(lastDate == null || date.after(lastDate))
+                        lastDate = date;
+                    if(firstDate == null || date.before(firstDate))
+                        firstDate = date;
+                    
+                    // Associate this date with this file
+                    dateToFile.put(date, fileName);
+                }		
+                else {
                     if(errorCount < 5) {
-                        DesktopManager.showErrorMessage("Can't load " +
-                                                        fileName);
-                        errorCount++;	
+                        DesktopManager.
+                            showErrorMessage("No quotes found in " +
+                                             fileName);
+                        errorCount++;
                     }
                 }
-
-                p.increment();
+                
+            } catch (java.io.IOException ioe) {
+                if(errorCount < 5) {
+                    DesktopManager.showErrorMessage("Can't load " +
+                                                    fileName);
+                    errorCount++;	
+                }
             }
-
-            ProgressDialogManager.closeProgressDialog(p);
+            
+            p.increment();
         }
+        
+        ProgressDialogManager.closeProgressDialog(p);
+
+        // Nuke the hash if it is empty
+        if(dateToFile.isEmpty())
+            dateToFile = null;
     }
+
 
     /**
      * Returns the company name associated with the given symbol. Not
@@ -245,20 +264,20 @@ public class FileQuoteSource implements QuoteSource
      */
     public boolean symbolExists(String symbol) {
 
-        createIndex();
-
-	// Iterate through all files until we find one containing the
-	// symbol name we are looking for
-	Set dates = dateToFile.keySet();
-	Iterator iterator = dates.iterator();
-
-        while(iterator.hasNext()) {
-	    TradingDate date = (TradingDate)iterator.next();
-            Vector quotes = getContainedQuotes(getFileForDate(date),
-                                               new QuoteRange(symbol));
-	    if(quotes.size() > 0)
-		return true; // found!
-	}
+        if(checkFiles()) {
+            // Iterate through all files until we find one containing the
+            // symbol name we are looking for
+            Set dates = dateToFile.keySet();
+            Iterator iterator = dates.iterator();
+            
+            while(iterator.hasNext()) {
+                TradingDate date = (TradingDate)iterator.next();
+                Vector quotes = getContainedQuotes(getFileForDate(date),
+                                                   new QuoteRange(symbol));
+                if(quotes.size() > 0)
+                    return true; // found!
+            }
+        }
 
 	return false;
     }
@@ -269,7 +288,7 @@ public class FileQuoteSource implements QuoteSource
      * @return	the oldest quote date
      */
     public TradingDate getFirstDate() {
-        createIndex();
+        checkFiles();
 
         return firstDate;
     }
@@ -280,7 +299,7 @@ public class FileQuoteSource implements QuoteSource
      * @return	the most recent quote date.
      */
     public TradingDate getLastDate() {
-        createIndex();
+        checkFiles();
 
 	return lastDate;
     }
@@ -292,9 +311,10 @@ public class FileQuoteSource implements QuoteSource
      * @return	the file containing quotes for this date
      */
     public String getFileForDate(TradingDate date) {
-        createIndex();
-
-        return (String)dateToFile.get(date);
+        if(checkFiles()) 
+            return (String)dateToFile.get(date);
+        else
+            return null;
     }
 
     /**
@@ -304,11 +324,13 @@ public class FileQuoteSource implements QuoteSource
      * @return wehther the source contains the given date
      */
     public boolean containsDate(TradingDate date) {
-        createIndex();
-
-        // If we have a file - we'll assume we also have quotes
-        String file = getFileForDate(date);
-        return file != null;
+        if(checkFiles()) {
+            // If we have a file - we'll assume we also have quotes
+            String file = getFileForDate(date);
+            return file != null;
+        }
+        else
+            return false;
     }
 
     /**
@@ -317,78 +339,88 @@ public class FileQuoteSource implements QuoteSource
      * @return a vector of dates
      */
     public Vector getDates() {
-        createIndex();
-
-	return new Vector(dateToFile.keySet());
+        if(checkFiles()) 
+            return new Vector(dateToFile.keySet());
+        else
+            return new Vector();
     }
 
     /**
      * Load the given quote range into the quote cache.
      *
      * @param	quoteRange	the range of quotes to load
+     * @return  <code>TRUE</code> if the operation suceeded
      * @see Quote
      * @see QuoteCache
      */
-    public void loadQuoteRange(QuoteRange quoteRange) {
+    public boolean loadQuoteRange(QuoteRange quoteRange) {
 
-        createIndex();
+        if(checkFiles()) {
+            // This needs to be before the progress dialog otherwise
+            // we might end up (during an import) trying to open 3
+            // progress dialogs within one thread which is illegal.
+            QuoteCache quoteCache = QuoteCache.getInstance();
 
-	// This query might take a while...
-        Thread thread = Thread.currentThread();
-        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-        progress.setNote("Loading Quotes...");
-        progress.setIndeterminate(true);
-
-        // Work out date range in quote range
-        TradingDate firstDate = quoteRange.getFirstDate();
-        TradingDate lastDate = quoteRange.getLastDate();
-
-        // ... all dates?
-        if(firstDate == null) {
-            firstDate = this.firstDate;
-            lastDate = this.lastDate;
-        }
-
-        Vector dates = Converter.dateRangeToTradingDateVector(firstDate,
-                                                              lastDate);
-
-        // If there are multiple dates, set the progress indicator
-        // to indicate the date we are on. Otherwise set it to
-        // indeterminate.
-        if(dates.size() > 1) {
-            progress.setMaximum(dates.size());
-            progress.setProgress(0);
-            progress.setIndeterminate(false);
-        }
-        else {
+            // This query might take a while...
+            Thread thread = Thread.currentThread();
+            ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+            progress.setNote("Loading Quotes...");
             progress.setIndeterminate(true);
-        }
-
-	for(Iterator iterator = dates.iterator(); iterator.hasNext();) {
-            TradingDate date = (TradingDate)iterator.next();
-            Quote quote;
-
-            // Load all quotes from the file
-            String fileName = getFileForDate(date);
-
-            if(fileName != null) {
-                Vector quotes = getContainedQuotes(fileName, quoteRange);
-                QuoteCache quoteCache = QuoteCache.getInstance();
-
-                // Load quotes into cache
-                for(Iterator quoteIterator = quotes.iterator(); quoteIterator.hasNext();) {
-                    quoteCache.load((Quote)quoteIterator.next());
-                }
+            
+            // Work out date range in quote range
+            TradingDate firstDate = quoteRange.getFirstDate();
+            TradingDate lastDate = quoteRange.getLastDate();
+            
+            // ... all dates?
+            if(firstDate == null) {
+                firstDate = this.firstDate;
+                lastDate = this.lastDate;
             }
-
-            if(thread.isInterrupted())
-                break;
-
-            if(dates.size() > 1)
-               progress.increment();
+            
+            Vector dates = Converter.dateRangeToTradingDateVector(firstDate,
+                                                                  lastDate);
+            
+            // If there are multiple dates, set the progress indicator
+            // to indicate the date we are on. Otherwise set it to
+            // indeterminate.
+            if(dates.size() > 1) {
+                progress.setMaximum(dates.size());
+                progress.setProgress(0);
+                progress.setIndeterminate(false);
+            }
+            else {
+                progress.setIndeterminate(true);
+            }
+            
+            for(Iterator iterator = dates.iterator(); iterator.hasNext();) {
+                TradingDate date = (TradingDate)iterator.next();
+                Quote quote;
+                
+                // Load all quotes from the file
+                String fileName = getFileForDate(date);
+                
+                if(fileName != null) {
+                    Vector quotes = getContainedQuotes(fileName, quoteRange);
+                                        
+                    // Load quotes into cache
+                    for(Iterator quoteIterator = quotes.iterator(); quoteIterator.hasNext();) {
+                        quoteCache.load((Quote)quoteIterator.next());
+                    }
+                }
+                
+                if(thread.isInterrupted())
+                    break;
+                
+                if(dates.size() > 1)
+                    progress.increment();
+            }
+            
+            ProgressDialogManager.closeProgressDialog(progress);
+            
+            return true;
         }
-
-        ProgressDialogManager.closeProgressDialog(progress);
+        else
+            return false;
     }
 
     /**
@@ -419,26 +451,31 @@ public class FileQuoteSource implements QuoteSource
     public int getAdvanceDecline(TradingDate date)
         throws MissingQuoteException {
 
-        String fileName = getFileForDate(date);
+        if(checkFiles()) {
 
-        if(fileName == null)
-            throw new MissingQuoteException();
-
-        // Get all ordinaries for that date
-        QuoteRange quoteRange = new QuoteRange(QuoteRange.ALL_ORDINARIES, date);
-        Vector quotes = getContainedQuotes(fileName, quoteRange);
-
-        int advanceDecline = 0;
-
-        for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-            Quote quote = (Quote)iterator.next();
-
-            if(quote.getDayClose() > quote.getDayOpen())
-                advanceDecline++;
-            else if(quote.getDayClose() < quote.getDayOpen())
-                advanceDecline--;
+            String fileName = getFileForDate(date);
+            
+            if(fileName == null)
+                throw new MissingQuoteException();
+            
+            // Get all ordinaries for that date
+            QuoteRange quoteRange = new QuoteRange(QuoteRange.ALL_ORDINARIES, date);
+            Vector quotes = getContainedQuotes(fileName, quoteRange);
+            
+            int advanceDecline = 0;
+            
+            for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
+                Quote quote = (Quote)iterator.next();
+                
+                if(quote.getDayClose() > quote.getDayOpen())
+                    advanceDecline++;
+                else if(quote.getDayClose() < quote.getDayOpen())
+                    advanceDecline--;
+            }
+            
+            return advanceDecline;
         }
-
-        return advanceDecline;
+        else
+            return 0;
     }
 }

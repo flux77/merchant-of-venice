@@ -69,10 +69,11 @@ public interface QuoteSource {
      * Load the given quote range into the quote cache.
      *
      * @param	quoteRange	the range of quotes to load
+     * @return  <code>TRUE</code> if the operation suceeded
      * @see Quote
      * @see QuoteCache
      */
-    public void loadQuoteRange(QuoteRange quoteRange);
+    public boolean loadQuoteRange(QuoteRange quoteRange);
 
     /**
      * Returns whether the source contains any quotes for the given date.

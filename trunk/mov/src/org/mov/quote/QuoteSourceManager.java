@@ -55,6 +55,22 @@ public class QuoteSourceManager {
 	return instance.getSourceInstance();
     }
 
+
+    /**
+     * Set the quote source to be the given quote source. This function was
+     * written for import. During import we set the quote source to be the
+     * source source for the import. Then after the import we flush the
+     * source and let it return to whatever the user selected.
+     *
+     * @param source the new quote source
+     */
+    public static void setSource(QuoteSource source) {
+	if(instance == null) 
+	    instance = new QuoteSourceManager();
+
+        instance.sourceInstance = source;
+    }
+
     /**
      * The user has changed their quote source preferences, flush singleton
      * reference and create new instance. 
@@ -68,7 +84,8 @@ public class QuoteSourceManager {
 	// declared here so constructor is not public
     }
 
-    // Creates and returns singleton instance of quote source
+    // Creates and returns singleton instance of quote source which
+    // user has selected in the Preferences->Quote Source page.
     private synchronized QuoteSource getSourceInstance() {
 	if(sourceInstance == null) {
 	    Preferences p = PreferencesManager.getUserNode("/quote_source");

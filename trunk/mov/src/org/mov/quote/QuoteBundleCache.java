@@ -106,14 +106,14 @@ public class QuoteBundleCache {
      * @see QuoteCache
      */
     public void load(QuoteBundle quoteBundle) {
-	if(!isLoaded(quoteBundle)) {
-            load(quoteBundle.getQuoteRange());
-	    loadedQuoteBundles.add(quoteBundle);
-	}
+        // If the bundle isn't loaded, then load it. If we successfully loaded it
+        // then add it to the list.
+	if(!isLoaded(quoteBundle) && load(quoteBundle.getQuoteRange()))
+            loadedQuoteBundles.add(quoteBundle);
     }
     
     // Make sure all the quotes in the given quote range into the quote cache.
-    private void load(QuoteRange quoteRange) {
+    private boolean load(QuoteRange quoteRange) {
         // Go thorugh all loaded quote bundles to reduce the
         // possibility of reloading quotes that are already in
         // the cache
@@ -131,8 +131,10 @@ public class QuoteBundleCache {
         }
         
         if(quoteRange != null) { 
-            // Load the quote range into the quote cache
-            QuoteSourceManager.getSource().loadQuoteRange(quoteRange);
+            // Load the quote range into the quote cache. Return immediately if
+            // we couldn't load it.
+            if(!QuoteSourceManager.getSource().loadQuoteRange(quoteRange))
+                return false;
             
             // If the quote cache has too many quotes then keep
             // freeing the oldest bundle
@@ -141,6 +143,8 @@ public class QuoteBundleCache {
                 free((QuoteBundle)loadedQuoteBundles.firstElement());
             }
         }
+
+        return true;
     }
 
     /**

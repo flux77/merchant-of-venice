@@ -47,7 +47,7 @@ public class Main extends JFrame implements WindowListener {
 	CommandManager.getInstance().setDesktop(desktop);
 
 	// Instantiate main menu singletons
-	MainMenu.getInstance(this, desktop);
+	MainMenu.getInstance(this, desktopManager, desktop);
 
 	setContentPane(desktop);
 	addWindowListener(this);

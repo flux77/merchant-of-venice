@@ -24,20 +24,17 @@ import org.mov.quote.*;
 /**
  * An expression which finds the RSI over a given trading period.
  */
-public class RSIExpression extends Expression {
+public class RSIExpression extends BinaryExpression {
     
-    private int quoteKind;
-
     public RSIExpression(Expression days, Expression lag) {
-	add(days);
-	add(lag);
+        super(days, lag);
     }
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 	
-	int days = (int)get(0).evaluate(variables, quoteBundle, symbol, day);
-	int lastDay = day + (int)get(1).evaluate(variables, quoteBundle, symbol, day);
+	int days = (int)getChild(0).evaluate(variables, quoteBundle, symbol, day);
+	int lastDay = day + (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
 	System.err.println("calling rsi on symbol "+symbol);
 	return QuoteFunctions.rsi(quoteBundle, symbol, Quote.DAY_CLOSE, days,
 				  lastDay);
@@ -45,20 +42,16 @@ public class RSIExpression extends Expression {
 
     public String toString() {
 	return new String("rsi(" + 
-			  get(0).toString() + ", " +
-			  get(1).toString() + ")");
+			  getChild(0).toString() + ", " +
+			  getChild(1).toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {
-	if(get(0).checkType() == INTEGER_TYPE &&
-	   get(1).checkType() == INTEGER_TYPE)
+	if(getChild(0).checkType() == INTEGER_TYPE &&
+	   getChild(1).checkType() == INTEGER_TYPE)
 	    return FLOAT_TYPE;
 	else
 	    throw new TypeMismatchException();
-    }
-
-    public int getNeededChildren() {
-	return 2;
     }
 
     /**
@@ -71,8 +64,8 @@ public class RSIExpression extends Expression {
     }
 
     public Object clone() {
-        return new RSIExpression((Expression)get(0).clone(), 
-                                 (Expression)get(1).clone());
+        return new RSIExpression((Expression)getChild(0).clone(), 
+                                 (Expression)getChild(1).clone());
     }
 }
 

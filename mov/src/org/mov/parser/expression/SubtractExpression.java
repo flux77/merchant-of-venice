@@ -34,8 +34,8 @@ public class SubtractExpression extends ArithmeticExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	return getLeft().evaluate(variables, quoteBundle, symbol, day) -
-	    getRight().evaluate(variables, quoteBundle, symbol, day);
+	return getChild(0).evaluate(variables, quoteBundle, symbol, day) -
+	    getChild(1).evaluate(variables, quoteBundle, symbol, day);
     }
 
     public Expression simplify() {
@@ -43,18 +43,18 @@ public class SubtractExpression extends ArithmeticExpression {
         Expression simplified = super.simplify();
 
         if(simplified == this) {
-            NumberExpression left = (getLeft() instanceof NumberExpression? 
-                                     (NumberExpression)getLeft() : null);
-            NumberExpression right = (getRight() instanceof NumberExpression? 
-                                      (NumberExpression)getRight() : null);
+            NumberExpression left = (getChild(0) instanceof NumberExpression? 
+                                     (NumberExpression)getChild(0) : null);
+            NumberExpression right = (getChild(1) instanceof NumberExpression? 
+                                      (NumberExpression)getChild(1) : null);
 
             // a-0 -> a.
-            if(right != null && right.equals(0.0F))
-                return getLeft();
+            if(right != null && right.equals(0.0D))
+                return getChild(0);
 
             // a-a -> 0.
-            else if(getLeft().equals(getRight()))
-                return new NumberExpression(0.0F, getType());
+            else if(getChild(0).equals(getChild(1)))
+                return new NumberExpression(0.0D, getType());
         }
         return simplified;
     }
@@ -64,7 +64,7 @@ public class SubtractExpression extends ArithmeticExpression {
     }
 
     public Object clone() {
-        return new SubtractExpression((Expression)getLeft().clone(), 
-                                      (Expression)getRight().clone());
+        return new SubtractExpression((Expression)getChild(0).clone(), 
+                                      (Expression)getChild(1).clone());
     }
 }

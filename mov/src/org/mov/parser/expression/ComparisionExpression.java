@@ -42,8 +42,8 @@ abstract public class ComparisionExpression extends BinaryExpression {
      */
     public int checkType() throws TypeMismatchException {
 	// left & right types must be the same and not boolean or quote
-	int leftType = getLeft().checkType();
-	int rightType = getRight().checkType();
+	int leftType = getChild(0).checkType();
+	int rightType = getChild(1).checkType();
 
 	if(leftType == rightType && 
            (leftType == FLOAT_TYPE || leftType == INTEGER_TYPE))
@@ -57,8 +57,8 @@ abstract public class ComparisionExpression extends BinaryExpression {
         super.simplify();
 
         // If both the child arguments are constant we can precompute.
-        if(getLeft() instanceof NumberExpression &&
-           getRight() instanceof NumberExpression) {
+        if(getChild(0) instanceof NumberExpression &&
+           getChild(1) instanceof NumberExpression) {
             try {
                 return new NumberExpression(evaluate(null, null, null, 0), getType());
             }

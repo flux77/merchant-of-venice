@@ -35,8 +35,8 @@ public class AndExpression extends LogicExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	if(getLeft().evaluate(variables, quoteBundle, symbol, day) >= TRUE_LEVEL &&
-	   getRight().evaluate(variables, quoteBundle, symbol, day) >= TRUE_LEVEL)
+	if(getChild(0).evaluate(variables, quoteBundle, symbol, day) >= TRUE_LEVEL &&
+	   getChild(1).evaluate(variables, quoteBundle, symbol, day) >= TRUE_LEVEL)
 	    return TRUE;
 	else
 	    return FALSE;
@@ -46,17 +46,17 @@ public class AndExpression extends LogicExpression {
         // First simplify all the child arguments
         super.simplify();
 
-        NumberExpression left = (getLeft() instanceof NumberExpression? 
-                                 (NumberExpression)getLeft() : null);
-        NumberExpression right = (getRight() instanceof NumberExpression? 
-                                  (NumberExpression)getRight() : null);
+        NumberExpression left = (getChild(0) instanceof NumberExpression? 
+                                 (NumberExpression)getChild(0) : null);
+        NumberExpression right = (getChild(1) instanceof NumberExpression? 
+                                  (NumberExpression)getChild(1) : null);
 
         // If either child argument is the constant TRUE we can simplify to the 
         // other child argument
         if(left != null && left.getValue() >= TRUE_LEVEL)
-            return getRight();
+            return getChild(1);
         else if(right != null && right.getValue() >= TRUE_LEVEL)
-            return getLeft();
+            return getChild(0);
 
         // If either child argument is the constant FALSE we can simplify to the
         // constant FALSE
@@ -66,7 +66,7 @@ public class AndExpression extends LogicExpression {
 
         // If both child arguments are the same then we can simplify to the constant
         // TRUE.
-        else if(getLeft().equals(getRight()))
+        else if(getChild(0).equals(getChild(1)))
             return new NumberExpression(true);
 
         else
@@ -80,13 +80,13 @@ public class AndExpression extends LogicExpression {
             AndExpression expression = (AndExpression)object;
 
             // (x and y) == (x and y)
-            if(getLeft().equals(expression.getLeft()) &&
-               getRight().equals(expression.getRight()))
+            if(getChild(0).equals(expression.getChild(0)) &&
+               getChild(1).equals(expression.getChild(1)))
                 return true;
 
             // (x and y) == (y and x)
-            if(getLeft().equals(expression.getRight()) &&
-               getRight().equals(expression.getLeft()))
+            if(getChild(0).equals(expression.getChild(1)) &&
+               getChild(1).equals(expression.getChild(0)))
                 return true;
         }
     
@@ -98,8 +98,8 @@ public class AndExpression extends LogicExpression {
     }
 
     public Object clone() {
-        return new AndExpression((Expression)getLeft().clone(), 
-                                 (Expression)getRight().clone());
+        return new AndExpression((Expression)getChild(0).clone(), 
+                                 (Expression)getChild(1).clone());
     }
 }
 

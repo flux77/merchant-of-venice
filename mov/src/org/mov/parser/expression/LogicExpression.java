@@ -42,8 +42,8 @@ abstract public class LogicExpression extends BinaryExpression {
      */
     public int checkType() throws TypeMismatchException {
 	// both types must be boolean
-	int leftType = getLeft().checkType();
-	int rightType = getRight().checkType();
+	int leftType = getChild(0).checkType();
+	int rightType = getChild(1).checkType();
 
 	if(leftType == BOOLEAN_TYPE && rightType == BOOLEAN_TYPE)
 	    return BOOLEAN_TYPE;
@@ -72,17 +72,17 @@ abstract public class LogicExpression extends BinaryExpression {
     protected String toString(String operator) {
 	String string = "";
 
-	if(getLeft().getNeededChildren() < 2)
-	    string += getLeft().toString();
+	if(getChild(0).getChildCount() < 2)
+	    string += getChild(0).toString();
 	else
-	    string += "(" + getLeft().toString() + ")";
+	    string += "(" + getChild(0).toString() + ")";
 	
 	string += " " + operator + " ";
 	
-	if(getRight().getNeededChildren() < 2)
-	    string += getRight().toString();
+	if(getChild(1).getChildCount() < 2)
+	    string += getChild(1).toString();
 	else
-	    string += "(" + getRight().toString() + ")";
+	    string += "(" + getChild(1).toString() + ")";
 
 	return string;
     }

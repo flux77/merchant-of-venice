@@ -47,18 +47,18 @@ public class IfExpression extends TernaryExpression {
 	throws EvaluationException {
 
 	// if(...) then
-	if(get(0).evaluate(variables, quoteBundle, symbol, day) 
+	if(getChild(0).evaluate(variables, quoteBundle, symbol, day) 
 	   >= Expression.TRUE_LEVEL)
-	    return get(1).evaluate(variables, quoteBundle, symbol, day);
+	    return getChild(1).evaluate(variables, quoteBundle, symbol, day);
 	// else
 	else
-	    return get(2).evaluate(variables, quoteBundle, symbol, day);
+	    return getChild(2).evaluate(variables, quoteBundle, symbol, day);
     }
 
     public String toString() {
-	return new String("if(" + get(0).toString() + ") {" +
-			  get(1).toString() + "} else {" +
-			  get(2).toString() + "}");
+	return new String("if(" + getChild(0).toString() + ") {" +
+			  getChild(1).toString() + "} else {" +
+			  getChild(2).toString() + "}");
     }
 
     /**
@@ -70,10 +70,10 @@ public class IfExpression extends TernaryExpression {
      * @return	the type of the second and third arguments
      */
     public int checkType() throws TypeMismatchException {
-	if(get(0).getType() == BOOLEAN_TYPE &&
-           get(1).getType() == get(2).getType() &&
-           (get(1).getType() == FLOAT_TYPE || get(1).getType() == INTEGER_TYPE ||
-            get(1).getType() == BOOLEAN_TYPE))
+	if(getChild(0).getType() == BOOLEAN_TYPE &&
+           getChild(1).getType() == getChild(2).getType() &&
+           (getChild(1).getType() == FLOAT_TYPE || getChild(1).getType() == INTEGER_TYPE ||
+            getChild(1).getType() == BOOLEAN_TYPE))
            return getType();
 	else
 	    throw new TypeMismatchException();
@@ -85,47 +85,47 @@ public class IfExpression extends TernaryExpression {
      * @return {@link #FLOAT_TYPE}, {@link #INTEGER_TYPE} or {@link #BOOLEAN_TYPE}.
      */
     public int getType() {
-        assert get(1).getType() == get(2).getType();
+        assert getChild(1).getType() == getChild(2).getType();
 
-        return get(1).getType();
+        return getChild(1).getType();
     }
 
     public Expression simplify() {
         // First simplify all the child arguments
         super.simplify();
 
-        NumberExpression first = (get(0) instanceof NumberExpression? 
-                                  (NumberExpression)get(0) : null);
+        NumberExpression first = (getChild(0) instanceof NumberExpression? 
+                                  (NumberExpression)getChild(0) : null);
 
         // If the first argument is the constant TRUE then we simplify to the
         // second argument. Otherwise if the first argument is the constant FALSE
         // then we simplify to the third argument.
         if(first != null) {
             if(first.getValue() >= TRUE_LEVEL)
-                return get(1);
+                return getChild(1);
             else
-                return get(2);
+                return getChild(2);
         }
 
         // If the second and third arguments are the same then we can simplify
         // to the second argument.
-        else if(get(1).equals(get(2)))
-            return get(1);
+        else if(getChild(1).equals(getChild(2)))
+            return getChild(1);
 
         // If the first argument is not, create a new If expression that
         // reverses argument 1 and 2. I.e.
         // if(not(c)) {a} else {b}")) => if(c) {b} else {a}
-        else if(get(0) instanceof NotExpression)
-            return new IfExpression(get(0).get(0), get(2), get(1));
+        else if(getChild(0) instanceof NotExpression)
+            return new IfExpression(getChild(0).getChild(0), getChild(2), getChild(1));
 
         else
             return this;
     }
 
     public Object clone() {
-        return new IfExpression((Expression)get(0).clone(), 
-                                (Expression)get(1).clone(),
-                                (Expression)get(2).clone());
+        return new IfExpression((Expression)getChild(0).clone(), 
+                                (Expression)getChild(1).clone(),
+                                (Expression)getChild(2).clone());
     }
 
 }

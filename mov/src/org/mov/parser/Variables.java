@@ -33,7 +33,7 @@ public class Variables {
     }
 
     public void add(String name, int type) {
-        add(name, type, 0.0F);
+        add(name, type, 0.0D);
     }
 
     public void add(String name, int type, double value) {
@@ -79,7 +79,7 @@ public class Variables {
             return variable.getValue();
         else {
             assert false;
-            return 0.0F;
+            return 0.0D;
         }
     }
 

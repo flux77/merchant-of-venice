@@ -34,8 +34,8 @@ public class EqualThanExpression extends ComparisionExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	if(getLeft().evaluate(variables, quoteBundle, symbol, day) ==
-	   getRight().evaluate(variables, quoteBundle, symbol, day))
+	if(getChild(0).evaluate(variables, quoteBundle, symbol, day) ==
+	   getChild(1).evaluate(variables, quoteBundle, symbol, day))
 	    return TRUE;
 	else
 	    return FALSE;
@@ -48,7 +48,7 @@ public class EqualThanExpression extends ComparisionExpression {
         // If we haven't simplified the whole expression away and
         // the left and right arguments are the same expression
         // then the comparision must be true.
-        if(simplified == this && getLeft().equals(getRight()))
+        if(simplified == this && getChild(0).equals(getChild(1)))
             return new NumberExpression(true);
         else
             return simplified;
@@ -61,13 +61,13 @@ public class EqualThanExpression extends ComparisionExpression {
             EqualThanExpression expression = (EqualThanExpression)object;
 
             // (x == y) == (x == y)
-            if(getLeft().equals(expression.getLeft()) &&
-               getRight().equals(expression.getRight()))
+            if(getChild(0).equals(expression.getChild(0)) &&
+               getChild(1).equals(expression.getChild(1)))
                 return true;
 
             // (x == y) == (y == x)
-            if(getLeft().equals(expression.getRight()) &&
-               getRight().equals(expression.getLeft()))
+            if(getChild(0).equals(expression.getChild(1)) &&
+               getChild(1).equals(expression.getChild(0)))
                 return true;
         }
     
@@ -79,8 +79,8 @@ public class EqualThanExpression extends ComparisionExpression {
     }
 
     public Object clone() {
-        return new EqualThanExpression((Expression)getLeft().clone(), 
-                                       (Expression)getRight().clone());
+        return new EqualThanExpression((Expression)getChild(0).clone(), 
+                                       (Expression)getChild(1).clone());
     }
 }
 

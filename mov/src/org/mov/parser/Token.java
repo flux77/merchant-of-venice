@@ -238,7 +238,7 @@ public class Token {
 
         // Is it a float or an integer number?
 	if(Character.isDigit(string.charAt(0))) {
-	    double value = 0.0F; 
+	    double value = 0.0D; 
 	    String numberString = new String();
 
             // Any values are considered to be integers, unless we find a decimal

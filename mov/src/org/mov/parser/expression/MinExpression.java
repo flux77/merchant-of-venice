@@ -43,39 +43,39 @@ public class MinExpression extends TernaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
-        int quoteKind = ((QuoteExpression)get(0)).getQuoteKind();
+	int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
 
         if(days <= 0)
             throw EvaluationException.rangeForMin();
 
-        int offset = (int)get(2).evaluate(variables, quoteBundle, symbol, day);
+        int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
 	return min(quoteBundle, symbol, quoteKind, days, day, offset);
     }
 
     public String toString() {
 	return new String("min(" + 
-			  get(0).toString() + ", " +
-			  get(1).toString() + ", " +
-			  get(2).toString() + ")");
+			  getChild(0).toString() + ", " +
+			  getChild(1).toString() + ", " +
+			  getChild(2).toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {
 	// First type must be quote, second and third types must be value
-	if((get(0).checkType() == FLOAT_QUOTE_TYPE ||
-            get(0).checkType() == INTEGER_QUOTE_TYPE) &&
-	   get(1).checkType() == INTEGER_TYPE &&
-	   get(2).checkType() == INTEGER_TYPE)
+	if((getChild(0).checkType() == FLOAT_QUOTE_TYPE ||
+            getChild(0).checkType() == INTEGER_QUOTE_TYPE) &&
+	   getChild(1).checkType() == INTEGER_TYPE &&
+	   getChild(2).checkType() == INTEGER_TYPE)
 	    return getType();
 	else
 	    throw new TypeMismatchException();
     }
 
     public int getType() {
-        if(get(0).getType() == FLOAT_QUOTE_TYPE)
+        if(getChild(0).getType() == FLOAT_QUOTE_TYPE)
             return FLOAT_TYPE;
         else {
-            assert get(0).getType() == INTEGER_QUOTE_TYPE;
+            assert getChild(0).getType() == INTEGER_QUOTE_TYPE;
             return INTEGER_TYPE;
         }
     }
@@ -102,8 +102,8 @@ public class MinExpression extends TernaryExpression {
     }
 
     public Object clone() {
-        return new MinExpression((Expression)get(0).clone(), 
-                                 (Expression)get(1).clone(),
-                                 (Expression)get(2).clone());
+        return new MinExpression((Expression)getChild(0).clone(), 
+                                 (Expression)getChild(1).clone(),
+                                 (Expression)getChild(2).clone());
     }
 }

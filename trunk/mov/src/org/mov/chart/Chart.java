@@ -10,6 +10,13 @@ import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.util.*;
 
+/**
+ * New swing component that allows creation of charts. This charting
+ * component supports graphing levels and also highlighting of a graph
+ * region.
+ *
+ * @see ChartModule
+ */
 public class Chart extends JComponent implements MouseListener {
 
     // The first element of this vector contains a vector of the
@@ -20,15 +27,14 @@ public class Chart extends JComponent implements MouseListener {
     private BasicChartUI gui;
     private boolean toolTipBeenUp = false;
 
-    // Will graph between the start date and end date here, dates is
-    // a vector of all dates inbetween (inclusive)
-    private TradingDate startDate;
-    private TradingDate endDate;
-    private Vector dates;
+    // Will graph between the start and end X coordinates (inclusive)
+    private Comparable startX;
+    private Comparable endX;
+    private Vector xRange;
 
-    // When highlighting the grap keep track of the start and end dates
-    private TradingDate startHighlightedDate;
-    private TradingDate endHighlightedDate;
+    // When highlighting the grap keep track of the start and end x 
+    private Comparable startHighlightedX;
+    private Comparable endHighlightedX;
 
     // Are we in a zoomed in view?
     private boolean zoomedIn = false;
@@ -36,6 +42,9 @@ public class Chart extends JComponent implements MouseListener {
     // Map of graphs to display annotations
     private HashMap annotatedGraphs = new HashMap();
 
+    /**
+     * Create a new Chart component.
+     */
     public Chart() {
 	setBackground(Color.white);
 	setForeground(Color.gray);
@@ -43,55 +52,133 @@ public class Chart extends JComponent implements MouseListener {
 	updateUI();
     }
 
-    private void setDates(TradingDate startDate, TradingDate endDate) {
+    // Create a vector of iterators containing the x range iterators
+    // for each graph.
+    private Vector getGraphXRangeIterators() {
 
-	// Dont do anything if the start and end date are
-	// still the same
-	if(dates == null || this.startDate != startDate ||
-	   this.endDate != endDate) {
-	    this.startDate = startDate;
-	    this.endDate = endDate;
+	Vector graphXRangeIterators = new Vector();
+	Iterator levelsIterator = levels.iterator();
+	
+	while(levelsIterator.hasNext()) {
 
-	    dates = Converter.dateRangeToTradingDateVector(startDate, endDate);
+	    Iterator graphIterator = 
+		((Vector)levelsIterator.next()).iterator();
+
+	    while(graphIterator.hasNext()) {	
+		
+		Graph graph = (Graph)graphIterator.next();
+		Set xRange = graph.getXRange();
+		graphXRangeIterators.add(xRange.iterator());
+	    }
 	}
+
+	return graphXRangeIterators;
     }
 
-    public Vector getDates() {
-	return dates;
+    // Create a set of X values containing every X value between startX
+    // and endX (inclusive) that occurs in any one of the graphs we
+    // are charting.
+    private void setXRange(Comparable startX, Comparable endX) {
+
+	// Algorithm work as follows:
+	//
+	// get x range iterators for all graphs
+	//
+	// while x range iterator for all graphs
+	//	get graph x range iterator 
+	//
+	//	while graph x range iterator
+	//		get x value
+	//		if below starting x
+	//		        next
+	//		if above starting x
+	//			last
+	//		if not already in set of x values
+	//			add
+
+	this.startX = startX;
+	this.endX = endX;
+
+	// Use a tree set to give us a means of sorting the x range
+	TreeSet xRangeSet = new TreeSet();
+
+	// Get vector of iterators over x range for each graph
+	Vector graphXRangeiterators = getGraphXRangeIterators();
+
+	// Add each x within range
+	Iterator graphXRangeIterator = graphXRangeiterators.iterator();
+
+	while(graphXRangeIterator.hasNext()) {
+
+	    // Get next graph's iterator over its x range
+	    Iterator xRangeIterator = (Iterator)graphXRangeIterator.next();
+
+	    while(xRangeIterator.hasNext()) {
+		Comparable x = (Comparable)xRangeIterator.next();
+
+		if(x.compareTo(startX) < 0) 
+		    continue;
+		else if(x.compareTo(endX) > 0)
+		    break;
+		else if(!xRangeSet.contains(x))
+		    xRangeSet.add(x);
+	    }
+	}
+
+	// Load x range into a vector as we need to access
+	// values at arbitary offsets
+	xRange = new Vector(xRangeSet);
     }
 
-    public TradingDate getStartDate() {
-	return startDate;
+    /**
+     * Get the range of X values which appear in the chart.
+     *
+     * @return	<code>Vector</code> of <code>Comparables</code>
+     */
+    public Vector getXRange() {
+	return xRange;
     }
 
-    public TradingDate getEndDate() {
-	return endDate;
+    /**
+     * Get the first X value that appears in the chart.
+     */
+    public Comparable getStartX() {
+	return startX;
     }
 
-    private TradingDate calculateStartDate() {
+    /**
+     * Get the last X value that appears in the chart.
+     */
+    public Comparable getEndX() {
+	return endX;
+    }
+
+    // Find the lowest X value in all the graphs we are going to chart
+    private Comparable calculateStartX() {
 	Iterator iterator = levels.iterator();
-	TradingDate date;
-	TradingDate startDate = null;
+	Comparable x;
+	Comparable startX = null;
 	
 	while(iterator.hasNext()) {
 
 	    Iterator innerIterator = ((Vector)iterator.next()).iterator();
 	    
 	    while(innerIterator.hasNext()) {	
-		date = 
-		    ((Graph)innerIterator.next()).getStartDate();
-		if(startDate == null || date.compareTo(startDate) < 0)
-		    startDate = date;
+		x = 
+		    ((Graph)innerIterator.next()).getStartX();
+		if(startX == null || x.compareTo(startX) < 0)
+		    startX = x;
 	    }
 	}
 
-	return startDate;
+	return startX;
     }
 
-    private TradingDate calculateEndDate() {
+    // Find the highest X value in all the graphs we are going to chart
+    private Comparable calculateEndX() {
 	Iterator iterator = levels.iterator();
-	TradingDate date;
-	TradingDate endDate = null;
+	Comparable x;
+	Comparable endX = null;
 	
 	while(iterator.hasNext()) {
 
@@ -99,19 +186,24 @@ public class Chart extends JComponent implements MouseListener {
 	    
 	    while(innerIterator.hasNext()) {	
 
-		date = 
-		    ((Graph)innerIterator.next()).getEndDate();
+		x = 
+		    ((Graph)innerIterator.next()).getEndX();
 
-		if(endDate == null || date.compareTo(endDate) > 0)
-		    endDate = date;
+		if(endX == null || x.compareTo(endX) > 0)
+		    endX = x;
 	    }
 	}
 	
-	return endDate;
+	return endX;
     }
 
-    // Record whether the given graph should have its annotations
-    // displayed or not
+    /**
+     * Set whether the given graph should display its annotations.
+     *
+     * @param	graph	the graph to modify
+     * @param	enabled	<code>true</code> to turn on graph annotations; 
+     *			<code>false</code> to turn them off
+     */
     public void handleAnnotation(Graph graph, boolean enabled) {
 	if(enabled)
 	    annotatedGraphs.put(graph, new Boolean(true));
@@ -119,7 +211,13 @@ public class Chart extends JComponent implements MouseListener {
 	    annotatedGraphs.remove(graph);
     }
 
-    // Graph's annotation is on?
+    /**
+     * Query whether the given graph is displaying its annotations.
+     *
+     * @param	graph	the graph to query
+     * @return	<code>true</code> if the graph is displaying its annotations;
+     *		<code>false</code> otherwise
+     */
     public boolean isAnnotated(Graph graph) {
 	if(annotatedGraphs.get(graph) != null)
 	    return true;
@@ -127,6 +225,13 @@ public class Chart extends JComponent implements MouseListener {
 	    return false;
     }
 
+    /**
+     * Chart a new graph at the given level. If the chart does not contain
+     * the level, create a new one/
+     *
+     * @param	graph	the new graph to chart
+     * @param	index	the level index
+     */
     public void add(Graph graph, int index) {
 
 	// Do we already have any graphs at this index?
@@ -143,11 +248,17 @@ public class Chart extends JComponent implements MouseListener {
 	}
 
 	// If we are not zoomed in, make sure we are displaying the
-	// dates of the new graph (if any new dates)
+	// x range of the new graph
 	if(!zoomedIn)
-	    setDates(calculateStartDate(), calculateEndDate());
+	    setXRange(calculateStartX(), calculateEndX());
     }
 
+    /**
+     * Remove the graph from the chart. If the graph was an only member of
+     * its level, then the level will also be removed.
+     *
+     * @param	graph	the graph to remove
+     */
     public void remove(Graph graph) {
 
 	// Find and remove first (only) matching graph
@@ -175,11 +286,11 @@ public class Chart extends JComponent implements MouseListener {
 			levels.remove(innerVector);
 
 			// If we are not zoomed in a graph has disappeared,
-			// make sure we arent displaying dates for a graph
+			// make sure we arent displaying x range for a graph
 			// that doesnt exist yet - but dont do this if
 			// we are zoomed in.
 			if(!zoomedIn)
-			    setDates(calculateStartDate(), calculateEndDate());
+			    setXRange(calculateStartX(), calculateEndX());
 
 		    }
 		    return;
@@ -190,18 +301,41 @@ public class Chart extends JComponent implements MouseListener {
 	// If we got here we couldnt find it
     }
 
+    /**
+     * Return all the graphs for each level.
+     *
+     * @return	A <code>Vector</code> where each element represents a
+     *		a graph level. Each element in the <code>Vector</code>
+     *		is another <code>Vector</code> containing the graphs at that
+     *		level.
+     */ 
     public Vector getLevels() {
 	return levels;
     }
 
+    /**
+     * Return the colour that the given graph will be drawn. Note that the
+     * graph may choose to override this colour.
+     *
+     * @param	graph	the graph to query
+     * @return	the colour the graph may be drawn as
+     */
     public Color getGraphColour(Graph graph) {
 	return gui.getGraphColour(graph, this);
     }
 
+    /**
+     * Sets the L&F object that renders this component.
+     *
+     * @param	ui	the ButtonUI L&F object
+     */
     public void setUI(BasicChartUI ui) {
 	super.setUI(ui);
     }
 
+    /** 
+     * Resets the UI property to a value from the current look and feel.
+     */
     public void updateUI() {
 	gui = new BasicChartUI();
 
@@ -209,10 +343,24 @@ public class Chart extends JComponent implements MouseListener {
 	resetBuffer();
     }
 
-    public TradingDate getDateAtPoint(int x) {
-	return gui.getDateAtPoint(this, x);
+    /**
+     * Return the X value at the given x coordinate.
+     *
+     * @param	x	an x coordinate on the screen
+     * @return	the X value at the x coordinate
+     */
+    public Comparable getXAtPoint(int x) {
+	return gui.getXAtPoint(this, x);
     }
 
+    /**
+     * Return whether the x,y coordinate is within this component.
+     *
+     * @param	x	the x coordinate
+     * @param	y	the y coordinate
+     * @return	<code>true</code> if the point is within this component;
+     *		<code>false</code> otherwise.
+     */
     public boolean contains(int x, int y) {
 
 	String text = gui.getToolTipText(this, x, y);
@@ -232,7 +380,8 @@ public class Chart extends JComponent implements MouseListener {
 
 	return super.contains(x, y);
     }
-
+    
+    // Set the size of this component
     private void setSize() {
 	setMinimumSize(new Dimension(BasicChartUI.getMinimumWidth(this),
 				     BasicChartUI.getMinimumHeight(this)));
@@ -240,64 +389,110 @@ public class Chart extends JComponent implements MouseListener {
 				       BasicChartUI.getMinimumHeight(this)));
     }
 
+    /**
+     * Returns a string that specifies the name of the l&f class that 
+     * renders this component.
+     *
+     * @return String "ChartUI"
+     */
     public String getUIClassID() {
 	return "ChartUI";
     }
 
-    public void setHighlightedRegionStart(TradingDate start) {
-	startHighlightedDate = start;
-	endHighlightedDate = start;
+    /**
+     * Sets the start X point of the highlighted region. Also resets the
+     * end point of the highlighted region to the start point. This
+     * creates a highlighted region 1 pixel thick.
+     *
+     * @param	x	the starting x value
+     */
+    public void setHighlightedStart(Comparable x) {
+	startHighlightedX = x;
+	endHighlightedX = x;
 	repaint();
     }
 
-    public void setHighlightedRegionEnd(TradingDate end) {
-	endHighlightedDate = end;
+    /**
+     * Sets the end X point of the highlighted region. The highlighted
+     * region will now stretch from the start to the end X point.
+     *
+     * @param	x	the ending x value
+     */
+    public void setHighlightedEnd(Comparable x) {
+	endHighlightedX = x;
 	repaint();
     }
 
-    public TradingDate getHighlightedStart() {
-	return startHighlightedDate;
+    /**
+     * Get the start X of the highlighted region.
+     *
+     * @return	the start X
+     */
+    public Comparable getHighlightedStart() {
+	return startHighlightedX;
     }
 
-    public TradingDate getHighlightedEnd() {
-	return endHighlightedDate;
+    /**
+     * Get the end X of the highlighted region.
+     *
+     * @return	the end X
+     */
+    public Comparable getHighlightedEnd() {
+	return endHighlightedX;
     }
 
+    /**
+     * Clear the highlighted region.
+     */
     public void clearHighlightedRegion() {
-	startHighlightedDate = null;
-	endHighlightedDate = null;
+	startHighlightedX = null;
+	endHighlightedX = null;
 	repaint();
     }
 
+    /**
+     * Draw the graph zoomed into the given highlighted region.
+     */
     public void zoomToHighlightedRegion() {
-	// Order [startHighlightedDate, endHighlightedDate]
-	if(startHighlightedDate.after(endHighlightedDate)) {
-	    TradingDate temp = startHighlightedDate;
-	    startHighlightedDate = endHighlightedDate;
-	    endHighlightedDate = temp;
+	// Order [startHighlightedX, endHighlightedX]
+	if(startHighlightedX.compareTo(endHighlightedX) > 0) {
+	    Comparable temp = startHighlightedX;
+	    startHighlightedX = endHighlightedX;
+	    endHighlightedX = temp;
 	}
 
-	// Recalculate dates 
-	setDates(startHighlightedDate, endHighlightedDate);
+	// Recalculate x range 
+	setXRange(startHighlightedX, endHighlightedX);
 	clearHighlightedRegion();
 	zoomedIn = true;
 	resetBuffer();
     }
 
+    /**
+     * Draw the graph back at its default zoom.
+     */
     public void zoomToDefaultRegion() {
 
-	// Recalculate dates and lowest, highest values
-	setDates(calculateStartDate(), calculateEndDate());
+	// Recalculate x range
+	setXRange(calculateStartX(), calculateEndX());
 	zoomedIn = false;
 	resetBuffer();
     }
 
+    /**
+     * Reset the double buffer, forcing the graph to redraw.
+     */
     public void resetBuffer() {
 	if(gui != null)
 	    gui.resetBuffer();
 	setSize();
     }
 
+    /**
+     * Return the window title.
+     *
+     * @return	the window title
+     */
     public String getTitle() {
 
 	Iterator levelIterator = levels.iterator();

@@ -364,69 +364,28 @@ public class ChartModule extends JPanel implements Module,
 	return this;
     }
 
-    /**
-     * Called when a mouse click event is received. 
-     *
-     * @param	e	mouse event
-     */
     public void mouseClicked(MouseEvent e) { 
 	chart.clearHighlightedRegion();
 	zoomIn.setEnabled(zoomInEnabled = false);
     }
-
-    /**
-     * Called when a mouse enter event is received. 
-     *
-     * @param	e	mouse event
-     */
     public void mouseEntered(MouseEvent e) {}
-
-    /**
-     * Called when a mouse exit event is received. 
-     *
-     * @param	e	mouse event
-     */
     public void mouseExited(MouseEvent e) {}
-
-    /**
-     * Called when a mouse press event is received. 
-     *
-     * @param	e	mouse event
-     */
     public void mousePressed(MouseEvent e) {
-	TradingDate date = chart.getDateAtPoint(e.getX());
+	Comparable x = chart.getXAtPoint(e.getX());
 
-	if(date != null) 
-	    chart.setHighlightedRegionStart(date);
+	if(x != null) 
+	    chart.setHighlightedStart(x);
     }
-
-    /**
-     * Called when a mouse release event is received. 
-     *
-     * @param	e	mouse event
-     */
     public void mouseReleased(MouseEvent e) { }
-
-    /**
-     * Called when a mouse drag event is received. 
-     *
-     * @param	e	mouse event
-     */
     public void mouseDragged(MouseEvent e) {
-	TradingDate date = chart.getDateAtPoint(e.getX());
+	Comparable x = chart.getXAtPoint(e.getX());
 
-	if(date != null) 
-	    chart.setHighlightedRegionEnd(date);
+	if(x != null) 
+	    chart.setHighlightedEnd(x);
 
 	// can now zoom in!
 	zoomIn.setEnabled(zoomInEnabled = true);
     }
-
-    /**
-     * Called when a mouse move event is received. 
-     *
-     * @param	e	mouse event
-     */
     public void mouseMoved(MouseEvent e) {}
 
     /**

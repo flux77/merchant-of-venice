@@ -8,7 +8,7 @@ import org.mov.quote.*;
 
 public interface GraphSource {
     abstract public String getName();
-    abstract public String getToolTipText(TradingDate date);
+    abstract public String getToolTipText(Comparable x);
     abstract public String getYLabel(float value);
     abstract public float[] getAcceptableMajorDeltas();
     abstract public float[] getAcceptableMinorDeltas();

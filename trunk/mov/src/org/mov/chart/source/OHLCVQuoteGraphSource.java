@@ -34,7 +34,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    date = (TradingDate)iterator.previous();
 	    try {
 		value = new Float(cache.getQuote(symbol, quote, date));
-		graphable.putValue(date, value);
+		graphable.putY((Comparable)date, value);
 	    }
 	    catch(EvaluationException e) {
 		// ignore
@@ -50,7 +50,11 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	return symbol;
     }
 
-    public String getToolTipText(TradingDate date) {
+    public String getToolTipText(Comparable x) {
+
+	// In OHLCV graphs the x axis is in dates
+	TradingDate date = (TradingDate)x;
+
 	if(!cache.containsDate(date)) 
 	    return null;
 

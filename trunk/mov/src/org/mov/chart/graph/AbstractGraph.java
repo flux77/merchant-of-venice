@@ -19,18 +19,22 @@ abstract public class AbstractGraph implements Graph {
     	return source;
     }
 
-    public String getToolTipText(TradingDate date, int y, int yoffset,
+    public String getToolTipText(Comparable x, int y, int yoffset,
 				 float verticalScale,
 				 float bottomLineValue) {
-	return source.getToolTipText(date);
+	return source.getToolTipText(x);
     }
 
-    public TradingDate getStartDate() {
-	return source.getGraphable().getStartDate();
+    public Comparable getStartX() {
+	return source.getGraphable().getStartX();
     }
 
-    public TradingDate getEndDate() {
-	return source.getGraphable().getEndDate();
+    public Comparable getEndX() {
+	return source.getGraphable().getEndX();
+    }
+
+    public Set getXRange() {
+	return source.getGraphable().getXRange();
     }
 
     public String getYLabel(float value) {
@@ -41,16 +45,16 @@ abstract public class AbstractGraph implements Graph {
 	return source.getName();
     }
 
-    public Float getValue(TradingDate date) {
-	return source.getGraphable().getValue(date);
+    public Float getY(Comparable x) {
+	return source.getGraphable().getY(x);
     }
 
-    public float getHighestValue(Vector dates) {
-	return source.getGraphable().getHighestValue(dates);
+    public float getHighestY(Vector x) {
+	return source.getGraphable().getHighestY(x);
     }
 
-    public float getLowestValue(Vector dates) {
-	return source.getGraphable().getLowestValue(dates);
+    public float getLowestY(Vector x) {
+	return source.getGraphable().getLowestY(x);
     }
 
     public float[] getAcceptableMajorDeltas() {
@@ -69,7 +73,7 @@ abstract public class AbstractGraph implements Graph {
 	return false;
     }
 
-    public String getAnnotationToolTipText(TradingDate date) {
+    public String getAnnotationToolTipText(Comparable x) {
 	return null;
     }
 }

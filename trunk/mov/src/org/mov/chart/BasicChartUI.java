@@ -13,6 +13,9 @@ import org.mov.chart.source.*;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * Chart Implementation.
+ */
 public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
     //
@@ -74,16 +77,26 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     // tool tip generation
     private int xoffset, yoffset;
 
+    /**
+     * Return the minimum width needed by this component.
+     * 
+     * @param	chart	the chart component
+     */
     public static int getMinimumWidth(Chart chart) {
 	// The minimum width is merely the length of this plus some
 	// space for the Y axis labels. The minimum height is fixed but
 	// may or may not include the X axis labels height.
-	if(chart.getDates() != null)
-	    return chart.getDates().size() + Y_LABEL_WIDTH;
+	if(chart.getXRange() != null)
+	    return chart.getXRange().size() + Y_LABEL_WIDTH;
 	else
 	    return Y_LABEL_WIDTH;
     }
 
+    /**
+     * Return the minimum height needed by this component.
+     * 
+     * @param	chart	the chart component
+     */
     public static int getMinimumHeight(Chart chart) {
 	// Levels of graphs
 	int levels = chart.getLevels().size();
@@ -95,25 +108,39 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	return new BasicChartUI();
     }
 
-    public TradingDate getDateAtPoint(Chart chart, int x) {
+    /**
+     * Return the X value at the given x coordinate.
+     *
+     * @param	chart	the chart component
+     * @param	xCoordinate	an x coordinate on the screen
+     * @return	the X value at the x coordinate
+     */
+    public Comparable getXAtPoint(Chart chart, int xCoordinate) {
 
-	TradingDate date = null;
+	Comparable x = null;
 
-       	// First find the date at this point
-	int dateOffset = (int)(x / horizontalScale);
+       	// First find the X at this point
+	int xOffset = (int)(xCoordinate / horizontalScale);
 
-	if(dateOffset >= chart.getDates().size())
-	    dateOffset = chart.getDates().size()-1;
-	if(dateOffset < 0)
-	    dateOffset = 0;
+	if(xOffset >= chart.getXRange().size())
+	    xOffset = chart.getXRange().size()-1;
+	if(xOffset < 0)
+	    xOffset = 0;
 
-	if(chart.getDates() != null && dateOffset < chart.getDates().size())
-	    date = (TradingDate)chart.getDates().elementAt(dateOffset);
+	if(chart.getXRange() != null && xOffset < chart.getXRange().size())
+	    x = (Comparable)chart.getXRange().elementAt(xOffset);
 	
-	return date;
+	return x;
     }
     
-    private int getLevelAtPoint(int y) {
+    /**
+     * Return which graph level contains the given y coordinate.
+     *
+     * @param	yCoordinate	the y coordinate to query
+     * @return	the level which contains the y coordinate or <code>0</code>
+     *		if none do
+     */
+    private int getLevelAtPoint(int yCoordinate) {
 	
 	Iterator iterator = levelHeights.iterator();
 	int level = 0;
@@ -123,7 +150,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	while(iterator.hasNext()) {
 	    
 	    yoffset += ((Integer)iterator.next()).intValue();
-	    if(y <= yoffset)
+	    if(yCoordinate <= yoffset)
 		return level;
 	    
 	    level++;
@@ -131,6 +158,12 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
        	return 0;
     }
 
+    /**
+     * Return the start y offset for the given level.
+     *
+     * @param	level	the level
+     * @return	the start y offset
+     */
     private int getStartOfLevel(int level) {
 	int yoffset = 0;
 
@@ -142,7 +175,15 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	return yoffset;
     }
 
-    public String getToolTipText(Chart chart, int x, int y) {
+    /**
+     * Return the tool tip text for the given x, y coordinates.
+     *
+     * @param	chart	the chart component
+     * @param	x	the x coordinate
+     * @param	y	the y coordinate
+     */
+    public String getToolTipText(Chart chart, int xCoordinate, 
+				 int yCoordinate) {
 
 	// Abort if some of our variables are set yet
 	if(verticalAxes == null)
@@ -151,10 +192,10 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	Insets insets = chart.getInsets();
 	int height = chart.getHeight() - insets.top - insets.bottom;
 
-	// Get date at this point
-	TradingDate date = getDateAtPoint(chart, x);
+	// Get x at this point
+	Comparable x = getXAtPoint(chart, xCoordinate);
 	// Get graph level at this point
-	int level = getLevelAtPoint(y);
+	int level = getLevelAtPoint(yCoordinate);
 	// Get vertical axis of graph level
 	VerticalAxis verticalAxis = 
 	    (VerticalAxis)verticalAxes.elementAt(level);
@@ -162,8 +203,8 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
 	String toolTipText = null;
 
-	if(y < (height - X_LABEL_HEIGHT) && verticalAxis != null &&
-	   date != null) {
+	if(yCoordinate < (height - X_LABEL_HEIGHT) && verticalAxis != null &&
+	   x != null) {
 
 	    // Iterate through all graphs until one of the graph gives us
 	    // a tooltip
@@ -175,7 +216,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		graph = (Graph)iterator.next();
 		
 		toolTipText = 
-		    graph.getToolTipText(date, y, yoffset + 
+		    graph.getToolTipText(x, yCoordinate, yoffset + 
 					 verticalAxis.getHeightOfGraph(),
 					 verticalAxis.getScale(), 
 					 verticalAxis.getBottomLineValue());
@@ -185,6 +226,12 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	return toolTipText;
     }
 
+    /**
+     * Paint the component. 
+     *
+     * @param	g the graphics to paint to
+     * @param	c the chart component
+     */
     public void paint(Graphics g, JComponent c) {
 
 	// Get size
@@ -224,6 +271,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	highlightRegion(g, (Chart)c, height);
     }
 
+    // Repaint the component and recalculate everything
     private void bufferedPaint(Graphics g, Chart chart, 
 			       int width, int height) {
 
@@ -237,6 +285,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	drawAnnotations(g, chart);
     }
 
+    // Create a new horizontal axis which is sized for the component
     private void calculateHorizontalAxes(Graphics g, Chart chart, 
 					 int width, int height) {
 	// Minor horizontal axis can either be MONTHS or QUARTERS. Test
@@ -246,14 +295,14 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	// Calculate horizontal scale
 	horizontalScale =
 	    HorizontalAxis.calculateScale(width - Y_LABEL_WIDTH, 
-					  chart.getDates().size());
+					  chart.getXRange().size());
 
 	if(horizontalScale * MINIMUM_TRADING_DAYS_IN_MONTH <
 	   2 * g.getFontMetrics().stringWidth(new String("Feb"))) {
 	    
 	    if(quartersHorizontalAxis == null)
 		quartersHorizontalAxis = 
-		    new HorizontalAxis(chart.getDates(), 
+		    new HorizontalAxis(chart.getXRange(), 
 				       HorizontalAxis.QUARTERS,
 				       HorizontalAxis.MINOR);
 
@@ -262,7 +311,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	else {
 	    if(monthsHorizontalAxis == null)		
 		monthsHorizontalAxis = 
-		    new HorizontalAxis(chart.getDates(), 
+		    new HorizontalAxis(chart.getXRange(), 
 				       HorizontalAxis.MONTHS,
 				       HorizontalAxis.MINOR);
 
@@ -273,18 +322,19 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	// Major horizontal axis is always years
 	if(majorHorizontalAxis == null)
 	    majorHorizontalAxis = 
-		new HorizontalAxis(chart.getDates(), HorizontalAxis.YEARS,
+		new HorizontalAxis(chart.getXRange(), HorizontalAxis.YEARS,
 				   HorizontalAxis.MAJOR);
 
     }
 
+    // Highlight the component's highlighted region
     private void highlightRegion(Graphics g, Chart chart, int height) {
 	if(chart.getHighlightedStart() != null && 
 	   chart.getHighlightedEnd() != null) {
 
-	    // Convert dates to x values
-	    int start = dateToX(chart, chart.getHighlightedStart());
-	    int end = dateToX(chart, chart.getHighlightedEnd());
+	    // Convert X value to X coordinate
+	    int start = getXCoordinate(chart, chart.getHighlightedStart());
+	    int end = getXCoordinate(chart, chart.getHighlightedEnd());
 
 	    g.setXORMode(Color.pink);
 
@@ -295,18 +345,19 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	}
     }
 
-    private int dateToX(Chart chart, TradingDate date) {
+    // For the given X value, return the X coordinate
+    private int getXCoordinate(Chart chart, Comparable x) {
 
 	int i = 0;
 	
-	if(chart.getDates() != null) {
-	    Iterator iterator = chart.getDates().iterator();
-	    TradingDate thisDate = null;
+	if(chart.getXRange() != null) {
+	    Iterator iterator = chart.getXRange().iterator();
+	    Comparable thisX = null;
 
 	    while(iterator.hasNext()) {
-		thisDate = (TradingDate)iterator.next();
+		thisX = (Comparable)iterator.next();
 
-		if(date.compareTo(thisDate) <= 0)
+		if(x.compareTo(thisX) <= 0)
 		    return (int)(i * horizontalScale);
 		
 		i++;
@@ -315,6 +366,9 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	return (int)(i * horizontalScale);
     }
 
+    /**
+     * Reset the double buffer and force the chart to redraw.
+     */
     public void resetBuffer() {
 	// Recalculate everything
 	quartersHorizontalAxis = null;
@@ -327,12 +381,14 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	bufferHeight = 0;
     }
 
+    // Set the background colour 
     private void drawBackground(Graphics g, Chart chart, int width,
 				int height) {
 	g.setColor(chart.getBackground());
 	g.fillRect(0, 0, width, height);
     }
 
+    // Draw the vertical grid and the vertical labels onto the chart
     private void drawVerticalGridAndLabels(Graphics g, 
 					   Graph firstGraph,
 					   String title,
@@ -344,6 +400,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
     }
 
+    // Draw all the graph levels onto the chart
     private void drawLevels(Graphics g, Chart chart, int width, int height) {
 	// Calculate space between top of graph and first horizontalLine
 	firstHorizontalLine = getFirstHorizontalLine(g);
@@ -368,6 +425,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	}
     }
 
+    // Draw a single graph level onto the chart
     private void drawLevel(Graphics g, Vector graphs, Chart chart, int yoffset,
 			   int width, int height, int level) {
 
@@ -437,6 +495,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	return title;
     }
 
+    // Create a new vertical axis which is sized for the component
     private VerticalAxis calculateVerticalAxis(Chart chart, Vector graphs,
 					       int height, int level) {
 
@@ -456,8 +515,8 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
 	if(verticalAxis == null) {
 	    verticalAxis = 
-		new VerticalAxis(getLowestValue(chart.getDates(), graphs), 
-				 getHighestValue(chart.getDates(), graphs),
+		new VerticalAxis(getLowestY(chart.getXRange(), graphs), 
+				 getHighestY(chart.getXRange(), graphs),
 				 firstGraph.getAcceptableMinorDeltas(),
 				 firstGraph.getAcceptableMajorDeltas());
 	    verticalAxes.setElementAt(verticalAxis, level);
@@ -469,6 +528,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	return verticalAxis;
     }
 
+    // Draw all of the given graphs at this level onto the graph
     private void drawGraphs(Graphics g, Vector graphs, Chart chart,
 			    VerticalAxis verticalAxis,
 			    int yoffset, int width, int height) {
@@ -487,10 +547,11 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 			 horizontalScale, 
 			 verticalAxis.getScale(),
 			 verticalAxis.getBottomLineValue(), 
-			 chart.getDates());
+			 chart.getXRange());
 	}
     }
 
+    // Draw the horizontal grid onto the chart
     private void drawHorizontalGrid(Graphics g, Chart chart, 
 				   VerticalAxis verticalAxis, int yoffset) {
 
@@ -506,6 +567,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 				     verticalAxis.getHeightOfGraph());
     }
 
+    // Draw the horizontal axis labels onto the chart
     private void drawHorizontalLabels(Graphics g, int height) {
 
 	g.setColor(Color.lightGray);
@@ -556,37 +618,39 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 				      VerticalAxis verticalAxis, 
 				      int yoffset, HashMap annotations) {
 
-	Set dates = annotations.keySet();
-	Iterator iterator = dates.iterator();
-	TradingDate date;
+	Set xRange = annotations.keySet();
+	Iterator iterator = xRange.iterator();
+	Comparable x;
 	String text;
 
 	while(iterator.hasNext()) {
 
-	    date = (TradingDate)iterator.next();
+	    x = (Comparable)iterator.next();
 
-	    // Only display date if its within the range displayed by the
+	    // Only display annotation if its within the range displayed by the
 	    // chart
-	    if(date.compareTo(chart.getStartDate()) >= 0 &&
-	       date.compareTo(chart.getEndDate()) <= 0) {
+	    if(x.compareTo(chart.getStartX()) >= 0 &&
+	       x.compareTo(chart.getEndX()) <= 0) {
 	  
-		text = (String)annotations.get(date); // associated annotation
+		text = (String)annotations.get(x); // associated annotation
 
-		// Insert date into text field
-		text = date.toShortString() + ": " + text;
-		Float value = graph.getValue(date);
+		// Insert X value into text field
+		text = x.toString() + ": " + text;
+		Float y = graph.getY(x);
 
 		// Ignore annotations where the data source has no y value
-		if(value != null) {
+		if(y != null) {
 
 		    // Put y position near graph (assumes y graph is a line)
-		    int y = yoffset + verticalAxis.getHeightOfGraph() - 
+		    int yCoordinate = yoffset + 
+			verticalAxis.getHeightOfGraph() - 
 			GraphTools.
-			scaleAndFitPoint(value.floatValue(),
+			scaleAndFitPoint(y.floatValue(),
 					 verticalAxis.getBottomLineValue(), 
 					 verticalAxis.getScale());
 
-		    drawAnnotation(g, text, dateToX(chart, date), y);
+		    drawAnnotation(g, text, getXCoordinate(chart, x), 
+				   yCoordinate);
 		}
 	    }
 	}
@@ -612,38 +676,43 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	return true;
     }
 
-    private float getLowestValue(Vector dates, Vector graphs) {
+    // Find the lowest Y value for all the graphs in the given vector
+    // over the given X range.
+    private float getLowestY(Vector x, Vector graphs) {
 	Iterator iterator = graphs.iterator();
-	float value;
-	float lowest = Integer.MAX_VALUE;
+	float y;
+	float lowestY = Integer.MAX_VALUE;
 
 	while(iterator.hasNext()) {
 		
-	    value = ((Graph)iterator.next()).getLowestValue(dates);
+	    y = ((Graph)iterator.next()).getLowestY(x);
 
-	    if(value < lowest)
-		lowest = value;
+	    if(y < lowestY)
+		lowestY = y;
 	}
-	return lowest;
+	return lowestY;
     }
 
-    private float getHighestValue(Vector dates, Vector graphs) {
+    // Find the highest Y value for all the graphs in the given vector
+    // over the given X range.
+    private float getHighestY(Vector x, Vector graphs) {
 	Iterator iterator = graphs.iterator();
-	float value;
-	float highest = Integer.MIN_VALUE;
+	float y;
+	float highestY = Integer.MIN_VALUE;
 	
 	while(iterator.hasNext()) {
 
-	    value = ((Graph)iterator.next()).getHighestValue(dates);
+	    y = ((Graph)iterator.next()).getHighestY(x);
 
-	    if(value > highest)
-		highest = value;
+	    if(y > highestY)
+		highestY = y;
 
 	}
 
-	return highest;
+	return highestY;
     }
 
+    // Calculate the height of each graph level.
     private void calculateLevelHeights(Chart chart, int height) {
 
 	// At the moment the top level is the primary level, whilst
@@ -676,11 +745,16 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    levelHeights.add(new Integer(secondaryLevelHeight));
     }
 
+    // Return the y value of the first horizontal line from the top of
+    // this component.
     private int getFirstHorizontalLine(Graphics g) {
 	return(firstHorizontalLine = (int)(TOP_GRAPH_BUFFER_MULTIPLIER *
 					   g.getFontMetrics().getHeight()));
     }
 
+    // Create a mapping between stock symbol and the colour we should
+    // graph it. E.g. if CBA is charted in two different levels
+    // they will both be in the same colour.
     private void calculateColourMap(Chart chart) {
 
 	if(colourMap == null) {
@@ -741,6 +815,14 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	}
     }
 
+    /**
+     * Retuen the colour we will draw the given graph. Note that the graph
+     * may choose to override this colour.
+     *
+     * @param	graph	the graph to query
+     * @param	chart	the chart component
+     * @return	the colour the graph might be
+     */
     public Color getGraphColour(Graph graph, Chart chart) {
 
 	if(colourMap == null)
@@ -751,7 +833,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	if(colour != null)
 	    return colour;
 
-	// If the colour map is missing a symbol or not there default
+	// If the colour map is missing a symbol then default
 	// to dark grey (shouldnt happen)
 	return Color.darkGray;
     }

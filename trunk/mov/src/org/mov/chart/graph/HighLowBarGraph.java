@@ -28,99 +28,99 @@ public class HighLowBarGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector dates) {
+		       float bottomLineValue, Vector xRange) {
 
 	g.setColor(colour);
 
-	int x, lowY, highY, closeY;
-	Float dayLowValue, dayHighValue, dayCloseValue;
-	TradingDate date;
-	Iterator iterator = dates.iterator();
+	int xCoordinate, lowY, highY, closeY;
+	Float dayLowY, dayHighY, dayCloseY;
+	Iterator iterator = xRange.iterator();
 	int i = 0;
 
 	while(iterator.hasNext()) {
 
-	    date = (TradingDate)iterator.next();
+	    Comparable x = (Comparable)iterator.next();
 	    
 	    // Skip until our start date
-	    if(date.compareTo(dayClose.getStartDate()) < 0) {
+	    if(x.compareTo(dayClose.getStartX()) < 0) {
 		i++;
 		continue;
 	    }
 
 	    // If our graph is finished exit this loop
-	    if(date.compareTo(dayClose.getEndDate()) > 0) 
+	    if(x.compareTo(dayClose.getEndX()) > 0) 
 		break;
 
 	    // Otherwise draw bar
-	    dayLowValue = dayLow.getValue(date);
-	    dayHighValue = dayHigh.getValue(date);
-	    dayCloseValue = dayClose.getValue(date);
+	    dayLowY = dayLow.getY(x);
+	    dayHighY = dayHigh.getY(x);
+	    dayCloseY = dayClose.getY(x);
 
 	    // The graph is allowed to skip points
-	    if(dayLowValue != null && dayHighValue != null &&
-	       dayCloseValue != null) {
+	    if(dayLowY != null && dayHighY != null &&
+	       dayCloseY != null) {
 
-		x = (int)(xoffset + horizontalScale * i);
+		xCoordinate = (int)(xoffset + horizontalScale * i);
 
 		lowY = yoffset - 
-		    GraphTools.scaleAndFitPoint(dayLowValue.floatValue(), 
+		    GraphTools.scaleAndFitPoint(dayLowY.floatValue(), 
 						bottomLineValue, 
 						verticalScale);
 		highY = yoffset - 
-		    GraphTools.scaleAndFitPoint(dayHighValue.floatValue(), 
+		    GraphTools.scaleAndFitPoint(dayHighY.floatValue(), 
 						bottomLineValue, 
 						verticalScale);
 		closeY = yoffset - 
-		    GraphTools.scaleAndFitPoint(dayCloseValue.floatValue(), 
+		    GraphTools.scaleAndFitPoint(dayCloseY.floatValue(), 
 						bottomLineValue, 
 						verticalScale);
 		
 		// Draw bar
-		g.drawLine(x, lowY, x, highY);
+		g.drawLine(xCoordinate, lowY, xCoordinate, highY);
 
 		// Draw perpendicular line indicating day close
-		g.drawLine(x, closeY, 
-			   (int)(x + DAY_CLOSE_BAR_WIDTH * horizontalScale),
+		g.drawLine(xCoordinate, closeY, 
+			   (int)(xCoordinate + 
+				 DAY_CLOSE_BAR_WIDTH * horizontalScale),
 			   closeY);
 	    }
 	    i++;
 	}
     }
 
-    public String getToolTipText(TradingDate date, int y, int yoffset,
+    public String getToolTipText(Comparable x, int y, int yoffset,
 				 float verticalScale,
 				 float bottomLineValue)
     {
-	Float dayLowValue = dayLow.getValue(date);
-	Float dayHighValue = dayHigh.getValue(date);
+	Float dayLowY = dayLow.getY(x);
+	Float dayHighY = dayHigh.getY(x);
 	
-	if(dayLowValue != null && dayHighValue != null) {
+	if(dayLowY != null && dayHighY != null) {
 
-	    int dayLowY = yoffset - 
-		GraphTools.scaleAndFitPoint(dayLowValue.floatValue(),
+	    int dayLowYCoordinate = yoffset - 
+		GraphTools.scaleAndFitPoint(dayLowY.floatValue(),
 					    bottomLineValue, verticalScale);
 
-	    int dayHighY = yoffset - 
-		GraphTools.scaleAndFitPoint(dayHighValue.floatValue(),
+	    int dayHighYCoordinate = yoffset - 
+		GraphTools.scaleAndFitPoint(dayHighY.floatValue(),
 					    bottomLineValue, verticalScale);
 	    
 	    // Its our graph if its within TOOL_TIP_BUFFER pixels of the 
 	    // line from day low to day high
-	    if(y >= (dayLowY - Graph.TOOL_TIP_BUFFER) &&
-	       y <= (dayHighY + Graph.TOOL_TIP_BUFFER))
-		return getSource().getToolTipText(date);
+	    if(y >= (dayLowYCoordinate - Graph.TOOL_TIP_BUFFER) &&
+	       y <= (dayHighYCoordinate + Graph.TOOL_TIP_BUFFER))
+		return getSource().getToolTipText(x);
 	}
 	return null;
     }
 
     // Override base class method
-    public float getHighestValue(Vector dates) {
-	return dayHigh.getHighestValue(dates);
+    public float getHighestY(Vector x) {
+	return dayHigh.getHighestY(x);
     }
 
     // Override base class method
-    public float getLowestValue(Vector dates) {
-        return dayLow.getLowestValue(dates);
+    public float getLowestY(Vector x) {
+        return dayLow.getLowestY(x);
     }
 }

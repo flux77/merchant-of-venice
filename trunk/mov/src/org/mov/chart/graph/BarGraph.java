@@ -15,12 +15,12 @@ public class BarGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, Vector dates) {
+		       float bottomLineValue, Vector xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderBar(g, getSource().getGraphable(), 
 			     xoffset, yoffset, horizontalScale,
-			     verticalScale, bottomLineValue, dates);
+			     verticalScale, bottomLineValue, xRange);
 
     }
 }

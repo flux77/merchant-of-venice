@@ -25,7 +25,7 @@ import javax.swing.*;
 
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
-import org.mov.util.*;
+import org.mov.util.Locale;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
 
@@ -37,7 +37,7 @@ import org.mov.quote.*;
 public class PortfolioChartMenu extends JMenu implements ActionListener {
 
     // Graphs
-    private static final String PROFIT_LOSS	= "Profit Loss";
+    private static final String PROFIT_LOSS = Locale.getString("PROFIT_LOSS");
 
     JMenu graphMenu;
     JMenu annotateMenu;
@@ -70,7 +70,7 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 	this.portfolio = portfolio;
 	
 	// Create graph + annotation menus
-	graphMenu = new JMenu("Graph");
+	graphMenu = new JMenu(Locale.getString("GRAPH"));
 	this.add(graphMenu);
 
 	// Add graph menu items
@@ -78,7 +78,7 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 
 	// Add all static menus
 	this.addSeparator();
-	removeMenu = new JMenuItem("Remove");
+	removeMenu = new JMenuItem(Locale.getString("REMOVE"));
 	removeMenu.addActionListener(this);
 	this.add(removeMenu);	    
     }

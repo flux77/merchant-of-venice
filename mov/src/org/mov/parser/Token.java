@@ -21,6 +21,8 @@ package org.mov.parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.mov.util.Locale;
+
 /**
  * A representation of any token in the <i>Gondola</i> language.
  */
@@ -292,7 +294,7 @@ public class Token {
 		value = Double.parseDouble(numberString);
 	    }
 	    catch(NumberFormatException e) {
-		throw new ParserException("malformed number");
+		throw new ParserException(Locale.getString("MALFORMED_NUMBER_ERROR"));
 	    }
 
 	    token.setType(Token.NUMBER_TOKEN);
@@ -337,7 +339,7 @@ public class Token {
             }
 
             if(!matched) 
-                throw new ParserException("unknown identifier '" + identifier + "'");
+                throw new ParserException(Locale.getString("UNKNOWN_IDENTIFIER_ERROR", identifier));
         }
 
         // Must be some sort of punctuation
@@ -355,7 +357,7 @@ public class Token {
 		}
 
             if(!matched)
-                throw new ParserException("unknown symbol '" + symbol + "'");
+                throw new ParserException(Locale.getString("UNKNOWN_SYMBOL_ERROR", symbol));
         }
 
         assert matched;

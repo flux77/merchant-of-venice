@@ -18,6 +18,7 @@
 
 package org.mov.quote;
 
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 
@@ -46,7 +47,7 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
      * @return	the name of the filter.
      */
     public String getName() {
-	return "MetaStock (volume/100)";
+	return new String("MetaStock (" + Locale.getString("VOLUME") + "/100)");
     }
     
     /**

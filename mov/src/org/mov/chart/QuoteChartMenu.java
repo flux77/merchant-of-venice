@@ -25,7 +25,7 @@ import javax.swing.*;
 
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
-import org.mov.util.*;
+import org.mov.util.Locale;
 import org.mov.quote.*;
 
 /**
@@ -35,18 +35,18 @@ import org.mov.quote.*;
  */
 public class QuoteChartMenu extends JMenu implements ActionListener {
 
-    // Graphs
-    private static final String BOLLINGER      = "Bollinger Bands";
-    private static final String DAY_HIGH       = "Day High";
-    private static final String DAY_LOW        = "Day Low";
-    private static final String DAY_OPEN       = "Day Open";
-    private static final String HIGH_LOW_BAR   = "High Low Bar";
-    private static final String MACD           = "MACD";
-    private static final String MOMENTUM       = "Momentum";
-    private static final String MOVING_AVERAGE = "Moving Average";
-    private static final String OBV	       = "OBV";
-    private static final String STANDARD_DEVIATION = "Standard Deviation";
-    private static final String DAY_VOLUME     = "Volume";
+    // Graphs 
+    private static final String BOLLINGER      = Locale.getString("BOLLINGER_BANDS");
+    private static final String DAY_HIGH       = Locale.getString("DAY_HIGH");
+    private static final String DAY_LOW        = Locale.getString("DAY_LOW");
+    private static final String DAY_OPEN       = Locale.getString("DAY_OPEN");
+    private static final String HIGH_LOW_BAR   = Locale.getString("HIGH_LOW_BAR");
+    private static final String MACD           = Locale.getString("MACD");
+    private static final String MOMENTUM       = Locale.getString("MOMENTUM");
+    private static final String MOVING_AVERAGE = Locale.getString("MOVING_AVERAGE");
+    private static final String OBV	       = Locale.getString("OBV");
+    private static final String STANDARD_DEVIATION = Locale.getString("STANDARD_DEVIATION");
+    private static final String DAY_VOLUME     = Locale.getString("VOLUME");
     
     JMenu graphMenu;
     JMenu annotateMenu;
@@ -77,8 +77,8 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	this.listener = listener;
 	
 	// Create graph + annotation menus
-	graphMenu = new JMenu("Graph");
-	annotateMenu = new JMenu("Annotate");
+	graphMenu = new JMenu(Locale.getString("GRAPH"));
+	annotateMenu = new JMenu(Locale.getString("ANNOTATE"));
 	this.add(graphMenu);
 	this.add(annotateMenu);
 
@@ -98,12 +98,12 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	addMenuItem(STANDARD_DEVIATION);
 
 	// Add annotation menu items
-	addAnnotateMenuItem(MACD, "Buy/Sell");
-	addAnnotateMenuItem(MOVING_AVERAGE, "Buy/Sell");
+	addAnnotateMenuItem(MACD, Locale.getString("BUY_SELL"));
+	addAnnotateMenuItem(MOVING_AVERAGE, Locale.getString("BUY_SELL"));
 
 	// Add all static menus
 	this.addSeparator();
-	removeMenu = new JMenuItem("Remove");
+	removeMenu = new JMenuItem(Locale.getString("REMOVE"));
 	removeMenu.addActionListener(this);
 	this.add(removeMenu);	    
     }

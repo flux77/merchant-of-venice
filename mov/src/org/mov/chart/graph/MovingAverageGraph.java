@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.mov.chart.*;
 import org.mov.chart.source.*;
-import org.mov.util.*;
+import org.mov.util.Locale;
 import org.mov.parser.*;
 import org.mov.quote.*;
 
@@ -113,7 +113,7 @@ public class MovingAverageGraph extends AbstractGraph {
      * @return	<code>Moving Average</code>
      */
     public String getName() {
-	return "Moving Average";
+	return Locale.getString("MOVING_AVERAGE");
     }
 
     /**

@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.mov.chart.*;
 import org.mov.chart.source.*;
-import org.mov.util.*;
+import org.mov.util.Locale;
 import org.mov.parser.*;
 
 /**
@@ -142,7 +142,7 @@ public class MACDGraph extends AbstractGraph {
      * @return	<code>MACD</code>
      */
     public String getName() {
-	return "MACD";
+	return Locale.getString("MACD");
     }
 }
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 
 /**
@@ -409,14 +410,14 @@ public class QuoteRange implements Cloneable {
      */
     public static String getDescription(int type) {
         if(type == ALL_SYMBOLS) 
-            return "All Symbols";
+            return Locale.getString("ALL_SYMBOLS");
         else if(type == GIVEN_SYMBOLS) 
-            return "Given Sybmols";
+            return Locale.getString("GIVEN_SYMBOLS");
         else if(type == ALL_ORDINARIES)
-            return "All Ordinaries";
+            return Locale.getString("ALL_ORDINARIES");
         else {
             assert type == MARKET_INDICES;
-            return "Market Indices";
+            return Locale.getString("MARKET_INDICES");
         }
     }
 
@@ -431,14 +432,14 @@ public class QuoteRange implements Cloneable {
         // Get basic description
         String string = getDescription();
 
-        // Between what dates?
+        // Between what dates? (This locale code might need some work).
         if(getFirstDate() == null) 
-            string = string.concat(" for all dates");
+            string = Locale.getString("FOR_ALL_DATES", string);
         else if(getFirstDate().equals(getLastDate()))
-            string = string.concat(" on date " + getFirstDate());
+            string = Locale.getString("ON_DATE", string, getFirstDate().toString());
         else 
-            string = string.concat(" between " + getFirstDate() + " and " +
-                               getLastDate());
+            string = Locale.getString("BETWEEN_DATES", string, getFirstDate().toString(), 
+                                      getLastDate().toString());
 
         return string;
     }

@@ -33,11 +33,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mov.util.TradingDate;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
 import org.mov.prefs.PreferencesManager;
+import org.mov.util.Locale;
+import org.mov.util.TradingDate;
 
 /**
  * Provides functionality to obtain stock quotes from the internet. The entire
@@ -221,7 +222,7 @@ public class InternetQuoteSource implements QuoteSource
             // This query might take a while
             Thread thread = Thread.currentThread();
             ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-            progress.setNote("Loading Quotes...");
+            progress.setNote(Locale.getString("DOWNLOADING_QUOTES"));
 
             if(symbols.size() > 1) {
                 progress.setMaximum(symbols.size());
@@ -330,33 +331,33 @@ public class InternetQuoteSource implements QuoteSource
         }
 
 	catch(BindException e) {
-	    DesktopManager.showErrorMessage("Unable to connect: " + e.getMessage() + ".");
+	    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_CONNECT_ERROR", e.getMessage()));
 	    success = false;
 	}
 
 	catch(ConnectException e) {
-	    DesktopManager.showErrorMessage("Unable to connect: " + e.getMessage() + ".");
+	    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_CONNECT_ERROR", e.getMessage()));
 	    success = false;
 	}
 
 	catch(UnknownHostException e) {
-	    DesktopManager.showErrorMessage("Unknown host: " + e.getMessage() + ".");
+	    DesktopManager.showErrorMessage(Locale.getString("UNKNOWN_HOST_ERROR", e.getMessage()));
 	    success = false;
 	}
 
 	catch(NoRouteToHostException e) {
-	    DesktopManager.showErrorMessage("Destination unreachable: " + e.getMessage() + ".");
+	    DesktopManager.showErrorMessage(Locale.getString("DESTINATION_UNREACHABLE_ERROR", e.getMessage()));
 	    success = false;
 	}
 
 	catch(MalformedURLException e) {
-	    DesktopManager.showErrorMessage("Invalid proxy address: " + proxyPreferences.host + 
-					    ":" + proxyPreferences.port + ".");
+	    DesktopManager.showErrorMessage(Locale.getString("INVALID_PROXY_ERROR", proxyPreferences.host,
+                                                             proxyPreferences.port));
 	    success = false;
 	}
 
         catch(IOException e) {
-            DesktopManager.showErrorMessage("Error downloading quotes.");
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_DOWNLOADING_QUOTES"));
             success = false;
         }
         

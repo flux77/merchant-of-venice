@@ -46,6 +46,7 @@ import org.mov.parser.Variables;
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.GridBagHelper;
 import org.mov.ui.EquationComboBox;
+import org.mov.util.Locale;
 
 public class RulesPage extends JPanel implements AnalyserPage {
 
@@ -139,9 +140,8 @@ public class RulesPage extends JPanel implements AnalyserPage {
 
         if(buyRuleString.length() == 0) {
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "You need to specify a rule which indicates " +
-                                                  "when to buy.",
-                                                  "Error parsing buy rule",
+                                                  Locale.getString("MISSING_BUY_RULE"),
+                                                  Locale.getString("ERROR_PARSING_RULES"),
                                                   JOptionPane.ERROR_MESSAGE);
                                                   
 	    return false;
@@ -149,9 +149,8 @@ public class RulesPage extends JPanel implements AnalyserPage {
 
         if(sellRuleString.length() == 0) {
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "You need to specify a rule which indicates " +
-                                                  "when to sell.",
-                                                  "Error parsing sell rule",
+                                                  Locale.getString("MISSING_SELL_RULE"),
+                                                  Locale.getString("ERROR_PARSING_RULES"),
                                                   JOptionPane.ERROR_MESSAGE);
                                                   
 	    return false;
@@ -163,9 +162,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
 	catch(ExpressionException e) {	   
             buyRule = null;
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Error parsing buy rule: " +
-                                                  e.getReason(),
-                                                  "Error parsing buy rule",
+                                                  Locale.getString("ERROR_PARSING_BUY_RULE",
+                                                                   e.getReason()),
+                                                  Locale.getString("ERROR_PARSING_RULES"),
                                                   JOptionPane.ERROR_MESSAGE);
                                                   
 	    return false;
@@ -177,9 +176,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
 	catch(ExpressionException e) {
             sellRule = null;
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Error parsing sell rule: " +
-                                                  e.getReason(),
-                                                  "Error parsing buy rule",
+                                                  Locale.getString("ERROR_PARSING_SELL_RULE",
+                                                                   e.getReason()),
+                                                  Locale.getString("ERROR_PARSING_RULES"),
                                                   JOptionPane.ERROR_MESSAGE);
             
 	    return false;
@@ -203,9 +202,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
         }
 	catch(NumberFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Error parsing number: '" +
-                                                  e.getMessage() + "'",
-                                                  "Error parsing number",
+                                                  Locale.getString("ERROR_PARSING_NUMBER",
+                                                                   e.getMessage()),
+                                                  Locale.getString("ERROR_PARSING_RULES"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
 	}
@@ -223,6 +222,10 @@ public class RulesPage extends JPanel implements AnalyserPage {
 
     public JComponent getComponent() {
         return this;
+    }
+
+    public String getTitle() {
+        return Locale.getString("RULES_PAGE_TITLE");
     }
 
     public Expression getBuyRule() {
@@ -255,7 +258,7 @@ public class RulesPage extends JPanel implements AnalyserPage {
 
         // Rules panel
         {
-            TitledBorder equationTitled = new TitledBorder("Rules");
+            TitledBorder equationTitled = new TitledBorder(Locale.getString("RULES_PAGE_TITLE"));
             JPanel panel = new JPanel();
             panel.setBorder(equationTitled);
             panel.setLayout(new BorderLayout());
@@ -271,9 +274,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
             c.fill = GridBagConstraints.HORIZONTAL;
 
             buyRuleEquationComboBox = 
-                GridBagHelper.addEquationRow(innerPanel, "Buy Rule", "", gridbag, c);
+                GridBagHelper.addEquationRow(innerPanel, Locale.getString("BUY_RULE"), "", gridbag, c);
             sellRuleEquationComboBox = 
-                GridBagHelper.addEquationRow(innerPanel, "Sell Rule", "", gridbag, c);
+                GridBagHelper.addEquationRow(innerPanel, Locale.getString("SELL_RULE"), "", gridbag, c);
 
             panel.add(innerPanel, BorderLayout.NORTH);
 	    add(panel);
@@ -281,7 +284,7 @@ public class RulesPage extends JPanel implements AnalyserPage {
 
         // Rule Family panel
         {
-	    TitledBorder ruleFamilyTitled = new TitledBorder("Rule family");
+	    TitledBorder ruleFamilyTitled = new TitledBorder(Locale.getString("RULE_FAMILY"));
 	    JPanel panel = new JPanel();
 	    panel.setBorder(ruleFamilyTitled);
             panel.setLayout(new BorderLayout());
@@ -296,7 +299,7 @@ public class RulesPage extends JPanel implements AnalyserPage {
 	    c.anchor = GridBagConstraints.WEST;
             
             ruleFamilyEnabledCheckBox = 
-                GridBagHelper.addCheckBoxRow(innerPanel, "Enable multiple rules", 
+                GridBagHelper.addCheckBoxRow(innerPanel, Locale.getString("ENABLE_MULTIPLE_RULES"), 
                                              false, gridbag, c);
             ruleFamilyEnabledCheckBox.addActionListener(new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
@@ -305,13 +308,13 @@ public class RulesPage extends JPanel implements AnalyserPage {
                 });
 
             aRangeTextField = 
-                GridBagHelper.addTextRow(innerPanel, "Range a: 1 to", "", 
+                GridBagHelper.addTextRow(innerPanel, Locale.getString("RANGE_A_1_TO"), "",
                                          gridbag, c, 3);
             bRangeTextField = 
-                GridBagHelper.addTextRow(innerPanel, "Range b: 1 to", "", 
+                GridBagHelper.addTextRow(innerPanel, Locale.getString("RANGE_B_1_TO"), "",
                                          gridbag, c, 3);
             cRangeTextField = 
-                GridBagHelper.addTextRow(innerPanel, "Range c: 1 to", "", 
+                GridBagHelper.addTextRow(innerPanel, Locale.getString("RANGE_C_1_TO"), "",
                                          gridbag, c, 3);
 
             panel.add(innerPanel, BorderLayout.NORTH);

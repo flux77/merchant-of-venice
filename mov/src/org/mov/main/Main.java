@@ -43,10 +43,10 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.3a";
+    public static String SHORT_VERSION = "0.31a";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION  = "0.3 alpha";
+    public static String LONG_VERSION  = "0.31 alpha";
 
     /** Release date, e.g. 13/Jan/2003 */
     public static String RELEASE_DATE  = "14/Mar/2004";
@@ -88,7 +88,7 @@ public class Main extends JFrame {
         // under the default steel l&f, but the Windows XP uses a very
         // strong blue colour that looks horrible. So this light green
         // which is the Venice theme will be the default.
-        desktop.setBackground(new Color(238, 241,238));
+        desktop.setBackground(new Color(238, 241, 238));
 	CommandManager.getInstance().setDesktopManager(desktopManager);
 
 	// Instantiate main menu singleton

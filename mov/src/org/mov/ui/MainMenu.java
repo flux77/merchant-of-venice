@@ -103,7 +103,7 @@ public class MainMenu implements ActionListener, ModuleListener
      * Construct a new main menu and attach it to the given frame.
      *
      * @param	frame	the window frame
-     * @param	desktop	the desktop to lunch internal frames on
+     * @param	desktopManager	the desktop to lunch internal frames on
      */
     public static MainMenu getInstance(JFrame frame, 
 				       org.mov.ui.DesktopManager desktopManager) {

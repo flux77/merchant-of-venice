@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.parser.*;
@@ -31,8 +32,8 @@ import org.mov.quote.*;
 
 public class PaperTrade {
 
-    private final static String CASH_ACCOUNT_NAME = "Cash Account";
-    private final static String SHARE_ACCOUNT_NAME = "Share Account";
+    private final static String CASH_ACCOUNT_NAME = Locale.getString("CASH_ACCOUNT");
+    private final static String SHARE_ACCOUNT_NAME = Locale.getString("SHARE_ACCOUNT");
 
     private class Environment {
         public QuoteCache quoteCache;

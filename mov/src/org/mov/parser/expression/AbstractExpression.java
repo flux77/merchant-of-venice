@@ -67,7 +67,7 @@ public abstract class AbstractExpression implements Expression {
     /**
      * Set the parent of this node.
      *
-     * @param the new parent.
+     * @param parent the new parent.
      */
     public void setParent(Expression parent) {
         assert parent != this;

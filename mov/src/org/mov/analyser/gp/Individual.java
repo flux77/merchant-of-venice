@@ -29,6 +29,7 @@ import org.mov.parser.Variables;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
@@ -51,7 +52,8 @@ public class Individual implements Comparable {
     private final static int BREED_BY_SWAPPING_AND_RECOMBINING        = 3;
     private final static int BREED_BY_DOUBLE_RECOMBINING              = 4;
 
-    private final static String PORTFOLIO_NAME = "Genetic Programme Portfolio";
+    private final static String PORTFOLIO_NAME = 
+        Locale.getString("GENETIC_PROGRAMME_PORTFOLIO");
 
     public Individual(Expression buyRule, Expression sellRule) {
         this.buyRule = buyRule;

@@ -19,6 +19,7 @@
 package org.mov.chart.source;
 
 import org.mov.chart.*;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.portfolio.*;
@@ -200,8 +201,10 @@ public class PortfolioGraphSource implements GraphSource {
 	if(value != null) {
 	    String name = portfolio.getName();
 
-	    if(mode == PROFIT_LOSS)
-		name = name.concat(" Profit");
+	    if(mode == PROFIT_LOSS) {
+		name = name.concat(" ");
+                name = name.concat(Locale.getString("PROFIT"));
+            }
 
 	    return new String("<html>" +
 			      name +

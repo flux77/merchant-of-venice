@@ -38,6 +38,7 @@ import org.mov.quote.QuoteBundle;
 import org.mov.quote.ScriptQuoteBundle;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
@@ -70,17 +71,17 @@ public class GPModule extends JPanel implements Module {
 
         tabbedPane = new JTabbedPane();
         quoteRangePage = new QuoteRangePage(desktop);
-        tabbedPane.addTab("Range", quoteRangePage.getComponent());
+        tabbedPane.addTab(quoteRangePage.getTitle(), quoteRangePage.getComponent());
 
         portfolioPage = new PortfolioPage(desktop);
-        tabbedPane.addTab("Portfolio", portfolioPage.getComponent());
+        tabbedPane.addTab(portfolioPage.getTitle(), portfolioPage.getComponent());
 
         GPPage = new GPPage(desktop);
-        tabbedPane.addTab("GP", GPPage.getComponent());
+        tabbedPane.addTab(GPPage.getTitle(), GPPage.getComponent());
 
 	// Run, close buttons
 	JPanel buttonPanel = new JPanel();
-	JButton runButton = new JButton("Run");
+	JButton runButton = new JButton(Locale.getString("RUN"));
         runButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     // Run GP
@@ -89,7 +90,7 @@ public class GPModule extends JPanel implements Module {
             });
 	buttonPanel.add(runButton);
 
-	JButton closeButton = new JButton("Close");
+	JButton closeButton = new JButton(Locale.getString("CLOSE"));
 	closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     // Tell frame we want to close
@@ -118,7 +119,7 @@ public class GPModule extends JPanel implements Module {
     }
 
     public String getTitle() {
-	return "Genetic Programming";
+	return Locale.getString("GENETIC_PROGRAMMING_TITLE");
     }
 
     public void addModuleChangeListener(PropertyChangeListener listener) {
@@ -188,7 +189,7 @@ public class GPModule extends JPanel implements Module {
 
         Thread thread = Thread.currentThread();
         progress.setIndeterminate(true);
-        progress.show("Genetic Programme");
+        progress.show(Locale.getString("GENETIC_PROGRAMME"));
 
         // Get a copy of the values in the GUI, so that if the user changes
         // them, it won't screw up the GP.
@@ -231,20 +232,21 @@ public class GPModule extends JPanel implements Module {
             for(int generation = 1; generation <= numberGenerations; generation++) {
                 if(thread.isInterrupted())
                     break;
-             
+
                 int individual = 1;
-   
+
                 // Keep generating more individuals until we've created the
                 // breeding population size or if the breeding population size
                 // is too small. The breeding population size can only be too
                 // small for the first generation.
-                while(individual < population || 
+                while(individual < population ||
                       geneticProgramme.getNextBreedingPopulationSize() < breedingPopulation) {
                     if(thread.isInterrupted())
                         break;
-                    
-                    progress.setNote("Generation " + generation + " of " +
-                                     numberGenerations);
+
+                    // "Generation x of y"
+                    progress.setNote(Locale.getString("GENERATION_OF", generation,
+                                                      numberGenerations));
 
                     // If we are looping only to increase the breeding population size
                     // then don't update the progress counter as we didn't count this
@@ -253,7 +255,7 @@ public class GPModule extends JPanel implements Module {
                     if(individual < population)
                         progress.increment();
 
-                    geneticProgramme.nextIndividual();                    
+                    geneticProgramme.nextIndividual();
                     individual++;
                 }
 
@@ -262,9 +264,9 @@ public class GPModule extends JPanel implements Module {
                 // The actual breeding population size and the breeding population
                 // may be different iff the operation was cancelled
                 if(geneticProgramme.getBreedingPopulationSize() > 0)
-                    display(getResults(geneticProgramme, 
-                                       geneticProgramme.getBreedingPopulationSize(), 
-                                       displayPopulation, 
+                    display(getResults(geneticProgramme,
+                                       geneticProgramme.getBreedingPopulationSize(),
+                                       displayPopulation,
                                        quoteBundle, startDate, endDate,
                                        initialCapital, tradeCost, generation));
             }

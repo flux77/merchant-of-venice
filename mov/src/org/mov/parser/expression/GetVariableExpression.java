@@ -26,6 +26,7 @@ import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
+import org.mov.util.Locale;
 
 /**
  * A representation of an expression to return the value of a variable.
@@ -53,7 +54,7 @@ public class GetVariableExpression extends TerminalExpression {
             return variables.getValue(name);
         }
         else
-            throw new EvaluationException("variable '" + name + "' is not defined");
+            throw new EvaluationException(Locale.getString("VARIABLE_NOT_DEFINED_ERROR", name));
     }
 
     public String toString() {

@@ -18,6 +18,8 @@
 
 package org.mov.parser;
 
+import org.mov.util.Locale;
+
 /**
  * An exception which is thrown when there is a problem executing an
  * expression. Since this exception can be thrown a lot by the GP,
@@ -28,8 +30,10 @@ package org.mov.parser;
 public class EvaluationException extends ExpressionException {
 
     private static EvaluationException divideByZeroException = 
-        new EvaluationException("Divide by zero error");
+        new EvaluationException(Locale.getString("DIVIDE_BY_ZERO_ERROR"));
 
+    // The next two errors should never appear to the user so it isn't
+    // localised.
     private static EvaluationException futureDateException = 
         new EvaluationException("Future date");
 
@@ -37,19 +41,19 @@ public class EvaluationException extends ExpressionException {
         new EvaluationException("Date too far into past");
 
     private static EvaluationException rangeForSumException = 
-        new EvaluationException("Range for sum() needs to be >0");
+        new EvaluationException(Locale.getString("SUM_RANGE_ERROR"));
 
     private static EvaluationException rangeForAvgException = 
-        new EvaluationException("Range for avg() needs to be >0");
+        new EvaluationException(Locale.getString("AVG_RANGE_ERROR"));
 
     private static EvaluationException rangeForMaxException = 
-        new EvaluationException("Range for max() needs to be >0");
+        new EvaluationException(Locale.getString("MAX_RANGE_ERROR"));
 
     private static EvaluationException rangeForMinException = 
-        new EvaluationException("Range for min() needs to be >0");
+        new EvaluationException(Locale.getString("MIN_RANGE_ERROR"));
 
     private static EvaluationException squareRootNegativeNumberException = 
-        new EvaluationException("Square root of a negative number");
+        new EvaluationException(Locale.getString("SQUARE_ROOT_NEGATIVE_ERROR"));
 
     /**
      * Create a new evaluation exception with the given error reason.

@@ -118,8 +118,6 @@ public class PaperTrade {
 				       float capital,
 				       float tradeCost) {
 
-	System.out.println("paper trade");
-
 	// First create a portfolio suitable for paper trading
 	Portfolio portfolio = createPortfolio(portfolioName,
 					      startDate,
@@ -137,14 +135,10 @@ public class PaperTrade {
 	// This is set when we own the stock
 	boolean ownStock = false;
 
-	System.out.println("day " + day + " to " + endDay);
-
 	// Now iterate through each trading day and decide whether
 	// to buy/sell. The last day is used for placing the previous
 	// day's buy/sell orders.
 	while(day < endDay) {
-
-	    //	    System.out.println("trying date " + day);
 
 	    try {		
 
@@ -186,63 +180,3 @@ public class PaperTrade {
 
 
 }
-
-/*
-
-	System.out.println("loading quotes");
-	QuoteCache cache = new QuoteCache("NCP");
-
-
-
-	Parser parser = new Parser();
-
-	try {
-	    System.out.println("ncp start: " +
-			       cache.getQuote("ncp", Quote.DAY_CLOSE,
-					      new TradingDate(1990, 1, 3)));
-	    System.out.println("ncp end: " +
-			       cache.getQuote("ncp", Quote.DAY_CLOSE,
-					      new TradingDate(2001, 12, 20)));
-
-
-	    //	    int i = 10;
-	    //int j = 30;
-
-	    for(int i = 1; i < 100; i++) {
-	    	for(int j = i + 1; j < 101; j++) {
-		    
-		    Expression buy = 
-	    		parser.parse("avg(day_close, " + i + ", 0) > avg(day_close, " + j + ", 0)");
-		    Expression sell = 
-		    	parser.parse("avg(day_close, " + i + ", 0) < avg(day_close, " + j + ", 0)");
-
-		    //Expression buy = 
-		    //	parser.parse("1");
-		    //Expression sell = 
-		    //	parser.parse("0");
-		    
-		    Portfolio portfolio = 
-			PaperTradeModule.paperTrade("test",
-						    cache,
-						    "ncp",
-						    new TradingDate(1990, 1, 3),
-						    new TradingDate(2001, 12, 20),
-						    buy,
-						    sell,
-						    10000,
-						    35);
-	    
-		    
-		    System.out.println(i + " " + j + " " + portfolio.getValue(cache,
-									      new TradingDate(2001, 12, 20)));
-		}
-	    }
-
-	    //    CommandManager.getInstance().graphPortfolio(portfolio);
-	}
-	catch(ExpressionException e) {
-	    System.out.println(e);
-	}
-	
-
-	*/

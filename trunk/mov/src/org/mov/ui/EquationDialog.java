@@ -19,8 +19,10 @@
 package org.mov.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -34,6 +36,7 @@ import org.mov.util.Locale;
 /**
  * Dialog for querying the user for an equation string.
  *
+ * @author Andrew Leppard
  * @see EquationComboBox
  */
 public class EquationDialog implements ActionListener
@@ -83,22 +86,22 @@ public class EquationDialog implements ActionListener
 	CancelButton = new JButton(Locale.getString("CANCEL"));
 	equationComboBox = new EquationComboBox(defaultEquation);
 
-	JPanel panel = new JPanel();
 	JLabel label = new JLabel(message);	    
 
-	BorderLayout layout = new BorderLayout();
-	layout.setHgap(50);
-	layout.setVgap(5);
+        // Make sure the label and the equation combo box are aligned
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        equationComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-	panel.setLayout(layout);
-	panel.add(label, BorderLayout.NORTH);
-	panel.add(equationComboBox, BorderLayout.CENTER);
+        Box box = Box.createVerticalBox();
+        box.add(label);
+        box.add(Box.createVerticalStrut(5));
+        box.add(equationComboBox);
 
 	OKButton.addActionListener (this);
 	CancelButton.addActionListener (this);
 
 	Object options[] = {OKButton, CancelButton};
-	JOptionPane optionPane = new JOptionPane(panel,
+	JOptionPane optionPane = new JOptionPane(box,
 						 JOptionPane.QUESTION_MESSAGE,
 						 JOptionPane.OK_CANCEL_OPTION,
 						 null, options, null);

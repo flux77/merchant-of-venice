@@ -18,6 +18,8 @@
 
 package org.mov.ui;
 
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -82,11 +84,17 @@ public class MenuHelper {
 					JMenuItem parent, String title, 
 					char key) {
 	JMenuItem menuItem = new JMenuItem(title);
-	if (key != 0) {
-	    KeyStroke keyStroke = 
-		KeyStroke.getKeyStroke("ctrl " + key);
 
-	    menuItem.setAccelerator(keyStroke);
+	if (key != 0) {
+            try {
+                // Determine the correct short cut key to use for menus
+                Toolkit toolKit = Toolkit.getDefaultToolkit();
+                int shortcutKey = toolKit.getMenuShortcutKeyMask();
+                KeyStroke keyStroke = KeyStroke.getKeyStroke(new Character(key), shortcutKey);
+                menuItem.setAccelerator(keyStroke);
+            } catch(HeadlessException e) {
+                assert false;
+            }
 	}
 	menuItem.addActionListener(listener);
 	parent.add(menuItem);

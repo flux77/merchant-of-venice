@@ -138,7 +138,7 @@ public class SymbolListDialog {
                     invalidResponse = true;
 
                     JOptionPane.showInternalMessageDialog(parent, 
-                                                          e.getReason(),
+                                                          e.getMessage(),
                                                           Locale.getString("ERROR_PARSING_SYMBOL"),
                                                           JOptionPane.ERROR_MESSAGE);
                 }
@@ -189,7 +189,7 @@ public class SymbolListDialog {
                     invalidResponse = true;
 
                     JOptionPane.showInternalMessageDialog(parent, 
-                                                          e.getReason(),
+                                                          e.getMessage(),
                                                           Locale.getString("ERROR_PARSING_SYMBOLS"),
                                                           JOptionPane.ERROR_MESSAGE);
                 }

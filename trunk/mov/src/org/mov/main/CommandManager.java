@@ -46,6 +46,8 @@ import org.mov.portfolio.Portfolio;
 import org.mov.portfolio.PortfolioModule;
 import org.mov.prefs.PreferencesModule;
 import org.mov.prefs.PreferencesManager;
+import org.mov.quote.ImportQuoteModule;
+import org.mov.quote.ExportQuoteModule;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteRange;
@@ -56,7 +58,6 @@ import org.mov.table.PortfolioTableModule;
 import org.mov.table.QuoteModule;
 import org.mov.table.WatchScreen;
 import org.mov.table.WatchScreenModule;
-import org.mov.importer.ImporterModule;
 import org.mov.importer.PreferencesXML;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
@@ -83,7 +84,8 @@ public class CommandManager {
     // Keep track of dialogs/modules to make sure the user doesn't open
     // two about dialogs, two preferences etc.
     private boolean isAboutDialogUp = false;
-    private JInternalFrame importModuleFrame = null;
+    private JInternalFrame importQuoteModuleFrame = null;
+    private JInternalFrame exportQuoteModuleFrame = null;
     private JInternalFrame preferencesModuleFrame = null;
 
     // Locales for about box translation credits
@@ -973,10 +975,23 @@ public class CommandManager {
     public void importQuotes() {
 	// Only allow one copy of the import module to be displayed.
 	synchronized(this) {
-	    if(!wakeIfPresent(importModuleFrame)) {
-		ImporterModule importerModule = new ImporterModule(desktop);
-		
-		importModuleFrame = desktopManager.newFrame(importerModule, true, true, false);
+	    if(!wakeIfPresent(importQuoteModuleFrame)) {
+                ImportQuoteModule importQuoteModule = new ImportQuoteModule(desktop);
+		importQuoteModuleFrame = desktopManager.newFrame(importQuoteModule, true, true, false);
+	    }
+	}
+    }
+
+    /**
+     * Displays the export quotes modules that allows the user to export
+     * quotes from the application.
+     */
+    public void exportQuotes() {
+	// Only allow one copy of the export module to be displayed.
+	synchronized(this) {
+	    if(!wakeIfPresent(exportQuoteModuleFrame)) {
+                ExportQuoteModule exportQuoteModule = new ExportQuoteModule(desktop);
+		exportQuoteModuleFrame = desktopManager.newFrame(exportQuoteModule, true, true, false);
 	    }
 	}
     }

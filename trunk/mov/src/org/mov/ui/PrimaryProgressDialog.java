@@ -31,6 +31,8 @@ import org.mov.util.Locale;
  * <p>
  * See {@link ProgressDialogManager} for details about using progress dialogs in
  * venice.
+ *
+ * @author Andrew Leppard
  */
 public class PrimaryProgressDialog implements ProgressDialog {
 
@@ -80,14 +82,19 @@ public class PrimaryProgressDialog implements ProgressDialog {
             });
 
 	progressBar = new JProgressBar();
-        progressBar.setUI(new ProgressBarUI());
 
-	JPanel panel = new JPanel();
+        // Most the Java implementations have very poor representations of
+        // indeterminate progress, the exception being the Mac implementation.
+        // So unless the user is running under Mac. Use our custom graphic.
+        if(!isMacOSX())
+            progressBar.setUI(new ProgressBarUI());
+
 	noteLabel = new JLabel(Locale.getString("LOADING"));
 	progressLabel = new JLabel(Locale.getString("PLEASE_WAIT"));
 
+	JPanel panel = new JPanel();
 	BorderLayout layout = new BorderLayout();
-	layout.setHgap(50);
+        layout.setHgap(50);
 	layout.setVgap(5);
 
 	panel.setLayout(layout);
@@ -309,5 +316,15 @@ public class PrimaryProgressDialog implements ProgressDialog {
      */
     public boolean isMaster() {
         return master;
+    }
+
+    /**
+     * Return whether the current operating system is Mac OS X.
+     *
+     * @return <code>true</code> if the OS is Mac OS X; <code>false</code> otherwise
+     */
+    private boolean isMacOSX() {
+        String OS = System.getProperty("os.name");
+        return OS.equals("Mac OS X");
     }
 }

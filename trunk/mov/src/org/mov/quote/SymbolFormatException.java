@@ -24,32 +24,12 @@ package org.mov.quote;
  */
 public class SymbolFormatException extends Throwable {
 
-    private String reason = null;
-
     /** 
      * Create a new symbol format exception with the given error reason.
      *
-     * @param reason the reason why the string isn't a valid symbol
+     * @param message the reason why the string isn't a valid symbol
      */
-    public SymbolFormatException(String reason) {
-        this.reason = reason;
-    }
-
-    /**
-     * Return the reason this exception was raised.
-     *
-     * @return the reason why the string isn't a valid symbol
-     */
-    public String getReason() {
-        return reason;
-    }
-
-    /**
-     * Convert the exception to a string
-     *
-     * @return	string version of the exception
-     */
-    public String toString() {
-	return getReason();
+    public SymbolFormatException(String message) {
+        super(message);
     }
 }

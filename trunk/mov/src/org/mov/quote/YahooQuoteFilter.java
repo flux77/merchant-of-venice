@@ -18,6 +18,7 @@
 
 package org.mov.quote;
 
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 
@@ -38,6 +39,8 @@ import org.mov.util.TradingDateFormatException;
  * <pre>
  * 16-Oct-03,38.75,39.15,38.22,38.70,307300,38.70
  * </pre>
+ *
+ * @author Andrew Leppard
  */
 
 public class YahooQuoteFilter implements QuoteFilter {
@@ -65,9 +68,10 @@ public class YahooQuoteFilter implements QuoteFilter {
      * if it did not contain a valid quote.
      *
      * @param	quoteLine	a single line of text containing a quote
+     * @exception QuoteFormatException if the quote could not be parsed
      * @return	the stock quote
      */
-    public Quote toQuote(String quoteLine) {
+    public Quote toQuote(String quoteLine) throws QuoteFormatException {
 	Quote quote = null;
 
 	if(quoteLine != null) {
@@ -82,8 +86,7 @@ public class YahooQuoteFilter implements QuoteFilter {
                                            TradingDate.US);
                 }
                 catch(TradingDateFormatException e) {
-                    return null;
-                    // Return null - couldn't parse quote
+                    throw new QuoteFormatException(e.getMessage());
                 }
 
                 try {
@@ -98,9 +101,12 @@ public class YahooQuoteFilter implements QuoteFilter {
                                       day_open, day_close);
                 } 
                 catch(NumberFormatException e) {
-                    // Return null - couldn't parse quote
+                    throw new QuoteFormatException(Locale.getString("ERROR_PARSING_NUMBER",
+                                                                    quoteParts[i - 1]));
                 }
             }
+            else
+                throw new QuoteFormatException(Locale.getString("WRONG_FIELD_COUNT"));
         }
         return quote;
     }

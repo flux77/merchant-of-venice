@@ -39,8 +39,9 @@ public interface QuoteFilter {
      *
      * @param	quoteLine	a single line of text containing a quote.
      * @return	the stock quote
+     * @exception QuoteFormatException if the quote could not be parsed
      */
-    public Quote toQuote(String quoteLine);
+    public Quote toQuote(String quoteLine) throws QuoteFormatException;
 
     /**
      * Convert the given stock quote to a string line.

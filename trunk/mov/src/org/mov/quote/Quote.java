@@ -18,11 +18,17 @@
 
 package org.mov.quote;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mov.ui.QuoteFormat;
+import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 
 /**
  * Representation of a stock quote for a given stock on a given date.
+ *
+ * @author Andrew Leppard
  */
 public class Quote {
     private Symbol symbol;
@@ -48,6 +54,10 @@ public class Quote {
     /** Represents day volume quote */
     public static final int DAY_VOLUME = 4;
 
+    /** Quotes before this year are considered suspect and raise warnings. */
+    private static final int SUSPECT_YEAR = 1900;
+    private static final TradingDate SUSPECT_DATE = new TradingDate(SUSPECT_YEAR, 0, 0);
+
     /**
      * Create a new stock quote for the given date.
      *
@@ -62,23 +72,6 @@ public class Quote {
     public Quote(Symbol symbol, TradingDate date,
 		 int day_volume, double day_low, double day_high,
 		 double day_open, double day_close) {
-
-        /*
-
-        // Some of these fail in my data!! Shouldn't assert. It should
-        // do better parsing. Import should show warnings or something?
-        assert day_low <= day_open; 
-        assert day_low <= day_close;
-        assert day_low <= day_high; 
-        assert day_high >= day_open; 
-        assert day_high >= day_close;
-        assert day_low >= 0.0D;
-        assert day_open >= 0.0D;
-        assert day_high >= 0.0D;
-        assert day_close >= 0.0D;
-        assert day_volume >= 0;
-        */
-
 	setSymbol(symbol);
 	setDate(date);
 
@@ -87,6 +80,62 @@ public class Quote {
 	this.day_high = day_high;
 	this.day_open = day_open;
 	this.day_close = day_close;
+    }
+
+    /**
+     * Clean up the quote. This fixes any irregularities that might exist in the quote,
+     * such as the day low not being the lowest quote.
+     *
+     * @exception QuoteFormatException if there were any problems with the quote
+     */
+    public void verify()
+        throws QuoteFormatException {
+
+        List messages = new ArrayList();
+
+        if(date.before(SUSPECT_DATE))
+            messages.add(Locale.getString("SUSPECT_YEAR", SUSPECT_YEAR));
+
+        if(date.after(new TradingDate()))
+            messages.add(Locale.getString("FUTURE_DATE"));
+
+        if(day_low > day_open || day_low > day_close || day_low > day_high) {
+            messages.add(Locale.getString("DAY_LOW_NOT_LOWEST"));
+            day_low = Math.min(Math.min(day_open, day_close), day_high);
+        }
+
+        if(day_high < day_open || day_high < day_close || day_high < day_low) {
+            messages.add(Locale.getString("DAY_HIGH_NOT_HIGHEST"));
+            day_high = Math.max(Math.max(day_open, day_close), day_low);
+        }
+
+        if(day_low < 0) {
+            messages.add(Locale.getString("DAY_LOW_LESS_THAN_ZERO"));
+            day_low = 0;
+        }
+
+        if(day_high < 0) {
+            messages.add(Locale.getString("DAY_HIGH_LESS_THAN_ZERO"));
+            day_high = 0;
+        }
+
+        if(day_open < 0) {
+            messages.add(Locale.getString("DAY_OPEN_LESS_THAN_ZERO"));
+            day_open = 0;
+        }
+
+        if(day_close < 0) {
+            messages.add(Locale.getString("DAY_CLOSE_LESS_THAN_ZERO"));
+            day_close = 0;
+        }
+
+        if(day_volume < 0) {
+            messages.add(Locale.getString("DAY_VOLUME_LESS_THAN_ZERO"));
+            day_volume = 0;
+        }
+
+        if(messages.size() > 0)
+            throw new QuoteFormatException(messages);
     }
 
     /**

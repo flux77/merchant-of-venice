@@ -676,7 +676,7 @@ public class PortfolioModule extends JPanel implements Module,
 	    }
             catch(SymbolFormatException e) {
                 DesktopManager.showErrorMessage(Locale.getString("ERROR_PARSING)SYMBOL") + "\n" +
-                                                e.getReason());
+                                                e.getMessage());
             }
 	}
 

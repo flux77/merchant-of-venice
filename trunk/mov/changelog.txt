@@ -6,20 +6,43 @@ Changes for Venice, 0.5 alpha 14/Jan/2005
     using the Gondola language.
   - Improved look of Candle Stick, Bar & Volume Charts (Bryan Lin).
 
+* Internationalisation:
+  - Can now specify the language to use in preferences (Alberto Nacher).
+  - Swedish translation added (Pontus Strömdahl).
+
 * Updates to Genetic Programming:
   - Can now specify window size in days.
   - Can now specify the buy/sell stock price (Alberto Nacher).
 
 * Updates to the Gondola Language:
   - Added ema() quote function (Alberto Nacher).
-  - Added sd() quote function (Andrew Leppard, Andrea Varga).
+  - Added sd() quote function (Andrew Leppard, Alberto Nacher).
+  - Added bol_upper() quote function (Alberto Nacher).
+  - Added bol_lower() quote function (Alberto Nacher).
+  - Added obv() quote function (Alberto Nacher).
+  - Added momentum() quote function (Alberto Nacher).
+  - Added implicit casting in the following cases:
 
-* Internationalisation:
-  - Can now specify the language to use in preferences (Alberto Nacher).
-  - Swedish translation added (Pontus Strömdahl).
+    float x integer = float
+    integer x float = integer
 
-* Internet quote download:
+    for +, -, / and * (Alberto Nacher).
+
+* Updates to Stock Quote Support:
   - Added proxy authentication support (Bryan Lin).
+  - Added HSQLDB (Hypersonic) support.
+  - Maximum symbol length increased to 12.
+  - Replaced file quote source with internal database. This makes Venice
+    easier to use and removes the problem where the file quote source
+    would not work if a file contained quotes from different dates.
+  - Separated import and export dialogs to simplify interface.
+  - Improved speed of internet import.
+  - Venice now cleans up any dubious stock quotes, e.g. quotes where
+    the day low is greater than the day high etc.
+  - Venice now displays an import report with any warnings and errors
+    encountered.
+
+* Can now import/export preference settings (Alberto Nacher).
 
 * Bug Fixes:
   - Paper trade and GP no longer sell, then buy back, the same stock on the
@@ -32,6 +55,10 @@ Changes for Venice, 0.5 alpha 14/Jan/2005
   - Gondola. Venice now properly displays an error if the user specifies
     a positive date offset in any function that accepts a date offset,
     e.g. lag(), avg(), min() etc.
+  - No longer crashes if you input certain punctuation symbols in
+    inappropriate places (e.g. "$" in symbol, date or number fields).
+  - Fixed user interface display bugs under Mac OS X. Also under Mac OS X
+    it now uses the standard, and better looking, progress bar.
 
 Changes for Venice, 0.4 alpha 14/Aug/2004
 ==========================================

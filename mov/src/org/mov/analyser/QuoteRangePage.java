@@ -21,6 +21,8 @@ package org.mov.analyser;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.Class;
 import java.lang.String;
 import java.util.HashMap;
@@ -44,6 +46,7 @@ import org.mov.parser.Parser;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteRange;
+import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.WeekendDateException;
 import org.mov.ui.EquationComboBox;
 import org.mov.ui.GridBagHelper;
@@ -104,6 +107,8 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             else
                 assert false;
         }
+
+        checkDisabledStatus();
     }
 
     public void save(String key) {
@@ -142,6 +147,24 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
                                                   "Invalid date range",
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
+        }
+
+        if(!QuoteSourceManager.getSource().containsDate(startDate)) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  "No data available for date '" + 
+                                                  startDateTextField.getText() + "'",
+                                                  "Invalid date range",
+                                                  JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if(!QuoteSourceManager.getSource().containsDate(endDate)) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  "No data available for date '" + 
+                                                  endDateTextField.getText() + "'",
+                                                  "Invalid date range",
+                                                  JOptionPane.ERROR_MESSAGE);
+            return false;
         }
 
         try {
@@ -300,6 +323,10 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 
             orderByKeyButton = new JRadioButton("By");
             orderByKeyButton.setSelected(true);
+            orderByKeyButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {                        
+                        checkDisabledStatus();
+                    }});
             buttonGroup.add(orderByKeyButton);
 
             c.gridwidth = 1;
@@ -321,6 +348,10 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             orderByKeyComboBox.addItem("Day Close Increasing");
             orderByKeyComboBox.addItem("Change Decreasing");
             orderByKeyComboBox.addItem("Change Increasing");
+            orderByKeyComboBox.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {                        
+                        checkDisabledStatus();
+                    }});
 
             c.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(orderByKeyComboBox, c);
@@ -345,5 +376,11 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             panel.add(innerPanel, BorderLayout.NORTH);
 	    add(panel);
         }
+    }         
+
+    private void checkDisabledStatus() {
+        orderByKeyComboBox.setEnabled(orderByKeyButton.isSelected());
+        orderByEquationComboBox.setEnabled(orderByEquationButton.isSelected());
+        
     }
 }

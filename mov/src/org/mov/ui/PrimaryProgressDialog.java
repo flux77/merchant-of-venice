@@ -114,7 +114,7 @@ public class PrimaryProgressDialog implements ProgressDialog {
      * Close the dialog window.
      */
     public void hide() {
-        dialog.hide();
+        dialog.setVisible(false);
     }
 
     /**
@@ -127,7 +127,7 @@ public class PrimaryProgressDialog implements ProgressDialog {
      */
     public void show(String title) {
         setTitle(title);
-        dialog.show();
+        dialog.setVisible(true);
         setProgress(getProgress());
     }
 

@@ -138,7 +138,7 @@ public class HelpPage extends DefaultMutableTreeNode {
 		    String line = br.readLine();
 		    
 		    while(line != null) {
-			stringBuffer = stringBuffer.append(line);
+			stringBuffer = (StringBuffer) stringBuffer.append(line);
 			line = br.readLine();                
 		    }
                 

@@ -79,7 +79,7 @@ public class CommandManager {
 
     public void setDesktopManager(DesktopManager desktopManager) {
 	this.desktopManager = desktopManager;
-        this.desktop = desktopManager.getDesktop();
+	this.desktop = DesktopManager.getDesktop();
     }
 
     /**

@@ -2,6 +2,9 @@ Changes for Venice, 0.4 alpha 14/Mar/2004
 ==========================================
 
 * Chart Update:
+  - Added Bar Chart (Quentin Bossard).
+  - Added Candle Stick (Quentin Bossard).
+  - Added Point & Figure (Mark Hummel).
   - Added RSI.
 
 * Internationalised.
@@ -32,6 +35,11 @@ Changes for Venice, 0.4 alpha 14/Mar/2004
   - Fixed various graphing bugs (Bryan Lin, Andrew Leppard).
   - Fixed a bug when the paper trade could never afford to buy any stock.
   - The standard deviation calculation is now correct.
+  - Internet download no longer stops when the date ranges covers a
+    stock market holiday.
+  - Limited precision of generated MetaStock quote files to prevent
+    stock quotes like "24.00020014".
+  - The application now handles importing empty quote files.
 
 Changes for Venice, 0.3 alpha 14/Mar/2004
 ==========================================

@@ -16,9 +16,12 @@ public class Analyser extends JFrame {
     public Analyser() {
 	// Read in the system preferences
 	try {
-	    InputStream is = ClassLoader.getSystemClassLoader().getResource(PREFS_FILE).openStream();
-	    Preferences.importPreferences(is);
-	    is.close();
+	    java.net.URL prefs_url = ClassLoader.getSystemClassLoader().getResource(PREFS_FILE);
+	    if (prefs_url != null) {
+		InputStream is = prefs_url.openStream();
+		Preferences.importPreferences(is);
+		is.close();
+	    }
 	} catch (java.io.IOException ioe) {
 	    System.err.println("IO Exception thrown while opening "+
 			       PREFS_FILE+

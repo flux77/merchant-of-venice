@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.source;
@@ -26,6 +26,10 @@ import org.mov.quote.*;
 
 import java.util.*;
 
+/**
+ * Provides a Portfolio graph source. This class allows portfolios
+ * to be graphed.
+ */
 public class PortfolioGraphSource implements GraphSource {
 
     /** Graph the market value (day close) of the portfolio */
@@ -65,7 +69,7 @@ public class PortfolioGraphSource implements GraphSource {
 
 	// Create a copy of the portfolio without the transactions
 	Portfolio temporaryPortfolio = (Portfolio)portfolio.clone();
-	Vector transactions = 
+	Vector transactions =
 	    (Vector)temporaryPortfolio.getTransactions().clone();
 	Iterator transactionIterator = transactions.iterator();
 	Transaction transaction = (Transaction)transactionIterator.next();
@@ -111,14 +115,14 @@ public class PortfolioGraphSource implements GraphSource {
 		  transaction.getDate().compareTo(date) <= 0) {
 		temporaryPortfolio.addTransaction(transaction);
 
-		if(transactionIterator.hasNext()) 
+		if(transactionIterator.hasNext())
 		    transaction = (Transaction)transactionIterator.next();
-		else 
+		else
 		    transaction = null; // no more transactions
 	    }
 
 	    try {
-		Float value = 
+		Float value =
 		    new Float(temporaryPortfolio.getValue(quoteBundle, date));
 		graphable.putY((Comparable)date, value);
 	    }
@@ -140,7 +144,7 @@ public class PortfolioGraphSource implements GraphSource {
 	// Build graphable so this source can be directly graphed
 	graphable = new Graphable();
 
-	// Keep track of cash deposited into portfolio. 
+	// Keep track of cash deposited into portfolio.
 	float depositedCash = 0.0F;
 
 	while(dateIterator.hasNext()) {
@@ -160,14 +164,14 @@ public class PortfolioGraphSource implements GraphSource {
 
 		temporaryPortfolio.addTransaction(transaction);
 
-		if(transactionIterator.hasNext()) 
+		if(transactionIterator.hasNext())
 		    transaction = (Transaction)transactionIterator.next();
-		else 
+		else
 		    transaction = null; // no more transactions
 	    }
 
 	    try {
-		Float value = 
+		Float value =
 		    new Float(temporaryPortfolio.getValue(quoteBundle, date) -
 			      depositedCash);
 		graphable.putY((Comparable)date, value);
@@ -197,13 +201,13 @@ public class PortfolioGraphSource implements GraphSource {
 	Float value = graphable.getY(x);
 	
 	if(value != null) {
-	    String name = portfolio.getName(); 
+	    String name = portfolio.getName();
 
-	    if(mode == PROFIT_LOSS) 
+	    if(mode == PROFIT_LOSS)
 		name = name.concat(" Profit");
 
 	    return new String("<html>" +
-			      name + 
+			      name +
 			      ", " +
 			      date.toLongString() +
 			      "<p>" +
@@ -234,12 +238,12 @@ public class PortfolioGraphSource implements GraphSource {
 			 1000000000.0F, // $1B (wow)
 			 1000000000.0F}; // $10B (Bill Gates)
 
-	return major;	    
+	return major;	
     }
 
     public float[] getAcceptableMinorDeltas() {
-	float[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F, 
-			 2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F, 
+	float[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F,
+			 2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F,
 			 8F, 9F};
 	return minor;
     }

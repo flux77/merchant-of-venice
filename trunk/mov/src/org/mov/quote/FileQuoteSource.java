@@ -1,4 +1,3 @@
-
 package org.mov.quote;
 
 import java.io.*;
@@ -39,7 +38,7 @@ public class FileQuoteSource implements QuoteSource
 	TradingDate date = null;
 	FileReader fr = new FileReader(fileName);
 	BufferedReader br = new BufferedReader(fr);
-	Stock stock = filter.filter(br.readLine());
+	Stock stock = filter.toQuote(br.readLine());
 	if(stock != null)
 	    date = stock.getDate();
 	br.close();
@@ -62,7 +61,7 @@ public class FileQuoteSource implements QuoteSource
 
 	    while(line != null && !found) {
 
-		stock = filter.filter(line);
+		stock = filter.toQuote(line);
 	    
 		if(stock != null && stock.getSymbol().equals(symbol)) 
 		    found = true;
@@ -108,9 +107,9 @@ public class FileQuoteSource implements QuoteSource
      * preferences. 
      *
      * @param	format	The format filter to use to parse the quotes
-     * @param	files	An array of files to search through
+     * @param	fileNames	Vector of file names
      */
-    public FileQuoteSource(String format, String[] files) {
+    public FileQuoteSource(String format, Vector fileNames) {
 
 	// Set filter to whatever is defined in the preferences to filter
 	// to our internal format
@@ -128,12 +127,16 @@ public class FileQuoteSource implements QuoteSource
 	// Indexing might take a while
 	boolean owner = 
 	    Progress.getInstance().open("Indexing files", 
-					files.length);
+					fileNames.size());
+	Iterator iterator = fileNames.iterator();
+	String fileName;
 
-	for(int i = 0; i < files.length; i++) {
+	while(iterator.hasNext()) {
+	    
+	    fileName = (String)iterator.next();
 
 	    try {
-		date = getContainedDate(files[i]);
+		date = getContainedDate(fileName);
 	    
 		if(date != null) {
 		    // Buffer the latest quote date 
@@ -141,12 +144,13 @@ public class FileQuoteSource implements QuoteSource
 			latestQuoteDate = date;
 		    
 		    // Associate this date with this file
-		    dateToFile.put(date, files[i]);
+		    dateToFile.put(date, fileName);
 		}		    
 		else {
 		    if(errorCount < 5) {
 			DesktopManager.
-			    showErrorMessage("No quotes found in " + files[i]);
+			    showErrorMessage("No quotes found in " + 
+					     fileName);
 			errorCount++;
 		    }
 		}
@@ -154,7 +158,7 @@ public class FileQuoteSource implements QuoteSource
 	    } catch (java.io.IOException ioe) {
 		if(errorCount < 5) {
 		    DesktopManager.showErrorMessage("Can't load " + 
-						    files[i]);
+						    fileName);
 		    errorCount++;	    
 		}
 	    }
@@ -265,6 +269,16 @@ public class FileQuoteSource implements QuoteSource
     }
 
     /**
+     * Returns the filename that contains quotes for the given date.
+     *
+     * @param	date	the given date
+     * @return	the file containing quotes for this date
+     */
+    public String getFileForDate(TradingDate date) {
+	return (String)dateToFile.get(date);
+    }
+
+    /**
      * Return a vector of all quotes in the given date.
      * The vector will be in order of stock symbol.
      *
@@ -275,7 +289,7 @@ public class FileQuoteSource implements QuoteSource
      */
     public Vector getQuotesForDate(TradingDate date, int type) {
 	Vector quotes = new Vector();
-	String fileName = (String)dateToFile.get(date);
+	String fileName = getFileForDate(date);
 	String line;	
 	Stock stock;
 
@@ -285,7 +299,7 @@ public class FileQuoteSource implements QuoteSource
 	    line = br.readLine();
 
 	    while(line != null) {
-		stock = filter.filter(line);
+		stock = filter.toQuote(line);
 
 		if(stock != null && isType(stock, type)) 
 		    quotes.add((Object)stock);
@@ -333,7 +347,7 @@ public class FileQuoteSource implements QuoteSource
 	while(iterator.hasNext()) {
 	    date = (TradingDate)iterator.next();
 
-	    stock = getContainedStock((String)dateToFile.get(date),
+	    stock = getContainedStock(getFileForDate(date),
 				      symbol);
 	    if(stock != null) 
 		quotes.add(stock);

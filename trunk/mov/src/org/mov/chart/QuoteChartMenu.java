@@ -39,22 +39,24 @@ import org.mov.ui.*;
 public class QuoteChartMenu extends JMenu implements ActionListener {
 
     // Graphs
-    private static final String BOLLINGER      = Locale.getString("BOLLINGER_BANDS");
-    private static final String DAY_HIGH       = Locale.getString("DAY_HIGH");
-    private static final String DAY_LOW        = Locale.getString("DAY_LOW");
-    private static final String DAY_OPEN       = Locale.getString("DAY_OPEN");
-    private static final String HIGH_LOW_BAR   = Locale.getString("HIGH_LOW_BAR");
-    private static final String MACD           = Locale.getString("MACD");
-    private static final String MOMENTUM       = Locale.getString("MOMENTUM");
-    private static final String MOVING_AVERAGE = Locale.getString("MOVING_AVERAGE");
+    private static final String BOLLINGER          = Locale.getString("BOLLINGER_BANDS");
+    private static final String DAY_HIGH           = Locale.getString("DAY_HIGH");
+    private static final String DAY_LOW            = Locale.getString("DAY_LOW");
+    private static final String DAY_OPEN           = Locale.getString("DAY_OPEN");
+    private static final String HIGH_LOW_BAR       = Locale.getString("HIGH_LOW_BAR");
+    private static final String MACD               = Locale.getString("MACD");
+    private static final String MOMENTUM           = Locale.getString("MOMENTUM");
+    private static final String MOVING_AVERAGE     = Locale.getString("MOVING_AVERAGE");
     private static final String EXP_MOVING_AVERAGE = Locale.getString("EXP_MOVING_AVERAGE");
-    private static final String OBV	       = Locale.getString("OBV");
-    private static final String RSI	       = Locale.getString("RSI");
+    private static final String OBV	           = Locale.getString("OBV");
+    private static final String RSI	           = Locale.getString("RSI");
     private static final String STANDARD_DEVIATION = Locale.getString("STANDARD_DEVIATION");
-    private static final String DAY_VOLUME     = Locale.getString("VOLUME");
-    private static final String POINTANDFIGURE = Locale.getString("POINTANDFIGURE");
-    private static final String PRICE_THRESHOLD = Locale.getString("PRICE_THRESHOLD");
+    private static final String DAY_VOLUME         = Locale.getString("VOLUME");
+    private static final String POINT_AND_FIGURE   = Locale.getString("POINT_AND_FIGURE");
+    private static final String PRICE_THRESHOLD    = Locale.getString("PRICE_THRESHOLD");
     private static final String SMOOTHING_CONSTANT = Locale.getString("SMOOTHING_CONSTANT");
+    private static final String BAR_CHART          = Locale.getString("BAR_CHART");
+    private static final String CANDLE_STICK       = Locale.getString("CANDLE_STICK");
         
     JMenu graphMenu;
     JMenu annotateMenu;
@@ -127,16 +129,18 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	addMenuItem(DAY_VOLUME);
 	graphMenu.addSeparator();
 	
+	addMenuItem(BAR_CHART);
 	addMenuItem(BOLLINGER);
+	addMenuItem(CANDLE_STICK);
 	addMenuItem(HIGH_LOW_BAR);
 	addMenuItem(MACD);
 	addMenuItem(MOMENTUM);
 	addMenuItem(MOVING_AVERAGE);
 	addMenuItem(EXP_MOVING_AVERAGE);
 	addMenuItem(OBV);
+	addMenuItem(POINT_AND_FIGURE);
         addMenuItem(RSI);
 	addMenuItem(STANDARD_DEVIATION);
-	addMenuItem(POINTANDFIGURE);
 
 	// Add annotation menu items
 	addAnnotateMenuItem(MACD, Locale.getString("BUY_SELL"));
@@ -264,10 +268,10 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	    }
 
 	    // FIXME: replace this kludge with proper redraw code
-	    if (graphExists(POINTANDFIGURE)) {
-		removeGraph(POINTANDFIGURE);
+	    if (graphExists(POINT_AND_FIGURE)) {
+		removeGraph(POINT_AND_FIGURE);
 		addGraph(new PointAndFigureGraph(getDayClose(), 20,graphConstants.getPriceReversalThreshold()),
-			 POINTANDFIGURE);
+			 POINT_AND_FIGURE);
 	    }
 	    
 	}
@@ -332,10 +336,20 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 		addGraph(new StandardDeviationGraph(getDayClose(), 20),
 			 STANDARD_DEVIATION);
 
-	    else if(text == POINTANDFIGURE) 
-		addGraph(new PointAndFigureGraph(getDayClose(), 20,graphConstants.getPriceReversalThreshold()),
-			 POINTANDFIGURE);
+	    else if(text == POINT_AND_FIGURE) 
+		addGraph(new PointAndFigureGraph(getDayClose(), 20,
+                                                 graphConstants.getPriceReversalThreshold()),
+			 POINT_AND_FIGURE);
 	    
+	    else if(text == BAR_CHART) 
+		addGraph(new BarChartGraph(getDayOpen(), getDayLow(), 
+                                           getDayHigh(), getDayClose()),
+			 BAR_CHART, 0);
+            
+	    else if(text == CANDLE_STICK) 
+		addGraph(new CandleStickGraph(getDayOpen(), getDayLow(), 
+                                              getDayHigh(), getDayClose()),
+			 CANDLE_STICK, 0);
 	}
     }
 

@@ -18,6 +18,10 @@
 
 package org.mov.analyser;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.portfolio.*;
@@ -28,42 +32,66 @@ public class PaperTrade {
     private final static String CASH_ACCOUNT_NAME = "Cash Account";
     private final static String SHARE_ACCOUNT_NAME = "Share Account";
 
-    private static Portfolio createPortfolio(String portfolioName,
-					    TradingDate startDate,
-					    float capital) {
-	Portfolio portfolio = new Portfolio(portfolioName);
+    private class Environment {
+        public ScriptQuoteBundle quoteBundle;
+        public Portfolio portfolio;
+        public CashAccount cashAccount;
+        public ShareAccount shareAccount;
+        public int startDateOffset;
+        public int endDateOffset;
 
-	// Add a cash account and a share account
-	CashAccount cashAccount = new CashAccount(CASH_ACCOUNT_NAME);
-	ShareAccount shareAccount = new ShareAccount(SHARE_ACCOUNT_NAME);
+        public Environment(ScriptQuoteBundle quoteBundle,
+                           String portfolioName,
+                           TradingDate startDate,
+                           TradingDate endDate,
+                           float capital) {
 
-	portfolio.addAccount(cashAccount);
-	portfolio.addAccount(shareAccount);
+            this.quoteBundle = quoteBundle;
 
-	// Deposit starting capital into portfolio
-	Transaction transaction = 
-	    Transaction.newDeposit(startDate, capital, cashAccount);
+            // First set up portfolio
+            portfolio = new Portfolio(portfolioName);
 
-	portfolio.addTransaction(transaction);
+            // Add a cash account and a share account
+            cashAccount = new CashAccount(CASH_ACCOUNT_NAME);
+            shareAccount = new ShareAccount(SHARE_ACCOUNT_NAME);
 
-	return portfolio;
+            portfolio.addAccount(cashAccount);
+            portfolio.addAccount(shareAccount);
+
+            // Deposit starting capital into portfolio
+            Transaction transaction = 
+                Transaction.newDeposit(startDate, capital, cashAccount);
+
+            portfolio.addTransaction(transaction);
+
+            // Now find the fast date offsets
+            try {
+                startDateOffset = quoteBundle.dateToOffset(startDate);
+                endDateOffset = quoteBundle.dateToOffset(endDate);
+            }
+            catch(WeekendDateException e) {
+                assert(false);
+                
+                startDateOffset = endDateOffset = 0;
+            }
+        }
     }
 
+    private PaperTrade() {
+        // users shouldn't instantiate this class
+    }
 
-    private static boolean sell(ScriptQuoteBundle quoteBundle,
-				Portfolio portfolio,
-				CashAccount cashAccount,
-				ShareAccount shareAccount,
+    private static boolean sell(Environment environment,
 				String symbol,
 				float tradeCost,
 				int day) 
 	throws MissingQuoteException {
 
 	// Make sure we have enough money for the trade
-	if(cashAccount.getValue() >= tradeCost) {
+	if(environment.cashAccount.getValue() >= tradeCost) {
 
 	    // Get the number of shares we own - we will sell all of them
-	    StockHolding stockHolding = shareAccount.get(symbol);
+	    StockHolding stockHolding = environment.shareAccount.get(symbol);
 	    int shares = 0;
 	    if(stockHolding != null) 
 		shares = stockHolding.getShares();
@@ -72,16 +100,18 @@ public class PaperTrade {
 	    if(shares > 0) {
 
 		// How much are they worth? We sell at the day open price
-		float amount = shares * quoteBundle.getQuote(symbol, Quote.DAY_OPEN,
-							     day);
+		float amount = shares * environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN,
+                                                                         day);
 		
-		TradingDate date = quoteBundle.offsetToDate(day);
-		Transaction sell = Transaction.newReduce(date, amount,
-							 symbol, shares,
+		TradingDate date = environment.quoteBundle.offsetToDate(day);
+		Transaction sell = Transaction.newReduce(date, 
+                                                         amount,
+							 symbol, 
+                                                         shares,
 							 tradeCost,
-							 cashAccount,
-							 shareAccount);
-		portfolio.addTransaction(sell);
+							 environment.cashAccount,
+							 environment.shareAccount);
+		environment.portfolio.addTransaction(sell);
 
 		return true;
 	    }
@@ -90,10 +120,7 @@ public class PaperTrade {
 	return false;
     }
 
-    private static boolean buy(ScriptQuoteBundle quoteBundle,
-			       Portfolio portfolio,
-			       CashAccount cashAccount,
-			       ShareAccount shareAccount,
+    private static boolean buy(Environment environment,
 			       String symbol,
 			       float amount,				 
 			       float tradeCost,
@@ -103,7 +130,7 @@ public class PaperTrade {
 
 	// Calculate maximum number of shares we can buy with
 	// the given amount
-	float sharePrice = quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day);
+	float sharePrice = environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day);
 	int shares = 
 	    (new Double(Math.floor(amount / sharePrice))).intValue();
 	
@@ -111,16 +138,18 @@ public class PaperTrade {
 	amount = sharePrice * shares;
 	
 	// Make sure we have enough money for the trade
-	if(cashAccount.getValue() >= (tradeCost + amount)) {
+	if(environment.cashAccount.getValue() >= (tradeCost + amount)) {
 
-	    TradingDate date = quoteBundle.offsetToDate(day);
-	    Transaction buy = Transaction.newAccumulate(date, amount,
-							symbol, shares,
+	    TradingDate date = environment.quoteBundle.offsetToDate(day);
+	    Transaction buy = Transaction.newAccumulate(date, 
+                                                        amount,
+							symbol, 
+                                                        shares,
 							tradeCost,
-							cashAccount,
-							shareAccount);
+							environment.cashAccount,
+							environment.shareAccount);
 
-	    portfolio.addTransaction(buy);
+	    environment.portfolio.addTransaction(buy);
 
 	    return true;
 	}
@@ -128,88 +157,177 @@ public class PaperTrade {
 	return false;
     }
 
+    private static int getHoldingTime(StockHolding stockHolding, int dateOffset) {
+        int holdingTime = 0;
+
+        try {              
+            holdingTime = -(QuoteCache.getInstance().dateToOffset(stockHolding.getDate()) - 
+                            dateOffset);
+        }
+        catch(WeekendDateException e) {
+            assert false;
+        }
+
+        return holdingTime;
+    }
+
     public static Portfolio paperTrade(String portfolioName, 
-				       ScriptQuoteBundle quoteBundle, String symbol,
+				       ScriptQuoteBundle quoteBundle, 
+                                       Variables variables,
+                                       String symbol,
 				       TradingDate startDate, 
 				       TradingDate endDate,
 				       Expression buy,
 				       Expression sell,
 				       float capital,
-				       float tradeCost) {
+				       float tradeCost) 
+        throws EvaluationException {
 
-	// First create a portfolio suitable for paper trading
-	Portfolio portfolio = createPortfolio(portfolioName,
-					      startDate,
-					      capital);
-	ShareAccount shareAccount = 
-	    (ShareAccount)
-	    portfolio.findAccountByName(SHARE_ACCOUNT_NAME);
-	CashAccount cashAccount = 
-	    (CashAccount)
-	    portfolio.findAccountByName(CASH_ACCOUNT_NAME);
+        // Set up environment for paper trading
+        PaperTrade paperTrade = new PaperTrade();
+        Environment environment = paperTrade.new Environment(quoteBundle,
+                                                             portfolioName,
+                                                             startDate,
+                                                             endDate,
+                                                             capital);
+        int dateOffset = environment.startDateOffset;
 
-	int dateOffset; 
-	int endDateOffset; 
-
-	try {
-	    dateOffset = quoteBundle.dateToOffset(startDate);
-	    endDateOffset = quoteBundle.dateToOffset(endDate);
-	}
-	catch(WeekendDateException e) {
-	    assert(false);
-
-	    dateOffset = endDateOffset = 0;
-	}
-
-	// This is set when we own the stock
+	// This is set when we own the stock and we set the date we acquired the
+        // stock
 	boolean ownStock = false;
+        int dateAcquiredOffset = 0;
+
+        if(!variables.contains("held"))
+            variables.add("held", Expression.INTEGER_TYPE, 0.0F);
+        else
+            variables.setValue("held", 0.0F);
 
 	// Now iterate through each trading date and decide whether
 	// to buy/sell. The last date is used for placing the previous
 	// date's buy/sell orders.
-	while(dateOffset < endDateOffset) {
+	while(dateOffset < environment.endDateOffset) {
 
 	    try {		
-
-		// If we own the stock should we sell?
+		// Sell?
 		if(ownStock) {
-		    if(sell.evaluate(quoteBundle, symbol, dateOffset) >= Expression.TRUE) {
-			if(sell(quoteBundle, portfolio, cashAccount,
-				shareAccount, symbol, 
-				tradeCost, dateOffset + 1))
+                    variables.setValue("held", -(dateAcquiredOffset - dateOffset));
+
+		    if(sell.evaluate(variables, 
+                                     quoteBundle, 
+                                     symbol, 
+                                     dateOffset) >= Expression.TRUE) {
+			if(sell(environment, symbol, tradeCost, dateOffset + 1))
 			    ownStock = false;
 		    }
+
+                    variables.setValue("held", 0.0F);
 		}
 		
-		// If we don't own the stock should we buy?
+		// Buy?
 		else {
-		    if(buy.evaluate(quoteBundle, symbol, dateOffset) >= Expression.TRUE) {
+		    if(buy.evaluate(variables, quoteBundle, symbol, 
+                                    dateOffset) >= Expression.TRUE) {
 			// Spend all our money except for enough to do
-			// a buy and a later sell trade
-			float amount = cashAccount.getValue() - 2 * tradeCost;
+			// a buy and a later sell trade. 
+			float amount = environment.cashAccount.getValue() - 2 * tradeCost;
 
-			if(buy(quoteBundle, portfolio, cashAccount, 
-			       shareAccount, symbol, amount, 
-			       tradeCost, dateOffset + 1))
+			if(buy(environment, symbol, amount, tradeCost, dateOffset + 1)) {
+                            dateAcquiredOffset = dateOffset;
 			    ownStock = true;
-
+                        }
 		    }
 		}
 	    }
 	    catch(MissingQuoteException e) {
-		// quote was missing
-	    }
-
-	    catch(EvaluationException e) {
-		// Expression didn't evaluate 
+                // Ignore and move on
 	    }
 
 	    // Go to the next trading date
 	    dateOffset++;
 	}
 
-	return portfolio;
+	return environment.portfolio;
     }
 
+    public static Portfolio paperTrade(String portfolioName,
+                                       ScriptQuoteBundle quoteBundle, 
+                                       Variables variables,
+                                       OrderComparator orderComparator,
+                                       TradingDate startDate, 
+				       TradingDate endDate,
+				       Expression buy,
+				       Expression sell,
+				       float capital,
+                                       float valuePerStock,
+				       float tradeCost) 
+        throws EvaluationException {
 
+        // Set up environment for paper trading
+        PaperTrade paperTrade = new PaperTrade();
+        Environment environment = paperTrade.new Environment(quoteBundle,
+                                                             portfolioName,
+                                                             startDate,
+                                                             endDate,
+                                                             capital);
+        int dateOffset = environment.startDateOffset;
+
+        if(orderComparator != null && !variables.contains("order"))
+            variables.add("order", Expression.INTEGER_TYPE);
+        if(!variables.contains("held"))
+            variables.add("held", Expression.INTEGER_TYPE, 0.0F);
+        else
+            variables.setValue("held", 0.0F);
+
+        // Now iterate through each trading date and decide whether
+	// to buy/sell. The last date is used for placing the previous
+	// date's buy/sell orders.
+	while(dateOffset < environment.endDateOffset) {
+
+            List symbols = quoteBundle.getSymbols(dateOffset);
+
+            // If we've been asked to trade in a specific order, then order them
+            if(orderComparator != null) 
+                Collections.sort(symbols, orderComparator);
+
+            // Iterate through stocks available today - should we buy or sell any of it?
+            for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
+
+                String symbol = (String)iterator.next();
+                StockHolding stockHolding = environment.shareAccount.get(symbol);
+
+                // If we care about the order, make sure the "order" variable is set
+                if(orderComparator != null)
+                    variables.setValue("order", symbols.indexOf(symbol));
+
+                try {
+                    // Sell?
+                    if(stockHolding != null) {                  
+                        variables.setValue("held", getHoldingTime(stockHolding, dateOffset));
+
+                        if(sell.evaluate(variables, quoteBundle, symbol, 
+                                         dateOffset) >= Expression.TRUE)
+                            sell(environment, symbol, tradeCost, dateOffset + 1);
+
+                        variables.setValue("held", 0.0F);
+                    }
+
+                    // Buy? But only if we have enough money
+                    else if((valuePerStock + 2 * tradeCost) < 
+                            environment.cashAccount.getValue()) {
+
+                        if(buy.evaluate(variables, quoteBundle, symbol, 
+                                        dateOffset) >= Expression.TRUE)
+                            buy(environment, symbol, valuePerStock,  tradeCost, 
+                                dateOffset + 1);
+                    }
+                }
+                catch(MissingQuoteException e) {
+                    // Ignore and move on
+                }
+            }
+            dateOffset++;
+        }
+
+        return environment.portfolio;
+    }
 }

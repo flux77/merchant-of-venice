@@ -62,7 +62,8 @@ public class DatabaseQuoteSource implements QuoteSource
 
     // MySQL driver info
     private final static String DRIVER_NAME       = "mysql";
-    private final static String DRIVER_CLASS      = "org.gjt.mm.mysql.Driver";
+    private final static String MM_MYSQL_DRIVER   = "org.gjt.mm.mysql.Driver";
+    private final static String MYSQL_DRIVER      = "com.mysql.jdbc.Driver";
 
     // Shares table
     private final static String SHARE_TABLE_NAME  = "shares";
@@ -102,16 +103,22 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	// Get driver
 	try {
-	    // The newInstance() call is a work around for some
-	    // broken Java implementations
-	    Class.forName(DRIVER_CLASS).newInstance();
-	
-	    // connect to database
-	    connect(host, port, database, username, password);
-
+            // Try MM MySql driver first as if anything it seems a little
+            // faster and it's the one I used first
+	    Class.forName(MM_MYSQL_DRIVER).newInstance();
+            connect(host, port, database, username, password);
 	}
-	catch (Exception E) {
-	    DesktopManager.showErrorMessage("Unable to load MySQL driver");
+	catch (Exception e) {
+            // If the MM mysql driver doesn't work, we can try the
+            // official driver from MySql
+            try {
+                Class.forName(MYSQL_DRIVER).newInstance();
+                connect(host, port, database, username, password);
+            }
+            catch(Exception e2) {
+                // Neither worked!
+                DesktopManager.showErrorMessage("Unable to load MySQL driver");
+            }
 	}
     }
 
@@ -370,9 +377,7 @@ public class DatabaseQuoteSource implements QuoteSource
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setNote("Loading Quotes...");
         progress.setIndeterminate(true);
-
 	executeSQLString(progress, queryString);
-
         ProgressDialogManager.closeProgressDialog(progress);
     }
 

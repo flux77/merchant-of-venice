@@ -49,8 +49,10 @@ public class RSIExpression extends BinaryExpression {
         // Extract arguments
 	int period = (int)getChild(0).evaluate(variables, quoteBundle, symbol, day);
         if(period <= 0)
-            throw EvaluationException.rangeForRSI();
+            throw EvaluationException.RSI_RANGE_EXCEPTION;
         int offset = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+        if (offset > 0)
+           throw EvaluationException.RSI_OFFSET_EXCEPTION;
 
         // Calculate and return the RSI. We start the offset one day before the actual offset
         // and increase the period by one day, as the RSI calculation needs an extra day

@@ -97,11 +97,11 @@ public class GPQuoteBundle implements QuoteBundle {
 
         // Trying to access a future quote?
         if(offset > 0)
-            throw EvaluationException.futureDate();
+            throw EvaluationException.FUTURE_DATE_EXCEPTION;
 
         // Trying to access a date too far into the past?
         else if(offset <= window)
-            throw EvaluationException.pastDate();
+            throw EvaluationException.PAST_DATE_EXCEPTION;
 
         // Date is within range
         else

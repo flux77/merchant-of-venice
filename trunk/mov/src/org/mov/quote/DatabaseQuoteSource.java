@@ -58,13 +58,11 @@ import org.mov.util.TradingDate;
 public class DatabaseQuoteSource implements QuoteSource
 {
     private Connection connection;
+    private boolean checkedTables = false;
 
     // Buffer first and last trading date in database
     private TradingDate firstDate;
     private TradingDate lastDate;
-
-    // When we are importing, first check to make sure the database is OK
-    private boolean readyForImport = false;
 
     // Database Software
 
@@ -139,17 +137,24 @@ public class DatabaseQuoteSource implements QuoteSource
 
     // Get the driver and connect to the database. Return FALSE if failed.
     private boolean checkConnection() {
+        boolean success = true;
 
-        // Are we already connected?
-        if(connection != null)
-            return true;
+        // Connect to database if we haven't already
+        if(connection == null) {
+            // Connect
+            if(software == MYSQL)
+                success = connectMySQL();
+            else {
+                assert software == POSTGRESQL;
+                success = connectPostgreSQL();
+            }
+        }
 
-	else if(software == MYSQL)
-	    return connectMySQL();
-	else {
-	    assert software == POSTGRESQL;
-	    return connectPostgreSQL();
-	}
+        // If we are connected, check the tables exist, if not, create them.
+        if(connection != null && !checkedTables)
+            success = checkedTables = (checkDatabase() && checkTables());
+
+        return success;
     }
     
     // Connect to a MySQL database
@@ -616,13 +621,13 @@ public class DatabaseQuoteSource implements QuoteSource
 	}
 	else if(quoteRange.getType() == QuoteRange.ALL_ORDINARIES) {
 	    filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
-					     "LEFT(" + SYMBOL_FIELD + ",1) != 'X' ");
+                                               left(SYMBOL_FIELD, 1) + " != 'X' ");
 	}
 	else {
 	    assert quoteRange.getType() == QuoteRange.MARKET_INDICES;
 
 	    filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
-					     "LEFT(" + SYMBOL_FIELD + ", 1) = 'X' ");
+                                               left(SYMBOL_FIELD, 1) + " = 'X' ");
 	}
 
 	//
@@ -657,8 +662,7 @@ public class DatabaseQuoteSource implements QuoteSource
     }
 
     // Creates database tables
-    private boolean createTable(String databaseName) {
-
+    private boolean createTables() {
 	boolean success = false;
 
 	try {
@@ -698,16 +702,13 @@ public class DatabaseQuoteSource implements QuoteSource
 	return success;	
     }
 
-    // Make sure database and tables exist before doing import, if
-    // the database or tables do not exist then create them
-    private boolean prepareForImport(String databaseName) {
-
+    private boolean checkDatabase() {
 	boolean success = true;
 
 	try {
 	    DatabaseMetaData meta = connection.getMetaData();
 
-	    // 1. Check database exists
+	    // Check database exists
 	    {
 		ResultSet RS = meta.getCatalogs();
 		String traverseDatabaseName;
@@ -716,7 +717,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		while(RS.next()) {
 		    traverseDatabaseName = RS.getString(1);
 		
-		    if(traverseDatabaseName.equals(databaseName)) {
+		    if(traverseDatabaseName.equals(database)) {
 			foundDatabase = true;
 			break;
 		    }
@@ -724,32 +725,10 @@ public class DatabaseQuoteSource implements QuoteSource
 		
 		if(!foundDatabase) {
 		    DesktopManager.showErrorMessage(Locale.getString("CANT_FIND_DATABASE",
-								     databaseName));
+								     database));
 		    return false;
 		}
 	    }
-
-	    // 2. Check table exists - if not create it
-	    {
-		ResultSet RS =
-		    meta.getTables(databaseName, null, "%", null);
-		String traverseTables;
-		boolean foundTable = false;
-
-		while(RS.next()) {
-		    traverseTables = RS.getString(3);
-			
-		    if(traverseTables.equals(SHARE_TABLE_NAME)) {
-			foundTable = true;
-                        break;
-                    }
-		}
-		
-		// No table? Well have to go create it
-		if(!foundTable)
-		    success = createTable(databaseName);
-	    }
-
 	}
 	catch (SQLException e) {
 	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
@@ -757,8 +736,41 @@ public class DatabaseQuoteSource implements QuoteSource
 	    return false;
 	}
 
-	// If we got here its all ready for importing
+	// If we got here the database is available
 	return success;
+    }
+
+    private boolean checkTables() {
+        boolean success = false;
+
+	try {
+	    DatabaseMetaData meta = connection.getMetaData();
+            ResultSet RS = meta.getTables(database, null, "%", null);
+            String traverseTables;
+            boolean foundTable = false;
+            
+            while(RS.next()) {
+                traverseTables = RS.getString(3);
+		
+                if(traverseTables.equals(SHARE_TABLE_NAME)) {
+                    foundTable = true;
+                    break;
+                }
+            }
+            
+            // No table? Well have to go create it
+            if(!foundTable)
+                success = createTables();
+            else
+                success = true;
+        }
+        
+	catch (SQLException e) {
+	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+							     e.getMessage()));
+        }
+
+        return success;
     }
 
     /**
@@ -774,59 +786,53 @@ public class DatabaseQuoteSource implements QuoteSource
 	if(!checkConnection()) 
             return;
 
-	if(!readyForImport)
-	    readyForImport = prepareForImport(databaseName);
-
-	// Make sure the database is ready for import
-	if(readyForImport) {
-	    StringBuffer insertString = new StringBuffer();
-	    boolean firstQuote = true;
-	    String dateString = date.toString();
-
-	    // Get a list of all the symbols for the given date that are
-	    // already in the database
-	    List existingSymbols = getSymbols(date);
-
-	    // Build single query to insert stocks for a whole day into
-	    // the table
-            Iterator iterator = quoteBundle.iterator();
-
-	    while(iterator.hasNext()) {
-		Quote quote = (Quote)iterator.next();
-
-		// Don't import quotes that are already in the database
-		if(!existingSymbols.contains(quote.getSymbol())) {
-		    if(firstQuote) {
-			insertString.append("INSERT INTO " + SHARE_TABLE_NAME +
-					    " VALUES (");
-			firstQuote = false;
-		    }
-		    else
-			insertString.append(", (");
-		    
-		    // Add new quote
-		    insertString.append("'" + dateString          + "', " +
-					"'" + quote.getSymbol()   + "', " +
-					"'" + quote.getDayOpen()  + "', " +
-					"'" + quote.getDayClose() + "', " +
-					"'" + quote.getDayHigh()  + "', " +
-					"'" + quote.getDayLow()   + "', " +
-					"'" + quote.getDayVolume()   + "')");
-		}
-	    }
-	    
-	    // Now insert day quote into database - if we had any quotes!
-	    if(!firstQuote) {
-		try {
-		    Statement statement = connection.createStatement();
-		    statement.executeUpdate(insertString.toString());
-		}
-		catch (SQLException e) {
-		    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-								     e.getMessage()));
-		}
-	    }
-	}
+        StringBuffer insertString = new StringBuffer();
+        boolean firstQuote = true;
+        String dateString = date.toString();
+        
+        // Get a list of all the symbols for the given date that are
+        // already in the database
+        List existingSymbols = getSymbols(date);
+        
+        // Build single query to insert stocks for a whole day into
+        // the table
+        Iterator iterator = quoteBundle.iterator();
+        
+        while(iterator.hasNext()) {
+            Quote quote = (Quote)iterator.next();
+            
+            // Don't import quotes that are already in the database
+            if(!existingSymbols.contains(quote.getSymbol())) {
+                if(firstQuote) {
+                    insertString.append("INSERT INTO " + SHARE_TABLE_NAME +
+                                        " VALUES (");
+                    firstQuote = false;
+                }
+                else
+                    insertString.append(", (");
+                
+                // Add new quote
+                insertString.append("'" + dateString          + "', " +
+                                    "'" + quote.getSymbol()   + "', " +
+                                    "'" + quote.getDayOpen()  + "', " +
+                                    "'" + quote.getDayClose() + "', " +
+                                    "'" + quote.getDayHigh()  + "', " +
+                                    "'" + quote.getDayLow()   + "', " +
+                                    "'" + quote.getDayVolume()   + "')");
+            }
+        }
+        
+        // Now insert day quote into database - if we had any quotes!
+        if(!firstQuote) {
+            try {
+                Statement statement = connection.createStatement();
+                statement.executeUpdate(insertString.toString());
+            }
+            catch (SQLException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                                 e.getMessage()));
+            }
+        }
     }
 
     /**
@@ -934,7 +940,7 @@ public class DatabaseQuoteSource implements QuoteSource
                            " WHERE " + DATE_FIELD + " = '" + date + "' AND " +
                            DAY_CLOSE_FIELD + " > " + DAY_OPEN_FIELD + " AND " +
                            "LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
-                           "LEFT(" + SYMBOL_FIELD + ",1) != 'X' ");
+                           left(SYMBOL_FIELD ,1)  + " != 'X' ");
 
             ResultSet RS = statement.executeQuery(query);
 
@@ -968,7 +974,7 @@ public class DatabaseQuoteSource implements QuoteSource
                            " WHERE " + DATE_FIELD + " = '" + date + "' AND " +
                            DAY_CLOSE_FIELD + " < " + DAY_OPEN_FIELD + " AND " +
                            "LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
-                           "LEFT(" + SYMBOL_FIELD + ",1) != 'X' ");
+                           left(SYMBOL_FIELD, 1) + " != 'X' ");
 
             RS = statement.executeQuery(query);
 
@@ -1038,6 +1044,25 @@ public class DatabaseQuoteSource implements QuoteSource
     // check for cancellation, rather than each individual fault.
     private void showEmptyDatabaseError() {
         DesktopManager.showErrorMessage(Locale.getString("NO_QUOTES_FOUND"));
+    }
+
+    /**
+     * Return the SQL operator for returning the left most characters in
+     * a string. This function is needed because there seems no portable
+     * way of doing this.
+     *
+     * @param field the field to extract
+     * @param length the number of left most characters to extract
+     * @return the SQL operator for performing LEFT(string, letters)
+     */
+    private String left(String field, int length) {
+        if(software == MYSQL)
+            return new String("LEFT(" + field + ", " + length + ")");
+        else {
+            // This is probably more portable than the above
+            assert software == POSTGRESQL;
+            return new String("SUBSTR(" + field + ", 0, " + length + ")");
+        }        
     }
 }
 

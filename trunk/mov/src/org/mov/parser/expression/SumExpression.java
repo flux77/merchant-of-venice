@@ -29,6 +29,8 @@ import org.mov.quote.Symbol;
 
 /**
  * An expression which finds the sum of quotes over a given trading period.
+ *
+ * @author Andrew Leppard
  */
 public class SumExpression extends TernaryExpression {
    
@@ -49,15 +51,15 @@ public class SumExpression extends TernaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 	
-	int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+	int period = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+        if (period <= 0)
+            throw EvaluationException.SUM_RANGE_EXCEPTION;
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-
-        if (days<=0)
-            throw EvaluationException.rangeForSum();
-
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        if (offset > 0)
+           throw EvaluationException.SUM_OFFSET_EXCEPTION;
 
-	return sum(quoteBundle, symbol, quoteKind, days, day, offset);
+	return sum(quoteBundle, symbol, quoteKind, period, day, offset);
 
     }
 
@@ -89,13 +91,13 @@ public class SumExpression extends TernaryExpression {
     }
 
     private double sum(QuoteBundle quoteBundle, Symbol symbol, 
-                      int quote, int days, int day, int offset)
+                      int quote, int period, int day, int offset)
         throws EvaluationException {
 
 	double sum = 0.0D;
 
 	// Sum quotes
-	for(int i = offset - days + 1; i <= offset; i++) {
+	for(int i = offset - period + 1; i <= offset; i++) {
             try {
                 sum += quoteBundle.getQuote(symbol, quote, day, i);
                

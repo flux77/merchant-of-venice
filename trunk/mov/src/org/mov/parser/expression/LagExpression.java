@@ -50,6 +50,8 @@ public class LagExpression extends BinaryExpression {
 	throws EvaluationException {
 
         int lag = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+        if (lag > 0)
+           throw EvaluationException.LAG_OFFSET_EXCEPTION;
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
 
         try {

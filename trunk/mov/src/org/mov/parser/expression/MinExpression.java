@@ -28,6 +28,8 @@ import org.mov.quote.Symbol;
 
 /**
  * An expression which finds the minimum quote over a given trading period.
+ *
+ * @author Andrew Leppard
  */
 public class MinExpression extends TernaryExpression {
 
@@ -49,12 +51,12 @@ public class MinExpression extends TernaryExpression {
 	throws EvaluationException {
 
 	int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-
         if(days <= 0)
-            throw EvaluationException.rangeForMin();
-
+            throw EvaluationException.MIN_RANGE_EXCEPTION;
+        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        if (offset > 0)
+           throw EvaluationException.MIN_OFFSET_EXCEPTION;
         
 	return min(quoteBundle, symbol, quoteKind, days, day, offset);
     }

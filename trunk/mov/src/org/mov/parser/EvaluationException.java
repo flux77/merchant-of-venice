@@ -26,40 +26,84 @@ import org.mov.util.Locale;
  * and a stack trace is not used, common compile time exceptions
  * have been made static to avoid generating unused stack traces.
  * See Java Performance Tuning for more information.
+ *
+ * @author Andrew Leppard
  */
 public class EvaluationException extends ExpressionException {
 
-    private static EvaluationException divideByZeroException =
+    /** An exception which is thrown when per performa a divide by zero operation. */
+    public static EvaluationException DIVIDE_BY_ZERO_EXCEPTION =
         new EvaluationException(Locale.getString("DIVIDE_BY_ZERO_ERROR"));
 
-    // The next two errors should never appear to the user so it isn't
+    // The next two errors should never appear to the user so they aren't
     // localised.
-    private static EvaluationException futureDateException =
+
+    /** An exception which is thrown when the GP tries to access a date that is
+        too far into the future. */
+    public static EvaluationException FUTURE_DATE_EXCEPTION =
         new EvaluationException("Future date");
 
-    private static EvaluationException pastDateException =
+    /** An exception which is thrown when the GP tries to access a date that is
+        too distant in the past. */
+    public static EvaluationException PAST_DATE_EXCEPTION =
         new EvaluationException("Date too far into past");
 
-    private static EvaluationException rangeForSumException =
+    /** An exception which is thrown on an invalid sum() range. */
+    public static EvaluationException SUM_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("SUM_RANGE_ERROR"));
 
-    private static EvaluationException rangeForAvgException =
+    /** An exception which is thrown on an invalid avg() range. */
+    public static EvaluationException AVG_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("AVG_RANGE_ERROR"));
 
-    private static EvaluationException rangeForMaxException =
+    /** An exception which is thrown on an invalid max() range. */
+    public static EvaluationException MAX_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("MAX_RANGE_ERROR"));
 
-    private static EvaluationException rangeForMinException =
+    /** An exception which is thrown on an invalid min() range. */
+    public static EvaluationException MIN_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("MIN_RANGE_ERROR"));
 
-    private static EvaluationException rangeForRSIException =
+    /** An exception which is thrown on an invalid rsi() range. */
+    public static EvaluationException RSI_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("RSI_RANGE_ERROR"));
 
-    private static EvaluationException rangeForLagException =
+    /** An exception which is thrown on an invalid lag() range. */
+    public static EvaluationException LAG_RANGE_EXCEPTION =
         new EvaluationException(Locale.getString("LAG_RANGE_ERROR"));
 
-    private static EvaluationException squareRootNegativeNumberException =
+    /** An exception which is thrown when trying to calculate the square
+        root of a negative number. */
+    public static EvaluationException SQUARE_ROOT_NEGATIVE_EXCEPTION =
         new EvaluationException(Locale.getString("SQUARE_ROOT_NEGATIVE_ERROR"));
+
+    /** An exception which is thrown on an invalid sum() offset. */
+    public static EvaluationException SUM_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("SUM_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid avg() offset. */
+    public static EvaluationException AVG_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("AVG_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid lag() offset. */
+    public static EvaluationException LAG_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("LAG_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid max() offset. */
+    public static EvaluationException MAX_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("MAX_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid min() offset. */
+    public static EvaluationException MIN_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("MIN_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid rsi() offset. */
+    public static EvaluationException RSI_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("RSI_OFFSET_ERROR"));
+
+    /** An exception which is thrown on an invalid corr() offset. */
+    public static EvaluationException CORR_OFFSET_EXCEPTION =
+        new EvaluationException(Locale.getString("CORR_OFFSET_ERROR"));
 
     /**
      * Create a new evaluation exception with the given error reason.
@@ -70,95 +114,5 @@ public class EvaluationException extends ExpressionException {
      */
     public EvaluationException(String reason) {
 	super(reason);
-    }
-
-    /**
-     * Returns an instance of the divide by zero exception. This error
-     * represents when you divide a number by zero, which is undefined.
-     *
-     * @return divide by zero exception
-     */
-    public static EvaluationException divideByZero() {
-        return divideByZeroException;
-    }
-
-    /**
-     * Returns an instance where the GP has accessed a date in
-     * the future.
-     *
-     * @return future date exception
-     */
-    public static EvaluationException futureDate() {
-        return futureDateException;
-    }
-
-    /**
-     * Returns an instance where the GP has accessed a date that
-     * is too far into the past.
-     *
-     * @return past date exception
-     */
-    public static EvaluationException pastDate() {
-        return pastDateException;
-    }
-
-    /**
-     * Returns an instance where the range in the sum() expression
-     * is less than or equal to zero.
-     *
-     * @return range for sum exception
-     */
-    public static EvaluationException rangeForSum() {
-        return rangeForSumException;
-    }
-
-    /**
-     * Returns an instance where the range in the avg() expression
-     * is less than or equal to zero.
-     *
-     * @return range for avg exception
-     */
-    public static EvaluationException rangeForAvg() {
-        return rangeForAvgException;
-    }
-
-    /**
-     * Returns an instance where the range in the max() expression
-     * is less than or equal to zero.
-     *
-     * @return range for max exception
-     */
-    public static EvaluationException rangeForMax() {
-        return rangeForMaxException;
-    }
-
-    /**
-     * Returns an instance where the range in the min() expression
-     * is less than or equal to zero.
-     *
-     * @return range for min exception
-     */
-    public static EvaluationException rangeForMin() {
-        return rangeForMinException;
-    }
-
-    /**
-     * Returns an instance where the range in the rsi() expression
-     * is less than or equal to zero.
-     *
-     * @return range for rsi exception
-     */
-    public static EvaluationException rangeForRSI() {
-        return rangeForRSIException;
-    }
-
-   /**
-     * Returns an instance where the caller tried to take the
-     * square root of a negative number.
-     *
-     * @return square root of negative number exception.
-     */
-    public static EvaluationException squareRootNegativeNumber() {
-        return squareRootNegativeNumberException;
     }
 }

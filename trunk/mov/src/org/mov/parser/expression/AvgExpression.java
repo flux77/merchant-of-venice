@@ -55,9 +55,11 @@ public class AvgExpression extends TernaryExpression {
         // Extract arguments
 	int period = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         if(period <= 0)
-            throw EvaluationException.rangeForAvg();
+            throw EvaluationException.AVG_RANGE_EXCEPTION;
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        if (offset > 0)
+           throw EvaluationException.AVG_OFFSET_EXCEPTION;
 
         // Calculate and return the average.
         QuoteBundleFunctionSource source =

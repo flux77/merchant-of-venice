@@ -18,7 +18,6 @@
 
 package org.mov.quote;
 
-
 import org.mov.prefs.PreferencesManager;
 
 /**
@@ -32,6 +31,7 @@ import org.mov.prefs.PreferencesManager;
  *	List quotes = QuoteSourceManager.getSource().getQuotesForSymbol("CBA");
  * </pre>
  * 
+ * @author Andrew Leppard
  * @see QuoteSource
  */
 public class QuoteSourceManager {
@@ -48,8 +48,7 @@ public class QuoteSourceManager {
      * @param source the new quote source
      */
     public static void setSource(QuoteSource source) {
-        if(sourceInstance == null) 
-            sourceInstance = source;
+        sourceInstance = source;
     }
     
     /**

@@ -27,6 +27,8 @@ import org.mov.quote.Symbol;
 
 /**
  * An expression which calculates the square root of a number.
+ *
+ * @author Andrew Leppard
  */
 public class SqrtExpression extends UnaryExpression {
     
@@ -42,7 +44,7 @@ public class SqrtExpression extends UnaryExpression {
         if(number >= 0)
             return (double)Math.sqrt(number);
         else
-            throw EvaluationException.squareRootNegativeNumber();
+            throw EvaluationException.SQUARE_ROOT_NEGATIVE_EXCEPTION;
     }
 
     public String toString() {

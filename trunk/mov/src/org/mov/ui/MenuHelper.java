@@ -43,7 +43,8 @@ public class MenuHelper {
     }
 
     /**
-     * Creates a menu item and attaches it to a menu
+     * Creates a menu item and attaches it to a menu.
+     *
      * @param parent The menu to attach the menu item to
      * @param title The title of the menu item
      */
@@ -53,13 +54,48 @@ public class MenuHelper {
     }
 
     /**
-     * Creates a menu item and attaches it to a menu
+     * Creates a menu item and attaches it to a menu.
+     *
      * @param parent The menu to attach the menu item to
      * @param title The title of the menu item
      * @param key Accelerator key
      */
     public static JMenuItem addMenuItem(ActionListener listener, 
 					JMenuItem parent, String title, 
+					char key) {
+	JMenuItem menuItem = new JMenuItem(title);
+	if (key != 0) {
+	    KeyStroke keyStroke = 
+		KeyStroke.getKeyStroke("ctrl " + key);
+
+	    menuItem.setAccelerator(keyStroke);
+	}
+	menuItem.addActionListener(listener);
+	parent.add(menuItem);
+
+	return menuItem;
+    } 
+
+    /**
+     * Creates a menu item and attaches it to a popup menu.
+     *
+     * @param parent The menu to attach the menu item to
+     * @param title The title of the menu item
+     */
+    public static JMenuItem addMenuItem(ActionListener listener, 
+					JPopupMenu parent, String title) {
+	return addMenuItem(listener, parent, title, (char)0);
+    }
+
+    /**
+     * Creates a menu item and attaches it to a popup menu.
+     *
+     * @param parent The menu to attach the menu item to
+     * @param title The title of the menu item
+     * @param key Accelerator key
+     */
+    public static JMenuItem addMenuItem(ActionListener listener, 
+					JPopupMenu parent, String title, 
 					char key) {
 	JMenuItem menuItem = new JMenuItem(title);
 	if (key != 0) {

@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.mov.util.*;
 import org.mov.parser.*;
+import org.mov.quote.*;
 
 public class CashAccount implements Account {
 

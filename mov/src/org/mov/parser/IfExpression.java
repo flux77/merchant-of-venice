@@ -1,6 +1,7 @@
 package org.mov.parser;
 
 import org.mov.util.*;
+import org.mov.quote.*;
 
 public class IfExpression extends TernaryExpression {
 

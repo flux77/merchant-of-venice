@@ -20,6 +20,7 @@ package org.mov.parser.expression;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,7 +42,7 @@ public abstract class AbstractExpression implements Expression {
 
     // Constants that manage the USA/Australian/UK localization
     // the goal is forcing that localization also for others languages
-    private final static String fmt = "0.000000000000#";
+    private final static String fmt = "0.000000#";
     private final static DecimalFormat df = new DecimalFormat(fmt, new DecimalFormatSymbols(Locale.US));
 
     // Pointer to parent node (if any)
@@ -243,6 +244,24 @@ public abstract class AbstractExpression implements Expression {
         }
         return retValue;
     }
+
+    public static NumberFormat getNumberFormat() {
+
+        // Synchronisation cannot cause issues here. So this code
+        // isn't synchronised.
+        
+        NumberFormat format = null;
+
+        format = NumberFormat.getInstance(Locale.US);
+        format.setMinimumIntegerDigits(1);
+        format.setMinimumFractionDigits(1);
+        format.setMaximumFractionDigits(6);
+        
+        return format;
+        
+    }
+
+
 
     /**
      * Returns whether this expression tree and the given expression tree

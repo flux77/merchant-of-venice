@@ -18,12 +18,13 @@
 
 package org.mov.quote;
 
+import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
- * A representation of a stock symbol, e.g. <code>CBA</code> or <code>WBC</code>.
+ * An immutable representation of a stock symbol, e.g. <code>CBA</code> or <code>WBC</code>.
  * Previously the stock symbol was stored as a String but this created the
  * question of whether it should be stored in lower or upper case.
  * Unfortunately, due to development drift, even though the stock symbols were
@@ -31,16 +32,23 @@ import java.util.regex.Pattern;
  * a "missing" conversion meant the symbol was displayed in lower case or
  * worse it was stored in upper case which could cause the stock symbol to
  * become "invisible".
+ *
  * <p>By creating a single class we reduce the amount of <code>toUpperCase()</code> and
  * <code>toLowerCase()</code> calls required, and have a single place to store symbol 
  * parsing code. Also this implementation uses a single <code>int</code> to store the 
  * symbol, which is designed to reduce memory and also increase speed of <code>hashCode()</code>
  * calls. These calls are used extensively in the {@link QuoteCache}.
+ *
+ * <p>To further reduce memory symbols are stored canonically. That is there is a single
+ * object for each symbol. For example the string symbol "CBA" would be represented by
+ * a single class, no matter where it was used. So instead of instantiating a new
+ * symbol class, you find the canonical object using the find method.
  */
 public class Symbol implements Cloneable, Comparable {
     
-    // Pack down symbol string, e.g. "ABCDE" into single int. 
-    // Saves space!
+    // Pack symbol string, e.g. "ABCDE" into single int to save space.
+    // This was written before I thought about making the object canonical
+    // so it can be removed now if necessary.
     private int symbol;
     
     /** The minimum valid length for a symbol */
@@ -52,48 +60,17 @@ public class Symbol implements Cloneable, Comparable {
     // A-Z contains 26 letters which fit in 5 bits
     private final static int BITS_PER_CHARACTER = 5;
 
+    // Hashmap of linking strings to canonical symbol class
+    private static HashMap registry = new HashMap();
+
     /**
      * Create a new symbol from the given string.
      *
      * @param string a string containing a single symbol
      * @exception SymbolFormatException if the string doesn't contain a valid quote
      */
-    public Symbol(String string) 
+    private Symbol(String string) 
         throws SymbolFormatException {
-        set(string);
-    }
-   
-    /**
-     * Return the symbol string.
-     *
-     * @return an upper case symbol string
-     */
-    public String get() {
-        String string = new String();
-        int i = 0;
-        boolean isMoreCharacters = true;
-	char[] characters = new char[MAXIMUM_SYMBOL_LENGTH];
-	
-        while(isMoreCharacters) {
-	    
-            // 1..26 (A..Z)
-            int characterNumber = symbol >> (BITS_PER_CHARACTER * i);
-            characterNumber &= ((2 << BITS_PER_CHARACTER - 1) - 1);
-	    
-            if(characterNumber == 0)
-                isMoreCharacters = false;
-            else 
-		characters[i++] = (char)(characterNumber - 1 + (int)'A');
-        }
-	
-	return String.copyValueOf(characters, 0, i);
-    }
-
-    // Set the symbol string.
-    private void set(String string) 
-        throws SymbolFormatException {
-	
-        string = string.toUpperCase();
 
         if(string.length() > MAXIMUM_SYMBOL_LENGTH)
             throw new SymbolFormatException("Symbol '" + string + "' is too long.");
@@ -114,6 +91,63 @@ public class Symbol implements Cloneable, Comparable {
 
             symbol += characterNumber << (BITS_PER_CHARACTER * i);
         }
+    }
+
+    /**
+     * Return the canonical symbol instance of the given symbol string.
+     *
+     * @param string a string containing a single symbol
+     * @exception SymbolFormatException if the string doesn't contain a valid quote
+     */
+    public static Symbol find(String string) 
+        throws SymbolFormatException {
+
+        String upperCaseString = string.toUpperCase();
+        Symbol symbol = (Symbol)registry.get(upperCaseString);
+
+        if(symbol == null) {
+            // To prevent two simultaneous threads adding the same symbol twice, 
+            // we run the add code in a synchronized block. Since
+            // sychronisation is slow, it is only invoked if we encounter a
+            // new symbol.
+            synchronized(registry) {
+
+                // We need to look this up again incase it was just added
+                symbol = (Symbol)registry.get(upperCaseString);
+
+                if(symbol == null) {
+                    symbol = new Symbol(upperCaseString);
+                    registry.put(upperCaseString, symbol);
+                }
+            }
+        }
+
+        return symbol;
+    }
+   
+    /**
+     * Return the symbol string.
+     *
+     * @return an upper case symbol string
+     */
+    public String get() {
+        int i = 0;
+        boolean isMoreCharacters = true;
+	char[] characters = new char[MAXIMUM_SYMBOL_LENGTH];
+	
+        while(isMoreCharacters) {
+	    
+            // 1..26 (A..Z)
+            int characterNumber = symbol >> (BITS_PER_CHARACTER * i);
+            characterNumber &= ((2 << BITS_PER_CHARACTER - 1) - 1);
+	    
+            if(characterNumber == 0)
+                isMoreCharacters = false;
+            else 
+		characters[i++] = (char)(characterNumber - 1 + (int)'A');
+        }
+	
+	return String.copyValueOf(characters, 0, i);
     }
 
     /**
@@ -165,7 +199,7 @@ public class Symbol implements Cloneable, Comparable {
 
         for(int i = 0; i < symbols.length; i++) {
             if(symbols[0].length() > 0) {
-                Symbol symbol = new Symbol(symbols[i]);
+                Symbol symbol = find(symbols[i]);
                 
                 if(!QuoteSourceManager.getSource().symbolExists(symbol))
                     throw new SymbolFormatException("No quotes available for symbol '" +
@@ -179,7 +213,7 @@ public class Symbol implements Cloneable, Comparable {
 
     /**
      * Convert a string containing a single symbol into a quote symbol.
-     * This differs from {@link Symbol#Symbol} as it performs better
+     * This differs from {@link Symbol#find} as it performs better
      * error checking and checks that the symbol exists.
      * 
      * @param string a string containing a single symbol
@@ -205,10 +239,7 @@ public class Symbol implements Cloneable, Comparable {
      * @return clone of this symbol
      */
     public Object clone() {
-
-        // Since the symbol class is immutable and because we may
-        // potentially have thousands of them, a clone can actually
-        // be the same class.
+        // Since Symbols are canonical the clone is this class.
         return this;
     }
     
@@ -231,7 +262,8 @@ public class Symbol implements Cloneable, Comparable {
      * @return <code>true</code> if they are equal
      */
     public boolean equals(Object object) {
-	return object.hashCode() == hashCode();
+        // We can compare directly since the objects are canonical
+	return this == object;
     }
     
     /**

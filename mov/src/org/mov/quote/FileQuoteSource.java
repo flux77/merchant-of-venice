@@ -461,7 +461,7 @@ public class FileQuoteSource implements QuoteSource
             URL fileURL = getURLForDate(date);
             
             if(fileURL == null)
-                throw new MissingQuoteException();
+                throw MissingQuoteException.getInstance();
             
             // Get all ordinaries for that date
             QuoteRange quoteRange = new QuoteRange(QuoteRange.ALL_ORDINARIES, date);

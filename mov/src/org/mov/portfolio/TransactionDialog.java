@@ -31,7 +31,9 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 
 import org.mov.main.*;
-import org.mov.util.*;
+import org.mov.util.Money;
+import org.mov.util.MoneyFormatException;
+import org.mov.util.TradingDate;
 import org.mov.table.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
@@ -852,14 +854,14 @@ public class TransactionDialog extends JInternalFrame
 		(ShareAccount)portfolio.findAccountByName(accountName);
 	}
 
-	float amount = 0.0F;
+	Money amount = Money.ZERO;
 	int shares = 0;
-	float tradeCost = 0.0F;
+	Money tradeCost = Money.ZERO;
 
 	try {
 	    if(amountTextField != null) 
 		if(!amountTextField.getText().equals(""))
-		    amount = Float.parseFloat(amountTextField.getText());
+		    amount = new Money(amountTextField.getText());
 
 	    if(sharesTextField != null) 
 		if(!sharesTextField.getText().equals(""))
@@ -867,12 +869,23 @@ public class TransactionDialog extends JInternalFrame
 	    
 	    if(tradeCostTextField != null) 
 		if(!tradeCostTextField.getText().equals(""))
-		    tradeCost = Float.parseFloat(tradeCostTextField.getText());
+		    tradeCost = new Money(tradeCostTextField.getText());
 	}
 
 	//
 	// Validate fields
 	//
+
+        // Can't parse money field?
+        catch(MoneyFormatException e) {
+            String message = new String("Can't parse number '" +
+                                        e.getReason() + "'");
+	    JOptionPane.showInternalMessageDialog(desktop, 
+						  message,
+						  "Error building transaction",
+						  JOptionPane.ERROR_MESSAGE);
+	    return null;
+        }
 
 	// Can't parse numeric field?
 	catch(NumberFormatException e) {

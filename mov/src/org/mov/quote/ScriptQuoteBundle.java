@@ -127,11 +127,11 @@ public class ScriptQuoteBundle implements QuoteBundle {
                     catch(QuoteNotLoadedException e3) {
                         
                         // We tried everyting - we just don't have it
-                        throw new MissingQuoteException();
+                        throw MissingQuoteException.getInstance();
                     }
                 }
                 else 
-                    throw new MissingQuoteException();
+                    throw MissingQuoteException.getInstance();
             
             }
         }
@@ -182,7 +182,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	    quote = getQuote(symbol, quoteType, quoteCache.dateToOffset(date));
 	}
 	catch(WeekendDateException e) {
-	    throw new MissingQuoteException();
+	    throw MissingQuoteException.getInstance();
 	}
 
 	return quote;
@@ -294,14 +294,13 @@ public class ScriptQuoteBundle implements QuoteBundle {
             List expectedSymbols = getQuoteRange().getAllSymbols();
 
 	    // Weed out ones that aren't ours
-	    Iterator iterator = expectedSymbols.iterator();
-	    while(iterator.hasNext()) {
+            for(Iterator iterator = expectedSymbols.iterator(); iterator.hasNext();) {
 		Symbol symbol = (Symbol)iterator.next();
 
 		if(allSymbols.contains(symbol))
                     presentSymbols.add(symbol);
 	    }
-	    
+
 	    return presentSymbols;
 	}
 		
@@ -518,7 +517,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
             return quoteCache.getQuote(symbol, quoteType, dateOffset);
         }                
 
-        throw new QuoteNotLoadedException();
+        throw QuoteNotLoadedException.getInstance();
     }
 
     // Try to expand the quote bundle so that it includes the current date.

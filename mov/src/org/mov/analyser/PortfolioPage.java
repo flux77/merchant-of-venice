@@ -40,6 +40,7 @@ import javax.swing.JTextField;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.GridBagHelper;
+import org.mov.util.Money;
 
 public class PortfolioPage extends JPanel implements AnalyserPage {
 
@@ -54,11 +55,11 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
     private JTextField tradeCostTextField;
 
     // Parsed input
-    private float initialCapital;
-    private float tradeCost;
+    private Money initialCapital;
+    private Money tradeCost;
     private int mode;
     private int numberStocks;
-    private float stockValue;
+    private Money stockValue;
 
     public final static int NUMBER_STOCKS_MODE = 0;
     public final static int STOCK_VALUE_MODE = 1;
@@ -115,9 +116,9 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 
     public boolean parse() {
         numberStocks = 0;
-        stockValue = 0.0F;
-	initialCapital = 0.0F;
-	tradeCost = 0.0F;
+        stockValue = Money.ZERO;
+	initialCapital = Money.ZERO;
+	tradeCost = Money.ZERO;
 
         if(numberStocksButton.isSelected())
             mode = NUMBER_STOCKS_MODE;
@@ -129,7 +130,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 	try {
             if(!stockValueTextField.getText().equals(""))
 		stockValue = 
-		    Float.parseFloat(stockValueTextField.getText());
+		    new Money(Float.parseFloat(stockValueTextField.getText()));
 
             if(!numberStocksTextField.getText().equals(""))
 		numberStocks = 
@@ -137,11 +138,11 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 
 	    if(!initialCapitalTextField.getText().equals(""))
 		initialCapital = 
-		    Float.parseFloat(initialCapitalTextField.getText());
+		    new Money(Float.parseFloat(initialCapitalTextField.getText()));
 	    	   
 	    if(!tradeCostTextField.getText().equals(""))
 		tradeCost = 
-		    Float.parseFloat(tradeCostTextField.getText());
+		    new Money(Float.parseFloat(tradeCostTextField.getText()));
 	}
 	catch(NumberFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop, 
@@ -152,7 +153,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 	    return false;
 	}
 
-	if(initialCapital <= 0) {
+	if(initialCapital.isLessThanEqual(Money.ZERO)) {
             JOptionPane.showInternalMessageDialog(desktop, 
                                                   "Cannot trade without some initial capital.",
                                                   "Invalid number",
@@ -168,7 +169,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 	    return false;
         }
 
-        if(mode == STOCK_VALUE_MODE && stockValue <= 0) {
+        if(mode == STOCK_VALUE_MODE && stockValue.isLessThanEqual(Money.ZERO)) {
             JOptionPane.showInternalMessageDialog(desktop, 
                                                   "Stocks must have a value.",
                                                   "Invalid number",
@@ -176,7 +177,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 	    return false;
         }
 
-        if(tradeCost < 0) {
+        if(tradeCost.isLessThan(Money.ZERO)) {
             JOptionPane.showInternalMessageDialog(desktop, 
                                                   "Trade cost can't be negative.",
                                                   "Invalid number",
@@ -191,11 +192,11 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
         return this;
     }
 
-    public float getInitialCapital() {
+    public Money getInitialCapital() {
         return initialCapital;
     }
 
-    public float getTradeCost() {
+    public Money getTradeCost() {
         return tradeCost;
     }
 
@@ -205,11 +206,11 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
         return mode;
     }
 
-    public float getStockValue() {
+    public Money getStockValue() {
         if (mode == STOCK_VALUE_MODE)
             return stockValue;
         else {
-            return 0.0F;
+            return null;
         }
     }
 

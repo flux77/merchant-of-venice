@@ -28,8 +28,7 @@ import org.mov.quote.*;
 public class CashAccount implements Account, Cloneable {
 
     // Amount of cash available
-    private float capital;
-
+    private Money capital;
     private String name;
 
     /**
@@ -39,7 +38,7 @@ public class CashAccount implements Account, Cloneable {
      */
     public CashAccount(String name) {
 	this.name = name;
-	this.capital = 0.0F;
+	this.capital = Money.ZERO;
     }
 
     public void transaction(Transaction transaction) {
@@ -49,26 +48,28 @@ public class CashAccount implements Account, Cloneable {
 	// Update value of account
 	if(type == Transaction.WITHDRAWAL ||
 	   type == Transaction.FEE) {
-	    capital -= transaction.getAmount();
+	    capital = capital.subtract(transaction.getAmount());
 	}
 	else if(type == Transaction.DEPOSIT ||
 		type == Transaction.INTEREST ||
 		type == Transaction.DIVIDEND) {
-	    capital += transaction.getAmount();
+	    capital = capital.add(transaction.getAmount());
 	}
 	else if(type == Transaction.ACCUMULATE) {
-	    capital -= (transaction.getAmount() + transaction.getTradeCost());
+	    capital = capital.subtract(transaction.getAmount());
+            capital = capital.subtract(transaction.getTradeCost());
 	}
 	else if(type == Transaction.REDUCE) {
-	    capital += (transaction.getAmount() - transaction.getTradeCost());
+	    capital = capital.add(transaction.getAmount());
+            capital = capital.subtract(transaction.getTradeCost());
 	}
 	else if(type == Transaction.TRANSFER) {
 	    // Are we transfering to or from this account?
 	    if(transaction.getCashAccount() == this) { 
-		capital -= transaction.getAmount(); // from
+		capital = capital.subtract(transaction.getAmount()); // from
 	    }
 	    else { 
-		capital += transaction.getAmount(); // to
+		capital = capital.add(transaction.getAmount()); // to
 	    }
 	}
     }
@@ -83,7 +84,7 @@ public class CashAccount implements Account, Cloneable {
 	return name;
     }
 
-    public float getValue(QuoteBundle quoteBundle, int dateOffset) {
+    public Money getValue(QuoteBundle quoteBundle, int dateOffset) {
 	return capital;
     }
 
@@ -92,12 +93,12 @@ public class CashAccount implements Account, Cloneable {
      * depend on any stock price, the cache and date can be
      * omitted.
      */
-    public float getValue() {
+    public Money getValue() {
 	return capital;
     }
 
     public void removeAllTransactions() {
-	capital = 0.0F;
+	capital = Money.ZERO;
     }
 
     public int getType() {

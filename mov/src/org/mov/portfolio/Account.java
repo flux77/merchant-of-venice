@@ -20,6 +20,7 @@ package org.mov.portfolio;
 
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
+import org.mov.util.Money;
 
 /**
  * Generic interface for all financial account objects. This interface
@@ -55,7 +56,7 @@ public interface Account {
      * @param	quoteBundle	the quote bundle
      * @param	dateOffset fast date offset
      */
-    public float getValue(QuoteBundle quoteBundle, int dateOffset)
+    public Money getValue(QuoteBundle quoteBundle, int dateOffset)
 	throws MissingQuoteException;
 
     /**

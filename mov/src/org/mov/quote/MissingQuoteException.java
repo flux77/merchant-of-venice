@@ -18,19 +18,29 @@
 
 package org.mov.quote;
 
+import java.lang.Throwable;
+
 /**
  * This exception represents the error condition that occurs when the caller
  * is trying to retrieve a quote that is not present. This exception would
  * occur if a caller was trying to retrieve a quote for a public holiday for
  * example.
  */
-public class MissingQuoteException extends java.lang.Throwable {
+public class MissingQuoteException extends Throwable {
+
+    private static MissingQuoteException instance = new MissingQuoteException();
+
+    private MissingQuoteException() {
+        // nothing to do
+    }
 
     /**
-     * Create an exception that represents the error condition that occurs
-     * when the caller is trying to retrieve a quote that is not present.
+     * Return the singleton instance of this exception. There is only a single
+     * instance of this exception defined. The reason is that this exception
+     * is thrown around a lot so needs to be fast - and the stack trace is
+     * not important. See "Java Performance Tuning" for an explanation.
      */
-    public MissingQuoteException() {
-        // nothing to do
+    public static MissingQuoteException getInstance() {
+        return instance;
     }
 }

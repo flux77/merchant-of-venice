@@ -541,11 +541,11 @@ public class PortfolioModule extends JPanel implements Module,
 						       TradingDate.BRITISH);
 
 		    int type = Transaction.stringToType(parts[i++]);
-		    float amount = Float.valueOf(parts[i++]).floatValue();
-		    Symbol symbol = new Symbol(parts[i++]);
+		    Money amount = new Money(Float.valueOf(parts[i++]).floatValue());
+		    Symbol symbol = Symbol.find(parts[i++]);
 
 		    int shares = Integer.valueOf(parts[i++]).intValue();
-		    float tradeCost = Float.valueOf(parts[i++]).floatValue();
+		    Money tradeCost = new Money(Float.valueOf(parts[i++]).floatValue());
 		    String cashAccountName = parts[i++];
 		    String cashAccountName2 = "";
 		    String shareAccountName = "";

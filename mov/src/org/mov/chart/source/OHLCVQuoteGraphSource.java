@@ -19,8 +19,8 @@
 package org.mov.chart.source;
 
 import org.mov.chart.*;
-import org.mov.ui.*;
-import org.mov.util.*;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
 import org.mov.quote.*;
 
 import java.util.*;
@@ -147,7 +147,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    return Integer.toString((int)value) + extension;
 	}
 	else {
-	    return PriceFormat.priceToString(value);
+	    return Money.toString(value);
 	}
     }
 

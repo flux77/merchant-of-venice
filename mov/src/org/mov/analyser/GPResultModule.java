@@ -42,12 +42,12 @@ import javax.swing.table.AbstractTableModel;
 import org.mov.main.CommandManager;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
+import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.ui.AbstractTable;
 import org.mov.ui.ChangeFormat;
 import org.mov.ui.ExpressionEditorDialog;
 import org.mov.ui.MenuHelper;
-import org.mov.ui.PriceFormat;
 
 public class GPResultModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -156,16 +156,16 @@ public class GPResultModule extends AbstractTable implements Module {
 		return new Integer(result.getGeneration());
 
 	    else if(column == TRADE_COST_COLUMN)
-		return new PriceFormat(result.getTradeCost());
+		return result.getTradeCost();
 
 	    else if(column == NUMBER_OF_TRADES_COLUMN) 
                 return new Integer(result.getNumberTrades());
 
 	    else if(column == FINAL_CAPITAL_COLUMN)
-		return new PriceFormat(result.getFinalCapital());
+		return result.getFinalCapital();
 
 	    else if(column == INITIAL_CAPITAL_COLUMN)
-		return new PriceFormat(result.getInitialCapital());
+		return result.getInitialCapital();
 
 	    else if(column == PERCENT_RETURN_COLUMN)
 		return new ChangeFormat(result.getInitialCapital(),
@@ -186,15 +186,15 @@ public class GPResultModule extends AbstractTable implements Module {
         columns.add(new Column(BUY_RULE_COLUMN, "Buy Rule", "Buy Rule", String.class, true));
         columns.add(new Column(SELL_RULE_COLUMN, "Sell Rule", "Sell Rule", String.class, true));
         columns.add(new Column(TRADE_COST_COLUMN, "Trade Cost", "Trade Cost", 
-                               PriceFormat.class, false));
+                               Money.class, false));
         columns.add(new Column(NUMBER_OF_TRADES_COLUMN, "Number of Trades", "No. Trades", 
                                Integer.class, false));
         columns.add(new Column(GENERATION_COLUMN, "Generation Number", "Generation", 
                                Integer.class, true));
         columns.add(new Column(INITIAL_CAPITAL_COLUMN, "Initial Capital", "Initial Capital", 
-                               PriceFormat.class, false));
+                               Money.class, false));
         columns.add(new Column(FINAL_CAPITAL_COLUMN, "Final Capital", "Final Capital", 
-                               PriceFormat.class, false));
+                               Money.class, false));
         columns.add(new Column(PERCENT_RETURN_COLUMN, "Return", "Return", 
                                ChangeFormat.class, true));
 

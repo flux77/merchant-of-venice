@@ -18,17 +18,27 @@
 
 package org.mov.quote;
 
+import java.lang.Throwable;
+
 /**
  * This exception represents the error condition that occurs when the caller
  * is trying to retrieve a quote that has not been loaded into Venice.
  */
-public class QuoteNotLoadedException extends java.lang.Throwable {
+public class QuoteNotLoadedException extends Throwable {
 
-    /**
-     * Create an exception that represents the error condition that occurs when the caller
-     * is trying to retrieve a quote that has not been loaded into Venice. */
-    public QuoteNotLoadedException() {
+    private static QuoteNotLoadedException instance = new QuoteNotLoadedException();
+
+    private QuoteNotLoadedException() {
         // nothing to do
     }
 
+    /**
+     * Return the singleton instance of this exception. There is only a single
+     * instance of this exception defined. The reason is that this exception
+     * is thrown around a lot so needs to be fast - and the stack trace is
+     * not important. See "Java Performance Tuning" for an explanation.
+     */
+    public static QuoteNotLoadedException getInstance() {
+        return instance;
+    }
 }

@@ -16,30 +16,31 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.quote;
+package org.mov.util;
 
-import java.util.HashMap;
+public class MoneyFormatException extends Throwable {
 
-public class SymbolRegistry {
+    private String reason = null;
 
-    private static HashMap symbolRegistry = new HashMap();
-
-    private SymbolRegistry() {
-        assert false;
+    public MoneyFormatException(String reason) {
+        this.reason = reason;
     }
 
-    public static Symbol find(String symbolString)
-        throws SymbolFormatException {
-
-        Symbol symbol = (Symbol)symbolRegistry.get(symbolString);
-
-        if(symbol == null) {
-            symbol = new Symbol(symbolString);
-            symbolRegistry.put(symbolString, symbol);
-        }
-
-        return symbol;
-
+    /**
+     * Return the reason this exception was raised.
+     *
+     * @return the reason why the string isn't a valid symbol
+     */
+    public String getReason() {
+        return reason;
     }
 
+    /**
+     * Convert the exception to a string
+     *
+     * @return	string version of the exception
+     */
+    public String toString() {
+	return getReason();
+    }
 }

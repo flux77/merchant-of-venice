@@ -52,20 +52,20 @@ public class ShareAccount implements Account, Cloneable {
 	return name;
     }
 
-    public float getValue(QuoteBundle quoteBundle, int dateOffset)
+    public Money getValue(QuoteBundle quoteBundle, int dateOffset)
 	throws MissingQuoteException {
  
 	Set set = stockHoldings.keySet();
 	Iterator iterator = set.iterator();
-	float value = 0;
+        Money value = Money.ZERO;
 
 	while(iterator.hasNext()) {
 	    Symbol symbol = (Symbol)iterator.next();
 	    StockHolding holding = (StockHolding)stockHoldings.get(symbol);
 
-	    value += quoteBundle.getQuote(holding.getSymbol(), 
-					  Quote.DAY_CLOSE, dateOffset) *
-		holding.getShares();
+	    value = value.add(quoteBundle.getQuote(holding.getSymbol(), 
+                                                   Quote.DAY_CLOSE, dateOffset) *
+                              holding.getShares());
 	}
 	
 	return value;
@@ -85,7 +85,7 @@ public class ShareAccount implements Account, Cloneable {
 	   type == Transaction.DIVIDEND_DRP) {
             assert shares > 0;
 
-            float averageCost = (transaction.getAmount() / 
+            float averageCost = (transaction.getAmount().floatValue() / 
                                  transaction.getShares());
 
 	    // Do we already own the stock? If so accumulate

@@ -25,19 +25,20 @@ import org.mov.analyser.gp.Individual;
 import org.mov.portfolio.Transaction;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.*;
-import org.mov.util.*;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
 
 public class GPResult {
     private Individual individual;
     private QuoteBundle quoteBundle;
-    private float initialCapital;
-    private float tradeCost;
+    private Money initialCapital;
+    private Money tradeCost;
     private int generation;
     private TradingDate startDate;	
     private TradingDate endDate;
     
     public GPResult(Individual individual, QuoteBundle quoteBundle,
-                    float initialCapital, float tradeCost,
+                    Money initialCapital, Money tradeCost,
                     int generation,
                     TradingDate startDate,
                     TradingDate endDate) {
@@ -87,7 +88,7 @@ public class GPResult {
         return generation;
     }
 
-    public float getTradeCost() {
+    public Money getTradeCost() {
         return tradeCost;
     }
 
@@ -100,12 +101,12 @@ public class GPResult {
         return accumulateTrades + reduceTrades;
     }
 
-    public float getInitialCapital() {
+    public Money getInitialCapital() {
         return initialCapital;
     }
 
-    public float getFinalCapital() {
-        float finalCapital = 0.0F;
+    public Money getFinalCapital() {
+        Money finalCapital = Money.ZERO;
         
         try {
             finalCapital = getPortfolio().getValue(getQuoteBundle(), getEndDate());

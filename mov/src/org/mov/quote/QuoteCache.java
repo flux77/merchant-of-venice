@@ -154,7 +154,7 @@ public class QuoteCache {
 
 	QuoteCacheQuote quote = (QuoteCacheQuote)symbols.get(symbol);
 	if(quote == null)
-	    throw new QuoteNotLoadedException();
+	    throw QuoteNotLoadedException.getInstance();
 	
 	return quote.getQuote(quoteType);
     }
@@ -212,12 +212,12 @@ public class QuoteCache {
 	assert dateOffset <= 0;
 
 	if(dateOffset <= -dates.size())
-	    throw new QuoteNotLoadedException();
+	    throw QuoteNotLoadedException.getInstance();
 	
 	HashMap quotesForDate = (HashMap)cache.get(-dateOffset);
 
 	if(quotesForDate == null)
-	    throw new QuoteNotLoadedException();
+	    throw QuoteNotLoadedException.getInstance();
 
 	return quotesForDate;
     }

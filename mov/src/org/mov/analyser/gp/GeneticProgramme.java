@@ -27,6 +27,7 @@ import org.mov.analyser.OrderComparator;
 import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
 import org.mov.quote.QuoteBundle;
+import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
 public class GeneticProgramme {
@@ -48,10 +49,10 @@ public class GeneticProgramme {
     private OrderComparator orderComparator;
     private TradingDate startDate;
     private TradingDate endDate;
-    private float initialCapital;
-    private float stockValue;
+    private Money initialCapital;
+    private Money stockValue;
     private int numberStocks;
-    private float tradeCost;
+    private Money tradeCost;
 
     private int generation;
 
@@ -59,10 +60,10 @@ public class GeneticProgramme {
                             OrderComparator orderComparator,
                             TradingDate startDate,
                             TradingDate endDate,
-                            float initialCapital,
-                            float stockValue,
+                            Money initialCapital,
+                            Money stockValue,
                             int numberStocks,
-                            float tradeCost,
+                            Money tradeCost,
                             int breedingPopulationSize, 
                             int seed) {
 
@@ -99,7 +100,7 @@ public class GeneticProgramme {
 
             if(individual.isValid(MIN_SIZE, MAX_SIZE)) {
                 try {
-                    float value =
+                    Money value =
                         individual.paperTrade(quoteBundle,
                                               orderComparator,
                                               startDate,
@@ -149,8 +150,12 @@ public class GeneticProgramme {
         return null;
     }
 
-    public int getActualBreedingPopulation() {
+    public int getBreedingPopulationSize() {
         return breedingPopulation.size();
+    }
+
+    public int getNextBreedingPopulationSize() {
+        return nextBreedingPopulation.size();
     }
 
     private Individual createIndividual() {
@@ -168,22 +173,22 @@ public class GeneticProgramme {
         }
     }
 
-    private void competeForBreeding(Individual individual, float value) {
+    private void competeForBreeding(Individual individual, Money value) {
         // If the individual made a loss or broke even, then we are just going to get 
         // rubbish if we breed from it, so even if it is the best we've seen so far, it
         // gets ignored.
-        if(value > initialCapital) {
+        if(value.isGreaterThan(initialCapital)) {
             // If there is another individual with exactly the same value -
             // we assume it made the same trades. Replace this individual
             // ONLY if the new individual is smaller. This puts a small
             // pressure for equations to be as tight as possible.
             Individual sameTradeIndividual = 
-                (Individual)nextBreedingPopulation.get(new Float(value));
+                (Individual)nextBreedingPopulation.get(value);
 
             if(sameTradeIndividual != null) {
                 if(individual.getTotalEquationSize() < 
                    sameTradeIndividual.getTotalEquationSize())
-                    nextBreedingPopulation.put(new Float(value), individual);
+                    nextBreedingPopulation.put(value, individual);
             }
 
             // Our individual is a unique butterfly. It'll get in only if the
@@ -191,14 +196,14 @@ public class GeneticProgramme {
             // existing individual.
             else {
                 if(nextBreedingPopulation.size() < breedingPopulationSize) 
-                    nextBreedingPopulation.put(new Float(value), individual);
+                    nextBreedingPopulation.put(value, individual);
             
                 else {
-                    Float weakestValue = (Float)nextBreedingPopulation.firstKey();
+                    Money weakestValue = (Money)nextBreedingPopulation.firstKey();
 
-                    if(value > weakestValue.floatValue()) {
+                    if(value.isGreaterThan(weakestValue)) {
                         nextBreedingPopulation.remove(weakestValue);
-                        nextBreedingPopulation.put(new Float(value), individual);
+                        nextBreedingPopulation.put(value, individual);
                     }
                 }
             }

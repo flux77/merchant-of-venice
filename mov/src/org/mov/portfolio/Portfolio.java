@@ -18,11 +18,12 @@
 
 package org.mov.portfolio;
 
-import org.mov.util.TradingDate;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.WeekendDateException;
+import org.mov.util.TradingDate;
+import org.mov.util.Money;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -378,14 +379,14 @@ public class Portfolio implements Cloneable {
      * @param	date	the date to calculate the value
      * @return	the value
      */
-    public float getValue(QuoteBundle quoteBundle, TradingDate date) 
+    public Money getValue(QuoteBundle quoteBundle, TradingDate date) 
 	throws MissingQuoteException {
 
         try {
             return getValue(quoteBundle, QuoteCache.getInstance().dateToOffset(date));
         }
         catch(WeekendDateException e) {
-            throw new MissingQuoteException();
+            throw MissingQuoteException.getInstance();
         }
     }
 
@@ -399,16 +400,16 @@ public class Portfolio implements Cloneable {
      * @param	dateOffset fast date offset
      * @return	the value
      */
-    public float getValue(QuoteBundle quoteBundle, int dateOffset) 
+    public Money getValue(QuoteBundle quoteBundle, int dateOffset) 
 	throws MissingQuoteException {
 
 	Iterator iterator = accounts.iterator();
-	float value = 0.0F;
+        Money value = Money.ZERO;
 	
 	while(iterator.hasNext()) {
 	    Account account = (Account)iterator.next();
 
-	    value += account.getValue(quoteBundle, dateOffset);
+	    value = value.add(account.getValue(quoteBundle, dateOffset));
 	}
 	
 	return value;

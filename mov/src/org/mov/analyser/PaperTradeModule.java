@@ -48,6 +48,7 @@ import org.mov.prefs.PreferencesManager;
 import org.mov.quote.ScriptQuoteBundle;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
+import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
 public class PaperTradeModule extends JPanel implements Module {
@@ -243,11 +244,11 @@ public class PaperTradeModule extends JPanel implements Module {
                                         TradingDate endDate,
                                         Expression buyRule,
                                         Expression sellRule,
-                                        float initialCapital,
+                                        Money initialCapital,
                                         int mode,
-                                        float stockValue,
+                                        Money stockValue,
                                         int numberStocks,
-                                        float tradeCost,
+                                        Money tradeCost,
                                         Variables variables,
                                         int a, int b, int c)
         throws EvaluationException {
@@ -318,11 +319,11 @@ public class PaperTradeModule extends JPanel implements Module {
         TradingDate endDate = quoteRangePage.getQuoteRange().getLastDate();
         Expression buyRule = rulesPage.getBuyRule();
         Expression sellRule = rulesPage.getSellRule();
-        float initialCapital = portfolioPage.getInitialCapital();
+        Money initialCapital = portfolioPage.getInitialCapital();
         int mode = portfolioPage.getMode();
-        float stockValue = portfolioPage.getStockValue();
+        Money stockValue = portfolioPage.getStockValue();
         int numberStocks = portfolioPage.getNumberStocks();
-        float tradeCost = portfolioPage.getTradeCost();
+        Money tradeCost = portfolioPage.getTradeCost();
 
         quoteBundle = new ScriptQuoteBundle(quoteRangePage.getQuoteRange());
 

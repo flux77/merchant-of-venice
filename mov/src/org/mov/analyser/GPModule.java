@@ -55,6 +55,7 @@ public class GPModule extends JPanel implements Module {
     private QuoteRangePage quoteRangePage;
     private PortfolioPage portfolioPage;
     private GPPage GPPage;
+    private GPGondolaSelection GPGondolaSelection;
 
     public GPModule(JDesktopPane desktop) {
 	this.desktop = desktop;
@@ -78,6 +79,9 @@ public class GPModule extends JPanel implements Module {
 
         GPPage = new GPPage(desktop);
         tabbedPane.addTab(GPPage.getTitle(), GPPage.getComponent());
+
+        GPGondolaSelection = new GPGondolaSelection(desktop);
+        tabbedPane.addTab(GPGondolaSelection.getTitle(), GPGondolaSelection.getComponent());
 
 	// Run, close buttons
 	JPanel buttonPanel = new JPanel();
@@ -110,12 +114,14 @@ public class GPModule extends JPanel implements Module {
         quoteRangePage.load(getClass().getName());
         portfolioPage.load(getClass().getName());
         GPPage.load(getClass().getName());
+        GPGondolaSelection.load(getClass().getName());
     }
 
     public void save() {
         quoteRangePage.save(getClass().getName());
         portfolioPage.save(getClass().getName());
         GPPage.save(getClass().getName());
+        GPGondolaSelection.save(getClass().getName());
     }
 
     public String getTitle() {
@@ -179,6 +185,10 @@ public class GPModule extends JPanel implements Module {
             tabbedPane.setSelectedComponent(GPPage.getComponent());
             return false;
         }
+        else if(!GPGondolaSelection.parse()) {
+            tabbedPane.setSelectedComponent(GPGondolaSelection.getComponent());
+            return false;
+        }
         else
             return true;
     }
@@ -219,6 +229,7 @@ public class GPModule extends JPanel implements Module {
 
             GeneticProgramme geneticProgramme =
                 new GeneticProgramme(quoteBundle,
+                                     GPGondolaSelection,
                                      orderCache,
                                      startDate,
                                      endDate,
@@ -226,8 +237,7 @@ public class GPModule extends JPanel implements Module {
                                      stockValue,
                                      numberStocks,
                                      tradeCost,
-                                     breedingPopulation,
-                                     1);
+                                     breedingPopulation);
 
             for(int generation = 1; generation <= numberGenerations; generation++) {
                 if(thread.isInterrupted())

@@ -46,11 +46,4 @@ public interface PreferencesPage {
      * @return the component to display.
      */
     public JComponent getComponent();
-
-    /**
-     * Return menu bar for quote source preferences module.
-     *
-     * @return	the menu bar.
-     */
-    public JMenuBar getJMenuBar();
 }

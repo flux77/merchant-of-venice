@@ -253,19 +253,23 @@ public class Token {
 	
 	if(!matched) {
             // Maybe it's a variable? Greedily extract possible variable name
-            Pattern pattern = Pattern.compile("^[a-aA-z][a-zA-Z0-9]*");
+            Pattern pattern = Pattern.compile("^[a-zA-z][a-zA-Z0-9]*");
             Matcher matcher = pattern.matcher(string);
-            String possibleVariableName = matcher.group();
 
-            if(variables.contains(possibleVariableName)) {
-                string = string.substring(possibleVariableName.length());
-                matched = true;
+            if(matcher.find()) {
+                String possibleVariableName = matcher.group();
 
-                token.setType(Token.VARIABLE_TOKEN);
-                token.setValueName(possibleVariableName);
-                token.setValueType(variables.getType(possibleVariableName));
+                if(variables.contains(possibleVariableName)) {
+                    string = string.substring(possibleVariableName.length());
+                    matched = true;
+                    
+                    token.setType(Token.VARIABLE_TOKEN);
+                    token.setValueName(possibleVariableName);
+                    token.setValueType(variables.getType(possibleVariableName));
+                }
             }
-            else
+
+            if(!matched)
                 throw new ParserException("unknown symbol");
         }
 

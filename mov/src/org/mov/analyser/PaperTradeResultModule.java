@@ -17,7 +17,6 @@
 */
 
 package org.mov.analyser;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
@@ -78,32 +77,6 @@ public class PaperTradeResultModule extends AbstractTable
     private JMenuItem popupRemoveMenuItem;
     private JMenuItem popupRemoveAllMenuItem;
 
-    class PaperTradeResult {
-	public Portfolio portfolio;
-	public QuoteBundle quoteBundle;
-	public float initialCapital;
-	public float tradeCost;
-	public String buyRule;
-	public String sellRule;
-	public TradingDate startDate;	
-	public TradingDate endDate;
-
-	public PaperTradeResult(Portfolio portfolio, QuoteBundle quoteBundle,
-				float initialCapital, float tradeCost,
-				String buyRule, String sellRule,
-				TradingDate startDate,
-				TradingDate endDate) {
-	    this.portfolio = portfolio;
-	    this.quoteBundle = quoteBundle;
-	    this.initialCapital = initialCapital;
-	    this.tradeCost = tradeCost;
-	    this.buyRule = buyRule;
-	    this.sellRule = sellRule;
-	    this.startDate = startDate;
-	    this.endDate = endDate;
-	}
-    }
-
     class Model extends AbstractTableModel {
 	private String[] headers = {
 	    "Start Date", "End Date", "Symbols", "Buy Rule", "Sell Rule",
@@ -143,20 +116,12 @@ public class PaperTradeResultModule extends AbstractTable
             fireTableDataChanged();
         }
 
-	public void addResult(Portfolio portfolio, QuoteBundle quoteBundle,
-			      float initialCapital, float tradeCost,
-			      String buyRule, String sellRule,
-			      TradingDate startDate,
-			      TradingDate endDate) {
-	    results.add((Object)new PaperTradeResult(portfolio, quoteBundle,
-						     initialCapital, tradeCost,
-						     buyRule, sellRule,
-						     startDate, endDate));
+        public void addResults(Vector results) {
+            this.results.addAll(results);
 
-	    // Notify table that we've appended a row at the end
-	    fireTableRowsInserted(results.size() - 1,
-	    			  results.size() - 1);
-	}
+            // Notify table that the whole data has changed
+            fireTableDataChanged();
+        }
 	
 	public int getRowCount() {
 	    return results.size();
@@ -174,32 +139,6 @@ public class PaperTradeResultModule extends AbstractTable
 	    return columnClasses[c];
 	}
 
-	// Calculate the final value of the portfolio 
-	private float finalPortfolioValue(Portfolio portfolio, 
-					  QuoteBundle quoteBundle,
-					  TradingDate startDate,
-					  TradingDate endDate) {
-	    boolean calculatedEndValue = false;
-	    float endValue = 0.0F;
-
-	    // We have to do a loop here because the last day in the
-	    // paper trade may be a public holiday where we have no
-	    // data for and thus can't calculate the end value...
-	    while(!calculatedEndValue && endDate.after(startDate)) {
-		try {
-		    endValue = 
-			portfolio.getValue(quoteBundle, 
-					   endDate);
-		    calculatedEndValue = true;
-		}
-		catch(MissingQuoteException e) {
-		    endDate = endDate.previous(1);
-		}
-	    }
-	    
-	    return endValue;
-	}
-
 	public Object getValueAt(int row, int column) {
 	    if(row >= getRowCount()) 
 		return "";
@@ -208,72 +147,44 @@ public class PaperTradeResultModule extends AbstractTable
 		(PaperTradeResult)results.elementAt(row);
 
 	    if(column == START_DATE_COLUMN) {
-		return result.startDate;
+		return result.getStartDate();
 	    }
 
 	    else if(column == END_DATE_COLUMN) {
-		return result.endDate;
+		return result.getEndDate();
 	    }
 
 	    else if(column == SYMBOLS_COLUMN) {
-		Vector symbolsTraded = result.portfolio.getSymbolsTraded();
-
-		String string = new String();
-		Iterator iterator = symbolsTraded.iterator();
-		while(iterator.hasNext()) {
-		    String symbol = (String)iterator.next();
-		    symbol = symbol.toUpperCase();
-
-		    if(string.length() > 0)
-			string = string.concat(", " + symbol);
-		    else
-			string = symbol;
-		}
-
-		return string;
+		return result.getSymbols();
 	    }
 	    
 	    else if(column == BUY_RULE_COLUMN) {
-		return result.buyRule;
+		return result.getBuyRule();
 	    }
 
 	    else if(column == SELL_RULE_COLUMN) {
-		return result.sellRule;
+		return result.getSellRule();
 	    }
 	    
 	    else if(column == TRADE_COST_COLUMN) {
-		return new PriceFormat(result.tradeCost);
+		return new PriceFormat(result.getTradeCost());
 	    }
 
 	    else if(column == NUMBER_OF_TRADES_COLUMN) {
-		Portfolio portfolio = result.portfolio;
-		int accumulateTrades = 
-		    portfolio.countTransactions(Transaction.ACCUMULATE);
-		int reduceTrades =
-		    portfolio.countTransactions(Transaction.REDUCE);
-
-		return new Integer(accumulateTrades + reduceTrades);
+                return new Integer(result.getNumberTrades());
 	    }
 
 	    else if(column == FINAL_CAPITAL_COLUMN) {
-		return new PriceFormat(finalPortfolioValue(result.portfolio,
-                                                           result.quoteBundle,
-                                                           result.startDate,
-                                                           result.endDate));
+		return new PriceFormat(result.getFinalCapital());
 	    }
 
 	    else if(column == INITIAL_CAPITAL_COLUMN) {
-		return new PriceFormat(result.initialCapital);
+		return new PriceFormat(result.getInitialCapital());
 	    }
 
 	    else if(column == PERCENT_RETURN_COLUMN) {
-		float startValue = result.initialCapital;
-		float endValue = finalPortfolioValue(result.portfolio,
-						     result.quoteBundle,
-						     result.startDate,
-						     result.endDate);
-
-		return new ChangeFormat(startValue, endValue);
+		return new ChangeFormat(result.getInitialCapital(),
+                                        result.getFinalCapital());
 	    }
 
 	    else {
@@ -354,10 +265,10 @@ public class PaperTradeResultModule extends AbstractTable
         PaperTradeResult result = 
             model.getPaperTradeResult(row);
         
-        CommandManager.getInstance().graphPortfolio(result.portfolio,
-                                                    result.quoteBundle,
-                                                    result.startDate,
-                                                    result.endDate);
+        CommandManager.getInstance().graphPortfolio(result.getPortfolio(),
+                                                    result.getQuoteBundle(),
+                                                    result.getStartDate(),
+                                                    result.getEndDate());
     }
 
     // Opens first selected result
@@ -371,7 +282,7 @@ public class PaperTradeResultModule extends AbstractTable
         PaperTradeResult result = 
             model.getPaperTradeResult(row);
 
-        CommandManager.getInstance().openPortfolio(result.portfolio);
+        CommandManager.getInstance().openPortfolio(result.getPortfolio());
     }
 
     // Removes all the selected results from the table
@@ -500,15 +411,9 @@ public class PaperTradeResultModule extends AbstractTable
         checkMenuDisabledStatus();
     }
 
-    // MAKE THIS SO IT ACCEPTS A LIST OF RESULTS
-    public void addResult(Portfolio portfolio, QuoteBundle quoteBundle,
-			  float initialCapital, float tradeCost, 
-			  String buyRule, String sellRule,
-			  TradingDate startDate, TradingDate endDate) {
-	model.addResult(portfolio, quoteBundle, initialCapital, tradeCost, 
-			buyRule, sellRule, startDate, endDate);
+    public void addResults(Vector results) {
+        model.addResults(results);
         checkMenuDisabledStatus();
-
 	validate();
 	repaint();
     }

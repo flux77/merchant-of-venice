@@ -553,7 +553,87 @@ public class PaperTradeModule extends JPanel implements Module,
 
     }
 
-    private PaperTradeData[] paperTrade() {
+    private PaperTradeResult paperTradeSymbol(ProgressDialog progress, Vector symbols, 
+                                              ScriptQuoteBundle quoteBundle,
+                                              Expression buyRule, Expression sellRule)
+    {
+        String firstSymbol = (String)symbols.firstElement();
+        Portfolio portfolio = 
+            PaperTrade.paperTrade("Paper Trade of " + 
+                                  firstSymbol.toLowerCase(),
+                                  quoteBundle,
+                                  firstSymbol.toLowerCase(),
+                                  fromDate,
+                                  toDate,
+                                  buyRule,
+                                  sellRule,
+                                  initialCapital,
+                                  tradeCost);
+
+        // Running the equation means we might need to load in
+        // more quotes so the note may have changed...
+        progress.setNote("Paper Trading...");
+        progress.increment();
+
+        return new BasicPaperTradeResult(portfolio, quoteBundle, initialCapital,
+                                         tradeCost, buyRule.toString(), sellRule.toString(), 
+                                         fromDate, toDate);
+    }
+   
+    private PaperTradeResult
+        paperTradeForEachSymbol(ProgressDialog progress, Vector symbols, 
+                                ScriptQuoteBundle quoteBundle,
+                                Expression buyRule, Expression sellRule)
+    {
+        // These are the only values that are averaged
+        int averageNumberTrades = 0;
+        int averageFinalCapital = 0;
+		    
+        // Evaluate expression for each equation
+        for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
+            String symbol = (String)iterator.next();
+
+            Portfolio portfolio = 
+                PaperTrade.paperTrade("Paper Trade of " + 
+                                      symbol.toLowerCase(),
+                                      quoteBundle,
+                                      symbol.toLowerCase(),
+                                      fromDate,
+                                      toDate,
+                                      buyRule,
+                                      sellRule,
+                                      initialCapital,
+                                      tradeCost);
+            
+            averageNumberTrades += (portfolio.countTransactions(Transaction.ACCUMULATE) +
+                                    portfolio.countTransactions(Transaction.REDUCE));
+            try {
+                averageFinalCapital += portfolio.getValue(quoteBundle, toDate);
+            }
+            catch(MissingQuoteException e) {
+                // Already checked...
+                assert false;
+            }
+            
+            // Running the equation means we might need to load in
+            // more quotes so the note may have changed...
+            progress.setNote("Paper Trading...");
+            progress.increment();
+        }
+
+        if(symbols.size() > 1) {
+            averageNumberTrades /= symbols.size();
+            averageFinalCapital /= symbols.size();
+        }
+
+        return new AveragePaperTradeResult(quoteBundle, "Symbols",
+                                           initialCapital, averageFinalCapital,
+                                           tradeCost, averageNumberTrades,
+                                           buyRule.toString(), sellRule.toString(), 
+                                           fromDate, toDate);
+    }
+                                
+    private Vector paperTrade() {
 
         ProgressDialog progress = 
             ProgressDialogManager.getProgressDialog();
@@ -561,9 +641,18 @@ public class PaperTradeModule extends JPanel implements Module,
         progress.setIndeterminate(true);
         progress.show("Paper Trade");
 
+        Date date = new Date();
+        long startTime = date.getTime();
+
         quoteBundle = new ScriptQuoteBundle(quoteRange);
 
-        Vector symbols = quoteBundle.getSymbols(quoteBundle.getFirstDateOffset());
+        date = new Date();
+        long endTime = date.getTime();
+        long timeTaken = endTime - startTime;
+
+        System.out.println("it took " + timeTaken + " ms");
+
+        Vector symbols = quoteBundle.getAllSymbols();
 	String symbol = (String)symbols.firstElement();
 	symbol = symbol.toLowerCase();
 
@@ -577,26 +666,22 @@ public class PaperTradeModule extends JPanel implements Module,
 	if(cRange <= 0)
 	    cRange = 1;
 	
-	int numberOfEquations = aRange * bRange * cRange;
+        int numberOfSymbolRuns = aRange * bRange * cRange;
+	int numberOfRuns = numberOfSymbolRuns * symbols.size();
 
         progress.setIndeterminate(false);
-        progress.setMaximum(numberOfEquations);
+        progress.setMaximum(numberOfRuns);
         progress.setProgress(0);
         progress.setNote("Paper Trading...");
         progress.setMaster(true);
 
 	// Iterate through all possible paper trade equations
-	PaperTradeData[] paperTradeData = 
-	    new PaperTradeData[numberOfEquations];
-
-	int equationNumber = 0;
+        Vector paperTradeResults = new Vector(numberOfSymbolRuns);
 
 	for(int a = 1; a <= aRange; a++) {
 	    for(int b = 1; b <= bRange; b++) {
 		for(int c = 1; c <= cRange; c++) {
-		    Expression buyRule = null;
-		    Expression sellRule = null;
-
+                    
 		    // Put in $A, $B, $C substitutes
 		    String buyRuleStringCopy = new String(buyRuleString);
 		    String sellRuleStringCopy = new String(sellRuleString);
@@ -606,50 +691,47 @@ public class PaperTradeModule extends JPanel implements Module,
 		    sellRuleStringCopy = 
 			substituteVariables(sellRuleStringCopy, a, b, c);
 
-		    try {
-			buyRule = parser.parse(buyRuleStringCopy);
-			sellRule = parser.parse(sellRuleStringCopy);
-		    }
-		    catch(ExpressionException e) {	   
-			// Should not happen - they've already been checked
+                    Expression buyRule = null;
+                    Expression sellRule = null;
+                    
+                    // Parse Expression
+                    try {
+                        buyRule = parser.parse(buyRuleStringCopy);
+                        sellRule = parser.parse(sellRuleStringCopy);
+                    }
+                    catch(ExpressionException e) {	   
+                        // Should not happen - they've already been checked
                         assert false;
-		    }
-		    
-		    Portfolio portfolio = 
-			PaperTrade.paperTrade("Paper Trade of " + 
-					      symbol.toUpperCase(),
-					      quoteBundle,
-					      symbol,
-					      fromDate,
-					      toDate,
-					      buyRule,
-					      sellRule,
-					      initialCapital,
-					      tradeCost);
+                    }
 
-		    paperTradeData[equationNumber] = new PaperTradeData();
-		    paperTradeData[equationNumber].portfolio = portfolio;
-		    paperTradeData[equationNumber].buyRuleString = 
-			buyRule.toString();
-		    paperTradeData[equationNumber].sellRuleString = 
-			sellRule.toString();
+                    PaperTradeResult paperTradeResult;
 
-		    equationNumber++;
+                    // If there is only one symbol to trade - we create a
+                    // basic paper trade result of just that symbol. This
+                    // includes the portfolio so it can be graphed
+                    if(symbols.size() == 1) 
+                        paperTradeResult = 
+                            paperTradeSymbol(progress, symbols, quoteBundle, buyRule, sellRule);
 
-                    // Running the equation means we might need to load in
-                    // more quotes so the note may have changed...
-                    progress.setNote("Paper Trading...");
-                    progress.increment();
+                    // If there are multiple symbols, we paper trade each one
+                    // and create a summary paper trade result. This doesn't
+                    // include portfolio information (there'd be too much data!)
+                    else
+                        paperTradeResult = 
+                            paperTradeForEachSymbol(progress, symbols, quoteBundle, buyRule,
+                                                    sellRule);
+
+                    paperTradeResults.add(paperTradeResult);
 		}
 	    }
 	}
 
         ProgressDialogManager.closeProgressDialog(progress);
 
-	return paperTradeData;
+	return paperTradeResults;
     }
 
-    private void displayPaperTrades(final PaperTradeData[] paperTrades) {
+    private void displayPaperTrades(final Vector paperTradeResults) {
 
 	// Invokes on dispatch thread
 	SwingUtilities.invokeLater(new Runnable() {
@@ -677,16 +759,7 @@ public class PaperTradeModule extends JPanel implements Module,
 		    PaperTradeResultModule resultsModule = 
 			(PaperTradeResultModule)resultsFrame.getModule();
 		    
-		    // Add each portfolio separately
-		    for(int i = 0; i < paperTrades.length; i++) {	
-			resultsModule.addResult(paperTrades[i].portfolio,
-						quoteBundle,
-						initialCapital,
-						tradeCost,
-						paperTrades[i].buyRuleString,
-						paperTrades[i].sellRuleString,
-						fromDate, toDate);
-		    }
+                    resultsModule.addResults(paperTradeResults);
 		}});
     }
 

@@ -16,13 +16,13 @@ public class Converter {
      * Convert a file array to a file name array.
      *
      * @param	files	an array of files
-     * @return	an array of file names
+     * @return	a vector of strings
      */
-    public static String[] toFileNames(File[] files) {
-	String[] fileNames = new String[files.length];
+    public static Vector toFileNameVector(File[] files) {
+	Vector fileNames = new Vector();
 	
 	for(int i = 0; i < files.length; i++) {
-	    fileNames[i] = files[i].getPath();
+	    fileNames.add(files[i].getPath());
 	}
 
 	return fileNames;

@@ -22,8 +22,8 @@ public class Converter {
 	quote *= 1000;
 	quote = Math.round(quote);
 	quote /= 1000;
-
-	return Double.toString(quote);
+	return new String(""+quote);
+	//	return Double.toString(quote);
     }
 
     public static String priceToString(float price) {
@@ -94,5 +94,6 @@ public class Converter {
 	return dates;
     }
 }
+
 
 

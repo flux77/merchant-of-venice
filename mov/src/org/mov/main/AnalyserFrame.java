@@ -33,6 +33,7 @@ public class AnalyserFrame extends JInternalFrame
 	// Listen to events from module
 	module.addPropertyChangeListener(this);
 
+	super.setFrameIcon(module.getFrameIcon());
 	show();	
     }
 
@@ -43,3 +44,4 @@ public class AnalyserFrame extends JInternalFrame
 	    dispose();
     }
 }
+

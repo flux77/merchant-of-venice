@@ -27,9 +27,10 @@ import org.mov.quote.*;
  */
 public class DayCloseExpression extends TerminalExpression {
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) {
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) {
 	// shouldnt happen
-	return 0.0F;
+        assert false;
+        return 0.0F;
     }
  
     public String toString() {
@@ -37,6 +38,19 @@ public class DayCloseExpression extends TerminalExpression {
     }
 
     public int checkType() throws TypeMismatchException {
-	return QUOTE_TYPE;
+	return getType();
+    }
+
+    /**
+     * Get the type of the expression.
+     *
+     * @return {@link QUOTE_TYPE}.
+     */
+    public int getType() {
+        return QUOTE_TYPE;
+    }
+
+    public Object clone() {
+        return new DayCloseExpression();
     }
 }

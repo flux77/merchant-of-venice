@@ -37,11 +37,11 @@ public class PercentExpression extends BinaryExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	return getLeft().evaluate(quoteBundle, symbol, day) *
-	    (getRight().evaluate(quoteBundle, symbol, day) / 100);
+	return getLeft().evaluate(variables, quoteBundle, symbol, day) *
+	    (getRight().evaluate(variables, quoteBundle, symbol, day) / 100);
     }
 
     public String toString() {
@@ -50,23 +50,36 @@ public class PercentExpression extends BinaryExpression {
     }
 
     /** 
-     * The value we are calculating the percent for can be any type except
-     * {@link #BOOLEAN_TYPE} or {@link #QUOTE_TYPE}. The percent value we
-     * are calculating must be a {@link #VALUE_TYPE}. The type returned 
-     * will be the same type as the value we are calculating the percent for.
+     * Either argument can be {@link INTEGER_TYPE} or {@link FLOAT_TYPE}.
      *
-     * @return	the type of the first argument
+     * @return	the left argument type
+     * @throws	TypeMismatchException if the expression has incorrect types
      */
     public int checkType() throws TypeMismatchException {
 	// returned type is type of first arg
 	int leftType = getLeft().checkType();
 	int rightType = getRight().checkType();
 	
-	if(leftType != BOOLEAN_TYPE && leftType != QUOTE_TYPE &&
-	   rightType == VALUE_TYPE)
-	    return leftType;
+	if((leftType == FLOAT_TYPE || leftType == INTEGER_TYPE) &&
+           (rightType == FLOAT_TYPE || rightType == INTEGER_TYPE))
+            return getType();
 	else
 	    throw new TypeMismatchException();
     }
+
+    /**
+     * Get the type of the expression.
+     *
+     * @return {@link FLOAT_TYPE} or {@link INTEGER_TYPE}.
+     */
+    public int getType() {
+        return getLeft().getType();
+    }
+
+    public Object clone() {
+        return new PercentExpression((Expression)getLeft().clone(), 
+                                     (Expression)getRight().clone());
+    }
+
 }
 

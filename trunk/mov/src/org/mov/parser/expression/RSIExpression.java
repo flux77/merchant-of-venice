@@ -33,11 +33,11 @@ public class RSIExpression extends Expression {
 	add(lag);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 	
-	int days = (int)getArg(0).evaluate(quoteBundle, symbol, day);
-	int lastDay = day + (int)getArg(1).evaluate(quoteBundle, symbol, day);
+	int days = (int)getArg(0).evaluate(variables, quoteBundle, symbol, day);
+	int lastDay = day + (int)getArg(1).evaluate(variables, quoteBundle, symbol, day);
 	System.err.println("calling rsi on symbol "+symbol);
 	return QuoteFunctions.rsi(quoteBundle, symbol, Quote.DAY_CLOSE, days,
 				  lastDay);
@@ -50,11 +50,9 @@ public class RSIExpression extends Expression {
     }
 
     public int checkType() throws TypeMismatchException {
-
-	// First type must be quote, second and third types must be value
-	if(getArg(0).checkType() == VALUE_TYPE &&
-	   getArg(1).checkType() == VALUE_TYPE)
-	    return VALUE_TYPE;
+	if(getArg(0).checkType() == INTEGER_TYPE &&
+	   getArg(1).checkType() == INTEGER_TYPE)
+	    return FLOAT_TYPE;
 	else
 	    throw new TypeMismatchException();
     }
@@ -67,5 +65,18 @@ public class RSIExpression extends Expression {
 	return (Expression)getChildAt(arg);
     }
 
+    /**
+     * Get the type of the expression.
+     *
+     * @return {@link FLOAT_TYPE}.
+     */
+    public int getType() {
+        return FLOAT_TYPE;
+    }
+
+    public Object clone() {
+        return new RSIExpression((Expression)getArg(0).clone(), 
+                                 (Expression)getArg(1).clone());
+    }
 }
 

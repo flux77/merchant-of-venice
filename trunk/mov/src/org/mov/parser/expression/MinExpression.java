@@ -44,11 +44,11 @@ public class MinExpression extends QuoteExpression {
      * @param	days	the number of days to search
      * @param	lag	the offset from the current day
      */
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	int days = (int)getArg(1).evaluate(quoteBundle, symbol, day);
-	int lastDay = day + (int)getArg(2).evaluate(quoteBundle, symbol, day);
+	int days = (int)getArg(1).evaluate(variables, quoteBundle, symbol, day);
+	int lastDay = day + (int)getArg(2).evaluate(variables, quoteBundle, symbol, day);
 
 	return min(quoteBundle, symbol, getQuoteKind(), days, lastDay);
     }
@@ -64,9 +64,9 @@ public class MinExpression extends QuoteExpression {
 
 	// First type must be quote, second and third types must be value
 	if(getArg(0).checkType() == QUOTE_TYPE &&
-	   getArg(1).checkType() == VALUE_TYPE &&
-	   getArg(2).checkType() == VALUE_TYPE)
-	    return getQuoteType();
+	   getArg(1).checkType() == INTEGER_TYPE &&
+	   getArg(2).checkType() == INTEGER_TYPE)
+	    return getType();
 	else
 	    throw new TypeMismatchException();
     }
@@ -103,5 +103,11 @@ public class MinExpression extends QuoteExpression {
 	}
 
 	return min;
+    }
+
+    public Object clone() {
+        return new MinExpression((Expression)getArg(0).clone(), 
+                                 (Expression)getArg(1).clone(),
+                                 (Expression)getArg(2).clone());
     }
 }

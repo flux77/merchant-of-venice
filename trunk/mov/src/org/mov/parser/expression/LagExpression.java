@@ -41,12 +41,12 @@ public class LagExpression extends QuoteExpression {
 	add(lag);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
 	try {
 	    return quoteBundle.getQuote(symbol, getQuoteKind(), day +
-					(int)getArg(1).evaluate(quoteBundle, symbol, day));
+					(int)getArg(1).evaluate(variables, quoteBundle, symbol, day));
 	}
 	catch(MissingQuoteException e) {
 	    // TO BE UPDATED. This means if we can't find a quote we assume its
@@ -66,8 +66,8 @@ public class LagExpression extends QuoteExpression {
 
 	// Left type must be quote and right type must be number type
 	if(getArg(0).checkType() == QUOTE_TYPE &&
-	   getArg(1).checkType() == VALUE_TYPE)
-	    return getQuoteType();
+	   getArg(1).checkType() == INTEGER_TYPE)
+	    return getType();
 	else
 	    throw new TypeMismatchException();
     }
@@ -75,4 +75,10 @@ public class LagExpression extends QuoteExpression {
     public int getNeededChildren() {
 	return 2;
     }
+
+    public Object clone() {
+        return new LagExpression((Expression)getArg(0).clone(), 
+                                 (Expression)getArg(1).clone());
+    }
+
 }

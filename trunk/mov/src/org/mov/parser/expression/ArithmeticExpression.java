@@ -36,22 +36,31 @@ abstract public class ArithmeticExpression extends BinaryExpression {
     }
 
     /**
-     * Check the input arguments to the expression. They can be any type
-     * except {@link #BOOLEAN_TYPE} and {@link #QUOTE_TYPE} and
-     * they must match.
+     * Check the input arguments to the expression. They can only be
+     * {@link #INTEGER_TYPE} or {@link #FLOAT_TYPE}. Both must be the same!
      *
-     * @return	the type of the left expression
+     * @return	the type of the expression
      */
     public int checkType() throws TypeMismatchException {
 	// Types must be the same and not boolean or quote
 	int leftType = getLeft().checkType();
 	int rightType = getRight().checkType();
 
-	if(equivelantTypes(leftType, rightType) && leftType != BOOLEAN_TYPE
-	   && leftType != QUOTE_TYPE) 
-	    return leftType;
+	if(leftType == rightType && 
+           (leftType == FLOAT_TYPE || leftType == INTEGER_TYPE))
+            return getType();
 	else
 	    throw new TypeMismatchException();
     }
 
+    /**
+     * Get the type of the expression.
+     *
+     * @return either {@link FLOAT_TYPE} or {@link INTEGER_TYPE}.
+     */
+    public int getType() {
+        assert getLeft().getType() == getRight().getType();
+
+        return getLeft().getType();
+    }
 }

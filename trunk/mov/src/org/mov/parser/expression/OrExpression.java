@@ -31,18 +31,23 @@ public class OrExpression extends LogicExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	if(getLeft().evaluate(quoteBundle, symbol, day) >= TRUE_LEVEL ||
-	   getRight().evaluate(quoteBundle, symbol, day) >= TRUE_LEVEL)
-	    return 1.0F;
+	if(getLeft().evaluate(variables, quoteBundle, symbol, day) >= TRUE_LEVEL ||
+	   getRight().evaluate(variables, quoteBundle, symbol, day) >= TRUE_LEVEL)
+	    return TRUE;
 	else
-	    return 0.0F;
+	    return FALSE;
     }
 
     public String toString() {
 	return super.toString("or");
+    }
+
+    public Object clone() {
+        return new OrExpression((Expression)getLeft().clone(), 
+                                (Expression)getRight().clone());
     }
 }
 

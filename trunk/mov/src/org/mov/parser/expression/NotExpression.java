@@ -32,10 +32,10 @@ public class NotExpression extends UnaryExpression {
 	super(sub);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	if(getSub().evaluate(quoteBundle, symbol, day) >= Expression.TRUE_LEVEL)
+	if(getSub().evaluate(variables, quoteBundle, symbol, day) >= Expression.TRUE_LEVEL)
 	    return FALSE;
 	else
 	    return TRUE;
@@ -53,4 +53,16 @@ public class NotExpression extends UnaryExpression {
 	    throw new TypeMismatchException();
     }
 
+    /**
+     * Get the type of the expression.
+     *
+     * @return {@link BOOLEAN_TYPE}.
+     */
+    public int getType() {
+        return BOOLEAN_TYPE;
+    }
+
+    public Object clone() {
+        return new NotExpression((Expression)getSub().clone());
+    }
 }

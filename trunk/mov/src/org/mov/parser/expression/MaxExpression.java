@@ -44,11 +44,11 @@ public class MaxExpression extends QuoteExpression {
 	add(lag);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	int days = (int)getArg(1).evaluate(quoteBundle, symbol, day);
-	int lastDay = day + (int)getArg(2).evaluate(quoteBundle, symbol, day);
+	int days = (int)getArg(1).evaluate(variables, quoteBundle, symbol, day);
+	int lastDay = day + (int)getArg(2).evaluate(variables, quoteBundle, symbol, day);
 
 	return max(quoteBundle, symbol, getQuoteKind(), days, lastDay);
     }
@@ -64,9 +64,9 @@ public class MaxExpression extends QuoteExpression {
 
 	// First type must be quote, second and third types must be value
 	if(getArg(0).checkType() == QUOTE_TYPE &&
-	   getArg(1).checkType() == VALUE_TYPE &&
-	   getArg(2).checkType() == VALUE_TYPE)
-	    return getQuoteType();
+	   getArg(1).checkType() == INTEGER_TYPE &&
+	   getArg(2).checkType() == INTEGER_TYPE)
+	    return getType();
 	else
 	    throw new TypeMismatchException();
     }
@@ -104,5 +104,11 @@ public class MaxExpression extends QuoteExpression {
 	}
 
 	return max;
+    }
+
+    public Object clone() {
+        return new MaxExpression((Expression)getArg(0).clone(), 
+                                 (Expression)getArg(1).clone(),
+                                 (Expression)getArg(2).clone());
     }
 }

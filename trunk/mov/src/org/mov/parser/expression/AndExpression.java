@@ -32,11 +32,11 @@ public class AndExpression extends LogicExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
+    public float evaluate(Variables variables, QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	if(getLeft().evaluate(quoteBundle, symbol, day) >= TRUE_LEVEL &&
-	   getRight().evaluate(quoteBundle, symbol, day) >= TRUE_LEVEL)
+	if(getLeft().evaluate(variables, quoteBundle, symbol, day) >= TRUE_LEVEL &&
+	   getRight().evaluate(variables, quoteBundle, symbol, day) >= TRUE_LEVEL)
 	    return TRUE;
 	else
 	    return FALSE;
@@ -44,6 +44,11 @@ public class AndExpression extends LogicExpression {
 
     public String toString() {
 	return super.toString("and");
+    }
+
+    public Object clone() {
+        return new AndExpression((Expression)getLeft().clone(), 
+                                 (Expression)getRight().clone());
     }
 }
 

@@ -4,6 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import org.mov.parser.*;
+import org.mov.ui.TextDialog;
 
 /**
  * A dialog used for querying the user for an expression string.
@@ -30,7 +31,7 @@ public class ExpressionQuery {
 	
 	Expression expression = null;
 	boolean invalidResponse;
-	String expressionString = null;
+	String expressionString = "";
 	Parser parser = new Parser();
 
 	do {
@@ -38,11 +39,9 @@ public class ExpressionQuery {
 	    invalidResponse = false;
 
 	    // Prompt user for expression
-	    expressionString = 
-		JOptionPane.
-		showInternalInputDialog(parent, prompt, title,
-					JOptionPane.QUESTION_MESSAGE); 
-
+	    TextDialog dlg = new TextDialog(parent, prompt, title,
+					    expressionString);
+	    expressionString = dlg.showDialog();
 
 	    // Parse expression checking for type errors
 	    if(expressionString != null && expressionString.length() > 0)

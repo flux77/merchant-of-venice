@@ -15,6 +15,7 @@ public class TextDialog implements ActionListener
     JButton OKButton, CancelButton;
     JTextField DataTextField;
     JDialog textDialog;
+    JInternalFrame textFrame;
     JPanel optionPanel;
 
     /**
@@ -30,7 +31,12 @@ public class TextDialog implements ActionListener
 	OKButton = new JButton("OK");
 	CancelButton = new JButton("Cancel");
 	DataTextField = new JTextField();
-	optionPanel = new JPanel(new BorderLayout());
+	BorderLayout layout = new BorderLayout();
+	layout.setHgap(50);
+	layout.setVgap(5);
+
+	optionPanel = new JPanel(layout);
+
 	optionPanel.add(DataTextField, BorderLayout.NORTH);
 	optionPanel.add(OKButton, BorderLayout.WEST);
 	optionPanel.add(CancelButton, BorderLayout.EAST);
@@ -45,8 +51,11 @@ public class TextDialog implements ActionListener
 						 JOptionPane.QUESTION_MESSAGE,
 						 JOptionPane.OK_CANCEL_OPTION,
 						 null, options, null);
-	textDialog = optionPane.createDialog(parent,
-					     title);
+	/*	textDialog = optionPane.createDialog(parent,
+		title);
+	*/
+	textFrame = optionPane.createInternalFrame(parent,
+							   title);
 	optionPane.getRootPane().setDefaultButton(OKButton);
     }
     
@@ -56,7 +65,13 @@ public class TextDialog implements ActionListener
      */
     public String showDialog()
     {
-	textDialog.show();
+	textFrame.show();
+	try {
+	    while(option == null) {
+		Thread.sleep(10);
+	    }
+	} catch (Exception e) {
+	}
 	return option;
     }
     
@@ -73,7 +88,7 @@ public class TextDialog implements ActionListener
 	    {
 		option = null;
 	    }
-	textDialog.dispose();
+	textFrame.dispose();
     }
 }
 

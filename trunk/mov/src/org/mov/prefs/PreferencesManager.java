@@ -84,22 +84,38 @@ public class PreferencesManager {
         prefs.put("directory", directory);
     }
 
-    public static HashMap loadEquations() {
-	
-	HashMap equations = new HashMap();
-	Preferences p = getUserNode("/filters/functions");
+    public static List loadStoredEquations() {
+	List storedEquations = new ArrayList();
+	Preferences prefs = getUserNode("/equations");
 
 	try {
-	    String[] keys = p.keys();
-	    for(int i = 0; i < keys.length; i++) {
-		equations.put(keys[i], p.get(keys[i], ""));
+	    String[] keys = prefs.keys();
+	    for(int i = 0; i < keys.length; i++)
+		storedEquations.add(new StoredEquation(keys[i], prefs.get(keys[i], "")));
+	}
+	catch(BackingStoreException e) {
+	    // ignore
+	}
+
+	return storedEquations;
+    }
+
+    public static void saveStoredEquations(List storedEquations) {
+
+	try {
+	    // Remove old equations
+	    Preferences prefs = getUserNode("/equations");
+	    prefs.removeNode();
+	    prefs = getUserNode("/equations");
+
+	    for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
+		StoredEquation storedEquation = (StoredEquation)iterator.next();
+		prefs.put(storedEquation.name, storedEquation.equation);
 	    }
 	}
 	catch(BackingStoreException e) {
-	    // dont care
+	    // ignore
 	}
-
-	return equations;
     }
 
     public static HashMap loadAnalyserPageSettings(String key) {
@@ -123,6 +139,16 @@ public class PreferencesManager {
 	}
 
 	return settings;
+    }
+
+    public static int loadLastPreferencesPage() {
+	Preferences prefs = getUserNode("/prefs");
+	return prefs.getInt("page", 0);
+    }
+    
+    public static void saveLastPreferencesPage(int page) {
+	Preferences prefs = getUserNode("/prefs");
+	prefs.putInt("page", page);
     }
 
     public static int loadMaximumCachedQuotes() {

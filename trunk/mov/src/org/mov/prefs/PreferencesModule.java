@@ -26,6 +26,7 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 
 import org.mov.main.*;
@@ -49,64 +50,76 @@ import org.mov.prefs.PreferencesManager;
  * @see PreferencesPage
  */
 
-public class PreferencesModule extends JPanel
-    implements Module, ActionListener {
+public class PreferencesModule extends JPanel implements Module, ActionListener {
     
     /**
      * Preferences page for retrieving stock quotes.
      */
     
+    /** Refers to the stored equaton preferences page */
+    public final static int EQUATION_PAGE = 0;
+
+    /** Refers to the quote source preferences page */
+    public final static int QUOTE_SOURCE_PAGE = 1;
+
+    /** Refers to the tuning preferences page */
+    public final static int TUNING_PAGE = 2;
+
     private Vector pages;
+    private DefaultListModel pageListModel;
     private JDesktopPane desktop;
     private PropertyChangeSupport propertySupport;
     private PreferencesPage activePage;
     
+    private JList pageList;
     private JButton okButton;
     private JButton cancelButton;
     private JSplitPane split;
     
     /**
-     * Create a new Preference Module.
+     * Create a new Preference Module loaded with the last viewed page.
      *
-     * @param	desktop	the parent desktop
+     * @param desktop the parent desktop
      */
     public PreferencesModule(JDesktopPane desktop) {
+	this(desktop, PreferencesManager.loadLastPreferencesPage());
+    }
+
+    /**
+     * Create a new Preference Module loaded with the given page.
+     *
+     * @param	desktop	the parent desktop
+     * @param page the page to view
+     */
+    public PreferencesModule(JDesktopPane desktop, int page) {
 	
 	this.desktop = desktop;
 	propertySupport = new PropertyChangeSupport(this);       
-	
-	DefaultListModel pageListModel = new DefaultListModel();
+	pageListModel = new DefaultListModel();
 	pages = new Vector();
 
-        pageListModel.addElement((Object)new String("Functions"));
-        pages.addElement(new EquationPage(desktop));
-        
-        pageListModel.addElement((Object)new String("Quote Source"));
-	pages.addElement(new QuoteSourcePage(desktop));
+	addPage(new EquationPage(desktop));
+	addPage(new QuoteSourcePage(desktop));	
+	addPage(new TuningPage(desktop));
 
-        pageListModel.addElement((Object)new String("Tuning"));
-	pages.addElement(new TuningPage(desktop));
+	pageList = new JList(pageListModel);
 
-	final JList pageList = new JList(pageListModel);
+	pageList.setSelectedIndex(page);
+	activePage = (PreferencesPage)pages.elementAt(page);
 
-	MouseListener mouseListener = new MouseAdapter() {
-		public void mouseClicked(MouseEvent e) {
-		    int index = pageList.locationToIndex(e.getPoint());
-		    pageList.setSelectedIndex(index);
-		    activePage = (PreferencesPage) pages.elementAt(index);
-		    split.setRightComponent(activePage.getComponent());
+	pageList.addListSelectionListener(new ListSelectionListener() {
+		public void valueChanged(ListSelectionEvent e) {
+		    int index = pageList.getSelectedIndex();
+		    if(index != -1 && pages.elementAt(index) != activePage) {
+			activePage = (PreferencesPage)pages.elementAt(index);
+			split.setRightComponent(activePage.getComponent());
+		    }
 		}
-	    };
-	pageList.addMouseListener(mouseListener);
-
-
-	pageList.setSelectedIndex(0);
-	activePage = (PreferencesPage) pages.elementAt(0);
+	    });
 
 	setLayout(new BorderLayout());
-	add(split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-			   pageList,
-			   activePage.getComponent()),
+	add(split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pageList, 
+				   activePage.getComponent()),
 	    BorderLayout.CENTER);
 
 	JPanel buttonPanel = new JPanel();
@@ -118,6 +131,13 @@ public class PreferencesModule extends JPanel
 	buttonPanel.add(cancelButton);
   
 	add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private void addPage(PreferencesPage page) {
+	// Add a border with the page's title around each page
+	page.getComponent().setBorder(new TitledBorder(page.getTitle()));
+        pageListModel.addElement(page.getTitle());
+        pages.addElement(page);
     }
 
     /**
@@ -144,20 +164,20 @@ public class PreferencesModule extends JPanel
         return d;
     }
 
-    
     /**
      * Called when the user clicks on the save or cancel button.
      *
      * @param	e	The event.
      */
     public void actionPerformed(ActionEvent e) {
-
 	if(e.getSource() == okButton) {
-	    // Save preference data - currently theres only one and its
-	    // the active page - so save it.
-	    activePage.save();
+	    // Save preferences from all pages
+	    for(Iterator iterator = pages.iterator(); iterator.hasNext();) {
+		PreferencesPage page = (PreferencesPage)iterator.next();
+		page.save();
+	    }
 
-	    // flush changes to backing store
+	    // Flush preference changes to backing store
 	    try {
 		PreferencesManager.userRoot().flush();
 	    }
@@ -235,13 +255,10 @@ public class PreferencesModule extends JPanel
     }
 
     /**
-     * Called when window is closing. We handle the saving explicitly so
-     * this is only called when the user clicks on the close button in the
-     * top right hand of the window. Dont trigger a save event for this.
-     *
-     * @return	enclose module in scroll bar
+     * Tell module to save any current state data / preferences data because
+     * the window is being closed.
      */
     public void save() {
-	// Same as hitting cancel - do not save anything
+	PreferencesManager.saveLastPreferencesPage(pageList.getSelectedIndex());
     }
 }

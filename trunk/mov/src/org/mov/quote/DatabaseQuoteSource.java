@@ -71,18 +71,6 @@ public class DatabaseQuoteSource implements QuoteSource
 			      "/"+db.get("dbname")+
 			      "?user="+db.get("username")+
 			      "&password="+db.get("password"));
-
-	    // How to get list of databases and tables in a database
-	    
-	    /*	    DatabaseMetaData meta = connection.getMetaData();
-	    ResultSet RS = meta.getTables("shares", null, "shares", null);
-	    	    ResultSet RS = meta.getCatalogs(); 
-
-	    while(RS.next()) {
-	    	System.out.println(RS.getString(1));
-	    }
-	    */
-
 	}
 	catch (SQLException E) {
 	    System.out.println(E.getMessage());
@@ -411,6 +399,35 @@ public class DatabaseQuoteSource implements QuoteSource
 
     private String orderByDateString() {
 	return "ORDER BY "+db.get("prices.date");
+    }
+
+
+    public static void importQuotes(QuoteSource source, TradingDate date) {
+	System.out.println("importing " + date);
+
+	    // How to get list of databases and tables in a database
+	    
+	    /*	    DatabaseMetaData meta = connection.getMetaData();
+	    ResultSet RS = meta.getTables("shares", null, "shares", null);
+	    	    ResultSet RS = meta.getCatalogs(); 
+
+	    while(RS.next()) {
+	    	System.out.println(RS.getString(1));
+	    }
+	    */
+
+
+
+    }
+
+    /** 
+     * Return all the dates which we have quotes for.
+     *
+     * @return	a vector of dates
+     */
+    public Vector getDates() {
+	// not implemented yet
+	return null;
     }
 }
 

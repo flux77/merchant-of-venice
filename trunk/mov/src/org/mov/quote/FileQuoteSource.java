@@ -337,4 +337,11 @@ public class FileQuoteSource implements QuoteSource
 
 	return quotes;
     }
+
+    /**
+     * Return all the dates which we have quotes for.
+     */
+    public Vector getDates() {
+	return new Vector(dateToFile.keySet());
+    }
 }

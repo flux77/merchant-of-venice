@@ -24,6 +24,7 @@ import java.beans.*;
 import java.text.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.table.*;
 
 import org.mov.main.*;
@@ -65,7 +66,17 @@ public class PaperTradeResultModule extends AbstractTable
     private JCheckBoxMenuItem showFinalCapitalColumn;
     private JCheckBoxMenuItem showReturnColumn;
 
-    private JMenuItem resultClose;
+    private JMenuItem graphMenuItem;
+    private JMenuItem openMenuItem;
+    private JMenuItem removeMenuItem;
+    private JMenuItem removeAllMenuItem;
+    private JMenuItem resultCloseMenuItem;
+
+    // Popup Menu
+    private JMenuItem popupOpenMenuItem;
+    private JMenuItem popupGraphMenuItem;
+    private JMenuItem popupRemoveMenuItem;
+    private JMenuItem popupRemoveAllMenuItem;
 
     class PaperTradeResult {
 	public Portfolio portfolio;
@@ -101,8 +112,8 @@ public class PaperTradeResultModule extends AbstractTable
 	    
 	private Class[] columnClasses = {
 	    TradingDate.class, TradingDate.class, String.class, String.class,
-	    String.class, Float.class, Integer.class, Float.class, 
-	    Float.class, Change.class};
+	    String.class, PriceFormat.class, Integer.class, PriceFormat.class, 
+	    PriceFormat.class, ChangeFormat.class};
 	
 	private Vector results;
 
@@ -113,6 +124,24 @@ public class PaperTradeResultModule extends AbstractTable
 	public PaperTradeResult getPaperTradeResult(int row) {
 	    return (PaperTradeResult)results.elementAt(row);
 	}
+
+        public void removeAllResults() {
+            results.removeAllElements();
+
+            // Notify table that the whole data has changed
+            fireTableDataChanged();
+        }
+
+        public Vector getResults() {
+            return results;
+        }
+
+        public void setResults(Vector results) {
+            this.results = results;
+
+            // Notify table that the whole data has changed
+            fireTableDataChanged();
+        }
 
 	public void addResult(Portfolio portfolio, QuoteBundle quoteBundle,
 			      float initialCapital, float tradeCost,
@@ -213,7 +242,7 @@ public class PaperTradeResultModule extends AbstractTable
 	    }
 	    
 	    else if(column == TRADE_COST_COLUMN) {
-		return new Float(result.tradeCost);
+		return new PriceFormat(result.tradeCost);
 	    }
 
 	    else if(column == NUMBER_OF_TRADES_COLUMN) {
@@ -227,14 +256,14 @@ public class PaperTradeResultModule extends AbstractTable
 	    }
 
 	    else if(column == FINAL_CAPITAL_COLUMN) {
-		return new Float(finalPortfolioValue(result.portfolio,
-						     result.quoteBundle,
-						     result.startDate,
-						     result.endDate));
+		return new PriceFormat(finalPortfolioValue(result.portfolio,
+                                                           result.quoteBundle,
+                                                           result.startDate,
+                                                           result.endDate));
 	    }
 
 	    else if(column == INITIAL_CAPITAL_COLUMN) {
-		return new Float(result.initialCapital);
+		return new PriceFormat(result.initialCapital);
 	    }
 
 	    else if(column == PERCENT_RETURN_COLUMN) {
@@ -244,7 +273,7 @@ public class PaperTradeResultModule extends AbstractTable
 						     result.startDate,
 						     result.endDate);
 
-		return Converter.changeToChange(startValue, endValue);
+		return new ChangeFormat(startValue, endValue);
 	    }
 
 	    else {
@@ -265,37 +294,144 @@ public class PaperTradeResultModule extends AbstractTable
 
 	addMenu();
 
-	// If the user double clicks on a cell then graph the portfolio
+        // If the user clicks on the table trap it. 
 	addMouseListener(new MouseAdapter() {
-		
 		public void mouseClicked(MouseEvent evt) {
-		    
-		    Point point = evt.getPoint();
-		    if (evt.getClickCount() == 2) {
-			
-			// This will take care of the issue of if the table
-			// is sorted by a different column. It'll return
-			// the row number as so it wasnt sorted
-			int row = getSelectedRow();
-			
-			// Get portfolio at row
-			PaperTradeResult result = 
-			    model.getPaperTradeResult(row);
-			    
-			CommandManager.getInstance().graphPortfolio(result.portfolio,
-								    result.quoteBundle,
-								    result.startDate,
-								    result.endDate);
-		    }
-		}
+                    handleMouseClicked(evt);
+                }
 	    });
     }
 
-    // Construct menu for this frame
+    // If the user double clicks on a result with the LMB, graph the portfolio.
+    // If the user right clicks over the table, open up a popup menu.
+    private void handleMouseClicked(MouseEvent event) {
+
+        Point point = event.getPoint();
+
+        // Right click on the table - raise menu
+        if(event.getButton() == MouseEvent.BUTTON3) {
+            JPopupMenu menu = new JPopupMenu();
+
+            popupOpenMenuItem =
+                MenuHelper.addMenuItem(this, menu,
+                                       "Open");
+            popupOpenMenuItem.setEnabled(getSelectedRowCount() == 1);
+
+            popupGraphMenuItem =
+                MenuHelper.addMenuItem(this, menu,
+                                       "Graph");
+            popupGraphMenuItem.setEnabled(getSelectedRowCount() == 1);
+
+            menu.addSeparator();
+
+            popupRemoveMenuItem =
+                MenuHelper.addMenuItem(this, menu,
+                                       "Remove");
+            popupRemoveMenuItem.setEnabled(getSelectedRowCount() >= 1);
+
+            popupRemoveAllMenuItem =
+                MenuHelper.addMenuItem(this, menu,
+                                       "Remove All");
+            popupRemoveAllMenuItem.setEnabled(model.getRowCount() > 0);
+
+            menu.show(this, point.x, point.y);
+        }
+
+        // Left double click on the table - graph portfolio
+        else if(event.getButton() == MouseEvent.BUTTON1 && event.getClickCount() == 2) {
+            graphSelectedResult();
+        }
+    }
+
+    // Graphs first selected result
+    private void graphSelectedResult() {
+        // This will take care of the issue of if the table
+        // is sorted by a different column. It'll return
+        // the row number as so it wasnt sorted
+        int row = getSelectedRow();
+        
+        // Get portfolio at row
+        PaperTradeResult result = 
+            model.getPaperTradeResult(row);
+        
+        CommandManager.getInstance().graphPortfolio(result.portfolio,
+                                                    result.quoteBundle,
+                                                    result.startDate,
+                                                    result.endDate);
+    }
+
+    // Opens first selected result
+    private void openSelectedResult() {
+        // This will take care of the issue of if the table
+        // is sorted by a different column. It'll return
+        // the row number as so it wasnt sorted
+        int row = getSelectedRow();
+        
+        // Get portfolio at row
+        PaperTradeResult result = 
+            model.getPaperTradeResult(row);
+
+        CommandManager.getInstance().openPortfolio(result.portfolio);
+    }
+
+    // Removes all the selected results from the table
+    private void removeSelectedResults() {
+
+        // Get selected rows and put them in order from highest to lowest
+        int[] rows = getSelectedRows();
+        Vector rowIntegers = new Vector();
+        for(int i = 0; i < rows.length; i++) 
+            rowIntegers.addElement(new Integer(rows[i]));
+        Vector sortedRows = new Vector(rowIntegers);
+        Collections.sort(sortedRows);
+        Collections.reverse(sortedRows);
+
+        // Now remove them from the results list starting from the highest row
+        // to the lowest
+        Vector results = model.getResults();
+        Iterator iterator = sortedRows.iterator();
+
+        while(iterator.hasNext()) {
+            Integer rowToRemove = (Integer)iterator.next();
+
+            results.remove(rowToRemove.intValue());
+        }
+
+        model.setResults(results);
+    }
+
+    // Some menu items are only enabled/disabled depending on what is
+    // selected in the table or by the size of the table
+    private void checkMenuDisabledStatus() {
+	int numberOfSelectedRows = getSelectedRowCount();
+
+        openMenuItem.setEnabled(numberOfSelectedRows == 1);
+        graphMenuItem.setEnabled(numberOfSelectedRows == 1);
+        removeMenuItem.setEnabled(numberOfSelectedRows >= 1);
+        removeAllMenuItem.setEnabled(model.getRowCount() > 0);
+    }
+
+    // Add a menu
     private void addMenu() {
 	menuBar = new JMenuBar();
 
 	JMenu resultMenu = MenuHelper.addMenu(menuBar, "Result");
+
+	openMenuItem = MenuHelper.addMenuItem(this, resultMenu,
+                                              "Open");        
+        
+	graphMenuItem = MenuHelper.addMenuItem(this, resultMenu,
+                                               "Graph");        
+        
+	resultMenu.addSeparator();
+
+	removeMenuItem = MenuHelper.addMenuItem(this, resultMenu,
+                                           "Remove");        
+
+	removeAllMenuItem = MenuHelper.addMenuItem(this, resultMenu,
+                                                   "Remove All");        
+
+	resultMenu.addSeparator();
 
 	JMenu columnMenu = 
 	    MenuHelper.addMenu(resultMenu, "Show Columns");
@@ -349,23 +485,37 @@ public class PaperTradeResultModule extends AbstractTable
 
 	resultMenu.addSeparator();
 
-	resultClose = MenuHelper.addMenuItem(this, resultMenu,
-					     "Close");
+	resultCloseMenuItem = MenuHelper.addMenuItem(this, resultMenu,
+                                                     "Close");
+
+	// Listen for changes in selection so we can update the menus
+	getSelectionModel().addListSelectionListener(new ListSelectionListener() {		
+
+		public void valueChanged(ListSelectionEvent e) {
+		    checkMenuDisabledStatus();
+		}
+
+	});
+
+        checkMenuDisabledStatus();
     }
 
+    // MAKE THIS SO IT ACCEPTS A LIST OF RESULTS
     public void addResult(Portfolio portfolio, QuoteBundle quoteBundle,
 			  float initialCapital, float tradeCost, 
 			  String buyRule, String sellRule,
 			  TradingDate startDate, TradingDate endDate) {
 	model.addResult(portfolio, quoteBundle, initialCapital, tradeCost, 
 			buyRule, sellRule, startDate, endDate);
+        checkMenuDisabledStatus();
 
 	validate();
 	repaint();
     }
 
     public void save() {
-
+        // Free up precious memory
+        model.removeAllResults();
     }
 
     public String getTitle() {
@@ -433,13 +583,44 @@ public class PaperTradeResultModule extends AbstractTable
      */
     public void actionPerformed(final ActionEvent e) {
 
-	if(e.getSource() == resultClose) {
+        // Graph selected result?
+        if(e.getSource() == graphMenuItem ||
+           (popupGraphMenuItem != null && e.getSource() == popupGraphMenuItem)) {
+            graphSelectedResult();
+        }
+
+        // Open selected result?
+        else if(e.getSource() == openMenuItem ||
+           (popupOpenMenuItem != null && e.getSource() == popupOpenMenuItem)) {
+            openSelectedResult();
+        }
+
+        // Remove selected results?
+        else if(e.getSource() == removeMenuItem ||
+           (popupRemoveMenuItem != null && e.getSource() == popupRemoveMenuItem)) {
+            removeSelectedResults();
+        }
+
+        // Remove all results?
+        else if(e.getSource() == removeAllMenuItem ||
+                (popupRemoveAllMenuItem != null && e.getSource() == popupRemoveAllMenuItem)) {
+            model.removeAllResults();
+            checkMenuDisabledStatus();
+        }
+
+        // Close window?
+	else if(e.getSource() == resultCloseMenuItem) {
+            // When we close, free all the results to reduce memory
+            model.removeAllResults();
+            
 	    propertySupport.
 		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
 	}
 
 	else {
 	    // Otherwise its a checkbox menu item
+            assert e.getSource() instanceof JCheckBoxMenuItem;
+
 	    JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)e.getSource();
 	    boolean state = menuItem.getState();
 	    int column = START_DATE_COLUMN;

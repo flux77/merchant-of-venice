@@ -5,25 +5,27 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.table;
 
 import java.awt.*;
+import java.awt.dnd.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.text.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.table.*;
 
 import org.mov.main.*;
@@ -35,8 +37,8 @@ import org.mov.ui.*;
 public class QuoteModule extends AbstractTable
     implements Module,
 	       ActionListener {
-    
-    private static final int EQUATION_COLUMNS = 5;
+
+    private static final int EQUATION_SLOTS = 5;
 
     private static final int SYMBOL_COLUMN = 0;
     private static final int VOLUME_COLUMN = 1;
@@ -46,7 +48,7 @@ public class QuoteModule extends AbstractTable
     private static final int DAY_CLOSE_COLUMN = 5;
     private static final int CHANGE_COLUMN = 6;
     private static final int ACTIVITY_COLUMN = 7;
-    private static final int EQUATION_SLOT_COLUMN = 8;
+    private static final int EQUATION_COLUMN = 8;
 
     private JMenuBar menuBar;
     private JCheckBoxMenuItem showSymbolsColumn;
@@ -56,17 +58,21 @@ public class QuoteModule extends AbstractTable
     private JCheckBoxMenuItem showDayOpenColumn;
     private JCheckBoxMenuItem showDayCloseColumn;
     private JCheckBoxMenuItem showChangeColumn;
-    private JCheckBoxMenuItem[] showEquationSlots =
-	new JCheckBoxMenuItem[EQUATION_COLUMNS];
+    private JCheckBoxMenuItem[] showEquationColumns =
+	new JCheckBoxMenuItem[EQUATION_SLOTS];
 
+    // Main menu items
+    private JMenuItem graphSymbols;
     private JMenuItem applyEquations;
     private JMenuItem applyFilter;
     private JMenuItem sortByMostActive;
     private JMenuItem tableClose;
-    
+
+    // Poup menu items
+    private JMenuItem popupGraphSymbols = null;
+
     private PropertyChangeSupport propertySupport;
     private ScriptQuoteBundle quoteBundle;
-    private Vector symbols;
 
     private Model model;
 
@@ -75,10 +81,17 @@ public class QuoteModule extends AbstractTable
 
     // Current equation we are filtering by
     private String filterEquationString;
-    
+
+    // DND objects
+    //    DragSource dragSource;
+    //DragGestureListener dragGestureListener;
+    //DragSourceListener dragSourceListener;
+
     public class EquationSlot {
 	String columnName;
 	String equation;
+        org.mov.parser.Expression expression;
+        Vector results;
 
 	public Object clone() {
 	    EquationSlot clone = new EquationSlot();
@@ -93,12 +106,12 @@ public class QuoteModule extends AbstractTable
 
     private class Model extends AbstractTableModel {
 	private String[] headers = {
-	    "Symbol", "Volume", "Day Low", "Day High", "Day Open", 
+	    "Symbol", "Volume", "Day Low", "Day High", "Day Open",
 	    "Day Close", "Change", "Activity"};
 
 	private Class[] columnClasses = {
-	    String.class, Integer.class, String.class, String.class,
-	    String.class, String.class, Change.class, Float.class};
+	    String.class, Integer.class, QuoteFormat.class, QuoteFormat.class,
+	    QuoteFormat.class, QuoteFormat.class, ChangeFormat.class, Float.class};
 
 	private TradingDate date = null;
 	private ScriptQuoteBundle quoteBundle;
@@ -111,15 +124,19 @@ public class QuoteModule extends AbstractTable
 	    this.symbols = symbols;
 	    this.equationSlots = equationSlots;
 
-	    // Pull first date from quoteBundle
-	    date = quoteBundle.getFirstDate();
+	    // Pull latest date from quoteBundle
+	    date = quoteBundle.getLastDate();
 	}
+
+        public Vector getSymbols() {
+            return symbols;
+        }
 
 	public void setSymbols(Vector symbols) {
 	    this.symbols = symbols;
 	}
 
-	public void setEquationSlots(EquationSlot[] equationSlots) {
+	public void setEquationColumns(EquationSlot[] equationSlots) {
 	    this.equationSlots = equationSlots;
 	}
 	
@@ -128,18 +145,18 @@ public class QuoteModule extends AbstractTable
 	}
 
 	public int getColumnCount() {
-	    return headers.length + EQUATION_COLUMNS;
+	    return headers.length + EQUATION_SLOTS;
 	}
 	
 	public String getColumnName(int c) {
-	    if(c < headers.length) 
+	    if(c < headers.length)
 		return headers[c];
 	    else
 		return equationSlots[c - headers.length].columnName;
 	}
 
 	public Class getColumnClass(int c) {
-	    if(c < headers.length) 
+	    if(c < headers.length)
 		return columnClasses[c];
 	    else
 		return String.class;
@@ -147,7 +164,7 @@ public class QuoteModule extends AbstractTable
 	
 	public Object getValueAt(int row, int column) {
 
-	    if(row >= getRowCount()) 
+	    if(row >= getRowCount())
 		return "";
 
 	    String symbol = (String)symbols.elementAt(row);
@@ -156,45 +173,50 @@ public class QuoteModule extends AbstractTable
 		switch(column) {
 		case(SYMBOL_COLUMN):
 		    return symbol.toUpperCase();
-		    
+		
 		case(VOLUME_COLUMN):
 		    return new Integer
-			((int)quoteBundle.getQuote(symbol, Quote.DAY_VOLUME, 
+			((int)quoteBundle.getQuote(symbol, Quote.DAY_VOLUME,
 					     date));
-		    
+		
 		case(DAY_LOW_COLUMN):
-		    return Converter.quoteToString
-			(quoteBundle.getQuote(symbol, Quote.DAY_LOW, date));
-		    
+		    return new QuoteFormat(quoteBundle.getQuote(symbol, Quote.DAY_LOW, date));
+		
 		case(DAY_HIGH_COLUMN):
-		    return Converter.quoteToString
-			(quoteBundle.getQuote(symbol, Quote.DAY_HIGH, date));
-		    
+                    return new QuoteFormat(quoteBundle.getQuote(symbol, Quote.DAY_HIGH, date));
+		
 		case(DAY_OPEN_COLUMN):
-		    return Converter.quoteToString
-			(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date));
-		    
+		    return new QuoteFormat(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date));
+		
 		case(DAY_CLOSE_COLUMN):
-		    return Converter.quoteToString
-			(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
-		    
+		    return new QuoteFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
+		
 		case(CHANGE_COLUMN):
-		    return 
-			Converter.changeToChange
-			(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date),
-			 quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
+		    return new ChangeFormat(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date),
+                                            quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
 
-		// This column is never visible but is used to determine
-		// the most active stocks
 		case(ACTIVITY_COLUMN):
-		    return new Float(quoteBundle.getQuote(symbol, 
+                    // This column is never visible but is used to determine
+                    // the most active stocks - I don't actually know how to
+                    // calculate "the most active stocks" or whether we even
+                    // have enough data to do it. But this seems to be roughly
+                    // right.
+		    return new Float(quoteBundle.getQuote(symbol,
 						    Quote.DAY_HIGH, date) *
-				     quoteBundle.getQuote(symbol, 
+				     quoteBundle.getQuote(symbol,
 						    Quote.DAY_VOLUME, date));
 		}
+
+                if(column >= EQUATION_COLUMN) {
+                    int equationColumn = column - EQUATION_COLUMN;
+                    Vector results = equationSlots[equationColumn].results;
+
+                    if(results != null)
+                        return (Float)results.elementAt(row);
+                }
 	    }
 	    catch(MissingQuoteException e) {
-		assert false;
+                assert false;
 	    }
 
 	    return "";
@@ -205,7 +227,7 @@ public class QuoteModule extends AbstractTable
 	this(quoteBundle, null);
     }
 
-    public QuoteModule(ScriptQuoteBundle quoteBundle, 
+    public QuoteModule(ScriptQuoteBundle quoteBundle,
                        String filterEquationString) {
 	
 	this.filterEquationString = filterEquationString;
@@ -213,17 +235,17 @@ public class QuoteModule extends AbstractTable
 
 	propertySupport = new PropertyChangeSupport(this);
 
-	// Set up equation slots
-	equationSlots = new EquationSlot[EQUATION_COLUMNS];
+	// Set up equation columns
+	equationSlots = new EquationSlot[EQUATION_SLOTS];
 
-	for(int i = 0; i < EQUATION_COLUMNS; i++) {
+	for(int i = 0; i < EQUATION_SLOTS; i++) {
 	    equationSlots[i] = new EquationSlot();
 	    equationSlots[i].columnName = new String("Eqn. " + (i + 1));
 	    equationSlots[i].equation = new String();
 	}
 
 	// Get list of symbols to display
-	symbols = extractSymbolsUsingRule(filterEquationString, quoteBundle);
+	Vector symbols = extractSymbolsUsingRule(filterEquationString, quoteBundle);
 
 	model = new Model(this.quoteBundle, symbols, equationSlots);
 	setModel(model, ACTIVITY_COLUMN, SORT_UP);
@@ -231,48 +253,86 @@ public class QuoteModule extends AbstractTable
 
 	model.addTableModelListener(this);
 
-	// Set menu items to hide equation slots
-	for(int i = 0; i < EQUATION_COLUMNS; i++) {
-	    showColumn(EQUATION_SLOT_COLUMN + i, false);
+	// Set menu items to hide equation columns
+	for(int i = 0; i < EQUATION_SLOTS; i++) {
+	    showColumn(EQUATION_COLUMN + i, false);
 	}
 	
 	// Activity column is always hidden - its just used for
 	// sorting purposes
 	showColumn(ACTIVITY_COLUMN, false);
 
-	// If the user double clicks on a cell then graph the stock
+        // If the user clicks on the table trap it.
 	addMouseListener(new MouseAdapter() {
-
 		public void mouseClicked(MouseEvent evt) {
-		    
-		    Point point = evt.getPoint();
-		    if (evt.getClickCount() == 2) {
-			int row = rowAtPoint(point);
-			
-			// Get symbol at row
-			String symbol = 
-			    (String)getModel().getValueAt(row, SYMBOL_COLUMN);
-			
-			Vector symbols = new Vector();
-			symbols.add((Object)symbol.toLowerCase());
-			    
-			CommandManager.getInstance().graphStockBySymbol(symbols);
-		    }
-		}
+                    handleMouseClicked(evt);
+                }
 	    });
 
         // Start the table sorted by most active
         setColumnSortStatus(ACTIVITY_COLUMN, SORT_UP);
         resort();
+
+        // Set up DND
+        //dragSource = DragSource.getDefaultDragSource();
+        //dragGestureListener = new DragGestureListener();
+        //dragSourceListener = new DragSourceListener();
+
+        // component, action, listener
+        //dragSource.createDefaultDragGestureRecognizer(this,
+        //                                             DnDConstants.ACTION_COPY,
+        //                                             dgListener);
     }
-   
-    private Vector extractSymbolsUsingRule(String filterEquation, 
+
+
+    // Graph menu item is only enabled when items are selected in the table.
+    private void checkMenuDisabledStatus() {
+	int numberOfSelectedRows = getSelectedRowCount();
+
+        graphSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
+    }
+
+    // If the user double clicks on a stock with the LMB, graph the stock.
+    // If the user right clicks over the table, open up a popup menu.
+    private void handleMouseClicked(MouseEvent event) {
+
+        Point point = event.getPoint();
+
+        // Right click on the table - raise menu
+        if(event.getButton() == MouseEvent.BUTTON3) {
+            JPopupMenu menu = new JPopupMenu();
+
+            popupGraphSymbols =
+                MenuHelper.addMenuItem(this, menu,
+                                       "Graph");
+            popupGraphSymbols.setEnabled(getSelectedRowCount() > 0);
+
+            menu.show(this, point.x, point.y);
+        }
+
+        // Left double click on the table - graph stock
+        else if(event.getButton() == MouseEvent.BUTTON1 && event.getClickCount() == 2) {
+
+            int row = rowAtPoint(point);
+
+            // Get symbol at row
+            String symbol =
+                (String)getModel().getValueAt(row, SYMBOL_COLUMN);
+
+            Vector symbols = new Vector();
+            symbols.add((Object)symbol.toLowerCase());
+
+            CommandManager.getInstance().graphStockBySymbol(symbols);
+        }
+    }
+
+    private Vector extractSymbolsUsingRule(String filterEquation,
                                            ScriptQuoteBundle quoteBundle) {
 
 	Vector symbols = quoteBundle.getSymbols(quoteBundle.getFirstDate());
 
 	// If theres no filter string then use all symbols
-	if(filterEquation == null || filterEquation.length() == 0) 
+	if(filterEquation == null || filterEquation.length() == 0)
 	    return symbols;
 
 	// First parse the equation
@@ -288,16 +348,11 @@ public class QuoteModule extends AbstractTable
 	    assert false;
 	}
 
-        ProgressDialog p = ProgressDialogManager.getProgressDialog();
-
 	// Add symbols to vector when expression proves true
 	try {
 	    Vector extractedSymbols = new Vector();
 	    String symbol;
 
-            p.setMaximum(symbols.size());
-            p.setNote("Filtering quotes");
-            
             // Traverse symbols
 	    Iterator iterator = symbols.iterator();
 	    while(iterator.hasNext()) {
@@ -306,10 +361,6 @@ public class QuoteModule extends AbstractTable
 		if(expression.evaluate(quoteBundle, symbol, 0) >=
 		   org.mov.parser.Expression.TRUE_LEVEL)
 		    extractedSymbols.add(symbol);
-
-		// Wait until weve done one evaluation since thats when the
-		// quotes are loaded
-                p.increment();
 	    }
 
 	    return extractedSymbols;
@@ -322,15 +373,12 @@ public class QuoteModule extends AbstractTable
 					  expression.toString(),
 					  "Error evaluating expression",
 					  JOptionPane.ERROR_MESSAGE);
-	    
+	
 	    // delete erroneous expression
 	    expression = null;
 
 	    // Return all quoteBundle's symbols
 	    return quoteBundle.getSymbols(quoteBundle.getFirstDate());
-	}
-	finally {
-	    ProgressDialogManager.closeProgressDialog(p);
 	}
     }
 
@@ -339,35 +387,41 @@ public class QuoteModule extends AbstractTable
 
 	JMenu tableMenu = MenuHelper.addMenu(menuBar, "Quote");
 
-	JMenu columnMenu = 
+	graphSymbols =
+	    MenuHelper.addMenuItem(this, tableMenu,
+				   "Graph");
+
+	tableMenu.addSeparator();
+
+	JMenu columnMenu =
 	    MenuHelper.addMenu(tableMenu, "Show Columns");
 	{
-	    showSymbolsColumn = 
+	    showSymbolsColumn =
 		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 					       "Symbols");
-	    showVolumeColumn = 
+	    showVolumeColumn =
 		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 					       "Volume");
-	    showDayLowColumn = 
+	    showDayLowColumn =
 		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 					       "Day Low");
-	    showDayHighColumn = 
+	    showDayHighColumn =
 		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 					       "Day High");
-	    showDayOpenColumn = 
+	    showDayOpenColumn =
 		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 					       "Day Open");
-	    showDayCloseColumn = 
+	    showDayCloseColumn =
 		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 					       "Day Close");
-	    showChangeColumn = 
+	    showChangeColumn =
 		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 					       "Change Column");
 	    columnMenu.addSeparator();
 
-	    // Set menu items to hide equation slots
-	    for(int i = 0; i < EQUATION_COLUMNS; i++) {
-		showEquationSlots[i] = 
+	    // Set menu items to hide equation columns
+	    for(int i = 0; i < EQUATION_SLOTS; i++) {
+		showEquationColumns[i] =
 		    MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 						   "Equation Slot " + (i + 1));
 	    }
@@ -381,8 +435,6 @@ public class QuoteModule extends AbstractTable
 	    showDayCloseColumn.setState(true);
 	    showChangeColumn.setState(true);
 	}
-       
-	tableMenu.addSeparator();
 
 	applyEquations =
 	    MenuHelper.addMenuItem(this, tableMenu,
@@ -392,7 +444,7 @@ public class QuoteModule extends AbstractTable
 	    MenuHelper.addMenuItem(this, tableMenu,
 				   "Apply Filter");
 
-	sortByMostActive = 
+	sortByMostActive =
 	    MenuHelper.addMenuItem(this, tableMenu,
 				   "Sort by Most Active");
 	
@@ -400,8 +452,19 @@ public class QuoteModule extends AbstractTable
 
 	tableClose = MenuHelper.addMenuItem(this, tableMenu,
 					    "Close");	
+
+	// Listen for changes in selection so we can update the menus
+	getSelectionModel().addListSelectionListener(new ListSelectionListener() {		
+
+		public void valueChanged(ListSelectionEvent e) {
+		    checkMenuDisabledStatus();
+		}
+
+	});
+
+	checkMenuDisabledStatus();
     }
-    
+
     // Allow the user to show only stocks where the given equation is true
     private void applyFilter() {
 	// Handle all action in a separate thread so we dont
@@ -413,7 +476,7 @@ public class QuoteModule extends AbstractTable
 		    JDesktopPane desktop =
 			org.mov.ui.DesktopManager.getDesktop();
 
-		    String equationString = 
+		    String equationString =
 			ExpressionQuery.getExpression(desktop,
 						      "Filter by Rule",
 						      "By Rule",
@@ -423,7 +486,8 @@ public class QuoteModule extends AbstractTable
 			filterEquationString = equationString;
 
 			// Get new list of symbols to display
-			symbols = extractSymbolsUsingRule(filterEquationString, quoteBundle);
+			final Vector symbols =
+                            extractSymbolsUsingRule(filterEquationString, quoteBundle);
 
 			// Update table
 			SwingUtilities.invokeLater(new Runnable() {
@@ -445,42 +509,42 @@ public class QuoteModule extends AbstractTable
 	Thread thread = new Thread() {
 
 		public void run() {
-		    
+		
 		    JDesktopPane desktop =
 			org.mov.ui.DesktopManager.getDesktop();
 
-		    final EquationsDialog dialog = 
+		    final EquationsDialog dialog =
 			new EquationsDialog(desktop,
-					    EQUATION_COLUMNS);
+					    EQUATION_SLOTS);
 
-		    // Did the user modify the equation slots?
+		    // Did the user modify the equation columns?
 		    if(dialog.showDialog(equationSlots)) {
 
-			SwingUtilities.invokeLater(new Runnable() {
+                        equationSlots = dialog.getEquationSlots();
+
+                        // Load equation columns with data
+                        model.setEquationColumns(equationSlots);
+                        loadEquationColumns();
+
+                        SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 
-				    equationSlots = dialog.getEquationSlots();
-				    
-				    model.setEquationSlots(equationSlots);
-
 				    // Make sure all columns with an equation
-				    // are visible and all without are not. 
+				    // are visible and all without are not.
 				    // Also update check box menus
-				    for(int i = 0; i < EQUATION_COLUMNS; i++) {
+				    for(int i = 0; i < EQUATION_SLOTS; i++) {
 					boolean containsEquation = false;
 					
 					if(equationSlots[i].equation.length() >
 					   0)
 					    containsEquation = true;
 					
-					showColumn(EQUATION_SLOT_COLUMN + i, 
+					showColumn(EQUATION_COLUMN + i,
 						   containsEquation);
 					
-					showEquationSlots[i].setState(containsEquation);
+					showEquationColumns[i].setState(containsEquation);
 				    }
-				    
-				}});
-			
+                                }});
 		    }
 		}
 	    };
@@ -488,12 +552,54 @@ public class QuoteModule extends AbstractTable
 	thread.start();
     }
 
+    // Runs out equation in each equation slot on every stock in the table
+    private void loadEquationColumns() {
+        Vector symbols = model.getSymbols();
+
+        Thread thread = Thread.currentThread();
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+        progress.setIndeterminate(true);
+        progress.show("Applying Equations");
+
+        for(int i = 0; i < EQUATION_SLOTS; i++) {
+            Vector results = new Vector();
+
+            org.mov.parser.Expression expression = equationSlots[i].expression;
+
+            if(expression != null) {
+                Iterator iterator = symbols.iterator();
+
+                while(iterator.hasNext()) {
+                    String symbol = (String)iterator.next();
+                    float result;
+
+                    try {
+                        result = expression.evaluate(quoteBundle, symbol, 0);
+                        results.add(new Float(result));
+                    }
+                    catch(EvaluationException e) {
+                        // Should display error message to user
+                        assert false;
+                        results.add(new Float(0.0));
+                    }
+                }
+            }
+
+            equationSlots[i].results = results;
+
+            if(thread.isInterrupted())
+                break;
+        }
+
+        ProgressDialogManager.closeProgressDialog(progress);
+    }
+
     public void save() {
 
     }
 
     public String getTitle() {
-	return "Quotes for " + quoteBundle.getFirstDate().toString("dd/mm/yyyy");
+	return "Quotes for " + quoteBundle.getLastDate().toString("dd/mm/yyyy");
     }
 
     /**
@@ -504,7 +610,7 @@ public class QuoteModule extends AbstractTable
     public void addModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
     }
-    
+
     /**
      * Remove a property change listener for module change events.
      *
@@ -513,7 +619,7 @@ public class QuoteModule extends AbstractTable
     public void removeModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
     }
-    
+
     /**
      * Return frame icon for table module.
      *
@@ -521,7 +627,7 @@ public class QuoteModule extends AbstractTable
      */
     public ImageIcon getFrameIcon() {
 	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource(frameIcon));
-    }    
+    }
 
     /**
      * Return displayed component for this module.
@@ -568,7 +674,7 @@ public class QuoteModule extends AbstractTable
 	else if(e.getSource() == applyFilter) {
 	    applyFilter();
 	}
-       
+
 	else if(e.getSource() == sortByMostActive) {
 	    setColumnSortStatus(ACTIVITY_COLUMN, SORT_UP);
 	    resort();
@@ -576,38 +682,57 @@ public class QuoteModule extends AbstractTable
 	    repaint();
 	}
 
+        // Graph symbols, either by the popup menu or the main menu
+        else if((popupGraphSymbols != null && e.getSource() == popupGraphSymbols) ||
+                e.getSource() == graphSymbols) {
+
+            int[] selectedRows = getSelectedRows();
+            Vector symbols = new Vector();
+
+            for(int i = 0; i < selectedRows.length; i++) {
+                String symbol = (String)model.getValueAt(selectedRows[i], SYMBOL_COLUMN);
+
+                symbols.add(symbol.toLowerCase());
+            }
+
+            // Graph the highlighted symbols
+            CommandManager.getInstance().graphStockBySymbol(symbols);
+        }
+
 	else {
 	    // Otherwise its a checkbox menu item
+            assert e.getSource() instanceof JCheckBoxMenuItem;
+
 	    JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)e.getSource();
 	    boolean state = menuItem.getState();
 	    int column = SYMBOL_COLUMN;
 
-	    if(menuItem == showSymbolsColumn) 
+	    if(menuItem == showSymbolsColumn)
 		column = SYMBOL_COLUMN;
 
-	    else if(menuItem == showVolumeColumn) 
+	    else if(menuItem == showVolumeColumn)
 		column = VOLUME_COLUMN;
 
-	    else if(menuItem == showDayLowColumn) 
+	    else if(menuItem == showDayLowColumn)
 		column = DAY_LOW_COLUMN;
 
-	    else if(menuItem == showDayHighColumn) 
+	    else if(menuItem == showDayHighColumn)
 		column = DAY_HIGH_COLUMN;
 
-	    else if(menuItem == showDayOpenColumn) 
+	    else if(menuItem == showDayOpenColumn)
 		column = DAY_OPEN_COLUMN;
 
-	    else if(menuItem == showDayCloseColumn) 
+	    else if(menuItem == showDayCloseColumn)
 		column = DAY_CLOSE_COLUMN;
 
-	    else if(menuItem == showChangeColumn) 
+	    else if(menuItem == showChangeColumn)
 		column = CHANGE_COLUMN;
 
 	    // Otherwise its an equation slot column
 	    else {
-		for(int i = 0; i < EQUATION_COLUMNS; i++) {
-		    if(menuItem == showEquationSlots[i]) {
-			column = EQUATION_SLOT_COLUMN + i;
+		for(int i = 0; i < EQUATION_SLOTS; i++) {
+		    if(menuItem == showEquationColumns[i]) {
+			column = EQUATION_COLUMN + i;
 		    }
 		}
 	    }
@@ -615,5 +740,5 @@ public class QuoteModule extends AbstractTable
 	    showColumn(column, state);
 	}
     }
-    
+
 }

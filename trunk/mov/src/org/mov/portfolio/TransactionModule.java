@@ -48,6 +48,11 @@ public class TransactionModule extends AbstractTable implements Module,
     private JMenuItem transactionDelete;
     private JMenuItem transactionClose;
 
+    // Popup menu items
+    private JMenuItem popupTransactionNew;
+    private JMenuItem popupTransactionEdit;
+    private JMenuItem popupTransactionDelete;
+
     private PropertyChangeSupport propertySupport;
     private PortfolioModule portfolioModule;
     private Portfolio portfolio;
@@ -65,7 +70,7 @@ public class TransactionModule extends AbstractTable implements Module,
 	};
 
 	private Class[] columnClasses = {
-	    TradingDate.class, String.class, Float.class, Float.class
+	    TradingDate.class, String.class, PriceFormat.class, PriceFormat.class
 	};
 
 	private Vector transactions;
@@ -117,35 +122,36 @@ public class TransactionModule extends AbstractTable implements Module,
 		
 	    case(CREDIT_COLUMN):
 		// Portfolio gains money		
-		Float credit = new Float(0.0F);
+                float credit = 0.0F;
 		
 		switch(type) {
 		case(Transaction.DEPOSIT):
 		case(Transaction.DIVIDEND):
 		case(Transaction.INTEREST):
 		case(Transaction.TRANSFER):
-		    credit = new Float(transaction.getAmount());
+		    credit = transaction.getAmount();
 		    break;
 		}
-		return credit;
+
+		return new PriceFormat(credit);
 
 	    case(DEBIT_COLUMN):
 		// Portfolio loses money
-		Float debit = new Float(0.0F);
+		float debit = 0.0F;
 		
 		switch(type) {
 		case(Transaction.WITHDRAWAL):
 		case(Transaction.FEE):
 		case(Transaction.TRANSFER):
-		    debit = new Float(transaction.getAmount());
+		    debit = transaction.getAmount();
 		    break;
 		case(Transaction.ACCUMULATE):
 		case(Transaction.REDUCE):
-		    debit = new Float(transaction.getTradeCost());
+		    debit = transaction.getTradeCost();
 		    break;
 		}
 
-		return debit;
+		return new PriceFormat(debit);
 	    }
 
 	    return "";
@@ -163,8 +169,8 @@ public class TransactionModule extends AbstractTable implements Module,
 	case(Transaction.ACCUMULATE):
 	case(Transaction.REDUCE):
 	    String pricePerShare =
-		Converter.priceToString(transaction.getAmount() /
-					transaction.getShares());
+		PriceFormat.priceToString(transaction.getAmount() /
+                                          transaction.getShares());
 	    
 	    transactionString = 
 		transactionString.concat(" " +
@@ -219,22 +225,10 @@ public class TransactionModule extends AbstractTable implements Module,
 
 	// If the user double clicks on a row then edit that transaction
 	addMouseListener(new MouseAdapter() {
-
 		public void mouseClicked(MouseEvent evt) {
-		    
-		    Point point = evt.getPoint();
-		    if (evt.getClickCount() == 2) {
-
-			int row = getUnsortedRow(rowAtPoint(point));
-			
-			// Get transaction at row
-			Transaction transaction = 
-			    model.getTransactionAtRow(row);
-
-			editTransaction(transaction);
-		    }
-		}
-	    });
+                    handleMouseClicked(evt);
+                }
+            });
 
 	// Listen for changes in selection so we can update the menus
 	getSelectionModel().addListSelectionListener(new ListSelectionListener() {		
@@ -246,6 +240,43 @@ public class TransactionModule extends AbstractTable implements Module,
 	});
 
 	createMenu();
+    }
+
+    // If the user double clicks on a transaction with the LMB, edit the transaction.
+    // If the user right clicks over the table, open up a popup menu.
+    private void handleMouseClicked(MouseEvent event) {
+
+        Point point = event.getPoint();
+
+        // Right click on the table - raise menu
+        if(event.getButton() == MouseEvent.BUTTON3) {
+            JPopupMenu menu = new JPopupMenu();
+
+            popupTransactionNew = 
+                MenuHelper.addMenuItem(this, menu, "New");
+            popupTransactionEdit = 
+                MenuHelper.addMenuItem(this, menu, "Edit");
+            popupTransactionDelete = 
+                MenuHelper.addMenuItem(this, menu, "Delete");
+
+            int numberOfSelectedRows = getSelectedRowCount();
+
+            popupTransactionEdit.setEnabled(numberOfSelectedRows == 1? true : false);
+            popupTransactionDelete.setEnabled(numberOfSelectedRows > 0? true : false);
+
+            menu.show(this, point.x, point.y);
+        }
+
+        // Left double click on the table - edit transaction
+        else if(event.getButton() == MouseEvent.BUTTON1 && event.getClickCount() == 2) {
+            int row = getUnsortedRow(rowAtPoint(point));
+            
+            // Get transaction at row
+            Transaction transaction = 
+                model.getTransactionAtRow(row);
+            
+            editTransaction(transaction);
+        }
     }
 
     // Create new menu for this module
@@ -452,18 +483,27 @@ public class TransactionModule extends AbstractTable implements Module,
 	Thread menuAction = new Thread() {
 
 		public void run() {
-		    if(e.getSource() == transactionNew) {
+		    if(e.getSource() == transactionNew ||
+                       (popupTransactionNew != null && 
+                        e.getSource() == popupTransactionNew)) {
+
 			newTransaction();
 		    }
 
-		    else if(e.getSource() == transactionEdit) {
+		    else if(e.getSource() == transactionEdit ||
+                            (popupTransactionEdit != null && 
+                             e.getSource() == popupTransactionEdit)) {
+
 			Transaction transaction =
 			    model.getTransactionAtRow(getSelectedRow());
 			
 			editTransaction(transaction);
 		    }
 
-		    else if(e.getSource() == transactionDelete) {
+		    else if(e.getSource() == transactionDelete ||
+                            (popupTransactionDelete != null &&
+                             e.getSource() == popupTransactionDelete)) {
+
 			int[] selectedRows = getSelectedRows();
 			Vector transactions = new Vector();
 

@@ -18,12 +18,17 @@
 
 package org.mov.quote;
 
-import java.lang.*;
-import java.sql.*;
-import java.util.*;
-import javax.swing.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.mov.util.*;
+import org.mov.util.TradingDate;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -147,12 +152,11 @@ public class DatabaseQuoteSource implements QuoteSource
     private boolean connect() {
 	try {
 	    connection =
-		DriverManager.
-		getConnection("jdbc:" + DRIVER_NAME +"://"+ host +
-			      ":" + port +
-			      "/"+ database +
-			      "?user=" + username +
-			      "&password=" + password);
+		DriverManager.getConnection("jdbc:" + DRIVER_NAME +"://"+ host +
+					    ":" + port +
+					    "/"+ database +
+					    "?user=" + username +
+					    "&password=" + password);
             return true;
 	}
 	catch (SQLException e) {
@@ -609,31 +613,27 @@ public class DatabaseQuoteSource implements QuoteSource
 	try {
 	    // 1. Create the shares table
 	    Statement statement = connection.createStatement();
-	    ResultSet RS = statement.executeQuery
-		("CREATE TABLE " + SHARE_TABLE_NAME + " (" +
-		 DATE_FIELD +		" DATE NOT NULL, " +
-		 SYMBOL_FIELD +		" CHAR(6) NOT NULL, " +
-		 DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, " +
-		 DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
-		 DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
-		 DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, " +
-		 DAY_VOLUME_FIELD +	" INT DEFAULT 0, " +
-		 "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
+	    statement.executeUpdate("CREATE TABLE " + SHARE_TABLE_NAME + " (" +
+				    DATE_FIELD +	" DATE NOT NULL, " +
+				    SYMBOL_FIELD +	" CHAR(6) NOT NULL, " +
+				    DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, " +
+				    DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
+				    DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
+				    DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, " +
+				    DAY_VOLUME_FIELD +	" INT DEFAULT 0, " +
+				    "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
 
 	    // 2. Create a couple of indices to speed things up
-	    RS = statement.executeQuery
-		("CREATE INDEX " + DATE_INDEX_NAME + " ON " +
-		 SHARE_TABLE_NAME + " (" + DATE_FIELD + ")");
-	    RS = statement.executeQuery
-		("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " +
-		 SHARE_TABLE_NAME + " (" + SYMBOL_FIELD + ")");
+	    statement.executeUpdate("CREATE INDEX " + DATE_INDEX_NAME + " ON " +
+				    SHARE_TABLE_NAME + " (" + DATE_FIELD + ")");
+	    statement.executeUpdate("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " +
+				    SHARE_TABLE_NAME + " (" + SYMBOL_FIELD + ")");
 
 	    // 3. Create the lookup table
-	    RS = statement.executeQuery
-		("CREATE TABLE " + LOOKUP_TABLE_NAME + " (" +
-		 SYMBOL_FIELD +		" CHAR(6) NOT NULL, " +
-		 NAME_FIELD +		" VARCHAR(100), " +
-		 "PRIMARY KEY(" + SYMBOL_FIELD + "))");
+	    statement.executeUpdate("CREATE TABLE " + LOOKUP_TABLE_NAME + " (" +
+				    SYMBOL_FIELD +		" CHAR(6) NOT NULL, " +
+				    NAME_FIELD +		" VARCHAR(100), " +
+				    "PRIMARY KEY(" + SYMBOL_FIELD + "))");
 
 	    success = true;
 	}
@@ -760,7 +760,7 @@ public class DatabaseQuoteSource implements QuoteSource
                 // Now insert day quote into database
                 try {
                     Statement statement = connection.createStatement();
-                    ResultSet RS = statement.executeQuery(insertString.toString());
+                    statement.executeUpdate(insertString.toString());
                 }
                 catch (SQLException e) {
                     DesktopManager.showErrorMessage("Error talking to database:\n" +

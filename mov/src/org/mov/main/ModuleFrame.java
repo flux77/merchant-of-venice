@@ -77,7 +77,7 @@ public class ModuleFrame extends JInternalFrame
 	else
 	    getContentPane().add(module.getComponent());
 
-	setSizeAndLocation(desktop, centre, honourSize);
+	setSizeAndLocation(this, desktop, centre, honourSize);
 
 	if(module.getJMenuBar() != null)
 	    setJMenuBar(module.getJMenuBar());
@@ -92,12 +92,22 @@ public class ModuleFrame extends JInternalFrame
 	show();	
     }
 
-    // Set the size and location of the new frame, taking care of out of
-    // bounds frames.
-    private void setSizeAndLocation(JDesktopPane desktop, 
-				    boolean centre, boolean honourSize) {
+    /**
+     * Set the size and location of any frame, taking care of out of
+     * bounds frames. This method has been made static to help any
+     * internal frames size themselves as if they were a proper
+     * Venice ModuleFrame.
+     *
+     * @param frame the frame to size
+     * @param desktop the desktop
+     * @param centre whether the frame should be centred?
+     * @param honourSize whether we should honour the frame's preferred size 
+     */
+    public static void setSizeAndLocation(JInternalFrame frame,
+                                          JDesktopPane desktop, 
+                                          boolean centre, boolean honourSize) {
 	int x, y, width, height;
-	Dimension preferred = getPreferredSize();	    
+	Dimension preferred = frame.getPreferredSize();	    
 
 	// Should we respect the window's preferred size or override?
 	if(honourSize) {
@@ -134,7 +144,7 @@ public class ModuleFrame extends JInternalFrame
 	    height = desktop.getHeight() - y;
 
 	// Set size and location
-	setBounds(x, y, width, height);
+	frame.setBounds(x, y, width, height);
     }
 
     /**

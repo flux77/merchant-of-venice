@@ -8,6 +8,23 @@ import javax.swing.event.*;
 public class MenuHelper {
 
     /**
+     * Creates a check box menu item and attaches it to a menu
+     * @param parent The menu to attach the menu item to
+     * @param title The title of the menu item
+     */
+    public static JCheckBoxMenuItem addCheckBoxMenuItem(ActionListener 
+							listener, 
+							JMenuItem parent, 
+							String title) {
+
+	JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(title);
+	menuItem.addActionListener(listener);
+	parent.add(menuItem);
+
+	return menuItem;
+    }
+
+    /**
      * Creates a menu item and attaches it to a menu
      * @param parent The menu to attach the menu item to
      * @param title The title of the menu item

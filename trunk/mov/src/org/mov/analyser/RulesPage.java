@@ -41,6 +41,7 @@ import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
 import org.mov.parser.ExpressionException;
 import org.mov.parser.Parser;
+import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.GridBagHelper;
@@ -128,13 +129,13 @@ public class RulesPage extends JPanel implements AnalyserPage {
 	String sellRuleString = sellRuleEquationComboBox.getEquationText();
 
         if(isFamilyEnabled) {
-            variables.add("a", Expression.INTEGER_TYPE);
-            variables.add("b", Expression.INTEGER_TYPE);
-            variables.add("c", Expression.INTEGER_TYPE);
+            variables.add("a", Expression.INTEGER_TYPE, Variable.CONSTANT);
+            variables.add("b", Expression.INTEGER_TYPE, Variable.CONSTANT);
+            variables.add("c", Expression.INTEGER_TYPE, Variable.CONSTANT);
         }
 
-        variables.add("held", Expression.INTEGER_TYPE);
-        variables.add("order", Expression.INTEGER_TYPE);
+        variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
 
         if(buyRuleString.length() == 0) {
             JOptionPane.showInternalMessageDialog(desktop, 

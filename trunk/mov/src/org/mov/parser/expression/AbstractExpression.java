@@ -45,7 +45,16 @@ public abstract class AbstractExpression implements Expression {
      * Create a new expression.
      */
     public AbstractExpression() {
-        children = new Expression[getChildCount()];
+	children = new Expression[getChildCount()];
+    }
+
+    /**
+     * Create a new expression with the given number of children.
+     *
+     * @param childCount the number of children in the expression.
+     */
+    public AbstractExpression(int childCount) {
+	children = new Expression[childCount];
     }
 
     /**

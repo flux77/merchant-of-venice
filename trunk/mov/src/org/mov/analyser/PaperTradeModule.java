@@ -42,6 +42,7 @@ import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
 import org.mov.parser.Expression;
 import org.mov.parser.EvaluationException;
+import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.portfolio.Portfolio;
 import org.mov.prefs.PreferencesManager;
@@ -352,9 +353,9 @@ public class PaperTradeModule extends JPanel implements Module {
             // If the user has selected rule family, then iterate through
             // each combination of a, b, c
             if(isFamilyEnabled) {
-                variables.add("a", Expression.INTEGER_TYPE);
-                variables.add("b", Expression.INTEGER_TYPE);
-                variables.add("c", Expression.INTEGER_TYPE);
+                variables.add("a", Expression.INTEGER_TYPE, Variable.CONSTANT);
+                variables.add("b", Expression.INTEGER_TYPE, Variable.CONSTANT);
+                variables.add("c", Expression.INTEGER_TYPE, Variable.CONSTANT);
 
                 for(int a = 1; a <= aRange; a++) {
                     if(thread.isInterrupted())

@@ -18,7 +18,14 @@
 
 package org.mov.parser;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mov.parser.expression.ClauseExpression;
+import org.mov.parser.expression.NumberExpression;
+import org.mov.parser.expression.DefineVariableExpression;
+import org.mov.parser.expression.GetVariableExpression;
+import org.mov.parser.expression.SetVariableExpression;
 
 /**
  * Parse a string into an executable expression. This class acts as
@@ -27,34 +34,41 @@ import java.util.*;
  * <p>
  * <h2>Langauge EBNF</h2>
  * <pre>
- * EXPR = BOOLEAN_EXPR [ LOGIC BOOLEAN_EXPR ]
- * LOGIC = "and" | "or"
- * BOOLEAN_EXPR = ADD_EXPR [ RELATION ADD_EXPR ]
- * RELATION = "==" | "<=" | ">=" | "<" | ">" | "!="
- * ADD_EXPR = MULTIPLY_EXPR [ ADD_OPERATOR MULTIPLY_EXPR ]
- * ADD_OPERATION = "-" | "+"
- * MULTIPLY_EXPR = FACTOR [ MULTIPLY_OPERATOR FACTOR ]
+
+ * ROOT_EXPR         = [SUB_EXPR]+
+ * EXPR              = SUB_EXPR | "{" [SUB_EXPR]+ "}"
+ * SUB_EXPR          = BOOLEAN_EXPR [ LOGIC BOOLEAN_EXPR ]
+ * LOGIC             = "and" | "or"
+ * BOOLEAN_EXPR      = ADD_EXPR [ RELATION ADD_EXPR ]
+ * RELATION          = "==" | "<=" | ">=" | "<" | ">" | "!="
+ * ADD_EXPR          = MULTIPLY_EXPR [ ADD_OPERATOR MULTIPLY_EXPR ]
+ * ADD_OPERATION     = "-" | "+"
+ * MULTIPLY_EXPR     = FACTOR [ MULTIPLY_OPERATOR FACTOR ]
  * MULTIPLY_OPERATOR = "*" | "/"
- * FACTOR = VARIABLE | NUMBER | FUNCTION | "(" EXPR ")"
- * NUMBER = ["-"]{0-9}+ ["." {0-9}+] | "true" | "false"
- * VARIABLE = {a-zA-Z}{a-zA-Z0-9}*
- * QUOTE      "open" | "close" | "low" | "high" | "volume"
- * FUNCTION = "lag" "(" QUOTE "," EXPR ")" | 
- *            "min" "(" QUOTE "," EXPR "," EXPR ")" | 
- *            "max" "(" QUOTE "," EXPR "," EXPR ")" |
- *            "avg" "(" QUOTE "," EXPR "," EXPR ")" |
- *            "sum" "(" QUOTE "," EXPR "," EXPR ")" |
- *            "rsi" "(" EXPR "," EXPR ")" |
- *            "not" "(" EXPR ")" |
- *            "percent" "(" EXPR "," EXPR ")" |
- *            "if"  "(" EXPR ")" "{" EXPR "}" "else" "{" EXPR "}" |
- *            "dayofweek" "(" ")" |
- *            "dayofyear" "(" ")" |
- *            "day" "(" ")" |
- *            "month" "(" ")" |
- *            "year" "(" ")" |
- *            "sqrt" "(" EXPR ")" |
- *            "abs" "(" EXPR ")"
+ * FACTOR            = VARIABLE | NUMBER | FUNCTION | FLOW_CONTROL | "(" SUB_EXPR ")"
+ * NUMBER            = ["-"]{0-9}+ ["." {0-9}+] | "true" | "false"
+ * VARIABLE_NAME     = {a-zA-Z}{a-zA-Z0-9_}*
+ * TYPE              = "boolean" | "float" | "int"
+ * VARIABLE          = [["const"] [TYPE]] VARIABLE_NAME ["=" SUB_EXPR]
+ * QUOTE             = "open" | "close" | "low" | "high" | "volume"
+ * FUNCTION          = "lag" "(" QUOTE "," SUB_EXPR ")" | 
+ *                     "min" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" | 
+ *                     "max" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
+ *                     "avg" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
+ *                     "sum" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
+ *                     "rsi" "(" SUB_EXPR "," SUB_EXPR ")" |
+ *                     "not" "(" SUB_EXPR ")" |
+ *                     "percent" "(" SUB_EXPR "," SUB_EXPR ")" |
+ *                     "dayofweek" "(" ")" |
+ *                     "dayofyear" "(" ")" |
+ *                     "day" "(" ")"       |
+ *                     "month" "(" ")"     |
+ *                     "year" "(" ")"      |
+ *                     "sqrt" "(" SUB_EXPR ")" |
+ *                     "abs" "(" SUB_EXPR ")"
+ * FLOW_CONTROL      = "if"  "(" SUB_EXPR ")" EXPR "else" EXPR |
+ *                     "for" "(" SUB_EXPR ";" SUB_EXPR ";" SUB_EXPR ")" EXPR |
+ *                     "while" "(" SUB_EXPR ")" EXPR
  * </pre>
  */
 public class Parser {
@@ -66,7 +80,8 @@ public class Parser {
     /**
      * Parse the given string into an executable expression. The first
      * argument allows you to parse any predefined variables which are
-     * available to the expression.
+     * available to the expression. Any variables defined by the
+     * expression will be added to this.
      *
      * @param variables any predefined variables.
      * @param string the string to parse.
@@ -81,7 +96,11 @@ public class Parser {
 	TokenStack tokens = lexicalAnalysis(variables, string);
 
 	// Translate stack of tokens to expression
-	Expression expression = parseExpression(tokens);
+	Expression expression = parseRootExpression(variables, tokens);
+
+	// There should be no more tokens
+	if(tokens.size() > 0)
+	    throw new ParserException("extraneous text at end of expression");
 
 	// Check for type mismatch
 	expression.checkType();
@@ -125,27 +144,75 @@ public class Parser {
 
 	return tokens;
     }
+    
+    private static Expression parseRootExpression(Variables variables, TokenStack tokens) 
+	throws ParserException {
+	
+	List subExpressions = new ArrayList();
 
-    private static Expression parseExpression(TokenStack tokens) 
+	while(tokens.size() > 0)
+	    subExpressions.add(parseSubExpression(variables, tokens));	    
+
+	if(subExpressions.size() == 0)
+	    throw new ParserException("empty equation");
+	else
+	    return new ClauseExpression(subExpressions);
+    }
+
+    private static Expression parseExpression(Variables variables, TokenStack tokens) 
 	throws ParserException {
 
-	Expression left = parseBooleanExpression(tokens);
+	// If the next symbol is "{" parse a list of sub-expressions
+	if(tokens.match(Token.LEFT_BRACE_TOKEN)) {
+	    List subExpressions = new ArrayList();
+	    boolean inClause = true;
+
+	    tokens.pop();
+
+	    while(inClause) {
+		subExpressions.add(parseSubExpression(variables, tokens));
+
+		// If there are no more symbols then we are mising the matching "}"
+		if(tokens.size() == 0)
+		    throw new ParserException("missing right brace");
+
+		// Keep parsing sub-expressions until we find the matching "}"
+		if(tokens.match(Token.RIGHT_BRACE_TOKEN)) {
+		    tokens.pop();
+		    inClause = false;
+		}
+	    }
+
+	    // Finally group all these sub-expressions together into a "clause" which
+	    // will execute the expressions sequentially.
+	    return new ClauseExpression(subExpressions);
+	}
+	
+	// Otherwise parse a single sub-expression
+	else
+	    return parseSubExpression(variables, tokens);
+    }
+
+    private static Expression parseSubExpression(Variables variables, TokenStack tokens) 
+	throws ParserException {
+	
+	Expression left = parseBooleanExpression(variables, tokens);
 
 	if(tokens.match(Token.AND_TOKEN) ||
 	   tokens.match(Token.OR_TOKEN)) {
 
 	    Token operation = tokens.pop();
-	    Expression right = parseBooleanExpression(tokens);
+	    Expression right = parseBooleanExpression(variables, tokens);
 
 	    return(ExpressionFactory.newExpression(operation, left, right));
 	}
 	return left;
     }
 
-    private static Expression parseBooleanExpression(TokenStack tokens) 
+    private static Expression parseBooleanExpression(Variables variables, TokenStack tokens) 
 	throws ParserException {
 
-	Expression left = parseAddExpression(tokens);
+	Expression left = parseAddExpression(variables, tokens);
 
 	if(tokens.match(Token.EQUAL_TOKEN) ||
 	   tokens.match(Token.NOT_EQUAL_TOKEN) ||
@@ -155,39 +222,39 @@ public class Parser {
 	   tokens.match(Token.GREATER_THAN_EQUAL_TOKEN)) {
 	    
 	    Token operation = tokens.pop();
-	    Expression right = parseAddExpression(tokens);
+	    Expression right = parseAddExpression(variables, tokens);
 
 	    return(ExpressionFactory.newExpression(operation, left, right));
 	}
 	return left;
     }
 	
-    private static Expression parseAddExpression(TokenStack tokens) 
+    private static Expression parseAddExpression(Variables variables, TokenStack tokens) 
 	throws ParserException {
 
-	Expression left = parseMultiplyExpression(tokens);
+	Expression left = parseMultiplyExpression(variables, tokens);
 
 	if(tokens.match(Token.ADD_TOKEN) ||
 	   tokens.match(Token.SUBTRACT_TOKEN)) {
 
 	    Token operation = tokens.pop();	    
-	    Expression right = parseMultiplyExpression(tokens);
+	    Expression right = parseMultiplyExpression(variables, tokens);
 
 	    return(ExpressionFactory.newExpression(operation, left, right));
 	}
 	return left;
     }
     
-    private static Expression parseMultiplyExpression(TokenStack tokens) 
+    private static Expression parseMultiplyExpression(Variables variables, TokenStack tokens) 
 	throws ParserException {
 	
-	Expression left = parseFactor(tokens);
+	Expression left = parseFactor(variables, tokens);
 
 	if(tokens.match(Token.MULTIPLY_TOKEN) ||
 	   tokens.match(Token.DIVIDE_TOKEN)) {
 	    
 	    Token operation = tokens.pop();
-	    Expression right = parseFactor(tokens);
+	    Expression right = parseFactor(variables, tokens);
 
 	    return(ExpressionFactory.newExpression(operation, left, right));
 	}
@@ -195,7 +262,7 @@ public class Parser {
 	return left;
     }	
 
-    private static Expression parseFactor(TokenStack tokens) 
+    private static Expression parseFactor(Variables variables, TokenStack tokens) 
 	throws ParserException {
 
 	Expression expression;
@@ -205,7 +272,7 @@ public class Parser {
            tokens.match(Token.TRUE_TOKEN) || 
            tokens.match(Token.FALSE_TOKEN) || 
            tokens.match(Token.SUBTRACT_TOKEN))
-	    expression = parseNumber(tokens);
+	    expression = parseNumber(variables, tokens);
 	
 	// FUNCTION
 	else if(tokens.match(Token.LAG_TOKEN) ||
@@ -215,7 +282,6 @@ public class Parser {
 		tokens.match(Token.SUM_TOKEN) ||
 		tokens.match(Token.RSI_TOKEN) ||
 		tokens.match(Token.NOT_TOKEN) ||
-		tokens.match(Token.IF_TOKEN) ||
 		tokens.match(Token.PERCENT_TOKEN) ||
 		tokens.match(Token.DAY_OF_WEEK_TOKEN) ||
 		tokens.match(Token.DAY_OF_YEAR_TOKEN) ||
@@ -224,18 +290,31 @@ public class Parser {
 		tokens.match(Token.YEAR_TOKEN) ||
                 tokens.match(Token.SQRT_TOKEN) ||
                 tokens.match(Token.ABS_TOKEN))
-	    expression = parseFunction(tokens);
+	    expression = parseFunction(variables, tokens);
+
+	// FLOW_CONTROL
+	else if(tokens.match(Token.IF_TOKEN) ||
+		tokens.match(Token.FOR_TOKEN) ||
+		tokens.match(Token.WHILE_TOKEN))
+	    expression = parseFlowControl(variables, tokens);
 
 	// EXPRESSION
 	else if(tokens.match(Token.LEFT_PARENTHESIS_TOKEN)) {
 	    tokens.pop();
-	    expression = parseExpression(tokens);
-	    parseRightParenthesis(tokens);
+	    expression = parseSubExpression(variables, tokens);
+	    parseRightParenthesis(variables, tokens);
 	}
 
-	// VARIABLE
+	// GET/SET VARIABLE
         else if(tokens.match(Token.VARIABLE_TOKEN))
-	    expression = parseVariable(tokens);
+	    expression = parseVariable(variables, tokens);
+	
+	// DECLARE VARIABLE
+	else if(tokens.match(Token.CONSTANT_TOKEN) ||
+		tokens.match(Token.BOOLEAN_TOKEN) ||
+		tokens.match(Token.INTEGER_TOKEN) ||
+		tokens.match(Token.FLOAT_TOKEN))
+	    expression = parseDefineVariable(variables, tokens);
 
 	else
 	    throw new ParserException("unexpected symbol");
@@ -243,19 +322,86 @@ public class Parser {
 	return expression;
     }
 
-    private static Expression parseVariable(TokenStack tokens) 
+    private static Expression parseVariable(Variables variables, TokenStack tokens) 
 	throws ParserException {
 
-	Token variable = tokens.pop();
-	Expression expression;
+	Token token = tokens.pop();
+	assert token.getType() == Token.VARIABLE_TOKEN;
+	
+	Variable variable = variables.get(token.getVariableName());
 
-        if(variable.getType() == Token.VARIABLE_TOKEN) 
-            return ExpressionFactory.newExpression(variable);
-        else
-            throw new ParserException("unexpected symbol");
+	// Make sure the variable is defined
+	if(variable == null)
+	    throw new ParserException("unknown identifier '" + token.getVariableName() + "'");
+
+	else if(tokens.match(Token.SET_TOKEN)) {
+	    tokens.pop();	  
+
+	    // Make sure we aren't trying to set a constant
+	    if(variable.isConstant())
+		throw new ParserException("variable '" + token.getVariableName() + 
+					  "' is a constant");
+
+	    Expression value = parseSubExpression(variables, tokens);
+	    return new SetVariableExpression(token.getVariableName(), variable.getType(),
+					     value);
+	}
+	else
+	    return new GetVariableExpression(token.getVariableName(), variable.getType());
     }
 
-    private static Expression parseQuote(TokenStack tokens) 
+    private static Expression parseDefineVariable(Variables variables, TokenStack tokens) 
+	throws ParserException {
+
+	String name ;
+	boolean isConstant = false;
+	Expression value = null;
+	int type;
+	Token token;
+
+	// Parse "const"
+	if(tokens.match(Token.CONSTANT_TOKEN)) {
+	    isConstant = true;
+	    tokens.pop();
+	}
+	
+	// Parse the variable type: "boolean" | "float" | "int"
+	token = tokens.pop();
+	
+	if(token.getType() == Token.BOOLEAN_TOKEN)
+	    type = Expression.BOOLEAN_TYPE;
+	else if(token.getType() == Token.FLOAT_TOKEN)
+	    type = Expression.FLOAT_TYPE;
+	else if(token.getType() == Token.INTEGER_TOKEN)
+	    type = Expression.INTEGER_TYPE;
+	else
+	    throw new ParserException("expecting variable type");
+	
+	// Parse the name
+	token = tokens.pop();
+	if(token.getType() == Token.VARIABLE_TOKEN)
+	    name = token.getVariableName();
+	else
+	    throw new ParserException("illegal variable name");
+	
+	// Parse the initial value (if any)
+	if(tokens.match(Token.SET_TOKEN)) {
+	    tokens.pop();
+	    value = parseSubExpression(variables, tokens);
+	}
+	else
+	    value = new NumberExpression(0.0D, type);
+
+	// Check the variable isn't already defined
+	if(variables.contains(name))
+	    throw new ParserException("variable '" + name + "' is already defined");
+
+	// Add variable
+	variables.add(name, type, isConstant);
+	return new DefineVariableExpression(name, type, isConstant, value);
+    }
+
+    private static Expression parseQuote(Variables variables, TokenStack tokens) 
 	throws ParserException {
 	
 	Token quote = tokens.pop();
@@ -276,7 +422,7 @@ public class Parser {
 	return expression;
     }
 
-    private static Expression parseNumber(TokenStack tokens) 
+    private static Expression parseNumber(Variables variables, TokenStack tokens) 
 	throws ParserException {
 
 	Token number = tokens.pop();
@@ -303,7 +449,7 @@ public class Parser {
         }
     }
 
-    private static Expression parseFunction(TokenStack tokens) 
+    private static Expression parseFunction(Variables variables, TokenStack tokens) 
 	throws ParserException {
 
 	Expression expression;
@@ -315,49 +461,37 @@ public class Parser {
 
 	// all functions must have a left parenthesis after the function
 	// name
-	parseLeftParenthesis(tokens);
+	parseLeftParenthesis(variables, tokens);
 
 	switch(function.getType()) {
 	case(Token.LAG_TOKEN):
 	case(Token.RSI_TOKEN):	  
-	    arg1 = parseQuote(tokens);
-	    parseComma(tokens);
-	    arg2 = parseExpression(tokens);
+	    arg1 = parseQuote(variables, tokens);
+	    parseComma(variables, tokens);
+	    arg2 = parseSubExpression(variables, tokens);
 	    break;
 
 	case(Token.MIN_TOKEN):
 	case(Token.MAX_TOKEN):
 	case(Token.AVG_TOKEN):
 	case(Token.SUM_TOKEN):
-	    arg1 = parseQuote(tokens);
-	    parseComma(tokens);
-	    arg2 = parseExpression(tokens);
-	    parseComma(tokens);
-	    arg3 = parseExpression(tokens);	    
+	    arg1 = parseQuote(variables, tokens);
+	    parseComma(variables, tokens);
+	    arg2 = parseSubExpression(variables, tokens);
+	    parseComma(variables, tokens);
+	    arg3 = parseSubExpression(variables, tokens);	    
 	    break;
 
 	case(Token.PERCENT_TOKEN): 
-	    arg1 = parseExpression(tokens);
-            parseComma(tokens);
-	    arg2 = parseExpression(tokens);
+	    arg1 = parseSubExpression(variables, tokens);
+            parseComma(variables, tokens);
+	    arg2 = parseSubExpression(variables, tokens);
             break;
 
 	case(Token.NOT_TOKEN):
         case(Token.SQRT_TOKEN):
         case(Token.ABS_TOKEN):
-	    arg1 = parseExpression(tokens);
-	    break;
-					       
-	case(Token.IF_TOKEN):	   
-	    arg1 = parseExpression(tokens);
-	    parseRightParenthesis(tokens);
-	    parseLeftBrace(tokens);
-	    arg2 = parseExpression(tokens);
-	    parseRightBrace(tokens);
-	    parseElse(tokens);
-	    parseLeftBrace(tokens);
-	    arg3 = parseExpression(tokens);
-	    parseRightBrace(tokens);				
+	    arg1 = parseSubExpression(variables, tokens);
 	    break;
 	    
         case(Token.DAY_OF_WEEK_TOKEN):
@@ -368,52 +502,92 @@ public class Parser {
             break;
 
 	default:
-	    throw new ParserException("expected function");
+	    // We shouldn't have entered this function unless it was one of the above
+	    assert false;
 	}
 
-	// create epxression
+	// Create epxression
 	expression = ExpressionFactory.newExpression(function, arg1, arg2, 
 						     arg3);
 	
-	// all functions must end with a right parenthesis (ignore IF
-	// because weve already removed its right parenthesis
-	if(function.getType() != Token.IF_TOKEN)
-	    parseRightParenthesis(tokens);
+	// All functions must end with a right parenthesis
+	parseRightParenthesis(variables, tokens);
 
 	return expression;
     }
 
-    private static void parseComma(TokenStack tokens) throws ParserException {
+    private static Expression parseFlowControl(Variables variables, TokenStack tokens) 
+	throws ParserException {
+
+	Token token = tokens.pop();
+
+	// All control flow functions have a left parenthesis after the function.
+	parseLeftParenthesis(variables, tokens);
+
+	if(token.getType() == Token.IF_TOKEN) {
+	    Expression condition = parseSubExpression(variables, tokens);
+	    parseRightParenthesis(variables, tokens);
+	    Expression ifTrue = parseExpression(variables, tokens);
+	    parseElse(variables, tokens);
+	    Expression ifFalse = parseExpression(variables, tokens);
+	    return ExpressionFactory.newExpression(token, condition, ifTrue, ifFalse);
+	}
+	else if(token.getType() == Token.WHILE_TOKEN) {
+	    Expression condition = parseSubExpression(variables, tokens);	    
+	    parseRightParenthesis(variables, tokens);
+	    Expression command = parseExpression(variables, tokens);
+	    return ExpressionFactory.newExpression(token, condition, command);
+	}
+	else {
+	    assert token.getType() == Token.FOR_TOKEN;
+	    Expression initial = parseSubExpression(variables, tokens);
+	    parseSemicolon(variables, tokens);
+	    Expression condition = parseSubExpression(variables, tokens);
+	    parseSemicolon(variables, tokens);
+	    Expression loop = parseSubExpression(variables, tokens);
+	    parseRightParenthesis(variables, tokens);
+	    Expression command = parseExpression(variables, tokens);
+	    return ExpressionFactory.newExpression(token, initial, condition, loop, command);
+	}
+    }
+
+    private static void parseComma(Variables variables, TokenStack tokens) throws ParserException {
 	if(!tokens.pop(Token.COMMA_TOKEN))
 	    throw new ParserException("expected comma");
     }
 
-    private static void parseLeftParenthesis(TokenStack tokens) 
+    private static void parseLeftParenthesis(Variables variables, TokenStack tokens) 
 	throws ParserException {
 	if(!tokens.pop(Token.LEFT_PARENTHESIS_TOKEN))
 	    throw new ParserException("expected left parenthesis");
     }
 
-    private static void parseRightParenthesis(TokenStack tokens) 
+    private static void parseRightParenthesis(Variables variables, TokenStack tokens) 
 	throws ParserException {
 	if(!tokens.pop(Token.RIGHT_PARENTHESIS_TOKEN))
 	    throw new ParserException("missing right parenthesis");
     }
 
-    private static void parseLeftBrace(TokenStack tokens) throws ParserException {
+    private static void parseLeftBrace(Variables variables, TokenStack tokens) 
+	throws ParserException {
 	if(!tokens.pop(Token.LEFT_BRACE_TOKEN))
 	    throw new ParserException("expected left brace");
     }
 
-    private static void parseRightBrace(TokenStack tokens) 
+    private static void parseRightBrace(Variables variables, TokenStack tokens) 
 	throws ParserException {
 
 	if(!tokens.pop(Token.RIGHT_BRACE_TOKEN))
 	    throw new ParserException("missing right brace");
     }
 
-    private static void parseElse(TokenStack tokens) throws ParserException {
+    private static void parseElse(Variables variables, TokenStack tokens) throws ParserException {
 	if(!tokens.pop(Token.ELSE_TOKEN))
-	    throw new ParserException("expected else token");
+	    throw new ParserException("expected 'else'");
+    }
+
+    private static void parseSemicolon(Variables variables, TokenStack tokens) throws ParserException {
+	if(!tokens.pop(Token.SEMICOLON_TOKEN))
+	    throw new ParserException("expected semicolon");
     }
 }

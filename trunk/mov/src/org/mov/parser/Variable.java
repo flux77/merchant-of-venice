@@ -32,21 +32,33 @@ public class Variable {
     // Type of variable
     private int type;
 
+    // Constant or variable
+    private boolean isConstant;
+
+    /** Indicates that the variable is constant and the value cannot be changed. */
+    public final static boolean CONSTANT = true;
+
+    /** Indicates that the variable can be changed. */
+    public final static boolean VARIABLE = false;
+
     /**
      * Create a new variable.
      *
      * @param name the name of the variable.
      * @param type the type of the variable, one of {@link Expression#BOOLEAN_TYPE},
      *        {@link Expression#FLOAT_TYPE} or {@link Expression#INTEGER_TYPE}.
+     * @param isConstant whether the variable is constant. Either @{link CONSTANT} or
+     *        {@link Variable#VARIABLE}.
      * @param value the initial value of the variable.
      */
-    public Variable(String name, int type, double value) {
+    public Variable(String name, int type, boolean isConstant, double value) {
         assert(type == Expression.BOOLEAN_TYPE || type == Expression.FLOAT_TYPE ||
                type == Expression.INTEGER_TYPE);
 
         this.name = name;
         this.type = type;
         this.value = value;
+	this.isConstant = isConstant;
     }
 
     /**
@@ -69,6 +81,15 @@ public class Variable {
     }
 
     /**
+     * Return whether the variable is a constant.
+     *
+     * @return <code>TRUE</code> iff the variable is a constant.
+     */
+    public boolean isConstant() {
+	return isConstant;
+    }
+
+    /**
      * Return the value of the variable.
      *
      * @return the value of the variable.
@@ -78,7 +99,9 @@ public class Variable {
     }
 
     /**
-     * Set the value of the variable.
+     * Set the value of the variable. You can legally change the value of constant
+     * variables using this method. Constant variables are only constant in the
+     * gondola language.
      *
      * @param value the new value.
      */
@@ -87,7 +110,9 @@ public class Variable {
     }
 
     /**
-     * Set the value of the variable.
+     * Set the value of the variable. You can legally change the value of constant
+     * variables using this method. Constant variables are only constant in the
+     * gondola language.
      *
      * @param value the new value.
      */

@@ -25,6 +25,8 @@ package org.mov.quote;
  * average.java, RSI.java etc. They will then be put into the stats package.
  * The gondola language will be made so that it can turn any stat
  * class into a function.
+ *
+ * @author Andrew Leppard
  */
 public class QuoteFunctions {
 
@@ -88,8 +90,7 @@ public class QuoteFunctions {
      * -1 (negative correlation) through to (no correlation) through to 1 (perfect
      * correlation.
      *
-     * The correlation co-efficient is calculated as follows:
-     *
+     * The correlation co-efficient is calculated as follows:<pre>
      * r = sum(Zx * Zy)
      *     ------------
      *         N - 1
@@ -97,8 +98,7 @@ public class QuoteFunctions {
      * Where Zx = X - E(X)
      *            --------
      *              Sx
-     *
-     * Where E(X) is the mean of X and Sx is the standard deviation of X.
+     * </pre>Where E(X) is the mean of X and Sx is the standard deviation of X.
      *
      * Simillarly for Zy.
      *
@@ -119,7 +119,7 @@ public class QuoteFunctions {
             for(int i = start; i < end; i++) {
                 double zx = (x[i] - ex) / sx;
                 double zy = (y[i] - ey) / sy;
-                
+
                 r += zx * zy;
             }
 
@@ -137,7 +137,7 @@ public class QuoteFunctions {
      * "It is a momentum indicator, or oscillator, that measures the relative internal
      *  strength of a security against <i>itself</i>....".
      *
-     * The formula for the RSI is as follows:
+     * The formula for the RSI is as follows:<pre>
      *
      *               100
      * RSI = 100 - ------
@@ -147,7 +147,7 @@ public class QuoteFunctions {
      * RS = ------------------------------
      *      average of x days' down closes
      *
-     * To calculate an X day RSI you need X + 1 quote values. So try and make
+     * </pre>To calculate an X day RSI you need X + 1 quote values. So try and make
      * sure that <code>start</code> is always greater than zero.
      *
      * @param values array of values to analyse
@@ -211,7 +211,7 @@ public class QuoteFunctions {
 
 	// Formula: AVGcurrent = AVGprev + k(DATAcurrent - AVGprev) where:
 	// AVGcurrent is the avg over values, DATAcurrent is values[i], and k is the smoothing constant.
-	for(int i = start; i < end; i++) {	    
+	for(int i = start; i < end; i++) {	
 	    if (i > start) {
 		avg = prev + (smoothingConstant) * (values[i] - prev);
 		prev = avg;
@@ -227,7 +227,7 @@ public class QuoteFunctions {
         return Math.round(d * Math.pow(10, (double) places)) / Math.pow(10,
             (double) places);
     }
-    
+
 
 }
 

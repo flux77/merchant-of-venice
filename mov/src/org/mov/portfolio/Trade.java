@@ -1,4 +1,4 @@
-package org.mov.main;
+package org.mov.portfolio;
 
 import java.util.*;
 
@@ -47,3 +47,4 @@ public class Trade {
     }
 
 }
+

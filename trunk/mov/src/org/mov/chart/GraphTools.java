@@ -99,10 +99,11 @@ public class GraphTools {
 
 	    x2 = (int)(xoffset + horizontalScale * i);
 	    y1 = yoffset - scaleAndFitPoint(floatValue, 
-					    bottomLineValue, verticalScale);
-	    
+	    				    bottomLineValue, verticalScale);
+	  
 	    if(x1 != -1) 
-		g.fillRect(x1, y1, Math.abs(x2-x1) + 1, Math.abs(y2-y1));
+		g.fillRect(Math.min(x1, x2), Math.min(y1, y2), 
+			   Math.abs(x2-x1) + 1, Math.abs(y2-y1));
 	    
 	    x1 = x2 + 1;
 

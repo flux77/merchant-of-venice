@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE preferences SYSTEM 'http://java.sun.com/dtd/preferences.dtd'>
+
+<preferences EXTERNAL_XML_VERSION="1.0">
+  <root	type="user">
+    <map />
+
+    <node name="display">
+      <map>
+        <entry key="default_width" value="1024" /> 
+        <entry key="default_height" value="768" /> 
+        <entry key="default_x" value="0" /> 
+        <entry key="default_y" value="0" /> 
+      </map>
+    </node>
+
+    <node name="quote_source">
+      <map>
+        <entry key="source" value="database" /> 
+      </map>
+
+      <node name="files">
+        <map>
+          <entry key="list" value="" /> 
+        </map>
+      </node>
+
+      <node name="database">
+        <map>
+          <entry key="driverclass" value="org.gjt.mm.mysql.Driver" /> 
+	  <entry key="drivername" value="mysql" />                    
+          <entry key="host" value="db" />                             
+          <entry key="port" value="3306" />                           
+          <entry key="dbname" value="shares" />                       
+          <entry key="username" value="shares" />                   
+          <entry key="password" value="money5me" />                   
+        </map>
+
+        <node name="tables">
+          <map>
+            <entry key="prices" value="shares" /> 
+            <entry key="info" value="lookup" />   
+          </map>
+          <node name="prices_fields">
+            <map>
+              <entry key="date" value="date" />
+              <entry key="symbol" value="symbol" />
+              <entry key="open" value="open" />
+              <entry key="high" value="high" />
+              <entry key="low" value="low" />
+              <entry key="close" value="close" />
+              <entry key="volume" value="volume" />
+            </map>
+          </node>
+          <node name="info_fields">
+            <map>
+              <entry key="symbol" value="symbol" />
+              <entry key="name" value="name" />
+            </map>
+          </node>
+        </node>
+      </node>
+
+    </node>
+  </root>
+</preferences>
+
+
+

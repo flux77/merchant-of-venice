@@ -743,6 +743,8 @@ public class ChartModule extends JPanel implements Module,
 		eraseOnChart.setSelected(false);
 	    } else {		
 		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
+		eraseOnChart.setSelected(false);
+		paintOnChart.setSelected(false);
 		inDrawMode = false;
 	    }
 	}

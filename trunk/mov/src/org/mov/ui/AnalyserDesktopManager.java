@@ -18,8 +18,8 @@ public class AnalyserDesktopManager
     extends javax.swing.DefaultDesktopManager
     implements java.io.Serializable {  
 
-    static private int DEFAULT_FRAME_WIDTH = 425;
-    static private int DEFAULT_FRAME_HEIGHT = 350;
+    static private int DEFAULT_FRAME_WIDTH = 450;
+    static private int DEFAULT_FRAME_HEIGHT = 375;
 
 
     public static final int HORIZONTAL          = 0,

@@ -13,8 +13,11 @@ introduction to Venice.</para>
 to customise Venice, including how Venice accesses stock
 quotes.</para>
 
-<para><link to="Importing Quotes">Importing Quotes</link> describes
-how to import stock quotes into Venice.</para>
+<para><link to="Importing">Importing</link> describes
+how to import preferences or stock quotes into Venice.</para>
+
+<para><link to="Exporting">Exporting</link> describes
+how to export preferences or stock quotes into Venice.</para>
 
 <para><link to="Tables">Tables</link> describes all the stock
 quote tables that Venice can generate.</para>
@@ -41,7 +44,7 @@ in Venice. For charting see <link to="Graphs">Graphs</link>.
 </para>
 </help>
 
-<text>Merchant of Venice, 0.3 alpha / 14/Mar/2004
+<text>Merchant of Venice, 0.5 alpha / 14/Mar/2005
 ===========================================
 
 Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
@@ -1128,7 +1131,10 @@ paper trading, this allows you to test buy/sell rules using historical share
 data.</para>
 
 <para><link to="Genetic Programming">Genetic Programming</link> describes how to use
-evolutionary computation to evovle new buy/sell rules.</para>
+evolutionary computation (genetic programming methodology) to evovle new buy/sell rules.</para>
+
+<para><link to="Genetic Programming">Genetic Algorithm</link> describes how to use
+evolutionary computation (genetic algorithm methodology) to evovle new buy/sell rules.</para>
 </help>
 
 <chapter name="Paper Trade">
@@ -1358,5 +1364,18 @@ the former button to transform the inserted values to percentages.</para>
 </section>
 
 </chapter>
+
+<chapter name="Genetic Algorithm">
+<para>Genetic Algorithm is similar to <link to="Genetic Programming">Genetic Programming Module</link>.
+Differently from Genetic Programming, you have to write a buy and a sell rule with many parameters as you wish.
+Then you have to declare the minimum and the maximum values for each parameter.
+If you'll use minimum and maximum values of float type (2.3, 1.7, 1.1, ...) you'll use that parameter as float,
+so be aware to put it in the rules so that it doesn't generate syntax error.
+If you'll use minimum and maximum values of integer type (2, 3, 4, ...) you'll use that parameter as integer,
+so be aware to put it in the rules so that it doesn't generate syntax error.
+The Genetic Algorithm process will modifiy the parameter values inside the rules,
+according to the range inserted.</para>
+</chapter>
+
 </chapter>
 </document>

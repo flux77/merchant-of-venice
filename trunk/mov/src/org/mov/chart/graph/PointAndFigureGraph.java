@@ -184,14 +184,16 @@ public class PointAndFigureGraph extends AbstractGraph {
 		*/
 
 		diff = Math.abs(diff) - boxPriceScale;
-		int counter = 1;		
-		while (diff  >= 0.0) {		    
-		    double tmp = (upmove) ? values[i] - (boxPriceScale * counter) : values[i] + (boxPriceScale * counter);
-
-		    Double yTemp = new Double(tmp);
-		    yList.add(yTemp);
-		    diff = Math.abs(diff) - boxPriceScale;
-		    counter++;		
+		int counter = 1;	
+		if (prev != 0.0) {
+		    while (diff  >= 0.0) {		    
+			double tmp = (upmove) ? values[i] - (boxPriceScale * counter) : values[i] + (boxPriceScale * counter);
+			
+			Double yTemp = new Double(tmp);
+			yList.add(yTemp);
+			diff = Math.abs(diff) - boxPriceScale;
+			counter++;		
+		    }
 		}
 
 		Double yTemp = new Double(values[i]);
@@ -293,7 +295,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 	    
 	    diff = (i <= 1)  ? 0 : (values[i] - prev);
 	    
-	    if (diff >= boxValue) {
+	    if (Math.abs(diff) >= boxValue) {
 		prev = values[i];
 	    }
 	    

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.util;
@@ -68,7 +68,7 @@ public class Converter {
 	return string;
     }
 
-    /** 
+    /**
      * Convert a start and end date to a vector of all the trading
      * dates inbetween which do not fall on weekends.
      *
@@ -78,8 +78,10 @@ public class Converter {
      */
     public static Vector dateRangeToTradingDateVector(TradingDate startDate,
 						      TradingDate endDate) {
-	Vector dates = new Vector();
+        assert(startDate != null && endDate != null &&
+               startDate.compareTo(endDate) <= 0);
 
+	Vector dates = new Vector();
 	TradingDate date = (TradingDate)startDate.clone();
 
 	while(!date.after(endDate)) {
@@ -90,7 +92,7 @@ public class Converter {
 	return dates;
     }
 
-    /** 
+    /**
      * Convert a string containing a list of symbols separated by spaces
      * or commas into a sorted set with duplicates removed.
      *

@@ -66,6 +66,9 @@ public class Main extends JFrame {
 
     // Go!
     private Main() {
+        // Set the preferred language if any is defined as preferred,
+        // otherwise setLocale gets the current language from the system.
+        Locale.setLocale();
         // Display a brief copyright message
         String title = (Locale.getString("VENICE_LONG") + ", " + LONG_VERSION + " / " +
 			RELEASE_DATE);

@@ -109,7 +109,7 @@ public class Transaction implements Cloneable, Comparable {
      *
      * @param	date	date the transaction took place
      * @param	amount	the amount withdrawn
-     * @param	cashAccount	cash account 
+     * @param	account	cash account 
      */
     public static Transaction newWithdrawal(TradingDate date, 
 					    float amount,
@@ -124,7 +124,7 @@ public class Transaction implements Cloneable, Comparable {
      *
      * @param	date	date the transaction took place
      * @param	amount	the amount deposited
-     * @param	cashAccount	cash account 
+     * @param	account	cash account 
      */
     public static Transaction newDeposit(TradingDate date, 
 					 float amount,
@@ -139,7 +139,7 @@ public class Transaction implements Cloneable, Comparable {
      *
      * @param	date	date the transaction took place
      * @param	amount	the amount deposited
-     * @param	cashAccount	cash account 
+     * @param	account	cash account 
      */
     public static Transaction newInterest(TradingDate date, 
 					  float amount,
@@ -154,7 +154,7 @@ public class Transaction implements Cloneable, Comparable {
      *
      * @param	date	date the transaction took place
      * @param	amount	the amount withdrawn
-     * @param	cashAccount	cash account 
+     * @param	account	cash account 
      */
     public static Transaction newFee(TradingDate date, 
 				     float amount,
@@ -237,7 +237,6 @@ public class Transaction implements Cloneable, Comparable {
      * @param	symbol	the stock paying the dividend
      * @param	shares	the number of shares gained
      * @param	shareAccount	share account 
-     * @param	cashAccount	cash account 
      */
     public static Transaction newDividendDRP(TradingDate date, 
 					     float amount,
@@ -472,7 +471,7 @@ public class Transaction implements Cloneable, Comparable {
     /**
      * Set the associated cash account. 
      *
-     * @param	new cash account
+     * @param	cashAccount the new cash account
      * @see	CashAccount
      */
     public void setCashAccount(CashAccount cashAccount) {
@@ -482,7 +481,7 @@ public class Transaction implements Cloneable, Comparable {
     /**
      * Set the secondary associated cash account. 
      *
-     * @param	new cash account
+     * @param	cashAccount2 the new secondary cash account
      * @see	CashAccount
      */
     public void setCashAccount2(CashAccount cashAccount2) {
@@ -492,7 +491,7 @@ public class Transaction implements Cloneable, Comparable {
     /**
      * Set the associated share account.
      *
-     * @param	new share account
+     * @param	shareAccount the new share account
      * @see	ShareAccount
      */
     public void setShareAccount(ShareAccount shareAccount) {

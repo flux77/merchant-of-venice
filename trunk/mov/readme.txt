@@ -1,4 +1,4 @@
-Merchant of Venice, 0.1 alpha *pre-release* / 13/Jan/2003
+Merchant of Venice, 0.1 alpha *pre-release* / 07/Feb/2003
 =========================================================
 
 Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
@@ -26,7 +26,7 @@ To run Venice you will need the following packages, available from the
 following locations:
 
    Java J2SE 1.4 or higher
-        http://java.sun.com/j2se/1.4/download.html
+        http://java.sun.com/j2se/1.4.1/download.html
    Java Look & Feel Graphics Repository
         http://developer.java.sun.com/developer/techDocs/hi/repository/
 
@@ -36,7 +36,8 @@ The following packages are optional:
         http://www.mysql.com
    MySQL Java Driver
         http://sourceforge.net/projects/mmmysql
-
+     OR http://www.mysql.com/downloads/api-jdbc-stable.html
+ 
    Venice allows you to access stock quotes through a MySQL database or
    directly from text files. Reading from text files is easy to set up,
    but the database is much faster.
@@ -44,8 +45,8 @@ The following packages are optional:
    Java Skin Look & Feel
         http://www.l2fprod.com/download.php
 
-   This package allows Venice to look closer to a Windows XP or MacOS X
-   application.
+   This package allows Venice to look more closely like a native
+   Windows XP or MacOS X application.
 
 Once they are set up, you can run Venice by typing from the command prompt:
 

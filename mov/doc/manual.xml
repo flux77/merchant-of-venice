@@ -1088,6 +1088,16 @@ case Venice works out the maximum number of stocks.</para>
 </item>
 </list>
 </section>
+<section name="The Trade Value Page">
+<para>The trade value page defines the strategy used to buy or sell the stocks. You
+need to enter an <highlight>equation for buying</highlight> and <highlight>another for selling</highlight>;
+if you prefer you can use the suggested equations instead, you can do that selecting one of the equations in the combo box.
+The equation gives to the system the value at which you buy or sell the stock the next day.
+The rules, in the Rules Page section, give you if you buy or sell the stock the next day,
+while the equations, in the Trade Value Page section, give you the fixed price at which you wish to buy or sell the stock the next day.
+So for example if you put 'open', you will buy or sell the stocks at open price the next day;
+if you put 'lag(open,-1)', you will buy or sell the stocks at a price equal to the open price of the day before and only if this price will be reached by the stock during the next day.</para>
+</section>
 </chapter>
 
 <chapter name="Genetic Programming">
@@ -1137,12 +1147,13 @@ come up with any principles that can be generally applied.</para>
 <para>This is the same as the portfolio page in the <link to="Paper Trade">Paper Trade Module</link>.</para>
 </section>
 
-<section name="The GP Page">
-<para>The Genetic Programme (GP) page defines the Genetic Programme settings.
-Inside the page there are two selectable tabbed panes.
-The former is the GP parameters page, the latter is the initial population page.</para>
+<section name="The Trade Value Page">
+<para>This is the same as the trade value page in the <link to="Paper Trade">Paper Trade Module</link>.</para>
+</section>
 
-<para>In the GP parameters page you can set the number of <highlight>Generations</highlight>
+<section name="The GP Parameters Page">
+<para>The genetic programming (GP) parameters page defines the Genetic Programme settings.
+You can set the number of <highlight>Generations</highlight>
 to run; you can set the <highlight>Population</highlight> size; you can set
 the <highlight>Breeding Population</highlight>, and you can set
 the <highlight>Display Population</highlight>. The display population is
@@ -1160,6 +1171,7 @@ generation has completed.</para>
 </list>
 </section>
 
+<section name="The Initial Population Page">
 <para>In the initial population page you can set many buy/sell rules as you wish.
 For each of them you need to specify the percentage that it will be used to generate
 the first population of GP algorithm.
@@ -1186,6 +1198,7 @@ equal to <highlight>Number of Mutations</highlight>;
 then if the individual is not fine for breeding,
 other mutations will be done until it is.
 </para>
+</section>
 
 <section name="The GP Language Page">
 <para>The Genetic Programme (GP) Language page defines the Gondola settings.

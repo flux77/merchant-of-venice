@@ -10,6 +10,7 @@ import com.l2fprod.gui.plaf.skin.CompoundSkin;
 import com.l2fprod.gui.plaf.skin.SkinLookAndFeel;
 import com.l2fprod.util.*;
 
+import org.mov.main.Main;
 
 /**
  * This class is responsible for the loading of UI skins 
@@ -28,7 +29,26 @@ public class SkinManager {
 	    String skin_type = p.get("skin_type", "none");
 	    Skin skin = null;
 	    
-	    if (skin_type.equals("pack")) {
+	    if (skin_type.equals("system")) {
+		String landf = null;
+		String system_skin = p.get("system_skin", "default");
+		if (system_skin.equals("default"))
+		    landf = UIManager.getSystemLookAndFeelClassName();
+		else if (system_skin.equals("metal"))
+		    landf = UIManager.getCrossPlatformLookAndFeelClassName();
+		else if (system_skin.equals("mac"))
+		    landf = "javax.swing.plaf.mac.MacLookAndFeel";
+		else if (system_skin.equals("solaris"))
+		    landf = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+		else if (system_skin.equals("win32"))
+		    landf = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+		try {
+		    UIManager.setLookAndFeel(landf);
+		    SwingUtilities.updateComponentTreeUI(Main.getApplicationFrame());
+		} catch (Exception ex) {
+		    DesktopManager.showErrorMessage("Unable to load the skin "+landf);
+		}
+	    } else if (skin_type.equals("pack")) {
 		URL pack_URL = null;
 		try {	
 		    pack_URL = new URL(p.get("pack_file", ""));
@@ -72,8 +92,8 @@ public class SkinManager {
 	    }
 	    if (skin_loaded == true) {
 		SkinLookAndFeel.setSkin(skin);
-		UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 		UIManager.setLookAndFeel("com.l2fprod.gui.plaf.skin.SkinLookAndFeel");
+		SwingUtilities.updateComponentTreeUI(Main.getApplicationFrame());
 	    } else
 		System.out.println("No skin loaded");
 	    

@@ -49,7 +49,7 @@ public class DesktopManager
     public static void showErrorMessage(String message) {
 	JOptionPane.showInternalMessageDialog(desktop_instance,
 					      message, 
-					      message,
+					      "Venice problem!",
 					      JOptionPane.ERROR_MESSAGE);
     }
 

@@ -23,10 +23,11 @@ public class SkinPage extends JPanel
 
     private JDesktopPane desktop;
 
-    private JRadioButton no_skintype;
+    private JRadioButton system_skintype;
     private JRadioButton pack_skintype;
     private JRadioButton x11_skintype;
 
+    private JComboBox  system_skin_combo;
     private JTextField pack_file_text;
     private JTextField x11_file_1_text;
     private JTextField x11_file_2_text;
@@ -36,6 +37,7 @@ public class SkinPage extends JPanel
     private JButton x11_browse_2_button;
 
     private String skin_type;
+    private String system_skin;
     private String pack_file;
     private String x11_file_1;
     private String x11_file_2;
@@ -58,31 +60,76 @@ public class SkinPage extends JPanel
 	skin_type = p.get("skin_type", "none");
 
 	ButtonGroup group = new ButtonGroup();
-	group.add(no_skintype = new JRadioButton("None", 
-						 skin_type.equals("none") ? true : false));
+	group.add(system_skintype = new JRadioButton("Inbuilt Swing skin", 
+						   skin_type.equals("system") ? true : false));
 	group.add(pack_skintype = new JRadioButton("Skin theme pack (see www.l2fprod.com)", 
 						   skin_type.equals("pack") ? true : false));
-	group.add(x11_skintype = new JRadioButton("KDE or GTK theme",
+	group.add(x11_skintype = new JRadioButton("KDE or GTK theme skin",
 						  skin_type.equals("x11") ? true: false));
 	
-	no_skintype.addActionListener(this);
+	system_skintype.addActionListener(this);
 	pack_skintype.addActionListener(this);
 	x11_skintype.addActionListener(this);
 
 	TitledBorder titled = new TitledBorder("Skins Preferences");
 	this.setBorder(titled);
 
-	// No skins
-	big_c.gridx = 0;
-	big_c.gridy = 0;
-	big_c.gridwidth = GridBagConstraints.REMAINDER;
-	big_c.anchor = GridBagConstraints.NORTHWEST;
-	big_c.fill = GridBagConstraints.BOTH;
-	add(no_skintype, big_c);
+	// System skin
+	JPanel system_panel;
+	big_c.gridy++;
+	add(system_panel = new JPanel(),big_c);
+
+	gb = new GridBagLayout();
+	c = new GridBagConstraints();
+	system_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+	system_panel.setLayout(gb);
+	    
+	c.weightx = 1.0;
+	c.ipadx = 5;
+	c.anchor = GridBagConstraints.WEST;
+	c.gridx = 0;
+	c.gridy = 0;
+	c.gridwidth = 3;
+
+	system_panel.add(system_skintype, c);
+
+	c.gridy = 1;
+	c.gridwidth = 1;
+	system_panel.add(new JLabel("Skin"), c);
+	
+	c.gridx = 1;
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	system_skin = p.get("system_skin", "default");
+	
+	String[] skin_list = {"(Operating system default)",
+			      "Java Metal",
+			      "MacOS 9",
+			      "Solaris",
+			      "Windows 98/2000"};
+
+	system_panel.add(system_skin_combo = new JComboBox(skin_list), c);
+	if (system_skin.equals("default"))
+	    system_skin_combo.setSelectedIndex(0);
+	else if (system_skin.equals("metal"))
+	    system_skin_combo.setSelectedIndex(1);
+	else if (system_skin.equals("mac"))
+	    system_skin_combo.setSelectedIndex(2);
+	else if (system_skin.equals("solaris"))
+	    system_skin_combo.setSelectedIndex(3);
+	else if (system_skin.equals("win32"))
+	    system_skin_combo.setSelectedIndex(4);
+
+	system_skin_combo.addActionListener(this);
+
+	if (skin_type.equals("system"))
+	    system_skin_combo.setEnabled(true);
+	else
+	    system_skin_combo.setEnabled(false);
+
 
 	// Theme Pack
 	JPanel pack_panel;
-	big_c.gridy = 1;
+	big_c.gridy++;
 	add(pack_panel = new JPanel(),big_c);
 
 	gb = new GridBagLayout();
@@ -112,9 +159,17 @@ public class SkinPage extends JPanel
 	pack_panel.add(pack_browse_button = new JButton("Browse..."),c);
 	pack_browse_button.addActionListener(this);
 	
+	if (skin_type.equals("pack")) {
+	    pack_file_text.setEnabled(true);
+	    pack_browse_button.setEnabled(true);
+	} else {
+	    pack_file_text.setEnabled(false);
+	    pack_browse_button.setEnabled(false);
+	}
+
 	// X11 Themes
 	JPanel x11_panel;
-	big_c.gridy = 2;
+	big_c.gridy++;
 	add(x11_panel = new JPanel(),big_c);
 
 	gb = new GridBagLayout();
@@ -122,7 +177,6 @@ public class SkinPage extends JPanel
 	x11_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 	x11_panel.setLayout(gb);
 	    
-	//	c2.weightx = 1.0;
 	c2.ipadx = 5;
 	c2.anchor = GridBagConstraints.WEST;
 	c2.gridx = 0;
@@ -153,11 +207,22 @@ public class SkinPage extends JPanel
 	x11_file_2 = p.get("x11_file_2", "");
 	x11_panel.add(x11_file_2_text = new JTextField(x11_file_2,15), c2);
 
-	
        	c2.gridy = 4;
 	c2.gridwidth = 1;
 	x11_panel.add(x11_browse_2_button = new JButton("Browse..."), c2);
 	x11_browse_2_button.addActionListener(this);
+
+	if (skin_type.equals("x11")) {
+	    x11_file_1_text.setEnabled(true);
+	    x11_browse_1_button.setEnabled(true);
+	    x11_file_2_text.setEnabled(true);
+	    x11_browse_2_button.setEnabled(true);
+	} else {
+	    x11_file_1_text.setEnabled(false);
+	    x11_browse_1_button.setEnabled(false);
+	    x11_file_2_text.setEnabled(false);
+	    x11_browse_2_button.setEnabled(false);
+	}
 	
     }
 
@@ -165,8 +230,28 @@ public class SkinPage extends JPanel
      *  This is called when one of the buttons is pressed
      */
     public void actionPerformed(ActionEvent e) {
-	
-	if(e.getSource() == pack_browse_button ||
+	if (e.getSource() == system_skin_combo) {
+	    switch(system_skin_combo.getSelectedIndex()) {
+	    case 0:
+		system_skin = "default";
+		break;
+	    case 1:
+		system_skin = "metal";
+		break;
+	    case 2:
+		system_skin = "mac";
+		break;
+	    case 3:
+		system_skin = "solaris";
+		break;
+	    case 4:
+		system_skin = "win32";
+		break;
+	    default:
+		break;
+	    }
+	}
+	else if(e.getSource() == pack_browse_button ||
 	   e.getSource() == x11_browse_1_button ||
 	   e.getSource() == x11_browse_2_button) {
 
@@ -196,13 +281,38 @@ public class SkinPage extends JPanel
 	    }
 	    
 	    
-	} else if (e.getSource() == no_skintype)
-	    skin_type = "none";
+	} 
+	else if (e.getSource() == system_skintype)
+	    skin_type = "system";
 	else if (e.getSource() == pack_skintype)
 	    skin_type = "pack";
 	else if (e.getSource() == x11_skintype)
 	    skin_type = "x11";
 	    
+	if (skin_type.equals("system"))
+	    system_skin_combo.setEnabled(true);
+	else
+	    system_skin_combo.setEnabled(false);
+
+	if (skin_type.equals("pack")) {
+	    pack_file_text.setEnabled(true);
+	    pack_browse_button.setEnabled(true);
+	} else {
+	    pack_file_text.setEnabled(false);
+	    pack_browse_button.setEnabled(false);
+	}
+
+	if (skin_type.equals("x11")) {
+	    x11_file_1_text.setEnabled(true);
+	    x11_browse_1_button.setEnabled(true);
+	    x11_file_2_text.setEnabled(true);
+	    x11_browse_2_button.setEnabled(true);
+	} else {
+	    x11_file_1_text.setEnabled(false);
+	    x11_browse_1_button.setEnabled(false);
+	    x11_file_2_text.setEnabled(false);
+	    x11_browse_2_button.setEnabled(false);
+	}
 
     }
 
@@ -230,7 +340,7 @@ public class SkinPage extends JPanel
      * @return	the window title.
      */
     public String getTitle() {
-	return "Quote Source Preferences";
+	return "Skins Preferences";
     }
 
     /**
@@ -241,6 +351,7 @@ public class SkinPage extends JPanel
 	Preferences p = 
 	    Preferences.userRoot().node("/display/skin");
 	p.put("skin_type", skin_type);
+	p.put("system_skin", system_skin);
 	p.put("pack_file", pack_file);
 	p.put("x11_file_1", x11_file_1);
 	p.put("x11_file_2", x11_file_2);

@@ -35,6 +35,9 @@ public class PaperTradeModule extends JPanel implements Module,
     private JButton tradeButton;
     private JButton closeButton;
 
+    // Single result table for entire application
+    private static ModuleFrame resultsFrame = null;
+
     /**
      * Create a new paper trade module.
      *
@@ -452,9 +455,23 @@ public class PaperTradeModule extends JPanel implements Module,
 
 	    if (!Thread.currentThread().interrupted()) {
 		ProgressDialogManager.closeProgressDialog();
-		CommandManager.getInstance().graphPortfolio(portfolio,
-							    fromDate,
-							    toDate);
+
+		// Dispaly results table if its not already up (or if it
+		// was closed we need to create a new one)
+		if(resultsFrame == null || resultsFrame.isClosed()) {
+		    resultsFrame = 
+			CommandManager.getInstance().newPaperTradeResultTable();
+		}
+
+		// Send result to result table for display
+		PaperTradeResultModule resultsModule = 
+		    (PaperTradeResultModule)resultsFrame.getModule();
+
+		resultsModule.addResult(portfolio, cache, initialCapital,
+					tradeCost,
+					buyRule.toString(), 
+					sellRule.toString(), 
+					fromDate, toDate);
 	    }
 
 	} catch (Exception e) {

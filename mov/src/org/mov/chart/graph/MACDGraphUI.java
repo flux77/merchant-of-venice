@@ -58,7 +58,7 @@ public class MACDGraphUI implements GraphUI {
     // Default values from Technical Analysis Explained by Gerald Appel.
     private final static String DEFAULT_AVERAGE = EMA;
     private final static int DEFAULT_PERIOD_FIRST_AVERAGE = 26;
-    private final static int DEFAULT_PERIOD_SECOND_AVERAGE = 13;
+    private final static int DEFAULT_PERIOD_SECOND_AVERAGE = 12;
     private final static double DEFAULT_SMOOTHING_CONSTANT = 0.1;
 
     // The graph's user interface

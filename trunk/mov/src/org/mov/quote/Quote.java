@@ -53,10 +53,23 @@ public class Quote {
 	    Preferences p = Preferences.userRoot().node("/quote_source");
 	    String quoteSource = p.get("source", "database");
 
-	    if(quoteSource.equals("files"))
-		sourceInstance = new FileQuoteSource();
-	    else
+	    if(quoteSource.equals("files")) {
+		// Get file format from preferences
+		p = Preferences.userRoot().node("/quote_source/files");
+
+		sourceInstance = 
+		    new FileQuoteSource(p.get("format", "MetaStock"),
+					p.get("list", "").split(", "));
+	    }
+	    else if(quoteSource.equals("database"))
 		sourceInstance = new DatabaseQuoteSource();
+	    else {
+		// Get username and password from preferences
+		p = Preferences.userRoot().node("/quote_source/internet");
+
+		sourceInstance = new SanfordQuoteSource(p.get("username", ""),
+							p.get("password", ""));
+	    }
 	}
 
 	return sourceInstance;

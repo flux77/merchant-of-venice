@@ -373,6 +373,17 @@ public class SanfordQuoteSource implements QuoteSource {
 
 	return match;
     }
+
+    /** 
+     * Return all the dates which we have quotes for.
+     *
+     * @return	a vector of dates
+     */
+    public Vector getDates() {
+	// not implemented yet
+	return null;
+    }
+
 }
 
 

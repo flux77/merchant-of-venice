@@ -20,9 +20,10 @@ package org.mov.parser.expression;
 
 import java.text.NumberFormat;
 
-import org.mov.util.*;
-import org.mov.parser.*;
-import org.mov.quote.*;
+import org.mov.parser.Expression;
+import org.mov.parser.Variables;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.Symbol;
 
 /**
  * A representation of a value.

@@ -56,6 +56,9 @@ public interface Expression extends Cloneable {
     /** Represents a stock integer quote <b>type</b>: volume */
     public static final int INTEGER_QUOTE_TYPE = 4;
 
+    /** Represents a string type that can containy any string. */
+    public static final int STRING_TYPE = 5;
+
     /** Threshold level where a number is registered as <code>TRUE</code> */
     public final static double TRUE_LEVEL = 0.1D;
 

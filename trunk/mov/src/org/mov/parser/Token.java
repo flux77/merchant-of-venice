@@ -178,14 +178,20 @@ public class Token {
     /** Represents "<code>while</code>" symbol */
     public static final int WHILE_TOKEN = 49;
 
+    /** Represents "<code>corr()</code>" symbol */
+    public static final int CORR_TOKEN = 50;
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 50;
+    private static final int FIXED_LENGTH_TOKENS = 51;
 
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;       
 
     /** Represents a variable */
     public static final int VARIABLE_TOKEN = 101;       
+
+    /** Represents a string */
+    public static final int STRING_TOKEN = 102;
     
     // Token type (e.g. PERCENT_TOKEN, FULLSTOP_TOKEN etc)
     private int type;
@@ -198,6 +204,9 @@ public class Token {
 
     // For NUMBER_TOKEN - the value's type
     private int valueType;
+
+    // For STRING_TOKEN - the value's string
+    private String stringValue;
     
     /**
      * Perform lexical analysis on the given string. Extract the first
@@ -267,6 +276,7 @@ public class Token {
 	tokenStrings[SEMICOLON_TOKEN]          = ";";
 	tokenStrings[FOR_TOKEN]                = "for";
 	tokenStrings[WHILE_TOKEN]              = "while";
+	tokenStrings[CORR_TOKEN]               = "corr";
 
 	boolean matched = false;
 
@@ -300,9 +310,26 @@ public class Token {
 	    token.setType(Token.NUMBER_TOKEN);
 	    token.setValue(value);
             token.setValueType(valueType);
-
 	    matched = true;
 	}
+
+        // Is it a string?
+        else if(string.charAt(0) == '\"') {
+            int closingQuote = string.indexOf('\"', 1);
+            
+            if(closingQuote >= 0) {
+                String quote = string.substring(1, closingQuote);
+                string = string.substring(closingQuote + 1);
+
+                token.setType(Token.STRING_TOKEN);
+                token.setStringValue(quote);
+                matched = true;
+            }
+
+            // Missing trailing quote
+            else
+                throw new ParserException(Locale.getString("MISSING_CLOSING_QUOTE"));
+        }
 
         // Is it a keyword or variable?
 	else if(Character.isLetter(string.charAt(0))) {
@@ -405,6 +432,16 @@ public class Token {
     }
 
     /**
+     * For string tokens, get the value.
+     *
+     * @return	the value.
+     */
+    public String getStringValue() {
+        assert getType() == STRING_TOKEN;
+	return stringValue;
+    }
+
+    /**
      * For variable token, get the name.
      *
      * @return the name.
@@ -447,5 +484,11 @@ public class Token {
     private void setValue(double value) {
         assert getType() == NUMBER_TOKEN;
 	this.value = value;
+    }
+
+    // For string tokens, set the value.
+    private void setStringValue(String stringValue) {
+        assert getType() == STRING_TOKEN;
+	this.stringValue = stringValue;
     }
 }

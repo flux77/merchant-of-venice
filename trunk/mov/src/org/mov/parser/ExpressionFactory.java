@@ -185,6 +185,9 @@ public class ExpressionFactory {
 	case(Token.NUMBER_TOKEN):
 	    expression = new NumberExpression(token.getValue(), token.getValueType());
 	    break;
+        case(Token.STRING_TOKEN):
+            expression = new StringExpression(token.getStringValue());
+            break;
 	case(Token.DAY_OF_WEEK_TOKEN):
 	    expression = new DayOfWeekExpression();
 	    break;
@@ -214,6 +217,9 @@ public class ExpressionFactory {
             break;
         case(Token.WHILE_TOKEN):
             expression = new WhileExpression(arg1, arg2);
+            break;
+        case(Token.CORR_TOKEN):
+            expression = new CorrExpression(arg1, arg2, arg3, arg4);
             break;
         default:
             // No such token

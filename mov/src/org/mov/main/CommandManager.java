@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
+import org.mov.analyser.*;
 import org.mov.chart.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
@@ -245,6 +246,16 @@ public class CommandManager {
     }
 
     /**
+     * Open up a new paper trade module. 
+     */
+    public void paperTrade() {
+
+	PaperTradeModule paperTrade = new PaperTradeModule(desktop_instance);
+
+	((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(paperTrade, true, true);
+    }
+
+    /**
      * Open up a dialog to create and then display a new portfolio.
      */
     public void newPortfolio() {
@@ -272,7 +283,6 @@ public class CommandManager {
      * @param	portfolio	the portfolio to graph
      */
     public void graphPortfolio(Portfolio portfolio) {
-
 	// Can only graph if portfolio has at least one transaction
 	if(portfolio.getTransactions().size() == 0) {
 	    JOptionPane.showInternalMessageDialog(desktop_instance,
@@ -308,7 +318,12 @@ public class CommandManager {
 		endDate = QuoteSourceManager.getSource().getLatestQuoteDate();
 		
 		Vector symbols = portfolio.getSymbolsTraded();
-		cache = new QuoteCache(symbols, startDate, endDate);
+
+		// Only need to load from cache if there are any stocks
+		// in the portfolio
+		if(symbols.size() > 0) {
+		    cache = new QuoteCache(symbols, startDate, endDate);
+		}
 	    }
 
             if (!thread.isInterrupted()) {

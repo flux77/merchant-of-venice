@@ -127,7 +127,7 @@ public class TradingDate implements Cloneable, Comparable {
      * Tests if this date is before the specified date.
      *
      * @param	the specified date to compare
-     * @return	<pre>true</pre> if the given date is before this one
+     * @return	<code>true</code> if the given date is before this one
      */
     public boolean before(Object date) {
 	if(compareTo(date) > 0)
@@ -140,8 +140,8 @@ public class TradingDate implements Cloneable, Comparable {
      * Tests if this date is after the specified date.
      *
      * @param	the specified date to compare
-     * @return	<pre>true</pre> if the specified date is before this one; 
-     * <pre>false</pre> otherwise.
+     * @return	<code>true</code> if the specified date is before this one; 
+     *		<code>false</code> otherwise.
      */
     public boolean after(Object date) {
 	if(compareTo(date) > 0)
@@ -154,8 +154,8 @@ public class TradingDate implements Cloneable, Comparable {
      * Compares this date with the specified object.
      *
      * @param	the specified date to compare
-     * @return	<pre>true</pre> if the specified date is equal; 
-     * <pre>false</pre> otherwise.
+     * @return	<code>true</code> if the specified date is equal; 
+     * <code>false</code> otherwise.
      */
     public boolean equals(Object date) {
 	if(compareTo(date) == 0)
@@ -245,9 +245,9 @@ public class TradingDate implements Cloneable, Comparable {
      * Compare the current date to the specified date.
      *
      * @param	date	the date to compare
-     * @return the value <pre>0</pre> if the dates are equal;
-     * <pre>1</pre> if this date is after the specified date or
-     * <pre>-1</pre> if this date is before the specified date.
+     * @return the value <code>0</code> if the dates are equal;
+     * <code>1</code> if this date is after the specified date or
+     * <code>-1</code> if this date is before the specified date.
      */
     public int compareTo(TradingDate date) {
 	if(getYear() < date.getYear())
@@ -364,7 +364,7 @@ public class TradingDate implements Cloneable, Comparable {
     /**
      * Convert this object to a java.util.Date.
      *
-     * @return	<pre>java.util.Date</pre>
+     * @return	<code>java.util.Date</code>
      */
     public Date toDate() {
 	return this.toCalendar().getTime();
@@ -373,7 +373,7 @@ public class TradingDate implements Cloneable, Comparable {
     /**
      * Convert this object to a java.util.Calendar.
      *
-     * @return	<pre>java.util.Calendar</pre>
+     * @return	<code>java.util.Calendar</code>
      */
     public Calendar toCalendar() {
 	// Convert from our month of 1-12 to theirs of 0-11

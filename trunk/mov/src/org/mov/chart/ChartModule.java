@@ -220,26 +220,25 @@ public class ChartModule extends JPanel implements Module,
     private void addMenu(JMenu menu) {
 
 	int menus = menuBar.getMenuCount();
+	boolean menuBarInserted = false;
 
 	for(int i = 1; i < menus; i++) {
 	    JMenu currentMenu = menuBar.getMenu(i);
 	    // Should it go before this menu item? If so insert
 	    if(menu.getText().compareTo(currentMenu.getText()) <= 0) {
 		menuBar.add(menu, i); 
-		return;
+		menuBarInserted = true;
+		break;
 	    }
 	}
 
-	// If its after all the above then append
-	menuBar.add(menu);	    
+	// If we haven't inserted the menu bar yet then append it
+	if(menuBarInserted == false)
+	    menuBar.add(menu);	    
 
 	// Send signal that our frame name has changed
-
-	//	System.out.println("title changed!");
-	//propertySupport.
-	//   firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1); 
-	//propertySupport.
-	//    firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
+	propertySupport.
+	    firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1); 
     }
 
     /**
@@ -290,21 +289,60 @@ public class ChartModule extends JPanel implements Module,
 	    if (!thread.isInterrupted())
 		graph = new LineGraph(dayClose);
 	    
-	    if (!thread.isInterrupted())
-		add(graph, cache, 0);
-
 	    if (!thread.isInterrupted()) {
-		redraw();		  
 
-		// For some reason I have to validate from the
-		// top level??
-		getTopLevelAncestor().validate();
-		getTopLevelAncestor().repaint();
+		final Graph finalGraph = graph;
+		final QuoteCache finalCache = cache;
+
+		// Invokes on dispatch thread
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+		    
+			    add(finalGraph, finalCache, 0);
+
+			    // This makes sure the menu updates OK
+			    getTopLevelAncestor().validate();
+			    getTopLevelAncestor().repaint();
+
+			    redraw();		  
+
+			    // Only way I can seem to get the scrollpane
+			    // to handle if the viewport size has changed!
+			    scrollPane.setViewportView(chart);
+			}});
 	    }
 	}
 
 	if (!thread.isInterrupted())
 	    ProgressDialogManager.closeProgressDialog();
+    }
+
+    /**
+     * Return if we graphing the given symbol/portfolio.
+     *
+     * @param	name	Name of symbol/portfolio
+     * @return	whether we are graphing the symbol/portfolio or not
+     */
+    public boolean isGraphing(String name) {
+	Vector levels = chart.getLevels();
+	Iterator levelsIterator = levels.iterator();
+
+	name = name.toUpperCase();
+
+	while(levelsIterator.hasNext()) {
+	    Vector graphs = (Vector)levelsIterator.next();
+	    Iterator graphIterator = graphs.iterator();
+
+	    while(graphIterator.hasNext()) {
+		Graph graph = (Graph)graphIterator.next();
+
+		if(name.equals(graph.getName()))
+		    return true;
+	    }
+	}
+
+	// If we got here it wasnt found
+	return false;
     }
 
     /**
@@ -372,29 +410,50 @@ public class ChartModule extends JPanel implements Module,
      * Remove all graphs with the given symbol from the chart. Or will
      * do when its implemented.
      *
-     * @param symbol	The symbol of the graphs to remove
+     * @param name	The name of the graphs to remove
      */
-    public void removeAll(String symbol) {
+    public void removeAll(String name) {
+      
+	// Construct vector of all graphs with the given name, then
+	// remove them one by one
+	Vector graphsToRemove = new Vector();
 
-	/*
-	// Remove graph
-	chart.remove(graph);
+	Vector levels = chart.getLevels();
+	Iterator levelsIterator = levels.iterator();
+
+	while(levelsIterator.hasNext()) {
+	    Vector graphs = (Vector)levelsIterator.next();
+	    Iterator graphIterator = graphs.iterator();
+
+	    while(graphIterator.hasNext()) {
+		Graph graph = (Graph)graphIterator.next();
+
+		if(name.equals(graph.getName()))
+		    graphsToRemove.add(graph);
+	    }
+	}
+
+	Iterator graphToRemoveIterator = graphsToRemove.iterator();
+	while(graphToRemoveIterator.hasNext()) {
+	    chart.remove((Graph)graphToRemoveIterator.next());
+	}
 
 	// Remove from menu bar
-	Iterator iterator = menus.iterator();
-	Menu menu;
+	int menus = menuBar.getMenuCount();
+	
+	for(int i = 1; i < menus; i++) {
+	    JMenu currentMenu = menuBar.getMenu(i);
 
-	while(iterator.hasNext()) {
-	    menu = (Menu)iterator.next();
-
-	    if(menu.getSymbol().equals(graph.getSource().getSymbol())) {
-		menuBar.remove(menu);
+	    // Is this the menu to remove?
+	    if(name.equals(currentMenu.getText())) {
+		menuBar.remove(currentMenu);
 		break;
-	    }		
+	    }
 	}
-	*/
 
-	redraw();
+	// Send signal that our frame name has changed
+	propertySupport.
+	    firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1); 
     }
 
     /** 
@@ -505,8 +564,23 @@ public class ChartModule extends JPanel implements Module,
 			SortedSet symbols = 
 			    CommodityListQuery.getCommoditiesByCode(desktop, "Add Graph");
 			// Did the user select anything?
-			if(symbols != null) 
-			    add(symbols);
+			if(symbols != null) {
+
+			    // Remove any symbols that we are already
+			    // displaying
+			    SortedSet newSymbols = new TreeSet();
+
+			    Iterator iterator = symbols.iterator();
+			    while(iterator.hasNext()) {
+				String symbol = (String)iterator.next();
+
+				if(!isGraphing(symbol)) 
+				    newSymbols.add(symbol);
+			    }
+
+			    if(newSymbols.size() > 0)
+				add(newSymbols);
+			}
 		    }
 		};
 	    

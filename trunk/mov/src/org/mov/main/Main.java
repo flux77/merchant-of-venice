@@ -150,7 +150,12 @@ public class Main extends JFrame {
         }
         venice = new Main();
         venice.setVisible(true);
-        MacroManager.executeStartupMacros();
+        try {
+            MacroManager.executeStartupMacros();
+
+        } catch (java.lang.NoClassDefFoundError err) {
+            System.out.println("Jython library not found, no macros executed");
+        }
     }
 }
 

@@ -183,7 +183,7 @@ public class PaperTrade {
             // If the wished price is lower than the maximum of the day,
             // your stocks will be sold.
             // It simulates an order of selling at fixed price (sellPrice).
-            if (sellPrice<environment.quoteBundle.getQuote(symbol, Quote.DAY_HIGH, day)) {
+            if (sellPrice<=environment.quoteBundle.getQuote(symbol, Quote.DAY_HIGH, day)) {
                 Money amount =
                     new Money(shares * sellPrice);
                 TradingDate date = environment.quoteBundle.offsetToDate(day);
@@ -222,7 +222,7 @@ public class PaperTrade {
         // If the wished price is greater than the minimum of the day,
         // your stocks will be bought.
         // It simulates an order of buying at fixed price (buyPrice).
-        if (buyPrice>environment.quoteBundle.getQuote(symbol, Quote.DAY_LOW, day)) {
+        if (buyPrice>=environment.quoteBundle.getQuote(symbol, Quote.DAY_LOW, day)) {
 	
             // Calculate maximum number of shares we can buy with the given amount
             double sharePrice = buyPrice;

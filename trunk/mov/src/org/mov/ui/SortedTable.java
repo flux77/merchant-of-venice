@@ -18,16 +18,29 @@
 
 package org.mov.ui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.lang.*;
-import java.lang.reflect.*;
-import java.net.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.net.URL;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.TreeSet;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 /**
  * Table that allows the user to sort by column by clicking on the column's
@@ -37,11 +50,15 @@ import javax.swing.table.*;
  * @author	Andrew Leppard
  */
 
-public class SortedTable extends JTable implements MouseListener
+public class SortedTable extends JTable 
 {
-    // Column sort order
+    /** Row is not sorted */
     public final static int DONT_SORT = 0;
+
+    /** Row is sorted in ascending order */
     public final static int SORT_UP = 1;
+
+    /** Row is sorted in descending order */
     public final static int SORT_DOWN = 2;
 
     // Column used for sorting and the direction of sort
@@ -55,7 +72,7 @@ public class SortedTable extends JTable implements MouseListener
     private String upImage = "toolbarButtonGraphics/navigation/Up16.gif";
     private String downImage = "toolbarButtonGraphics/navigation/Down16.gif";
 
-    class HeaderCellRenderer extends JLabel implements TableCellRenderer
+    private class HeaderCellRenderer extends JLabel implements TableCellRenderer
     {
 	public HeaderCellRenderer(Border border, Color background, Color foreground)
 	{
@@ -118,12 +135,11 @@ public class SortedTable extends JTable implements MouseListener
 	}
     }
     
-    class SortModel extends AbstractTableModel implements TableModelListener {
+    public class SortModel extends AbstractTableModel implements TableModelListener {
 
 	private TableModel userModel;
-	private SortComparator defaultSortComparator;
+	private SortComparator sortComparator;
 	private LinkedList sortIndex;
-	private HashMap userSortComparators = new HashMap();
 
 	// Keep track of which column and in which direction we are
 	// sorting
@@ -133,29 +149,25 @@ public class SortedTable extends JTable implements MouseListener
 	// Keep a set of hidden columns
 	private TreeSet hiddenColumns;
 
-	class TableElement
-	{
+	class TableElement {
 	    private Object key;
 	    private int index;
 
-	    TableElement(Object key, int index)
-	    {
+	    TableElement(Object key, int index) {
 		this.key = key;
 		this.index = index;
 	    }
 	    
-	    Object getKey()
-	    {
+	    Object getKey() {
 		return key;
 	    }
 
-	    int getIndex()
-	    {
+	    int getIndex() {
 		return index;
 	    }
 	}
 
-	class SortComparator implements Comparator
+	private class SortComparator implements Comparator
 	{
 	    private int sortDirection;
 	    
@@ -175,27 +187,18 @@ public class SortedTable extends JTable implements MouseListener
 		TableElement secondElement = (TableElement)secondObject;
 		int result = 0;
 
-		Object first = firstElement.getKey();
-		Object second = secondElement.getKey();
-
 		// If type implements Comparable we can sort via the
 		// compareTo. This handles string, double, integer etc
 		try {
-		    Comparable firstComparable = (Comparable)first;
-		    Comparable secondComparable = (Comparable)second;
+		    Comparable firstComparable = (Comparable)firstElement.getKey();
+		    Comparable secondComparable = (Comparable)secondElement.getKey();
 
 		    result = firstComparable.compareTo(secondComparable);
 		}
-		catch(Exception e) {
-		    // If it doesnt implement Comparable... try user
-		    // given sort stuff
-		    Comparator userComparator = 
-			(Comparator)userSortComparators.get(first.getClass());
-		    
-		    if(userComparator != null)
-			result = userComparator.compare(first, 
-							second);
-		}
+		catch(ClassCastException e) {
+                    // Everything should be comparable
+                    assert false;
+                }
 
 		// Change depending on direction of sort arrow
 		return applySortDirection(result);
@@ -222,7 +225,7 @@ public class SortedTable extends JTable implements MouseListener
 	    userModel.addTableModelListener(this);
 	    
 	    hiddenColumns = new TreeSet();
-	    defaultSortComparator = new SortComparator(sortDirection);
+	    sortComparator = new SortComparator(sortDirection);
 	    sortIndex = null;
 	    
 	    sort(sortColumn, sortDirection);
@@ -250,7 +253,6 @@ public class SortedTable extends JTable implements MouseListener
 	}
 
 	public void showColumn(int columnNumber, boolean show) {
-
 	    if(show == false && isColumnVisible(columnNumber)) {	
 		hiddenColumns.add(new Integer(columnNumber));
 		fireTableStructureChanged();
@@ -291,11 +293,13 @@ public class SortedTable extends JTable implements MouseListener
 	    while(iterator.hasNext()) {
 		int hiddenColumnNumber = ((Integer)iterator.next()).intValue();
 		
-		if(hiddenColumnNumber <= column)
+		if(hiddenColumnNumber <= column) {
 		    numberHiddenColumns++;
+                    column++;
+                }
 	    }
 
-	    return column + numberHiddenColumns;
+	    return column;
 	}
 
 	// Should take original column + direction
@@ -308,7 +312,7 @@ public class SortedTable extends JTable implements MouseListener
 	    // perform sort
 	    sortIndex = new LinkedList();
 	    TableElement tableElement;
-	    
+            
 	    for(int i = 0; i < getRowCount(); i++) {
 		tableElement = 
 		    new TableElement(userModel.getValueAt(i, sortColumn), 
@@ -317,18 +321,9 @@ public class SortedTable extends JTable implements MouseListener
 	    }
 	    
 	    // 2. Get comparator ready and then sort
-	    defaultSortComparator.setDirection(sortDirection);
-	    Collections.sort(sortIndex, (Comparator)defaultSortComparator);
+	    sortComparator.setDirection(sortDirection);
+	    Collections.sort(sortIndex, sortComparator);
 	}
-
-	// Sets the sort comparator to use for user defined data types in the
-	// table
-	public void setUserSortComparator(Class userClass, 
-					  Comparator comparator)
-	{
-	    userSortComparators.put(userClass, comparator);
-	}
-
 
 	public int getRowCount()
 	{
@@ -375,24 +370,33 @@ public class SortedTable extends JTable implements MouseListener
 	// original unsorted data?
 	public int getUnsortedRow(int sortedRow)
 	{
-	    TableElement index = (TableElement)sortIndex.get(sortedRow);
-
-	    return index.getIndex();
+            // Row is not in the table
+            if(sortedRow == -1)
+                return -1;
+            else {
+                TableElement index = (TableElement)sortIndex.get(sortedRow);            
+                return index.getIndex();
+            }
 	}
 
 	public int getSortedRow(int unsortedRow)
 	{
-	    TableElement index;
+            // Row is not in the table
+            if(unsortedRow == -1)
+                return -1;
+            else {
+                TableElement index;
+                
+                for(int i = 0; i < getRowCount(); i++) {
+                    index = (TableElement)sortIndex.get(i);
+                    
+                    if(index.getIndex() == unsortedRow)
+                        return i;		
+                }
 
-	    for(int i = 0; i < getRowCount(); i++) {
-		index = (TableElement)sortIndex.get(i);
-
-		if(index.getIndex() == unsortedRow)
-		    return i;		
-	    }
-
-	    // No longer in table
-	    return -1;
+                // No longer in table
+                return -1;
+            }
 	}
 
 	public TableModel getUserModel()
@@ -412,17 +416,43 @@ public class SortedTable extends JTable implements MouseListener
 	// sort direction arrow
         setCustomHeaderRenderer();
 
-	// Monitor mouse clicks on table header
-	getTableHeader().addMouseListener(this);
-	
 	// Set tool tip text to inform user of column sorting
         String toolTipText =
             "Click on table header to sort by that column, click again to change sort direction";
 	getTableHeader().setToolTipText(toolTipText);
+
+	// Monitor mouse clicks on table header
+	getTableHeader().addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e)
+                {
+                    // Only interested in left mouse button events *and*
+                    // only interested them if the table has more than one
+                    // entry
+                    if((e.getModifiers() & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
+                        
+                        // Get which column has been been clicked
+                        int column = columnAtPoint(e.getPoint());
+                        
+                        // Deal with "moved" columns
+                        column = convertColumnIndexToModel(column);
+                        
+                        // Deal with "hidden" columns
+                        column = model.convertFromDisplayedColumn(column);
+                        
+                        // Toggle up/down arrow on column. Assign to new one if needed
+                        toggleColumnSortStatus(column);
+                        
+                        // Tell table model a resort is needed
+                        resort();
+                        
+                        // redraw
+                        revalidate();
+                        repaint();
+                    }
+                }
+            });
     }
 
-
-    
     public void setModel(TableModel model)
     {
 	setModel(model, sortColumn, sortDirection);
@@ -520,7 +550,13 @@ public class SortedTable extends JTable implements MouseListener
     //          data given to them in the model event
     public int getSelectedRow()
     {
-	return model.getUnsortedRow(super.getSelectedRow());
+        int row = super.getSelectedRow();
+        
+        // No selected row?
+        if(row == -1)
+            return -1;
+        else
+            return model.getUnsortedRow(row);
     }
 
     public int[] getSelectedRows()
@@ -556,83 +592,40 @@ public class SortedTable extends JTable implements MouseListener
 	// selections. It is for this reason this function will only work 
 	// when index0 == index1 otherwise it will be ignored. 
 	// This forces the user to think about what they are doing.
-
 	if(index0 == index1) {
-
 	    // Convert
 	    int sortedIndex = model.getSortedRow(index0);
-	    super.setRowSelectionInterval(sortedIndex, sortedIndex);
-	    
+
+	    if(sortedIndex != -1)
+                super.setRowSelectionInterval(sortedIndex, sortedIndex);
 	}
     }
 
     public void addRowSelectionInterval(int index0, int index1)
     {
 	if(index0 == index1) {
-
 	    // Convert
 	    int sortedIndex = model.getSortedRow(index0);
 
 	    if(sortedIndex != -1)
 		super.addRowSelectionInterval(sortedIndex, sortedIndex);
-	    
 	}
     }
 
     // Given the row of the sorted data, what row would it be in the
     // original unsorted data?
-    public int getUnsortedRow(int sortedRow)
-    {
-	return model.getUnsortedRow(sortedRow);
+    public int getUnsortedRow(int sortedRow) {
+        if(sortedRow == -1)
+            return sortedRow;
+        else
+            return model.getUnsortedRow(sortedRow);
     }
 
-    public int getSortedRow(int unsortedRow)
-    {
-	return model.getSortedRow(unsortedRow);
+    public int getSortedRow(int unsortedRow) {
+        if(unsortedRow == -1)
+            return unsortedRow;
+        else
+            return model.getSortedRow(unsortedRow);
     }
-
-    // Sets the sort comparator to use for user defined data types in the
-    // table
-    public void setDefaultSortComparator(Class userClass, 
-					 Comparator comparator)
-    {
-	model.setUserSortComparator(userClass, comparator);
-    }
-
-    // We observe mouse clicks on the header of the table to
-    // change which column (and direction) is used for sorting
-    public void mouseClicked(MouseEvent e)
-    {
-	// Only interested in left mouse button events *and*
-	// only interested them if the table has more than one
-	// entry
-	if((e.getModifiers() & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
-	    
-	    // Get which column has been been clicked
-	    int column = columnAtPoint(e.getPoint());
-
-	    // Deal with "moved" columns
-	    column = convertColumnIndexToModel(column);
-
-	    // Deal with "hidden" columns
-	    column = model.convertFromDisplayedColumn(column);
-
-	    // Toggle up/down arrow on column. Assign to new one if needed
-	    toggleColumnSortStatus(column);
-
-	    // Tell table model a resort is needed
-	    resort();
-
-	    // redraw
-	    revalidate();
-	    repaint();
-	}
-    }
-
-    // Necessary to conform to interface but we ignore these events
-    public void mouseEntered(MouseEvent e) {}
-    public void mouseExited(MouseEvent e) {}
-    public void mousePressed(MouseEvent e) {}
-    public void mouseReleased(MouseEvent e) {}
 }
 

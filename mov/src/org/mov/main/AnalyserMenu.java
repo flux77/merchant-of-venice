@@ -218,50 +218,47 @@ public class AnalyserMenu implements ActionListener, ContainerListener {
 		    // They should all be menu actions
 		    JMenuItem menu = (JMenuItem)e.getSource();
 		    
-		    // Is it the file menu?
+		    // File Menu ********************************************************************************
 		    if(menu == fileExitMenuItem)
 			System.exit(0);
 		    else if(menu == filePreferencesQuoteMenuItem) {
 			// Display preferences
-				    ((AnalyserDesktopManager)(desktop.getDesktopManager())).newCentredFrame(new PreferencesModule(desktop, PreferencesModule.QUOTE_SOURCE_PAGE));
+			((AnalyserDesktopManager)(desktop.getDesktopManager()))
+			    .newCentredFrame(new PreferencesModule(desktop, 
+								   PreferencesModule.QUOTE_SOURCE_PAGE));
 		    }
 		    
-		    // Is it a table menu?
-		    if(menu == tableCommoditiesListAllMenuItem ||
-		       menu == tableCompanyListRuleMenuItem ||
-		       menu == tableCompanyListAllMenuItem ||
-		       menu == tableIndicesListAllMenuItem) {
-			
-			handleTableMenuAction(menu);
-		    }
+		    // Table Menu *******************************************************************************
+		    else if(menu == tableCommoditiesListAllMenuItem)
+			CommandManager.getInstance().tableListCommoditiesAll();
+		    else if (menu == tableCommoditiesListRuleMenuItem)
+			CommandManager.getInstance().tableListCommoditiesByRule();
+		    else if(menu == tableCompanyListAllMenuItem)
+			CommandManager.getInstance().tableListCompanyNamesAll();
+		    else if (menu == tableCompanyListRuleMenuItem)
+			CommandManager.getInstance().tableListCompanyNamesByRule();
+		    else if (menu == tableIndicesListAllMenuItem)
+			CommandManager.getInstance().tableListIndicesAll();
+		    else if (menu == tableIndicesListRuleMenuItem)
+			CommandManager.getInstance().tableListIndicesByRule();
 		    
-		    // Is it a graph menu?
-		    else if(menu == graphCommodityCodeMenuItem ||
-			    menu == graphCommodityNameMenuItem) {
-			
-			handleGraphMenuAction(menu);
-		    }
+		    // Graph Menu *******************************************************************************
+		    else if (menu == graphCommodityCodeMenuItem)
+			CommandManager.getInstance().graphStockByCode();
+		    else if (menu == graphCommodityNameMenuItem)
+			CommandManager.getInstance().graphStockByName();
 		    
-		    
-		    // Is it a window handling function?
-		    else if (menu == windowTileHorizontalMenuItem) {
-			AnalyserDesktopManager.tileFrames(desktop, 
-							AnalyserDesktopManager.HORIZONTAL);
-		    }
-		    else if (menu == windowTileVerticalMenuItem) {
-			AnalyserDesktopManager.tileFrames(desktop, 
-							AnalyserDesktopManager.VERTICAL);
-		    }
-		    else if (menu == windowCascadeMenuItem) {
-			AnalyserDesktopManager.tileFrames(desktop, 
-							AnalyserDesktopManager.CASCADE);
-		    }
-		    else if (menu == windowGridMenuItem) {
-			AnalyserDesktopManager.tileFrames(desktop, 
-							AnalyserDesktopManager.ARRANGE);
-		    }
+		    // Window Menu ******************************************************************************
+		    else if (menu == windowTileHorizontalMenuItem)
+			CommandManager.getInstance().tileFramesHorizontal();
+		    else if (menu == windowTileVerticalMenuItem)
+			CommandManager.getInstance().tileFramesVertical();
+		    else if (menu == windowCascadeMenuItem)
+			CommandManager.getInstance().tileFramesCascade();
+		    else if (menu == windowGridMenuItem)
+			CommandManager.getInstance().tileFramesArrange();
 
-		    // Must be a window action
+		    // Must be a window selection action
 		    else {
 			Component c = (Component)menu_frame_hash.get(menu);
 			if(c != null) {
@@ -287,101 +284,6 @@ public class AnalyserMenu implements ActionListener, ContainerListener {
 	menuAction.start();
     }
 
-    public void handleGraphMenuAction(JMenuItem menu) {
-
-	SortedSet companySet;
-
-	// Get graph either by code or name
-	if(menu == graphCommodityCodeMenuItem)
-	    companySet = 
-		CommodityListQuery.getCommoditiesByCode(desktop, "New graph");
-	else
-	    companySet = 
-		CommodityListQuery.getCommodityByName(desktop, "New graph");
-
-	if(companySet != null) {
-	    
-	    Iterator iterator = companySet.iterator();
-	    String symbol;
-	    AnalyserChart chart = new AnalyserChart(desktop);
-	    
-	    // Iterate through companies adding them to the graph
-	    boolean owner =
-		Progress.getInstance().open();
-
-	    while(iterator.hasNext()) {
-		symbol = (String)iterator.next();
-		
-		QuoteCache cache = new QuoteCache(symbol);
-		Graph graph = 
-		    new LineGraph(new DayCloseGraphDataSource(cache));
-
-		chart.add(graph, 0);
-	    }
-
-	    Progress.getInstance().close(owner);
-
-	    chart.redraw();
-	    ((AnalyserDesktopManager)(desktop.getDesktopManager())).newFrame(chart);
-	}
-    }	
-
-    public void handleTableMenuAction(JMenuItem menu) {
-
-	// Get search restriction, i.e. is it indices, all commodities or
-	// just funds & companies?
-	int searchRestriction;       
-	if(menu == tableCommoditiesListAllMenuItem ||
-	   menu == tableCommoditiesListRuleMenuItem)
-	    searchRestriction = QuoteSource.ALL_COMMODITIES;
-
-	else if(menu == tableCompanyListAllMenuItem ||
-		menu == tableCompanyListRuleMenuItem)
-	    searchRestriction = QuoteSource.COMPANIES_AND_FUNDS;
-
-	else 
-	    searchRestriction = QuoteSource.INDICES;
-
-	// Get restriction expression if necessary
-	org.mov.parser.Expression expression = null;
-	boolean askedForExpression = false;
-
-	if(menu == tableCommoditiesListRuleMenuItem) {
-	    expression = 
-		ExpressionQuery.getExpression(desktop,
-					      "List All Commodities", 
-					      "By Rule");
-	    askedForExpression = true;
-	}
-
-	else if(menu == tableCompanyListRuleMenuItem) {
-	    expression = 
-		ExpressionQuery.getExpression(desktop,
-					      "List Companies + Funds", 
-					      "By Rule");
-	    askedForExpression = true;
-	}
-
-	else if(menu == tableIndicesListRuleMenuItem) {
-	    expression = 
-		ExpressionQuery.getExpression(desktop,
-					      "List Indices",
-					      "By Rule");
-	    askedForExpression = true;
-	}
-
-	// Only continue if user didnt ask for expression then pressed
-	// cancel
-	if(!askedForExpression || expression != null) {
-	    // Create cache with stock quotes for this day
-	    QuoteCache cache =
-		new QuoteCache(Quote.getSource().getLatestQuoteDate(),
-			       searchRestriction);
-
-	    // Display table of quotes
-	    ((AnalyserDesktopManager)(desktop.getDesktopManager())).newFrame(new QuoteModule(desktop, cache, expression));
-	}
-    }
 
     private Hashtable frame_menu_hash = null;
     private Hashtable menu_frame_hash = null;

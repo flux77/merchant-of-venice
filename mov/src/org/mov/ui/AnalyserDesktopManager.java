@@ -27,11 +27,15 @@ public class AnalyserDesktopManager
 	CASCADE             = 2, 
 	ARRANGE             = 3;
 
-    private JDesktopPane desktop = null;
+    private static JDesktopPane desktop_instance = null;
+
+    public static void setDesktop(JDesktopPane desktop) {
+	desktop_instance = desktop;
+    }
 
     public AnalyserDesktopManager(JDesktopPane desktop) {
 	super();
-	this.desktop = desktop;
+	setDesktop(desktop);
     }
 
 
@@ -41,11 +45,11 @@ public class AnalyserDesktopManager
     //    CASCADE = cascade windows, resizing based on desktop size  
     //    ARRANGE = arranges windows in a grid  
 
-    public static void tileFrames(JDesktopPane desk, int style){    
-	Dimension deskDim = desk.getSize();
+    public static void tileFrames(int style){    
+	Dimension deskDim = desktop_instance.getSize();
 	int deskWidth = deskDim.width;
 	int deskHeight = deskDim.height;
-	JInternalFrame[] frames = desk.getAllFrames();
+	JInternalFrame[] frames = desktop_instance.getAllFrames();
 	int frameCount = frames.length;
 	int frameWidth=0;
 	int frameHeight=0;
@@ -161,8 +165,8 @@ public class AnalyserDesktopManager
     }  
 
     // method to minimize all windows that are iconifiable  
-    public static void minimizeWindows(JDesktopPane desktopPane) {
-	JInternalFrame[] openWindows = desktopPane.getAllFrames();
+    public static void minimizeWindows() {
+	JInternalFrame[] openWindows = desktop_instance.getAllFrames();
 	for (int i=0; i<openWindows.length; i++)
 	    if(openWindows[i].isIconifiable()) {
 		try { 
@@ -175,8 +179,8 @@ public class AnalyserDesktopManager
     }
     
     // method to restore all minimized windows  
-    public static void restoreAll(JDesktopPane desktopPane) {
-	JInternalFrame[] openWindows = desktopPane.getAllFrames();
+    public static void restoreAll() {
+	JInternalFrame[] openWindows = desktop_instance.getAllFrames();
 	for(int i=0; i<openWindows.length; i++) {
 	    if(openWindows[i].isIcon())
 		try {
@@ -189,8 +193,8 @@ public class AnalyserDesktopManager
     }  
     
     // method to close all open windows  
-    public static void closeAllWindows(JDesktopPane desktopPane) {
-	JInternalFrame[] openWindows = desktopPane.getAllFrames();
+    public static void closeAllWindows() {
+	JInternalFrame[] openWindows = desktop_instance.getAllFrames();
 	for (int i=0; i<openWindows.length; i++) { 
 	    openWindows[i].dispose();
 	}  
@@ -248,8 +252,8 @@ public class AnalyserDesktopManager
      * @param module the module to render in the frame
      */
     public void newCentredFrame(AnalyserModule module) {
-	int xOffset = (desktop.getWidth() - DEFAULT_FRAME_WIDTH) / 2;
-	int yOffset = (desktop.getHeight() - DEFAULT_FRAME_HEIGHT) / 2;
+	int xOffset = (desktop_instance.getWidth() - DEFAULT_FRAME_WIDTH) / 2;
+	int yOffset = (desktop_instance.getHeight() - DEFAULT_FRAME_HEIGHT) / 2;
 	
 	newFrame(module, xOffset, yOffset, DEFAULT_FRAME_WIDTH,
 		 DEFAULT_FRAME_HEIGHT);
@@ -282,22 +286,22 @@ public class AnalyserDesktopManager
 	// ORDER IMPORTANT
 	{
 	    if(x > width)
-		x = desktop.getWidth() - width;
+		x = desktop_instance.getWidth() - width;
 	    if(y > height)
-		y = desktop.getHeight() - height;
+		y = desktop_instance.getHeight() - height;
 	    if(x < 0) 
 		x = 0;
 	    if(y < 0)
 		y = 0;
 	    
-	    if(x + width > desktop.getWidth())
-		width = desktop.getWidth() - x;
-	    if(y + height > desktop.getHeight())
-		height = desktop.getHeight() - y;
+	    if(x + width > desktop_instance.getWidth())
+		width = desktop_instance.getWidth() - x;
+	    if(y + height > desktop_instance.getHeight())
+		height = desktop_instance.getHeight() - y;
 	}
 	
 	AnalyserFrame frame = new AnalyserFrame(module, x, y, width, height);
-	desktop.add(frame);
+	desktop_instance.add(frame);
 	
 	try {
 	    frame.setSelected(true);

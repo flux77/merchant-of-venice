@@ -51,10 +51,6 @@ public class PreferencesManager {
         return user_root;
     }
 
-    /** Value given to an integer if it is undefined and we need to 
-	know if it is defined or not */
-    public static final int UNDEFINED_INT = -1000000;
-
     /** Fetches the desired user node, based at the <code>base</code> branch
      * @param node the path to the node to be fetched
      */
@@ -63,30 +59,19 @@ public class PreferencesManager {
         return user_root.node(node);
     }
 
-    public static int loadCachedAdvance(TradingDate date) {
-	Preferences p = getUserNode("/advance");	
+    public static String loadLastImportDirectory() {
+        Preferences prefs = getUserNode("/importer");
+        String directory = prefs.get("directory", "");
 
-	return p.getInt(date.toString(), UNDEFINED_INT);
+        if(directory.length() != 0)
+            return directory;
+        else
+            return null;
     }
 
-
-    public static void saveCachedAdvance(TradingDate date, int value) {
-	Preferences p = getUserNode("/advance");	
-
-	p.putInt(date.toString(), value);
-    }
-
-    public static int loadCachedDecline(TradingDate date) {
-	Preferences p = getUserNode("/decline");	
-
-	return p.getInt(date.toString(), UNDEFINED_INT);
-    }
-
-
-    public static void saveCachedDecline(TradingDate date, int value) {
-	Preferences p = getUserNode("/decline");	
-
-	p.putInt(date.toString(), value);
+    public static void saveLastImportDirectory(String directory) {
+        Preferences prefs = getUserNode("/importer");
+        prefs.put("directory", directory);
     }
 
     public static HashMap loadEquations() {
@@ -107,6 +92,45 @@ public class PreferencesManager {
 	return equations;
     }
 
+    public static HashMap loadAnalyserPageSettings(String key) {
+
+	HashMap settings = new HashMap();
+	Preferences p = getUserNode("/analyser/" + key);
+	String[] settingList = null;
+
+	// Get all the settings that we've saved
+	try {
+	    settingList = p.keys();
+	}
+	catch(BackingStoreException e) {
+	    // ignore
+	}
+
+	// Now populate settings into a hash
+	for(int i = 0; i < settingList.length; i++) {
+	    String value = p.get(settingList[i], "");
+	    settings.put((Object)settingList[i], (Object)value);
+	}
+
+	return settings;
+    }
+
+    public static void saveAnalyserPageSettings(String key, HashMap settings) {
+	Preferences p = getUserNode("/analyser/" + key);
+
+	Iterator iterator = settings.keySet().iterator();
+
+	while(iterator.hasNext()) {
+	    String setting = (String)iterator.next();
+	    String value = (String)settings.get((Object)setting);
+
+	    p.put(setting, value);
+	}
+    }
+
+
+
+    // deprecate me
     public static HashMap loadLastPaperTradeSettings() {
 
 	HashMap settings = new HashMap();
@@ -130,6 +154,7 @@ public class PreferencesManager {
 	return settings;
     }
 
+    // deprecate me
     public static void saveLastPaperTradeSettings(HashMap settings) {
 	Preferences p = getUserNode("/papertrade");
 

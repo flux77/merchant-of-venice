@@ -37,7 +37,7 @@ in Venice. For charting see <link to="Graphs">Graphs</link>.
 </para>
 </help>
 
-<text>Merchant of Venice, 0.2 alpha / 24/Aug/2003
+<text>Merchant of Venice, 0.3 alpha / 14/Mar/2004
 ===========================================
 
 Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
@@ -52,7 +52,7 @@ See COPYING.txt for license terms.
 management, charting, technical analysis, paper trading and
 experimental methods like genetic programming. Venice runs in a
 graphical user interface with online help and has full documentation.
-Venice runs on UNIX, including MacOSX and Windows.</para>
+Venice runs on UNIX, including Mac OS X and Windows.</para>
 
 </chapter>
 
@@ -60,10 +60,14 @@ Venice runs on UNIX, including MacOSX and Windows.</para>
 <help><para>Preferences describes the various settings that can be modified to customise
 the way Venice works.</para>
 
-<para><link to="Functions">Functions</link> describes how to get Venice to
+<para><link to="Equations">Equations</link> describes how to get Venice to
 remember functions or equations based on a keyword. This way instead of
 typing in a long equation, such as a buy indicator, you could type in
 a short name instead.</para>
+
+<para><link to="Proxy">Proxy</link> describes how to configure Venice to work
+with a web proxy. This allows you to download quotes from the Internet
+through a web proxy.</para>
 
 <para><link to="Quote Source">Quote Source</link> describes how to
 configure Venice to read stock quotes from either files or from
@@ -73,21 +77,42 @@ a database.</para>
 configure Venice for optimal performance.</para>
 </help>
 
-<chapter name="Functions">
+<chapter name="Equations">
 <para>You can store commonly used functions, such as indicators, so you do not
 need to retype them. Once an equation is stored, you can access it from
 any equation entry field by clicking on the small down arrow, which
 appears next to all the equation entry fields. It will then display a list 
-of your stored functions.</para>
+of your stored equations.</para>
 
-<para>You can reach the functions page by:</para>
+<para>You do not need to go to preferences to add, edit or delete stored equations.
+Each equation entry field will display a menu if you right click on it.
+It will give you the options to <highlight>Add</highlight>, <highlight>Edit</highlight>, <highlight>Delete</highlight>, 
+or <highlight>Manage</highlight>. Most of these options are self-explanatory; Manage 
+will display the equations preferences page.</para>
+
+<para>You can reach the equations page by:</para>
 <list><item>Clicking on the <highlight>File</highlight> menu item.
 </item>
 <item>Then clicking on the <highlight>Preferences</highlight> menu item.
 </item>
-<item>Then selecting the <highlight>Functions</highlight> page.
+<item>Then selecting the <highlight>Equations</highlight> page.
 </item>
 </list>
+</chapter>
+
+<chapter name="Proxy">
+<para>You can configure Venice to work with a web proxy. This allows
+you to download quotes from the Internet through a web proxy. You can reach
+the proxy configuration page by:</para>
+<list><item>Clicking on the <highlight>File</highlight> menu item.
+</item>
+<item>Then clicking on the <highlight>Preferences</highlight> menu item.
+</item>
+<item>Then selecting the <highlight>Proxy</highlight> page.
+</item>
+</list>
+<para>To use the proxy, make sure the <highlight>Use Proxy</highlight> check box is
+selected and enter the proxy host and port into the two fields.</para>
 </chapter>
 
 <chapter name="Quote Source">
@@ -187,7 +212,25 @@ radio button. You'll be confronted with several fields you need to fill in:</par
 <para>Finally you'll need to import the quotes into the database, you can do this by
 using the <link to="Importing Quotes">Import Quotes</link> dialog.</para>
 <para>Good luck!</para>
+<para>With the current version you might get an error message saying that it
+can't find a table. If you get this, it probably means that you haven't
+imported any quotes into Venice yet. Venice will automatically create its
+required tables the first time you import quotes. For reference, this is
+the format of the SQL shares table:</para>
+<para><codeblock>+--------+---------+------+-----+------------+-------+
+| Field  | Type    | Null | Key | Default    | Extra |
++--------+---------+------+-----+------------+-------+
+| date   | date    |      | PRI | 0000-00-00 |       |
+| symbol | char(6) |      | PRI |            |       |
+| open   | float   | YES  |     | 0          |       |
+| close  | float   | YES  |     | 0          |       |
+| high   | float   | YES  |     | 0          |       |
+| low    | float   | YES  |     | 0          |       |
+| volume | int(11) | YES  |     | 0          |       |
++--------+---------+------+-----+------------+-------+
+</codeblock></para>
 </section>
+
 <section name="Sample Quote Source">
 <para>Venice has some inbuilt sample quotes, so you can test out Venice without
 going to all the trouble of importing stock quotes. It contains a small
@@ -258,6 +301,17 @@ and <highlight>Database</highlight> in the <highlight>Import To</highlight> area
 import the files into the database and also into Venice. This is useful if
 you access the files via the database, but would like Venice to be able to
 cope if the database goes down.</para>
+</section>
+
+<section name="Import quotes from the Internet">
+<para>To perform this operation:</para>
+<para>Click on <highlight>Internet</highlight> in the <highlight>Import From</highlight> area and on <highlight>Files</highlight> 
+and/or <highlight>Database</highlight> in the <highlight>Import To</highlight> area.
+Enter a comma or space separated list of symbols you wish to import and the
+date ranges you wish to import.</para>
+<para>This allows you to import quotes directly from the internet and store
+them in the database and/or in quote files on your hard drive. If you need
+to use a web proxy, you can configure it in Venice's <link to="Proxy">Preferences</link>.</para>
 </section>
 
 <section name="Export quote files from the Database">
@@ -365,6 +419,22 @@ double click on a row the most common operation is invoked, typically
 Graphing. Some tables also have a menu item <highlight>Show Columns</highlight> which lets
 you specify which columns are shown.</para>
 </section>
+</chapter>
+
+<chapter name="Watch Screens">
+<para>Venice currently does not support real-time or intra-day quote data, but
+it does support end-of-day watch screens. These watch screens are useful for
+grouping and displaying stocks that are interesting. You can create a new
+watch screen by doing the following:</para>
+<list><item>Clicking on the <highlight>Table</highlight> menu item.
+</item>
+<item>Then clicking on the <highlight>Watch Screen</highlight> menu item.
+</item>
+<item>Then clicking on the <highlight>New Watch Screen</highlight> menu item.
+</item>
+</list>
+<para>This will create a new watch screen which you will need to name. You
+can then add symbols that should be displayed in this watch screen.</para>
 </chapter>
 
 <chapter name="Graphs">
@@ -561,17 +631,21 @@ account you withdrew the money from and the amount you withdrew.</para>
 <chapter name="Gondola Language">
 <para>The <highlight>Gondola Language</highlight> is a language for analysing stock market data.
 The language allows you to do a variety of tasks from listing stocks in tables
-that only match your criteria to creating automated buy/sell paper trade rules.</para>
+that only match your criteria to creating automated buy/sell paper trade rules.
+The language is closely modelled after the C programming language, so if you
+know that language, then you should find Gondola easy and familliar to
+work with.
+</para>
 
 <para>Whenever you enter a Gondola expression there are two implicit variables that
 are always set: the current date and the current stock. For example if
 you are displaying a <link to="Tables">Table</link> of stock quotes, you can execute an
-equation for each stock. If you entered the current line:</para>
+equation for each stock. If you entered this line:</para>
 
 <para><code>avg(close, 30, 0)</code></para>
 
 <para>It would display, for each stock, the average day close value over the last
-30 days starting with today. Here the current date would be set to the most
+30 days starting from today. Here the current date would be set to the most
 recent day you have a quote for and the current stock would be set to the
 current stock.</para>
 
@@ -593,7 +667,7 @@ are different. If you get a type mismatch error, you've probably entered an
 <highlight>integer</highlight> number (e.g. <code>12</code>) instead of a <highlight>real</highlight> number (e.g. <code>12.0</code>).</para>
 
 <section name="Gondola Operators">
-<para>The gondola language supports the following boolean operators: <highlight>and</highlight>, <highlight>or</highlight>
+<para>The Gondola language supports the following boolean operators: <highlight>and</highlight>, <highlight>or</highlight>
 and <highlight>not</highlight>. For example:</para>
 
 <list><item><code>lag(close, 0) &gt; 12.0 or lag(open, 0) &gt; 12.0
@@ -627,6 +701,22 @@ and <highlight>not</highlight>. For example:</para>
 <item><code>lag(close, 0) &lt;= lag(close, -1)
 </code></item>
 <item><code>lag(volume, 0) != lag(volume, -1)
+</code></item>
+</list>
+</section>
+
+<section name="Gondola Variables">
+<para>The Gondola language has full support for variables, which allow you to
+store, retrieve and manipulate values. When defining a new variable you
+need to specify whether the variable can change or is constant, the variable
+type, the name of the variable and optionally the initial value of the
+variable.</para>
+<para>Examples:</para>
+<list><item><code>int averageValue
+</code></item>
+<item><code>const boolean myValue = true
+</code></item>
+<item><code>float averageValue = 10.0*12.0
 </code></item>
 </list>
 </section>
@@ -680,16 +770,41 @@ trading date, -1 means the previous trading date, etc.</para>
 <para>Returns the current day of the year, which might be 365, if it is New Years Eve.</para>
 </section>
 
+<section name="For">
+<para>The for function is a looping function that allows you to loop over
+an expression of code. Typically the loop is tied to a variable, so you
+need to set the initial value of the variable, a condition where the loop
+will terminate, and how the variable should change after each loop.</para>
+<para><code>for(INITIAL; CONDITION; LOOP) { COMMAND }</code></para>
+<para>The function will execute the INITIAL expression, then execute
+the COMMAND expression, and then execute the LOOP expression. It will
+then execute the CONDITION expression. If the CONDITION expression
+was FALSE then the function will return. Otherwise it will run the
+COMMAND expression, then the LOOP expression, then check the CONDITION
+expression, etc.</para>
+<para>Example:</para>
+<para><codeblock>int b = 0
+
+for(int i = 0; i &lt; 10; i = i + 1) {
+  b = b + i
+}
+</codeblock></para>
+<para>The above code will sum the numbers 0, 1, 2, ... 9 and store the result
+in the b variable.</para>
+</section>
+
 <section name="If">
 <para>The if function allows a selection of which code to be executed.</para>
 <para><code>if(VALUE) { TRUE } else { FALSE }</code></para>
-<para>If the value of the VALUE expression renders to true, then the TRUE expression
+<para>If the value of the VALUE expression is true, then the TRUE expression
 will be executed, otherwise the FALSE expression will be.</para>
 <para>Example:</para>
-<para><code>if(lag(open, 0) &gt; lag(open, -1))
-    { lag(open, 0) }
-else
-    { lag(open, -1) }</code></para>
+<para><codeblock>if(lag(open, 0) &gt; lag(open, -1)) { 
+   lag(open, 0)
+}
+else {
+   lag(open, -1) 
+}</codeblock></para>
 <para>Returns the greater of today and yesterday's day open values.</para>
 </section>
 
@@ -769,12 +884,29 @@ trading date, -1 means the previous trading date, etc.</para>
 15 days, ending with yesterday.</para>
 </section>
 
+<section name="While">
+<para>The while function is a looping function that allows you to loop over an
+expression of code. The loop contains an expression that will be executed until
+a specific condition is not met.</para>
+<para><code>while(CONDITION) { COMMAND }</code></para>
+<para>The function will execute the COMMAND expression until the CONDITION
+is not met. If the CONDITION is never met, the loop will not be entered.</para>
+<para>Example:</para>
+<para><codeblock>int sum = 1
+
+while(sum &lt; 100) {
+  sum = sum + 1
+}
+</codeblock></para>
+<para>The above code will keep increment the value of sum until it is equal to 100.</para>
+</section>
+
 <section name="Year">
 <para>The year function returns the current year.</para>
 <para><code>year()</code></para>
 <para>Example:</para>
 <para><code>year()</code></para>
-<para>Returns the current year, which will be 2003, if it is 2003.</para>
+<para>Returns the current year, which will be 2004, if it is 2004.</para>
 </section>
 </section>
 </chapter>
@@ -888,28 +1020,29 @@ case Venice works out the maximum number of stocks.</para>
 
 <chapter name="Genetic Programming">
 <para>Venice supports using evolutionary computation to create new buy/sell rules
-based on historial data. The way it works is that Venice initially creates a
+based on historical data. The way it works is that Venice initially creates a
 set of random buy/sell rule equations. A pair of buy/sell rule equations is 
 refered to as an individual. It will then use algebraic simplification
 to reduce the size of the individual's equations and also to remove any 
 unecessary computation. It will then check the individual's equations using a
 few simple rules, e.g. is the equation big enough to be meaningful? 
-is the equation not too large? If the individual's equations look like they 
-could be  meaningful, it will paper trade with them, in the same method as the
+Is the equation not too large? If the individual's equations look like they 
+could be meaningful, it will paper trade with them, in the same method as the
 <link to="Paper Trade">Paper Trade Module</link>. If the individual makes a loss or beaks even,
 then it will be immediately rejected.</para>
 
 <para>Once Venice has created a set of these random individuals, it will then
-move onto the second generation. For this generation is will pick two
-random individuals and combine them, using a combination of cross-over
-and mutation, to create a new individual. This process is refered to as
-breeding. It will again apply algebraic simplification to the resultant
-individual's equations. It will then paper trade this new individual. If the
-new individual has a greater return than any of the previous individuals, it 
-will be recorded. Venice will then repeat this process, creating several new 
-individuals. The number of individuals created is refered to as the
-popluation. The number of the highest returning individuals created which
-are bred in the next generation is refered to as the breeding population.</para>
+move onto the second generation. For this generation it will pick two
+random individuals (with a strong bias to the better performing individuals) 
+and combine them, using a combination of cross-over and mutation, to create 
+a new individual. This process is refered to as breeding. It will again apply 
+algebraic simplification to the resultant individual's equations. It will 
+then paper trade this new individual. If the new individual has a greater 
+return than any of the previous individuals, it will be recorded. Venice will 
+then repeat this process, creating several new individuals. The number of 
+individuals created is refered to as the popluation. The number of the 
+highest returning individuals created which are bred in the next generation, 
+is refered to as the breeding population.</para>
 
 <para>Once a given number of individuals have been created, Venice will then move
 onto the third generation. Here, it is the same as the second generation, 

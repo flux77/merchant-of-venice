@@ -645,8 +645,8 @@ public class CommandManager {
                                    "Daniel Makovec\n\n" +
 				   
 				   Locale.getString("ADDITIONAL_CODE") + "\n\n" +
-
-				   "Matthias St\366ckel"
+                                   
+                                   "Peter Fradley, Bryan Lin & Matthias St\366ckel."
 				   );
 
 

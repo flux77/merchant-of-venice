@@ -1,9 +1,76 @@
+Changes for Venice, 0.3 alpha 14/Mar/2004
+==========================================
+
+* Addition of internet quote download.
+
+* Addition of end-of-day Watch Screens.
+
+* Stored Equation Updates:
+  - Redesigned stored equations preferences page.
+  - The stored equations preferences page is now accessible from all
+    equation combo boxes (by right mouse click).
+  - Fixed stored equation list in equation combo boxes.
+  - Can now add/edit/delete stored equations from equation combo boxes.
+
+* Table Updates:
+  - Added "Find" feature to locate symbols in tables.
+  - Equation column results are now displayed according to their type,
+    e.g. 12, 12.0 & true.
+  - Can now rename portfolios.
+
+* Updates to the Gondola Language:
+  - Full support for variables.
+  - Addition of constants.
+  - Multiple statement programmes are now supported.
+  - Addition of for() and while() flow control functions.
+  - Calculations are now made using "doubles" instead of "floats" for
+    greater precision.
+
+* Updates to Genetic Programming:
+  - GP no longer progresses past generation 1 until breeding population size 
+    is large enough.
+  - Higher performing individuals in breeding population now have a 
+    greater chance of breeding over lower performing indvidiausl
+
+* Updates to Usability:
+  - Many minor GUI enhancements.
+  - Symbols can now contain full stops, carets and numbers. Also the
+    maximum symbol length has been increased to 9.
+  - Preferences now remembers last preference page visited.
+
+* Tuning:
+  - Massive speed improvements in GP and Paper Trade.
+  - Reduced memory required to store quotes by about 25%.
+
+* Technical Updates:
+  - Venice can now run on Java 1.5 beta.
+  - Implemented new Money type to store cash values to fix precision problems.
+
+* Bug Fixes;
+  - Fixed a bug where you couldn't import quote files on Windows.
+  - Fixed a bug where if you displayed the equation results in a table
+    with quotes over multiple dates, it would only display the
+    correct result for a single date.   
+  - Fixed a bug where importing quotes into MySQL using MySQL's own
+    driver failed [mm.mysql driver OK].
+  - Fixed a memory retention issue when importing a large number of
+    quotes.
+  - Fixed a bug where adding new symbols to the chart failed.
+  - Fixed a bug where the preferences manager would only save the
+    preferences on the visible page.
+  - Fixed a bug where the preferencs page you selected would not always
+    appear.
+  - Fixed a bug where the GP wasn't mutating open/close/high/low types
+    properly.
+
 Changes for Venice, 0.2 alpha 24/Aug/2003
 =========================================
 
-* Updates to Gondola Language:
-  - Strong type checking between INTEGER, BOOLEAN, FLOAT & QUOTE types.
-  - Creation of "true" and "false" keywords for BOOLEAN type.
+* Addition of Genetic Programming.
+
+* Updates to the Gondola Language:
+  - Strong type checking between integer, boolean, float & quote types.
+  - Creation of "true" and "false" keywords for boolean type.
   - Addition of date functions: day(), month(), year(), dayofweek() and
     dayofyear().
   - Addition of maths functions: sqrt() and abs().
@@ -35,8 +102,6 @@ Changes for Venice, 0.2 alpha 24/Aug/2003
   - Can now paper trade multiple stock portfolios.
   - Number of days held available to paper trade.
   - Can now order stocks before trading.
-
-* Addition of Genetic Programming
 
 * Updates to Stock Quote Support:
   - Improved parsing of stock symbols.

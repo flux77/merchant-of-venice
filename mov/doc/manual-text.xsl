@@ -19,6 +19,10 @@
     <xsl:apply-templates/>
   </xsl:template>
 
+  <xsl:template match="codeblock">
+    <xsl:apply-templates/>
+  </xsl:template>
+
   <xsl:template match="help">
   </xsl:template>
 

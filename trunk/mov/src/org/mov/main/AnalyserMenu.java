@@ -6,6 +6,7 @@ import java.beans.*;
 import java.text.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 import org.mov.main.*;
 import org.mov.util.*;
@@ -44,13 +45,11 @@ public class AnalyserMenu implements ActionListener, ContainerListener {
 	this.desktop = desktop;
 	desktop.addContainerListener(this);
 	JMenuBar menuBar = new JMenuBar();
-
 	// File 
 	{	   
-	    JMenu fileMenu = addMenu(menuBar, "File");
-
+	    JMenu fileMenu = addMenu(menuBar, "File", 'F');
 	    // File -> Preferences
-	    JMenu filePreferences = addMenu(fileMenu, "Preferences");
+	    JMenu filePreferences = addMenu(fileMenu, "Preferences", 'P');
 
 	    // File -> Preferences -> Stock Quote Source
 	    filePreferencesQuoteMenuItem = addMenuItem(filePreferences, 
@@ -59,81 +58,90 @@ public class AnalyserMenu implements ActionListener, ContainerListener {
 	    fileMenu.addSeparator();
 
 	    // File -> Exit
-	    fileExitMenuItem = addMenuItem(fileMenu, "Exit");
+	    fileExitMenuItem = addMenuItem(fileMenu, "Exit", 'x');
+	    fileExitMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+								   KeyEvent.VK_Q, 
+								   ActionEvent.CTRL_MASK));
 	}
 
 	// Table
 	{
-	    JMenu tableMenu = addMenu(menuBar, "Table");
+	    JMenu tableMenu = addMenu(menuBar, "Table", 'T');
 	    
 	    // Table -> Companies + Funds
-	    JMenu tableMenuCompany = addMenu(tableMenu, "Companies + Funds");
+	    JMenu tableMenuCompany = addMenu(tableMenu, "Companies + Funds", 'f');
 
 	    // Table -> Companies + Funds -> List all
 	    tableCompanyListAllMenuItem = 
-		addMenuItem(tableMenuCompany, "List all");
+		addMenuItem(tableMenuCompany, "List all", 'l');
 
 	    // Table -> Companies + Funds -> List by rule
 	    tableCompanyListRuleMenuItem = 
-		addMenuItem(tableMenuCompany, "List by rule");
+		addMenuItem(tableMenuCompany, "List by rule", 'r');
 	    
 	    // Table -> Indices
-	    JMenu tableMenuIndices = addMenu(tableMenu, "Indices");
+	    JMenu tableMenuIndices = addMenu(tableMenu, "Indices",'i');
 
 	    // Table -> Indices -> List All
 	    tableIndicesListAllMenuItem = 
-		addMenuItem(tableMenuIndices, "List all");
+		addMenuItem(tableMenuIndices, "List all", 'l');
 
 	    // Table -> Indices -> List by Rule
 	    tableIndicesListRuleMenuItem = 
-		addMenuItem(tableMenuIndices, "List by rule");
+		addMenuItem(tableMenuIndices, "List by rule",'r');
 	    
 	    // Table -> All Commodities
-	    JMenu tableMenuCommodities = addMenu(tableMenu, "All Commodities");
+	    JMenu tableMenuCommodities = addMenu(tableMenu, "All Commodities", 'l');
 
 	    // Table -> All Commodities -> List All
 	    tableCommoditiesListAllMenuItem = 
-		addMenuItem(tableMenuCommodities, "List all");
+		addMenuItem(tableMenuCommodities, "List all", 'l');
+	    tableCommoditiesListAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+									     KeyEvent.VK_L, 
+									     ActionEvent.CTRL_MASK));
 
 	    // Table -> All Commodities -> List by Rule
 	    tableCommoditiesListRuleMenuItem = 
-		addMenuItem(tableMenuCommodities, "List by rule");
+		addMenuItem(tableMenuCommodities, "List by rule",'r');
 	}
 	
 	// Graph        
 	{
-	    JMenu graphMenu = addMenu(menuBar, "Graph");
+	    JMenu graphMenu = addMenu(menuBar, "Graph", 'r');
 	    
 	    // Graph -> Commodities
-	    JMenu graphCommodityMenu = addMenu(graphMenu, "Commodities");
+	    JMenu graphCommodityMenu = addMenu(graphMenu, "Commodities", 'c');
 	    
 	    // Graph -> Commodities -> By Codes
 	    graphCommodityCodeMenuItem = 
-		addMenuItem(graphCommodityMenu, "By Symbols");
+		addMenuItem(graphCommodityMenu, "By Symbols", 's');
+	    graphCommodityCodeMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+									     KeyEvent.VK_G, 
+									     ActionEvent.CTRL_MASK));
 	    
 	    // Graph -> Commodities -> By Name
 	    graphCommodityNameMenuItem = 
-		addMenuItem(graphCommodityMenu, "By Name");
+		addMenuItem(graphCommodityMenu, "By Name",'n');
 	}
      
 	// Portfolio menu
 	{
-	    JMenu portfolioMenu = addMenu(menuBar, "Portfolio");
+	    JMenu portfolioMenu = addMenu(menuBar, "Portfolio", 'o');
 	}
 
 	// Paper-trade menu
 	{
-	    JMenu paperTradeMenu = addMenu(menuBar, "Paper Trade");
+	    JMenu paperTradeMenu = addMenu(menuBar, "Paper Trade", 'a');
 	}
 
 	// Genetic Algorithm menu
 	{
-	    JMenu geneticAlgorithmMenu = addMenu(menuBar, "GA");
+	    JMenu geneticAlgorithmMenu = addMenu(menuBar, "GA", 'G');
 	}
 
 	// Window menu
 	{
-	    windowMenu = addMenu(menuBar, "Window");
+	    windowMenu = addMenu(menuBar, "Window", 'W');
 	    windowTileHorizontalMenuItem = addMenuItem(windowMenu, "Tile Horizontally");
 	    windowTileHorizontalMenuItem.setEnabled(false);
 	    windowTileVerticalMenuItem = addMenuItem(windowMenu, "Tile Vertically");
@@ -148,23 +156,52 @@ public class AnalyserMenu implements ActionListener, ContainerListener {
 	frame.setJMenuBar(menuBar);
     }
 
-    private JMenuItem addMenuItem(JMenuItem parent, String text) {
-	JMenuItem menuItem = new JMenuItem(text);
+    /**
+     * Creates a menu item and attaches it to a menu
+     * @param parent The menu to attach the menu item to
+     * @param title The title of the menu item
+     */
+    private JMenuItem addMenuItem(JMenuItem parent, String title) {
+	return addMenuItem(parent, title, (char)0);
+    }
+
+    /**
+     * Creates a menu item and attaches it to a menu
+     * @param parent The menu to attach the menu item to
+     * @param title The title of the menu item
+     */
+    private JMenuItem addMenuItem(JMenuItem parent, String title, char key) {
+	JMenuItem menuItem;
+	if (key != 0) {
+	    menuItem = new JMenuItem(title, key);
+	} else {
+	    menuItem = new JMenuItem(title);
+	}
 	menuItem.addActionListener(this);
 	parent.add(menuItem);
 
 	return menuItem;
     } 
 
-    private JMenu addMenu(JMenuBar parent, String text) {
-	JMenu menu = new JMenu(text);
-	parent.add(menu);
-	
-	return menu;
+    /**
+     * Creates a menu and attaches it to a component
+     * @param parent The component to attach the menu to
+     * @param title The title of the menu
+     */
+    private JMenu addMenu(JComponent parent, String title) {
+	return addMenu(parent, title, (char)0);
     }
 
-    private JMenu addMenu(JMenu parent, String text) {
-	JMenu menu = new JMenu(text);
+    /**
+     * Creates a menu and attaches it to a component
+     * @param parent The component to attach the menu to
+     * @param title The title of the menu
+     * @param key The accelerator key for the menu
+     */
+    private JMenu addMenu(JComponent parent, String title, char key) {
+	JMenu menu = new JMenu(title);
+	if (key != 0)
+	    menu.setMnemonic(key);
 	parent.add(menu);
 	
 	return menu;

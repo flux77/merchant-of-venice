@@ -22,6 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JDesktopPane;
 import javax.swing.BoxLayout;
+import javax.swing.JPasswordField;
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -37,6 +38,9 @@ import org.mov.util.Locale;
  * Provides a preference page to let the user specify their web proxy.
  *
  * @author Matthias Stockel
+ * 
+ * Provides the function of handle authentication requests in proxy.
+ * @author Bryan Lin 2004-9-11 
  */
 public class ProxyPage extends JPanel implements PreferencesPage {
     
@@ -45,6 +49,10 @@ public class ProxyPage extends JPanel implements PreferencesPage {
     private JCheckBox useProxyCheckBox = null;
     private JTextField hostTextField = null;
     private JTextField portTextField = null;
+
+    private JCheckBox useAuthCheckBox = null;
+    private JTextField userTextField = null;
+    private JPasswordField passwordTextField= null;
     
     /**
      * Create a new proxy preferences page.
@@ -95,10 +103,30 @@ public class ProxyPage extends JPanel implements PreferencesPage {
 						 proxyPreferences.port,
 						 gridbag, c, 5);
 	
+	useAuthCheckBox = 
+	    GridBagHelper.addCheckBoxRow(borderPanel, 
+					 Locale.getString("PROXY_AUTH"),
+					 proxyPreferences.authEnabled, gridbag, c);
+	useAuthCheckBox.addActionListener(new ActionListener() {
+		public void actionPerformed(final ActionEvent e) {
+		    checkAuthDisabledStatus();
+		}
+	    });
+
+	userTextField = GridBagHelper.addTextRow(borderPanel,
+						 Locale.getString("PROXY_USER"),
+						 proxyPreferences.user,
+						 gridbag, c, 20);
+	
+	passwordTextField = GridBagHelper.addPasswordRow(borderPanel,
+						 Locale.getString("PROXY_PASSWORD"),
+						 proxyPreferences.password,
+						 gridbag, c, 5);
+	
 	proxyPanel.add(borderPanel, BorderLayout.NORTH);
 
 	checkDisabledStatus();
-					   
+	checkAuthDisabledStatus();					   
 	return proxyPanel;
     }
     
@@ -110,6 +138,11 @@ public class ProxyPage extends JPanel implements PreferencesPage {
 	proxyPreferences.host = hostTextField.getText();
 	proxyPreferences.port = portTextField.getText();
 	proxyPreferences.isEnabled = useProxyCheckBox.isSelected();
+	
+	proxyPreferences.user= userTextField.getText();
+	proxyPreferences.password = new String(passwordTextField.getPassword());
+	proxyPreferences.authEnabled = useAuthCheckBox.isSelected();
+	
 	PreferencesManager.saveProxySettings(proxyPreferences);
     }
     
@@ -117,6 +150,12 @@ public class ProxyPage extends JPanel implements PreferencesPage {
 	return this;
     }
 
+    private void checkAuthDisabledStatus() {
+        boolean useAuth = useAuthCheckBox.isSelected();
+	userTextField.setEnabled(useAuth);
+	passwordTextField.setEnabled(useAuth);
+    }
+    
     private void checkDisabledStatus() {
         boolean useProxy = useProxyCheckBox.isSelected();
 	hostTextField.setEnabled(useProxy);

@@ -59,7 +59,9 @@ public class PortfolioSymbolComboBox extends JComboBox
 	Vector symbols = portfolio.getSymbolsTraded();
 	Iterator iterator = symbols.iterator();
 	while(iterator.hasNext()) {
-	    addItem(iterator.next());
+            String symbol = (String)iterator.next();
+            symbol = symbol.toUpperCase();
+	    addItem(symbol);
 	}
     }
 }

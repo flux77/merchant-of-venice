@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.graph;
@@ -29,7 +29,7 @@ import org.mov.chart.source.*;
 import org.mov.util.*;
 
 /**
- * High low bar graph. This graph draws a single vertical line between the 
+ * High low bar graph. This graph draws a single vertical line between the
  * day low and the day high values and draws a single horizontal bars at
  * the day close.
  */
@@ -56,7 +56,7 @@ public class HighLowBarGraph extends AbstractGraph {
 
 	this.dayLow = dayLow.getGraphable();
 	this.dayHigh = dayHigh.getGraphable();
-	this.dayClose = dayClose.getGraphable();       
+	this.dayClose = dayClose.getGraphable();
     }
 
     // See Graph.java
@@ -74,7 +74,7 @@ public class HighLowBarGraph extends AbstractGraph {
 	while(iterator.hasNext()) {
 
 	    Comparable x = (Comparable)iterator.next();
-	    
+	
 	    // Skip until our start date
 	    if(x.compareTo(dayClose.getStartX()) < 0) {
 		i++;
@@ -82,7 +82,7 @@ public class HighLowBarGraph extends AbstractGraph {
 	    }
 
 	    // If our graph is finished exit this loop
-	    if(x.compareTo(dayClose.getEndX()) > 0) 
+	    if(x.compareTo(dayClose.getEndX()) > 0)
 		break;
 
 	    // Otherwise draw bar
@@ -96,25 +96,25 @@ public class HighLowBarGraph extends AbstractGraph {
 
 		xCoordinate = (int)(xoffset + horizontalScale * i);
 
-		lowY = yoffset - 
-		    GraphTools.scaleAndFitPoint(dayLowY.doubleValue(), 
-						bottomLineValue, 
+		lowY = yoffset -
+		    GraphTools.scaleAndFitPoint(dayLowY.doubleValue(),
+						bottomLineValue,
 						verticalScale);
-		highY = yoffset - 
-		    GraphTools.scaleAndFitPoint(dayHighY.doubleValue(), 
-						bottomLineValue, 
+		highY = yoffset -
+		    GraphTools.scaleAndFitPoint(dayHighY.doubleValue(),
+						bottomLineValue,
 						verticalScale);
-		closeY = yoffset - 
-		    GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(), 
-						bottomLineValue, 
+		closeY = yoffset -
+		    GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(),
+						bottomLineValue,
 						verticalScale);
 		
 		// Draw bar
 		g.drawLine(xCoordinate, lowY, xCoordinate, highY);
 
 		// Draw perpendicular line indicating day close
-		g.drawLine(xCoordinate, closeY, 
-			   (int)(xCoordinate + 
+		g.drawLine(xCoordinate, closeY,
+			   (int)(xCoordinate +
 				 DAY_CLOSE_BAR_WIDTH * horizontalScale),
 			   closeY);
 	    }
@@ -142,15 +142,15 @@ public class HighLowBarGraph extends AbstractGraph {
 	
 	if(dayLowY != null && dayHighY != null) {
 
-	    int dayLowYCoordinate = yoffset - 
+	    int dayLowYCoordinate = yoffset -
 		GraphTools.scaleAndFitPoint(dayLowY.doubleValue(),
 					    bottomLineValue, verticalScale);
 
-	    int dayHighYCoordinate = yoffset - 
+	    int dayHighYCoordinate = yoffset -
 		GraphTools.scaleAndFitPoint(dayHighY.doubleValue(),
 					    bottomLineValue, verticalScale);
-	    
-	    // Its our graph if its within TOOL_TIP_BUFFER pixels of the 
+	
+	    // Its our graph if its within TOOL_TIP_BUFFER pixels of the
 	    // line from day low to day high
 	    if(y >= (dayLowYCoordinate - Graph.TOOL_TIP_BUFFER) &&
 	       y <= (dayHighYCoordinate + Graph.TOOL_TIP_BUFFER))
@@ -167,5 +167,18 @@ public class HighLowBarGraph extends AbstractGraph {
     // Lowest value will always be in the day low source
     public double getLowestY(List x) {
         return dayLow.getLowestY(x);
+    }
+
+    /**
+     * Return the name of this graph.
+     *
+     * @return <code>High Low Bar</code>
+     */
+    public String getName() {
+        return Locale.getString("HIGH_LOW_BAR");
+    }
+
+    public boolean isPrimary() {
+        return true;
     }
 }

@@ -5,54 +5,52 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.graph;
 
-import java.awt.*;
-import java.lang.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.mov.chart.*;
-import org.mov.chart.source.*;
-import org.mov.util.*;
-import org.mov.parser.*;
-import org.mov.quote.*;
+import org.mov.chart.Graphable;
+import org.mov.chart.GraphTools;
+import org.mov.chart.source.GraphSource;
+import org.mov.util.Locale;
+import org.mov.quote.QuoteFunctions;
 
 /**
  * Standard Deviation graph. This graph is used to show the
  * volatility of a stock. The higher the standard deviation, the
  * more volatile the stock.
+ *
+ * @author Andrew Leppard
+ * @see PeriodGraphUI
  */
 public class StandardDeviationGraph extends AbstractGraph {
 
+    // Standard deviation ready to graph
     private Graphable standardDeviation;
-   
+
     /**
      * Create a new standard deviation graph.
      *
      * @param	source	the source to create a standard deviation from
-     * @param	period	the period of the standard deviation
      */
-    public StandardDeviationGraph(GraphSource source, int period) {
-	
-	super(source);
-
-	// create standard deviation
-	standardDeviation = createStandardDeviation(source.getGraphable(),
-						    period);
+    public StandardDeviationGraph(GraphSource source) {
+        super(source);
+        setSettings(new HashMap());
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
@@ -60,7 +58,7 @@ public class StandardDeviationGraph extends AbstractGraph {
 		       double bottomLineValue, List xRange) {
 
 	g.setColor(colour);
-	GraphTools.renderLine(g, standardDeviation, xoffset, yoffset, 
+	GraphTools.renderLine(g, standardDeviation, xoffset, yoffset,
 			      horizontalScale,
 			      verticalScale, bottomLineValue, xRange);
     }
@@ -94,7 +92,7 @@ public class StandardDeviationGraph extends AbstractGraph {
 
     // Override vertical axis
     public double[] getAcceptableMinorDeltas() {
-	double[] minor = {1D, 
+	double[] minor = {1D,
 			 2D,
 			 3D,
 			 4D,
@@ -114,11 +112,11 @@ public class StandardDeviationGraph extends AbstractGraph {
     /**
      * Creates a new standard deviation based on the given data source.
      *
-     * @param	source	the input graph source 
+     * @param	source	the input graph source
      * @param	period	the desired period of the standard deviation
      * @return	the graphable containing averaged data from the source
      */
-    public static Graphable createStandardDeviation(Graphable source, 
+    public static Graphable createStandardDeviation(Graphable source,
 						    int period) {
 	Graphable standardDeviation = new Graphable();
 
@@ -132,7 +130,7 @@ public class StandardDeviationGraph extends AbstractGraph {
 	while(iterator.hasNext()) {
 	    Comparable x = (Comparable)iterator.next();
 
-	    sd = QuoteFunctions.sd(values,  
+	    sd = QuoteFunctions.sd(values,
 				   i - Math.min(period - 1, i),
 				   i + 1);
 	    i++;
@@ -141,6 +139,40 @@ public class StandardDeviationGraph extends AbstractGraph {
 	}
 
 	return standardDeviation;
+    }
+
+    public void setSettings(HashMap settings) {
+        super.setSettings(settings);
+
+        // Retrieve period from settings hashmap
+        int period = PeriodGraphUI.getPeriod(settings);
+
+	// Create standard deviation
+	standardDeviation = createStandardDeviation(getSource().getGraphable(),
+						    period);
+    }
+
+    /**
+     * Return the graph's user interface.
+     *
+     * @param settings the initial settings
+     * @return user interface
+     */
+    public GraphUI getUI(HashMap settings) {
+        return new PeriodGraphUI(settings);
+    }
+
+    /**
+     * Return the name of this graph.
+     *
+     * @return <code>Standard Deviation</code>
+     */
+    public String getName() {
+        return Locale.getString("STANDARD_DEVIATION");
+    }
+
+    public boolean isPrimary() {
+        return false;
     }
 }
 

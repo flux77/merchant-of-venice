@@ -5,43 +5,49 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.graph;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JPanel;
 
-import org.mov.chart.source.*;
-import org.mov.util.*;
-import org.mov.quote.*;
+import org.mov.chart.source.GraphSource;
 
 /**
- * Set the default values for a graph based on a single 
- * <code>GraphSource</code>. All graphs that are based on a single
- * <code>GraphSource</code> object will almost certainly want to use these
- * default values. Graphs that use multiple <code>GraphSource</code>
+ * Set the default values for a graph based on a single
+ * {@link GraphSource}. All graphs that are based on a single
+ * {@link GraphSource} object will almost certainly want to use these
+ * default values. Graphs that use multiple {@link GraphSource}
  * objects will still probably want to extend this class and override
- * any differences. 
+ * any differences.
+ *
+ * @author Andrew Leppard
+ * @see Graph
+ * @see GraphUI
+ * @see GraphSource
  */
 abstract public class AbstractGraph implements Graph {
 
     // We provide defaults based on a single GraphSource object.
     private GraphSource source;
-   
+
+    // Store the settings
+    private HashMap settings = new HashMap();
+
     /**
-     * Set the default values to the ones provided by this 
+     * Set the default values to the ones provided by this
      * <code>GraphSource</code>.
      *
      * @param	source	default <code>GraphSource</code> to use
@@ -79,7 +85,7 @@ abstract public class AbstractGraph implements Graph {
     /**
      * Get the first X value that this graph will draw.
      *
-     * @return	X value of the first x coordinate in the default 
+     * @return	X value of the first x coordinate in the default
      *		<code>GraphSource</code>'s <code>Graphable</code>
      */
     public Comparable getStartX() {
@@ -89,7 +95,7 @@ abstract public class AbstractGraph implements Graph {
     /**
      * Get the last X value that this graph will draw.
      *
-     * @return	X value of the last x coordinate in the default 
+     * @return	X value of the last x coordinate in the default
      *		<code>GraphSource</code>'s <code>Graphable</code>
      */
     public Comparable getEndX() {
@@ -99,7 +105,7 @@ abstract public class AbstractGraph implements Graph {
     /**
      * Get all X values that this graph will draw.
      *
-     * @return	X values in the default <code>GraphSource</code>'s 
+     * @return	X values in the default <code>GraphSource</code>'s
      *		<code>Graphable</code>
      */
     public Set getXRange() {
@@ -119,11 +125,12 @@ abstract public class AbstractGraph implements Graph {
     }
 
     /**
-     * Return the name of the graph we are drawing.
+     * Return the name of the source data that we are graphing, e.g.
+     * <code>CBA</code>.
      *
-     * @return	the name of the default <code>GraphSource</code>
+     * @return the name of the source
      */
-    public String getName() {
+    public String getSourceName() {
 	return source.getName();
     }
 
@@ -161,9 +168,9 @@ abstract public class AbstractGraph implements Graph {
      * Return an array of acceptable major deltas for the vertical
      * axis.
      *
-     * @return	an array of doubles representing the minor deltas 
+     * @return	an array of doubles representing the minor deltas
      *		of the default <code>GraphSource</code>
-     */ 
+     */
     public double[] getAcceptableMajorDeltas() {
 	return source.getAcceptableMajorDeltas();
     }
@@ -175,29 +182,44 @@ abstract public class AbstractGraph implements Graph {
      * @return	an array of doubles representing the minor deltas
      *		of the default <code>GraphSource</code>
      * @see	Graph#getAcceptableMajorDeltas
-     */ 
+     */
     public double[] getAcceptableMinorDeltas() {
 	return source.getAcceptableMinorDeltas();
     }
 
     /**
-     * Return the annotations for this graph or <code>null</code> if it
-     * does not have any. The annotations should be in a map of X values
-     * to <code>String</code> values.
+     * Return the graph's current settings. Each graph must contain
+     * its user definable settings in a hashmap. If a graph does not
+     * have any user definable settings, then it can just return
+     * an empty hashmap here.
      *
-     * @return	<code>null</code>
+     * @return settings
      */
-    public HashMap getAnnotations() {
-	return null;
+    public HashMap getSettings() {
+        return settings;
     }
 
     /**
-     * Return if this graph has any annotations.
+     * Set the graph's user definable settings.
      *
-     * @return	<code>false</code>
+     * @param settings the new settings
      */
-    public boolean hasAnnotations() {
-	return false;
+    public void setSettings(HashMap settings) {
+        this.settings = settings;
+    }
+
+    /**
+     * Returns the graph's user interface. The default action is to
+     * return <code>null</code> which indicates that the graph does not
+     * have a user interface. If the graph does have a user interface then
+     * it should override this method.
+     *
+     * @param settings initial settings (ignored)
+     * @return <code>null</code>
+     */
+    public GraphUI getUI(HashMap settings) {
+        // null indicates no UI
+        return null;
     }
 }
 

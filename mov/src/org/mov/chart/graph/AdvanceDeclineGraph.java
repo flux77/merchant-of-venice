@@ -118,15 +118,6 @@ public class AdvanceDeclineGraph implements Graph {
     }
 
     /**
-     * Return the name of this graph.
-     *
-     * @return	<code>Advance/Decline</code>
-     */
-    public String getName() {
-	return Locale.getString("ADVANCE_DECLINE");
-    }
-
-    /**
      * Return the Y value for the given X value.
      *
      * @param	x value
@@ -258,6 +249,36 @@ public class AdvanceDeclineGraph implements Graph {
 	ProgressDialogManager.closeProgressDialog(progress);	
 
 	return advanceDecline;
+    }
+
+    public HashMap getSettings() {
+        return new HashMap();
+    }
+
+    public void setSettings(HashMap settings) {
+        // ignore
+    }
+
+    public GraphUI getUI(HashMap settings) {
+        // No user interface
+        return null;
+    }
+
+    /**
+     * Return the name of this graph.
+     *
+     * @return	<code>Advance/Decline</code>
+     */
+    public String getName() {
+	return Locale.getString("ADVANCE_DECLINE");
+    }
+
+    public String getSourceName() {
+        return Locale.getString("ADVANCE_DECLINE");
+    }
+
+    public boolean isPrimary() {
+        return true;
     }
 }
 

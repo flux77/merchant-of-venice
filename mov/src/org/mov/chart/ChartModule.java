@@ -42,7 +42,7 @@ import org.mov.ui.*;
  * <pre>
  *	QuoteBundle quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
  *	GraphSource dayClose = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
- *	Graph graph = new LineGraph(dayClose);
+ *	Graph graph = new LineGraph(dayClose, Locale.getString("LINE_CHART"), true);
  *
  *	ChartModule chart = new ChartModule(desktop);
  *	chart.add(graph, 0);
@@ -317,7 +317,7 @@ public class ChartModule extends JPanel implements Module,
 		    new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
 	
 	    if (!thread.isInterrupted())
-		graph = new LineGraph(dayClose);
+		graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
 	
 	    if (!thread.isInterrupted()) {
 
@@ -365,7 +365,7 @@ public class ChartModule extends JPanel implements Module,
 	    while(graphIterator.hasNext()) {
 		Graph graph = (Graph)graphIterator.next();
 
-		if(name.equals(graph.getName()))
+		if(name.equals(graph.getSourceName()))
 		    return true;
 	    }
 	}
@@ -471,7 +471,7 @@ public class ChartModule extends JPanel implements Module,
 	    while(graphIterator.hasNext()) {
 		Graph graph = (Graph)graphIterator.next();
 
-		if(name.equals(graph.getName()))
+		if(name.equals(graph.getSourceName()))
 		    graphsToRemove.add(graph);
 	    }
 	}

@@ -5,31 +5,28 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.graph;
 
-import java.awt.*;
-import java.util.HashMap;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.lang.*;
-import java.util.*;
 
-import org.mov.chart.*;
-import org.mov.chart.source.*;
-import org.mov.util.*;
-import org.mov.parser.*;
-import org.mov.quote.*;
+import org.mov.chart.Graphable;
+import org.mov.chart.GraphTools;
+import org.mov.chart.source.GraphSource;
+import org.mov.util.Locale;
 
 /**
  * On Balance Volume (OBV) graph. This graph is used as a precursor for
@@ -37,29 +34,34 @@ import org.mov.quote.*;
  * stock will too and vice-versa. OBV is calculated by starting with
  * an arbitary constant. To calculate a day's OBV, get the previous
  * day's OBV. If the stock went up that day, add the volume. If the stock
- * went down, minus the volume. 
+ * went down, minus the volume.
+ *
+ * @author Andrew Leppard
  */
 public class OBVGraph extends AbstractGraph {
 
+    // Initial (arbitrary) value to start from
+    private final static double INITIAL_VALUE = 50000D;
+
+    // OBV values ready to graph
     private Graphable obv;
-   
+
     /**
      * Create a new On Balance Volume (OBV) graph.
      *
      * @param	open	the day open price
      * @param	close	the day close price
      * @param	volume	the day volume
-     * @param	start	arbitary start value
      */
     public OBVGraph(GraphSource open, GraphSource close,
-		    GraphSource volume, double start) {
+		    GraphSource volume) {
 	
 	// Use same axis as volume
 	super(volume);
 
 	// create OBV
 	obv = createOBV(open.getGraphable(), close.getGraphable(),
-			volume.getGraphable(), start);
+			volume.getGraphable());
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
@@ -67,7 +69,7 @@ public class OBVGraph extends AbstractGraph {
 		       double bottomLineValue, List xRange) {
 
 	g.setColor(colour);
-	GraphTools.renderLine(g, obv, xoffset, yoffset, 
+	GraphTools.renderLine(g, obv, xoffset, yoffset,
 			      horizontalScale,
 			      verticalScale, bottomLineValue, xRange);
     }
@@ -95,12 +97,10 @@ public class OBVGraph extends AbstractGraph {
      * @param	open	the day open price
      * @param	close	the day close price
      * @param	volume	the day volume
-     * @param	runningOBV	arbitary start value
      * @return	the OBV
      */
-    public static Graphable createOBV(Graphable open, Graphable close,
-				      Graphable volume, double runningOBV) {
-
+    public static Graphable createOBV(Graphable open, Graphable close, Graphable volume) {
+        double runningOBV = INITIAL_VALUE;
 	Graphable obv = new Graphable();
 
 	// All graphables should be in-sync
@@ -113,7 +113,7 @@ public class OBVGraph extends AbstractGraph {
 	    Double dayClose = close.getY(x);
 	    Double dayVolume = volume.getY(x);
 
-	    if(dayClose.compareTo(dayOpen) > 0) 
+	    if(dayClose.compareTo(dayOpen) > 0)
 		runningOBV += dayVolume.intValue();
 	    else if(dayClose.compareTo(dayOpen) < 0)
 		runningOBV -= dayVolume.intValue();
@@ -122,6 +122,19 @@ public class OBVGraph extends AbstractGraph {
 	}
 
 	return obv;
+    }
+
+    /**
+     * Return the name of this graph.
+     *
+     * @return <code>OBV</code>
+     */
+    public String getName() {
+        return Locale.getString("OBV");
+    }
+
+    public boolean isPrimary() {
+        return false;
     }
 }
 

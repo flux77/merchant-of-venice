@@ -221,6 +221,10 @@ public class PointAndFigureGraph extends AbstractGraph {
 	
 	return pointAndFigure;
     }
+
+    public boolean isPrimary() {
+        return true;
+    }
 }
 
 

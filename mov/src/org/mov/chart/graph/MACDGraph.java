@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.graph;
@@ -39,7 +39,6 @@ public class MACDGraph extends AbstractGraph {
 
     private Graphable fastMovingAverage;
     private Graphable slowMovingAverage;
-    private HashMap annotations;
 
     /**
      * Create a new MACD graph.
@@ -53,20 +52,16 @@ public class MACDGraph extends AbstractGraph {
 
 	super(source);
 
-	// Create averaged data sources. 
+	// Create averaged data sources.
 	int slowPeriod = Math.max(periodOne, periodTwo);
 	int fastPeriod = Math.min(periodOne, periodTwo);
 
-	slowMovingAverage = 
-	    MovingAverageGraph.createMovingAverage(source.getGraphable(), 
+	slowMovingAverage =
+	    MovingAverageGraph.createMovingAverage(source.getGraphable(),
 						   slowPeriod);
-	fastMovingAverage = 
-	    MovingAverageGraph.createMovingAverage(source.getGraphable(), 
+	fastMovingAverage =
+	    MovingAverageGraph.createMovingAverage(source.getGraphable(),
 						   fastPeriod);
-	
-	// Create buy sell recommendations
-	annotations = GraphTools.createAnnotations(fastMovingAverage, 
-						   slowMovingAverage);
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
@@ -77,13 +72,13 @@ public class MACDGraph extends AbstractGraph {
 
 	// Fast moving line
 	g.setColor(Color.green.darker());
-	GraphTools.renderLine(g, fastMovingAverage, xoffset, yoffset, 
+	GraphTools.renderLine(g, fastMovingAverage, xoffset, yoffset,
 			      horizontalScale,
 			      verticalScale, bottomLineValue, dates);
 
 	// Slow moving line
 	g.setColor(Color.red.darker());
-	GraphTools.renderLine(g, slowMovingAverage, xoffset, yoffset, 
+	GraphTools.renderLine(g, slowMovingAverage, xoffset, yoffset,
 			      horizontalScale,
 			      verticalScale, bottomLineValue, dates);
     }
@@ -95,32 +90,13 @@ public class MACDGraph extends AbstractGraph {
 	return null; // we never give tool tip information
     }
 
-    /** 
-     * Return annotations containing buy/sell recommendations based on
-     * when the moving averages cross each other.
-     *
-     * @return	annotations
-     */
-    public HashMap getAnnotations() {
-	return annotations;
-    }
-
-    /**
-     * Return that we support annotations.
-     *
-     * @return	<code>true</code>
-     */
-    public boolean hasAnnotations() {
-	return true;
-    }
-
     // Highest Y value is the highest of both the moving averages
     public double getHighestY(List x) {
 	double fastHighestY = fastMovingAverage.getHighestY(x);
 	double slowHighestY = slowMovingAverage.getHighestY(x);
 
-	return 
-	    fastHighestY > slowHighestY? 
+	return
+	    fastHighestY > slowHighestY?
 	    fastHighestY :
 	    slowHighestY;
     }
@@ -130,8 +106,8 @@ public class MACDGraph extends AbstractGraph {
 	double fastLowestY = fastMovingAverage.getLowestY(x);
 	double slowLowestY = slowMovingAverage.getLowestY(x);
 
-	return 
-	    fastLowestY < slowLowestY? 
+	return
+	    fastLowestY < slowLowestY?
 	    fastLowestY :
 	    slowLowestY;
     }
@@ -143,6 +119,10 @@ public class MACDGraph extends AbstractGraph {
      */
     public String getName() {
 	return Locale.getString("MACD");
+    }
+
+    public boolean isPrimary() {
+        return true;
     }
 }
 

@@ -65,7 +65,7 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
     public PortfolioChartMenu(ChartModule listener, QuoteBundle quoteBundle,
 			      Portfolio portfolio, Graph graph) {
 
-	super(graph.getName());
+	super(graph.getSourceName());
 	
 	this.quoteBundle = quoteBundle;
 	this.graph = graph;
@@ -112,7 +112,7 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
      * @return	the graph name
      */
     public String getName() {
-	return graph.getName();
+	return graph.getSourceName();
     }
 
     /**
@@ -142,23 +142,27 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 	    else if(text == RETURN_VALUE)
 		addGraph(new LineGraph(new PortfolioGraphSource(portfolio,
 								quoteBundle,
-								PortfolioGraphSource.RETURN_VALUE)),
+								PortfolioGraphSource.RETURN_VALUE),
+                                       RETURN_VALUE, true),
 			 RETURN_VALUE, 0);
 	    else if(text == CASH_VALUE)
 		addGraph(new LineGraph(new PortfolioGraphSource(portfolio,
 								quoteBundle,
-								PortfolioGraphSource.CASH_VALUE)),
+								PortfolioGraphSource.CASH_VALUE),
+                                       CASH_VALUE, true),
 			 CASH_VALUE, 0);
 	    else if(text == SHARE_VALUE)
 		addGraph(new LineGraph(new PortfolioGraphSource(portfolio,
 								quoteBundle,
-								PortfolioGraphSource.SHARE_VALUE)),
+								PortfolioGraphSource.SHARE_VALUE),
+                                       SHARE_VALUE, true),
 			 SHARE_VALUE, 0);
 
 	    else if(text == STOCKS_HELD)
 		addGraph(new BarGraph(new PortfolioGraphSource(portfolio,
                                                                quoteBundle,
-                                                               PortfolioGraphSource.STOCKS_HELD)),
+                                                               PortfolioGraphSource.STOCKS_HELD),
+                                      STOCKS_HELD, false),
 			 STOCKS_HELD);
 
             // Otherwise it's an account in the portfolio
@@ -166,7 +170,8 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
                 String accountName = text;
                 addGraph(new LineGraph(new PortfolioGraphSource(portfolio,
                                                                 quoteBundle,
-                                                                accountName)),
+                                                                accountName),
+                                       accountName, true),
                          accountName, 0);
             }
 	}

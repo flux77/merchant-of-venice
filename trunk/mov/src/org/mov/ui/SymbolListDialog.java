@@ -45,6 +45,7 @@ public class SymbolListDialog {
      * @return	a sorted set containing a single commodity string or
      * <code>null</code> if the user cancelled the dialog
      */
+    /*
     public static SortedSet getSymbolByName(JDesktopPane parent, 
 					    String title) {
 	SortedSet symbolSet;
@@ -97,6 +98,7 @@ public class SymbolListDialog {
 	
 	return symbolSet;
     }
+    */
 
     /**
      * Open a new <code>SymbolListDialog</code> dialog. Ask the user
@@ -128,12 +130,18 @@ public class SymbolListDialog {
 	    // Parse what the user inputed
 	    if(symbols != null) {
 		
-                // Get the set of symbols and check to see if they
-                // all exist
-                symbolSet = checkSymbols(parent, symbols);
-
-                if(symbolSet == null)
+                // Parse
+                try {
+                    symbolSet = Symbol.toSortedSet(symbols);
+                }
+                catch(SymbolFormatException e) {
                     invalidResponse = true;
+
+                    JOptionPane.showInternalMessageDialog(parent, 
+                                                          e.getReason(),
+                                                          "Error parsing symbols",
+                                                          JOptionPane.ERROR_MESSAGE);
+                }
 	    }
 
 	    // Keep going while user hasnt entered a valid symbol and
@@ -145,66 +153,5 @@ public class SymbolListDialog {
 	    return null;
 
 	return symbolSet;
-    }
-
-    /**
-     * This function takes a string containing a comma or space
-     * separated list of symbols and turns it into a sorted list of
-     * strings containing each symbol. It will then check to make
-     * sure that each symbol exists.
-     *
-     * If any symbols do not exist in the quote source, it will display
-     * a dialog to the user informing them of the error.
-     *
-     * @param parent the parent component used for displaying the error
-     *               dialog
-     * @param symbols space or comma separated list of symbols
-     * @return sorted set of symbol strings or <code>null</code> if there
-     *         was an error
-     */
-    public static SortedSet checkSymbols(JComponent parent, String symbols) {
-        // Convert string to sorted set of symbols        
-        SortedSet symbolSet = Converter.stringToSortedSet(symbols);
-	String symbol;
-        Iterator iterator = symbolSet.iterator();
-	String unknownSymbols = new String();
-        
-        while(iterator.hasNext()) {
-            symbol = (String)iterator.next();
-            
-            // See if symbol exists
-            if(!QuoteSourceManager.getSource().symbolExists(symbol)) {
-                
-                // Add to list of symbols we don't know
-                if(unknownSymbols.length() > 0)
-                    unknownSymbols = unknownSymbols.concat(" ");
-                
-                unknownSymbols = unknownSymbols.concat(symbol);
-                
-                // Remove symbol from set of valid symbols the user
-                // has entered
-                iterator.remove();
-            }
-        }
-
-        // If there was any unknown symbols put up a message dialog
-        // telling the user which ones were unknown
-        if(unknownSymbols.length() > 0) {
-            String noData = 
-                "No data available for symbol(s) '" + 
-                unknownSymbols + 
-                "'";
-            
-            JOptionPane.
-                showInternalMessageDialog(parent, noData, 
-                                          "Unknown symbol(s)",
-                                          JOptionPane.ERROR_MESSAGE);
-
-            // Return null indicating there was at least one
-            // unknown symbol
-            symbolSet = null;
-        }
-        
-        return symbolSet;
     }
 }

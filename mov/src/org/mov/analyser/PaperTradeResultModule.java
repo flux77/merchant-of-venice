@@ -74,6 +74,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     private JMenuBar menuBar;
     private JMenuItem openMenuItem;
     private JMenuItem graphMenuItem;
+    private JMenuItem transactionsMenuItem;
     private JMenuItem viewBuyRuleMenuItem;
     private JMenuItem viewSellRuleMenuItem;
     private JMenuItem storeBuyRuleMenuItem;
@@ -283,6 +284,14 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     }});
             menu.add(popupGraphMenuItem);
 
+            JMenuItem popupTransactionsMenuItem = new JMenuItem(Locale.getString("TRANSACTIONS"));
+            popupTransactionsMenuItem.setEnabled(getSelectedRowCount() == 1);
+            popupTransactionsMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        transactionsSelectedResult();
+                    }});
+            menu.add(popupTransactionsMenuItem);
+
             menu.addSeparator();
 
             JMenuItem popupViewBuyRuleMenuItem =
@@ -355,6 +364,20 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                                                         result.getQuoteBundle(),
                                                         result.getStartDate(),
                                                         result.getEndDate());
+        }
+    }
+
+    // Transactions first selected result
+    private void transactionsSelectedResult() {
+        // Get result at row
+        int row = getSelectedRow();
+
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            PaperTradeResult result = model.getResult(row);
+
+            CommandManager.getInstance().tableTransactions(result.getPortfolio(),
+                                                           result.getQuoteBundle());
         }
     }
 
@@ -482,6 +505,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
         openMenuItem.setEnabled(numberOfSelectedRows == 1);
         graphMenuItem.setEnabled(numberOfSelectedRows == 1);
+        transactionsMenuItem.setEnabled(numberOfSelectedRows == 1);
         viewBuyRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         viewSellRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         storeBuyRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
@@ -509,6 +533,13 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     graphSelectedResult();
                 }});
         resultMenu.add(graphMenuItem);
+
+        transactionsMenuItem = new JMenuItem(Locale.getString("TRANSACTIONS"));
+        transactionsMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    transactionsSelectedResult();
+                }});
+        resultMenu.add(transactionsMenuItem);
 
 	resultMenu.addSeparator();
 

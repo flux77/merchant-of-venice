@@ -25,9 +25,11 @@ public class TradingDate {
     }
     
     public TradingDate(Date date) {
-	this.year = date.getYear() + 1900;
-	this.month = date.getMonth() + 1;
-	this.day = date.getDate();
+	GregorianCalendar gc = new GregorianCalendar();
+	gc.setTime(date);
+	this.year = gc.get(Calendar.YEAR);
+	this.month = gc.get(Calendar.MONTH) + 1;
+	this.day = gc.get(Calendar.DATE);
     }
 
     // Create trading date set to closest trading date to today (e.g.
@@ -100,21 +102,21 @@ public class TradingDate {
 
     public void next(int days) {
 
-	Calendar date = this.toCalendar();
+	Calendar cal = this.toCalendar();
 
 	for(int i = 0; i < days; i++) {
 
 	    // Add 1 day or more to skip weekends as necessary
 	    do {
-		date.add(Calendar.DAY_OF_WEEK, 1);
-	    } while(date.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
-		    date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
+		cal.add(Calendar.DAY_OF_WEEK, 1);
+	    } while(cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
+		    cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
 	}
 
 	// Convert back
-	year = date.get(Calendar.YEAR);
-	month = date.get(Calendar.MONTH) + 1;
-	day = date.get(Calendar.DAY_OF_MONTH);
+	year = cal.get(Calendar.YEAR);
+	month = cal.get(Calendar.MONTH) + 1;
+	day = cal.get(Calendar.DAY_OF_MONTH);
     }
 
     public int compareTo(Object date) {
@@ -170,7 +172,7 @@ public class TradingDate {
     }
 
     public Date toDate() {
-	return new Date(getYear() - 1900, getMonth() - 1, getDay());
+	return this.toCalendar().getTime();
     }
 
     public Calendar toCalendar() {
@@ -178,3 +180,4 @@ public class TradingDate {
 	return new GregorianCalendar(getYear(), getMonth() - 1, getDay());
     }
 }
+

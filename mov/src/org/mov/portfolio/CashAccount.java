@@ -8,7 +8,7 @@ import org.mov.quote.*;
 
 /** Representation of a cash account in a portfolio.
  */
-public class CashAccount implements Account {
+public class CashAccount implements Account, Cloneable {
 
     // Amount of cash available
     private float capital;
@@ -47,12 +47,22 @@ public class CashAccount implements Account {
 	}
     }
 
+    public Object clone() {
+	CashAccount clonedCashAccount = new CashAccount(getName());
+
+	return clonedCashAccount;
+    }
+
     public String getName() {
 	return name;
     }
 
     public float getValue(QuoteCache cache, TradingDate date) {
 	return capital;
+    }
+
+    public void removeAllTransactions() {
+	capital = 0.0F;
     }
 
     public int getType() {

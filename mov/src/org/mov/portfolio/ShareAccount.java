@@ -8,7 +8,7 @@ import org.mov.quote.*;
 
 /** Representation of a share account in a portfolio.
  */
-public class ShareAccount implements Account {
+public class ShareAccount implements Account, Cloneable {
     
     // Current stock holdings
     private HashMap stockHoldings = new HashMap();
@@ -25,12 +25,19 @@ public class ShareAccount implements Account {
 	this.name = name;
     }
 
+    public Object clone() {
+	ShareAccount clonedShareAccount = new ShareAccount(getName());
+
+	return clonedShareAccount;
+    }
+
     public String getName() {
 	return name;
     }
 
-    public float getValue(QuoteCache cache, TradingDate date) {
-
+    public float getValue(QuoteCache cache, TradingDate date) 
+	throws EvaluationException {
+ 
 	Set set = stockHoldings.keySet();
 	Iterator iterator = set.iterator();
 	float value = 0;
@@ -39,14 +46,9 @@ public class ShareAccount implements Account {
 	    String symbol = (String)iterator.next();
 	    StockHolding holding = (StockHolding)stockHoldings.get(symbol);
 
-	    try {
-		value += cache.getQuote(holding.getSymbol().toLowerCase(), 
-					Quote.DAY_CLOSE, date) *
-		    holding.getShares();
-	    }
-	    catch(EvaluationException e) {
-		// shouldn't happen
-	    }
+	    value += cache.getQuote(holding.getSymbol().toLowerCase(), 
+				    Quote.DAY_CLOSE, date) *
+		holding.getShares();
 	}
 	
 	return value;
@@ -107,6 +109,13 @@ public class ShareAccount implements Account {
 
     public int getType() {
 	return Account.SHARE_ACCOUNT;
+    }
+
+    public void removeAllTransactions() {
+
+	// Removing all transactions means removing all stocks
+	// from our account
+	stockHoldings.clear();
     }
 
     /**

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.parser;
@@ -22,16 +22,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mov.parser.expression.ClauseExpression;
-import org.mov.parser.expression.NumberExpression;
 import org.mov.parser.expression.DefineVariableExpression;
 import org.mov.parser.expression.GetVariableExpression;
+import org.mov.parser.expression.LagExpression;
+import org.mov.parser.expression.NumberExpression;
 import org.mov.parser.expression.SetVariableExpression;
 import org.mov.util.Locale;
 
 /**
  * Parse a string into an executable expression. This class acts as
  * a gatekeeper to the <i>Gondala</i> language which is used to perform
- * manipulations on stock market quotes. 
+ * manipulations on stock market quotes.
  * <p>
  * <h2>Langauge EBNF</h2>
  * <pre>
@@ -46,14 +47,14 @@ import org.mov.util.Locale;
  * ADD_OPERATION     = "-" | "+"
  * MULTIPLY_EXPR     = FACTOR [ MULTIPLY_OPERATOR FACTOR ]
  * MULTIPLY_OPERATOR = "*" | "/"
- * FACTOR            = VARIABLE | NUMBER | FUNCTION | FLOW_CONTROL | "(" SUB_EXPR ")"
+ * FACTOR            = VARIABLE | NUMBER | FUNCTION | FLOW_CONTROL | QUOTE | "(" SUB_EXPR ")"
  * NUMBER            = ["-"]{0-9}+ ["." {0-9}+] | "true" | "false"
  * VARIABLE_NAME     = {a-zA-Z}{a-zA-Z0-9_}*
  * TYPE              = "boolean" | "float" | "int"
  * VARIABLE          = [["const"] [TYPE]] VARIABLE_NAME ["=" SUB_EXPR]
  * QUOTE             = "open" | "close" | "low" | "high" | "volume"
- * FUNCTION          = "lag" "(" QUOTE "," SUB_EXPR ")" | 
- *                     "min" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" | 
+ * FUNCTION          = "lag" "(" QUOTE "," SUB_EXPR ")" |
+ *                     "min" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
  *                     "max" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
  *                     "avg" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
  *                     "sum" "(" QUOTE "," SUB_EXPR "," SUB_EXPR ")" |
@@ -121,7 +122,7 @@ public class Parser {
         return parse(new Variables(), string);
     }
 
-    private static TokenStack lexicalAnalysis(Variables variables, String string) 
+    private static TokenStack lexicalAnalysis(Variables variables, String string)
 	throws ParserException {
 
 	TokenStack tokens = new TokenStack();
@@ -131,7 +132,7 @@ public class Parser {
 
 	    // skip spaces
 	    while(string.length() > 0 &&
-		  Character.isWhitespace(string.charAt(0)))		  
+		  Character.isWhitespace(string.charAt(0)))		
 		string = string.substring(1);
 
 	    if(string.length() > 0) {
@@ -145,14 +146,14 @@ public class Parser {
 
 	return tokens;
     }
-    
-    private static Expression parseRootExpression(Variables variables, TokenStack tokens) 
+
+    private static Expression parseRootExpression(Variables variables, TokenStack tokens)
 	throws ParserException {
 	
 	List subExpressions = new ArrayList();
 
 	while(tokens.size() > 0)
-	    subExpressions.add(parseSubExpression(variables, tokens));	    
+	    subExpressions.add(parseSubExpression(variables, tokens));	
 
 	if(subExpressions.size() == 0)
 	    throw new ParserException(Locale.getString("EMPTY_EQUATION_ERROR"));
@@ -160,7 +161,7 @@ public class Parser {
 	    return new ClauseExpression(subExpressions);
     }
 
-    private static Expression parseExpression(Variables variables, TokenStack tokens) 
+    private static Expression parseExpression(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	// If the next symbol is "{" parse a list of sub-expressions
@@ -194,7 +195,7 @@ public class Parser {
 	    return parseSubExpression(variables, tokens);
     }
 
-    private static Expression parseSubExpression(Variables variables, TokenStack tokens) 
+    private static Expression parseSubExpression(Variables variables, TokenStack tokens)
 	throws ParserException {
 	
 	Expression left = parseBooleanExpression(variables, tokens);
@@ -210,7 +211,7 @@ public class Parser {
 	return left;
     }
 
-    private static Expression parseBooleanExpression(Variables variables, TokenStack tokens) 
+    private static Expression parseBooleanExpression(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	Expression left = parseAddExpression(variables, tokens);
@@ -221,7 +222,7 @@ public class Parser {
 	   tokens.match(Token.LESS_THAN_TOKEN) ||
 	   tokens.match(Token.GREATER_THAN_TOKEN) ||
 	   tokens.match(Token.GREATER_THAN_EQUAL_TOKEN)) {
-	    
+	
 	    Token operation = tokens.pop();
 	    Expression right = parseAddExpression(variables, tokens);
 
@@ -230,7 +231,7 @@ public class Parser {
 	return left;
     }
 	
-    private static Expression parseAddExpression(Variables variables, TokenStack tokens) 
+    private static Expression parseAddExpression(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	Expression left = parseMultiplyExpression(variables, tokens);
@@ -238,22 +239,22 @@ public class Parser {
 	if(tokens.match(Token.ADD_TOKEN) ||
 	   tokens.match(Token.SUBTRACT_TOKEN)) {
 
-	    Token operation = tokens.pop();	    
+	    Token operation = tokens.pop();	
 	    Expression right = parseMultiplyExpression(variables, tokens);
 
 	    return(ExpressionFactory.newExpression(operation, left, right));
 	}
 	return left;
     }
-    
-    private static Expression parseMultiplyExpression(Variables variables, TokenStack tokens) 
+
+    private static Expression parseMultiplyExpression(Variables variables, TokenStack tokens)
 	throws ParserException {
 	
 	Expression left = parseFactor(variables, tokens);
 
 	if(tokens.match(Token.MULTIPLY_TOKEN) ||
 	   tokens.match(Token.DIVIDE_TOKEN)) {
-	    
+	
 	    Token operation = tokens.pop();
 	    Expression right = parseFactor(variables, tokens);
 
@@ -263,15 +264,15 @@ public class Parser {
 	return left;
     }	
 
-    private static Expression parseFactor(Variables variables, TokenStack tokens) 
+    private static Expression parseFactor(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	Expression expression;
 
 	// NUMBER
-	if(tokens.match(Token.NUMBER_TOKEN) || 
-           tokens.match(Token.TRUE_TOKEN) || 
-           tokens.match(Token.FALSE_TOKEN) || 
+	if(tokens.match(Token.NUMBER_TOKEN) ||
+           tokens.match(Token.TRUE_TOKEN) ||
+           tokens.match(Token.FALSE_TOKEN) ||
            tokens.match(Token.SUBTRACT_TOKEN))
 	    expression = parseNumber(variables, tokens);
 	
@@ -292,6 +293,14 @@ public class Parser {
                 tokens.match(Token.SQRT_TOKEN) ||
                 tokens.match(Token.ABS_TOKEN))
 	    expression = parseFunction(variables, tokens);
+
+        // ABBREVIATION QUOTE FUNCTIONS
+        else if (tokens.match(Token.DAY_OPEN_TOKEN) ||
+                 tokens.match(Token.DAY_CLOSE_TOKEN) ||
+                 tokens.match(Token.DAY_HIGH_TOKEN) ||
+                 tokens.match(Token.DAY_LOW_TOKEN) ||
+                 tokens.match(Token.DAY_VOLUME_TOKEN))
+            expression = parseDayQuoteFunction(variables, tokens);
 
 	// FLOW_CONTROL
 	else if(tokens.match(Token.IF_TOKEN) ||
@@ -323,7 +332,7 @@ public class Parser {
 	return expression;
     }
 
-    private static Expression parseVariable(Variables variables, TokenStack tokens) 
+    private static Expression parseVariable(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	Token token = tokens.pop();
@@ -337,7 +346,7 @@ public class Parser {
                                                        token.getVariableName()));
 
 	else if(tokens.match(Token.SET_TOKEN)) {
-	    tokens.pop();	  
+	    tokens.pop();	
 
 	    // Make sure we aren't trying to set a constant
 	    if(variable.isConstant())
@@ -352,7 +361,7 @@ public class Parser {
 	    return new GetVariableExpression(token.getVariableName(), variable.getType());
     }
 
-    private static Expression parseDefineVariable(Variables variables, TokenStack tokens) 
+    private static Expression parseDefineVariable(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	String name ;
@@ -397,13 +406,13 @@ public class Parser {
 	// Check the variable isn't already defined
 	if(variables.contains(name))
 	    throw new ParserException(Locale.getString("VARIABLE_DEFINED_ERROR", name));
-                                                      
+
 	// Add variable
 	variables.add(name, type, isConstant);
 	return new DefineVariableExpression(name, type, isConstant, value);
     }
 
-    private static Expression parseQuote(Variables variables, TokenStack tokens) 
+    private static Expression parseQuote(Variables variables, TokenStack tokens)
 	throws ParserException {
 	
 	Token quote = tokens.pop();
@@ -424,7 +433,7 @@ public class Parser {
 	return expression;
     }
 
-    private static Expression parseNumber(Variables variables, TokenStack tokens) 
+    private static Expression parseNumber(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	Token number = tokens.pop();
@@ -435,30 +444,30 @@ public class Parser {
             return ExpressionFactory.newExpression(number);
 
         else {
-            // Is there a "-" infront? Handle negative numbers 
+            // Is there a "-" infront? Handle negative numbers
             if(number.getType() == Token.SUBTRACT_TOKEN) {
                 number = tokens.pop();
                 negate = true;
             }
-            
+
             if(number.getType() == Token.NUMBER_TOKEN) {
                 if(negate)
                     number.negate();
-                return ExpressionFactory.newExpression(number);	    
+                return ExpressionFactory.newExpression(number);	
             }
             else
                 throw new ParserException(Locale.getString("EXPECTED_NUMBER_ERROR"));
         }
     }
 
-    private static Expression parseFunction(Variables variables, TokenStack tokens) 
+    private static Expression parseFunction(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	Expression expression;
 	Expression arg1 = null;
 	Expression arg2 = null;
 	Expression arg3 = null;
-	    
+	
 	Token function = tokens.pop();
 
 	// all functions must have a left parenthesis after the function
@@ -467,7 +476,7 @@ public class Parser {
 
 	switch(function.getType()) {
 	case(Token.LAG_TOKEN):
-	case(Token.RSI_TOKEN):	  
+	case(Token.RSI_TOKEN):	
 	    arg1 = parseQuote(variables, tokens);
 	    parseComma(variables, tokens);
 	    arg2 = parseSubExpression(variables, tokens);
@@ -481,10 +490,10 @@ public class Parser {
 	    parseComma(variables, tokens);
 	    arg2 = parseSubExpression(variables, tokens);
 	    parseComma(variables, tokens);
-	    arg3 = parseSubExpression(variables, tokens);	    
+	    arg3 = parseSubExpression(variables, tokens);	
 	    break;
 
-	case(Token.PERCENT_TOKEN): 
+	case(Token.PERCENT_TOKEN):
 	    arg1 = parseSubExpression(variables, tokens);
             parseComma(variables, tokens);
 	    arg2 = parseSubExpression(variables, tokens);
@@ -495,7 +504,7 @@ public class Parser {
         case(Token.ABS_TOKEN):
 	    arg1 = parseSubExpression(variables, tokens);
 	    break;
-	    
+	
         case(Token.DAY_OF_WEEK_TOKEN):
         case(Token.DAY_OF_YEAR_TOKEN):
         case(Token.DAY_TOKEN):
@@ -509,7 +518,7 @@ public class Parser {
 	}
 
 	// Create epxression
-	expression = ExpressionFactory.newExpression(function, arg1, arg2, 
+	expression = ExpressionFactory.newExpression(function, arg1, arg2,
 						     arg3);
 	
 	// All functions must end with a right parenthesis
@@ -518,7 +527,14 @@ public class Parser {
 	return expression;
     }
 
-    private static Expression parseFlowControl(Variables variables, TokenStack tokens) 
+    private static Expression parseDayQuoteFunction(Variables variables, TokenStack tokens)
+        throws ParserException {
+
+        return new LagExpression(parseQuote(variables, tokens),
+                                 new NumberExpression(0.0D, Expression.INTEGER_TYPE));
+    }
+
+    private static Expression parseFlowControl(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	Token token = tokens.pop();
@@ -535,7 +551,7 @@ public class Parser {
 	    return ExpressionFactory.newExpression(token, condition, ifTrue, ifFalse);
 	}
 	else if(token.getType() == Token.WHILE_TOKEN) {
-	    Expression condition = parseSubExpression(variables, tokens);	    
+	    Expression condition = parseSubExpression(variables, tokens);	
 	    parseRightParenthesis(variables, tokens);
 	    Expression command = parseExpression(variables, tokens);
 	    return ExpressionFactory.newExpression(token, condition, command);
@@ -558,25 +574,25 @@ public class Parser {
 	    throw new ParserException(Locale.getString("EXPECTED_COMMA_ERROR"));
     }
 
-    private static void parseLeftParenthesis(Variables variables, TokenStack tokens) 
+    private static void parseLeftParenthesis(Variables variables, TokenStack tokens)
 	throws ParserException {
 	if(!tokens.pop(Token.LEFT_PARENTHESIS_TOKEN))
 	    throw new ParserException(Locale.getString("EXPECTED_LEFT_PARENTHESIS_ERROR"));
     }
 
-    private static void parseRightParenthesis(Variables variables, TokenStack tokens) 
+    private static void parseRightParenthesis(Variables variables, TokenStack tokens)
 	throws ParserException {
 	if(!tokens.pop(Token.RIGHT_PARENTHESIS_TOKEN))
 	    throw new ParserException(Locale.getString("MISSING_RIGHT_PARENTHESIS_ERROR"));
     }
 
-    private static void parseLeftBrace(Variables variables, TokenStack tokens) 
+    private static void parseLeftBrace(Variables variables, TokenStack tokens)
 	throws ParserException {
 	if(!tokens.pop(Token.LEFT_BRACE_TOKEN))
 	    throw new ParserException(Locale.getString("EXPECTED_LEFT_BRACE_ERROR"));
     }
 
-    private static void parseRightBrace(Variables variables, TokenStack tokens) 
+    private static void parseRightBrace(Variables variables, TokenStack tokens)
 	throws ParserException {
 
 	if(!tokens.pop(Token.RIGHT_BRACE_TOKEN))

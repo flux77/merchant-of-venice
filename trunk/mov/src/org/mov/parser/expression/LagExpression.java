@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.parser.expression;
@@ -26,7 +26,7 @@ import org.mov.quote.*;
  * An expression which returns a quote.
  */
 public class LagExpression extends BinaryExpression {
-   
+
     /**
      * Create a new average expression for the given <code>quote</code> kind,
      * for <code>lag</code> days away.
@@ -38,7 +38,7 @@ public class LagExpression extends BinaryExpression {
         super(quote, lag);
     }
 
-    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
 
         int lag = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
@@ -54,8 +54,28 @@ public class LagExpression extends BinaryExpression {
     }
 
     public String toString() {
-	return new String("lag(" + getChild(0).toString() + ", " +
-			  getChild(1).toString() + ")");
+        boolean isLagZeroConstant = false;
+        Expression lagExpression = getChild(1);
+
+        if(lagExpression instanceof NumberExpression) {
+            try {
+                if ((int)lagExpression.evaluate(null, null, null, 0) == 0)
+                    isLagZeroConstant = true;
+            }
+            catch(EvaluationException e) {
+                // Can't happen
+                assert false;
+            }
+        }
+
+        // lag(X, 0) is abbreviated as X
+        if(isLagZeroConstant)
+            // E.g. close
+            return getChild(0).toString();
+        else
+            // E.g. lag(close, 12)
+            return new String("lag(" + getChild(0).toString() + ", " +
+                              getChild(1).toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {
@@ -78,7 +98,7 @@ public class LagExpression extends BinaryExpression {
     }
 
     public Object clone() {
-        return new LagExpression((Expression)getChild(0).clone(), 
+        return new LagExpression((Expression)getChild(0).clone(),
                                  (Expression)getChild(1).clone());
     }
 

@@ -289,7 +289,7 @@ public class QuoteFunctions {
      * Average is a weighted moving average where the most recent values are
      * weighted higher than the previous values.
      *
-     * The formule for the EMA is as follows:</pre>
+     * The formula for the EMA is as follows:</pre>
      *
      * EMA(current) = EMA(previous) + k * (day close - EMA(previous))
      *
@@ -327,6 +327,122 @@ public class QuoteFunctions {
 	    }
 	}	
 	return EMA;
+    }
+
+    /**
+     * Calculate the Moving Average Convergence Divergence (MACD) value.
+     * The Moving Average Convergence Divergence is the remainder of
+     * the 26 days EMA and the 12 days EMA.
+     * The smoothing constant for the EMA functions is set to 0.1.
+     *
+     * The formula for the MACD is as follows:</pre>
+     *
+     * MACD = EMA(26) - EMA(12)
+     *
+     * </pre>Where EMA(26) is the 26 days EMA and EMA(12) is the 12 days EMA.
+     *
+     * @param sourceSlow the source of quotes used by EMA to average (slow average)
+     * @param sourceFast the source of quotes used by EMA to average (fast average)
+     * @return       the moving average convergence divergence
+     * @see          org.mov.chart.graph.MACDGraph
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     */
+    static public double macd(QuoteFunctionSource sourceSlow, QuoteFunctionSource sourceFast)
+        throws EvaluationException {
+
+	double MACD = 0.0D;
+	double smoothingConstant = 0.1D;
+	int periodSlow = 26;
+	int periodFast = 12;
+
+        MACD = ema(sourceSlow, periodSlow, smoothingConstant) - ema(sourceFast, periodFast, smoothingConstant);
+        
+	return MACD;
+    }
+
+    /**
+     * Calculate the Momentum value.
+     * The Moving Average Convergence Divergence is the remainder of
+     * the today value and the period delayed value.
+     *
+     * The formula for the Momentum is as follows:</pre>
+     *
+     * Momentum = Quote(Today) - Quote(Today+1-period)
+     *
+     * </pre>Where Quote is got from the input parameter: source.
+     *
+     * @param source the source of quotes
+     * @return       the momentum
+     * @see          org.mov.chart.graph.MomentumGraph
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     */
+    static public double momentum(QuoteFunctionSource source, int period)
+        throws EvaluationException {
+
+	double momentum = 0.0D;
+        double value;
+        double valueDay;
+        
+        valueDay = source.getValue(0);
+        
+        if(!Double.isNaN(valueDay)) {
+            for(int i = period-1; i > 0; i--) {
+                value = source.getValue(i);
+
+                if(!Double.isNaN(value)) {
+                    momentum = value - valueDay;
+                    i = 0;
+                }
+            } 
+        }
+        
+	return momentum;
+    }
+
+    /**
+     * Calculate the On Balance Volume (OBV) value.
+     * The On Balance Volume is counted adding or subtracting the day volume
+     * from range until today, starting from an initial value.
+     *
+     * The formula for the OBV is as follows:</pre>
+     *
+     * if close(current)>open(current):
+     * OBV(current) = OBV(previous) + Volume(current)
+     * if close(current)<open(current):
+     * OBV(current) = OBV(previous) - Volume(current)
+     *
+     * @param sourceOpen the source of open quotes
+     * @param sourceClose the source of close quotes
+     * @param sourceVolume the source of volumes
+     * @param range the range which we calculate over
+     * @param initialValue the starting value of OBV
+     * @return       the on balance volume value
+     * @see          org.mov.chart.graph.OBVGraph
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     */
+    static public int obv(QuoteFunctionSource sourceOpen, QuoteFunctionSource sourceClose, QuoteFunctionSource sourceVolume,
+                            int range, int initialValue)
+        throws EvaluationException {
+
+	int OBV = initialValue;
+        
+        for(int i = range-1; i >= 0; i--) {
+            double open = sourceOpen.getValue(i);
+            double close = sourceClose.getValue(i);
+            double volume = sourceVolume.getValue(i);
+
+            if((!Double.isNaN(open)) && (!Double.isNaN(close)) && (!Double.isNaN(volume))) {
+                if(close>open)
+                    OBV += new Double(volume).intValue();
+                else if(close<open)
+                    OBV -= new Double(volume).intValue();
+            }
+	}
+        
+	return OBV;
     }
 
     /**

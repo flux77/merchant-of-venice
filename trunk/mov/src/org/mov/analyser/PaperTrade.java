@@ -564,60 +564,40 @@ public class PaperTrade {
                                   Money tradeCost,
                                   List symbols,
                                   OrderCache orderCache) {
-        // Count the buy tip for the next day
-        variables.setValue("held", 0);
-
-        int order = 0;
-        
+                                      
         symbolStock = new String[symbols.size()];
         buyRule = new boolean[symbols.size()];
         sellRule = new boolean[symbols.size()];
         buyCost = new double[symbols.size()];
         sellCost = new double[symbols.size()];
         
-        int index = 0;
+        setSellTip(environment, quoteBundle, variables, sell, dateOffset,
+                    tradeCost, symbols, orderCache);
         
-        // Iterate through stocks available today - should we buy or sell any of it?
-        for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
-            Symbol symbol = (Symbol)iterator.next();
-
-            symbolStock[index] = new String(symbol.get());
-            
-            // Skip if we already own it
-            if(!environment.shareAccount.isHolding(symbol)) {
-
-                // If we care about the order, make sure the "order" variable is set
-                if(orderCache.isOrdered())
-                    variables.setValue("order", order);
-
-                try {
-                    // Did we have enough money to buy at least one share?
-                    buyRule[index] = (buy.evaluate(variables, quoteBundle, symbol,
-                                dateOffset) >= Expression.TRUE);
-                    // price to buy
-                    Expression tradeCostBuyExpression = ExpressionFactory.newExpression(environment.tradeCostBuy);
-                    buyCost[index] = tradeCostBuyExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
-                }
-                catch(EvaluationException e) {
-                    buyCost[index] = 0.0D;
-                }
-                catch(java.lang.ArrayIndexOutOfBoundsException ex) {
-                    buyCost[index] = 0.0D;
-                }
-                finally {
-                    index++;
-                }
-            }
-
-            order++;
-        }
+        setBuyTip(environment, quoteBundle, variables, buy, dateOffset,
+                    tradeCost, symbols, orderCache);
         
+    }
+    
+    private static void setSellTip(Environment environment,
+                                  QuoteBundle quoteBundle,
+                                  Variables variables,
+                                  Expression sell,
+                                  int dateOffset,
+                                  Money tradeCost,
+                                  List symbols,
+                                  OrderCache orderCache) {
+                                      
         // Count the sell tip for the next day
+                                      
         // Iterate through our stock holdings and see if we should sell any
         List stockHoldings = new ArrayList(environment.shareAccount.getStockHoldings().values());
 
-        index = 0;
+        int order = 0;
+
+        int index = 0;
         
+        // Iterate through stocks available today - should we sell any of it?
         for(Iterator iterator = stockHoldings.iterator(); iterator.hasNext();) {
             StockHolding stockHolding = (StockHolding)iterator.next();
             Symbol symbol = stockHolding.getSymbol();
@@ -645,11 +625,68 @@ public class PaperTrade {
                 sellCost[index] = 0.0D;
             }
             catch(java.lang.ArrayIndexOutOfBoundsException ex) {
+                sellCost[index] = 0.0D;
+            }
+            finally {
+                index++;
+            }
+        }
+    }
+    
+    private static void setBuyTip(Environment environment,
+                                  QuoteBundle quoteBundle,
+                                  Variables variables,
+                                  Expression buy,
+                                  int dateOffset,
+                                  Money tradeCost,
+                                  List symbols,
+                                  OrderCache orderCache) {
+                                      
+        // Count the buy tip for the next day
+        variables.setValue("held", 0);
+
+        int order = 0;
+        
+        int index = 0;
+        
+        // Iterate through stocks available today - should we buy or sell any of it?
+        for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
+            Symbol symbol = (Symbol)iterator.next();
+
+            symbolStock[index] = new String(symbol.get());
+            
+            // If we care about the order, make sure the "order" variable is set
+            if(orderCache.isOrdered())
+                variables.setValue("order", order);
+
+            try {
+                // Did we have enough money to buy at least one share?
+                buyRule[index] = (buy.evaluate(variables, quoteBundle, symbol,
+                            dateOffset) >= Expression.TRUE);
+                
+                // If you own the stock and you want to continue to own it,
+                // you wouldn't sell it, neither would you buy it.
+                // So it is necessary set the buyRule and sellRule to false.
+                if(environment.shareAccount.isHolding(symbol) && buyRule[index]) {
+                    sellRule[index] = false;
+                    buyRule[index] = false;
+                }
+
+                // price to buy
+                Expression tradeCostBuyExpression = ExpressionFactory.newExpression(environment.tradeCostBuy);
+                buyCost[index] = tradeCostBuyExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
+            }
+            catch(EvaluationException e) {
+                buyCost[index] = 0.0D;
+            }
+            catch(java.lang.ArrayIndexOutOfBoundsException ex) {
                 buyCost[index] = 0.0D;
             }
             finally {
                 index++;
             }
+
+            order++;
         }
     }
     

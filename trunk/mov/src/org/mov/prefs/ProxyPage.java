@@ -116,12 +116,12 @@ public class ProxyPage extends JPanel implements PreferencesPage {
 	userTextField = GridBagHelper.addTextRow(borderPanel,
 						 Locale.getString("PROXY_USER"),
 						 proxyPreferences.user,
-						 gridbag, c, 20);
+						 gridbag, c, 10);
 	
 	passwordTextField = GridBagHelper.addPasswordRow(borderPanel,
 						 Locale.getString("PROXY_PASSWORD"),
 						 proxyPreferences.password,
-						 gridbag, c, 5);
+						 gridbag, c, 10);
 	
 	proxyPanel.add(borderPanel, BorderLayout.NORTH);
 

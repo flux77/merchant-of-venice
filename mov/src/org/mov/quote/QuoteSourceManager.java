@@ -18,7 +18,11 @@
 
 package org.mov.quote;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
+
 import org.mov.importer.ImporterModule;
 import org.mov.prefs.PreferencesManager;
 
@@ -91,15 +95,14 @@ public class QuoteSourceManager {
 	    Preferences p = PreferencesManager.getUserNode("/quote_source");
 	    String quoteSource = p.get("source", "database");
 
-	    if(quoteSource.equals("files")) {
+	    if(quoteSource.equals("files"))
 		sourceInstance = createFileQuoteSource();
-	    }
 	    else if(quoteSource.equals("database"))
 		sourceInstance = createDatabaseQuoteSource();
-	    else {
-		assert false;
-		// sourceInstance = createInternetQuoteSource();
-	    }
+            //	    else if(quoteSource.equalts("internet"))
+            //	sourceInstance = createInternetQuoteSource();
+            else
+                sourceInstance = createSamplesQuoteSource();
 	}
 
 	return sourceInstance;
@@ -111,13 +114,75 @@ public class QuoteSourceManager {
      * @return	the file quote source 
      */
     public static FileQuoteSource createFileQuoteSource() {
-
 	// Get file format from preferences
 	Preferences p = PreferencesManager.getUserNode("/quote_source/files");
 
-	return
-	    new FileQuoteSource(p.get("format", "MetaStock"),
-				ImporterModule.getFileList());
+	return new FileQuoteSource(p.get("format", "MetaStock"),
+                                   ImporterModule.getFileURLList());
+    }
+
+    /**
+     * Create a file quote source directly using the in-built sample files
+     * as the quotes.
+     *
+     * @return the file quote source
+     */
+    public static FileQuoteSource createSamplesQuoteSource() {
+        String[] fileNames = {"org/mov/quote/samples/01-12-86.txt",
+                              "org/mov/quote/samples/02-12-86.txt",
+                              "org/mov/quote/samples/03-11-86.txt",
+                              "org/mov/quote/samples/03-12-86.txt",
+                              "org/mov/quote/samples/04-11-86.txt",
+                              "org/mov/quote/samples/04-12-86.txt",
+                              "org/mov/quote/samples/05-11-86.txt",
+                              "org/mov/quote/samples/05-12-86.txt",
+                              "org/mov/quote/samples/06-11-86.txt",
+                              "org/mov/quote/samples/07-11-86.txt",
+                              "org/mov/quote/samples/08-12-86.txt",
+                              "org/mov/quote/samples/09-12-86.txt",
+                              "org/mov/quote/samples/10-11-86.txt",
+                              "org/mov/quote/samples/10-12-86.txt",
+                              "org/mov/quote/samples/11-11-86.txt",
+                              "org/mov/quote/samples/11-12-86.txt",
+                              "org/mov/quote/samples/12-11-86.txt",
+                              "org/mov/quote/samples/12-12-86.txt",
+                              "org/mov/quote/samples/13-11-86.txt",
+                              "org/mov/quote/samples/14-11-86.txt",
+                              "org/mov/quote/samples/15-12-86.txt",
+                              "org/mov/quote/samples/16-12-86.txt",
+                              "org/mov/quote/samples/17-11-86.txt",
+                              "org/mov/quote/samples/17-12-86.txt",
+                              "org/mov/quote/samples/18-11-86.txt",
+                              "org/mov/quote/samples/18-12-86.txt",
+                              "org/mov/quote/samples/19-11-86.txt",
+                              "org/mov/quote/samples/19-12-86.txt",
+                              "org/mov/quote/samples/20-11-86.txt",
+                              "org/mov/quote/samples/21-11-86.txt",
+                              "org/mov/quote/samples/22-12-86.txt",
+                              "org/mov/quote/samples/23-12-86.txt",
+                              "org/mov/quote/samples/24-11-86.txt",
+                              "org/mov/quote/samples/24-12-86.txt",
+                              "org/mov/quote/samples/25-11-86.txt",
+                              "org/mov/quote/samples/25-12-86.txt",
+                              "org/mov/quote/samples/26-11-86.txt",
+                              "org/mov/quote/samples/26-12-86.txt",
+                              "org/mov/quote/samples/27-11-86.txt",
+                              "org/mov/quote/samples/28-11-86.txt",
+                              "org/mov/quote/samples/29-12-86.txt",
+                              "org/mov/quote/samples/30-12-86.txt",
+                              "org/mov/quote/samples/31-12-86.txt"};
+
+        List fileURLs = new ArrayList();
+        for(int i = 0; i < fileNames.length; i++) {
+            URL fileURL = ClassLoader.getSystemResource(fileNames[i]);
+
+            if(fileURL != null) 
+                fileURLs.add(fileURL);
+            else
+                assert false;
+        }
+
+        return new FileQuoteSource("EzyChart", fileURLs);
     }
     
     /**
@@ -126,7 +191,6 @@ public class QuoteSourceManager {
      * @return	the database quote source 
      */
     public static DatabaseQuoteSource createDatabaseQuoteSource() {
-
 	Preferences p = PreferencesManager.getUserNode("/quote_source/database");
 	String host = p.get("host", "db");
 	String port = p.get("port",  "3306");

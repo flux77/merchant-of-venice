@@ -412,7 +412,7 @@ public class PortfolioModule extends JPanel implements Module,
 		new TransactionModule(this, portfolio);
 	
 	    historyFrame = 
-		((org.mov.ui.DesktopManager)(desktop.getDesktopManager())).newFrame(historyModule);
+                ((org.mov.ui.DesktopManager)(desktop.getDesktopManager())).newFrame(historyModule);
 	}
     }
 
@@ -509,14 +509,19 @@ public class PortfolioModule extends JPanel implements Module,
 		    int shares = Integer.valueOf(parts[i++]).intValue();
 		    float tradeCost = Float.valueOf(parts[i++]).floatValue();
 		    String cashAccountName = parts[i++];
-		    String cashAccountName2 = parts[i++];
+		    String cashAccountName2 = "";
 		    String shareAccountName = "";
 
-		    // This may be ommited in the imported string as it
-		    // is only relevant for share transactions
-		    if(i < parts.length) {
-			shareAccountName = parts[i++];
-		    }
+                    // When the line ends in ",," the split doesn't take the
+                    // last values. So be prepared for a ArrayIndexOutOfBounds
+                    // which is OK.
+                    try {
+                        cashAccountName2 = parts[i++];
+                        shareAccountName = parts[i++];
+                    }
+                    catch(ArrayIndexOutOfBoundsException e) {
+                        // OK
+                    }
 
 		    // Convert the cash/share accounts to a string - if
 		    // we don't have the account in the portfolio, create it

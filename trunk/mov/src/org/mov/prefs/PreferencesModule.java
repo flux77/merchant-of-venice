@@ -213,7 +213,7 @@ public class PreferencesModule extends JPanel
      * @return	the window title.
      */
     public String getTitle() {
-	return activePage.getTitle();
+	return "Application Preferences";
     }
 
     /**

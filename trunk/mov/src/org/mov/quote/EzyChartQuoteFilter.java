@@ -19,6 +19,7 @@
 package org.mov.quote;
 
 import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 
 /**
  * Provides a filter to parse the Ezy Chart quote format. This
@@ -72,8 +73,17 @@ public class EzyChartQuoteFilter implements QuoteFilter {
                     return null;
                 }
 
-		TradingDate date = new TradingDate(quoteParts[i++],
-						   TradingDate.US);
+		TradingDate date = null;
+
+                try {
+                    date = new TradingDate(quoteParts[i++],
+                                           TradingDate.US);
+                }
+                catch(TradingDateFormatException e) {
+                    return null;
+                    // Return null - couldn't parse quote
+                }
+
 		// Convert all prices from cents to dollars
                 try {
                     float day_open = Float.parseFloat(quoteParts[i++]) / 100;

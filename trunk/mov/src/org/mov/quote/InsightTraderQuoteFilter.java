@@ -19,6 +19,7 @@
 package org.mov.quote;
 
 import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 
 /**
  * Provides a filter to parse the Insight Trader quote format. This
@@ -73,8 +74,16 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
                     return null;
                 }
 
-		TradingDate date = new TradingDate(quoteParts[i++],
-						   TradingDate.US);
+		TradingDate date = null;
+
+                try {
+                    date = new TradingDate(quoteParts[i++],
+                                           TradingDate.US);
+                }
+                catch(TradingDateFormatException e) {
+                    return null;
+                    // Return null - couldn't parse quote
+                }
 
 		// Convert all prices from cents to dollars
                 try {

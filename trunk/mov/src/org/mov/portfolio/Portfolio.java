@@ -83,6 +83,15 @@ public class Portfolio implements Cloneable {
     }
 
     /**
+     * Set the portfolio name.
+     *
+     * @param name the new portfolio name.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Return whether the portfolio is transient or permanent.
      *
      * @return <code>true</code> if the portfolio is transient and shouldn't

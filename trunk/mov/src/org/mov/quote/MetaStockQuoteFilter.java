@@ -19,12 +19,13 @@
 package org.mov.quote;
 
 import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 
 /**
  * Provides a filter to parse the Meta Stock quote format. This
  * format uses 4 digit years and prices in dollars. The first
  * column is the symbol, then the date, open, high, low, close & volume.
- * Exampe:
+ * Example:
  * <pre>
  * XXX,19990715,1.73,1.82,1.71,1.81,3648921
  * </pre>
@@ -72,8 +73,17 @@ public class MetaStockQuoteFilter implements QuoteFilter {
                     return null;
                 }
 
-		TradingDate date = new TradingDate(quoteParts[i++],
-						   TradingDate.BRITISH);
+		TradingDate date = null;
+
+                try {
+                    date = new TradingDate(quoteParts[i++],
+                                           TradingDate.BRITISH);
+                }
+                catch(TradingDateFormatException e) {
+                    return null;
+                    // Return null - couldn't parse quote
+                }
+
                 try {
                     float day_open = Float.parseFloat(quoteParts[i++]);
                     float day_high = Float.parseFloat(quoteParts[i++]);

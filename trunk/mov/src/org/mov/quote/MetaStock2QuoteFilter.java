@@ -19,6 +19,7 @@
 package org.mov.quote;
 
 import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 
 /**
  * Provides a filter to parse the Meta Stock (volume/100) quote format. This
@@ -73,8 +74,17 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
                     return null;
                 }
 
-		TradingDate date = new TradingDate(quoteParts[i++],
-						   TradingDate.BRITISH);
+		TradingDate date = null;
+
+                try {
+                    date = new TradingDate(quoteParts[i++],
+                                           TradingDate.BRITISH);
+                }
+                catch(TradingDateFormatException e) {
+                    return null;
+                    // Return null - couldn't parse quote
+                }
+
                 try {
                     float day_open = Float.parseFloat(quoteParts[i++]);
                     float day_high = Float.parseFloat(quoteParts[i++]);

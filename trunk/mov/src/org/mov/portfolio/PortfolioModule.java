@@ -72,6 +72,7 @@ public class PortfolioModule extends JPanel implements Module,
     private JMenuItem portfolioExport;
     private JMenuItem portfolioImport;
     private JMenuItem portfolioDelete;
+    private JMenuItem portfolioRename;
     private JMenuItem portfolioClose;
 
     private JMenuItem transactionNew;
@@ -126,12 +127,15 @@ public class PortfolioModule extends JPanel implements Module,
 				       "Import");
 
             // If the portfolio is transient it won't be saved anyway - so
-            // you can't delete it.
+            // you can't delete or rename it.
             if(!portfolio.isTransient()) {
                 portfolioMenu.addSeparator();
                 
                 portfolioDelete = MenuHelper.addMenuItem(this, portfolioMenu, 
                                                          "Delete");
+
+                portfolioRename = MenuHelper.addMenuItem(this, portfolioMenu, 
+                                                         "Rename");
             }
 
             portfolioMenu.addSeparator();
@@ -385,6 +389,9 @@ public class PortfolioModule extends JPanel implements Module,
 		    else if(e.getSource() == portfolioDelete) {
 			deletePortfolio();
 		    }
+		    else if(e.getSource() == portfolioRename) {
+			renamePortfolio();
+		    }
 		    else if(e.getSource() == portfolioImport) {
 			importPortfolio();
 		    }
@@ -477,6 +484,35 @@ public class PortfolioModule extends JPanel implements Module,
 	    propertySupport.
 		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
 	}
+    }
+
+    // Rename the portfolio
+    private void renamePortfolio() {
+        String oldPortfolioName = portfolio.getName();
+	JDesktopPane desktop =
+	    org.mov.ui.DesktopManager.getDesktop();
+
+        // Get new name for portfolio
+	TextDialog dialog = new TextDialog(desktop,
+					   "Enter new portfolio name",
+					   "Rename Portfolio",
+                                           oldPortfolioName);
+	String newPortfolioName = dialog.showDialog();
+
+        if(newPortfolioName != null && newPortfolioName.length() > 0 &&
+           !newPortfolioName.equals(oldPortfolioName)) {
+            
+            // Save the portfolio under the new name
+            portfolio.setName(newPortfolioName);
+	    PreferencesManager.savePortfolio(portfolio);
+
+            // Delete the old portfolio
+            PreferencesManager.deletePortfolio(oldPortfolioName);
+
+            // Update GUI
+	    MainMenu.getInstance().updatePortfolioMenu();
+            propertySupport.firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1); 
+        }
     }
 
     // Export this portfolio to a CSV file
@@ -609,6 +645,11 @@ public class PortfolioModule extends JPanel implements Module,
 		    line = br.readLine();
 		}
 	    }
+	    catch(TradingDateFormatException e) {
+		DesktopManager.showErrorMessage("Error reading from file: " +
+                                                fileName);
+            }
+
 	    catch(IOException e) {
 		DesktopManager.showErrorMessage("Error reading from file: " +
                                                 fileName);

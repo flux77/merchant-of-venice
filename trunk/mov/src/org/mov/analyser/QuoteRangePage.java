@@ -51,8 +51,9 @@ import org.mov.quote.SymbolFormatException;
 import org.mov.quote.WeekendDateException;
 import org.mov.ui.EquationComboBox;
 import org.mov.ui.GridBagHelper;
-import org.mov.ui.QuoteRangeComboBox;
+import org.mov.ui.SymbolListComboBox;
 import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 
 public class QuoteRangePage extends JPanel implements AnalyserPage {
 
@@ -61,7 +62,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     // Swing items
     private JTextField startDateTextField;
     private JTextField endDateTextField;
-    private QuoteRangeComboBox quoteRangeComboBox;
+    private SymbolListComboBox symbolListComboBox;
     private JRadioButton orderByKeyButton;
     private JRadioButton orderByEquationButton;
     private JComboBox orderByKeyComboBox; 
@@ -96,7 +97,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             else if(setting.equals("end_date"))
                 endDateTextField.setText(value);
             else if(setting.equals("symbols"))
-                quoteRangeComboBox.setText(value);
+                symbolListComboBox.setText(value);
             else if(setting.equals("by")) {
                 if(value.equals("orderByKey"))
                     orderByKeyButton.setSelected(true);
@@ -119,7 +120,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         
         settings.put("start_date", startDateTextField.getText());
         settings.put("end_date", endDateTextField.getText());
-        settings.put("symbols", quoteRangeComboBox.getText());
+        settings.put("symbols", symbolListComboBox.getText());
         settings.put("by", orderByKeyButton.isSelected()? "orderByKey" : "orderByEquation");
         settings.put("by_key", orderByKeyComboBox.getSelectedItem());
         settings.put("by_equation", orderByEquationComboBox.getEquationText());
@@ -131,12 +132,13 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     public boolean parse() {
         quoteRange = null;
 
-	startDate = new TradingDate(startDateTextField.getText(),
-                                    TradingDate.BRITISH);
-	endDate = new TradingDate(endDateTextField.getText(),
-                                  TradingDate.BRITISH);
-
-	if(startDate.getYear() == 0 || endDate.getYear() == 0) {
+        try {
+            startDate = new TradingDate(startDateTextField.getText(),
+                                        TradingDate.BRITISH);
+            endDate = new TradingDate(endDateTextField.getText(),
+                                      TradingDate.BRITISH);
+        }
+        catch(TradingDateFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop, 
                                                   "Invalid date.",
                                                   "Invalid date range",
@@ -193,7 +195,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         }
 
         try {
-            quoteRange = quoteRangeComboBox.getQuoteRange();
+            quoteRange = symbolListComboBox.getQuoteRange();
         }
         catch(SymbolFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop, 
@@ -296,17 +298,10 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	    c.weightx = 1.0;
 	    c.ipadx = 5;
 	    c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
 
-            JLabel label = new JLabel("Symbols");
-            c.gridwidth = 1;
-            gridbag.setConstraints(label, c);
-            innerPanel.add(label);
-
-            quoteRangeComboBox = new QuoteRangeComboBox();
-            c.gridwidth = GridBagConstraints.REMAINDER;
-            gridbag.setConstraints(quoteRangeComboBox, c);
-            innerPanel.add(quoteRangeComboBox);
-
+            symbolListComboBox = GridBagHelper.addSymbolListComboBox(innerPanel, "Symbols", "",
+                                                                     gridbag, c);
             panel.add(innerPanel, BorderLayout.NORTH);
 	    add(panel);
 	}
@@ -328,6 +323,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	    c.weightx = 1.0;
 	    c.ipadx = 5;
 	    c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
 
             orderByKeyButton = new JRadioButton("By");
             orderByKeyButton.setSelected(true);

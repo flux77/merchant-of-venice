@@ -253,6 +253,9 @@ public class Chart extends JComponent implements MouseListener {
      */
     public void add(Graph graph, int index) {
 
+        // Make sure it has at least one value
+        assert graph.getXRange().size() > 0;
+
 	// Do we already have any graphs at this index?
 	if(index >= levels.size()) {
 	    Vector newGraphs = new Vector();
@@ -270,6 +273,23 @@ public class Chart extends JComponent implements MouseListener {
 	// x range of the new graph
 	if(!zoomedIn)
 	    setXRange(calculateStartX(), calculateEndX());
+    }
+
+    /**
+     * Return the number of graphs in the chart.
+     *
+     * @return the number of graphs in the chart
+     */
+    public int count() {
+        Iterator iterator = levels.iterator();
+        int count = 0;
+
+        while(iterator.hasNext()) {
+            Vector innerVector = (Vector)iterator.next();
+            count += innerVector.size();
+        }
+
+        return count;
     }
 
     /**

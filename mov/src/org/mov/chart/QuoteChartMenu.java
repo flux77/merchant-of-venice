@@ -147,7 +147,10 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 	// Check static menus first
 	if(e.getSource() == removeMenu) {
 	    listener.removeAll(getName());
-	    listener.redraw();
+
+            // Only redraw if there are only graphs left
+            if(listener.count() > 0)
+                listener.redraw();
 	}
 	
 	// Otherwise check dynamic menus

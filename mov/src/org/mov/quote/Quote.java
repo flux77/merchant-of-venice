@@ -18,9 +18,8 @@
 
 package org.mov.quote;
 
-import java.util.*;
-
-import org.mov.util.*;
+import org.mov.ui.QuoteFormat;
+import org.mov.util.TradingDate;
 
 /**
  * Representation of a stock quote for a given stock on a given date.
@@ -179,16 +178,13 @@ public class Quote {
      * @return	<code>1</code> if they are equal; <code>0</code> otherwise
      */
     public boolean equals(Quote quote) {
-	if(getSymbol().equals(quote.getSymbol()) &&
-	   getDate().equals(quote.getDate()) &&
-	   getDayLow() == quote.getDayLow() &&
-	   getDayHigh() == quote.getDayHigh() &&
-	   getDayOpen() == quote.getDayOpen() &&
-	   getDayClose() == quote.getDayClose() &&
-	   getDayVolume() == quote.getDayVolume())
-	    return true;
-	else
-	    return false;
+	 return (getSymbol().equals(quote.getSymbol()) &&
+                 getDate().equals(quote.getDate()) &&
+                 getDayLow() == quote.getDayLow() &&
+                 getDayHigh() == quote.getDayHigh() &&
+                 getDayOpen() == quote.getDayOpen() &&
+                 getDayClose() == quote.getDayClose() &&
+                 getDayVolume() == quote.getDayVolume());
     }
 
     /**
@@ -222,9 +218,12 @@ public class Quote {
      * @return	a string representation of the stock quote.
      */
     public String toString() {
-	return new String(getSymbol() + ", " + getDate() + ", " +
-			  getDayOpen() + ", " + getDayHigh() + ", " + 
-			  getDayLow() + ", " + getDayClose() + ", " + 
+	return new String(getSymbol() + ", " + 
+                          getDate() + ", " +
+			  QuoteFormat.quoteToString(getDayOpen()) + ", " + 
+                          QuoteFormat.quoteToString(getDayHigh()) + ", " + 
+			  QuoteFormat.quoteToString(getDayLow()) + ", " + 
+                          QuoteFormat.quoteToString(getDayClose()) + ", " + 
 			  getDayVolume());
 			   
     }

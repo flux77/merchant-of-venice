@@ -13,6 +13,8 @@ import org.mov.util.*;
 import org.mov.parser.*;
 import org.mov.quote.*;
 import org.mov.ui.DesktopManager;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
 
 public class QuoteModule extends AbstractTable
     implements Module {
@@ -159,17 +161,16 @@ public class QuoteModule extends AbstractTable
 
 	Object[] symbols = cache.getSymbols();
 
-	boolean owner = false;
-
 	// Add symbols to vector when expression proves true
 	try {
 	    Vector extractedSymbols = new Vector();
 	    String symbol;
 
-	    // Claim ownership
-	    owner = Progress.getInstance().open();
-
-	    // Traverse array
+            ProgressDialog p = ProgressDialogManager.getProgressDialog();
+            p.setMaximum(symbols.length);
+            p.setTitle("Filtering quotes");
+            
+            // Traverse array
 	    for(int i = 0; i < symbols.length; i++) {
 		symbol = (String)symbols[i];
 
@@ -180,12 +181,7 @@ public class QuoteModule extends AbstractTable
 
 		// Wait until weve done one evaluation since thats when the
 		// quotes are loaded
-		if(i == 0) {
-		    Progress.getInstance().open("Filtering quotes",
-						symbols.length);
-		    Progress.getInstance().next();
-		}
-		Progress.getInstance().next();
+                p.increment();
 	    }
 
 	    return extractedSymbols.toArray();
@@ -207,7 +203,7 @@ public class QuoteModule extends AbstractTable
 	    return cache.getSymbols();
 	}
 	finally {
-	    Progress.getInstance().close(owner);
+	    ProgressDialogManager.closeProgressDialog();
 	}
     }
 

@@ -133,10 +133,11 @@ public class FileQuoteSource implements QuoteSource
 	int errorCount = 0;
 
 	// Indexing might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Indexing files", 
-					fileNames.size());
-	Iterator iterator = fileNames.iterator();
+        ProgressDialog p = ProgressDialogManager.getProgressDialog();
+        p.setTitle("Indexing files");
+        p.setMaximum(fileNames.size());
+
+        Iterator iterator = fileNames.iterator();
 	String fileName;
 
 	while(iterator.hasNext()) {
@@ -170,10 +171,10 @@ public class FileQuoteSource implements QuoteSource
 		    errorCount++;	    
 		}
 	    }
-	    Progress.getInstance().next();	    
+	    p.increment();
 	}
 
-	Progress.getInstance().close(owner);
+	ProgressDialogManager.closeProgressDialog();
     }
 
     /**
@@ -258,20 +259,19 @@ public class FileQuoteSource implements QuoteSource
 	TradingDate date;
 
 	// This query might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Loading quotes " + 
-					startDate.toShortString() + " to " +
-					endDate.toShortString(), dates.size());
+        ProgressDialog p = ProgressDialogManager.getProgressDialog();
+        p.setTitle("Loading quotes " + startDate.toShortString() +" to "+ endDate.toShortString());
+        p.setMaximum(dates.size());
 
 	while(iterator.hasNext()) {
 	    date = (TradingDate)iterator.next();
 
 	    quotes.addAll((Collection)getQuotesForDate(date, type));
 
-	    Progress.getInstance().next();
+	    p.increment();
 	}
 
-	Progress.getInstance().close(owner);
+	ProgressDialogManager.closeProgressDialog();
 
 	return quotes;
     }
@@ -343,9 +343,10 @@ public class FileQuoteSource implements QuoteSource
 	TradingDate date = null;
 	Stock stock = null;
 
-        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 	// This query might take a while
-        progress.setNote("Retrieving dates");
+        ProgressDialog p = ProgressDialogManager.getProgressDialog();
+        p.setMaximum(dates.size());
+        p.setTitle("Retrieving dates");
 
 	// All checks are done in lower case no matter what case the
 	// file format is in
@@ -359,7 +360,7 @@ public class FileQuoteSource implements QuoteSource
 	    if(stock != null) 
 		quotes.add(stock);
 
-	    Progress.getInstance().next();
+	    p.increment();
 	}
 
 	ProgressDialogManager.closeProgressDialog();

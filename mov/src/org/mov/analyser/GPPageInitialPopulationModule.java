@@ -206,20 +206,20 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
         this.desktop = desktop;
         List columns = new ArrayList();
         columns.add(new Column(BUY_RULE_COLUMN,
-        Locale.getString("BUY_RULE"),
-        Locale.getString("BUY_RULE_COLUMN_HEADER"),
-        String.class,
-        Column.VISIBLE));
+            Locale.getString("BUY_RULE"),
+            Locale.getString("BUY_RULE_COLUMN_HEADER"),
+            String.class,
+            Column.VISIBLE));
         columns.add(new Column(SELL_RULE_COLUMN,
-        Locale.getString("SELL_RULE"),
-        Locale.getString("SELL_RULE_COLUMN_HEADER"),
-        String.class,
-        Column.VISIBLE));
+            Locale.getString("SELL_RULE"),
+            Locale.getString("SELL_RULE_COLUMN_HEADER"),
+            String.class,
+            Column.VISIBLE));
         columns.add(new Column(PERCENT_COLUMN,
-        Locale.getString("PERCENT_MUTATION"),
-        Locale.getString("PERCENT_MUTATION_COLUMN_HEADER"),
-        String.class,
-        Column.VISIBLE));
+            Locale.getString("PERCENT_MUTATION"),
+            Locale.getString("PERCENT_MUTATION_COLUMN_HEADER"),
+            String.class,
+            Column.VISIBLE));
         
         model = new Model(columns);
         setModel(model);
@@ -744,7 +744,6 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
     }
     
     private boolean isTotalOK() {
-        // We should consider the absence of held and order -> totalIntegerModified
         long total = 0;
         int totalLength = perc.length;
         for (int i=0; (i<totalLength); i++)

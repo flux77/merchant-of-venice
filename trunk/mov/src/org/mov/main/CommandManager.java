@@ -283,16 +283,22 @@ public class CommandManager {
      * @param	portfolio	the portfolio to graph
      */
     public void graphPortfolio(Portfolio portfolio) {
-	// Can only graph if portfolio has at least one transaction
-	if(portfolio.getTransactions().size() == 0) {
-	    JOptionPane.showInternalMessageDialog(desktop_instance,
-						  "Can't graph an empty portfolio: " + portfolio.getName(),
-						  "Graph " + 
-						  portfolio.getName(),
-						  JOptionPane.ERROR_MESSAGE);
-	    return;
-	}
 
+	// Set the start and end dates to null - the other graph
+	// function will determine appropriate start and end dates
+	graphPortfolio(portfolio, null, null);
+    }
+
+    /**
+     * Graph the given portfolio inbetween the given dates.
+     *
+     * @param	portfolio	the portfolio to graph
+     * @param	startDate	date to graph from
+     * @param	endDate		date to graph to
+     */
+    public void graphPortfolio(Portfolio portfolio, 
+			       TradingDate startDate,
+			       TradingDate endDate) {
         final ChartModule chart = new ChartModule(desktop_instance);
 
 	final Thread thread = Thread.currentThread();
@@ -307,16 +313,18 @@ public class CommandManager {
 	    progress.setTitle("Loading quotes for portfolio");
 	    progress.show();
 
-	    TradingDate startDate = portfolio.getStartDate();
-	    TradingDate endDate = null;
 	    QuoteCache cache = null;
 	    PortfolioGraphSource portfolioGraphSource = null;
 	    Graph graph = null;
 
             if (!thread.isInterrupted()) {
-		startDate = portfolio.getStartDate();
-		endDate = QuoteSourceManager.getSource().getLatestQuoteDate();
-		
+
+		// Get default start and end date if not supplied
+		if(startDate == null) 
+		    startDate = portfolio.getStartDate();
+
+		if(endDate == null)
+		    endDate = QuoteSourceManager.getSource().getLatestQuoteDate();		
 		Vector symbols = portfolio.getSymbolsTraded();
 
 		// Only need to load from cache if there are any stocks
@@ -351,19 +359,76 @@ public class CommandManager {
 	}
     }
 
-    /** Displays a graph closing prices for stock(s), based on their code. The stock(s) is/are determined by a user prompt */
-    public void graphStockByCode() {
+    /**
+     * Graph the advance/decline market indicator
+     */
+    public void graphAdvanceDecline() {
 
         final Thread t = new Thread(new Runnable() {
             public void run() {
-                SortedSet s = CommodityListQuery.getCommoditiesByCode(desktop_instance, "Graph stocks by code");
+                ProgressDialog p = ProgressDialogManager.getProgressDialog();
+                p.setTitle("Calculating advance/decline");
+                p.show();
 
-                String str = s.toString();
+		final Thread thread = Thread.currentThread();
+
+		p.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			    thread.interrupt();
+			}
+		    });
+		
+		try {
+		    ChartModule chart = new ChartModule(desktop_instance);
+		    Graph graph = null;
+
+                    if (!thread.isInterrupted())
+			graph = new AdvanceDeclineGraph();
+
+                    if (!thread.isInterrupted())
+                        chart.add(graph, null, 0);
+
+                    if (!thread.isInterrupted())
+			ProgressDialogManager.closeProgressDialog();
+
+		    if (!thread.isInterrupted())
+			((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart);
+		}
+		catch (Exception e) {
+		    ProgressDialogManager.closeProgressDialog();
+		}
+	    }
+	    });
+
+	t.start();
+    }
+
+    /** 
+     * Displays a graph closing prices for stock(s), based on their code. 
+     * The stock(s) is/are determined by a user prompt if a set of symbols
+     * is not supplied.
+     *
+     * @param	symbols	Optional. Set of symbols to graph.
+     */
+    public void graphStockBySymbol(final Vector symbols) {
+
+        final Thread t = new Thread(new Runnable() {
+            public void run() {
+		SortedSet symbolsCopy;
+
+		if(symbols == null) {
+		    symbolsCopy = CommodityListQuery.getCommoditiesByCode(desktop_instance, "Graph stocks by code");
+		}
+		else {
+		    symbolsCopy = new TreeSet(symbols);
+		}
+
+                String str = symbolsCopy.toString();
                 str = str.substring(1,str.length()-1);
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
                 p.setTitle("Displaying graph of stock symbols "+str);
                 p.show();
-                graphStock(s);
+                graphStock(symbolsCopy);
                 if (!Thread.currentThread().interrupted())
                     ProgressDialogManager.closeProgressDialog();
             }

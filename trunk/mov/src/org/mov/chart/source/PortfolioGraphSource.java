@@ -35,6 +35,8 @@ import java.util.List;
 
 /**
  * Provides a Portfolio graph source. This class allows portfolios to be graphed.
+ *
+ * @author Andrew Leppard
  */
 public class PortfolioGraphSource implements GraphSource {
 
@@ -71,11 +73,11 @@ public class PortfolioGraphSource implements GraphSource {
      * @param	quoteBundle	quote bundle containing all the necessary
      *				quotes to calculate the portfolio value
      *				for every day
-     * @param	mode		{@link MARKET_VALUE} for the total market value of the portfolio;
-     *                          {@link RETURN_VALUE} for the return moade;
-     *			        {@link CASH_VALUE} for the cash value of the portfolio;
-     *                          {@link STOCKS_HELD} for the number of stocks held in the portfolio;
-     *                          or {@link SHARE_VALUE} for the share value of the portfolio.
+     * @param	mode		{@link #MARKET_VALUE} for the total market value of the portfolio;
+     *                          {@link #RETURN_VALUE} for the return moade;
+     *			        {@link #CASH_VALUE} for the cash value of the portfolio;
+     *                          {@link #STOCKS_HELD} for the number of stocks held in the portfolio;
+     *                          or {@link #SHARE_VALUE} for the share value of the portfolio.
      */
     public PortfolioGraphSource(Portfolio portfolio, QuoteBundle quoteBundle,
 				int mode) {

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart;
@@ -24,7 +24,8 @@ import org.mov.util.*;
 
 /**
  * Represents a graphable set of X points and their associated list of Y points.
-
+ *
+ * @author Mark Hummel
  */
 public class PFGraphable extends Graphable {
 
@@ -52,10 +53,10 @@ public class PFGraphable extends Graphable {
         if(endX == null) {
             // Get last value
             Iterator iterator = map.keySet().iterator();
-            while(iterator.hasNext()) 
+            while(iterator.hasNext())
                 endX = (Comparable)iterator.next();
         }
-        
+
 	return endX;
     }
 
@@ -70,7 +71,7 @@ public class PFGraphable extends Graphable {
             Iterator iterator = map.keySet().iterator();
             assert iterator.hasNext();
             startX = (Comparable)iterator.next();
-        }        
+        }
 	return startX;
     }
 
@@ -97,34 +98,34 @@ public class PFGraphable extends Graphable {
     /**
      * Associate the given X value with the given Y value. This
      * function is used to "load" up the graphable with data.
-     * 
+     *
      * @param	x	the x value
      * @param	y	the associated List of y values
      */
     public void putYList(Comparable x, Vector y) {
         startX = endX = null;
 
-	 map.put(x, (Object)y);	    
+	 map.put(x, (Object)y);	
 	
     }
 
     /**
      * Associate the given x value with the given character. This
      * function is used to "load" up the graphable with data.
-     * 
+     *
      * @param	x	the x value
-     * @param	y	the associated character
+     * @param	s	the associated character
      */
     public void putString(Comparable x, String s) {
 	charMap.put(x, (Object)s);
     }
 
-    
+
     /**
-     * Given an X range, inspect all the associated Y values and return the 
+     * Given an X range, inspect all the associated Y values and return the
      * highest.
      *
-     * @param	xRange	a <code>List</code> of <code>Comparable</code> 
+     * @param	xRange	a <code>List</code> of <code>Comparable</code>
      *			objects
      * @return	the highest Y value
      */
@@ -137,10 +138,10 @@ public class PFGraphable extends Graphable {
 
 	while(iterator.hasNext()) {
 	    yList = getYList((Comparable)iterator.next());
-	    
+	
 	    if (yList != null) {
-		iterator2 = yList.iterator();	    
-		while (iterator2.hasNext()) {		    
+		iterator2 = yList.iterator();	
+		while (iterator2.hasNext()) {		
 		    y = (Double)iterator2.next();
 		    if(y != null && y.compareTo(highestY) > 0)
 			highestY = y;
@@ -152,10 +153,10 @@ public class PFGraphable extends Graphable {
     }
 
     /**
-     * Given an X range, inspect all the associated Y values and return the 
+     * Given an X range, inspect all the associated Y values and return the
      * lowest.
      *
-     * @param	xRange	a <code>List</code> of <code>Comparable</code> 
+     * @param	xRange	a <code>List</code> of <code>Comparable</code>
      *			objects
      * @return	the lowest Y value
      */
@@ -172,10 +173,10 @@ public class PFGraphable extends Graphable {
 	    yList = getYList(x);
 	    if (yList != null) {
 		Iterator iterator2 = yList.iterator();
-	    
+	
 		while (iterator2.hasNext()) {
 		    y = (Double)iterator2.next();
-		    
+		
 		    if(y != null && y.compareTo(lowestY) < 0)
 			lowestY = y;
 		}

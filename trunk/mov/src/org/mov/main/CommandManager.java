@@ -35,14 +35,21 @@ import org.mov.analyser.PaperTradeResultModule;
 import org.mov.chart.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
-import org.mov.help.*;
+import org.mov.help.HelpModule;
 import org.mov.util.ExpressionQuery;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.parser.Expression;
-import org.mov.portfolio.*;
-import org.mov.prefs.*;
-import org.mov.quote.*;
+import org.mov.portfolio.Portfolio;
+import org.mov.portfolio.PortfolioModule;
+import org.mov.prefs.PreferencesModule;
+import org.mov.prefs.PreferencesManager;
+import org.mov.quote.Quote;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteRange;
+import org.mov.quote.QuoteSourceManager;
+import org.mov.quote.ScriptQuoteBundle;
+import org.mov.quote.Symbol;
 import org.mov.table.PortfolioTableModule;
 import org.mov.table.QuoteModule;
 import org.mov.table.WatchScreen;
@@ -58,7 +65,10 @@ import org.mov.ui.TradingDateDialog;
 
 /**
  * This class manages the tasks that can be initiated from menus and toolbars. Each
- * task is launched in a separate thread. */
+ * task is launched in a separate thread.
+ *
+ * @author Dan Makovec
+ */
 public class CommandManager {
 
     // Singleton instance of this class
@@ -631,7 +641,7 @@ public class CommandManager {
 
                 if (!thread.isInterrupted()) {
                     ChartModule chart = new ChartModule(desktop);
-                    chart.add(graph, null, 0);
+                    chart.addMarketIndicator(graph);
                     chart.redraw();
 
                     desktopManager.newFrame(chart);

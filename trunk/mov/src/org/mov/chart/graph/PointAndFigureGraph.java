@@ -5,38 +5,40 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart.graph;
 
-import java.awt.*;
-import java.lang.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.mov.chart.*;
-import org.mov.chart.source.*;
+import org.mov.chart.Graphable;
+import org.mov.chart.PFGraphable;
+import org.mov.chart.GraphTools;
+import org.mov.chart.source.GraphSource;
+import org.mov.quote.QuoteFunctions;
 import org.mov.util.Locale;
-import org.mov.parser.*;
-import org.mov.quote.*;
 
 /**
- * Point and Figure graph. This graph draws a series of characters (X/O) 
- * mapping the general movement. A change in column shows a reversal 
+ * Point and Figure graph. This graph draws a series of characters (X/O)
+ * mapping the general movement. A change in column shows a reversal
  * such that price difference met the price scale.
- * 
+ *
+ * @author Mark Hummel
  */
 public class PointAndFigureGraph extends AbstractGraph {
 
@@ -45,7 +47,7 @@ public class PointAndFigureGraph extends AbstractGraph {
     private HashMap annotations;
 
     private double priceScale;
-    
+
     /**
      * Create a new point and figure graph.
      *
@@ -60,10 +62,6 @@ public class PointAndFigureGraph extends AbstractGraph {
 	
 	// Create point and figure graphable
 	pointAndFigure = createPointAndFigureGraph(source.getGraphable(), period,priceScale);
-
-	// Create buy sell recommendations
-	//annotations = GraphTools.createAnnotations(getSource().getGraphable(),
-	//pointAndFigure);
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
@@ -72,7 +70,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 
 	// We ignore the graph colours and use our own custom colours
 	g.setColor(Color.green.darker());
-	GraphTools.renderChar(g, pointAndFigure, xoffset, yoffset, 
+	GraphTools.renderChar(g, pointAndFigure, xoffset, yoffset,
 			      horizontalScale,
 			      verticalScale, bottomLineValue, xRange);
     }
@@ -85,13 +83,13 @@ public class PointAndFigureGraph extends AbstractGraph {
 	/*
 	Double yCoord = getY(x);
 
-	int yOfGraph = yoffset -  
+	int yOfGraph = yoffset -
 	    GraphTools.scaleAndFitPoint(yCoord.doubleValue(),
 					bottomLineValue, verticalScale);
 
 	*/
 
-	// Its our graph *only* if its within 5 pixels	    
+	// Its our graph *only* if its within 5 pixels	
 	/*
 	if(Math.abs(y - yOfGraph) < Graph.TOOL_TIP_BUFFER) {
 	    return getSource().getToolTipText(x);
@@ -101,9 +99,9 @@ public class PointAndFigureGraph extends AbstractGraph {
 	return null;
     }
 
-    
 
-    /** 
+
+    /**
      * Return annotations containing buy/sell recommendations based on
      * when the moving average crosses its source.
      *
@@ -138,7 +136,7 @@ public class PointAndFigureGraph extends AbstractGraph {
      * @return	<code>Point and Figure</code>
      */
     public String getName() {
-	return Locale.getString("POINTANDFIGURE");
+	return Locale.getString("POINT_AND_FIGURE");
     }
 
     /**
@@ -149,7 +147,7 @@ public class PointAndFigureGraph extends AbstractGraph {
      * @return	the graphable containing averaged data from the source
      */
 
-    /* Rules of PandF: 
+    /* Rules of PandF:
        1. X = Upmoves, O = DownMoves
        2. Stay in same col until price changes direction, and then move one col to the right.
        3. Plot only prices which meet the price scale. A plot is marked regardless of the direction. If a direction change occurs, the affect is to move the column one to the right.
@@ -161,9 +159,9 @@ public class PointAndFigureGraph extends AbstractGraph {
 	// Date set and value array will be in sync
 	double[] values = source.toArray();
 	Vector yList = new Vector();
-		    
+		
 	Set xRange = source.getXRange();
-	Set column = source.getXRange(); // Associate Column with date 
+	Set column = source.getXRange(); // Associate Column with date
 	Iterator iterator = xRange.iterator();
 	Iterator iterator2 = column.iterator();
 	double diff, prev = 0.0;
@@ -190,10 +188,10 @@ public class PointAndFigureGraph extends AbstractGraph {
 		} else if (upmove == false && diff > 0) {
 		    changeDirection = true;
 		} else {
-		    changeDirection = false;		    
+		    changeDirection = false;		
 		}
 		
-		// Stay in the same column until theres a change in direction 
+		// Stay in the same column until theres a change in direction
 		if (changeDirection) {
 
 		    // Associate a new set of points.
@@ -205,7 +203,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 		    col = x;	
 		    // This places it in the next column
 		    //col = (Comparable)iterator2.next();
-		    
+		
 		}
 		
 		marker = (upmove) ? "X" : "O";
@@ -217,7 +215,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 		pointAndFigure.putString(col, marker);
 		
 	    }
-	    prev = values[i];	    
+	    prev = values[i];	
 	    i++;
 	}
 	

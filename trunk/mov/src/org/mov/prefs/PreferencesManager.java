@@ -293,7 +293,33 @@ public class PreferencesManager {
             // ignore
         }
     }
-    
+
+    //Store the users text made for this symbol     
+    public static void saveUserNotes(String symbol, String text) {
+	    String xpath = "/userNotes/" + symbol;
+	    Preferences prefs = getUserNode("/userNotes");
+	    
+	    prefs = getUserNode("/userNotes");
+	    prefs.put(symbol, text);
+    }
+
+    // Retrieve the notes made for this symbol.
+    public static String loadUserNotes(String symbol) {
+	String text, xpath;
+	Preferences prefs;
+
+	text = "";
+	xpath = "/userNotes" + symbol;
+
+	prefs = getUserNode("/userNotes");
+	if (prefs != null) {
+	    text = prefs.get(symbol, "");
+	}
+	    
+	return text;
+
+    }
+
     /**
      * Load all saved user input in an Analyser Page.
      *

@@ -1,0 +1,148 @@
+/* Merchant of Venice - technical analysis software for the stock market.
+   Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+package org.mov.chart;
+
+import java.beans.PropertyVetoException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.JDesktopPane;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import javax.swing.JTextField;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JButton;
+import java.awt.BorderLayout;
+
+import org.mov.ui.GridBagHelper;
+import org.mov.chart.graph.*;
+import org.mov.chart.source.GraphSource;
+import org.mov.chart.source.OHLCVQuoteGraphSource;
+import org.mov.ui.DesktopManager;
+import org.mov.util.Locale;
+import org.mov.util.TradingDate;
+import org.mov.quote.Quote;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteFunctions;
+import org.mov.prefs.PreferencesManager;
+
+/**
+ * Provides a menu which is associated with a stock symbol being graphed.
+ * This menu provides a series of options which allow the user to graph related
+ * charts and indicators.
+ *
+ * <p>If you have added a view or indicator graph to Venice, you'll need to
+ * add it to this menu. To add the graph, you'll need to make two changes.
+ * First add your graph to the <code>JMenu</code> which is created in
+ * <code>buildMenu</code>. Then add your graph to the factory method
+ * <code>newGraph</code>.
+ *
+ * @author Mark Hummel
+ */
+public class UserNotes extends JInternalFrame {
+
+    private JTextArea notes;
+    private String symbol;    
+
+    public UserNotes(String name) {
+
+	String prevText = "";
+	
+	symbol = name;
+
+	String frameTitle = "Notes for " + name;
+	setTitle(frameTitle);		    
+	setSize(250,300);
+	setVisible(true);
+	setResizable(true);
+	setClosable(true);
+	setIconifiable(true);
+	setMaximizable(true);
+	DesktopManager.getDesktop().add(this);
+
+	JPanel notePane = new JPanel();
+	JPanel buttonPane = new JPanel();
+	
+	notes = new JTextArea(30,15);
+
+	prevText = PreferencesManager.loadUserNotes(symbol);
+	if (prevText != "") {
+	    notes.setText(prevText);
+	}
+
+	JScrollPane noteContainer = new JScrollPane(notes);
+	JButton save = new JButton("save");
+	JButton close = new JButton("close");
+	JButton revert = new JButton("revert");
+	
+	save.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    try {
+			PreferencesManager.saveUserNotes(symbol, notes.getText());
+			setClosed(true);
+		    } 
+		    catch (PropertyVetoException pve) {
+
+		    }
+		}});
+	
+	close.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    try {
+			setClosed(true);
+		    }
+		    catch (PropertyVetoException pve) {
+			
+		    }		    
+		}});
+
+	revert.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    String foo = PreferencesManager.loadUserNotes(symbol);
+		    notes.setText(foo);
+		    
+		}
+	    });
+	
+	
+	notePane.add(noteContainer);
+	buttonPane.add(save, BorderLayout.WEST);
+	buttonPane.add(close, BorderLayout.CENTER);
+	buttonPane.add(revert, BorderLayout.EAST);
+	getContentPane().add(notePane, BorderLayout.CENTER);		 
+	getContentPane().add(buttonPane,BorderLayout.SOUTH);
+	
+    }
+
+    public void setText(String text) {
+
+    }
+}

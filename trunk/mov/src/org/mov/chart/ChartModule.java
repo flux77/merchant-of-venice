@@ -24,6 +24,7 @@ import java.beans.*;
 import java.net.*;
 import java.util.*;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
@@ -674,6 +675,11 @@ public class ChartModule extends JPanel implements Module,
      * the window is being closed.
      */
     public void save() { }
+
+    public BufferedImage getImage() { 
+	return chart.getImage();
+    }
+
 }
 
 

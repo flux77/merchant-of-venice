@@ -26,14 +26,23 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import java.awt.Image.*;
+import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
+import javax.swing.JFileChooser;
+import java.io.File;
 
 import org.mov.chart.graph.*;
 import org.mov.chart.source.GraphSource;
 import org.mov.chart.source.OHLCVQuoteGraphSource;
+import org.mov.ui.DesktopManager;
 import org.mov.util.Locale;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
+import org.mov.util.ImageFilter;
+import org.mov.util.BMPFile;
+import org.mov.util.ImageExporterUI;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.
@@ -63,6 +72,9 @@ public class QuoteChartMenu extends JMenu {
     private Graph currentViewGraph = null;
     private JRadioButtonMenuItem currentViewMenuItem = null;
 
+    // Name of menu / graph source
+    private String menuName = null;
+
     // Symbol being graphed
     private Symbol symbol = null;
 
@@ -86,6 +98,7 @@ public class QuoteChartMenu extends JMenu {
     public QuoteChartMenu(final ChartModule listener, QuoteBundle quoteBundle,
 			  Symbol symbol, Graph graph) {
 	super(graph.getSourceName());
+	menuName = graph.getSourceName();
 
 	this.quoteBundle = quoteBundle;
         this.symbol = symbol;
@@ -144,8 +157,46 @@ public class QuoteChartMenu extends JMenu {
                         listener.redraw();
                 }});
 
+	JMenuItem annotateMenu = new JMenuItem(Locale.getString("GRAPH_ANNOTATE"));
+	annotateMenu.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { 
+
+		    UserNotes notes = new UserNotes(menuName);
+		    
+                }});
+
+	JMenuItem exportMenu = new JMenuItem(Locale.getString("GRAPH_EXPORT"));
+
+	exportMenu.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    File f;
+		    String filename = "";
+		    String userDir = System.getProperty("user.home");
+		    JFileChooser chooser = new JFileChooser();
+                    chooser.setMultiSelectionEnabled(false);
+
+		    ImageFilter filter = new ImageFilter();
+		    chooser.setFileFilter(filter);
+
+		    int rv = chooser.showSaveDialog(DesktopManager.getDesktop());
+
+		    if (rv == JFileChooser.APPROVE_OPTION) {
+			
+			BufferedImage bi = listener.getImage();
+			f = chooser.getSelectedFile();		
+			filename = f.getAbsolutePath();
+
+			BMPFile bmpwrite = new BMPFile(true);
+			bmpwrite.saveBitmap(filename, bi, bi.getWidth(), bi.getHeight());
+
+		    }
+		}
+	    });
+
         // Build menu items
 	this.add(graphMenu);
+	this.add(annotateMenu);
+	this.add(exportMenu);
 	this.add(removeMenu);	
     }
 
@@ -249,7 +300,7 @@ public class QuoteChartMenu extends JMenu {
      * @return	the menu name
      */
     public String getName() {
-        return symbol.toString();
+        return menuName;
     }
 
     /**

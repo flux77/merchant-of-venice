@@ -46,7 +46,7 @@
                   </Properties>
 
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="functionListModel = new org.liquid.list.SortedListModel();"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="functionListModel = new org.mov.ui.SortedListModel();"/>
                   </AuxValues>
                 </Component>
               </SubComponents>

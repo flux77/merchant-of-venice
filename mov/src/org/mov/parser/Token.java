@@ -210,11 +210,11 @@ public class Token {
 	tokenStrings[MIN_TOKEN]                = "min";
 	tokenStrings[MAX_TOKEN]                = "max";
 	tokenStrings[AVG_TOKEN]                = "avg";
-	tokenStrings[DAY_OPEN_TOKEN]           = "day_open";
-	tokenStrings[DAY_CLOSE_TOKEN]          = "day_close";
-	tokenStrings[DAY_LOW_TOKEN]            = "day_low";
-	tokenStrings[DAY_HIGH_TOKEN]           = "day_high";
-	tokenStrings[DAY_VOLUME_TOKEN]         = "day_volume";
+	tokenStrings[DAY_OPEN_TOKEN]           = "open";
+	tokenStrings[DAY_CLOSE_TOKEN]          = "close";
+	tokenStrings[DAY_LOW_TOKEN]            = "low";
+	tokenStrings[DAY_HIGH_TOKEN]           = "high";
+	tokenStrings[DAY_VOLUME_TOKEN]         = "volume";
 	tokenStrings[IF_TOKEN]                 = "if";
 	tokenStrings[LEFT_BRACE_TOKEN]         = "{";
 	tokenStrings[RIGHT_BRACE_TOKEN]        = "}";
@@ -238,7 +238,7 @@ public class Token {
 
         // Is it a float or an integer number?
 	if(Character.isDigit(string.charAt(0))) {
-	    float value = 0.0F;
+	    float value = 0.0F; 
 	    String numberString = new String();
 
             // Any values are considered to be integers, unless we find a decimal
@@ -270,11 +270,55 @@ public class Token {
 	    matched = true;
 	}
 
-        // Go through our token list
-	else 
+        // Is it a keyword or variable?
+	else if(Character.isLetter(string.charAt(0))) {
+            
+            // Extract all letters
+            Pattern pattern = Pattern.compile("^[a-zA-Z]*");
+            Matcher matcher = pattern.matcher(string);
+            matcher.find();
+            String identifier = matcher.group();
+            
+            for(int i = 0; !matched && i < tokenStrings.length; i++)
+		if(identifier.equals(tokenStrings[i])) {
+                    token.setType(i);
+		    
+		    // move string along
+		    string = string.substring(tokenStrings[i].length());
+		    matched = true;
+		}
+
+            // Maybe it's a variable? 
+            if(!matched) {
+                
+                // Greedily extract possible variable name
+                pattern = Pattern.compile("^[a-zA-Z][a-zA-Z0-9]*");
+                matcher = pattern.matcher(string);
+                
+                if(matcher.find()) {
+                    String possibleVariableName = matcher.group();
+                    
+                    if(variables.contains(possibleVariableName)) {
+                        string = string.substring(possibleVariableName.length());
+                        matched = true;
+                        
+                        token.setType(Token.VARIABLE_TOKEN);
+                        token.setValueName(possibleVariableName);
+                        token.setValueType(variables.getType(possibleVariableName));
+                    }
+                }
+            }
+
+            if(!matched) 
+                throw new ParserException("unknown identifier '" + identifier + "'");
+        }
+
+        // Must be some sort of punctuation
+        else {
+            char symbol = string.charAt(0);
+
 	    for(int i = 0; !matched && i < tokenStrings.length; i++)
-		if(tokenStrings[i] != null && 
-		   string.startsWith(tokenStrings[i])) {
+		if(string.startsWith(tokenStrings[i])) {
 		    
 		    token.setType(i);
 		    
@@ -282,28 +326,12 @@ public class Token {
 		    string = string.substring(tokenStrings[i].length());
 		    matched = true;
 		}
-	
-	if(!matched) {
-            // Maybe it's a variable? Greedily extract possible variable name
-            Pattern pattern = Pattern.compile("^[a-zA-z][a-zA-Z0-9]*");
-            Matcher matcher = pattern.matcher(string);
-
-            if(matcher.find()) {
-                String possibleVariableName = matcher.group();
-
-                if(variables.contains(possibleVariableName)) {
-                    string = string.substring(possibleVariableName.length());
-                    matched = true;
-                    
-                    token.setType(Token.VARIABLE_TOKEN);
-                    token.setValueName(possibleVariableName);
-                    token.setValueType(variables.getType(possibleVariableName));
-                }
-            }
 
             if(!matched)
-                throw new ParserException("unknown symbol");
+                throw new ParserException("unknown symbol '" + symbol + "'");
         }
+
+        assert matched;
 
 	return string;
     }

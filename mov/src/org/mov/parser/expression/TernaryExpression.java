@@ -37,6 +37,8 @@ abstract public class TernaryExpression extends Expression {
     public TernaryExpression(Expression arg1,
 			     Expression arg2,
 			     Expression arg3) {
+        assert arg1 != null && arg2 != null && arg3 != null;
+
 	add(arg1);
 	add(arg2);
 	add(arg3);
@@ -50,15 +52,5 @@ abstract public class TernaryExpression extends Expression {
      */
     public int getNeededChildren() {
 	return 3;
-    }
-
-    /**
-     * Return the given argument.
-     *
-     * @param	arg	the argument number
-     * @return	the argument
-     */
-    protected Expression getArg(int arg) {
-	return (Expression)getChildAt(arg);
     }
 }

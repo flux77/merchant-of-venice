@@ -35,6 +35,8 @@ abstract public class BinaryExpression extends Expression {
      */
     public BinaryExpression(Expression left,
 			    Expression right) {
+        assert left != null && right != null;
+
 	add(left);
 	add(right);
     }
@@ -51,7 +53,7 @@ abstract public class BinaryExpression extends Expression {
 
     /**
      * Helper method to conver the given expression to a string.
-     * Given an operator such as <code>and</code>, <code>or</code> etc
+     * Given an operator such as <code>+</code>, <code>-</code> etc
      * it will return <code>arg1 operator arg2</code>. It will insert
      * parentheses as needed.
      *
@@ -82,7 +84,7 @@ abstract public class BinaryExpression extends Expression {
      * @return	the left argument
      */
     protected Expression getLeft() {
-	return (Expression)getChildAt(0);
+	return get(0);
     }
 
     /**
@@ -91,6 +93,6 @@ abstract public class BinaryExpression extends Expression {
      * @return	the left argument
      */
     protected Expression getRight() {
-	return (Expression)getChildAt(1);
+	return get(1);
     }
 }

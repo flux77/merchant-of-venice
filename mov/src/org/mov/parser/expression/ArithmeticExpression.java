@@ -53,6 +53,25 @@ abstract public class ArithmeticExpression extends BinaryExpression {
 	    throw new TypeMismatchException();
     }
 
+    public Expression simplify() {
+        // First simplify all the child arguments
+        super.simplify();
+
+        // If both the child arguments are constant we can precompute.
+        if(getLeft() instanceof NumberExpression &&
+           getRight() instanceof NumberExpression) {
+            try {
+                return new NumberExpression(evaluate(null, null, null, 0), getType());
+            }
+            catch(EvaluationException e) {
+                // Can happen if we hit 1/0. In which case don't bother to simplify.
+                return this;
+            }
+        }
+        else
+            return this;
+    }
+
     /**
      * Get the type of the expression.
      *

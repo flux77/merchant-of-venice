@@ -41,6 +41,39 @@ public class EqualThanExpression extends ComparisionExpression {
 	    return FALSE;
     }
 
+    public Expression simplify() {
+        // First perform comparision simplifications
+        Expression simplified = super.simplify();
+
+        // If we haven't simplified the whole expression away and
+        // the left and right arguments are the same expression
+        // then the comparision must be true.
+        if(simplified == this && getLeft().equals(getRight()))
+            return new NumberExpression(true);
+        else
+            return simplified;
+    }
+
+    public boolean equals(Object object) {
+
+        // Are they both equals expressions?
+        if(object instanceof EqualThanExpression) {
+            EqualThanExpression expression = (EqualThanExpression)object;
+
+            // (x == y) == (x == y)
+            if(getLeft().equals(expression.getLeft()) &&
+               getRight().equals(expression.getRight()))
+                return true;
+
+            // (x == y) == (y == x)
+            if(getLeft().equals(expression.getRight()) &&
+               getRight().equals(expression.getLeft()))
+                return true;
+        }
+    
+        return false;
+    }
+
     public String toString() {
 	return super.toString("==");
     }

@@ -59,5 +59,32 @@ abstract public class LogicExpression extends BinaryExpression {
     public int getType() {
         return BOOLEAN_TYPE;
     }
+
+    /**
+     * Helper method to conver the given expression to a string.
+     * Given an operator such as <code>and</code>, <code>or</code> etc
+     * it will return <code>arg1 operator arg2</code>. It will insert
+     * parentheses as needed.
+     *
+     * @param	operator	the binary operator
+     * @return	the string representation
+     */
+    protected String toString(String operator) {
+	String string = "";
+
+	if(getLeft().getNeededChildren() < 2)
+	    string += getLeft().toString();
+	else
+	    string += "(" + getLeft().toString() + ")";
+	
+	string += " " + operator + " ";
+	
+	if(getRight().getNeededChildren() < 2)
+	    string += getRight().toString();
+	else
+	    string += "(" + getRight().toString() + ")";
+
+	return string;
+    }
 }
 

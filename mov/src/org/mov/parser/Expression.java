@@ -55,10 +55,10 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
     /** Threshold level where a number is registered as <code>TRUE</code> */
     public final static float TRUE_LEVEL = 0.1F;
 
-    /** <code>Value of TRUE</code> */
+    /** Value of <code>TRUE</code> */
     public final static float TRUE = 1.0F;
 
-    /** <code>Value of FALSE</code> */
+    /** Value of <code>FALSE</code> */
     public final static float FALSE = 0.0F;
     
     /**
@@ -76,8 +76,8 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
      * @param	symbol	the current symbol
      * @param	day	current date in cache fast access format
      * @return	the result of the expression
-     * @throws	EvaluationException if the expression tries to access
-     *		dates outside of the cache
+     * @throws	EvaluationException if the expression performs an illegal
+     *          operation such as divide by zero.
      */
     abstract public float evaluate(Variables variables, QuoteBundle quoteBundle, 
                                    String symbol, int day)
@@ -107,12 +107,118 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
     abstract public int getType();
 
     /**
-     * Return the number of children (arguments) that this expression
-     * needs.
+     * Return the number of arguments that this expressio needs.
      *
      * @return	the required number of arguments
      */
     abstract public int getNeededChildren();
+
+    /**
+     * Return the given argument.
+     *
+     * @param	index	the argument index
+     * @return	the argument
+     */
+    public Expression get(int index) {
+        assert index < getNeededChildren();
+        
+        Expression expression = (Expression)getChildAt(index);
+        assert expression != null;
+
+	return expression;
+    }
+
+    /**
+     * Set the argument.
+     *
+     * @param expression new argument expression
+     * @param index index of the argument expression
+     */
+    public void set(Expression expression, int index) {
+        assert index < getNeededChildren();
+
+        Expression current = get(index);
+        if(current != expression) {
+            remove(index);
+            insert(expression, index);            
+        }
+    }
+
+    /**
+     * Perform simplifications and optimisations on the expression tree.
+     * For example, if the expression tree was <code>a and true</code> then the
+     * expression tree would be simplified to <code>a</code>.
+     */
+    public Expression simplify() {
+        assert getChildCount() == getNeededChildren();
+        
+        // Simplify child arguments
+        if(getNeededChildren() > 0) {
+            for(int i = 0; i < getNeededChildren(); i++) 
+                set(get(i).simplify(), i);
+        }
+
+        return this;
+    }
+
+    /**
+     * Return the index of the given argument in the expression. We override
+     * this method because we use "==" to denote equality, not "equals" 
+     * as the former would return the first argument with the same expression
+     * not necessarily the actual expression instance desired.
+     *
+     * @param expression the child expression to locate
+     * @return index of the child expression or <code>-1</code> if it could
+     *              not be found
+     */
+    public int getIndex(Expression expression) {
+        for(int index = 0; index < getNeededChildren(); index++) {
+            if(get(index) == expression)
+                return index;
+        }
+        
+        // Not found
+        return -1;
+    }
+
+    /**
+     * Returns whether this expression tree and the given expression tree
+     * are equivalent.
+     *
+     * @param object the other expression
+     */
+    public boolean equals(Object object) {
+
+        // Top level nodes the sames?
+        if(!(object instanceof Expression))
+            return false;
+        Expression expression = (Expression)object;
+        
+        if(getClass() != expression.getClass())
+            return false;
+        
+        // Check all children are the same - only check the children
+        // we currently have - we might not have them all yet!
+        for(int i = 0; i < getNeededChildren(); i++) {
+            if(!get(i).equals(expression.get(i)))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * If you override the {@link #equals} method then you should override
+     * this method. It provides a very basic hash code function.
+     *
+     * @return a poor hash code of the tree
+     */
+    public int hashCode() {
+        // If you implement equals you should implement hashCode().
+        // Since I don't need it I haven't bothered to implement a very
+        // good hash.
+        return getClass().hashCode();
+    }
 
     /** 
      * Count the number of nodes in the tree.
@@ -123,7 +229,7 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
         int count = 1;
 
         for(int i = 0; i < getChildCount(); i++) {
-            Expression childExpression = (Expression)getChildAt(i);
+            Expression childExpression = get(i);
 
             count += childExpression.size();
         }
@@ -146,7 +252,7 @@ public abstract class Expression extends DefaultMutableTreeNode implements Clone
             count = 1;
 
         for(int i = 0; i < getChildCount(); i++) {
-            Expression childExpression = (Expression)getChildAt(i);
+            Expression childExpression = get(i);
 
             count += childExpression.size(type);
         }

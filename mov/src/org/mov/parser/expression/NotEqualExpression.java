@@ -41,6 +41,39 @@ public class NotEqualExpression extends ComparisionExpression {
 	    return FALSE;
     }
 
+    public Expression simplify() {
+        // First perform comparision simplifications
+        Expression simplified = super.simplify();
+
+        // If we haven't simplified the whole expression away and
+        // the left and right arguments are the same expression
+        // then the comparision must be false.
+        if(simplified == this && getLeft().equals(getRight()))
+            return new NumberExpression(false);
+        else
+            return simplified;
+    }
+
+    public boolean equals(Object object) {
+
+        // Are they both not equals expressions?
+        if(object instanceof NotEqualExpression) {
+            NotEqualExpression expression = (NotEqualExpression)object;
+
+            // (x != y) == (x != y)
+            if(getLeft().equals(expression.getLeft()) &&
+               getRight().equals(expression.getRight()))
+                return true;
+
+            // (x != y) == (y != x)
+            if(getLeft().equals(expression.getRight()) &&
+               getRight().equals(expression.getLeft()))
+                return true;
+        }
+    
+        return false;
+    }
+
     public String toString() {
 	return super.toString("!=");
     }

@@ -62,8 +62,24 @@ public class VariableExpression extends TerminalExpression {
 	return getType();
     }
 
+    public String getName() {
+        return name;
+    }
+
     public int getType() {
         return type;
+    }
+
+    public boolean equals(Object object) {
+        if(object instanceof VariableExpression) {
+            VariableExpression expression = (VariableExpression)object;
+
+            if(expression.getName().equals(getName()) &&
+               expression.getType() == getType())
+                return true;
+        }
+
+        return false;
     }
 
     public Object clone() {

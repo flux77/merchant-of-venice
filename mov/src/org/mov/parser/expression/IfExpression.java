@@ -47,38 +47,34 @@ public class IfExpression extends TernaryExpression {
 	throws EvaluationException {
 
 	// if(...) then
-	if(getArg(0).evaluate(variables, quoteBundle, symbol, day) 
+	if(get(0).evaluate(variables, quoteBundle, symbol, day) 
 	   >= Expression.TRUE_LEVEL)
-	    return getArg(1).evaluate(variables, quoteBundle, symbol, day);
+	    return get(1).evaluate(variables, quoteBundle, symbol, day);
 	// else
 	else
-	    return getArg(2).evaluate(variables, quoteBundle, symbol, day);
+	    return get(2).evaluate(variables, quoteBundle, symbol, day);
     }
 
     public String toString() {
-	return new String("if(" + getArg(0).toString() + ") {" +
-			  getArg(1).toString() + "} else {" +
-			  getArg(2).toString() + "} ");
+	return new String("if(" + get(0).toString() + ") {" +
+			  get(1).toString() + "} else {" +
+			  get(2).toString() + "}");
     }
 
     /**
      * Check the input arguments to the expression. The first argument
      * must be {@link #BOOLEAN_TYPE}, the remaining arguments can be
-     * any type but must be the same.      
+     * {@link #BOOLEAN_TYPE}, {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE} and 
+     * must be the same.
      *
      * @return	the type of the second and third arguments
      */
     public int checkType() throws TypeMismatchException {
-	// if(arg0) { arg1 } else { arg2} 
-	// then type of arg1 should be the same of arg2
-	// arg0 must be boolean
-	int arg0type = getArg(0).checkType();
-	int arg1type = getArg(1).checkType();
-	int arg2type = getArg(2).checkType();
-
-	if(arg0type == BOOLEAN_TYPE &&
-	   arg1type == arg2type)
-	    return arg1type;
+	if(get(0).getType() == BOOLEAN_TYPE &&
+           get(1).getType() == get(2).getType() &&
+           (get(1).getType() == FLOAT_TYPE || get(1).getType() == INTEGER_TYPE ||
+            get(1).getType() == BOOLEAN_TYPE))
+           return getType();
 	else
 	    throw new TypeMismatchException();
     }
@@ -86,16 +82,44 @@ public class IfExpression extends TernaryExpression {
     /**
      * Get the type of the expression.
      *
-     * @return {@link #BOOLEAN_TYPE}.
+     * @return {@link #FLOAT_TYPE}, {@link #INTEGER_TYPE} or {@link #BOOLEAN_TYPE}.
      */
     public int getType() {
-        return BOOLEAN_TYPE;
+        assert get(1).getType() == get(2).getType();
+
+        return get(1).getType();
+    }
+
+    public Expression simplify() {
+        // First simplify all the child arguments
+        super.simplify();
+
+        NumberExpression first = (get(0) instanceof NumberExpression? 
+                                  (NumberExpression)get(0) : null);
+
+        // If the first argument is the constant TRUE then we simplify to the
+        // second argument. Otherwise if the first argument is the constant FALSE
+        // then we simplify to the third argument.
+        if(first != null) {
+            if(first.getValue() >= TRUE_LEVEL)
+                return get(1);
+            else
+                return get(2);
+        }
+
+        // If the second and third arguments are the same then we can simplify
+        // to the second argument.
+        else if(get(1).equals(get(2)))
+            return get(1);
+
+        else
+            return this;
     }
 
     public Object clone() {
-        return new IfExpression((Expression)getArg(0).clone(), 
-                                (Expression)getArg(1).clone(),
-                                (Expression)getArg(2).clone());
+        return new IfExpression((Expression)get(0).clone(), 
+                                (Expression)get(1).clone(),
+                                (Expression)get(2).clone());
     }
 
 }

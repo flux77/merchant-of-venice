@@ -41,6 +41,57 @@ public class OrExpression extends LogicExpression {
 	    return FALSE;
     }
 
+    public Expression simplify() {
+        // First simplify all the child arguments
+        super.simplify();
+
+        NumberExpression left = (getLeft() instanceof NumberExpression? 
+                                 (NumberExpression)getLeft() : null);
+        NumberExpression right = (getRight() instanceof NumberExpression? 
+                                  (NumberExpression)getRight() : null);
+
+        // If either child argument is the constant TRUE we can simplify to the
+        // constant TRUE
+        if((left != null && left.getValue() >= TRUE_LEVEL) ||
+           (right != null && right.getValue() >= TRUE_LEVEL))
+            return new NumberExpression(true);
+
+        // If either child argument is the constant FALSE we can simplify to the 
+        // other child arguement
+        else if(left != null && left.getValue() < TRUE_LEVEL)
+            return getRight();
+        else if(right != null && right.getValue() < TRUE_LEVEL)
+            return getLeft();
+
+        // If both child arguments are the same we can simplify to the left
+        // argument
+        else if(getLeft().equals(getRight()))
+            return getLeft();
+
+        else
+            return this;
+    }
+
+    public boolean equals(Object object) {
+
+        // Are they both or expressions?
+        if(object instanceof OrExpression) {
+            OrExpression expression = (OrExpression)object;
+
+            // (x or y) == (x or y)
+            if(getLeft().equals(expression.getLeft()) &&
+               getRight().equals(expression.getRight()))
+                return true;
+
+            // (x or y) == (y or x)
+            if(getLeft().equals(expression.getRight()) &&
+               getRight().equals(expression.getLeft()))
+                return true;
+        }
+    
+        return false;
+    }
+
     public String toString() {
 	return super.toString("or");
     }

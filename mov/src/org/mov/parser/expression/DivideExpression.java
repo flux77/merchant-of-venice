@@ -42,6 +42,31 @@ public class DivideExpression extends ArithmeticExpression {
             throw new EvaluationException("Divide by zero error");
     }
 
+    public Expression simplify() {
+        // First perform arithmetic simplifications
+        Expression simplified = super.simplify();
+
+        if(simplified == this) {
+            NumberExpression left = (getLeft() instanceof NumberExpression? 
+                                     (NumberExpression)getLeft() : null);
+            NumberExpression right = (getRight() instanceof NumberExpression? 
+                                      (NumberExpression)getRight() : null);
+
+            // 0/a -> 0.
+            if(left != null && left.equals(0.0F))
+                return new NumberExpression(0.0F, getType());
+
+            // a/1 -> a.
+            else if(right != null && right.equals(1.0F))
+                return getLeft();
+            
+            // a/a -> 1 (pragmatism over idealism)
+            else if(getLeft().equals(getRight()))
+                return new NumberExpression(1.0F, getType());
+        }
+        return simplified;
+    }
+
     public String toString() {
 	return super.toString("/");
     }

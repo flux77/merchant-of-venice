@@ -32,6 +32,8 @@ abstract public class UnaryExpression extends Expression {
      * @param	sub	the sub argument
      */
     public UnaryExpression(Expression sub) {
+        assert sub != null;
+
 	add(sub);
     }
 
@@ -50,7 +52,7 @@ abstract public class UnaryExpression extends Expression {
      *
      * @return	the single argument
      */
-    protected Expression getSub() {
-	return (Expression)getChildAt(0);
+    protected Expression get() {
+	return get(0);
     }
 }

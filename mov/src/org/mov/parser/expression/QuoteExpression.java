@@ -66,16 +66,6 @@ abstract public class QuoteExpression extends Expression {
     }
 
     /**
-     * Get the argument.
-     *
-     * @param	arg	the argument to return
-     * @return	the argument
-     */
-    protected Expression getArg(int arg) {
-	return (Expression)getChildAt(arg);
-    }
-
-    /**
      * Get the type of the expression.
      *
      * @return {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.

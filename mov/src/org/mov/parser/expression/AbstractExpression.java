@@ -18,9 +18,13 @@
 
 package org.mov.parser.expression;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.mov.parser.Expression;
 
@@ -34,6 +38,11 @@ import org.mov.parser.Expression;
  * @see Expression
  */
 public abstract class AbstractExpression implements Expression {
+
+    // Constants that manage the USA/Australian/UK localization
+    // the goal is forcing that localization also for others languages
+    private final static String fmt = "0.000000000000#";
+    private final static DecimalFormat df = new DecimalFormat(fmt, new DecimalFormatSymbols(Locale.US));
 
     // Pointer to parent node (if any)
     private Expression parent = null;
@@ -157,6 +166,82 @@ public abstract class AbstractExpression implements Expression {
         
         // Not found
         return -1;
+    }
+
+    /**
+     * Parses doubleText from a string to produce a double.
+     *
+     * @param doubleText the string to be parsed
+     * @return the parsed value
+     */
+    public static double parseDouble(String doubleText) throws NumberFormatException {
+        double retValue = 0;
+        try {
+            Number num = df.parse(doubleText);
+            if (num == null)
+                throw new ParseException("AbstractExpression - parseDouble - null Error", 0);
+            retValue = df.parse(doubleText).doubleValue();
+        } catch (ParseException e) {
+            throw new NumberFormatException();
+        }
+        return retValue;
+    }
+
+    /**
+     * Parses intText from a string to produce an integer.
+     *
+     * @param intText the string to be parsed
+     * @return the parsed value
+     */
+    public static int parseInt(String intText) throws NumberFormatException {
+        int retValue = 0;
+        try {
+            Number num = df.parse(intText);
+            if (num == null)
+                throw new ParseException("AbstractExpression - parseInt - null Error", 0);
+            retValue = df.parse(intText).intValue();
+        } catch (ParseException e) {
+            throw new NumberFormatException();
+        }
+        return retValue;
+    }
+
+    /**
+     * Parses doubleText from a string to produce a Double Object.
+     *
+     * @param doubleText the string to be parsed
+     * @return the parsed value as Double Object
+     */
+    public static Double valueOfDouble(String doubleText) throws NumberFormatException {
+        Double retValue = null;
+        try {
+            Number num = df.parse(doubleText);
+            if (num == null)
+                throw new ParseException("AbstractExpression - valueOfDouble - null Error", 0);
+            retValue = new Double(df.parse(doubleText).doubleValue());
+        } catch (ParseException e) {
+            throw new NumberFormatException();
+        }
+        return retValue;
+    }
+
+    /**
+     * Parses intText from a string to produce an Integer Object.
+     *
+     * @param intText the string to be parsed
+     * @return the parsed value as Integer Object
+     */
+    public static Integer valueOfInt(String intText) throws NumberFormatException {
+        Integer retValue = null;
+        try {
+            Number num = df.parse(intText);
+            if (num == null)
+                throw new ParseException("AbstractExpression - valueOfInt - null Error", 0);
+            retValue = new Integer(df.parse(intText).intValue());
+        } catch (ParseException e) {
+            throw new NumberFormatException();
+        }
+        return retValue;
     }
 
     /**

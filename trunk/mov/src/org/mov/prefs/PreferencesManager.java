@@ -11,7 +11,6 @@ package org.mov.prefs;
 
 import org.mov.util.*;
 import org.mov.portfolio.*;
-
 import java.util.*;
 import java.util.prefs.*;
 
@@ -197,20 +196,24 @@ public class PreferencesManager {
 		int shares = transactionPrefs.getInt("shares", 0);
 		float tradeCost = transactionPrefs.getFloat("trade_cost",
 							    0.0F);
-		String cashAccountName = transactionPrefs.get("cash_account",
-							      "");
+
 		try {
+		    String cashAccountName = transactionPrefs.get("cash_account", "");
 		    CashAccount cashAccount = 
 			(CashAccount)portfolio.findAccountByName(cashAccountName);
-		    String shareAccountName = 
-			transactionPrefs.get("share_account", "");
 
+		    String cashAccountName2 = transactionPrefs.get("cash_account2", "");
+		    CashAccount cashAccount2 = 
+			(CashAccount)portfolio.findAccountByName(cashAccountName2);
+
+		    String shareAccountName = transactionPrefs.get("share_account", "");
 		    ShareAccount shareAccount = 
 			(ShareAccount)portfolio.findAccountByName(shareAccountName);
+
 		    // Build transaction and add it to the portfolio
 		    Transaction transaction = 
 			new Transaction(type, date, amount, symbol, shares,
-					tradeCost, cashAccount, shareAccount);
+					tradeCost, cashAccount, cashAccount2, shareAccount);
 						
 		    transactions.add(transaction);
 		}
@@ -287,6 +290,12 @@ public class PreferencesManager {
 	    if(cashAccount != null) 
 		transactionPrefs.put("cash_account", 
 				     cashAccount.getName());
+
+	    CashAccount cashAccount2 = transaction.getCashAccount2();
+	    if(cashAccount2 != null) 
+		transactionPrefs.put("cash_account2", 
+				     cashAccount2.getName());
+
 	    ShareAccount shareAccount = transaction.getShareAccount();
 	    if(shareAccount != null) 
 		transactionPrefs.put("share_account", 

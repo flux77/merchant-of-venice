@@ -45,6 +45,15 @@ public class CashAccount implements Account, Cloneable {
 	else if(type == Transaction.REDUCE) {
 	    capital += (transaction.getAmount() - transaction.getTradeCost());
 	}
+	else if(type == Transaction.TRANSFER) {
+	    // Are we transfering to or from this account?
+	    if(transaction.getCashAccount() == this) { 
+		capital -= transaction.getAmount(); // from
+	    }
+	    else { 
+		capital += transaction.getAmount(); // to
+	    }
+	}
     }
 
     public Object clone() {

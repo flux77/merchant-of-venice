@@ -21,9 +21,12 @@ package org.mov.main;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import javax.swing.JDesktopPane;
-import javax.swing.UIManager;
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.DesktopManager;
@@ -130,8 +133,9 @@ public class Main extends JFrame {
 	// Set the look and feel to be the default for the current platform
 	try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            //MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());//In win2000, it's display is better then default
-            //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");//In win2000, it's display is better then default
+            //In win2000, below display is better then default
+            //MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
+            //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 
 	}
 	catch(Exception e) {

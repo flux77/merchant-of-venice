@@ -1,5 +1,6 @@
 package org.mov.util;
 
+import java.io.File;
 import java.util.*;
 
 import org.mov.portfolio.Stock;
@@ -10,6 +11,22 @@ import org.mov.portfolio.Stock;
  * to fixed point strings etc.
  */
 public class Converter {
+
+    /**
+     * Convert a file array to a file name array.
+     *
+     * @param	files	an array of files
+     * @return	an array of file names
+     */
+    public static String[] toFileNames(File[] files) {
+	String[] fileNames = new String[files.length];
+	
+	for(int i = 0; i < files.length; i++) {
+	    fileNames[i] = files[i].getPath();
+	}
+
+	return fileNames;
+    }
 
     /**
      * Convert a number to a fixed length string of the given number of

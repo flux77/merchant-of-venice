@@ -186,7 +186,7 @@ public class Individual implements Comparable {
     public boolean isValid(int min, int max) {
         int sellRuleSize = sellRule.size();
         int buyRuleSize = buyRule.size();
-
+        
         return (sellRuleSize >= min && sellRuleSize <= max &&
                 buyRuleSize >= min && buyRuleSize <= max &&
                 (buyRule.size(Expression.FLOAT_QUOTE_TYPE) > 0 ||
@@ -224,8 +224,8 @@ public class Individual implements Comparable {
                             Money stockValue,
                             int numberStocks,
                             Money tradeCost,
-                            String tradeCostBuy,
-                            String tradeCostSell)
+                            String tradeValueBuy,
+                            String tradeValueSell)
         throws EvaluationException {
 
         // Is there a fixed number of stocks?
@@ -241,8 +241,8 @@ public class Individual implements Comparable {
                                               initialCapital,
                                               numberStocks,
                                               tradeCost,
-                                              tradeCostBuy,
-                                              tradeCostSell);
+                                              tradeValueBuy,
+                                              tradeValueSell);
         // Or a fixed value?
         else {
             portfolio = PaperTrade.paperTrade(PORTFOLIO_NAME,
@@ -256,8 +256,8 @@ public class Individual implements Comparable {
                                               initialCapital,
                                               stockValue,
                                               tradeCost,
-                                              tradeCostBuy,
-                                              tradeCostSell);
+                                              tradeValueBuy,
+                                              tradeValueSell);
         }
 
         // Get final value of portfolio

@@ -66,8 +66,8 @@ public class PaperTrade {
     private static String[] symbolStock;
     private static boolean[] buyRule;
     private static boolean[] sellRule;
-    private static double[] buyCost;
-    private static double[] sellCost;
+    private static double[] buyValue;
+    private static double[] sellValue;
 
     // Since this process uses so many temporary variables, it makes sense
     // grouping them all together.
@@ -95,10 +95,10 @@ public class PaperTrade {
         public int endDateOffset;
         
         // The rule getting the buy price
-        private String tradeCostBuy;
+        private String tradeValueBuy;
         
         // The rule getting the sell price
-        private String tradeCostSell;
+        private String tradeValueSell;
 
         /**
          * Create a new environment for paper trading.
@@ -114,14 +114,14 @@ public class PaperTrade {
                            TradingDate startDate,
                            TradingDate endDate,
                            Money capital,
-                           String tradeCostBuy,
-                           String tradeCostSell) {
+                           String tradeValueBuy,
+                           String tradeValueSell) {
 
             this.quoteBundle = quoteBundle;
             this.quoteCache = QuoteCache.getInstance();
             
-            this.tradeCostBuy = tradeCostBuy;
-            this.tradeCostSell = tradeCostSell;
+            this.tradeValueBuy = tradeValueBuy;
+            this.tradeValueSell = tradeValueSell;
             
             // First set up a new (transient) portfolio
             portfolio = new Portfolio(portfolioName, true);
@@ -181,8 +181,8 @@ public class PaperTrade {
             Symbol symbol = stockHolding.getSymbol();
 
             // How much are they worth? We sell at the user defined price.
-            Expression tradeCostSellExpression = ExpressionFactory.newExpression(environment.tradeCostSell);
-            double sellPrice = tradeCostSellExpression.evaluate(variables, environment.quoteBundle, symbol, day);
+            Expression tradeValueSellExpression = ExpressionFactory.newExpression(environment.tradeValueSell);
+            double sellPrice = tradeValueSellExpression.evaluate(variables, environment.quoteBundle, symbol, day);
             // If the wished price is lower than the maximum of the day,
             // your stocks will be sold.
             // It simulates an order of selling at fixed price (sellPrice).
@@ -220,8 +220,8 @@ public class PaperTrade {
                                int day)
 	throws EvaluationException, MissingQuoteException {
 
-        Expression tradeCostBuyExpression = ExpressionFactory.newExpression(environment.tradeCostBuy);
-        double buyPrice = tradeCostBuyExpression.evaluate(variables, environment.quoteBundle, symbol, day);
+        Expression tradeValueBuyExpression = ExpressionFactory.newExpression(environment.tradeValueBuy);
+        double buyPrice = tradeValueBuyExpression.evaluate(variables, environment.quoteBundle, symbol, day);
         // If the wished price is greater than the minimum of the day,
         // your stocks will be bought.
         // It simulates an order of buying at fixed price (buyPrice).
@@ -302,9 +302,9 @@ public class PaperTrade {
             catch(MissingQuoteException e) {
                 // ignore and move on
             }
-            catch(EvaluationException e) {
+            //catch(EvaluationException e) {
                 // Ignore and move on
-            }
+            //}
         }
     }
 
@@ -373,9 +373,9 @@ public class PaperTrade {
                     catch(MissingQuoteException e) {
                         // Ignore and move on
                     }
-                    catch(EvaluationException e) {
+                    //catch(EvaluationException e) {
                         // Ignore and move on
-                    }
+                    //}
                 }
 
                 order++;
@@ -431,8 +431,8 @@ public class PaperTrade {
 				       Money capital,
                                        Money stockValue,
 				       Money tradeCost,
-                                       String tradeCostBuy,
-                                       String tradeCostSell)
+                                       String tradeValueBuy,
+                                       String tradeValueSell)
         throws EvaluationException {
 
         // Set up environment for paper trading
@@ -442,8 +442,8 @@ public class PaperTrade {
                                                              startDate,
                                                              endDate,
                                                              capital,
-                                                             tradeCostBuy,
-                                                             tradeCostSell);
+                                                             tradeValueBuy,
+                                                             tradeValueSell);
         int dateOffset = environment.startDateOffset;
 
         if(orderCache.isOrdered() && !variables.contains("order"))
@@ -468,6 +468,9 @@ public class PaperTrade {
             dateOffset++;
         }
 
+        setTip(environment, quoteBundle, variables, buy, sell, dateOffset, tradeCost,
+                  orderCache.getTodaySymbols(dateOffset), orderCache);
+        
         return environment.portfolio;
     }
 
@@ -500,8 +503,8 @@ public class PaperTrade {
 				       Money capital,
                                        int numberStocks,
 				       Money tradeCost,
-                                       String tradeCostBuy,
-                                       String tradeCostSell)
+                                       String tradeValueBuy,
+                                       String tradeValueSell)
         throws EvaluationException {
 
         // Set up environment for paper trading
@@ -511,8 +514,8 @@ public class PaperTrade {
                                                              startDate,
                                                              endDate,
                                                              capital,
-                                                             tradeCostBuy,
-                                                             tradeCostSell);
+                                                             tradeValueBuy,
+                                                             tradeValueSell);
         int dateOffset = environment.startDateOffset;
 
         if(orderCache.isOrdered() && !variables.contains("order"))
@@ -568,8 +571,8 @@ public class PaperTrade {
         symbolStock = new String[symbols.size()];
         buyRule = new boolean[symbols.size()];
         sellRule = new boolean[symbols.size()];
-        buyCost = new double[symbols.size()];
-        sellCost = new double[symbols.size()];
+        buyValue = new double[symbols.size()];
+        sellValue = new double[symbols.size()];
         
         setSellTip(environment, quoteBundle, variables, sell, dateOffset,
                     tradeCost, symbols, orderCache);
@@ -618,14 +621,14 @@ public class PaperTrade {
             try {
                 sellRule[index] = (sell.evaluate(variables, quoteBundle, symbol, dateOffset) >= Expression.TRUE);
                 // price to sell.
-                Expression tradeCostSellExpression = ExpressionFactory.newExpression(environment.tradeCostSell);
-                sellCost[index] = tradeCostSellExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
+                Expression tradeValueSellExpression = ExpressionFactory.newExpression(environment.tradeValueSell);
+                sellValue[index] = tradeValueSellExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
             }
             catch(EvaluationException e) {
-                sellCost[index] = 0.0D;
+                sellValue[index] = 0.0D;
             }
             catch(java.lang.ArrayIndexOutOfBoundsException ex) {
-                sellCost[index] = 0.0D;
+                sellValue[index] = 0.0D;
             }
             finally {
                 index++;
@@ -673,14 +676,14 @@ public class PaperTrade {
                 }
 
                 // price to buy
-                Expression tradeCostBuyExpression = ExpressionFactory.newExpression(environment.tradeCostBuy);
-                buyCost[index] = tradeCostBuyExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
+                Expression tradeValueBuyExpression = ExpressionFactory.newExpression(environment.tradeValueBuy);
+                buyValue[index] = tradeValueBuyExpression.evaluate(variables, quoteBundle, symbol, dateOffset+1);
             }
             catch(EvaluationException e) {
-                buyCost[index] = 0.0D;
+                buyValue[index] = 0.0D;
             }
             catch(java.lang.ArrayIndexOutOfBoundsException ex) {
-                buyCost[index] = 0.0D;
+                buyValue[index] = 0.0D;
             }
             finally {
                 index++;
@@ -706,10 +709,10 @@ public class PaperTrade {
             retValue.append(symbolStock[i] + " --> ");
             
             if (buyRule[i]) {
-                if (buyCost[i]==0.0D) {
+                if (buyValue[i]==0.0D) {
                     retValue.append(Locale.getString("BUY_OPEN"));
                 } else {
-                    retValue.append(Locale.getString("BUY_FIXED_PRICE", Double.toString(buyCost[i])));
+                    retValue.append(Locale.getString("BUY_FIXED_PRICE", Double.toString(buyValue[i])));
                 }
             } else {
                 retValue.append(Locale.getString("BUY_NOT"));
@@ -720,10 +723,10 @@ public class PaperTrade {
             retValue.append(symbolStock[i] + " --> ");
             
             if (sellRule[i]) {
-                if (sellCost[i]==0.0D) {
+                if (sellValue[i]==0.0D) {
                     retValue.append(Locale.getString("SELL_OPEN"));
                 } else {
-                    retValue.append(Locale.getString("SELL_FIXED_PRICE", Double.toString(sellCost[i])));
+                    retValue.append(Locale.getString("SELL_FIXED_PRICE", Double.toString(sellValue[i])));
                 }
             } else {
                 retValue.append(Locale.getString("SELL_NOT"));

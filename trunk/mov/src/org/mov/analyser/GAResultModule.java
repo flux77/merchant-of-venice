@@ -92,8 +92,8 @@ public class GAResultModule extends AbstractTable implements Module {
 	    results = new ArrayList();
 	}
 
-	public GPResult getResult(int row) {
-	    return (GPResult)results.get(row);
+	public GAResult getResult(int row) {
+	    return (GAResult)results.get(row);
 	}
 
         public void removeAllResults() {
@@ -129,7 +129,7 @@ public class GAResultModule extends AbstractTable implements Module {
 	    if(row >= getRowCount())
 		return "";
 
-	    GPResult result = (GPResult)results.get(row);
+	    GAResult result = (GAResult)results.get(row);
 
 	    if(column == START_DATE_COLUMN)
 		return result.getStartDate();
@@ -358,7 +358,7 @@ public class GAResultModule extends AbstractTable implements Module {
 
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            GPResult result = model.getResult(row);
+            GAResult result = model.getResult(row);
 
             CommandManager.getInstance().graphPortfolio(result.getPortfolio(),
                                                         result.getQuoteBundle(),
@@ -374,7 +374,7 @@ public class GAResultModule extends AbstractTable implements Module {
 
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            GPResult result = model.getResult(row);
+            GAResult result = model.getResult(row);
 
             CommandManager.getInstance().openPortfolio(result.getPortfolio(),
                                                        result.getQuoteBundle());
@@ -388,7 +388,7 @@ public class GAResultModule extends AbstractTable implements Module {
 
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            GPResult result = model.getResult(row);
+            GAResult result = model.getResult(row);
 
             CommandManager.getInstance().tableTransactions(result.getPortfolio(),
                                                            result.getQuoteBundle());
@@ -402,7 +402,7 @@ public class GAResultModule extends AbstractTable implements Module {
 
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            final GPResult result = model.getResult(row);
+            final GAResult result = model.getResult(row);
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {
@@ -421,7 +421,7 @@ public class GAResultModule extends AbstractTable implements Module {
 
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            final GPResult result = model.getResult(row);
+            final GAResult result = model.getResult(row);
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {
@@ -440,7 +440,7 @@ public class GAResultModule extends AbstractTable implements Module {
 
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            final GPResult result = model.getResult(row);
+            final GAResult result = model.getResult(row);
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {
@@ -459,7 +459,7 @@ public class GAResultModule extends AbstractTable implements Module {
 
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            final GPResult result = model.getResult(row);
+            final GAResult result = model.getResult(row);
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {

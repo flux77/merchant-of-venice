@@ -34,8 +34,7 @@ public class ShareAccount implements Account {
 
 	    try {
 		value += cache.getQuote(holding.getSymbol().toLowerCase(), 
-					Token.DAY_CLOSE_TOKEN,
-					date) *
+					Quote.DAY_CLOSE, date) *
 		    holding.getShares();
 	    }
 	    catch(EvaluationException e) {

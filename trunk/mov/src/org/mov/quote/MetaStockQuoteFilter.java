@@ -1,6 +1,5 @@
 package org.mov.quote;
 
-import org.mov.portfolio.Stock;
 import org.mov.util.TradingDate;
 
 /**
@@ -37,8 +36,8 @@ public class MetaStockQuoteFilter implements QuoteFilter {
      * @param	quoteList	a single line of text containing a quote
      * @return	the stock quote
      */
-    public Stock toQuote(String quoteLine) {
-	Stock stock = null;
+    public Quote toQuote(String quoteLine) {
+	Quote quote = null;
 
 	if(quoteLine != null) {
 	    String[] quoteParts = quoteLine.split(",");
@@ -53,11 +52,11 @@ public class MetaStockQuoteFilter implements QuoteFilter {
 		float day_low = Float.parseFloat(quoteParts[i++]);
 		float day_close = Float.parseFloat(quoteParts[i++]);
 		int volume = Integer.parseInt(quoteParts[i++]);
-		stock = new Stock(symbol, date, volume, day_low, day_high,
+		quote = new Quote(symbol, date, volume, day_low, day_high,
 				  day_open, day_close);
 	    }	    
 	}
-	return stock;
+	return quote;
     }
 
     /**
@@ -66,7 +65,7 @@ public class MetaStockQuoteFilter implements QuoteFilter {
      * @param	quote	a stock quote
      * @return	string version of the quote
      */
-    public String toString(Stock quote) {
+    public String toString(Quote quote) {
 	return new String(quote.getSymbol() + "," + 
 			  quote.getDate().toString("yyyymmdd") + "," +
 			  quote.getDayOpen() + "," +

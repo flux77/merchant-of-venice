@@ -1,6 +1,5 @@
 package org.mov.quote;
 
-import org.mov.portfolio.Stock;
 import org.mov.util.TradingDate;
 
 /**
@@ -38,8 +37,8 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
      * @param	quoteList	a single line of text containing a quote
      * @return	the stock quote
      */
-    public Stock toQuote(String quoteLine) {
-	Stock stock = null;
+    public Quote toQuote(String quoteLine) {
+	Quote quote = null;
 
 	if(quoteLine != null) {
 	    String[] quoteParts = quoteLine.split(" ");
@@ -58,11 +57,11 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
 
 		// Convert volume from 1/100th volume to real volume
 		int volume = Integer.parseInt(quoteParts[i++]) * 100;
-		stock = new Stock(symbol, date, volume, day_low, day_high,
+		quote = new Quote(symbol, date, volume, day_low, day_high,
 				  day_open, day_close);
 	    }	    
 	}
-	return stock;
+	return quote;
     }
 
     /**
@@ -71,7 +70,7 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
      * @param	quote	a stock quote
      * @return	string version of the quote
      */
-    public String toString(Stock quote) {
+    public String toString(Quote quote) {
 	return new String(quote.getSymbol() + " " + 
 			  quote.getDate().toString("mm/dd/yy") + " " +
 			  Math.round(quote.getDayOpen()*100) + " " +

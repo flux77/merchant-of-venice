@@ -87,30 +87,30 @@ public class QuoteModule extends AbstractTable
 		    
 		case(VOLUME_COLUMN):
 		    return new Integer
-			((int)cache.getQuote(symbol, Token.DAY_VOLUME_TOKEN, 
+			((int)cache.getQuote(symbol, Quote.DAY_VOLUME, 
 					     date));
 		    
 		case(DAY_LOW_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Token.DAY_LOW_TOKEN, date));
+			(cache.getQuote(symbol, Quote.DAY_LOW, date));
 		    
 		case(DAY_HIGH_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Token.DAY_HIGH_TOKEN, date));
+			(cache.getQuote(symbol, Quote.DAY_HIGH, date));
 		    
 		case(DAY_OPEN_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Token.DAY_OPEN_TOKEN, date));
+			(cache.getQuote(symbol, Quote.DAY_OPEN, date));
 		    
 		case(DAY_CLOSE_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Token.DAY_CLOSE_TOKEN, date));
+			(cache.getQuote(symbol, Quote.DAY_CLOSE, date));
 		    
 		case(CHANGE_COLUMN):
 		    return 
 			Converter.changeToChange
-			(cache.getQuote(symbol, Token.DAY_OPEN_TOKEN, date),
-			 cache.getQuote(symbol, Token.DAY_CLOSE_TOKEN, date));
+			(cache.getQuote(symbol, Quote.DAY_OPEN, date),
+			 cache.getQuote(symbol, Quote.DAY_CLOSE, date));
 		}
 	    }
 	    catch(EvaluationException e) {

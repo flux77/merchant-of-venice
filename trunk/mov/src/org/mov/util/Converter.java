@@ -4,7 +4,7 @@ import java.io.File;
 import java.lang.*;
 import java.util.*;
 
-import org.mov.portfolio.Stock;
+import org.mov.quote.*;
 
 /**
  * Contains a set of general conversion functions. These functiosn include

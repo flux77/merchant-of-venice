@@ -7,7 +7,6 @@ import java.util.prefs.*;
 import java.util.regex.*;
 
 import org.mov.util.*;
-import org.mov.portfolio.Stock;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -117,8 +116,6 @@ public class SanfordQuoteSource implements QuoteSource {
 	    boolean symbolFound = false;
 
 	    try {
-		Stock stock;
-		
 		// Read quotes
 		URL url = new URL(PROTOCOL, HOST, 
 				  "/sanford/quotesnews/Quote.asp");
@@ -214,7 +211,7 @@ public class SanfordQuoteSource implements QuoteSource {
      * @param	endDate		the end of the date range (inclusive).
      * @param	type		the type of the search.
      * @return	a vector of stock quotes.
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForDates(TradingDate startDate, 
 				    TradingDate endDate, 
@@ -256,7 +253,7 @@ public class SanfordQuoteSource implements QuoteSource {
      * @param	date	the date to return quotes for.
      * @param	type	the type of the search.
      * @return	a vector of stock quotes.
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForDate(TradingDate date, int type) {
 
@@ -270,7 +267,7 @@ public class SanfordQuoteSource implements QuoteSource {
 	p.setNote("Loading quotes");
 
 	try {
-	    Stock stock;
+	    Quote quote;
 
 	    // Read quotes
 	    URL url = new URL(PROTOCOL, HOST, 
@@ -291,10 +288,10 @@ public class SanfordQuoteSource implements QuoteSource {
 	    String line;
 
 	    while ((line = reader.readLine()) != null) {
-		stock = filter.toQuote(line);
+		quote = filter.toQuote(line);
 
-		if(stock != null && isType(stock, type)) {
-		    quotes.add(stock);
+		if(quote != null && isType(quote, type)) {
+		    quotes.add(quote);
                     p.increment();
                 }
 	    }
@@ -316,7 +313,7 @@ public class SanfordQuoteSource implements QuoteSource {
      *
      * @param	symbol	the symbol to query.
      * @return	a vector of stock quotes.
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForSymbol(String symbol) {
 
@@ -330,7 +327,7 @@ public class SanfordQuoteSource implements QuoteSource {
         p.setNote("Loading quotes for " + symbol);
 
 	try {
-	    Stock stock;
+	    Quote quote;
 
 	    // Read quotes
 	    URL url = new URL(PROTOCOL, HOST, 
@@ -359,10 +356,10 @@ public class SanfordQuoteSource implements QuoteSource {
 	    String line;
 
 	    while ((line = reader.readLine()) != null) {
-		stock = filter.toQuote(line);
+		quote = filter.toQuote(line);
 
-		if(stock != null) {
-		    quotes.add(stock);
+		if(quote != null) {
+		    quotes.add(quote);
                     p.increment();
                 }
 	    }
@@ -380,20 +377,20 @@ public class SanfordQuoteSource implements QuoteSource {
     }
 
     // Is the given stock the same as the type given?
-    private boolean isType(Stock stock, int type) {
+    private boolean isType(Quote quote, int type) {
 	boolean match = false;
 
 	if(type == INDICES) {
-	    if(stock.getSymbol().startsWith("x"))
+	    if(quote.getSymbol().startsWith("x"))
 		match = true;
 	}
 	else if(type == COMPANIES_AND_FUNDS) {
-	    if(stock.getSymbol().length() == 3 &&
-	       !stock.getSymbol().startsWith("x"))
+	    if(quote.getSymbol().length() == 3 &&
+	       !quote.getSymbol().startsWith("x"))
 		match = true;
 	}
 	else if(type == ALL_COMMODITIES) {
-	    if(!stock.getSymbol().startsWith("x"))
+	    if(!quote.getSymbol().startsWith("x"))
 		match = true;
 	}
 	else // ALL_SYMBOLS

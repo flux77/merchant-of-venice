@@ -1,117 +1,200 @@
 package org.mov.quote;
 
-import java.util.prefs.Preferences;
-import org.mov.importer.ImporterModule;
-import org.mov.prefs.PreferencesManager;
+import java.util.*;
 
-
+import org.mov.util.*;
+import org.mov.parser.*;
 
 /**
- * Returns the singleton reference to the quote source that the user
- * has selected in their preferences. This class will also be
- * updated when the user preferences has changed so the return quote source
- * will always be update to date.
- *
- * Example:
- * <pre>
- *	Vector quotes = Quote.getSource().getQuotesForSymbol("CBA");
- * </pre>
- * 
- * @see QuoteSource
+ * Representation of a stock quote for a given stock on a given date.
  */
 public class Quote {
-    private static Quote instance = null;
-    private QuoteSource sourceInstance = null;
+    private String symbol;
+    private TradingDate date;
+    private int volume;
+    private float day_low;
+    private float day_high;
+    private float day_open;
+    private float day_close;
+
+    /** Represents day close quote */
+    public static final int DAY_CLOSE = 0;
+
+    /** Represents day open quote */
+    public static final int DAY_OPEN = 1;
+
+    /** Represents day low quote */
+    public static final int DAY_LOW = 2;
+
+    /** Represents day high quote */
+    public static final int DAY_HIGH = 3;
+
+    /** Represents day volume quote */
+    public static final int DAY_VOLUME = 4;
 
     /**
-     * Return the singleton reference to the user selected quote source.
+     * Create a new stock quote for the given date.
      *
-     * @return reference to a quote source.
+     * @param	symbol	the stock symbol
+     * @param	date	the date for this stock quote
+     * @param	volume	the number of shares traded on this date
+     * @param	day_low	the lowest quote on this date
+     * @param	day_high	the highest quote on this date
+     * @param	day_open	the opening quote on this date
+     * @param	day_close	the closing quote on this date
      */
-    public static QuoteSource getSource() {
-	if(instance == null) {
-	    instance = new Quote();
+    public Quote(String symbol, TradingDate date,
+		 int volume, float day_low, float day_high,
+		 float day_open, float day_close) {
+
+	setSymbol(symbol);
+	setDate(date);
+
+	this.volume = volume;
+	this.day_low = day_low;
+	this.day_high = day_high;
+	this.day_open = day_open;
+	this.day_close = day_close;
+    }
+
+    /**
+     * Return the stock's symbol.
+     *
+     * @return	the symbol
+     */
+    public String getSymbol() {
+	return symbol;
+    }
+
+    /**
+     * Return the quote date.
+     *
+     * @return	the date
+     */
+    public TradingDate getDate() {
+	return date;
+    }
+
+    /**
+     * Return the volume.
+     *
+     * @return	the volume
+     */
+    public int getVolume() {
+	return volume;
+    }
+
+    /**
+     * Return the day low.
+     *
+     * @return	the day low
+     */
+    public float getDayLow() {
+	return day_low;
+    }
+
+    /**
+     * Return the day high.
+     *
+     * @return	the day high
+     */
+    public float getDayHigh() {
+	return day_high;
+    }
+
+    /**
+     * Return the day open.
+     *
+     * @return	the day open
+     */
+    public float getDayOpen() {
+	return day_open;
+    }
+
+    /**
+     * Return the day close.
+     *
+     * @return	the day close
+     */
+    public float getDayClose() {
+	return day_close;
+    }
+
+    /**
+     * Set the symbol for this quote.
+     *
+     * @param	symbol	the stock symbol
+     */
+    public void setSymbol(String symbol) {	
+	if(symbol != null)
+	    this.symbol = symbol.toLowerCase();
+	else
+	    this.symbol = null;
+    }
+
+    /**
+     * Set the quote date.
+     *
+     * @param	date	the date
+     */
+
+    public void setDate(TradingDate date) {
+	this.date = date;
+    }
+
+    /**
+     * Compare the two stock quotes for equality.
+     *
+     * @param	quote	the quote to compare against
+     * @return	<code>1</code> if they are equal; <code>0</code> otherwise
+     */
+    public boolean equals(Quote quote) {
+	if(getSymbol().equals(quote.getSymbol()) &&
+	   getDate().equals(quote.getDate()) &&
+	   getDayLow() == quote.getDayLow() &&
+	   getDayHigh() == quote.getDayHigh() &&
+	   getDayOpen() == quote.getDayOpen() &&
+	   getDayClose() == quote.getDayClose() &&
+	   getVolume() == quote.getVolume())
+	    return true;
+	else
+	    return false;
+    }
+
+    /**
+     * Get a single quote.
+     *
+     * @param	quote	the quote type <code>DAY_OPEN, DAY_CLOSE, DAY_HIGH,
+     *			DAY_VOLUME</code> or <code>DAY_LOW</code>
+     */
+    public float getQuote(int quote) 
+	throws EvaluationException {
+	switch(quote) {
+	case(DAY_OPEN):
+	    return getDayOpen();
+	case(DAY_CLOSE):
+	    return getDayClose();
+	case(DAY_LOW):
+	    return getDayLow();
+	case(DAY_HIGH):
+	    return getDayHigh();
+	case(DAY_VOLUME):
+	    return getVolume();
+	default:
+	    throw new EvaluationException("unknown quote type");
 	}
-	
-	return instance.getSourceInstance();
     }
 
     /**
-     * The user has changed their quote source preferences, flush singleton
-     * reference and create new instance. 
-     */
-    public static void flush() {
-	if(instance != null)
-	    instance.sourceInstance = null;
-    }
-
-    private Quote() {
-	// declared here so constructor is not public
-    }
-
-    // Creates and returns singleton instance of quote source
-    private QuoteSource getSourceInstance() {
-	if(sourceInstance == null) {
-	    Preferences p = PreferencesManager.getUserNode("/quote_source");
-	    String quoteSource = p.get("source", "database");
-
-	    if(quoteSource.equals("files")) {
-		sourceInstance = createFileQuoteSource();
-	    }
-	    else if(quoteSource.equals("database"))
-		sourceInstance = createDatabaseQuoteSource();
-	    else {
-		sourceInstance = createInternetQuoteSource();
-	    }
-	}
-
-	return sourceInstance;
-    }
-
-
-    /**
-     * Create a file quote source directly using the user preferences.
+     * Return a string representation of the stock quote.
      *
-     * @return	the file quote source 
+     * @return	a string representation of the stock quote.
      */
-    public static FileQuoteSource createFileQuoteSource() {
-
-	// Get file format from preferences
-	Preferences p = PreferencesManager.getUserNode("/quote_source/files");
-
-	return
-	    new FileQuoteSource(p.get("format", "MetaStock"),
-				ImporterModule.getFileList());
-    }	
-
-    /**
-     * Create an internet quote source directly using the user preferences.
-     *
-     * @return	the internet quote source 
-     */
-    public static SanfordQuoteSource createInternetQuoteSource() {
-	// Get username and password from preferences
-	Preferences p = PreferencesManager.getUserNode("/quote_source/internet");
-	
-	return new SanfordQuoteSource(p.get("username", ""),
-				      p.get("password", ""));
-    }
-    
-    /**
-     * Create a database quote source directly using the user preferences.
-     *
-     * @return	the database quote source 
-     */
-    public static DatabaseQuoteSource createDatabaseQuoteSource() {
-
-	Preferences p = PreferencesManager.getUserNode("/quote_source/database");
-	String host = p.get("host", "db");
-	String port = p.get("port",  "3306");
-	String database = p.get("dbname", "shares");
-	String username = p.get("username", "");
-	String password = p.get("password", "");
-	return new DatabaseQuoteSource(host, port, database, username,
-				       password);
+    public String toString() {
+	return new String(getSymbol() + ", " + getDate() + ", " +
+			  getDayOpen() + ", " + getDayHigh() + ", " + 
+			  getDayLow() + ", " + getDayClose() + ", " + 
+			  getVolume());
+			   
     }
 }
-

@@ -516,7 +516,7 @@ public class TransactionDialog extends JInternalFrame
 	// If we are using the stock symbol check that its valid
 	if((type == Transaction.ACCUMULATE || type == Transaction.REDUCE ||
 	    type == Transaction.DIVIDEND_DRP) &&
-	   !Quote.getSource().symbolExists(symbol)) {
+	   !QuoteSourceManager.getSource().symbolExists(symbol)) {
 	    String message;
 
 	    if(symbol.equals(""))

@@ -7,7 +7,6 @@ import javax.swing.*;
 
 import org.liquid.misc.*;
 import org.mov.util.*;
-import org.mov.portfolio.*;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -282,18 +281,18 @@ public class DatabaseQuoteSource implements QuoteSource
 	    try {
 		Statement statement = connection.createStatement();	       
 		ResultSet RS = statement.executeQuery(query);
-		Stock stock;
+		Quote quote;
 		int i = 0;
 
 		while (RS.next()) {
-                    stock = new Stock(RS.getString(SYMBOL_FIELD).toLowerCase(),
+                    quote = new Quote(RS.getString(SYMBOL_FIELD).toLowerCase(),
 				      new TradingDate(RS.getDate(DATE_FIELD)),
 				      RS.getInt(DAY_VOLUME_FIELD),
 				      RS.getFloat(DAY_LOW_FIELD),
 				      RS.getFloat(DAY_HIGH_FIELD),
 				      RS.getFloat(DAY_OPEN_FIELD),
 				      RS.getFloat(DAY_CLOSE_FIELD));
-		    table.add(stock);
+		    table.add(quote);
                     // Update the progress bar per row
                     progress.increment();
                 }
@@ -317,7 +316,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * @param	endDate		the end of the date range (inclusive).
      * @param	type		the type of the search.
      * @return	a vector of stock quotes.
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForDates(TradingDate startDate, 
 				    TradingDate endDate, 
@@ -363,7 +362,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * @param	date	the date to return quotes for.
      * @param	type	the type of the search.
      * @return	a vector of stock quotes.
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForDate(TradingDate date, int type) {
         ProgressDialogManager.getProgressDialog().setNote("Retrieving stocks present on date "+date);
@@ -377,7 +376,7 @@ public class DatabaseQuoteSource implements QuoteSource
      *
      * @param	symbol	the symbol to query.
      * @return	a vector of stock quotes.
-     * @see Stock
+     * @see Quote
      */
     public Vector getQuotesForSymbol(String symbol) {
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
@@ -553,7 +552,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	
 	if(readyForImport) {
 	    Iterator iterator = dayQuotes.iterator();
-	    Stock stock;
+	    Quote quote;
 	    StringBuffer insertString = new StringBuffer();
 	    boolean firstQuote = true;
 	    String dateString = date.toString();
@@ -561,7 +560,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	    // Build single query to insert stocks for a whole day into 
 	    // the table
 	    while(iterator.hasNext()) {
-		stock = (Stock)iterator.next();
+		quote = (Quote)iterator.next();
 
 		if(firstQuote) {
 		    insertString.append("INSERT INTO " + SHARE_TABLE_NAME + 
@@ -573,12 +572,12 @@ public class DatabaseQuoteSource implements QuoteSource
 
 		// Add new quote
 		insertString.append("'" + dateString +		"', " +
-				    "'" + stock.getSymbol() +	"', " +
-				    "'" + stock.getDayOpen() +	"', " +
-				    "'" + stock.getDayClose() + "', " +
-				    "'" + stock.getDayHigh() +	"', " +
-				    "'" + stock.getDayLow() +	"', " +
-				    "'" + stock.getVolume() +	"')");
+				    "'" + quote.getSymbol() +	"', " +
+				    "'" + quote.getDayOpen() +	"', " +
+				    "'" + quote.getDayClose() + "', " +
+				    "'" + quote.getDayHigh() +	"', " +
+				    "'" + quote.getDayLow() +	"', " +
+				    "'" + quote.getVolume() +	"')");
 	    }
 
 	    // Now insert day quote into database

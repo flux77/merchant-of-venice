@@ -21,7 +21,7 @@ public class RSIExpression extends Expression {
 	int days = (int)getArg(0).evaluate(cache, symbol, day);
 	int lastDay = day + (int)getArg(1).evaluate(cache, symbol, day);
 	System.err.println("calling rsi on symbol "+symbol);
-	return QuoteFunctions.rsi(cache, symbol, Token.DAY_CLOSE_TOKEN, days,
+	return QuoteFunctions.rsi(cache, symbol, Quote.DAY_CLOSE, days,
 				  lastDay);
     }
 

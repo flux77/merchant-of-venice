@@ -185,8 +185,11 @@ public class Token {
     /** Represents "<code>corr()</code>" symbol */
     public static final int CORR_TOKEN = 50;
     
+    /** Represents "<code>ema()</code>" symbol */
+    public static final int EMA_TOKEN = 51;
+    
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 51;
+    private static final int FIXED_LENGTH_TOKENS = 52;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -282,6 +285,7 @@ public class Token {
         tokenStrings[FOR_TOKEN]                = "for";
         tokenStrings[WHILE_TOKEN]              = "while";
         tokenStrings[CORR_TOKEN]               = "corr";
+        tokenStrings[EMA_TOKEN]                = "ema";
         
         boolean matched = false;
         

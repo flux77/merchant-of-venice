@@ -187,6 +187,17 @@ public class QuoteBundle {
     }
 
     /**
+     * Return an iterator over this quote bundle. The iterator will return, in order,
+     * all the quotes in this bundle.
+     *
+     * @return iterator over the quotes
+     * @see Quote
+     */
+    public Iterator iterator() {
+        return new QuoteBundleIterator(this);
+    }
+
+    /**
      * Return the quote range which specifies this quote bundle.
      *
      * @return the quote range

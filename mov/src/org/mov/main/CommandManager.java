@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.main;
@@ -53,7 +53,7 @@ public class CommandManager {
         // nothing to do
     }
 
-    /** 
+    /**
      * Return the static CommandManager for this application
      */
     public static CommandManager getInstance() {
@@ -62,44 +62,44 @@ public class CommandManager {
 
 	return instance;
     }
-    
+
     /**
      * Sets the desktop that any window operations will be performed on
      *
-     * @param desktop The desktop that any window operations will be performed on 
+     * @param desktop The desktop that any window operations will be performed on
      */
     public void setDesktop(JDesktopPane desktop) {
 	this.desktop = desktop;
     }
-    
+
     /**
-     * Tile all the open internal frames horizontally 
+     * Tile all the open internal frames horizontally
      */
     public void tileFramesHorizontal() {
 	DesktopManager.tileFrames(DesktopManager.HORIZONTAL);
     }
 
-    /** 
-     * Tile all the open internal frames vertically 
+    /**
+     * Tile all the open internal frames vertically
      */
     public void tileFramesVertical() {
 	DesktopManager.tileFrames(DesktopManager.VERTICAL);
     }
 
     /**
-     * Arrange all open internal frames in a cascading fashion 
+     * Arrange all open internal frames in a cascading fashion
      */
     public void tileFramesCascade() {
 	DesktopManager.tileFrames(DesktopManager.CASCADE);
     }
 
-    /** 
+    /**
      * Allocate as square a shape as possible to open infternal frames
      */
     public void tileFramesArrange() {
 	DesktopManager.tileFrames(DesktopManager.ARRANGE);
     }
-    
+
     /**
      *  Display an internal frame, listing all the stocks by company name.
      */
@@ -117,9 +117,9 @@ public class CommandManager {
         thread.start();
     }
 
-    /** 
-     * Display an internal frame, listing stocks by company name, matching a rule that is to 
-     * be input by the user 
+    /**
+     * Display an internal frame, listing stocks by company name, matching a rule that is to
+     * be input by the user
      */
     public void quoteListCompanyNamesByRule() {
         Thread thread = new Thread(new Runnable() {
@@ -128,12 +128,12 @@ public class CommandManager {
                                                             "List All Ordinaries",
                                                             "By Rule");
                 if(expr != null) {
-                    ProgressDialog p = 
+                    ProgressDialog p =
                         ProgressDialogManager.getProgressDialog();
                     p.show("List All Ordinaries by rule \""+expr+"\"");
-                    
+
                     displayStockList(QuoteRange.ALL_ORDINARIES, expr);
-                    
+
                     ProgressDialogManager.closeProgressDialog(p);
                 }
             }
@@ -141,7 +141,7 @@ public class CommandManager {
         thread.start();
     }
 
-    /** 
+    /**
      * Display an internal frame, listing all the stocks by symbol.
      */
     public void quoteListCommoditiesAll() {
@@ -149,17 +149,17 @@ public class CommandManager {
             public void run() {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
                 p.show("List All Symbols");
-                
+
                 displayStockList(QuoteRange.ALL_SYMBOLS, null);
-                
+
                 ProgressDialogManager.closeProgressDialog(p);
             }
             });
         thread.start();
     }
 
-    /** 
-     * Display an internal frame, listing stocks by symbol, matching a rule that is to be 
+    /**
+     * Display an internal frame, listing stocks by symbol, matching a rule that is to be
      * input by the user.
      */
     public void quoteListCommoditiesByRule() {
@@ -167,10 +167,10 @@ public class CommandManager {
             public void run() {
                 String expr = ExpressionQuery.getExpression(desktop,
                                                             "List All Symbols",
-                                                            "By Rule"); 
+                                                            "By Rule");
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
                 p.show("List All Symbols by rule \""+expr+"\"");
-                
+
                 displayStockList(QuoteRange.ALL_SYMBOLS,expr);
                 ProgressDialogManager.closeProgressDialog(p);
             }
@@ -178,7 +178,7 @@ public class CommandManager {
         thread.start();
     }
 
-    /** 
+    /**
      * Display an internal frame, listing all the indices by symbol.
      */
     public void quoteListIndicesAll() {
@@ -186,7 +186,7 @@ public class CommandManager {
             public void run() {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
                 p.show("List Market Indices");
-                
+
                 displayStockList(QuoteRange.MARKET_INDICES, null);
                 ProgressDialogManager.closeProgressDialog(p);
             }
@@ -194,8 +194,8 @@ public class CommandManager {
         thread.start();
     }
 
-    /** 
-     * Display an internal frame, listing indices by symbol, matching a rule that is to be 
+    /**
+     * Display an internal frame, listing indices by symbol, matching a rule that is to be
      * input by the user.
      */
     public void quoteListIndicesByRule() {
@@ -203,38 +203,38 @@ public class CommandManager {
             public void run() {
                 String expr = ExpressionQuery.getExpression(desktop,
                                                             "List Market Indices",
-                                                            "By Rule"); 
-                
+                                                            "By Rule");
+
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
                 p.show("List Market Indices by rule \""+expr+"\"");
-                
+
                 displayStockList(QuoteRange.MARKET_INDICES, expr);
             }
             });
         thread.start();
     }
 
-    /** 
+    /**
      * Internal function for retrieving the required data displaying a table showing the results
      *
      * @param searchRestriction as defined by QuoteSource
      * @param expression as defined by Expression
      * @see org.mov.quote.QouteSource
      */
-    private void displayStockList(int searchRestriction, 
+    private void displayStockList(int searchRestriction,
 				  String expression) {
 
 	Thread thread = Thread.currentThread();
         ScriptQuoteBundle quoteBundle = null;
         QuoteModule table = null;
-        
+
         if (!thread.isInterrupted()) {
-            QuoteRange quoteRange = 
-                new QuoteRange(searchRestriction, 
+            QuoteRange quoteRange =
+                new QuoteRange(searchRestriction,
                                QuoteSourceManager.getSource().getLastDate());
             quoteBundle = new ScriptQuoteBundle(quoteRange);
         }
-        
+
         if (!thread.isInterrupted()) {
             table = new QuoteModule(quoteBundle, expression);
             getDesktopManager().newFrame(table);
@@ -250,7 +250,7 @@ public class CommandManager {
 
         // We don't run this in a new thread because we call openPortfolio(portfolio)
         // which will open a new thread for us.
-        Portfolio portfolio = 
+        Portfolio portfolio =
             PreferencesManager.loadPortfolio(portfolioName);
 
         openPortfolio(portfolio);
@@ -270,29 +270,29 @@ public class CommandManager {
                 ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
                 progress.show("Open " + portfolio.getName());
-                
+
                 QuoteBundle quoteBundle = null;
-                
-                if (!thread.isInterrupted()) { 
+
+                if (!thread.isInterrupted()) {
                     QuoteRange quoteRange =
                         new QuoteRange(portfolio.getSymbolsTraded(),
                                        QuoteSourceManager.getSource().getLastDate());
                     quoteBundle = new QuoteBundle(quoteRange);
                 }
                 if (!thread.isInterrupted()) {
-                    getDesktopManager().newFrame(new PortfolioModule(desktop, 
+                    getDesktopManager().newFrame(new PortfolioModule(desktop,
                                                                      portfolio, quoteBundle));
                 }
 
                 ProgressDialogManager.closeProgressDialog(progress);
             }
             });
-        
+
         thread.start();
     }
-    
+
     /**
-     * Open up a new paper trade module. 
+     * Open up a new paper trade module.
      */
     public void paperTrade() {
 	PaperTradeModule paperTrade = new PaperTradeModule(desktop);
@@ -319,18 +319,18 @@ public class CommandManager {
      */
     public void newPortfolio() {
 	// Get name for portfolio
-	TextDialog dialog = new TextDialog(desktop, 
+	TextDialog dialog = new TextDialog(desktop,
 					   "Enter portfolio name",
 					   "New Portfolio");
 	String portfolioName = dialog.showDialog();
 
 	if(portfolioName != null && portfolioName.length() > 0) {
 	    Portfolio portfolio = new Portfolio(portfolioName);
-	    
+	
 	    // Save portfolio so we can update the menu
 	    PreferencesManager.savePortfolio(portfolio);
 	    MainMenu.getInstance().updatePortfolioMenu();
-	    
+	
 	    // Open as normal
 	    openPortfolio(portfolioName);
 	}
@@ -356,7 +356,7 @@ public class CommandManager {
      * @param	startDate	date to graph from
      * @param	endDate		date to graph to
      */
-    public void graphPortfolio(Portfolio portfolio, 
+    public void graphPortfolio(Portfolio portfolio,
 			       QuoteBundle quoteBundle,
 			       TradingDate startDate,
 			       TradingDate endDate) {
@@ -370,27 +370,27 @@ public class CommandManager {
 
         PortfolioGraphSource portfolioGraphSource = null;
         Graph graph = null;
-        
+
         // Get default start and end date if not supplied
-        if(startDate == null) 
+        if(startDate == null)
             startDate = portfolio.getStartDate();
-        
+
         if(endDate == null)
             endDate = QuoteSourceManager.getSource().getLastDate();		
         Vector symbols = portfolio.getSymbolsTraded();
-        
+
         // Only need to load from quote bundle if there are any stocks
         // in the portfolio
         if(quoteBundle == null && symbols.size() > 0) {
             quoteBundle = new QuoteBundle(new QuoteRange(symbols, startDate, endDate));
         }
-        
+
         if (!thread.isInterrupted()) {
             portfolioGraphSource =
-                new PortfolioGraphSource(portfolio, quoteBundle, 
+                new PortfolioGraphSource(portfolio, quoteBundle,
                                          PortfolioGraphSource.MARKET_VALUE);
             graph = new LineGraph(portfolioGraphSource);
-            chart.add(graph, portfolio, quoteBundle, 0);            
+            chart.add(graph, portfolio, quoteBundle, 0);
             chart.redraw();
             getDesktopManager().newFrame(chart);
         }
@@ -406,27 +406,24 @@ public class CommandManager {
         final Thread thread = new Thread(new Runnable() {
 
             public void run() {
-                ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.show("Graph Advance/Decline");
                 Thread thread = Thread.currentThread();
-                
-                if (!thread.isInterrupted()) {
-                    Graph graph = new AdvanceDeclineGraph();
+                Graph graph = new AdvanceDeclineGraph();
 
+                if (!thread.isInterrupted()) {
                     ChartModule chart = new ChartModule(desktop);
                     chart.add(graph, null, 0);
+                    chart.redraw();
+
                     getDesktopManager().newFrame(chart);
                 }
-
-                ProgressDialogManager.closeProgressDialog(p);
 	    }
 	    });
 
 	thread.start();
     }
 
-    /** 
-     * Displays a graph closing prices for stock(s), based on their code. 
+    /**
+     * Displays a graph closing prices for stock(s), based on their code.
      * The stock(s) is/are determined by a user prompt if a set of symbols
      * is not supplied.
      *
@@ -438,26 +435,26 @@ public class CommandManager {
             public void run() {
 		SortedSet symbolsCopy;
 
-		if(symbols == null) 
-		    symbolsCopy = SymbolListDialog.getSymbols(desktop, 
+		if(symbols == null)
+		    symbolsCopy = SymbolListDialog.getSymbols(desktop,
 							      "Graph by symbol(s)");
-		else 
+		else
 		    symbolsCopy = new TreeSet(symbols);
-                
+
                 graphStock(symbolsCopy);
             }
         });
         thread.start();
     }
 
-    /** 
-     * Displays a graph closing prices for stock(s), based on their name. 
-     *  The stock(s) is/are determined by a user prompt 
+    /**
+     * Displays a graph closing prices for stock(s), based on their name.
+     *  The stock(s) is/are determined by a user prompt
      */
     public void graphStockByName() {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
-                SortedSet s = SymbolListDialog.getSymbolByName(desktop, 
+                SortedSet s = SymbolListDialog.getSymbolByName(desktop,
 							       "Graph by name");
                 graphStock(s);
             }
@@ -468,7 +465,7 @@ public class CommandManager {
     /**
      * Internal function for generic setup of graph modules
      *
-     * @param companySet the list of stock symbols to graph 
+     * @param companySet the list of stock symbols to graph
      */
     private void graphStock(SortedSet companySet) {
 
@@ -482,7 +479,7 @@ public class CommandManager {
             QuoteBundle quoteBundle = null;
             GraphSource dayClose = null;
             Graph graph = null;
-            
+
             String title = companySet.toString();
             title = title.substring(1, title.length() - 1);
 
@@ -500,24 +497,24 @@ public class CommandManager {
 
             while(iterator.hasNext() && !thread.isInterrupted()) {
                 symbol = (String)iterator.next();
-                
+
                 quoteBundle = new QuoteBundle(new QuoteRange(symbol));
-                
+
                 if(thread.isInterrupted())
                     break;
-                
-                dayClose = 
+
+                dayClose =
                     new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
                 graph = new LineGraph(dayClose);
                 chart.add(graph, quoteBundle, 0);
                 chart.redraw();
 
-                if(companySet.size() > 1) 
+                if(companySet.size() > 1)
                     progress.increment();
             }
 
             if (!thread.isInterrupted())
-                getDesktopManager().newFrame(chart);            
+                getDesktopManager().newFrame(chart);
 
             ProgressDialogManager.closeProgressDialog(progress);
         }
@@ -530,7 +527,7 @@ public class CommandManager {
 
     // Returns the singleton desktop manager. This will be an instance of
     // org.mov.ui.DesktopManager. The desktop manager controls the layout of
-    // the internal frames in the desktop 
+    // the internal frames in the desktop
     private DesktopManager getDesktopManager() {
         return (DesktopManager)desktop.getDesktopManager();
     }

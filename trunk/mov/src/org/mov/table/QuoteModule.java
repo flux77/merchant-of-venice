@@ -51,7 +51,7 @@ public class QuoteModule extends AbstractTable
 	    this.symbols = symbols;
 	    
 	    // Pull first date from cache
-	    Iterator iterator = cache.dateIterator();
+	    Iterator iterator = cache.dateIterator(0);
 	    if(iterator.hasNext())
 		date = (TradingDate)iterator.next();
 	}

@@ -1,4 +1,4 @@
-Merchant of Venice, 0.2 alpha 24/Aug/2003
+Merchant of Venice, 0.3 alpha 14/Mar/2004
 =========================================
 
 Copyright (C) 2003, Andrew Leppard (aleppard@picknowl.com.au)
@@ -89,3 +89,10 @@ jar     Create a java archive file for Venice
 release Packages Venice into a file ready for release
 test    Runs the automated test suite
 web     Packages the web files ready for deployment
+
+5. Thanks
+
+Thanks to the following people for providing additional code, patches or
+bugfixes: 
+
+Peter Fradley, Bryan Lin & Matthias Stöckel.

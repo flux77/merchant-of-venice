@@ -43,13 +43,13 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.29a";
+    public static String SHORT_VERSION = "0.3a";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION  = "0.29 alpha";
+    public static String LONG_VERSION  = "0.3 alpha";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE  = "15/Feb/2004";
+    public static String RELEASE_DATE  = "14/Mar/2004";
 
     /**
      * Get the main frame for the current application

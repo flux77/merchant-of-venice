@@ -2,7 +2,7 @@
 <project name="Venice" default="run" basedir=".">
 
   <!-- Current version we are working towards -->
-  <property name="VERSION" value="0.2alpha"/>
+  <property name="VERSION" value="0.3alpha"/>
 
   <!-- Paths -->
   <property name="api" value="${basedir}/api"/>
@@ -125,6 +125,7 @@
   <target name="jar" depends="build, doc">
     <jar jarfile="venice.jar" 
          includes="**/*.class, **/*.gif, **/*.png, org/mov/help/doc/*.html, 
+                   org/mov/util/locale/*.properties,
                    org/mov/help/doc/index.xml, org/mov/quote/samples/*.txt"
          basedir="${src}"
 	 manifest="${src}/MANIFEST.MF"/>

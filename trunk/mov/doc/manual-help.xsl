@@ -46,6 +46,10 @@
     <code><xsl:apply-templates/></code>
   </xsl:template>
 
+  <xsl:template match="codeblock">
+    <pre><xsl:apply-templates/></pre>
+  </xsl:template>
+
   <xsl:template match="list">
     <ul><xsl:apply-templates/></ul>
   </xsl:template>

@@ -42,15 +42,18 @@ public class QuoteModule extends AbstractTable
 	new JCheckBoxMenuItem[EQUATION_COLUMNS];
 
     private JMenuItem applyEquations;
+    private JMenuItem applyFilter;
     private JMenuItem sortByMostActive;
     private JMenuItem tableClose;
     
     private PropertyChangeSupport propertySupport;
     private QuoteCache cache;
     private Object[] symbols;
-    private org.mov.parser.Expression expression = null;
 
     private Model model;
+
+    // Current equation we are filtering by
+    private String filterEquationString;
     
     public class EquationSlot {
 	String columnName;
@@ -91,6 +94,10 @@ public class QuoteModule extends AbstractTable
 	    Iterator iterator = cache.dateIterator(0);
 	    if(iterator.hasNext())
 		date = (TradingDate)iterator.next();
+	}
+
+	public void setSymbols(Object[] symbols) {
+	    this.symbols = symbols;
 	}
 
 	public void setEquationSlots(EquationSlot[] equationSlots) {
@@ -180,16 +187,10 @@ public class QuoteModule extends AbstractTable
     }
 
     public QuoteModule(QuoteCache cache, 
-		      org.mov.parser.Expression expression) {
+		      String filterEquationString) {
 	
-	this.expression = expression;
+	this.filterEquationString = filterEquationString;
 	this.cache = cache;
-
-	// If theres a rule, create restricted list of symbols to display
-	if(expression != null)
-	    symbols = extractSymbolsUsingRule(cache);
-	else
-	    symbols = cache.getSymbols();
 
 	propertySupport = new PropertyChangeSupport(this);
 
@@ -201,6 +202,9 @@ public class QuoteModule extends AbstractTable
 	    equationSlots[i].columnName = new String("Eqn. " + (i + 1));
 	    equationSlots[i].equation = new String();
 	}
+
+	// Get list of symbols to display
+	symbols = extractSymbolsUsingRule(filterEquationString, cache);
 
 	model = new Model(this.cache, symbols, equationSlots);
 	setModel(model, ACTIVITY_COLUMN, SORT_UP);
@@ -239,9 +243,26 @@ public class QuoteModule extends AbstractTable
 	    });
     }
    
-    private Object[] extractSymbolsUsingRule(QuoteCache cache) {
+    private Object[] extractSymbolsUsingRule(String filterEquation, QuoteCache cache) {
 
 	Object[] symbols = cache.getSymbols();
+
+	// If theres no filter string then use all symbols
+	if(filterEquation == null || filterEquation.length() == 0) 
+	    return symbols;
+
+	// First parse the equation
+	org.mov.parser.Expression expression = null;
+
+
+	try {
+	    Parser parser = new Parser();
+	    expression = parser.parse(filterEquationString);
+	}
+	catch(ExpressionException e) {
+	    // We should have already checked the string for errors before here
+	    assert false;
+	}
 
 	// Add symbols to vector when expression proves true
 	try {
@@ -292,7 +313,7 @@ public class QuoteModule extends AbstractTable
     private void addMenu() {
 	menuBar = new JMenuBar();
 
-	JMenu tableMenu = MenuHelper.addMenu(menuBar, "Table");
+	JMenu tableMenu = MenuHelper.addMenu(menuBar, "Quote");
 
 	JMenu columnMenu = 
 	    MenuHelper.addMenu(tableMenu, "Show Columns");
@@ -343,6 +364,10 @@ public class QuoteModule extends AbstractTable
 	    MenuHelper.addMenuItem(this, tableMenu,
 				   "Apply Equations");
 
+	applyFilter =
+	    MenuHelper.addMenuItem(this, tableMenu,
+				   "Apply Filter");
+
 	sortByMostActive = 
 	    MenuHelper.addMenuItem(this, tableMenu,
 				   "Sort by Most Active");
@@ -353,6 +378,43 @@ public class QuoteModule extends AbstractTable
 					    "Close");	
     }
     
+    // Allow the user to show only stocks where the given equation is true
+    private void applyFilter() {
+	// Handle all action in a separate thread so we dont
+	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+	Thread thread = new Thread() {
+
+		public void run() {
+
+		    JDesktopPane desktop =
+			org.mov.ui.DesktopManager.getDesktop();
+
+		    String equationString = 
+			ExpressionQuery.getExpression(desktop,
+						      "Filter by Rule",
+						      "By Rule",
+						      filterEquationString);
+
+		    if(equationString != null) {
+			filterEquationString = equationString;
+
+			// Get new list of symbols to display
+			symbols = extractSymbolsUsingRule(filterEquationString, cache);
+
+			// Update table
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+
+				    model.setSymbols(symbols);
+				    model.fireTableDataChanged();
+				}});
+		    }
+		}};
+	
+	thread.start();
+    }
+
+    // Allow the user to enter in equations which will be run on every displayed quote
     private void applyEquations() {
 	// Handle all action in a separate thread so we dont
 	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
@@ -478,7 +540,11 @@ public class QuoteModule extends AbstractTable
 	else if(e.getSource() == applyEquations) {
 	    applyEquations();
 	}
-	
+
+	else if(e.getSource() == applyFilter) {
+	    applyFilter();
+	}
+       
 	else if(e.getSource() == sortByMostActive) {
 	    setColumnSortStatus(ACTIVITY_COLUMN, SORT_UP);
 	    resort();

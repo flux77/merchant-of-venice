@@ -124,12 +124,14 @@
   <!-- Generate a jar -->
   <target name="jar" depends="build, doc">
     <jar jarfile="venice.jar" 
+         includes="**/*.class, **/*.gif, **/*.png, org/mov/help/doc/*.html, 
+                   org/mov/help/doc/index.xml" 
          basedir="${src}"
 	 manifest="${src}/MANIFEST.MF"/>
   </target>
 
   <!-- Package venice up ready for release -->
-  <target name="release" depends="doc, jar, test">
+  <target name="release" depends="doc, jar">
 
     <!-- Layout files ready for release -->
     <mkdir dir="${release}"/>
@@ -140,7 +142,7 @@
     <copy file="${doc}/manual.txt" todir="${release}/venice-${VERSION}/doc"/>
     <copy file="${doc}/manual.html" todir="${release}/venice-${VERSION}/doc"/>
     <copy todir="${release}/venice-${VERSION}/build/src/"> 
-      <fileset dir="${src}" includes="**/*.java"/>
+      <fileset dir="${src}" includes="**/*.java, **/*.png, **/*.gif"/>
     </copy>
     <copy file="build.xml" todir="${release}/venice-${VERSION}/build/"/>
     <copy file="COPYING.txt" todir="${release}/venice-${VERSION}/"/>
@@ -148,15 +150,33 @@
     <copy file="venice" todir="${release}/venice-${VERSION}/"/>
     <copy file="venice.jar" todir="${release}/venice-${VERSION}/"/>   
 
-    <!-- Create release files for windows and unix -->
-    <zip zipfile="${release}/venice-${VERSION}.zip">
-      <fileset dir="${release}/" includes="venice-${VERSION}/**"/>
-    </zip>
+    <!-- Create release files for unix -->
     <tar tarfile="${release}/venice-${VERSION}.tar">
       <tarfileset dir="${release}/" includes="venice-${VERSION}/**"/>
     </tar>
     <gzip zipfile="${release}/venice-${VERSION}.tar.gz" 
       src="${release}/venice-${VERSION}.tar"/>
+    <bzip2 zipfile="${release}/venice-${VERSION}.tar.bz2" 
+      src="${release}/venice-${VERSION}.tar"/>
+
+    <!-- Fix CRLF issues on text files for windows -->
+    <fixcrlf srcdir="${release}/venice-${VERSION}/"
+             eol="crlf"
+             includes="*.txt"/>
+    <fixcrlf srcdir="${release}/venice-${VERSION}/doc"
+             eol="crlf"
+             includes="*.txt"/>
+    <fixcrlf srcdir="${release}/venice-${VERSION}/build/src/"
+             eol="crlf"
+             includes="**/*.java"/>
+
+    <!-- The Windows version doesn't need the venice shell script -->
+    <delete file="${release}/venice-${VERSION}/venice"/>
+
+    <!-- Create release files for windows -->
+    <zip zipfile="${release}/venice-${VERSION}.zip">
+      <fileset dir="${release}/" includes="venice-${VERSION}/**"/>
+    </zip>
   </target>
 
   <!-- Run Venice -->

@@ -109,32 +109,18 @@ public class CandleStickGraph extends AbstractGraph {
                     - GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(),
                         bottomLineValue, verticalScale);
 
-		// Draw bar
+                // Draw bar
                 int halfbarWidth=(int)(0.382 * horizontalScale);
                 if (closeY > openY) { // red candle : open higher than close
                     g.setColor(Color.RED);
-                    g.drawRect(xCoordinate - halfbarWidth, openY, 
-                            halfbarWidth, closeY-openY);
-                    g.drawRect(xCoordinate, openY, 
-                            halfbarWidth, closeY-openY);
-                    if(halfbarWidth>=1){
-                        g.setColor(Color.white);
-                        g.drawLine(xCoordinate, openY, xCoordinate, closeY);
-                    }
-                    g.setColor(Color.RED);
+                    g.drawRect(xCoordinate - halfbarWidth, openY,
+                            2*halfbarWidth, closeY-openY);
                     g.drawLine(xCoordinate, lowY, xCoordinate, closeY);
                     g.drawLine(xCoordinate, openY, xCoordinate, highY);
                 } else if (closeY < openY) { // green candle : close higher than open
                     g.setColor(Color.GREEN);
-                    g.drawRect(xCoordinate - halfbarWidth, closeY, 
-                            halfbarWidth, openY-closeY);
-                    g.drawRect(xCoordinate, closeY, 
-                            halfbarWidth, openY-closeY);
-                    if(halfbarWidth>=1){
-	                    g.setColor(Color.white);
-	                    g.drawLine(xCoordinate, closeY, xCoordinate, openY);
-                    }
-                    g.setColor(Color.GREEN);
+                    g.drawRect(xCoordinate - halfbarWidth, closeY,
+                            2*halfbarWidth, openY-closeY);
                     g.drawLine(xCoordinate, lowY, xCoordinate, openY);
                     g.drawLine(xCoordinate, closeY, xCoordinate, highY);
                 } else { // no candle
@@ -146,7 +132,7 @@ public class CandleStickGraph extends AbstractGraph {
             }
             i++;
         }
-  }
+    }
 
     /**
      * Get the tool tip text for the given X value and y coordinate.

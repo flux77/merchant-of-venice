@@ -80,8 +80,22 @@ public class PointAndFigureGraph extends AbstractGraph {
 				 double verticalScale,
 				 double bottomLineValue)
     {
-	return null; // we never give tool tip information
+
+	Double yCoord = getY(x);
+
+	int yOfGraph = yoffset -  
+	    GraphTools.scaleAndFitPoint(yCoord.doubleValue(),
+					bottomLineValue, verticalScale);
+
+	// Its our graph *only* if its within 5 pixels	    
+	if(Math.abs(y - yOfGraph) < Graph.TOOL_TIP_BUFFER) {
+	    return getSource().getToolTipText(x);
+	}	
+	
+	return null;
     }
+
+    
 
     /** 
      * Return annotations containing buy/sell recommendations based on
@@ -149,7 +163,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 	boolean upmove = true, changeDirection = false;	
 	String marker;
 	Comparable col;	
-
+	
 	int i = 0;	
 	double average;
 
@@ -160,7 +174,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 
 	    diff = (i == 0)  ? values[i] : (values[i] - prev);
 	    plot = (Math.abs(diff) >= priceScale) ? true : false;
-	    
+
 	    // Now check the direction
 	    if (plot) {
 		if (upmove == true && diff < 0) {
@@ -171,20 +185,35 @@ public class PointAndFigureGraph extends AbstractGraph {
 		    changeDirection = false;		    
 		}
 		
+		// Stay in the same column until theres a change in direction 
 		if (changeDirection) {
 		    upmove = (upmove) ? false: true;
-		    col = (Comparable)iterator2.next();
-		}
-		marker = (upmove) ? "X" : "O";
+		    // This places the marker on when the price changed
+		    // direction
+		    col = x;	
+		    // This places it in the next column
+		    // col = (Comparable)iterator2.next();
 
+		    // Reconsider the placement when putY is changed
+		    // to return multiple values
+		}
+		
+		marker = (upmove) ? "X" : "O";
+		
+		// This will replace the any marker associated with that 
+		// column. P&F is a relation not a function; there is
+		// more than one data point associated with the date
+		// TODO: Allow more than one data point to be associated
+		// with a date.
+		
 		pointAndFigure.putY(col, new Double(values[i]));
 		pointAndFigure.putString(col, marker);
-
+		
 	    }
 	    prev = values[i];	    
 	    i++;
 	}
-
+	
 	return pointAndFigure;
     }
 }

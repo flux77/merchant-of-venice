@@ -1,0 +1,32 @@
+<project name="Venice" default="build" basedir=".">
+
+<property name="src" value="${basedir}/src"/>
+<property name="docs" value="${basedir}/docs"/>
+
+<target name="build">
+  <javac srcdir="${src}" includes="**/*.java"/>
+</target>
+
+<target name="clean">
+  <delete>
+    <fileset dir="${src}" includes="**/*.class"/>
+  </delete>
+</target>
+
+<target name="docs">
+  <javadoc packagenames="org.mov.*"
+           sourcepath="${src}"
+           destdir="${docs}"
+	   windowtitle="Venice">
+    <header><![CDATA[<b>Venice</b>]]></header>
+    <footer><![CDATA[<b>Venice</b>]]></footer>
+    <doctitle>Venice</doctitle>
+  </javadoc>
+           
+</target>
+
+<target name="run">
+  <java fork="yes" dir="${src}" classname = "org.mov.main.Main"/>
+</target>
+
+</project>

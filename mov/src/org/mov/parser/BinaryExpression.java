@@ -2,18 +2,43 @@ package org.mov.parser;
 
 import org.mov.util.*;
 
+/**
+ * Abstract base class for all expressions requiring two arguments.
+ */
 abstract public class BinaryExpression extends Expression {
 
+    /**
+     * Create a new binary expression with the given left and right
+     * arguments.
+     *
+     * @param	left	the left argument
+     * @param	right	the right argument
+     */
     public BinaryExpression(Expression left,
 			    Expression right) {
 	add(left);
 	add(right);
     }
 
+    /**
+     * Return the number of children required in a binary expression.
+     * This will always evaluate to <code>2</code>.
+     *
+     * @return	<code>2</code>
+     */
     public int getNeededChildren() {
 	return 2;
     }
 
+    /**
+     * Helper method to conver the given expression to a string.
+     * Given an operator such as <code>and</code>, <code>or</code> etc
+     * it will return <code>arg1 operator arg2</code>. It will insert
+     * parentheses as needed.
+     *
+     * @param	operator	the binary operator
+     * @return	the string representation
+     */
     protected String toString(String operator) {
 	String string = "";
 
@@ -32,10 +57,20 @@ abstract public class BinaryExpression extends Expression {
 	return string;
     }
 
+    /**
+     * Return the left argument.
+     *
+     * @return	the left argument
+     */
     protected Expression getLeft() {
 	return (Expression)getChildAt(0);
     }
 
+    /**
+     * Return the right argument.
+     *
+     * @return	the left argument
+     */
     protected Expression getRight() {
 	return (Expression)getChildAt(1);
     }

@@ -1,54 +1,134 @@
 package org.mov.parser;
 
+/**
+ * A representation of any token in the <i>Gondola</i> language.
+ */
 public class Token {
 
-    // Token types
+    /** Represents "<code>(</code>" symbol */
+    public static final int LEFT_PARENTHESIS_TOKEN = 0;   
 
-    //
-    // Add percent(number, number) function
-    //
+    /** Represents "<code>)</code>" symbol */
+    public static final int RIGHT_PARENTHESIS_TOKEN = 1;  
 
-    public static final int LEFT_PARENTHESIS_TOKEN = 0;   // (
-    public static final int RIGHT_PARENTHESIS_TOKEN = 1;  // )
-    public static final int LESS_THAN_EQUAL_TOKEN = 2;    // <=
-    public static final int GREATER_THAN_EQUAL_TOKEN = 3; // >=
-    public static final int LESS_THAN_TOKEN = 4;          // <
-    public static final int GREATER_THAN_TOKEN = 5;       // >
-    public static final int EQUAL_TOKEN = 6;              // ==
-    public static final int ADD_TOKEN = 7;                // +
-    public static final int SUBTRACT_TOKEN = 8;           // -
-    public static final int MULTIPLY_TOKEN = 9;           // *
-    public static final int DIVIDE_TOKEN = 10;            // /
-    public static final int OR_TOKEN = 11;                // or
-    public static final int AND_TOKEN = 12;               // and
-    public static final int NOT_TOKEN = 13;               // not(boolean)    
-    public static final int COMMA_TOKEN = 14;             // ,
-    public static final int LAG_TOKEN = 15;               // lag(type, lag)
-    public static final int MIN_TOKEN = 16;         // min(type, days, lag)
-    public static final int MAX_TOKEN = 17;         // max(type, days, lag)
-    public static final int AVG_TOKEN = 18;         // avg(type, days, lag)
-    public static final int HELD_TOKEN = 19;              // held
-    public static final int DAY_OPEN_TOKEN = 20;          // day_open
-    public static final int DAY_CLOSE_TOKEN = 21;         // day_close
-    public static final int DAY_LOW_TOKEN = 22;           // day_low
-    public static final int DAY_HIGH_TOKEN = 23;          // day_high
-    public static final int DAY_VOLUME_TOKEN = 24;        // day_volume
-    public static final int IF_TOKEN = 25;                // if
-    public static final int LEFT_BRACE_TOKEN = 26;        // {
-    public static final int RIGHT_BRACE_TOKEN = 27;       // }
-    public static final int FULLSTOP_TOKEN = 28;          // .
-    public static final int ELSE_TOKEN = 29;              // else
-    public static final int AGE_TOKEN = 30;               // age
-    public static final int PERCENT_TOKEN = 31;      // percent(number, %)
-    public static final int NOT_EQUAL_TOKEN = 32;         // !=
-    public static final int RSI_TOKEN = 33;	     // rsi(type, days, lag)
-    public static final int FIXED_LENGTH_TOKENS = 34;
+    /** Represents "<code><=</code>" symbol */
+    public static final int LESS_THAN_EQUAL_TOKEN = 2;   
 
-    public static final int NUMBER_TOKEN = 100;           // [0-9]+
+    /** Represents "<code>>=</code>" symbol */
+    public static final int GREATER_THAN_EQUAL_TOKEN = 3; 
+
+    /** Represents "<code><</code>" symbol */
+    public static final int LESS_THAN_TOKEN = 4;          
+
+    /** Represents "<code>></code>" symbol */
+    public static final int GREATER_THAN_TOKEN = 5;       
+
+    /** Represents "<code>==</code>" symbol */
+    public static final int EQUAL_TOKEN = 6;              
+
+    /** Represents "<code>+</code>" symbol */
+    public static final int ADD_TOKEN = 7;
+
+    /** Represents "<code>-</code>" symbol */
+    public static final int SUBTRACT_TOKEN = 8; 
+
+    /** Represents "<code>*</code>" symbol */
+    public static final int MULTIPLY_TOKEN = 9;   
+
+    /** Represents "<code>/</code>" symbol */
+    public static final int DIVIDE_TOKEN = 10;    
+
+    /** Represents "<code>or</code>" symbol */
+    public static final int OR_TOKEN = 11;        
+
+    /** Represents "<code>and</code>" symbol */
+    public static final int AND_TOKEN = 12;       
+
+    /** Represents "<code>not</code>" symbol */
+    public static final int NOT_TOKEN = 13;         
+
+    /** Represents "<code>,</code>" symbol */
+    public static final int COMMA_TOKEN = 14;      
+
+    /** Represents "<code>lag</code>" symbol */
+    public static final int LAG_TOKEN = 15;        
+
+    /** Represents "<code>min</code>" symbol */
+    public static final int MIN_TOKEN = 16;        
+
+    /** Represents "<code>max</code>" symbol */
+    public static final int MAX_TOKEN = 17;        
+
+    /** Represents "<code>avg</code>" symbol */
+    public static final int AVG_TOKEN = 18;        
+
+    /** Represents "<code>held</code>" symbol */
+    public static final int HELD_TOKEN = 19;        
+
+    /** Represents "<code>day_open</code>" symbol */
+    public static final int DAY_OPEN_TOKEN = 20;    
+
+    /** Represents "<code>day_close</code>" symbol */
+    public static final int DAY_CLOSE_TOKEN = 21;   
+
+    /** Represents "<code>day_low</code>" symbol */
+    public static final int DAY_LOW_TOKEN = 22;     
+
+    /** Represents "<code>day_high</code>" symbol */
+    public static final int DAY_HIGH_TOKEN = 23;    
+
+    /** Represents "<code>day_volume</code>" symbol */
+    public static final int DAY_VOLUME_TOKEN = 24;  
+
+    /** Represents "<code>if</code>" symbol */
+    public static final int IF_TOKEN = 25;         
+
+    /** Represents "<code>{</code>" symbol */
+    public static final int LEFT_BRACE_TOKEN = 26; 
+
+    /** Represents "<code>}</code>" symbol */
+    public static final int RIGHT_BRACE_TOKEN = 27;
+
+    /** Represents "<code>.</code>" symbol */
+    public static final int FULLSTOP_TOKEN = 28;   
+
+    /** Represents "<code>else</code>" symbol */
+    public static final int ELSE_TOKEN = 29;       
+
+    /** Represents "<code>age</code>" symbol */
+    public static final int AGE_TOKEN = 30;        
+
+    /** Represents "<code>percent</code>" symbol */
+    public static final int PERCENT_TOKEN = 31;    
+
+    /** Represents "<code>!=</code>" symbol */
+    public static final int NOT_EQUAL_TOKEN = 32;   
+
+    /** Represents "<code>rsi</code>" symbol */
+    public static final int RSI_TOKEN = 33;	    
+
+    // Number of fixed length tokens, i.e. the ones above ^^
+    private static final int FIXED_LENGTH_TOKENS = 34;
+
+    /** Represents a number symbol */
+    public static final int NUMBER_TOKEN = 100;       
     
+    // Token type (e.g. PERCENT_TOKEN, FULLSTOP_TOKEN etc)
     private int type;
-    private int intValue; // for number tokens
+
+    // For NUMBER_TOKEN - the actual number
+    private int intValue; 
     
+    /**
+     * Perform lexical analysis on the given string. Extract the first
+     * symbol found from the given string, set the passed token object
+     * to represent this symbol then return the given string sans the
+     * extracted symbol.
+     *
+     * @param	token	the token to use to represent the first symbol found
+     * @param	string	the string to extract the first symbol from
+     * @return	the string minus the first symbol
+     */
     public static String stringToToken(Token token, String string) 
 	throws ParserException {
 
@@ -127,27 +207,53 @@ public class Token {
 	return string;
     }
 
+    /**
+     * Create a new empty token.
+     */
     public Token() {
 	type = 0;
 	intValue = 0;
     }
 
+    /**
+     * Get the type of this token.
+     *
+     * @return	the type
+     */
     public int getType() {
 	return type;
     }
     
+    /**
+     * Set the type of this token.
+     *
+     * @param	type	the new type
+     */
     public void setType(int type) {
 	this.type = type;
     }
 
+    /**
+     * For number tokens, get the value.
+     *
+     * @return	the value.
+     */
     public int getIntValue() {
 	return intValue;
     }
 
+    /**
+     * For number tokens, negate the value.
+     */
     public void negate() {
 	intValue = -intValue;
     }
 
+    /**
+     * For number tokens, set the value.
+     *
+     * @param	value	the value.
+     */
     public void setIntValue(int value) {
 	intValue = value;
     }

@@ -2,8 +2,20 @@ package org.mov.parser;
 
 import org.mov.quote.*;
 
+/**
+ * An expression which finds the maximum quote over a given trading period.
+ */
 public class MaxExpression extends QuoteExpression {
     
+    /**
+     * Create a new maximum expression for the given <code>quote</code> kind,
+     * for the given number of <code>days</code> starting with 
+     * <code>lag</code> days away.
+     *
+     * @param	quote	the quote kind to find the maximum
+     * @param	days	the number of days to search
+     * @param	lag	the offset from the current day
+     */
     public MaxExpression(Expression quote, Expression days,
 			 Expression lag) {
 	super(quote);

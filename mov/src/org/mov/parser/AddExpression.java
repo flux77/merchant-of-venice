@@ -3,6 +3,9 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which adds two sub-expressions.
+ */
 public class AddExpression extends ArithmeticExpression {
 
     public AddExpression(Expression left, Expression right) {

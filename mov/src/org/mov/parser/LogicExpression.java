@@ -1,20 +1,25 @@
 package org.mov.parser;
 
-// This class is used for the boolean expressons: and, or
-
+/**
+ * Abstract base class for the boolean expressions:
+ * <code>and, or</code>
+ */
 abstract public class LogicExpression extends BinaryExpression {
 
-    // Level at which double is registered as "true"
-    public final static double TRUE_LEVEL = 0.0001;
-
-    // Levels to set true and false
-    public final static double TRUE = 1.0;
-    public final static double FALSE = 0.0;
-
+    /**
+     * Create a new logic expression with the given left and
+     * right arguments.
+     */
     public LogicExpression(Expression left, Expression right) {
 	super(left, right);
     }
 
+    /**
+     * Check the input arguments to the expression. They must both be
+     * {@link #BOOLEAN_TYPE}.
+     *
+     * @return	{@link #BOOLEAN_TYPE}
+     */
     public int checkType() throws TypeMismatchException {
 	// both types must be boolean
 	int leftType = getLeft().checkType();

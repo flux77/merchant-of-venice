@@ -5,9 +5,13 @@ import javax.swing.tree.*;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * A representation of a value. 
+ */
 public class NumberExpression extends TerminalExpression {
 
-    int value;
+    // The number we represent
+    private int value;
 
     public NumberExpression(int value) {
 	this.value = value;
@@ -21,6 +25,11 @@ public class NumberExpression extends TerminalExpression {
 	return Integer.toString(value);
     }
 
+    /**
+     * A number expression is always a {@link #VALUE_TYPE}. 
+     *
+     * @return	{@link #VALUE_TYPE}
+     */
     public int checkType() throws TypeMismatchException {
 	return VALUE_TYPE;
     }

@@ -3,6 +3,9 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which subtracts two sub-expressions.
+ */
 public class SubtractExpression extends ArithmeticExpression {
 
     public SubtractExpression(Expression left, Expression right) {

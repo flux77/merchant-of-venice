@@ -2,6 +2,9 @@ package org.mov.parser;
 
 import org.mov.quote.*;
 
+/**
+ * An expression which finds the RSI over a given trading period.
+ */
 public class RSIExpression extends Expression {
     
     private int quoteKind;

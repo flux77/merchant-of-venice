@@ -3,6 +3,9 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which performs boolean <code>or</code> on two sub-expressions.
+ */
 public class OrExpression extends LogicExpression {
 
     public OrExpression(Expression left, Expression right) {

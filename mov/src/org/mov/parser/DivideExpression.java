@@ -3,6 +3,9 @@ package org.mov.parser;
 import org.mov.util.*;
 import org.mov.quote.*;
 
+/**
+ * An expression which divides two sub-expressions.
+ */
 public class DivideExpression extends ArithmeticExpression {
 
     public DivideExpression(Expression left, Expression right) {
@@ -17,7 +20,7 @@ public class DivideExpression extends ArithmeticExpression {
 	if(right != 0.0F)
 	    return getLeft().evaluate(cache, symbol, day) / right;
 	else
-	    return 0.0F; // whatever :)
+	    return 0.0F; // need a divide by 0 exception perhaps
     }
 
     public String toString() {

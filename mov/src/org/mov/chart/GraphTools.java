@@ -230,10 +230,6 @@ public class GraphTools {
 	    // Otherwise draw point
 	    yList = source.getYList(x);
 
-	    if (yList != null) {
-		System.out.println("date: " + x.toString() + "cols: " + yList.toString());
-	    }
-
 	    for (int j = 0; yList != null && j < yList.size(); j++) {
 		y = (Double)yList.elementAt(j);
 		

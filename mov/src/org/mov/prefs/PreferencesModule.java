@@ -65,7 +65,11 @@ public class PreferencesModule extends JPanel
 	
 	DefaultListModel pageListModel = new DefaultListModel();
 	pages = new Vector();
-	pageListModel.addElement((Object)new String("Quote Source"));
+
+        pageListModel.addElement((Object)new String("Functions"));
+        pages.addElement(new EquationPage(desktop));
+        
+        pageListModel.addElement((Object)new String("Quote Source"));
 	pages.addElement(new QuoteSourcePage(desktop));
 	
 	pageListModel.addElement((Object)new String("Skins"));
@@ -105,6 +109,32 @@ public class PreferencesModule extends JPanel
 	add(buttonPanel, BorderLayout.SOUTH);
     }
 
+
+    /**
+     * Overrides the default method.  Determines the preferred size
+     * of all page components, rather than just the one to be displayed first
+     */
+    public Dimension getPreferredSize() {
+        Dimension d = new Dimension();
+        for(int i = 0; i < pages.size(); i++) {
+            JPanel activePage = (JPanel) pages.elementAt(i);
+            if (activePage.getPreferredSize().width > d.width)
+                d.width = activePage.getPreferredSize().width;
+            
+            if (activePage.getPreferredSize().height > d.height)
+                d.height = activePage.getPreferredSize().height;
+        }
+
+        d.width += okButton.getPreferredSize().width;
+        d.height += okButton.getPreferredSize().height;
+
+        d.width += cancelButton.getPreferredSize().width;
+        d.height += cancelButton.getPreferredSize().height;
+        
+        return d;
+    }
+
+    
     /**
      * Called when the user clicks on the save or cancel button.
      *

@@ -196,5 +196,52 @@ public class GraphTools {
 	return annotations;
 
     }
+
+    // chars is character to draw - in synch with list xRange 
+
+    public static void renderChar(Graphics g, Graphable source, 
+				 int xoffset, int yoffset,
+				 double horizontalScale, double verticalScale,
+				  double bottomLineValue, List xRange) {
+
+	int xCoordinate, yCoordinate;
+	int lastXCoordinate = -1 , lastYCoordinate = -1;
+	Double y;
+	Comparable x;
+	Iterator iterator = xRange.iterator();
+	int i = 0;
+
+	while(iterator.hasNext()) {
+
+	    x = (Comparable)iterator.next();
+
+	    // Skip until our start X
+	    if(x.compareTo(source.getStartX()) < 0) {
+		i++;
+		continue;
+	    }
+
+	    // If our graph is finished exit this loop
+	    if(x.compareTo(source.getEndX()) > 0) 
+		break;
+
+	    // Otherwise draw point
+	    y = source.getY(x);
+
+	    // The graph is allowed to skip points
+	    if(y != null) {
+		
+		xCoordinate = (int)(xoffset + horizontalScale * i);
+		yCoordinate = yoffset - scaleAndFitPoint(y.doubleValue(), 
+							 bottomLineValue, 
+							 verticalScale);
+		g.drawString(source.getString(x),xCoordinate, yCoordinate);
+		
+	    }
+	    
+	    i++;
+	}
+	
+    }
 }
 

@@ -142,7 +142,7 @@ public class CommandManager {
                               final QuoteBundle quoteBundle) {
         PortfolioModule porfolioModule = new PortfolioModule(desktop, portfolio, quoteBundle);
         desktopManager.newFrame(porfolioModule);
-        porfolioModule.showTransactionHistory();
+        porfolioModule.tablePortfolio();
     }
 
     public void tableStocks(final int type) {

@@ -28,40 +28,48 @@ import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
 
+
+import org.mov.quote.QuoteCache;
+
 public class OrderComparator implements Comparator {
 
-    private final static int NO_REAL_ORDER         = 0;
-    private final static int STOCK_SYMBOL          = 1;
-    private final static int DAY_VOLUME_DECREASING = 2;
-    private final static int DAY_VOLUME_INCREASING = 3;
-    private final static int DAY_LOW_DECREASING    = 4;
-    private final static int DAY_LOW_INCREASING    = 5;
-    private final static int DAY_HIGH_DECREASING   = 6;
-    private final static int DAY_HIGH_INCREASING   = 7;
-    private final static int DAY_OPEN_DECREASING   = 8;
-    private final static int DAY_OPEN_INCREASING   = 9;
-    private final static int DAY_CLOSE_DECREASING  = 10;
-    private final static int DAY_CLOSE_INCREASING  = 11;
-    private final static int CHANGE_DECREASING     = 12;
-    private final static int CHANGE_INCREASING     = 13;
-    private final static int EQUATION              = 14;
+    public final static int NO_REAL_ORDER         = 0;
+    public final static int STOCK_SYMBOL          = 1;
+    public final static int DAY_VOLUME_DECREASING = 2;
+    public final static int DAY_VOLUME_INCREASING = 3;
+    public final static int DAY_LOW_DECREASING    = 4;
+    public final static int DAY_LOW_INCREASING    = 5;
+    public final static int DAY_HIGH_DECREASING   = 6;
+    public final static int DAY_HIGH_INCREASING   = 7;
+    public final static int DAY_OPEN_DECREASING   = 8;
+    public final static int DAY_OPEN_INCREASING   = 9;
+    public final static int DAY_CLOSE_DECREASING  = 10;
+    public final static int DAY_CLOSE_INCREASING  = 11;
+    public final static int CHANGE_DECREASING     = 12;
+    public final static int CHANGE_INCREASING     = 13;
+    public final static int EQUATION              = 14;
 
     private QuoteBundle quoteBundle;
     private Expression orderByEquation;
     private int orderByKey;
     private int dateOffset = 0;
+    private boolean isDateSet;
 
     public OrderComparator(QuoteBundle quoteBundle, int orderByKey) {
         this.quoteBundle = quoteBundle;
         this.orderByKey = orderByKey;
 
         assert orderByKey < EQUATION;
+
+        isDateSet = false;
     }
 
     public OrderComparator(QuoteBundle quoteBundle, Expression orderByEquation) {
         this.quoteBundle = quoteBundle;
         this.orderByEquation = orderByEquation;
         this.orderByKey = EQUATION;
+
+        isDateSet = false;
     }
 
     public int getOrderByKey() {
@@ -70,12 +78,16 @@ public class OrderComparator implements Comparator {
 
     public void setDateOffset(int dateOffset) {
         this.dateOffset = dateOffset;
+
+        isDateSet = true;
     }
 
     public int compare(Object object1, Object object2) {
 
         String symbol1 = (String)object1;
         String symbol2 = (String)object2;
+
+        assert isDateSet;
 
         try {
             switch(orderByKey) {
@@ -134,10 +146,6 @@ public class OrderComparator implements Comparator {
             assert false;
             return 0;
         }
-    }
-
-    public boolean equals(String symbol1, String symbol2) {
-        return (compare(symbol1, symbol2) == 0);
     }
 
     private int compareByEquation(String symbol1, String symbol2) {

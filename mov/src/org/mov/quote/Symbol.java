@@ -51,8 +51,8 @@ public class Symbol implements Cloneable, Comparable {
     /** The minimum valid length for a symbol */
     public final static int MINIMUM_SYMBOL_LENGTH = 1;
 
-    /** The maximum valid length for a symbol. This cannot be more than 6 */
-    public final static int MAXIMUM_SYMBOL_LENGTH = 9;
+    /** The maximum valid length for a symbol. */
+    public final static int MAXIMUM_SYMBOL_LENGTH = 12;
     
     // Hashmap of linking strings to their canonical symbol instance
     private static HashMap registry = new HashMap();

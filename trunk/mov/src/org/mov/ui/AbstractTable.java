@@ -1,4 +1,22 @@
-package org.mov.table;
+/* Merchant of Venice - technical analysis software for the stock market.
+   Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+*/
+
+package org.mov.ui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -19,9 +37,9 @@ public class AbstractTable extends SortedTable {
 	new Color(237, 237, 237);
 
     // Images used for arrows representing when stock has gone up, down or is unchanged
-    private String upImage = "org.mov/images/Up.gif";
-    private String downImage = "org.mov/images/Down.gif";
-    private String unchangedImage = "org.mov/images/Unchanged.gif";
+    private String upImage = "org/mov/images/Up.png";
+    private String downImage = "org/mov/images/Down.png";
+    private String unchangedImage = "org/mov/images/Unchanged.png";
 
     class StockQuoteRenderer extends JPanel implements TableCellRenderer,
 						       MouseListener
@@ -61,11 +79,11 @@ public class AbstractTable extends SortedTable {
 		renderChangeComponent(table, value, isSelected,
 				      hasFocus, row, column); 
 	    else if(value instanceof TradingDate) {
-		TradingDate date = (TradingDate)value;
+	    	TradingDate date = (TradingDate)value;
 
-		String text = date.toString("d?/m?/yyyy");
-		textLabel.setText(text);
-		add(textLabel);
+	    	String text = date.toString("d?/m?/yyyy");
+	    	textLabel.setText(text);
+	    	add(textLabel);
 	    }
 	    else {
 		textLabel.setText(value.toString());
@@ -92,20 +110,20 @@ public class AbstractTable extends SortedTable {
 	    textLabel.setText(text);
 
 	    if(changePercent > 0) {
-		// Create up arrow
+		// Create up arrow image
 		ImageIcon upImageIcon = 
 		    new ImageIcon(ClassLoader.getSystemResource(upImage));
 		iconLabel.setIcon(upImageIcon);
 	    }
 
 	    else if(changePercent < 0) {
-		// Create down arrow
+		// Create down arrow image
 		ImageIcon downImageIcon = 
 		    new ImageIcon(ClassLoader.getSystemResource(downImage));
 		iconLabel.setIcon(downImageIcon);
 	    }
 	    else {
-		// Create down arrow
+		// Create unchanged image
 		ImageIcon unchangedImageIcon = 
 		    new ImageIcon(ClassLoader.getSystemResource(unchangedImage));
 		iconLabel.setIcon(unchangedImageIcon);
@@ -142,8 +160,6 @@ public class AbstractTable extends SortedTable {
 	setDefaultRenderer(Integer.class, 
 			   new StockQuoteRenderer());
 	setDefaultRenderer(Double.class, 
-			   new StockQuoteRenderer());
-	setDefaultRenderer(Date.class, 
 			   new StockQuoteRenderer());
 	setDefaultRenderer(Float.class, 
 			   new StockQuoteRenderer());

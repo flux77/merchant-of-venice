@@ -107,6 +107,9 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	double quote;
 
         try {
+            // if it looks for future quote, a MissingQuoteException is thrown.
+            if (dateOffset>0)
+                throw MissingQuoteException.getInstance();
             quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
         }
         catch(QuoteNotLoadedException e) {
@@ -120,7 +123,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
                 // If the quote is still null, maybe we need to expand the bundle?
                 // First check to make sure the new date is older than any date in
                 // the cache
-                if(getQuoteRange().getFirstDate() != null && dateOffset < getFirstDateOffset()) {
+                 if(getQuoteRange().getFirstDate() != null && dateOffset < getFirstDateOffset()) {
                     try {
                         quote = tryExpand(symbol, quoteType, dateOffset);
                     }
@@ -130,7 +133,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
                         throw MissingQuoteException.getInstance();
                     }
                 }
-                else 
+                else
                     throw MissingQuoteException.getInstance();
             
             }
@@ -526,6 +529,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
         throws QuoteNotLoadedException {
 
         QuoteRange expandedQuoteRange = (QuoteRange)getQuoteRange().clone();
+        
         TradingDate date = quoteCache.offsetToDate(dateOffset);
         expandedQuoteRange.setFirstDate(date);
         quoteBundleCache.expand(this, expandedQuoteRange);

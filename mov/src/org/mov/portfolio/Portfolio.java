@@ -78,20 +78,38 @@ public class Portfolio implements Cloneable {
      */
     public void addTransaction(Transaction transaction) {
 
-	// Record history of transactions
-	transactions.add(transaction);
+	// If the transaction is older than an existing transaction then remove all
+	// transactions. Put the new transaction with them, sort them all and then
+	// add all of the transactions. I.e. we must add the transactions in chronological
+	// order to prevent things like selling stock before we have bought it.
 
-	// Now update accounts
-	Iterator iterator = accounts.iterator();
+	if(countTransactions() > 0 && 
+	   ((Transaction)transactions.lastElement()).compareTo(transaction) > 0) {
 
-	while(iterator.hasNext()) {
-	    Account account = (Account)iterator.next();
+	    Vector allTransactions = (Vector)transactions.clone();
+	    allTransactions.add(transaction);
 
-	    // Is this account involved in the transaction? If it
-	    // it is we'll need to update it
-	    if(account == transaction.getCashAccount() ||
-	       account == transaction.getShareAccount()) {
-		account.transaction(transaction);
+	    removeAllTransactions();
+	    addTransactions(allTransactions);
+	}
+
+	// Otherwise we can just append
+	else {
+	    // Record history of transactions
+	    transactions.add(transaction);
+
+	    // Now update accounts
+	    Iterator iterator = accounts.iterator();
+	    
+	    while(iterator.hasNext()) {
+		Account account = (Account)iterator.next();
+		
+		// Is this account involved in the transaction? If it
+		// it is we'll need to update it
+		if(account == transaction.getCashAccount() ||
+		   account == transaction.getShareAccount()) {
+		    account.transaction(transaction);
+		}
 	    }
 	}
     }

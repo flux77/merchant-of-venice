@@ -80,7 +80,13 @@ public class GPModule extends JPanel implements Module {
         GPPage = new GPPage(desktop);
         tabbedPane.addTab(GPPage.getTitle(), GPPage.getComponent());
 
-        GPGondolaSelection = new GPGondolaSelection(desktop);
+        // Get the max height
+        double maxHeight = quoteRangePage.getPreferredSize().getHeight();
+        if (portfolioPage.getPreferredSize().getHeight()>maxHeight)
+            maxHeight = portfolioPage.getPreferredSize().getHeight();
+        if (GPPage.getPreferredSize().getHeight()>maxHeight)
+            maxHeight = GPPage.getPreferredSize().getHeight();
+        GPGondolaSelection = new GPGondolaSelection(desktop, maxHeight);
         tabbedPane.addTab(GPGondolaSelection.getTitle(), GPGondolaSelection.getComponent());
 
 	// Run, close buttons

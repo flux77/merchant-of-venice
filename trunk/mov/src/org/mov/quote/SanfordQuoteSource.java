@@ -71,7 +71,8 @@ public class SanfordQuoteSource implements QuoteSource {
 
 	try {
 	    // Login
-	    URL url = new URL(PROTOCOL, HOST, "/sanford/Login.asp");
+	    URL url = 
+		new URL(PROTOCOL, HOST, "/sanford/Public/Home/Login.asp");
 	    URLConnection connection = url.openConnection();
 	    connection.setDoOutput(true);
 	    
@@ -117,8 +118,9 @@ public class SanfordQuoteSource implements QuoteSource {
 
 	    try {
 		// Read quotes
-		URL url = new URL(PROTOCOL, HOST, 
-				  "/sanford/quotesnews/Quote.asp");
+		URL url = 
+		    new URL(PROTOCOL, HOST, 
+			    "/sanford/Members/MarketInfo/MarketWatch.asp");
 
 		URLConnection connection = url.openConnection();
 		connection.setDoOutput(true);
@@ -135,6 +137,9 @@ public class SanfordQuoteSource implements QuoteSource {
 		String line;
 		
 		while ((line = reader.readLine()) != null) {
+
+		    System.out.println(line);
+
 		    // Line containing compnay name will contain this string
 		    if(line.indexOf("<p><font face") != -1) {
 			// Extract the company name from the line (by
@@ -348,7 +353,7 @@ public class SanfordQuoteSource implements QuoteSource {
 
 	    // Read quotes
 	    URL url = new URL(PROTOCOL, HOST, 
-			      "/sanford/research/HistoricalData.asp");
+			      "/sanford/Members/Research/HistoricalData.asp");
 
 	    URLConnection connection = url.openConnection();
 	    connection.setDoOutput(true);

@@ -38,8 +38,10 @@ import org.mov.portfolio.Portfolio;
 import org.mov.portfolio.Transaction;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
+import org.mov.table.WatchScreen;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 
 /**
  *
@@ -146,6 +148,72 @@ public class PreferencesManager {
 	}
     }
 
+    public static String[] getWatchScreenNames() {
+	Preferences p = getUserNode("/watchscreens");
+	String[] watchScreenNames = null;
+
+	try {
+	    watchScreenNames = p.childrenNames();
+	}
+	catch(BackingStoreException e) {
+	    // don't care
+	}
+
+	return watchScreenNames;
+    }
+
+    public static WatchScreen loadWatchScreen(String watchScreenName) {
+        WatchScreen watchScreen = new WatchScreen(watchScreenName);
+
+        Preferences p = getUserNode("/watchscreens/" + watchScreenName);
+
+	try {
+            // Load symbols
+            String[] symbols = p.node("symbols").childrenNames();
+
+            for(int i = 0; i < symbols.length; i++)
+                try {
+                    watchScreen.addSymbol(Symbol.find(symbols[i]));
+                } catch(SymbolFormatException e) {
+                    assert false;
+                }
+        }
+	catch(BackingStoreException e) {
+	    // don't care
+	}
+
+        return watchScreen;
+    }
+
+    public static void saveWatchScreen(WatchScreen watchScreen) {
+        Preferences p = getUserNode("/watchscreens/" + watchScreen.getName());
+	p.put("name", watchScreen.getName());
+
+        // Save watched symbols
+        List symbols = watchScreen.getSymbols();
+
+        for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
+            Symbol symbol = (Symbol)iterator.next();
+
+            // Later on we will associate things like alerts and stops
+            // for each symbol. But at the moment we only keep the list
+            // of symbols
+            Preferences symbolPrefs = p.node("symbols").node(symbol.toString());
+            symbolPrefs.put("present", "1");
+        }
+    }
+
+    public static void deleteWatchScreen(String name) {
+	Preferences p = getUserNode("/watchscreens/" + name);
+
+	try {
+	    p.removeNode();
+	}
+	catch(BackingStoreException e) {
+	    // don't care
+	}
+    }
+
     public static String[] getPortfolioNames() {
 	Preferences p = getUserNode("/portfolio");
 	String[] portfolioNames = null;
@@ -209,10 +277,18 @@ public class PreferencesManager {
 		int type = 
 		    Transaction.stringToType(transactionPrefs.get("type",
 								  "withdrawal"));
-		TradingDate date = 
-		    new TradingDate(transactionPrefs.get("date", 
-							 "01/01/2000"),
-				    TradingDate.BRITISH);
+		TradingDate date = null;
+
+                try {
+                    date = 
+                        new TradingDate(transactionPrefs.get("date", 
+                                                             "01/01/2000"),
+                                        TradingDate.BRITISH);
+                }
+                catch(TradingDateFormatException e) {
+                    // Shouldnt happen unless portfolio gets corrupted
+                }
+
 		Money amount = new Money(transactionPrefs.getDouble("amount", 0.0D));
 		Symbol symbol = null;
 		int shares = transactionPrefs.getInt("shares", 0);

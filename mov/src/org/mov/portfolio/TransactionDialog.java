@@ -34,6 +34,7 @@ import org.mov.main.*;
 import org.mov.util.Money;
 import org.mov.util.MoneyFormatException;
 import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 import org.mov.table.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
@@ -804,6 +805,7 @@ public class TransactionDialog extends JInternalFrame
     private Transaction buildTransaction() {
 	Transaction transaction = null;
         String symbolParseError = null;
+        TradingDate date = null;
 
 	//
 	// First extract data from GUI
@@ -811,8 +813,21 @@ public class TransactionDialog extends JInternalFrame
 
 	int type = 
 	    Transaction.stringToType((String)typeComboBox.getSelectedItem());
-	TradingDate date = new TradingDate(dateTextField.getText(),
-					   TradingDate.BRITISH);
+
+        try {
+            date = new TradingDate(dateTextField.getText(),
+                                   TradingDate.BRITISH);
+        } catch(TradingDateFormatException e) {
+	    String message = new String("Can't parse date '" + 
+					dateTextField.getText() + "', " +
+					"please enter in form DD/MM/YYYY");
+            
+	    JOptionPane.showInternalMessageDialog(desktop, 
+						  message,
+						  "Error building transaction",
+						  JOptionPane.ERROR_MESSAGE);
+	    return null;
+        }
 
 	// Get symbol - try the combo box first. If it doesn't exist then try the
 	// text field.
@@ -901,15 +916,7 @@ public class TransactionDialog extends JInternalFrame
 
 	// Can't parse date? (all fields will be 0)
 	if(date.getYear() == 0) {
-	    String message = new String("Can't parse date '" + 
-					dateTextField.getText() + "', " +
-					"please enter in form DD/MM/YYYY");
 
-	    JOptionPane.showInternalMessageDialog(desktop, 
-						  message,
-						  "Error building transaction",
-						  JOptionPane.ERROR_MESSAGE);
-	    return null;
 	}
 
 	// When transferring money - it must be between two different accounts

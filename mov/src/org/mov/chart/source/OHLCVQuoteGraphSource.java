@@ -19,6 +19,7 @@
 package org.mov.chart.source;
 
 import org.mov.chart.*;
+import org.mov.ui.QuoteFormat;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.quote.*;
@@ -83,7 +84,6 @@ public class OHLCVQuoteGraphSource implements GraphSource {
     }
 
     public String getToolTipText(Comparable x) {
-
 	// In OHLCV graphs the x axis is in dates
 	TradingDate date = (TradingDate)x;
 
@@ -102,6 +102,11 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 			       "</html>");
 	    }
 	    else {
+                double dayLow = quoteBundle.getQuote(symbol, Quote.DAY_LOW, date);
+                double dayHigh = quoteBundle.getQuote(symbol, Quote.DAY_HIGH, date);
+                double dayOpen = quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date);
+                double dayClose = quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date);
+
 		return
 		    new String("<html>" +
 			       symbol + 
@@ -109,18 +114,14 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 			       date.toLongString() +
 			       "<p>" +
 			       "<font color=red>" + 
-			       quoteBundle.getQuote(symbol, 
-					      Quote.DAY_LOW, date) +
+			       QuoteFormat.quoteToString(dayLow) +
 			       " </font>" +
 			       "<font color=green>" + 
-			       quoteBundle.getQuote(symbol, 
-					      Quote.DAY_HIGH, date) + 
+			       QuoteFormat.quoteToString(dayHigh) +
 			       " </font>" +
-			       quoteBundle.getQuote(symbol, 
-					      Quote.DAY_OPEN, date) +
+			       QuoteFormat.quoteToString(dayOpen) +
 			       " " + 
-			       quoteBundle.getQuote(symbol, 
-					      Quote.DAY_CLOSE, date) +
+			       QuoteFormat.quoteToString(dayClose) +
 			       "</html>");
 	    }
 	}

@@ -70,7 +70,7 @@ public interface QuoteBundle {
      * @exception EvaluationException if the script isn't allow access to the quote.
      */
     public float getQuote(Symbol symbol, int quoteType, int today, int offset)
-	throws EvaluationException;
+	throws EvaluationException, MissingQuoteException;
 
     /** 
      * Get a stock quote. 
@@ -202,12 +202,5 @@ public interface QuoteBundle {
      */
     public int dateToOffset(TradingDate date)
         throws WeekendDateException;
-
-    /**
-     * Free the quote bundle. This will remove the quote bundle from the 
-     * {@link QuoteBundleCache}. This method is optional - quote bundles do not need
-     * to call this when they are done. 
-     */
-    public void free();
 }
 

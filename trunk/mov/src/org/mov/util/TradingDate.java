@@ -212,12 +212,32 @@ public class TradingDate implements Cloneable, Comparable {
     }
 
     /**
-     * Return the day.
+     * Return the day of the month.
      *
      * @return the day of the month starting from 1
      */
     public int getDay() {
 	return day;
+    }
+
+    /**
+     * Return the day of the week.
+     *
+     * @return the day of the week
+     */
+    public int getDayOfWeek() {
+	Calendar date = toCalendar();
+        return date.get(Calendar.DAY_OF_WEEK);
+    }
+
+    /**
+     * Return the day of the year.
+     *
+     * @return the day of the year
+     */
+    public int getDayOfYear() {
+	Calendar date = toCalendar();
+        return date.get(Calendar.DAY_OF_YEAR);
     }
 
     /**
@@ -289,7 +309,7 @@ public class TradingDate implements Cloneable, Comparable {
      */
     public TradingDate previous(int days) {
 
-	Calendar date = this.toCalendar();
+	Calendar date = toCalendar();
 
 	for(int i = 0; i < days; i++) {
 

@@ -20,8 +20,6 @@ package org.mov.chart;
 
 import java.util.*;
 
-import org.mov.util.*;
-
 /**
  * Represents a graphable set of X points and their associated list of Y points.
  *

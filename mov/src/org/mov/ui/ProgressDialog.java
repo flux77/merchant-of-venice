@@ -18,13 +18,6 @@
 
 package org.mov.ui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
-
-import org.mov.main.Main;
-
 /**
  * This interface defines the functions that a progress dialog class should have.
  * It's purpose is to allow us to create a {@link PrimaryProgressDialog} and a

@@ -19,10 +19,8 @@
 package org.mov.chart;
 
 import java.awt.*;
-import java.awt.image.*;
 import java.awt.event.*;
 import java.beans.*;
-import java.text.*;
 import java.net.*;
 import java.util.*;
 import javax.swing.*;

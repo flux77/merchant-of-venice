@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.util.TradingDate;
-
 /**
  * Provides a list of quote filters available to us. This class is used
  * as a single point of reference to find and use all of the available

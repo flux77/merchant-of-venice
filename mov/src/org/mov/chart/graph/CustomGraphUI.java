@@ -27,7 +27,6 @@ import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 
 import org.mov.chart.Graphable;
-import org.mov.chart.source.GraphSource;
 import org.mov.parser.EvaluationException;
 import org.mov.parser.Expression;
 import org.mov.parser.ExpressionException;

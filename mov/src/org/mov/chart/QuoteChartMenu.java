@@ -21,24 +21,18 @@ package org.mov.chart;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 
 import org.mov.chart.graph.*;
 import org.mov.chart.source.GraphSource;
 import org.mov.chart.source.OHLCVQuoteGraphSource;
-import org.mov.ui.DesktopManager;
 import org.mov.util.Locale;
-import org.mov.util.TradingDate;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteFunctions;
 import org.mov.quote.Symbol;
 
 /**

@@ -65,7 +65,7 @@ public class WindowPreferencePage extends JPanel implements PreferencesPage {
     /* XML Filter File. */
     public class XMLFilter extends FileFilter {
 
-        public final static String xml = "xml";
+        public static final String xml = "xml";
         
         //Accept all directories and xml files.
         public boolean accept(File f) {
@@ -75,7 +75,7 @@ public class WindowPreferencePage extends JPanel implements PreferencesPage {
 
             String extension = this.getExtension(f);
             if (extension != null) {
-                if (extension.equals(this.xml)) {
+                if (extension.equals(XMLFilter.xml)) {
                         return true;
                 } else {
                     return false;

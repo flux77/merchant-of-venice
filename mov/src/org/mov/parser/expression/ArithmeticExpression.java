@@ -18,7 +18,6 @@
 
 package org.mov.parser.expression;
 
-import org.mov.util.*;
 import org.mov.parser.*;
 
 /**

@@ -22,7 +22,6 @@ import java.util.Comparator;
 
 import org.mov.parser.EvaluationException;
 import org.mov.parser.Expression;
-import org.mov.parser.Parser;
 import org.mov.parser.Variables;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;

@@ -19,11 +19,8 @@
 package org.mov.prefs;
 
 import java.awt.*;
-import java.awt.image.*;
 import java.awt.event.*;
 import java.beans.*;
-import java.io.*;
-import java.text.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

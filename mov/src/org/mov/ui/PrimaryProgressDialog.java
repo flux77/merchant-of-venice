@@ -21,9 +21,7 @@ package org.mov.ui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.util.*;
 
-import org.mov.main.Main;
 import org.mov.util.Locale;
 
 /**

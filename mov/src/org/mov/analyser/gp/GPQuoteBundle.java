@@ -25,7 +25,6 @@ import org.mov.parser.EvaluationException;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteBundleCache;
 import org.mov.quote.QuoteBundleIterator;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteRange;

@@ -20,8 +20,6 @@ package org.mov.chart;
 
 import java.awt.*;
 import java.util.*;
-import javax.swing.*;
-
 import org.mov.util.*;
 
 public class HorizontalAxis {

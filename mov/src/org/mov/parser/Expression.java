@@ -20,7 +20,6 @@ package org.mov.parser;
 
 import java.util.Iterator;
 
-import org.mov.util.TradingDate;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
 

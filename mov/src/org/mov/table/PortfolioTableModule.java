@@ -18,37 +18,18 @@
 
 package org.mov.table;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import javax.swing.ImageIcon;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
 
 import org.mov.main.*;
-import org.mov.util.ExpressionQuery;
 import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.parser.*;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.*;
 import org.mov.ui.*;

@@ -18,7 +18,6 @@
 
  package org.mov.util;
 
-import java.awt.*;
 import javax.swing.*;
 
 import org.mov.parser.*;

@@ -21,7 +21,6 @@ package org.mov.parser.expression;
 import java.lang.String;
 
 import org.mov.parser.EvaluationException;
-import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.quote.QuoteBundle;

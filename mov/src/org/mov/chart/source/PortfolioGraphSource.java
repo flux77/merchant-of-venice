@@ -26,10 +26,6 @@ import org.mov.portfolio.Account;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteCache;
-import org.mov.quote.WeekendDateException;
-
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 

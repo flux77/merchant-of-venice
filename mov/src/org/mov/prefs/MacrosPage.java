@@ -29,7 +29,6 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.table.TableColumn;
 
-import org.mov.macro.MacroManager;
 import org.mov.macro.StoredMacro;
 import org.mov.ui.AbstractTableModel;
 import org.mov.ui.MacroEditor;

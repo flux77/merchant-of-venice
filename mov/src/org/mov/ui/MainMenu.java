@@ -21,23 +21,17 @@ package org.mov.ui;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
-import java.text.*;
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
 
-import org.mov.chart.*;
 import org.mov.macro.MacroManager;
 import org.mov.macro.StoredMacro;
 import org.mov.main.*;
-import org.mov.util.*;
 import org.mov.util.Locale;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
-import org.mov.table.*;
-import org.mov.ui.*;
 
 /**
  * The main menu of the application.

@@ -26,7 +26,6 @@ import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.text.*;
 import javax.swing.tree.*;
 
 import org.mov.main.*;

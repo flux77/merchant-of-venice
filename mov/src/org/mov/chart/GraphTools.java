@@ -19,15 +19,9 @@
 package org.mov.chart;
 
 import java.awt.Graphics;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
-
-import org.mov.chart.graph.*;
-import org.mov.chart.source.*;
-import org.mov.util.Locale;
 
 public class GraphTools {
 
@@ -58,7 +52,7 @@ public class GraphTools {
 	Comparable x;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
-    int halfbarWidth=(int)(0.309 * horizontalScale);//bryan    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
+    int halfbarWidth=(int)(0.309 * horizontalScale);//bryan    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
 	while(iterator.hasNext()) {
 
 	    x = (Comparable)iterator.next();
@@ -88,7 +82,7 @@ public class GraphTools {
 //			       lastXCoordinate, lastYCoordinate);		    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, yCoordinate,				       lastXCoordinate, lastYCoordinate);
 		else
 //		    g.drawLine(xCoordinate, yCoordinate,//
-//			       xCoordinate, yCoordinate);		    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, yCoordinate,		    		xCoordinate+halfbarWidth+1 +halfBlankWidth, yCoordinate);
+//			       xCoordinate, yCoordinate);		    g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, yCoordinate,		    		xCoordinate+halfbarWidth+1 +halfBlankWidth, yCoordinate);
 //		lastXCoordinate = xCoordinate;		lastXCoordinate = xCoordinate+halfbarWidth+1 +halfBlankWidth;
 		lastYCoordinate = yCoordinate ;
 	    }
@@ -137,7 +131,7 @@ public class GraphTools {
 	    x2 = (int)(xoffset + horizontalScale * i);
 	    y1 = yoffset - scaleAndFitPoint(doubleValue,
 	    				    bottomLineValue, verticalScale);
-		g.fillRect( x2 +halfBlankWidth, Math.min(y1, y2),	    				halfbarWidth*2+1, Math.abs(y2-y1));
+		g.fillRect( x2 +halfBlankWidth, Math.min(y1, y2),	    				halfbarWidth*2+1, Math.abs(y2-y1));
 //	    if(x1 != -1)//
 //		g.fillRect(Math.min(x1, x2), Math.min(y1, y2),//
 //			   Math.abs(x2-x1) + 1, Math.abs(y2-y1));//

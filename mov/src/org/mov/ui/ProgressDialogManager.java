@@ -18,7 +18,6 @@
 
 package org.mov.ui;
 
-import java.awt.event.*;
 import java.util.*;
 
 /**

@@ -19,15 +19,10 @@
 package org.mov.chart.graph;
 
 import java.awt.*;
-import java.lang.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-
 import org.mov.chart.*;
 import org.mov.chart.source.*;
 import org.mov.util.Locale;
-import org.mov.parser.*;
 
 /**
  * Moving Average Convergence Divergence graph. This graph draws two

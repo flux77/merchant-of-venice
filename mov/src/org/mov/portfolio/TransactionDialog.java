@@ -20,23 +20,16 @@ package org.mov.portfolio;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.*;
-import java.lang.*;
-import java.text.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.table.*;
-
-import org.mov.main.*;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.MoneyFormatException;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
-import org.mov.table.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
 

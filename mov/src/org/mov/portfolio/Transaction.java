@@ -18,8 +18,6 @@
 
 package org.mov.portfolio;
 
-import java.util.*;
-
 import org.mov.quote.Symbol;
 import org.mov.util.Locale;
 import org.mov.util.Money;

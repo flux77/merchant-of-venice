@@ -21,8 +21,6 @@ package org.mov.chart.graph;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import javax.swing.JPanel;
-
 import org.mov.chart.source.GraphSource;
 
 /**

@@ -18,8 +18,6 @@
 
 package org.mov.ui;
 
-import org.mov.main.*;
-
 import java.util.*;
 
 /**

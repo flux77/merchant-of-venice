@@ -439,7 +439,8 @@ public class CommandManager {
 		SortedSet symbolsCopy;
 
 		if(symbols == null) {
-		    symbolsCopy = CommodityListQuery.getCommoditiesByCode(desktop_instance, "Graph stocks by code");
+		    symbolsCopy = SymbolListDialog.getSymbols(desktop_instance, 
+							      "Graph stocks by code");
 		}
 		else {
 		    symbolsCopy = new TreeSet(symbols);
@@ -465,11 +466,12 @@ public class CommandManager {
     public void graphStockByName() {
         final Thread t = new Thread(new Runnable() {
             public void run() {
-                SortedSet s = CommodityListQuery.getCommodityByName(desktop_instance, "Graph stocks by name");
+                SortedSet s = SymbolListDialog.getSymbolByName(desktop_instance, 
+							       "Graph stock by name");
                 String str = s.toString();
                 str = str.substring(1,str.length()-1);
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
-                p.setTitle("Displaying graph of stocks named "+str);
+                p.setTitle("Displaying graph of stock named "+str);
                 p.show();
                 graphStock(s);
                 if (!Thread.currentThread().interrupted())

@@ -12,6 +12,7 @@ import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.main.*;
 import org.mov.util.*;
+import org.mov.portfolio.*;
 import org.mov.quote.*;
 
 /**
@@ -238,8 +239,29 @@ public class ChartModule extends JPanel implements Module,
 	// Add graph to chart
 	chart.add(graph, level);
 
-	// Currently only support quotes - so add menu for quote
+	// Add menu for this quote
 	QuoteChartMenu menu = new QuoteChartMenu(this, cache, graph);
+	menus.add(menu);
+	menuBar.add(menu);
+    }
+
+    /**
+     * Add a new portfolio graph to the specified level. Add new menu
+     * for graph.
+     *
+     * @param	graph	Portfolio graph
+     * @param	portfolio	Portfolio
+     * @param	cache	quote cache
+     * @param	level	specified level
+     */
+    public void add(Graph graph, Portfolio portfolio, QuoteCache cache,
+		    int level) {
+	// Add graph to chart
+	chart.add(graph, level);
+
+	// Add menu for this portfolio
+	PortfolioChartMenu menu = new PortfolioChartMenu(this, cache,
+							 portfolio, graph);
 	menus.add(menu);
 	menuBar.add(menu);
     }

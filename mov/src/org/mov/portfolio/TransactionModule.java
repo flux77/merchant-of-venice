@@ -38,6 +38,7 @@ import org.mov.ui.AbstractTable;
 import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
 import org.mov.ui.MenuHelper;
+import org.mov.ui.*;
 
 /** 
  * Venice module for displaying a portfolio's transaction history to
@@ -409,15 +410,24 @@ public class TransactionModule extends AbstractTable implements Module,
 
     // Delete the given transaction(s)
     private void deleteTransactions(final List deleteTransactions) {
+//	JDesktopPane desktop =
+//	    org.mov.ui.DesktopManager.getDesktop();
+	
+//	int option = 
+//	    JOptionPane.showInternalConfirmDialog(desktop,
+//						  Locale.getString("SURE_DELETE_TRANSACTIONS"),
+//						  Locale.getString("DELETE_TRANSACTIONS"),
+//						  JOptionPane.YES_NO_OPTION);
+//	if(option == JOptionPane.YES_OPTION) {
 	JDesktopPane desktop =
 	    org.mov.ui.DesktopManager.getDesktop();
-	
-	int option = 
-	    JOptionPane.showInternalConfirmDialog(desktop,
-						  Locale.getString("SURE_DELETE_TRANSACTIONS"),
-						  Locale.getString("DELETE_TRANSACTIONS"),
-						  JOptionPane.YES_NO_OPTION);
-	if(option == JOptionPane.YES_OPTION) {
+
+	ConfirmDialog dialog = new ConfirmDialog(desktop,
+				   Locale.getString("SURE_DELETE_TRANSACTIONS"),
+				   Locale.getString("DELETE_TRANSACTIONS"));
+	boolean option = dialog.showDialog();
+	if(option) {
+
 	    // Update display
 	    SwingUtilities.invokeLater(new Runnable() {
 		    public void run() {

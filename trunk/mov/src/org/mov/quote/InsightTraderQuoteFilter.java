@@ -35,10 +35,10 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
      * Parse the given text string and returns the stock quote or null
      * if it did not contain a valid quote.
      *
-     * @param	quoteList	a single line of text containing a quote.
-     * @return	the stock quote.
+     * @param	quoteList	a single line of text containing a quote
+     * @return	the stock quote
      */
-    public Stock filter(String quoteLine) {
+    public Stock toQuote(String quoteLine) {
 	Stock stock = null;
 
 	if(quoteLine != null) {
@@ -62,5 +62,21 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
 	    }	    
 	}
 	return stock;
+    }
+
+    /**
+     * Convert the given stock quote to a string line.
+     *
+     * @param	quote	a stock quote
+     * @return	string version of the quote
+     */
+    public String toString(Stock quote) {
+	return new String(quote.getSymbol() + " " + 
+			  quote.getDate().toString("mm/dd/yy") + " " +
+			  Math.round(quote.getDayOpen()*100) + " " +
+			  Math.round(quote.getDayHigh()*100) + " " +
+			  Math.round(quote.getDayLow()*100) + " " +
+			  Math.round(quote.getDayClose()*100) + " " +
+			  quote.getVolume() / 100);
     }
 }

@@ -35,10 +35,10 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
      * Parse the given text string and returns the stock quote or null
      * if it did not contain a valid quote.
      *
-     * @param	quoteList	a single line of text containing a quote.
-     * @return	the stock quote.
+     * @param	quoteList	a single line of text containing a quote
+     * @return	the stock quote
      */
-    public Stock filter(String quoteLine) {
+    public Stock toQuote(String quoteLine) {
 	Stock stock = null;
 
 	if(quoteLine != null) {
@@ -60,5 +60,21 @@ public class MetaStock2QuoteFilter implements QuoteFilter {
 	    }	    
 	}
 	return stock;
+    }
+
+    /**
+     * Convert the given stock quote to a string line.
+     *
+     * @param	quote	a stock quote
+     * @return	string version of the quote
+     */
+    public String toString(Stock quote) {
+	return new String(quote.getSymbol() + "," + 
+			  quote.getDate().toString("yyyymmdd") + "," +
+			  quote.getDayOpen() + "," +
+			  quote.getDayHigh() + "," +
+			  quote.getDayLow() + "," +
+			  quote.getDayClose() + "," +
+			  quote.getVolume() / 100);
     }
 }

@@ -28,9 +28,10 @@ public class PaperTradeResultModule extends AbstractTable
     private static final int BUY_RULE_COLUMN = 3;
     private static final int SELL_RULE_COLUMN = 4;
     private static final int TRADE_COST_COLUMN = 5;
-    private static final int INITIAL_CAPITAL_COLUMN = 6;
-    private static final int FINAL_CAPITAL_COLUMN = 7;
-    private static final int PERCENT_RETURN_COLUMN = 8;
+    private static final int NUMBER_OF_TRADES_COLUMN = 6;
+    private static final int INITIAL_CAPITAL_COLUMN = 7;
+    private static final int FINAL_CAPITAL_COLUMN = 8;
+    private static final int PERCENT_RETURN_COLUMN = 9;
 
     private Model model;
 
@@ -42,6 +43,7 @@ public class PaperTradeResultModule extends AbstractTable
     private JCheckBoxMenuItem showBuyRuleColumn;
     private JCheckBoxMenuItem showSellRuleColumn;
     private JCheckBoxMenuItem showTradeCostColumn;
+    private JCheckBoxMenuItem showNumberOfTradesColumn;
     private JCheckBoxMenuItem showInitialCapitalColumn;
     private JCheckBoxMenuItem showFinalCapitalColumn;
     private JCheckBoxMenuItem showReturnColumn;
@@ -77,11 +79,13 @@ public class PaperTradeResultModule extends AbstractTable
     class Model extends AbstractTableModel {
 	private String[] headers = {
 	    "Start Date", "End Date", "Symbols", "Buy Rule", "Sell Rule",
-	    "Trade Cost", "Initial Capital", "Final Capital", "Return"};
+	    "Trade Cost", "No. Trades", "Initial Capital", "Final Capital", 
+	    "Return"};
 	    
 	private Class[] columnClasses = {
 	    TradingDate.class, TradingDate.class, String.class, String.class,
-	    String.class, Float.class, Float.class, Float.class, Change.class};
+	    String.class, Float.class, Integer.class, Float.class, 
+	    Float.class, Change.class};
 	
 	private Vector results;
 
@@ -158,28 +162,25 @@ public class PaperTradeResultModule extends AbstractTable
 		(PaperTradeResult)results.elementAt(row);
 
 	    if(column == START_DATE_COLUMN) {
+		System.out.println("start date " + result.startDate);
 		return result.startDate;
 	    }
 
 	    else if(column == END_DATE_COLUMN) {
+		System.out.println("end date " + result.endDate);
 		return result.endDate;
 	    }
 
 	    else if(column == SYMBOLS_COLUMN) {
 		Vector symbolsTraded = result.portfolio.getSymbolsTraded();
 
-		String string = null;
+		String string = new String();
 		Iterator iterator = symbolsTraded.iterator();
 		while(iterator.hasNext()) {
 		    String symbol = (String)iterator.next();
 		    symbol = symbol.toUpperCase();
 
-		    if(string == null) {
-			string = new String(symbol);
-		    }
-		    else {
-			string = string.concat(", " + symbol);
-		    }
+		    string = string.concat(", " + symbol);
 		}
 
 		return string;
@@ -195,6 +196,16 @@ public class PaperTradeResultModule extends AbstractTable
 	    
 	    else if(column == TRADE_COST_COLUMN) {
 		return new Float(result.tradeCost);
+	    }
+
+	    else if(column == NUMBER_OF_TRADES_COLUMN) {
+		Portfolio portfolio = result.portfolio;
+		int accumulateTrades = 
+		    portfolio.countTransactions(Transaction.ACCUMULATE);
+		int reduceTrades =
+		    portfolio.countTransactions(Transaction.REDUCE);
+
+		return new Integer(accumulateTrades + reduceTrades);
 	    }
 
 	    else if(column == FINAL_CAPITAL_COLUMN) {
@@ -216,6 +227,10 @@ public class PaperTradeResultModule extends AbstractTable
 						     result.endDate);
 
 		return Converter.changeToChange(startValue, endValue);
+	    }
+
+	    else {
+		assert false;
 	    }
 
 	    return "";
@@ -285,6 +300,9 @@ public class PaperTradeResultModule extends AbstractTable
 	    showTradeCostColumn = 
 		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 					       "Trade Cost");
+	    showNumberOfTradesColumn = 
+		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
+					       "Number of Trades");
 	    showInitialCapitalColumn = 
 		MenuHelper.addCheckBoxMenuItem(this, columnMenu,
 					       "Initial Capital");
@@ -307,6 +325,7 @@ public class PaperTradeResultModule extends AbstractTable
 	    // Tell table model not to show these columns - by default
 	    // they will all be visible
 	    showColumn(TRADE_COST_COLUMN, false);
+	    showColumn(NUMBER_OF_TRADES_COLUMN, false);
 	    showColumn(FINAL_CAPITAL_COLUMN, false);
 	}
 
@@ -424,6 +443,9 @@ public class PaperTradeResultModule extends AbstractTable
 
 	    else if(menuItem == showTradeCostColumn) 
 		column = TRADE_COST_COLUMN;
+
+	    else if(menuItem == showNumberOfTradesColumn) 
+		column = NUMBER_OF_TRADES_COLUMN;
 
 	    else if(menuItem == showInitialCapitalColumn) 
 		column = INITIAL_CAPITAL_COLUMN;

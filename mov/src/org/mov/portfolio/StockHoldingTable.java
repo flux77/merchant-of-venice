@@ -150,8 +150,8 @@ public class StockHoldingTable extends AbstractTable {
                     // yesterday's day close and today's day close. If we don't
                     // have yesterday's day close available, we just use today's
                     // day open. These first two should always work.
-                    float finalQuote = quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date);
-                    float initialQuote = quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date);
+                    double finalQuote = quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date);
+                    double initialQuote = quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date);
 
                     // There might not be any quotes for yesterday, so don't throw an
                     // assert if we can't get any.
@@ -177,8 +177,8 @@ public class StockHoldingTable extends AbstractTable {
                     // yesterday's day close and today's day close. If we don't
                     // have yesterday's day close available, we just use today's
                     // day open. These first two should always work.
-                    float finalQuote = quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date);
-                    float initialQuote = quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date);
+                    double finalQuote = quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date);
+                    double initialQuote = quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date);
 
                     // There might not be any quotes for yesterday, so don't throw an
                     // assert if we can't get any.

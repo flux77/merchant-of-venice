@@ -239,7 +239,7 @@ public class PaperTradeModule extends JPanel implements Module {
     private PaperTradeResult paperTrade(ProgressDialog progress,
                                         ScriptQuoteBundle quoteBundle,
                                         String quoteRangeDescription,
-                                        OrderComparator orderComparator,
+                                        OrderCache orderCache,
                                         TradingDate startDate,
                                         TradingDate endDate,
                                         Expression buyRule,
@@ -260,7 +260,7 @@ public class PaperTradeModule extends JPanel implements Module {
                                               quoteRangeDescription,
                                               quoteBundle,
                                               variables,
-                                              orderComparator,
+                                              orderCache,
                                               startDate,
                                               endDate,
                                               buyRule,
@@ -275,7 +275,7 @@ public class PaperTradeModule extends JPanel implements Module {
                                               quoteRangeDescription,
                                               quoteBundle,
                                               variables,
-                                              orderComparator,
+                                              orderCache,
                                               startDate,
                                               endDate,
                                               buyRule,
@@ -328,6 +328,7 @@ public class PaperTradeModule extends JPanel implements Module {
         quoteBundle = new ScriptQuoteBundle(quoteRangePage.getQuoteRange());
 
         OrderComparator orderComparator = quoteRangePage.getOrderComparator(quoteBundle);
+        OrderCache orderCache = new OrderCache(quoteBundle, orderComparator);
         String quoteRangeDescription = quoteBundle.getQuoteRange().getDescription();
 
         // If we are using a rule family, how many equations are in the family?
@@ -342,6 +343,8 @@ public class PaperTradeModule extends JPanel implements Module {
 
         // Iterate through all possible paper trade equations
         List paperTradeResults = new ArrayList(numberEquations);
+
+        long startTime = System.currentTimeMillis();
 
         try {
             Variables variables = new Variables();
@@ -373,7 +376,7 @@ public class PaperTradeModule extends JPanel implements Module {
                             paperTradeResults.add(paperTrade(progress,
                                                              quoteBundle,
                                                              quoteRangeDescription,
-                                                             orderComparator,
+                                                             orderCache,
                                                              startDate,
                                                              endDate,
                                                              buyRule,
@@ -395,7 +398,7 @@ public class PaperTradeModule extends JPanel implements Module {
                 paperTradeResults.add(paperTrade(progress,
                                                  quoteBundle,
                                                  quoteRangeDescription,
-                                                 orderComparator,
+                                                 orderCache,
                                                  startDate,
                                                  endDate,
                                                  buyRule,
@@ -419,6 +422,11 @@ public class PaperTradeModule extends JPanel implements Module {
 
             return null;
         }
+
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("Total time (s) " + (endTime - startTime));
+
 
         ProgressDialogManager.closeProgressDialog(progress);
 	return paperTradeResults;

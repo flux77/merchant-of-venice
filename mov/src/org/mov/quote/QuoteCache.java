@@ -62,6 +62,8 @@ public class QuoteCache {
     private static QuoteCache instance = null;
 
     private class QuoteCacheQuote {
+        // Floats have more than enough precision to hold quotes. So we
+        // store them as floats rather than doubles to reduce memory.
         public int day_volume;
         public float day_low;
         public float day_high;
@@ -77,18 +79,18 @@ public class QuoteCache {
             this.day_close = day_close;
         }
 
-        public float getQuote(int quote) {
+        public double getQuote(int quote) {
             switch(quote) {
             case(Quote.DAY_OPEN):
-                return day_open;
+                return (double)day_open;
             case(Quote.DAY_CLOSE):
-                return day_close;
+                return (double)day_close;
             case(Quote.DAY_LOW):
-                return day_low;
+                return (double)day_low;
             case(Quote.DAY_HIGH):
-                return day_high;
+                return (double)day_high;
             case(Quote.DAY_VOLUME):
-                return day_volume;
+                return (double)day_volume;
             default:
                 assert false;
                 return 0.0F;
@@ -152,7 +154,7 @@ public class QuoteCache {
      * @return the quote
      * @exception QuoteNotLoadedException if the quote was not in the cache
      */
-    public float getQuote(Symbol symbol, int quoteType, int dateOffset)
+    public double getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws QuoteNotLoadedException {
 
 	// Get the quote cache quote for the given symbol + date

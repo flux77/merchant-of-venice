@@ -24,7 +24,7 @@ import org.mov.parser.*;
 /**
  * An expression which finds the maximum quote over a given trading period.
  */
-public class MaxExpression extends QuoteExpression {
+public class MaxExpression extends TernaryExpression {
     
     /**
      * Create a new maximum expression for the given <code>quote</code> kind,
@@ -37,25 +37,20 @@ public class MaxExpression extends QuoteExpression {
      */
     public MaxExpression(Expression quote, Expression days,
 			 Expression lag) {
-	super(quote);
-
-        assert quote != null && days != null && lag != null;
-
-	add(quote);
-	add(days);
-	add(lag);
+	super(quote, days, lag);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
 	int days = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = ((QuoteExpression)get(0)).getQuoteKind();
 
         if(days <= 0)
-            throw new EvaluationException("Range for max() needs to be >0");
+            throw EvaluationException.rangeForMax();
 
         int offset = (int)get(2).evaluate(variables, quoteBundle, symbol, day);
-	return max(quoteBundle, symbol, getQuoteKind(), days, day, offset);
+	return max(quoteBundle, symbol, quoteKind, days, day, offset);
     }
 
     public String toString() {
@@ -76,20 +71,25 @@ public class MaxExpression extends QuoteExpression {
 	    throw new TypeMismatchException();
     }
 
-    public int getNeededChildren() {
-	return 3;
+    public int getType() {
+        if(get(0).getType() == FLOAT_QUOTE_TYPE)
+            return FLOAT_TYPE;
+        else {
+            assert get(0).getType() == INTEGER_QUOTE_TYPE;
+            return INTEGER_TYPE;
+        }
     }
 
-    private float max(QuoteBundle quoteBundle, Symbol symbol, 
+    private double max(QuoteBundle quoteBundle, Symbol symbol, 
                       int quote, int days, int day, int offset)
         throws EvaluationException {
 
-	float max = 0.0F;
+	double max = 0.0F;
 	
 	for(int i = offset - days + 1; i <= offset; i++) {
 
             try {
-                float value = quoteBundle.getQuote(symbol, quote, day, i);
+                double value = quoteBundle.getQuote(symbol, quote, day, i);
                 
                 if(value > max)
                     max = value;

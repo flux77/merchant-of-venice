@@ -19,7 +19,6 @@
 package org.mov.analyser;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +42,6 @@ public class PaperTrade {
         public ShareAccount shareAccount;
         public int startDateOffset;
         public int endDateOffset;
-        public List allSymbols;
 
         public Environment(QuoteBundle quoteBundle,
                            String portfolioName,
@@ -80,34 +78,6 @@ public class PaperTrade {
                 
                 startDateOffset = endDateOffset = 0;
             }
-        }
-    }
-
-    public static List getTodaySymbols(Environment environment,
-                                       QuoteBundle quoteBundle,
-                                       OrderComparator orderComparator,
-                                       int dateOffset) {
-
-        // If we don't care about the order then we can just return
-        // all the symbols. This is fast because we can do it once
-        // and cache the result
-        if(orderComparator == null) {
-            if(environment.allSymbols == null)
-                environment.allSymbols = quoteBundle.getAllSymbols();
-
-            return environment.allSymbols;
-        }
-
-        // Otherwise we have to find the list of symbols just for
-        // today and sort them, which is very slow.
-        else {
-            List symbols = quoteBundle.getSymbols(dateOffset);
-
-            // Sort
-            orderComparator.setDateOffset(dateOffset);
-            Collections.sort(symbols, orderComparator);            
-
-            return symbols;
         }
     }
 
@@ -152,8 +122,8 @@ public class PaperTrade {
 	throws MissingQuoteException {
 
 	// Calculate maximum number of shares we can buy with the given amount
-	float sharePrice = environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day);
-	int shares = (int)Math.floor(amount.floatValue() / sharePrice);
+	double sharePrice = environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day);
+	int shares = (int)Math.floor(amount.doubleValue() / sharePrice);
 	
 	// Now calculate the actual amount the shares will cost
 	amount = new Money(sharePrice * shares);
@@ -177,7 +147,7 @@ public class PaperTrade {
                                    int dateOffset,
                                    Money tradeCost,
                                    List symbols,
-                                   OrderComparator orderComparator) 
+                                   OrderCache orderCache) 
         throws EvaluationException {
 
         // Iterate through our stock holdings and see if we should sell any
@@ -187,14 +157,14 @@ public class PaperTrade {
             StockHolding stockHolding = (StockHolding)iterator.next();
             Symbol symbol = stockHolding.getSymbol();
             
-            // Skip it if for some reason we don't have a quote for it today
-            if(!environment.quoteCache.containsQuote(symbol, dateOffset))
-                continue;
-
-            // If we care about the order, make sure the "order" variable is set
-            if(orderComparator != null) {
+            // If we care about the order, make sure the "order" variable is set.
+            if(orderCache.isOrdered()) {
                 int order = symbols.indexOf(symbol);
-                assert order != -1;
+
+                // It's possible that we don't have a quote for the symbol today.
+                // So skip it.
+                if(order == -1)
+                    continue;
                 variables.setValue("order", order);
             }
 
@@ -217,7 +187,7 @@ public class PaperTrade {
                                   int dateOffset,
                                   Money tradeCost,
                                   List symbols,
-                                  OrderComparator orderComparator,
+                                  OrderCache orderCache,
                                   Money stockValue) 
         throws EvaluationException {
 
@@ -234,12 +204,11 @@ public class PaperTrade {
             for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
                 Symbol symbol = (Symbol)iterator.next();
 
-                // Skip if we already own it or we don't have a quote for it
-                if(!environment.shareAccount.isHolding(symbol) &&
-                   environment.quoteCache.containsQuote(symbol, dateOffset)) {
+                // Skip if we already own it
+                if(!environment.shareAccount.isHolding(symbol)) {
                    
                     // If we care about the order, make sure the "order" variable is set
-                    if(orderComparator != null)
+                    if(orderCache.isOrdered())
                         variables.setValue("order", order);
 
                     try {
@@ -282,7 +251,7 @@ public class PaperTrade {
     public static Portfolio paperTrade(String portfolioName,
                                        QuoteBundle quoteBundle, 
                                        Variables variables,
-                                       OrderComparator orderComparator,
+                                       OrderCache orderCache,
                                        TradingDate startDate, 
 				       TradingDate endDate,
 				       Expression buy,
@@ -301,7 +270,7 @@ public class PaperTrade {
                                                              capital);
         int dateOffset = environment.startDateOffset;
 
-        if(orderComparator != null && !variables.contains("order"))
+        if(orderCache.isOrdered() && !variables.contains("order"))
             variables.add("order", Expression.INTEGER_TYPE);
         if(!variables.contains("held"))
             variables.add("held", Expression.INTEGER_TYPE);
@@ -311,13 +280,14 @@ public class PaperTrade {
 	// date's buy/sell orders.
 	while(dateOffset < environment.endDateOffset) {
 
-            // Get and order all of todays symbols that we can trade
-            List symbols = getTodaySymbols(environment, quoteBundle, orderComparator, dateOffset);
+            // Get all the (ordered) symbols that we can trade for today and
+            // that we have quotes for.
+            List symbols = orderCache.getTodaySymbols(dateOffset);
 
             sellTrades(environment, quoteBundle, variables, sell, dateOffset, tradeCost, 
-                       symbols, orderComparator);
+                       symbols, orderCache);
             buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost, 
-                      symbols, orderComparator, stockValue);
+                      symbols, orderCache, stockValue);
 
             dateOffset++;
         }
@@ -328,7 +298,7 @@ public class PaperTrade {
     public static Portfolio paperTrade(String portfolioName,
                                        QuoteBundle quoteBundle, 
                                        Variables variables,
-                                       OrderComparator orderComparator,
+                                       OrderCache orderCache,
                                        TradingDate startDate, 
 				       TradingDate endDate,
 				       Expression buy,
@@ -347,7 +317,7 @@ public class PaperTrade {
                                                              capital);
         int dateOffset = environment.startDateOffset;
 
-        if(orderComparator != null && !variables.contains("order"))
+        if(orderCache.isOrdered() && !variables.contains("order"))
             variables.add("order", Expression.INTEGER_TYPE);
         if(!variables.contains("held"))
             variables.add("held", Expression.INTEGER_TYPE);
@@ -357,18 +327,19 @@ public class PaperTrade {
 	// date's buy/sell orders.
 	while(dateOffset < environment.endDateOffset) {
 
-            // Get and order all of todays symbols that we can trade
-            List symbols = getTodaySymbols(environment, quoteBundle, orderComparator, dateOffset);
+            // Get all the (ordered) symbols that we can trade for today and
+            // that we have quotes for.
+            List symbols = orderCache.getTodaySymbols(dateOffset);
 
             sellTrades(environment, quoteBundle, variables, sell, dateOffset, tradeCost, 
-                       symbols, orderComparator);
+                       symbols, orderCache);
             try {
                 // stockValue = (portfolio / numberStocks) - (2 * tradeCost)
                 Money portfolioValue = environment.portfolio.getValue(quoteBundle, dateOffset);
                 Money stockValue = 
                     portfolioValue.divide(numberStocks).subtract(tradeCost.multiply(2));
                 buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost, 
-                          symbols, orderComparator, stockValue);
+                          symbols, orderCache, stockValue);
             }
             catch(MissingQuoteException e) {
                 // Ignore and move on

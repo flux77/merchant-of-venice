@@ -52,7 +52,7 @@ public class OBVGraph extends AbstractGraph {
      * @param	start	arbitary start value
      */
     public OBVGraph(GraphSource open, GraphSource close,
-		    GraphSource volume, float start) {
+		    GraphSource volume, double start) {
 	
 	// Use same axis as volume
 	super(volume);
@@ -63,8 +63,8 @@ public class OBVGraph extends AbstractGraph {
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderLine(g, obv, xoffset, yoffset, 
@@ -73,19 +73,19 @@ public class OBVGraph extends AbstractGraph {
     }
 
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue)
+				 double verticalScale,
+				 double bottomLineValue)
     {
 	return null; // we never give tool tip information
     }
 
     // Override base class
-    public float getHighestY(List x) {
+    public double getHighestY(List x) {
 	return obv.getHighestY(x);
     }
 
     // Override base class
-    public float getLowestY(List x) {
+    public double getLowestY(List x) {
 	return obv.getLowestY(x);
     }
 
@@ -99,7 +99,7 @@ public class OBVGraph extends AbstractGraph {
      * @return	the OBV
      */
     public static Graphable createOBV(Graphable open, Graphable close,
-				      Graphable volume, float runningOBV) {
+				      Graphable volume, double runningOBV) {
 
 	Graphable obv = new Graphable();
 
@@ -109,16 +109,16 @@ public class OBVGraph extends AbstractGraph {
 	while(iterator.hasNext()) {
 	    Comparable x = (Comparable)iterator.next();
 
-	    Float dayOpen = open.getY(x);
-	    Float dayClose = close.getY(x);
-	    Float dayVolume = volume.getY(x);
+	    Double dayOpen = open.getY(x);
+	    Double dayClose = close.getY(x);
+	    Double dayVolume = volume.getY(x);
 
 	    if(dayClose.compareTo(dayOpen) > 0) 
 		runningOBV += dayVolume.intValue();
 	    else if(dayClose.compareTo(dayOpen) < 0)
 		runningOBV -= dayVolume.intValue();
 
-	    obv.putY(x, new Float(runningOBV));
+	    obv.putY(x, new Double(runningOBV));
 	}
 
 	return obv;

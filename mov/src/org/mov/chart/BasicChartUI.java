@@ -73,7 +73,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     private static final int SECONDARY_HEIGHT_UNITS = 1;
 
     // These variables are the same for each graph we draw
-    private float horizontalScale;
+    private double horizontalScale;
     private int firstHorizontalLine;
 
     // We buffer the graph image for speed so we dont have to recalculate
@@ -656,7 +656,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
 		// Insert X value into text field
 		text = x.toString() + ": " + text;
-		Float y = graph.getY(x);
+		Double y = graph.getY(x);
 
 		// Ignore annotations where the data source has no y value
 		if(y != null) {
@@ -665,7 +665,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		    int yCoordinate = yoffset + 
 			verticalAxis.getHeightOfGraph() - 
 			GraphTools.
-			scaleAndFitPoint(y.floatValue(),
+			scaleAndFitPoint(y.doubleValue(),
 					 verticalAxis.getBottomLineValue(), 
 					 verticalAxis.getScale());
 
@@ -698,10 +698,10 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
     // Find the lowest Y value for all the graphs in the given vector
     // over the given X range.
-    private float getLowestY(Vector x, Vector graphs) {
+    private double getLowestY(Vector x, Vector graphs) {
 	Iterator iterator = graphs.iterator();
-	float y;
-	float lowestY = Float.MAX_VALUE;
+	double y;
+	double lowestY = Double.MAX_VALUE;
 
 	while(iterator.hasNext()) {
 		
@@ -715,10 +715,10 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
     // Find the highest Y value for all the graphs in the given vector
     // over the given X range.
-    private float getHighestY(Vector x, Vector graphs) {
+    private double getHighestY(Vector x, Vector graphs) {
 	Iterator iterator = graphs.iterator();
-	float y;
-	float highestY = Float.NEGATIVE_INFINITY;
+	double y;
+	double highestY = Double.NEGATIVE_INFINITY;
 
 	while(iterator.hasNext()) {
 

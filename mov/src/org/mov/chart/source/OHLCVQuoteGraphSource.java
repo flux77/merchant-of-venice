@@ -55,14 +55,14 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 
 	// Build graphable so this source can be directly graphed
 	graphable = new Graphable();
-	Float value;
+	Double value;
 
 	for(TradingDate date = quoteBundle.getFirstDate();
 	    date.compareTo(quoteBundle.getLastDate()) <= 0;
 	    date = date.next(1)) {
 
 	    try {
-		value = new Float(quoteBundle.getQuote(symbol, quote, date));
+		value = new Double(quoteBundle.getQuote(symbol, quote, date));
 		graphable.putY((Comparable)date, value);
 	    }
 	    catch(MissingQuoteException e) {
@@ -129,10 +129,10 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	}
     }
 
-    public String getYLabel(float value) {
+    public String getYLabel(double value) {
 	if(quote == Quote.DAY_VOLUME) {
-	    final float BILLION = 1000000000F;
-	    final float MILLION = 1000000F;
+	    final double BILLION = 1000000000F;
+	    final double MILLION = 1000000F;
 	    String extension = "";
 	    
 	    if(Math.abs(value) >= BILLION) {
@@ -151,10 +151,10 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	}
     }
 
-    public float[] getAcceptableMajorDeltas() {
+    public double[] getAcceptableMajorDeltas() {
 
 	if(quote == Quote.DAY_VOLUME) {
-	    float[] major = {10F,
+	    double[] major = {10F,
 			     100F,
 			     1000F, // 1T
 			     10000F,
@@ -167,7 +167,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    return major;
 	}
 	else {
-	    float[] major = {0.001F, // 0.1c
+	    double[] major = {0.001F, // 0.1c
 			     0.01F, // 1c
 			     0.1F, // 10c
 			     1.0F, // $1
@@ -178,13 +178,13 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	}
     }
 
-    public float[] getAcceptableMinorDeltas() {
+    public double[] getAcceptableMinorDeltas() {
 	if(quote == Quote.DAY_VOLUME) {
-	    float[] minor = {1F, 1.5F, 2F, 2.5F, 3F, 4F, 5F, 6F, 8F};
+	    double[] minor = {1F, 1.5F, 2F, 2.5F, 3F, 4F, 5F, 6F, 8F};
 	    return minor;
 	}
 	else {
-	    float[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F, 
+	    double[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F, 
 			     2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F, 
 			     8F, 9F};
 	    return minor;

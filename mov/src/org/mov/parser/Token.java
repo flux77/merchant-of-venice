@@ -165,7 +165,7 @@ public class Token {
     private int type;
 
     // For NUMBER_TOKEN - the actual number
-    private float value; 
+    private double value; 
 
     // For VARIABLE_TOKEN - the variable name 
     private String valueName;
@@ -238,7 +238,7 @@ public class Token {
 
         // Is it a float or an integer number?
 	if(Character.isDigit(string.charAt(0))) {
-	    float value = 0.0F; 
+	    double value = 0.0F; 
 	    String numberString = new String();
 
             // Any values are considered to be integers, unless we find a decimal
@@ -255,9 +255,9 @@ public class Token {
 		    (Character.isDigit(string.charAt(0)) ||
 		    string.charAt(0) == '.'));
 
-	    // Now convert number string to float value
+	    // Now convert number string to double value
 	    try {
-		value = Float.parseFloat(numberString);
+		value = Double.parseDouble(numberString);
 	    }
 	    catch(NumberFormatException e) {
 		throw new ParserException("malformed number");
@@ -370,7 +370,7 @@ public class Token {
      *
      * @return	the value.
      */
-    public float getValue() {
+    public double getValue() {
         assert getType() == NUMBER_TOKEN;
 	return value;
     }
@@ -415,7 +415,7 @@ public class Token {
     }
 
     // For number tokens, set the value.
-    private void setValue(float value) {
+    private void setValue(double value) {
         assert getType() == NUMBER_TOKEN;
 	this.value = value;
     }

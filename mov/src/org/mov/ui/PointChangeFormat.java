@@ -22,17 +22,17 @@ import java.lang.Comparable;
 import java.text.NumberFormat;
 
 public class PointChangeFormat implements Comparable {
-    float change;
+    double change;
 
-    public PointChangeFormat(float change) {
+    public PointChangeFormat(double change) {
 	this.change = change;
     }
 
-    public PointChangeFormat(float initialValue, float finalValue) {
+    public PointChangeFormat(double initialValue, double finalValue) {
         change = (finalValue - initialValue) * 100;
     }
 
-    public float getPointChange() {
+    public double getPointChange() {
 	return change;
     }
 

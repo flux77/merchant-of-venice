@@ -33,7 +33,7 @@ public class RSIExpression extends Expression {
 	add(lag);
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 	
 	int days = (int)get(0).evaluate(variables, quoteBundle, symbol, day);

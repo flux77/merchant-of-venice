@@ -44,8 +44,8 @@ public class BarGraph extends AbstractGraph {
 
     // See Graph.java
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderBar(g, getSource().getGraphable(), 

@@ -55,7 +55,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(Symbol symbol, int quoteType, int dateOffset)
+    public double getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException {
 
         return quoteBundle.getQuote(symbol, quoteType, dateOffset);
@@ -75,16 +75,16 @@ public class GPQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception EvaluationException if the script isn't allowed access to the quote.
      */
-    public float getQuote(Symbol symbol, int quoteType, int today, int offset)
+    public double getQuote(Symbol symbol, int quoteType, int today, int offset)
 	throws EvaluationException, MissingQuoteException {
         
         // Trying to access a future quote?
         if(offset > 0)
-            throw new EvaluationException("future date");
+            throw EvaluationException.futureDate();
 
         // Trying to access a date too far into the past?
         else if(offset < earliestDateOffset)
-            throw new EvaluationException("date too far into the past");
+            throw EvaluationException.pastDate();
 
         // Date is within range
         else
@@ -101,7 +101,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(Symbol symbol, int quoteType, TradingDate date) 
+    public double getQuote(Symbol symbol, int quoteType, TradingDate date) 
         throws MissingQuoteException {
         assert false;
         return 0.0F;

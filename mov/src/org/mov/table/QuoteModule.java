@@ -138,7 +138,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	private Class[] columnClasses = {
 	    Symbol.class, TradingDate.class, Integer.class, QuoteFormat.class, QuoteFormat.class,
 	    QuoteFormat.class, QuoteFormat.class, PointChangeFormat.class,
-            ChangeFormat.class, Float.class};
+            ChangeFormat.class, Double.class};
 
 	private ScriptQuoteBundle quoteBundle;
 	private List quotes;
@@ -218,8 +218,8 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 // yesterday's day close and today's day close. If we don't
                 // have yesterday's day close available, we just use today's
                 // day open.
-                float finalQuote = quote.getDayClose();
-                float initialQuote = quote.getDayOpen();
+                double finalQuote = quote.getDayClose();
+                double initialQuote = quote.getDayOpen();
 
                 try {
                     initialQuote = 
@@ -255,7 +255,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 // calculate "the most active stocks" or whether we even
                 // have enough data to do it. But this seems to be roughly
                 // right.
-                return new Float(quote.getDayHigh() * quote.getDayVolume());
+                return new Double(quote.getDayHigh() * quote.getDayVolume());
             }
             
             if(column >= EQUATION_COLUMN) {
@@ -266,11 +266,11 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 // equations. If it is empty, we haven't created an
                 // equation in that column.
                 if(results != null && results.size() > row)
-                    return (Float)results.get(row);
+                    return (Double)results.get(row);
 
                 // No equation? Just display 0.
                 else
-                    return new Float(0.0F);
+                    return new Double(0.0F);
             }
 
             assert false;
@@ -755,20 +755,20 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
                     try {
                         int dateOffset = quoteBundle.dateToOffset(quote.getDate());
-                        float result = expression.evaluate(new Variables(), 
-                                                           quoteBundle, quote.getSymbol(), 
-                                                           dateOffset);
-                        results.add(new Float(result));
+                        double result = expression.evaluate(new Variables(), 
+                                                            quoteBundle, quote.getSymbol(), 
+                                                            dateOffset);
+                        results.add(new Double(result));
                     }
                     catch(EvaluationException e) {
                         // Should display error message to user
                         assert false;
-                        results.add(new Float(0.0));
+                        results.add(new Double(0.0F));
                     }
                     catch(WeekendDateException e) {
                         // Shouldn't happen
                         assert false;
-                        results.add(new Float(0.0));
+                        results.add(new Double(0.0F));
                     }
                 }
             }

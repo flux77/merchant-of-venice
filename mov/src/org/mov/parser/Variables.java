@@ -36,7 +36,7 @@ public class Variables {
         add(name, type, 0.0F);
     }
 
-    public void add(String name, int type, float value) {
+    public void add(String name, int type, double value) {
         if(!variables.containsKey(name)) {
             Variable variable = new Variable(name, type, value);
             variables.put(name, variable);
@@ -54,7 +54,7 @@ public class Variables {
             assert false;
     }
 
-    public void setValue(String name, float value) {
+    public void setValue(String name, double value) {
         Variable variable = get(name);
 
         if(variable != null)
@@ -72,7 +72,7 @@ public class Variables {
             assert false;
     }
 
-    public float getValue(String name) {
+    public double getValue(String name) {
         Variable variable = get(name);
 
         if(variable != null)

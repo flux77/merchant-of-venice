@@ -52,7 +52,7 @@ public interface QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(Symbol symbol, int quoteType, int dateOffset)
+    public double getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException;
 
     /** 
@@ -69,7 +69,7 @@ public interface QuoteBundle {
      * @return the quote
      * @exception EvaluationException if the script isn't allow access to the quote.
      */
-    public float getQuote(Symbol symbol, int quoteType, int today, int offset)
+    public double getQuote(Symbol symbol, int quoteType, int today, int offset)
 	throws EvaluationException, MissingQuoteException;
 
     /** 
@@ -82,7 +82,7 @@ public interface QuoteBundle {
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
-    public float getQuote(Symbol symbol, int quoteType, TradingDate date) 
+    public double getQuote(Symbol symbol, int quoteType, TradingDate date) 
 	throws MissingQuoteException;
 
     /**

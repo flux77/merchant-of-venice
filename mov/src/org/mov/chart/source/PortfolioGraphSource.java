@@ -122,8 +122,8 @@ public class PortfolioGraphSource implements GraphSource {
 	    }
 
 	    try {
-		Float value =
-		    new Float(temporaryPortfolio.getValue(quoteBundle, date).floatValue());
+		Double value =
+		    new Double(temporaryPortfolio.getValue(quoteBundle, date).doubleValue());
 		graphable.putY((Comparable)date, value);
 	    }
 	    catch(MissingQuoteException e) {
@@ -155,9 +155,9 @@ public class PortfolioGraphSource implements GraphSource {
 
 		// If its a cash deposit/withdrawal we need to update
 		// our cash value
-		if(transaction.getType() == Transaction.WITHDRAWAL) 
+		if(transaction.getType() == Transaction.WITHDRAWAL)
 		    depositedCash = depositedCash.subtract(transaction.getAmount());
-		else if(transaction.getType() == Transaction.DEPOSIT) 
+		else if(transaction.getType() == Transaction.DEPOSIT)
 		    depositedCash = depositedCash.add(transaction.getAmount());
 
 		temporaryPortfolio.addTransaction(transaction);
@@ -170,7 +170,7 @@ public class PortfolioGraphSource implements GraphSource {
 
 	    try {
                 Money portfolioValue = temporaryPortfolio.getValue(quoteBundle, date);
-		Float value = new Float(portfolioValue.subtract(depositedCash).floatValue());
+		Double value = new Double(portfolioValue.subtract(depositedCash).doubleValue());
 		graphable.putY((Comparable)date, value);
 	    }
 	    catch(MissingQuoteException e) {
@@ -195,7 +195,7 @@ public class PortfolioGraphSource implements GraphSource {
 	TradingDate date = (TradingDate)x;
 
 	// Get value for this date
-	Float value = graphable.getY(x);
+	Double value = graphable.getY(x);
 	
 	if(value != null) {
 	    String name = portfolio.getName();
@@ -208,19 +208,19 @@ public class PortfolioGraphSource implements GraphSource {
 			      ", " +
 			      date.toLongString() +
 			      "<p>" +
-			      getYLabel(value.floatValue()));
+			      getYLabel(value.doubleValue()));
 	}
 	else {
 	    return null;
 	}
     }
 
-    public String getYLabel(float value) {
+    public String getYLabel(double value) {
         return Money.toString(value);
     }
 
-    public float[] getAcceptableMajorDeltas() {
-	float[] major = {0.001F, // 0.1c
+    public double[] getAcceptableMajorDeltas() {
+	double[] major = {0.001F, // 0.1c
 			 0.01F, // 1c
 			 0.1F, // 10c
 			 1.0F, // $1
@@ -238,8 +238,8 @@ public class PortfolioGraphSource implements GraphSource {
 	return major;	
     }
 
-    public float[] getAcceptableMinorDeltas() {
-	float[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F,
+    public double[] getAcceptableMinorDeltas() {
+	double[] minor = {1F, 1.1F, 1.25F, 1.3333F, 1.5F, 2F, 2.25F,
 			 2.5F, 3F, 3.3333F, 4F, 5F, 6F, 6.5F, 7F, 7.5F,
 			 8F, 9F};
 	return minor;

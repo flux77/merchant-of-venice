@@ -406,10 +406,10 @@ public class FileQuoteSource implements QuoteSource
                         quoteCache.load(quote.getSymbol(),
                                         quote.getDate(),
                                         quote.getDayVolume(),
-                                        quote.getDayLow(),
-                                        quote.getDayHigh(),
-                                        quote.getDayOpen(),
-                                        quote.getDayClose());
+                                        (float)quote.getDayLow(),
+                                        (float)quote.getDayHigh(),
+                                        (float)quote.getDayOpen(),
+                                        (float)quote.getDayClose());
                     }
                 }
                 

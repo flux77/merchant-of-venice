@@ -44,8 +44,8 @@ public class LineGraph extends AbstractGraph {
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange) {
 
 	g.setColor(colour);
 	GraphTools.renderLine(g, getSource().getGraphable(), xoffset, yoffset, 
@@ -54,14 +54,14 @@ public class LineGraph extends AbstractGraph {
     }
 
     public String getToolTipText(Comparable x, int yCoordinate, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue)
+				 double verticalScale,
+				 double bottomLineValue)
     {
-	Float y = getY(x);
+	Double y = getY(x);
 	
 	if(y != null) {
 	    int yOfGraph = yoffset - 
-		GraphTools.scaleAndFitPoint(y.floatValue(),
+		GraphTools.scaleAndFitPoint(y.doubleValue(),
 					    bottomLineValue, verticalScale);
 	    // Its our graph *only* if its within 5 pixels	    
 	    if(Math.abs(yCoordinate - yOfGraph) < Graph.TOOL_TIP_BUFFER) 

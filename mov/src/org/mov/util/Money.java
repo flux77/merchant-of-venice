@@ -59,7 +59,7 @@ public class Money implements Cloneable, Comparable {
      * 
      * @param amount the amount of money.
      */
-    public Money(float amount) {
+    public Money(double amount) {
         this.amount = (long)(amount * 100.0F);
     }
 
@@ -78,10 +78,10 @@ public class Money implements Cloneable, Comparable {
             this.amount = (long)(number.doubleValue() * 100.0F);
         }
         catch(ParseException e2) {
-            // If that doesn't work try parsing it as a simple float
+            // If that doesn't work try parsing it as a simple double
             try {
-                Float floatNumber = Float.valueOf(string);
-                this.amount = (long)(floatNumber.doubleValue() * 100.0F);
+                double doubleValue = Double.parseDouble(string);
+                this.amount = (long)(doubleValue * 100.0F);
             }
             catch(NumberFormatException e) {
                 throw new MoneyFormatException(string);
@@ -105,7 +105,7 @@ public class Money implements Cloneable, Comparable {
      * @param money the money to add.
      * @return the resultant <code>Money</code>.
      */
-    public Money add(float money) {
+    public Money add(double money) {
         return new Money(amount + (long)(money * 100.0F));
     }
 
@@ -209,7 +209,7 @@ public class Money implements Cloneable, Comparable {
      * @param amount the amount of money
      * @return the string representation.
      */
-    public static String toString(float amount) {
+    public static String toString(double amount) {
         return format.format(amount);
     }
 
@@ -219,17 +219,17 @@ public class Money implements Cloneable, Comparable {
      * @return the string representation.
      */
     public String toString() {
-        return format.format(floatValue());
+        return format.format(doubleValue());
     }
 
     /** 
-     * Return the value of this <code>Money</code> as a <code>float</code>.
+     * Return the value of this <code>Money</code> as a <code>double</code>.
      *
      * @return the numeric value represented by this object after 
-     *         conversion to type <code>float</code>.
+     *         conversion to type <code>double</code>.
      */
-    public float floatValue() {
-        float cents = (float)amount;
+    public double doubleValue() {
+        double cents = (double)amount;
         return cents / 100.0F;
     }
 

@@ -45,7 +45,7 @@ public class HorizontalAxis {
     // Factors determing height of grid lines
     static final int STATIC_GRID_HEIGHT = 5;
     static final int VARIABLE_GRID_HEIGHT_SCALE = 50;
-    static final float MAJOR_MINOR_GRID_PROPORTION = 1.5F;
+    static final double MAJOR_MINOR_GRID_PROPORTION = 1.5F;
 
     private Vector dates;
     private Vector points;
@@ -88,7 +88,7 @@ public class HorizontalAxis {
 	}
     }
 
-    public void drawLabels(Graphics g, float scale, int x, int y) {
+    public void drawLabels(Graphics g, double scale, int x, int y) {
 	Integer value;
 	int lastValue = 0;
 	TradingDate date, lastDate;
@@ -128,17 +128,17 @@ public class HorizontalAxis {
 	}
     }
 
-    public static float calculateScale(int width, int dataPoints) {
-	float horizontalScale = 1.0F;
+    public static double calculateScale(int width, int dataPoints) {
+	double horizontalScale = 1.0F;
 	
 	if(dataPoints < width) {
-	    horizontalScale = (float)width / dataPoints;
+	    horizontalScale = (double)width / dataPoints;
 	}
 	return horizontalScale;
     }
 
     public void drawGrid(Graphics g, int y,
-			 float horizontalScale,
+			 double horizontalScale,
 			 int heightOfGraph) {
 	
 	Iterator iterator = points.iterator();

@@ -43,7 +43,7 @@ public class VariableExpression extends TerminalExpression {
         this.type = type;
     }
 
-    public float evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
         throws EvaluationException {
 
         Variable variable = variables.get(name);
@@ -58,10 +58,6 @@ public class VariableExpression extends TerminalExpression {
 
     public String toString() {
 	return name;
-    }
-
-    public int checkType() throws TypeMismatchException {
-	return getType();
     }
 
     public String getName() {

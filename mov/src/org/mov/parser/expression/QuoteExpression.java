@@ -23,35 +23,28 @@ import org.mov.parser.*;
 import org.mov.quote.*;
 
 /**
- * Abstract base class for expressions dealing with quotes:
- * <code>avg, lag, max, min</code>
+ * Class that represents a quote kind, e.g. day open, day close, etc.
+ * Originally there was a separate class for each quote kind but
+ * this was deemed a little excessive, so it was all folded into
+ * a single class.
  */
-abstract public class QuoteExpression extends Expression {
+public class QuoteExpression extends TerminalExpression {
 
-    // Quote kind - one of: open, close, low, high
+    // Quote kind - Quote.DAY_OPEN, Quote.DAY_CLOSE, Quote.DAY_LOW, etc...
     private int quoteKind;
 
     /**
-     * Create a new quote expression with the given quote expression.
-     * This expression should be either a {@link DayOpenExpression},
-     * {@link DayCloseExpression}, {@link DayLowExpression},
-     * {@link DayHighExpression} or a {@link DayVolumeExpression}.
+     * Create a new quote expression.
      *
-     * @param	quote	the quote expression
+     * @param quoteKind Kind of quote. One of {@link Quote#DAY_OPEN}, 
+     *        {@link Quote#DAY_CLOSE}, {@link Quote#DAY_LOW}, 
+     *        {@link Quote#DAY_HIGH} or {@link Quote#DAY_VOLUME}
      */
-    public QuoteExpression(Expression quote) {
-	if(quote instanceof DayOpenExpression)
-	    quoteKind = Quote.DAY_OPEN;
-	else if(quote instanceof DayCloseExpression)
-	    quoteKind = Quote.DAY_CLOSE;
-	else if(quote instanceof DayLowExpression)
-	    quoteKind = Quote.DAY_LOW;
-	else if(quote instanceof DayHighExpression)
-	    quoteKind = Quote.DAY_HIGH;
-	else {
-            assert quote instanceof DayVolumeExpression;
-	    quoteKind = Quote.DAY_VOLUME;
-	}
+    public QuoteExpression(int quoteKind) {
+        assert(quoteKind == Quote.DAY_OPEN || quoteKind == Quote.DAY_CLOSE || 
+               quoteKind == Quote.DAY_LOW || quoteKind == Quote.DAY_HIGH || 
+               quoteKind == Quote.DAY_VOLUME);
+        this.quoteKind = quoteKind;
     }
 
     /**
@@ -68,13 +61,40 @@ abstract public class QuoteExpression extends Expression {
     /**
      * Get the type of the expression.
      *
-     * @return {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
+     * @return {@link #FLOAT_QUOTE_TYPE} or {@link #INTEGER_QUOTE_TYPE}.
      */
     public int getType() {
         if(getQuoteKind() == Quote.DAY_VOLUME)
-            return INTEGER_TYPE;
+            return INTEGER_QUOTE_TYPE;
         else
-            return FLOAT_TYPE;
+            return FLOAT_QUOTE_TYPE;
     }
 
+    public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
+	throws EvaluationException {
+
+        // This should never be evaluated
+        assert false;
+        return 0.0F;
+    }
+
+    public String toString() {
+        switch(quoteKind) {
+        case Quote.DAY_OPEN:
+            return "open";
+        case Quote.DAY_CLOSE:
+            return "close";
+        case Quote.DAY_HIGH:
+            return "high";
+        case Quote.DAY_LOW:
+            return "low";
+        default:
+            assert quoteKind == Quote.DAY_VOLUME;
+            return "volume";
+        }
+    }
+
+    public Object clone() {
+        return new QuoteExpression(quoteKind);
+    }
 }

@@ -100,7 +100,7 @@ public class QuoteBundleIterator implements Iterator {
             // it starts on a certain date (i.e. the first date in the cache),
             // but it might not have any quotes until a much later date.
             try {
-                float volume = 
+                double volume = 
                     quoteBundle.getQuote(nextSymbol, Quote.DAY_VOLUME, nextDate);
                 found = true;
             }
@@ -129,13 +129,10 @@ public class QuoteBundleIterator implements Iterator {
             }
 
             try {
-                Float volume =
-                    new Float(quoteBundle.getQuote(nextSymbol, Quote.DAY_VOLUME, dateOffset));
-
                 Quote quote =
                     new Quote(nextSymbol,
                               nextDate,
-                              volume.intValue(),
+                              (int)quoteBundle.getQuote(nextSymbol, Quote.DAY_VOLUME, dateOffset),
                               quoteBundle.getQuote(nextSymbol, Quote.DAY_LOW, dateOffset),
                               quoteBundle.getQuote(nextSymbol, Quote.DAY_HIGH, dateOffset),
                               quoteBundle.getQuote(nextSymbol, Quote.DAY_OPEN, dateOffset),

@@ -57,8 +57,8 @@ public class Mutator {
         assert level > 0;
 
         // Work out percent chance of non-terminate symbol
-        float branchPercent = (float)BRANCH_FACTOR / (float)level;
-        float percent = random.nextFloat() * 100;
+        double branchPercent = (double)BRANCH_FACTOR / (double)level;
+        double percent = random.nextDouble() * 100;
 
         // If the type is a boolean then there isn't much point generating
         // the boolean terminal expressions TRUE or FALSE because our
@@ -106,7 +106,7 @@ public class Mutator {
             }
 
         case Expression.FLOAT_TYPE:
-            return new NumberExpression(50 - random.nextFloat() * 100);
+            return new NumberExpression(50 - random.nextDouble() * 100);
 
         case Expression.INTEGER_TYPE:
 
@@ -153,18 +153,18 @@ public class Mutator {
             randomNumber = random.nextInt(4);
 
             if(randomNumber == 0)
-                return new DayOpenExpression();
+                return new QuoteExpression(Quote.DAY_OPEN);
             else if(randomNumber == 1)
-                return new DayHighExpression();
+                return new QuoteExpression(Quote.DAY_HIGH);
             else if(randomNumber == 2)
-                return new DayLowExpression();
+                return new QuoteExpression(Quote.DAY_LOW);
             else {
                 assert randomNumber == 3;
-                return new DayCloseExpression();
+                return new QuoteExpression(Quote.DAY_CLOSE);
             }
 
         case Expression.INTEGER_QUOTE_TYPE:
-            return new DayVolumeExpression();
+            return new QuoteExpression(Quote.DAY_VOLUME);
 
         default:
             assert false;
@@ -231,8 +231,8 @@ public class Mutator {
            FAVOUR_NUMBER_PERCENT > random.nextInt(100)) {
 
             NumberExpression numberExpression = (NumberExpression)model;
-            int step = random.nextInt(6);
-            float value = (float)Math.pow(10.0F, (double)step);
+            double step = random.nextDouble() * 6.0F;
+            double value = Math.pow(10.0F, step);
 
             if(random.nextBoolean())
                 value = -value;
@@ -302,8 +302,8 @@ public class Mutator {
            FAVOUR_NUMBER_PERCENT > random.nextInt(100)) {
 
             NumberExpression numberExpression = (NumberExpression)model;
-            int step = random.nextInt(6);
-            float value = (float)Math.pow(10.0, (double)step);
+            double step = random.nextDouble() * 6.0F;
+            double value = Math.pow(10.0F, step);
 
             if(random.nextBoolean())
                 value = -value;
@@ -334,18 +334,18 @@ public class Mutator {
                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
         else if(randomNumber == 7)
-            return new LagExpression(new DayVolumeExpression(),
+            return new LagExpression(new QuoteExpression(Quote.DAY_VOLUME),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE));
         else if(randomNumber == 8)
-            return new MinExpression(new DayVolumeExpression(),
+            return new MinExpression(new QuoteExpression(Quote.DAY_VOLUME),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
         else if(randomNumber == 9)
-            return new MaxExpression(new DayVolumeExpression(),
+            return new MaxExpression(new QuoteExpression(Quote.DAY_VOLUME),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
         else if(randomNumber == 10)
-            return new SumExpression(new DayVolumeExpression(),
+            return new SumExpression(new QuoteExpression(Quote.DAY_VOLUME),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
         else if(randomNumber == 11)
@@ -355,7 +355,7 @@ public class Mutator {
             return new AbsExpression(getChild(model, level, 0, Expression.INTEGER_TYPE));
         else {
             assert randomNumber == 13;
-            return new AvgExpression(new DayVolumeExpression(),
+            return new AvgExpression(new QuoteExpression(Quote.DAY_VOLUME),
                                      getChild(model, level, 1, Expression.INTEGER_TYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
         }

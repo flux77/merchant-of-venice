@@ -29,10 +29,10 @@ public class Quote {
     private Symbol symbol;
     private TradingDate date;
     private int day_volume;
-    private float day_low;
-    private float day_high;
-    private float day_open;
-    private float day_close;
+    private double day_low;
+    private double day_high;
+    private double day_open;
+    private double day_close;
 
     /** Represents day close quote */
     public static final int DAY_CLOSE = 0;
@@ -61,8 +61,8 @@ public class Quote {
      * @param	day_close	the closing quote on this date
      */
     public Quote(Symbol symbol, TradingDate date,
-		 int day_volume, float day_low, float day_high,
-		 float day_open, float day_close) {
+		 int day_volume, double day_low, double day_high,
+		 double day_open, double day_close) {
 
         /*
 
@@ -122,7 +122,7 @@ public class Quote {
      *
      * @return	the day low
      */
-    public float getDayLow() {
+    public double getDayLow() {
 	return day_low;
     }
 
@@ -131,7 +131,7 @@ public class Quote {
      *
      * @return	the day high
      */
-    public float getDayHigh() {
+    public double getDayHigh() {
 	return day_high;
     }
 
@@ -140,7 +140,7 @@ public class Quote {
      *
      * @return	the day open
      */
-    public float getDayOpen() {
+    public double getDayOpen() {
 	return day_open;
     }
 
@@ -149,7 +149,7 @@ public class Quote {
      *
      * @return	the day close
      */
-    public float getDayClose() {
+    public double getDayClose() {
 	return day_close;
     }
 
@@ -197,7 +197,7 @@ public class Quote {
      * @param	quote	the quote type <code>DAY_OPEN, DAY_CLOSE, DAY_HIGH,
      *			DAY_VOLUME</code> or <code>DAY_LOW</code>
      */
-    public float getQuote(int quote) {
+    public double getQuote(int quote) {
 
 	switch(quote) {
 	case(DAY_OPEN):

@@ -59,12 +59,12 @@ public class BollingerBandsGraph extends AbstractGraph {
 	lowerBand = new Graphable();	
 
 	// Date set and value array will be in sync
-	float[] values = source.getGraphable().toArray();
+	double[] values = source.getGraphable().toArray();
 	Iterator iterator = source.getGraphable().getXRange().iterator();
 
 	int i = 0;	
-	float average;
-	float sd;
+	double average;
+	double sd;
 
 	while(iterator.hasNext()) {
 	    Comparable x = (Comparable)iterator.next();
@@ -76,16 +76,16 @@ public class BollingerBandsGraph extends AbstractGraph {
                                          i - Math.min(period - 1, i),
                                          i + 1);
 
-	    upperBand.putY(x, new Float(average + 2 * sd));
-	    lowerBand.putY(x, new Float(average - 2 * sd));
+	    upperBand.putY(x, new Double(average + 2 * sd));
+	    lowerBand.putY(x, new Double(average - 2 * sd));
 
 	    i++;
 	}
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
-		       float horizontalScale, float verticalScale,
-		       float bottomLineValue, List xRange) {
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange) {
 
 	// We ignore the graph colours and use our own custom colours
 	g.setColor(Color.green.darker());
@@ -99,19 +99,19 @@ public class BollingerBandsGraph extends AbstractGraph {
     }
 
     public String getToolTipText(Comparable x, int y, int yoffset,
-				 float verticalScale,
-				 float bottomLineValue)
+				 double verticalScale,
+				 double bottomLineValue)
     {
 	return null; // we never give tool tip information
     }
 
     // Highest Y value is in the bollinger bands graph
-    public float getHighestY(List x) {
+    public double getHighestY(List x) {
 	return upperBand.getHighestY(x);
     }
 
     // Lowest Y value is in the bollinger bands graph
-    public float getLowestY(List x) {
+    public double getLowestY(List x) {
 	return lowerBand.getLowestY(x);
     }
 }

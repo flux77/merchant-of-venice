@@ -21,22 +21,22 @@ public class Database
     private static boolean launchedMysql = false;
 
     // Only load indices (e.g. All Ordinaries, Mining etc) - we assume
-    // all three letter stocks starting with 'X' are indices. This is
+    // all three letter symbols starting with 'X' are indices. This is
     // *wrong*
     public static final int INDICES = 0;
 
-    // Only load 3 letter stocks which are generally companies + mutual funds
-    // Loads all 3 letter stocks except ones starting with 'X' (cause
-    // some of them are indicies) - so skips some legit X stocks
+    // Only load 3 letter symbols which are generally companies + mutual funds
+    // Loads all 3 letter symbols except ones starting with 'X' (cause
+    // some of them are indicies) - so skips some legit X symbols
     public static final int COMPANIES_AND_FUNDS = 1;
     
     // Load all commodoties listed on ASX (everything except indices)
-    // everything except stocks starting with X. Again this is not quite
+    // everything except symbols starting with X. Again this is not quite
     // right.
     public static final int ALL_COMMODITIES = 2;
 
-    // Indicates a single stock
-    public static final int SINGLE_STOCK = 3;
+    // Indicates a single symbol
+    public static final int SINGLE_SYMBOL = 3;
 
     public static Database getInstance() {
 	if(instance == null) {
@@ -45,13 +45,16 @@ public class Database
 	return instance;
     }
 
+    private DatabaseLookup db;
+
     private Database() {
+	db = new DatabaseLookup();
 
 	// Get driver
 	try {
 	    // The newInstance() call is a work around for some
 	    // broken Java implementations
-	    Class.forName("org.gjt.mm.mysql.Driver").newInstance(); 
+	    Class.forName(db.driverclass).newInstance(); 
 	    
 	}
 	catch (Exception E) {
@@ -68,7 +71,7 @@ public class Database
 	try {
 	    connection = 
 		DriverManager.
-		getConnection("jdbc:mysql://localhost/stock_market");
+		getConnection("jdbc:"+db.drivername+"://db/shares?user="+db.user+"&password="+db.password);
 	}
 	catch (SQLException E) {
 
@@ -92,7 +95,7 @@ public class Database
 	}
     }
 
-    // Get the name of a company from its stock symbol
+    // Get the name of a company from its symbol symbol
 
     // Buffer this!! should load it in and keep it in memory ie load in
     // the entire table. its not that big.
@@ -106,7 +109,7 @@ public class Database
 		Statement statement = connection.createStatement();
 		
 		ResultSet RS = statement.executeQuery
-		    ("SELECT name FROM company_data WHERE symbol = '"
+		    ("SELECT "+db.info.name+" FROM "+db.info+" WHERE "+db.info.symbol+" = '"
 		     + symbol.toUpperCase() + "'");
 
 		// Import SQL data into vector
@@ -141,8 +144,8 @@ public class Database
 		
 		ResultSet RS = statement.executeQuery
 		    ("SELECT " + symbol.toUpperCase() + 
-		     " FROM company_data WHERE LOCATE(" +
-		     "UPPER('" + partialCompanyName + "'), name) != 0");
+		     " FROM "+db.info+" WHERE LOCATE(" +
+		     "UPPER('" + partialCompanyName + "'), "+db.info.name+") != 0");
 
 		// Import SQL data into vector
 		RS.next();
@@ -179,7 +182,7 @@ public class Database
 		Statement statement = connection.createStatement();
 		
 		ResultSet RS = statement.executeQuery
-		    ("SELECT MIN(date) FROM historical_data WHERE STOCK = '"
+		    ("SELECT MIN("+db.prices.date+") FROM shares WHERE "+db.prices.symbol+" = '"
 		     + symbol.toUpperCase() + "'");
 
 		// Import SQL data into vector
@@ -213,7 +216,7 @@ public class Database
 		Statement statement = connection.createStatement();
 		
 		ResultSet RS = statement.executeQuery
-		    ("SELECT MAX(date) FROM historical_data");
+		    ("SELECT MAX("+db.prices.date+") FROM "+db.prices);
 
 		// Import SQL data into vector
 		RS.next();
@@ -250,13 +253,13 @@ public class Database
 		int i = 0;
 
 		while (RS.next()) {
-		    table.add(new Stock(RS.getString("stock").toLowerCase(),
-					new TradingDate(RS.getDate("date")),
-					RS.getInt("volume"),
-					RS.getFloat("day_low"),
-					RS.getFloat("day_high"),
-					RS.getFloat("day_start"),
-					RS.getFloat("day_end")));
+		    table.add(new Stock(RS.getString(db.prices.symbol).toLowerCase(),
+					new TradingDate(RS.getDate(db.prices.date)),
+					RS.getInt(db.prices.volume),
+					RS.getFloat(db.prices.low),
+					RS.getFloat(db.prices.high),
+					RS.getFloat(db.prices.open),
+					RS.getFloat(db.prices.close)));
 		}
 		// Clean up after ourselves
 		RS.close();
@@ -295,26 +298,26 @@ public class Database
     public Vector getQuotesForSymbol(String symbol) {
 	return executeQuery(selectAllString() +
 			    whereClauseString() + 
-			    specificStockString(symbol) +
+			    specificSymbolString(symbol) +
 			    orderByDateString());
     }
 
     private String selectAllString() {
-	return "SELECT * FROM historical_data ";
+	return "SELECT * FROM "+db.prices;
     }
 
     private String whereClauseString() {
-	return "WHERE ";
+	return " WHERE ";
     }
 
     private String dateRangeString(TradingDate startDate,
 				   TradingDate endDate) {
-	return "DATE >= '" + startDate + "' " + andString() + 
-	    "DATE <= '" + endDate + "' ";
+	return db.prices.date+" >= '" + startDate + "' " + andString() + 
+	    db.prices.date+" <= '" + endDate + "' ";
     }
 
     private String dateString(TradingDate date) {
-	return "DATE = '" + date + "' ";
+	return db.prices.date+" = '" + date + "' ";
     }
 
     private String andString() {
@@ -323,22 +326,23 @@ public class Database
 
     private String restrictTypeString(int type) {
 	if(type == ALL_COMMODITIES)
-	    return "LEFT(stock, 1) != 'X' ";
+	    return "LEFT("+db.prices.symbol+", 1) != 'X' ";
     
 	else if(type == COMPANIES_AND_FUNDS)
-	    return "LENGTH(stock) = 3 " + andString() + 
-		"LEFT(stock,1) != 'X' ";
+	    return "LENGTH("+db.prices.symbol+") = 3 " + andString() + 
+		"LEFT("+db.prices.symbol+",1) != 'X' ";
 	
 	else
-	    return "LENGTH(stock) = 3 " + andString() + 
-		"LEFT(stock, 1) = 'X' ";
+	    return "LENGTH("+db.prices.symbol+") = 3 " + andString() + 
+		"LEFT("+db.prices.symbol+", 1) = 'X' ";
     }
 
-    private String specificStockString(String stock) {
-	return "STOCK = '" + stock + "' ";
+    private String specificSymbolString(String symbol) {
+	return db.prices.symbol+" = '" + symbol + "' ";
     }
 
     private String orderByDateString() {
-	return "ORDER BY date ";
+	return "ORDER BY "+db.prices.date;
     }
 }
+

@@ -32,6 +32,7 @@
 ./org.mov.util/CommodityListQuery.java
 ./org.mov.util/Converter.java
 ./org.mov.util/Database.java
+./org.mov.util/DatabaseLookup.java
 ./org.mov.util/ExpressionQuery.java
 ./org.mov.util/InternetDataSource.java
 ./org.mov.util/Progress.java

@@ -20,16 +20,6 @@ package org.mov.analyser;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.lang.Class;
-import java.lang.Float;
-import java.lang.String;
-import java.lang.System;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -42,7 +32,6 @@ import javax.swing.JTabbedPane;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.ui.ConfirmDialog;
-import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
 public class GPGondolaSelection extends JPanel implements AnalyserPage {

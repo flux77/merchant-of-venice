@@ -17,6 +17,13 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
+/**
+ * The importer module for venice which allows importing of quotes from
+ * files or the internet. It provides an interface to allow the user
+ * to perform a variety of quote imports. Currently quotes can be
+ * imported from the internet, a range of quote file formats and can
+ * be imported to a database or another quote file.
+ */
 public class ImporterModule extends JPanel 
     implements Module, ActionListener {
 
@@ -39,6 +46,13 @@ public class ImporterModule extends JPanel
     private JButton importButton;
     private JButton cancelButton;
 
+    private DatabaseQuoteSource databaseSource = null;
+
+    /**
+     * Create a new Importer Module.
+     *
+     * @param	desktop	the parent desktop
+     */
     public ImporterModule(JDesktopPane desktop) {
 
 	this.desktop = desktop;
@@ -196,7 +210,7 @@ public class ImporterModule extends JPanel
 
     // Enable/disable the appropriate widgets depending on which widgets
     // are checked.
-    public void checkDisabledStatus() {
+    private void checkDisabledStatus() {
 
 	// Cant import from database to database
 	toDatabase.setEnabled(!fromDatabase.isSelected());
@@ -284,6 +298,10 @@ public class ImporterModule extends JPanel
 			new FileQuoteSource((String)formatComboBox.getSelectedItem(), 
 					    fileNames);
 		    dates = source.getDates();
+
+		    // Update number of days to reflect REAL number of days
+		    // in cache
+		    numberDays = dates.size();
 		}
 	    }
 	    else
@@ -311,8 +329,9 @@ public class ImporterModule extends JPanel
 	// visible
 	propertySupport.
 	    firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
-	
-	performImport(source, numberDays, fileNames, dates); 
+
+	if(numberDays > 0)
+	    performImport(source, numberDays, fileNames, dates); 
     }
 
     // Perform actual import given source and/or file list
@@ -324,11 +343,17 @@ public class ImporterModule extends JPanel
 	Thread importQuotes = new Thread() {		
 		public void run() {
 		    
+		    TradingDate date;
 		    boolean owner = 
 			Progress.getInstance().open("Importing", numberDays);
-		    
+
 		    // Import a day at a time
 		    for(int i = 0; i < numberDays; i++) {
+			date = (TradingDate)dates.get(i);
+			
+			Progress.getInstance().setText("Importing: " +
+						       date.toString("d?/m?/yyyy"),
+						       owner);
 
 			// file -> file 
 			if(fromFiles.isSelected() && toFiles.isSelected())
@@ -336,12 +361,15 @@ public class ImporterModule extends JPanel
 			
 			// anything -> database
 			if(toDatabase.isSelected())
-			    importToDatabase(source, 
-					     (TradingDate)dates.get(i));
+			    importToDatabase(source, date);
 
-			Progress.getInstance().next();			
+			Progress.getInstance().next();
 		    }
-	
+
+		    // This makes sure the next query uses the new imported 
+		    // quotes
+		    Quote.flush();	
+
 		    Progress.getInstance().close(owner);	
 		}
 	    };
@@ -369,7 +397,13 @@ public class ImporterModule extends JPanel
 
     // Import a file into the database
     private void importToDatabase(QuoteSource source, TradingDate date) {
-	DatabaseQuoteSource.importQuotes(source, date);
+	Preferences p = Preferences.userRoot().node("/quote_source/database");
+	String databaseName = p.get("dbname", "shares");
+
+	if(databaseSource == null)
+	    databaseSource = new DatabaseQuoteSource();
+
+	databaseSource.importQuotes(databaseName, source, date);
     }
 
     // Save the configuration on screen to the preferences file

@@ -376,7 +376,7 @@ public class GPModule extends JPanel implements Module {
                 // was closed we need to create a new one)
                 if(resultsFrame == null || resultsFrame.isClosed()) {
                     resultsFrame =
-                    CommandManager.getInstance().newGPResultTable();
+                    CommandManager.getInstance().newGPResultTable(GPPageInitialPopulation);
                 }
                 
                 // If it is already created, don't try to move it to

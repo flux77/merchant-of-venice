@@ -67,6 +67,7 @@ public class GPResultModule extends AbstractTable implements Module {
     private static final int PERCENT_RETURN_COLUMN = 10;
 
     private Model model;
+    private GPPageInitialPopulation GPPageInitialPopulation;
 
     // Menus
     private JMenuBar menuBar;
@@ -77,6 +78,7 @@ public class GPResultModule extends AbstractTable implements Module {
     private JMenuItem viewSellRuleMenuItem;
     private JMenuItem storeBuyRuleMenuItem;
     private JMenuItem storeSellRuleMenuItem;
+    private JMenuItem storeRulesInitialPopulation;
     private JMenuItem removeMenuItem;
     private JMenuItem removeAllMenuItem;
 
@@ -167,7 +169,10 @@ public class GPResultModule extends AbstractTable implements Module {
 	}
     }
 
-    public GPResultModule() {
+    public GPResultModule(GPPageInitialPopulation GPPageInitialPopulation) {
+        
+        this.GPPageInitialPopulation=GPPageInitialPopulation;
+        
         List columns = new ArrayList();
         columns.add(new Column(START_DATE_COLUMN,
                                Locale.getString("START_DATE"),
@@ -315,6 +320,17 @@ public class GPResultModule extends AbstractTable implements Module {
                     }});
             menu.add(popupStoreSellRuleMenuItem);
 
+            menu.addSeparator();
+            
+            JMenuItem popupStoreRulesInitialPopulation =
+                new JMenuItem(Locale.getString("STORE_RULES_INIT_POP"));
+            popupStoreRulesInitialPopulation.setEnabled(getSelectedRowCount() == 1);
+            popupStoreRulesInitialPopulation.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        storeRulesInitialPopulation();
+                    }});
+            menu.add(popupStoreRulesInitialPopulation);
+            
             menu.addSeparator();
 
             JMenuItem popupRemoveMenuItem =
@@ -466,6 +482,18 @@ public class GPResultModule extends AbstractTable implements Module {
         }
     }
 
+    // Store the rules, adding a row to the GPInitialPopulation section
+    private void storeRulesInitialPopulation() {
+        // Get result at row
+        int row = getSelectedRow();
+
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            final GPResult result = model.getResult(row);
+            this.GPPageInitialPopulation.addRowTable(result.getBuyRule(), result.getSellRule(), "");
+        }
+    }
+    
     // Removes all the selected results from the table
     private void removeSelectedResults() {
 
@@ -504,6 +532,7 @@ public class GPResultModule extends AbstractTable implements Module {
         viewSellRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         storeBuyRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
         storeSellRuleMenuItem.setEnabled(numberOfSelectedRows == 1);
+        storeRulesInitialPopulation.setEnabled(numberOfSelectedRows == 1);
         removeMenuItem.setEnabled(numberOfSelectedRows >= 1);
         removeAllMenuItem.setEnabled(model.getRowCount() > 0);
     }
@@ -564,6 +593,16 @@ public class GPResultModule extends AbstractTable implements Module {
                     storeSellRule();
                 }});
         resultMenu.add(storeSellRuleMenuItem);
+
+	resultMenu.addSeparator();
+
+        storeRulesInitialPopulation = new JMenuItem(Locale.getString("STORE_RULES_INIT_POP"));
+        storeRulesInitialPopulation.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    storeRulesInitialPopulation();
+                }});
+                
+        resultMenu.add(storeRulesInitialPopulation);
 
 	resultMenu.addSeparator();
 

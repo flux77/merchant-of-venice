@@ -56,10 +56,6 @@ public class MultiplyExpression extends ArithmeticExpression {
             else if(right != null && right.equals(0.0D))
                 return new NumberExpression(0.0D, getType());
 
-            // 1*a -> a.
-            else if(left != null && left.equals(1.0D))
-                return getChild(1);
-
             // a*1 -> a.
             else if(right != null && right.equals(1.0D))
                 return getChild(0);

@@ -37,7 +37,13 @@ abstract public class ArithmeticExpression extends BinaryExpression {
 
     /**
      * Check the input arguments to the expression. They can only be
-     * {@link #INTEGER_TYPE} or {@link #FLOAT_TYPE}. Both must be the same!
+     * {@link #INTEGER_TYPE} or {@link #FLOAT_TYPE}.
+     *
+     * There are 4 possible cases:
+     * {@link #INTEGER_TYPE} operator {@link #INTEGER_TYPE} returns a {@link #INTEGER_TYPE}
+     * {@link #INTEGER_TYPE} operator {@link #FLOAT_TYPE} returns a {@link #INTEGER_TYPE}
+     * {@link #FLOAT_TYPE} operator {@link #INTEGER_TYPE} returns a {@link #FLOAT_TYPE}
+     * {@link #FLOAT_TYPE} operator {@link #FLOAT_TYPE} returns a {@link #FLOAT_TYPE}
      *
      * @return	the type of the expression
      */
@@ -46,8 +52,8 @@ abstract public class ArithmeticExpression extends BinaryExpression {
 	int leftType = getChild(0).checkType();
 	int rightType = getChild(1).checkType();
 
-	if(leftType == rightType && 
-           (leftType == FLOAT_TYPE || leftType == INTEGER_TYPE))
+	if((leftType == FLOAT_TYPE || leftType == INTEGER_TYPE) && 
+           (rightType == FLOAT_TYPE || rightType == INTEGER_TYPE))
             return getType();
 	else
 	    throw new TypeMismatchException();
@@ -78,8 +84,6 @@ abstract public class ArithmeticExpression extends BinaryExpression {
      * @return either {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
     public int getType() {
-        assert getChild(0).getType() == getChild(1).getType();
-
         return getChild(0).getType();
     }
 }

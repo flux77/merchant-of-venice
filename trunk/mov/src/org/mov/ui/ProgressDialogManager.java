@@ -40,9 +40,9 @@ import java.util.*;
  * ProgressDialog progress = ProgressDialogManager.getProgressDialog();
  * progress.setMaximum(3);
  * progress.setProgress(0);
- * progress.show();
+ * progress.show("Performing Task");
  *
- * for(int i = 0; i < 3; i++) {
+* for(int i = 0; i < 3; i++) {
  *    Task(i);
  *
  *    // If the progress dialog is cancelled. The thread will be interrupted.

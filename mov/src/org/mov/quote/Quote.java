@@ -1,5 +1,7 @@
 package org.mov.quote;
 
+import org.mov.importer.ImporterModule;
+
 import java.util.prefs.*;
 
 /**
@@ -39,8 +41,6 @@ public class Quote {
     public static void flush() {
 	if(instance != null)
 	    instance.sourceInstance = null;
-
-	DatabaseLookup.flush();
     }
 
     private Quote() {
@@ -54,25 +54,63 @@ public class Quote {
 	    String quoteSource = p.get("source", "database");
 
 	    if(quoteSource.equals("files")) {
-		// Get file format from preferences
-		p = Preferences.userRoot().node("/quote_source/files");
-
-		sourceInstance = 
-		    new FileQuoteSource(p.get("format", "MetaStock"),
-					p.get("list", "").split(", "));
+		sourceInstance = createFileQuoteSource();
 	    }
 	    else if(quoteSource.equals("database"))
-		sourceInstance = new DatabaseQuoteSource();
+		sourceInstance = createDatabaseQuoteSource();
 	    else {
-		// Get username and password from preferences
-		p = Preferences.userRoot().node("/quote_source/internet");
-
-		sourceInstance = new SanfordQuoteSource(p.get("username", ""),
-							p.get("password", ""));
+		sourceInstance = createInternetQuoteSource();
 	    }
 	}
 
 	return sourceInstance;
+    }
+
+
+    /**
+     * Create a file quote source directly using the user preferences.
+     *
+     * @return	the file quote source 
+     */
+    public static FileQuoteSource createFileQuoteSource() {
+
+	// Get file format from preferences
+	Preferences p = Preferences.userRoot().node("/quote_source/files");
+
+	return
+	    new FileQuoteSource(p.get("format", "MetaStock"),
+				ImporterModule.getFileList());
+    }	
+
+    /**
+     * Create an internet quote source directly using the user preferences.
+     *
+     * @return	the internet quote source 
+     */
+    public static SanfordQuoteSource createInternetQuoteSource() {
+	// Get username and password from preferences
+	Preferences p = Preferences.userRoot().node("/quote_source/internet");
+	
+	return new SanfordQuoteSource(p.get("username", ""),
+				      p.get("password", ""));
+    }
+    
+    /**
+     * Create a database quote source directly using the user preferences.
+     *
+     * @return	the database quote source 
+     */
+    public static DatabaseQuoteSource createDatabaseQuoteSource() {
+
+	Preferences p = Preferences.userRoot().node("/quote_source/database");
+	String host = p.get("host", "db");
+	String port = p.get("port",  "3306");
+	String database = p.get("dbname", "shares");
+	String username = p.get("username", "");
+	String password = p.get("password", "");
+
+	return new DatabaseQuoteSource(host, port, database, username,
+				       password);
     }
 }
 

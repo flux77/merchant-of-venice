@@ -23,10 +23,13 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -34,19 +37,25 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.mov.main.ModuleFrame;
+import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.StoredEquation;
 
 public class ExpressionEditorDialog {
 
     private boolean isUp = true;
+    private boolean wasCancelled = false;
     private JInternalFrame internalFrame;
-    private String expression;
+
+    // Equation we are working with
+    private String name;
+    private String equation;
 
     // Width of text field: Name: [<-width->]
     private final static int NAME_WIDTH = 20;
 
-    // Minimum & preferred size to display expression */
-    private final static int EXPRESSION_ROWS = 14;
-    private final static int EXPRESSION_COLUMNS = 30;
+    // Minimum & preferred size to display equation */
+    private final static int EQUATION_ROWS = 14;
+    private final static int EQUATION_COLUMNS = 30;
 
     // Whether we should display just the OK button or the OK and 
     // the cancel button
@@ -54,28 +63,29 @@ public class ExpressionEditorDialog {
     private final static int OK_CANCEL_BUTTON = 1;
 
     private ExpressionEditorDialog(String title, boolean displayName, 
-                                   String name, String expression,
+                                   String name, String equation,
                                    int buttonArray, boolean isEditable) {
-        this.expression = expression;
+	this.name = name;
+        this.equation = equation;
         assert buttonArray == OK_BUTTON || buttonArray == OK_CANCEL_BUTTON;
 
-        buildDialog(title, displayName, name, buttonArray, isEditable);
+        buildDialog(title, displayName, buttonArray, isEditable);
     }
 
-    private void buildDialog(String title, boolean displayName, String name,
-                             int buttonArray, boolean isEditable) {
+    private void buildDialog(String title, final boolean displayName, int buttonArray, 
+			     boolean isEditable) {
         internalFrame = new JInternalFrame(title,
                                            true, /* resizable */
                                            false, /* closable */
                                            false, /* maximisible */
-                                           false); /* icnofiable */
+                                           false); /* iconifiable */
 	JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
+	final JTextField nameField = new JTextField(name, NAME_WIDTH);
+
         if(displayName) {
             JPanel innerNamePanel = new JPanel();
-
-            JTextField nameField = new JTextField(name, NAME_WIDTH);
             innerNamePanel.add(new JLabel("Name:"));
             innerNamePanel.add(nameField);
 
@@ -85,26 +95,29 @@ public class ExpressionEditorDialog {
             panel.add(namePanel, BorderLayout.NORTH);
         }
 
-        JPanel expressionPanel = new JPanel();
-        final JTextArea expressionEditor = new JTextArea(EXPRESSION_ROWS,
-                                                         EXPRESSION_COLUMNS);
-        expressionEditor.setText(expression);
-        expressionEditor.setEditable(isEditable);
+        JPanel equationPanel = new JPanel();
+        final JTextArea equationEditor = new JTextArea(EQUATION_ROWS,
+						       EQUATION_COLUMNS);
+        equationEditor.setText(equation);
+        equationEditor.setEditable(isEditable);
 
-        TitledBorder titledBorder = new TitledBorder("Expression");
-        expressionPanel.setLayout(new BorderLayout());
-        expressionPanel.setBorder(titledBorder);
-        expressionPanel.add(new JScrollPane(expressionEditor));
+        TitledBorder titledBorder = new TitledBorder("Equation");
+        equationPanel.setLayout(new BorderLayout());
+        equationPanel.setBorder(titledBorder);
+        equationPanel.add(new JScrollPane(equationEditor));
 
-        panel.add(expressionPanel, BorderLayout.CENTER);
-
+        panel.add(equationPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         JButton okButton = new JButton("OK");
         okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    // Update expression
-                    setExpression(expressionEditor.getText());
+                    // Update equation
+		    if(displayName)
+			setName(nameField.getText());
+
+                    setEquation(equationEditor.getText());
+		    wasCancelled = false;
                     close();
                 }});
         buttonPanel.add(okButton);
@@ -114,7 +127,8 @@ public class ExpressionEditorDialog {
             JButton cancelButton = new JButton("Cancel");
             cancelButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        // User cancelled dialog so don't modify expression
+                        // User cancelled dialog so don't modify equation
+			wasCancelled = true;
                         close();
                     }});
             buttonPanel.add(cancelButton);
@@ -155,19 +169,23 @@ public class ExpressionEditorDialog {
         return isUp;
     }
 
-    private String getExpression() {
-        return expression;
+    private String getName() {
+	return name;
     }
 
-    private void setExpression(String expression) {
-        this.expression = expression;
+    private void setName(String name) {
+	this.name = name;
     }
 
-    //    public static String addExpression(String expression);
-    
-    //public static String editExpression(String expression);
+    private String getEquation() {
+        return equation;
+    }
 
-    private void waitUntilClosed() {
+    private void setEquation(String equation) {
+        this.equation = equation;
+    }
+
+    private boolean waitUntilClosed() {
 	try {
 	    while(isUp()) 
 		Thread.sleep(10);
@@ -175,35 +193,151 @@ public class ExpressionEditorDialog {
 	} catch (InterruptedException e) {
             // Finish.
 	}        
+
+	return wasCancelled;
     }
 
     // make sure you run this in its own thread - not in the swing dispatch thread!
-    public static String showEditDialog(String title, String expression) {
+    public static StoredEquation showAddDialog(List storedEquations, String title,
+					       String equation) {
+	boolean isValid = false;
+	String name = "";
+	StoredEquation storedEquation = null;
+	
+	while(!isValid) {
+	    ExpressionEditorDialog dialog = new ExpressionEditorDialog(title, true, 
+								       name,
+								       equation,
+								       OK_CANCEL_BUTTON,
+								       true);
+	    boolean wasCancelled = dialog.waitUntilClosed();
+	    name = dialog.getName();
+	    equation = dialog.getEquation();
+
+	    if(!wasCancelled) {
+		isValid = validateStoredEquation(storedEquations, null, name);
+
+		if(isValid) 
+		    storedEquation = new StoredEquation(name, equation);
+	    }
+	    else
+		isValid = true;
+	}
+		
+	return storedEquation;
+    }
+
+    // make sure you run this in its own thread - not in the swing dispatch thread!
+    public static StoredEquation showAddDialog(List storedEquations, String title) {
+	return showAddDialog(storedEquations, title, "");
+    }
+
+    // make sure you run this in its own thread - not in the swing dispatch thread!
+    public static StoredEquation showAddDialog(String title, String equation) {
+	List storedEquations = PreferencesManager.loadStoredEquations();
+	StoredEquation storedEquation = showAddDialog(storedEquations, title, equation);
+
+	// If the user added an equation, save it to the preferences and make
+	// sure all the combo boxes are updated.
+	if(storedEquation != null) {
+	    storedEquations.add(storedEquation);
+	    PreferencesManager.saveStoredEquations(storedEquations);
+	    EquationComboBox.updateEquations();
+	}
+
+	return storedEquation;
+    }
+
+    // make sure you run this in its own thread - not in the swing dispatch thread!
+    public static String showEditDialog(String title, String equation) {
         ExpressionEditorDialog dialog = new ExpressionEditorDialog(title, false, "",
-                                                                   expression,
+                                                                   equation,
                                                                    OK_CANCEL_BUTTON,
                                                                    true);
         dialog.waitUntilClosed();
-        return dialog.getExpression();
+        return dialog.getEquation();
     }
 
     // make sure you run this in its own thread - not in the swing dispatch thread!
-    public static String showEditDialog(String title, String name, 
-                                        String expression) {
-        ExpressionEditorDialog dialog = new ExpressionEditorDialog(title, true, name,
-                                                                   expression,
-                                                                   OK_CANCEL_BUTTON,
-                                                                   true);
-        dialog.waitUntilClosed();
-        return dialog.getExpression();
+    public static StoredEquation showEditDialog(List storedEquations, String title, 
+						StoredEquation storedEquation) {
+	boolean isValid = false;
+	String oldName = new String(storedEquation.name);
+	String name = storedEquation.name;
+	String equation = storedEquation.equation;
+
+	while(!isValid) {
+	    ExpressionEditorDialog dialog = new ExpressionEditorDialog(title, true, 
+								       name,
+								       equation,
+								       OK_CANCEL_BUTTON,
+								       true);
+	    boolean wasCancelled = dialog.waitUntilClosed();
+	    name = dialog.getName();
+	    equation = dialog.getEquation();
+
+	    if(!wasCancelled) {
+		isValid = validateStoredEquation(storedEquations, oldName, name);
+
+		if(isValid) {
+		    storedEquation.name = name;
+		    storedEquation.equation = equation;
+		}
+	    }
+	    else
+		isValid = true;
+	}
+
+	return storedEquation;
     }
 
-
-    public static void showViewDialog(String title, String expression) {
+    // make sure you run this in its own thread - not in the swing dispatch thread!
+    public static void showViewDialog(String title, String equation) {
         ExpressionEditorDialog dialog = new ExpressionEditorDialog(title, false, "", 
-                                                                   expression,
+                                                                   equation,
                                                                    OK_BUTTON,
                                                                    false);
         dialog.waitUntilClosed();
+    }
+
+    // Check that a stored equation is valid after the user has modified it.
+    // Check for things like missing equation name or duplicate equation names.
+    // Don't check the equation for syntax as we can't do this without knowing
+    // the variables that will be predefined for that equation.
+    private static boolean validateStoredEquation(List storedEquations, String oldName,
+						  String newName) {
+
+	boolean isValid = true;
+
+	if(newName.length() == 0) {
+	    JOptionPane.showInternalMessageDialog(DesktopManager.getDesktop(),
+						  "Missing equation name.",
+						  "Error parsing stored equation",
+						  JOptionPane.ERROR_MESSAGE);
+	    isValid = false;
+	}
+
+	// If the name was changed, make sure it wasn't changed to an
+	// existing stored equation's name.
+	else if(oldName == null || !newName.equals(oldName)) {
+	    boolean isDuplicateName = false;
+	    
+	    for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
+		StoredEquation traverse = (StoredEquation)iterator.next();
+		if(traverse.name.equals(newName))
+		    isDuplicateName = true;
+		
+	    }
+	    
+	    if(isDuplicateName) {
+		JOptionPane.showInternalMessageDialog(DesktopManager.getDesktop(),
+						      "Equation name '" + newName + "' is already being used.",
+						      "Error parsing stored equation",
+						      JOptionPane.ERROR_MESSAGE);
+		isValid = false;
+	    }
+	}
+
+	return isValid;
     }
 }

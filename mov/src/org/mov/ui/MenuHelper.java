@@ -18,12 +18,30 @@
 
 package org.mov.ui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.awt.event.ActionListener;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
 
+/**
+ * MenuHelper is a class that makes it easier to add menu items to a menu.
+ * For example:
+ * <pre>
+ * JMenuBar menuBar = new JMenuBar();
+ * JMenu fileMenu = MenuHelper.addMenu(menuBar, "File", 'F');
+ * JMenuItem importMenuItem = 
+ *     MenuHelper.addMenuItem(this, fileMenu, "Import Quotes", 'I');
+ * frame.setJMenuBar(menuBar);
+ * </pre>
+ */
 public class MenuHelper {
+
+    private MenuHelper() {
+        // this class cannot be instantiated
+    }
 
     /**
      * Creates a check box menu item and attaches it to a menu

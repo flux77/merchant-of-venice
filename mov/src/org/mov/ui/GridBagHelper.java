@@ -27,12 +27,44 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+/**
+ * GridBagHelper is a class that makes it easier to create form user interfaces. Using
+ * GridBagLayout and this class you can easily create forms, reducing code repeitition.
+ * For example to create a form which lets the user fill in two text field entries: 
+ * <pre>
+ * JPanel formPanel = new JPanel();
+ * GridBagLayout gridbag = new GridBagLayout();
+ * GridBagConstraints c = new GridBagConstraints();
+ * formPanel.setLayout(gridbag);
+ *           
+ * c.weightx = 1.0;
+ * c.ipadx = 5;
+ * c.anchor = GridBagConstraints.WEST;
+ *          
+ * JTextField initialCapitalTextField = 
+ *    GridBagHelper.addTextRow(formPanel, "Initial Capital", "", gridbag, c, 
+ *                             10);
+ * JTextField tradeCostTextField =
+ *    GridBagHelper.addTextRow(formPanel, "Trade Cost", "", gridbag, c, 5);
+ *
+ * </pre>
+ */
 public class GridBagHelper {
 
-    private void GridBagHelper() {
+    private GridBagHelper() {
         // this class cannot be instantiated
     }
 
+    /**
+     * Append a new row containing a check box button to the form.
+     *
+     * @param panel form panel
+     * @param field text to display next to check box
+     * @param isSelected is the check box currently selected?
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @return the check box
+     */
     public static JCheckBox addCheckBoxRow(JPanel panel, String field,
                                            boolean isSelected,
                                            GridBagLayout gridbag,
@@ -46,8 +78,16 @@ public class GridBagHelper {
         return checkBox;
     }
 
-    // Helper method which adds a new text field in a new row to the given 
-    // grid bag layout.
+    /**
+     * Append a new row containing an equation combo box button to the form.
+     *
+     * @param panel form panel
+     * @param field text to display next to equation combo box
+     * @param value initial value of combo box
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @return the combo box
+     */
     public static EquationComboBox addEquationRow(JPanel panel, String field, 
                                                   String value,
                                                   GridBagLayout gridbag,
@@ -65,8 +105,17 @@ public class GridBagHelper {
 	return comboBox;
     }
 
-    // Helper method which adds a new password text field in a new row to
-    // the given grid bag layout.
+    /**
+     * Append a new row containing a password text field to the form.
+     *
+     * @param panel form panel
+     * @param field text to display next to password text field
+     * @param value initial value of password text field
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @param length the length of the text field
+     * @return the password text field
+     */
     public static JPasswordField addPasswordRow(JPanel panel, String field, 
                                                 String value,
                                                 GridBagLayout gridbag,
@@ -85,8 +134,17 @@ public class GridBagHelper {
 	return password;
     }
 
-    // Helper method which adds a new text field in a new row to the given 
-    // grid bag layout.
+    /**
+     * Append a new row containing a text field to the form.
+     *
+     * @param panel form panel
+     * @param field text to display next to text field
+     * @param value initial value of text field
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @param length the length of text field
+     * @return the text field
+     */
     public static JTextField addTextRow(JPanel panel, String field, String value,
                                         GridBagLayout gridbag,
                                         GridBagConstraints c,

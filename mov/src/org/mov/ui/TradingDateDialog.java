@@ -27,12 +27,30 @@ import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.TradingDate;
 
+/**
+ * Dialog for querying the user for a date.
+ *
+ * @see TradingDate
+ */
 public class TradingDateDialog {
 
     private TradingDateDialog() {
 	// Cannot instantiate this class
     }
 
+    /**
+     * Opens a new dialog asking the user to enter a date. If the user
+     * enters an illegal date, a date that falls on a weekend or any
+     * date that we don't have data for, then the date will be rejected
+     * and the user will be asked to re-enter the date.
+     * The date will be returned or <code>null</code> if the user
+     * cancelled the dialog.
+     *
+     * @param parent the parent desktop
+     * @param title the title of the dialog
+     * @param prompt the prompt string
+     * @return the date
+     */
     public static TradingDate getDate(JDesktopPane parent,
                                       String title,
                                       String prompt) {
@@ -68,6 +86,8 @@ public class TradingDateDialog {
         return date;
     }
 
+    // Given a string, parse it into a date and if there was an error raise a
+    // dialog to the user.
     private static TradingDate parseDate(JDesktopPane parent, String dateText) {
         TradingDate date = null;
         int dateOffset;

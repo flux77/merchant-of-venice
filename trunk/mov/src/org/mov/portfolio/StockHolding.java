@@ -18,6 +18,8 @@
 
 package org.mov.portfolio;
 
+import org.mov.util.TradingDate;
+
 /**
  * Representation of a single stock holding in a share account. 
  * @see ShareAccount
@@ -30,15 +32,20 @@ public class StockHolding {
     // Number of shares of stock
     private int shares;
     
+    // Date shares were purchased
+    private TradingDate date;
+
     /**
      * Create a new stock holding
      *
      * @param	symbol	the stock to own
      * @param	shares	the number of shares of that stock
+     * @param   date    the date the shares were purchased
      */
-    public StockHolding(String symbol, int shares) {
+    public StockHolding(String symbol, int shares, TradingDate date) {
 	this.symbol = symbol;
 	this.shares = shares;
+        this.date = date;
     }
 
     /**
@@ -75,5 +82,15 @@ public class StockHolding {
      */
     public int getShares() {
 	return shares;
+    }
+
+    /**
+     * Get the initial date that at least part of these shares was purchased
+     * on.
+     *
+     * @return date
+     */
+    public TradingDate getDate() {
+        return date;
     }
 }

@@ -160,6 +160,8 @@ public class Parser {
 
 	if(subExpressions.size() == 0)
 	    throw new ParserException(Locale.getString("EMPTY_EQUATION_ERROR"));
+        else if(subExpressions.size() == 1)
+	    return (Expression)subExpressions.get(0);
         else
 	    return new ClauseExpression(subExpressions);
     }

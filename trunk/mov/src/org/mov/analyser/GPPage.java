@@ -130,14 +130,6 @@ public class GPPage extends JPanel implements AnalyserPage {
 	    return false;
 	}
 
-        if(breedingPopulation > population) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  "Breeding population must be smaller or equal to population.",
-                                                  "Invalid number",
-                                                  JOptionPane.ERROR_MESSAGE);
-	    return false;
-        }
-
         if(displayPopulation > breedingPopulation) {
             JOptionPane.showInternalMessageDialog(desktop, 
                                                   "Display population must be smaller or equal to breeding population.",

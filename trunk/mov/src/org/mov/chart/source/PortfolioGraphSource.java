@@ -19,12 +19,14 @@
 package org.mov.chart.source;
 
 import org.mov.chart.*;
-import org.mov.ui.*;
-import org.mov.util.*;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Provides a Portfolio graph source. This class allows portfolios
@@ -121,7 +123,7 @@ public class PortfolioGraphSource implements GraphSource {
 
 	    try {
 		Float value =
-		    new Float(temporaryPortfolio.getValue(quoteBundle, date));
+		    new Float(temporaryPortfolio.getValue(quoteBundle, date).floatValue());
 		graphable.putY((Comparable)date, value);
 	    }
 	    catch(MissingQuoteException e) {
@@ -143,7 +145,7 @@ public class PortfolioGraphSource implements GraphSource {
 	graphable = new Graphable();
 
 	// Keep track of cash deposited into portfolio.
-	float depositedCash = 0.0F;
+	Money depositedCash = Money.ZERO;
 
 	while(dateIterator.hasNext()) {
 	    TradingDate date = (TradingDate)dateIterator.next();
@@ -153,12 +155,10 @@ public class PortfolioGraphSource implements GraphSource {
 
 		// If its a cash deposit/withdrawal we need to update
 		// our cash value
-		if(transaction.getType() == Transaction.WITHDRAWAL) {
-		    depositedCash -= transaction.getAmount();
-		}
-		else if(transaction.getType() == Transaction.DEPOSIT) {
-		    depositedCash += transaction.getAmount();
-		}
+		if(transaction.getType() == Transaction.WITHDRAWAL) 
+		    depositedCash = depositedCash.subtract(transaction.getAmount());
+		else if(transaction.getType() == Transaction.DEPOSIT) 
+		    depositedCash = depositedCash.add(transaction.getAmount());
 
 		temporaryPortfolio.addTransaction(transaction);
 
@@ -169,9 +169,8 @@ public class PortfolioGraphSource implements GraphSource {
 	    }
 
 	    try {
-		Float value =
-		    new Float(temporaryPortfolio.getValue(quoteBundle, date) -
-			      depositedCash);
+                Money portfolioValue = temporaryPortfolio.getValue(quoteBundle, date);
+		Float value = new Float(portfolioValue.subtract(depositedCash).floatValue());
 		graphable.putY((Comparable)date, value);
 	    }
 	    catch(MissingQuoteException e) {
@@ -192,9 +191,9 @@ public class PortfolioGraphSource implements GraphSource {
     }
 
     public String getToolTipText(Comparable x) {
-
 	// In portfolio graphs the x axis is in dates
 	TradingDate date = (TradingDate)x;
+
 	// Get value for this date
 	Float value = graphable.getY(x);
 	
@@ -217,7 +216,7 @@ public class PortfolioGraphSource implements GraphSource {
     }
 
     public String getYLabel(float value) {
-	return PriceFormat.priceToString(value);
+        return Money.toString(value);
     }
 
     public float[] getAcceptableMajorDeltas() {

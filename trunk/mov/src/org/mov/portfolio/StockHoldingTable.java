@@ -30,6 +30,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import org.mov.ui.*;
+import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.main.*;
 import org.mov.table.*;
@@ -127,11 +128,11 @@ public class StockHoldingTable extends AbstractTable {
 
             case(MARKET_VALUE_COLUMN):
                 try {
-                    return new PriceFormat(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date) *
-                                           stockHolding.getShares());
+                    return new Money(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date) *
+                                     stockHolding.getShares());
                 }
                 catch(MissingQuoteException e) {
-                    return new PriceFormat(0.0F);
+                    return Money.ZERO;
                 }
 
             case(PERCENT_RETURN_COLUMN):
@@ -220,7 +221,7 @@ public class StockHoldingTable extends AbstractTable {
         columns.add(new Column(DAY_CLOSE_COLUMN, "Day Close", "Day Close",
                                QuoteFormat.class, true));
         columns.add(new Column(MARKET_VALUE_COLUMN, "Market Value", "Mkt Value",
-                               PriceFormat.class, true));
+                               Money.class, true));
         columns.add(new Column(POINT_CHANGE_COLUMN, "Point Change", "+/-",
                                PointChangeFormat.class, false));
         columns.add(new Column(PERCENT_CHANGE_COLUMN, "Percent Change", "Change",

@@ -29,6 +29,7 @@ import org.mov.parser.Variables;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
+import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
 public class Individual implements Comparable {
@@ -36,7 +37,7 @@ public class Individual implements Comparable {
     private Expression buyRule = null;
     private Expression sellRule = null;
     private Portfolio portfolio = null;
-    private float value = 0.0F;
+    private Money value = null;
 
     private final static int CLONE_PERCENT                     = 10;
     private final static int SWAP_PERCENT                      = 5;
@@ -141,18 +142,18 @@ public class Individual implements Comparable {
         return buyRule.size() + sellRule.size();
     }
 
-    public float paperTrade(GPQuoteBundle quoteBundle,
+    public Money paperTrade(GPQuoteBundle quoteBundle,
                             OrderComparator orderComparator,
                             TradingDate startDate,
                             TradingDate endDate,
-                            float initialCapital,
-                            float stockValue,
+                            Money initialCapital,
+                            Money stockValue,
                             int numberStocks,
-                            float tradeCost) 
+                            Money tradeCost) 
         throws EvaluationException {
 
         // Is there a fixed number of stocks?
-        if(stockValue == 0)
+        if(stockValue == null)
             portfolio = PaperTrade.paperTrade(PORTFOLIO_NAME,
                                               quoteBundle,
                                               new Variables(),
@@ -186,13 +187,12 @@ public class Individual implements Comparable {
         catch(MissingQuoteException e) {
             // Already checked...
             assert false;
-            value = 0.0F;
         }
 
         return value;
     }
 
-    public float getValue() {
+    public Money getValue() {
         return value;
     }
 
@@ -211,12 +211,7 @@ public class Individual implements Comparable {
     public int compareTo(Object object) {
         Individual other = (Individual)object;
 
-        if(getValue() < other.getValue())
-            return 1;
-        if(getValue() > other.getValue())
-            return -1;
-        else
-            return 0;
+        return getValue().compareTo(other.getValue());
     }
 
     public boolean equals(Object object) {
@@ -230,7 +225,7 @@ public class Individual implements Comparable {
 
         Individual other = (Individual)object;
 
-        return getValue() == other.getValue();
+        return getValue().equals(other.getValue());
     }
 
     public int hashCode() {

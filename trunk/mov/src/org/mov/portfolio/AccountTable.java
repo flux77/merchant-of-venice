@@ -49,7 +49,7 @@ public class AccountTable extends AbstractTable {
 	    "Account", "Value"};
 
 	private Class[] columnClasses = {
-	    String.class, PriceFormat.class};
+	    String.class, Money.class};
 
 	private QuoteBundle quoteBundle;
 	private Portfolio portfolio;
@@ -98,10 +98,10 @@ public class AccountTable extends AbstractTable {
 		    
 		case(VALUE_COLUMN):
 		    try {
-			return new PriceFormat(account.getValue(quoteBundle, dateOffset));
+			return account.getValue(quoteBundle, dateOffset);
 		    }
 		    catch(MissingQuoteException e) {
-			return new PriceFormat(0.0F);
+			return Money.ZERO;
 		    }
 		}
 	    }
@@ -116,20 +116,20 @@ public class AccountTable extends AbstractTable {
 		    // Sum values of all accounts
 		    List accounts = portfolio.getAccounts();
 		    Iterator iterator = accounts.iterator();
-		    float value = 0;
+		    Money value = Money.ZERO;
 		    
 		    while(iterator.hasNext()) {
 			Account account = (Account)iterator.next();
 
 			try {
-			    value += account.getValue(quoteBundle, dateOffset);
+			    value = value.add(account.getValue(quoteBundle, dateOffset));
 			}
 			catch(MissingQuoteException e) {
 			    // nothing to do 
 			}
 		    }
 
-		    return new PriceFormat(value);
+		    return value;
 		}
 	    }
 

@@ -21,6 +21,7 @@ package org.mov.portfolio;
 import java.util.*;
 
 import org.mov.quote.Symbol;
+import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
 /**
@@ -65,10 +66,10 @@ public class Transaction implements Cloneable, Comparable {
     // All possible fields for all possible transactions 
     private TradingDate date;
     private int type;
-    private float amount;
+    private Money amount;
     private Symbol symbol;
     private int shares;
-    private float tradeCost;
+    private Money tradeCost;
     private CashAccount cashAccount;
     private CashAccount cashAccount2;
     private ShareAccount shareAccount;
@@ -88,8 +89,8 @@ public class Transaction implements Cloneable, Comparable {
      * @param	cashAccount2	second related cash account (if any)
      * @param	shareAccount	related share account (if any)
      */
-    public Transaction(int type, TradingDate date, float amount, 
-		       Symbol symbol, int shares, float tradeCost,
+    public Transaction(int type, TradingDate date, Money amount, 
+		       Symbol symbol, int shares, Money tradeCost,
 		       CashAccount cashAccount, CashAccount cashAccount2, 
 		       ShareAccount shareAccount) {
 	this.type = type;
@@ -112,10 +113,10 @@ public class Transaction implements Cloneable, Comparable {
      * @param	account	cash account 
      */
     public static Transaction newWithdrawal(TradingDate date, 
-					    float amount,
+					    Money amount,
 					    CashAccount account) {
 	return new Transaction(WITHDRAWAL, date, amount, null, 0, 
-			       0.0F, account, null, null);
+			       Money.ZERO, account, null, null);
     }
 
     /**
@@ -127,10 +128,10 @@ public class Transaction implements Cloneable, Comparable {
      * @param	account	cash account 
      */
     public static Transaction newDeposit(TradingDate date, 
-					 float amount,
+					 Money amount,
 					 CashAccount account) {
 	return new Transaction(DEPOSIT, date, amount, null, 0, 
-			       0.0F, account, null, null);
+			       Money.ZERO, account, null, null);
     }
 
     /**
@@ -142,10 +143,10 @@ public class Transaction implements Cloneable, Comparable {
      * @param	account	cash account 
      */
     public static Transaction newInterest(TradingDate date, 
-					  float amount,
+					  Money amount,
 					  CashAccount account) {
 	return new Transaction(INTEREST, date, amount, null, 0, 
-			       0.0F, account, null, null);
+			       Money.ZERO, account, null, null);
     }
 
     /**
@@ -157,10 +158,10 @@ public class Transaction implements Cloneable, Comparable {
      * @param	account	cash account 
      */
     public static Transaction newFee(TradingDate date, 
-				     float amount,
+				     Money amount,
 				     CashAccount account) {
 	return new Transaction(FEE, date, amount, null, 0, 
-			       0.0F, account, null, null);
+			       Money.ZERO, account, null, null);
     }
 
     /**
@@ -176,10 +177,10 @@ public class Transaction implements Cloneable, Comparable {
      * @param	cashAccount	cash account 
      */
     public static Transaction newAccumulate(TradingDate date, 
-					    float amount,
+					    Money amount,
 					    Symbol symbol,
 					    int shares,
-					    float tradeCost,
+					    Money tradeCost,
 					    CashAccount cashAccount,
 					    ShareAccount shareAccount) {
 	return new Transaction(ACCUMULATE, date, amount, symbol, shares, 
@@ -199,10 +200,10 @@ public class Transaction implements Cloneable, Comparable {
      * @param	cashAccount	cash account 
      */
     public static Transaction newReduce(TradingDate date, 
-					float amount,
+					Money amount,
 					Symbol symbol,
 					int shares,
-					float tradeCost,
+					Money tradeCost,
 					CashAccount cashAccount,
 					ShareAccount shareAccount) {
 	return new Transaction(REDUCE, date, amount, symbol, shares, 
@@ -219,12 +220,12 @@ public class Transaction implements Cloneable, Comparable {
      * @param	cashAccount	cash account 
      */
     public static Transaction newDividend(TradingDate date, 
-					  float amount,
+					  Money amount,
 					  Symbol symbol,
 					  CashAccount cashAccount,
 					  ShareAccount shareAccount) {
 	return new Transaction(DIVIDEND, date, amount, symbol, 0, 
-			       0.0F, cashAccount, null, shareAccount);
+			       Money.ZERO, cashAccount, null, shareAccount);
     }
 
     /**
@@ -239,12 +240,12 @@ public class Transaction implements Cloneable, Comparable {
      * @param	shareAccount	share account 
      */
     public static Transaction newDividendDRP(TradingDate date, 
-					     float amount,
+					     Money amount,
 					     Symbol symbol,
 					     int shares,
 					     ShareAccount shareAccount) {
-	return new Transaction(DIVIDEND_DRP, date, 0.0F, symbol, shares, 
-			       0.0F, null, null, shareAccount);
+	return new Transaction(DIVIDEND_DRP, date, Money.ZERO, symbol, shares, 
+			       Money.ZERO, null, null, shareAccount);
     }
 
     /**
@@ -257,11 +258,11 @@ public class Transaction implements Cloneable, Comparable {
      * @param	cashAccount2	destination cash account
      */
     public static Transaction newTransfer(TradingDate date, 
-					  float amount,
+					  Money amount,
 					  CashAccount cashAccount,
 					  CashAccount cashAccount2) {
 	return new Transaction(TRANSFER, date, amount, null, 0, 
-			       0.0F, cashAccount, cashAccount2, null);
+			       Money.ZERO, cashAccount, cashAccount2, null);
     }
 
     /** 
@@ -400,7 +401,7 @@ public class Transaction implements Cloneable, Comparable {
      *
      * @return	amount
      */
-    public float getAmount() {
+    public Money getAmount() {
 	return amount;
     }
     
@@ -431,7 +432,7 @@ public class Transaction implements Cloneable, Comparable {
      * @return cost of trade or <code>0</code> if this transaction was 
      *		not a share transaction
      */
-    public float getTradeCost() {
+    public Money getTradeCost() {
 	return tradeCost;
     }
 

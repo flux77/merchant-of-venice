@@ -66,7 +66,7 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
                 Symbol symbol = null;
 
                 try {
-                    symbol = SymbolRegistry.find(quoteParts[i++]);
+                    symbol = Symbol.find(quoteParts[i++]);
                 }
                 catch(SymbolFormatException e) {
                     // Return null - couldn't parse quote

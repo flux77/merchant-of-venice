@@ -22,13 +22,14 @@ import java.util.*;
 
 import org.mov.portfolio.*;
 import org.mov.quote.*;
-import org.mov.util.*;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
 
 public class PaperTradeResult {
     private Portfolio portfolio;
     private ScriptQuoteBundle quoteBundle;
-    private float initialCapital;
-    private float tradeCost;
+    private Money initialCapital;
+    private Money tradeCost;
     private String buyRule;
     private String sellRule;
     private int a;
@@ -38,7 +39,7 @@ public class PaperTradeResult {
     private TradingDate endDate;
     
     public PaperTradeResult(Portfolio portfolio, ScriptQuoteBundle quoteBundle,
-                            float initialCapital, float tradeCost,
+                            Money initialCapital, Money tradeCost,
                             String buyRule, String sellRule,
                             int a, int b, int c,
                             TradingDate startDate,
@@ -101,7 +102,7 @@ public class PaperTradeResult {
         return c;
     }
 
-    public float getTradeCost() {
+    public Money getTradeCost() {
         return tradeCost;
     }
 
@@ -114,22 +115,19 @@ public class PaperTradeResult {
         return accumulateTrades + reduceTrades;
     }
 
-    public float getInitialCapital() {
+    public Money getInitialCapital() {
         return initialCapital;
     }
 
-    public float getFinalCapital() {
-        float finalCapital = 0.0F;
-        
+    public Money getFinalCapital() {
         try {
-            finalCapital = portfolio.getValue(getQuoteBundle(), getEndDate());
+            return portfolio.getValue(getQuoteBundle(), getEndDate());
         }
         catch(MissingQuoteException e) {
             // Already checked...
             assert false;
+            return Money.ZERO;
         }
-        
-        return finalCapital;
     }
 
     public Portfolio getPortfolio() {

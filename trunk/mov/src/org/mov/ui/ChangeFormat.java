@@ -18,6 +18,8 @@
 
 package org.mov.ui;
 
+import org.mov.util.Money;
+
 /**
  * An abstract representation of the concept of Change. This class stores the
  * change of a value (in percent). It is currently used as a place holder
@@ -29,7 +31,7 @@ public class ChangeFormat implements Comparable {
     double change;
 
     /**
-     * Create a new Change object.
+     * Create a new Change object from the given change.
      *
      * @param	change	the change in percent
      */
@@ -37,11 +39,29 @@ public class ChangeFormat implements Comparable {
 	this.change = change;
     }
 
-    public ChangeFormat(float a, float b) {
+    /**
+     * Create a new change object and calculate the change
+     * from the initial and final monetary values.
+     *
+     * @param initialValue the initial amount
+     * @param finalValue the final amount
+     */
+    public ChangeFormat(Money initialValue, Money finalValue) {
+        this(initialValue.floatValue(), finalValue.floatValue());
+    }
+
+    /**
+     * Create a new change object and calculate the change
+     * from the initial and final monetary values.
+     *
+     * @param initialValue the initial amount
+     * @param finalValue the final amount
+     */
+    public ChangeFormat(float initialValue, float finalValue) {
 	change = 0.0;
 
-	if(a != 0.0) 
-	    change = ((b - a) / a) * 100;
+	if(initialValue != 0.0) 
+	    change = ((finalValue - initialValue) / finalValue) * 100;
     }
 
     /**

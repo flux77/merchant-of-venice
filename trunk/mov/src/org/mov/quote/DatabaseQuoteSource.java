@@ -224,7 +224,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
 		// Get only entry which is the name
                 try {
-                    symbol = new Symbol(RS.getString(1));
+                    symbol = Symbol.find(RS.getString(1));
                 }
                 catch(SymbolFormatException e) {
                     // Error in data. Ignore.
@@ -441,7 +441,7 @@ public class DatabaseQuoteSource implements QuoteSource
                     QuoteCache quoteCache = QuoteCache.getInstance();
 
                     while (RS.next()) {
-                        quoteCache.load(SymbolRegistry.find(RS.getString(SYMBOL_FIELD)),
+                        quoteCache.load(Symbol.find(RS.getString(SYMBOL_FIELD)),
                                         new TradingDate(RS.getDate(DATE_FIELD)),
                                         RS.getInt(DAY_VOLUME_FIELD),
                                         RS.getFloat(DAY_LOW_FIELD),
@@ -895,7 +895,7 @@ public class DatabaseQuoteSource implements QuoteSource
                 RS.close();
                 statement.close();
 
-                throw new MissingQuoteException();
+                throw MissingQuoteException.getInstance();
             }
 
             //

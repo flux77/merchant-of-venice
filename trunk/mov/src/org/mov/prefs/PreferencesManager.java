@@ -38,6 +38,7 @@ import org.mov.portfolio.Portfolio;
 import org.mov.portfolio.Transaction;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
+import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
 /**
@@ -212,13 +213,13 @@ public class PreferencesManager {
 		    new TradingDate(transactionPrefs.get("date", 
 							 "01/01/2000"),
 				    TradingDate.BRITISH);
-		float amount = transactionPrefs.getFloat("amount", 0.0F);
+		Money amount = new Money(transactionPrefs.getFloat("amount", 0.0F));
 		Symbol symbol = null;
 		int shares = transactionPrefs.getInt("shares", 0);
-		float tradeCost = transactionPrefs.getFloat("trade_cost",
-							    0.0F);
+		Money tradeCost = new Money(transactionPrefs.getFloat("trade_cost", 0.0F));
+
                 try {
-                    symbol = new Symbol(transactionPrefs.get("symbol", ""));
+                    symbol = Symbol.find(transactionPrefs.get("symbol", ""));
                 }
                 catch(SymbolFormatException e) {
                     // Shouldnt happen unless portfolio gets corrupted
@@ -240,7 +241,8 @@ public class PreferencesManager {
 		    // Build transaction and add it to the portfolio
 		    Transaction transaction = 
 			new Transaction(type, date, amount, symbol, shares,
-					tradeCost, cashAccount, cashAccount2, shareAccount);
+					tradeCost, cashAccount, cashAccount2, 
+                                        shareAccount);
 						
 		    transactions.add(transaction);
 		}
@@ -304,14 +306,14 @@ public class PreferencesManager {
 			     Transaction.typeToString(transaction.getType()));
 	    transactionPrefs.put("date", 
 			     transaction.getDate().toString("dd/mm/yyyy"));
-	    transactionPrefs.putFloat("amount", transaction.getAmount());
+	    transactionPrefs.putFloat("amount", transaction.getAmount().floatValue());
 
 	    if(transaction.getSymbol() != null) 
 		transactionPrefs.put("symbol", transaction.getSymbol().toString());
 
 	    transactionPrefs.putInt("shares", transaction.getShares());
 	    transactionPrefs.putFloat("trade_cost", 
-				      transaction.getTradeCost());
+				      transaction.getTradeCost().floatValue());
 
 	    CashAccount cashAccount = transaction.getCashAccount();
 	    if(cashAccount != null) 

@@ -30,7 +30,8 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 
 import org.mov.main.*;
-import org.mov.util.*;
+import org.mov.util.Money;
+import org.mov.util.TradingDate;
 import org.mov.quote.*;
 import org.mov.table.*;
 import org.mov.ui.*;
@@ -72,7 +73,7 @@ public class TransactionModule extends AbstractTable implements Module,
 	};
 
 	private Class[] columnClasses = {
-	    TradingDate.class, String.class, PriceFormat.class, PriceFormat.class
+	    TradingDate.class, String.class, Money.class, Money.class
 	};
 
 	private List transactions;
@@ -124,36 +125,29 @@ public class TransactionModule extends AbstractTable implements Module,
 		
 	    case(CREDIT_COLUMN):
 		// Portfolio gains money		
-                float credit = 0.0F;
-		
 		switch(type) {
 		case(Transaction.DEPOSIT):
 		case(Transaction.DIVIDEND):
 		case(Transaction.INTEREST):
 		case(Transaction.TRANSFER):
-		    credit = transaction.getAmount();
-		    break;
+		    return transaction.getAmount();
 		}
 
-		return new PriceFormat(credit);
+		return Money.ZERO;
 
 	    case(DEBIT_COLUMN):
 		// Portfolio loses money
-		float debit = 0.0F;
-		
 		switch(type) {
 		case(Transaction.WITHDRAWAL):
 		case(Transaction.FEE):
 		case(Transaction.TRANSFER):
-		    debit = transaction.getAmount();
-		    break;
+		    return transaction.getAmount();
 		case(Transaction.ACCUMULATE):
 		case(Transaction.REDUCE):
-		    debit = transaction.getTradeCost();
-		    break;
+		    return transaction.getTradeCost();
 		}
 
-		return new PriceFormat(debit);
+                return Money.ZERO;
 	    }
 
 	    return "";
@@ -170,9 +164,7 @@ public class TransactionModule extends AbstractTable implements Module,
 	switch(type) {
 	case(Transaction.ACCUMULATE):
 	case(Transaction.REDUCE):
-	    String pricePerShare =
-		PriceFormat.priceToString(transaction.getAmount() /
-                                          transaction.getShares());
+            Money pricePerShare = transaction.getAmount().divide(transaction.getShares());
 	    
 	    transactionString = 
 		transactionString.concat(" " +

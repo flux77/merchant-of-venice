@@ -148,11 +148,9 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	int levelHeight;
 
 	while(iterator.hasNext()) {
-	    
 	    yoffset += ((Integer)iterator.next()).intValue();
 	    if(yCoordinate <= yoffset)
 		return level;
-	    
 	    level++;
 	}
        	return 0;
@@ -318,13 +316,11 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    minorHorizontalAxis = monthsHorizontalAxis;
 	}
 
-
 	// Major horizontal axis is always years
 	if(majorHorizontalAxis == null)
 	    majorHorizontalAxis = 
 		new HorizontalAxis(chart.getXRange(), HorizontalAxis.YEARS,
 				   HorizontalAxis.MAJOR);
-
     }
 
     // Highlight the component's highlighted region
@@ -838,6 +834,3 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	return Color.darkGray;
     }
 }
-
-
-

@@ -5,9 +5,12 @@ import java.sql.*;
 import java.util.*;
 import javax.swing.*;
 
+import org.liquid.misc.*;
 import org.mov.util.*;
 import org.mov.portfolio.*;
 import org.mov.ui.DesktopManager;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
 
 /**
  * Provides functionality to obtain stock quotes from a database. This class
@@ -56,7 +59,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
     // Keep list of dates in database when importing
     private Vector allDates = null;
-    
+
     /**
      * Creates a new quote source using the database information specified
      * in the user preferences.
@@ -274,17 +277,16 @@ public class DatabaseQuoteSource implements QuoteSource
     // stock quotes
     private Vector executeQuery(String query) {
 	Vector table = new Vector();
-
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 	if(connection != null) {
 	    try {
 		Statement statement = connection.createStatement();	       
 		ResultSet RS = statement.executeQuery(query);
 		Stock stock;
-
 		int i = 0;
 
 		while (RS.next()) {
-		    stock = new Stock(RS.getString(SYMBOL_FIELD).toLowerCase(),
+                    stock = new Stock(RS.getString(SYMBOL_FIELD).toLowerCase(),
 				      new TradingDate(RS.getDate(DATE_FIELD)),
 				      RS.getInt(DAY_VOLUME_FIELD),
 				      RS.getFloat(DAY_LOW_FIELD),
@@ -292,7 +294,9 @@ public class DatabaseQuoteSource implements QuoteSource
 				      RS.getFloat(DAY_OPEN_FIELD),
 				      RS.getFloat(DAY_CLOSE_FIELD));
 		    table.add(stock);
-		}
+                    // Update the progress bar per row
+                    progress.increment();
+                }
 		// Clean up after ourselves
 		RS.close();
 		statement.close();
@@ -320,22 +324,34 @@ public class DatabaseQuoteSource implements QuoteSource
 				    int type) {
 
 	// This query might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Loading quotes " + 
-					startDate.toShortString() + " to " +
-					endDate.toShortString(), 1);
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+        try {
+            progress.setNote("Connecting to source");
+            progress.setIndeterminate(true);
+            Statement statement = connection.createStatement();	       
+            ResultSet RS = statement.executeQuery("SELECT COUNT(*) FROM " + SHARE_TABLE_NAME +
+			 " WHERE " + DATE_FIELD +" >= '" + startDate + "' " +
+			 " AND " + DATE_FIELD +" <= '" + endDate + "' " + 
+			 restrictTypeString(type));
+            
+            int rows = 0;
+            if (RS.next()) {
+                // Update the progress bar
+                progress.setMaximum(RS.getInt(1));
+                progress.setProgress(0);
+                progress.setIndeterminate(false);
+            }
+        } catch (Exception e) {}
 
-	Vector query = 
+        progress.setNote("Loading quotes for " + startDate.toShortString() + " to " +
+                                                 endDate.toShortString());
+
+        Vector query = 
 	    executeQuery("SELECT * FROM " + SHARE_TABLE_NAME +
 			 " WHERE " + DATE_FIELD +" >= '" + startDate + "' " +
 			 " AND " + DATE_FIELD +" <= '" + endDate + "' " + 
 			 restrictTypeString(type) +
 			 " ORDER BY " + DATE_FIELD);
-
-	// A next right before a close is OK because we might not be the
-	// owner so it might not close straight away
-	Progress.getInstance().next();
-	Progress.getInstance().close(owner); 
 
 	return query;
     }
@@ -363,21 +379,31 @@ public class DatabaseQuoteSource implements QuoteSource
      * @see Stock
      */
     public Vector getQuotesForSymbol(String symbol) {
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
-	// This query might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Loading quotes for " + symbol, 1);
+        try {
+            progress.setNote("Connecting to source");
+            progress.setIndeterminate(true);
+            Statement statement = connection.createStatement();	       
+            ResultSet RS = statement.executeQuery("SELECT COUNT(*) FROM " + SHARE_TABLE_NAME + " " +
+                                                  "WHERE " + SYMBOL_FIELD +" = '" + symbol + "' ");
+        
+            int rows = 0;
+            if (RS.next()) {
+                // Update the progress bar
+                progress.setMaximum(RS.getInt(1));
+                progress.setNote("Retrieving prices");
+                progress.setProgress(0);
+                progress.setIndeterminate(false);
+            }
+        } catch (Exception e) {}
 
-	Vector query = 
+        
+        Vector query = 
 	    executeQuery("SELECT * FROM " + SHARE_TABLE_NAME + " " +
 			 "WHERE " + SYMBOL_FIELD +" = '" + symbol + "' " +
 			 "ORDER BY " + DATE_FIELD);
 	
-	// A next right before a close is OK because we might not be the
-	// owner so it might not close straight away
-	Progress.getInstance().next();
-	Progress.getInstance().close(owner); 
-
 	return query;
     }
 
@@ -627,9 +653,10 @@ public class DatabaseQuoteSource implements QuoteSource
 	    return dates;
 	
 	// This might take a while
-	boolean owner = 
-	    Progress.getInstance().open("Retrieving dates from database", 1);
-
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+        progress.setTitle("Getting dates...");
+        progress.setNote("");
+        progress.setIndeterminate(true);
 	try {
 	    // 1. Create the table
 	    Statement statement = connection.createStatement();
@@ -639,6 +666,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
 	    while(RS.next()) {
 		dates.add(new TradingDate(RS.getDate(1)));
+                progress.increment();
 	    }
 
 	}
@@ -646,7 +674,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	    DesktopManager.showErrorMessage("Error talking to database");
 	}
 
-	Progress.getInstance().close(owner);
+	ProgressDialogManager.closeProgressDialog();
 
 	return dates;
     }

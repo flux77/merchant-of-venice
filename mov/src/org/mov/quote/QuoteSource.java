@@ -79,7 +79,7 @@ public interface QuoteSource {
     public Vector getQuotesForDates(TradingDate startDate, 
 				    TradingDate endDate, 
 				    int type);
-
+    
     /**
      * Return a vector of all quotes in the given date.
      * The vector will be in order of stock symbol.

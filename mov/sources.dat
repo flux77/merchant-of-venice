@@ -31,14 +31,8 @@
 ./org.mov.util/Change.java
 ./org.mov.util/CommodityListQuery.java
 ./org.mov.util/Converter.java
-./org.mov.util/Database.java
-./org.mov.util/DatabaseLookup.java
 ./org.mov.util/ExpressionQuery.java
-./org.mov.util/InternetDataSource.java
 ./org.mov.util/Progress.java
-./org.mov.util/QuoteCache.java
-./org.mov.util/QuoteFunctions.java
-./org.mov.util/SanfordDataSource.java
 ./org.mov.util/TradingDate.java
 ./org.mov.util/TradingDateComparator.java
 ./org.mov/parser/AddExpression.java
@@ -92,9 +86,17 @@
 ./org.mov/portfolio/StockHolding.java
 ./org.mov/portfolio/Trade.java
 ./org.mov/portfolio/Transaction.java
+./org.mov/prefs/QuoteSourcePreferences.java
 ./org.mov/table/AbstractAnalyserTable.java
 ./org.mov/table/PortfolioTable.java
 ./org.mov/table/QuoteModule.java
 ./org.mov/table/TradingHistoryTable.java
 ./org.mov/ui/InternalFrameHandler.java
+./org.mov/quote/Quote.java
+./org.mov/quote/QuoteSource.java
+./org.mov/quote/DatabaseQuoteSource.java
+./org.mov/quote/FileQuoteSource.java
+./org.mov/quote/DatabaseLookup.java
+./org.mov/quote/QuoteCache.java
+./org.mov/quote/QuoteFunctions.java
 

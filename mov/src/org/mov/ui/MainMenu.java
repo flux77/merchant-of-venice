@@ -8,14 +8,14 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import org.mov.chart.*;
 import org.mov.main.*;
 import org.mov.util.*;
-import org.mov.chart.*;
 import org.mov.parser.*;
-import org.mov.table.*;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
+import org.mov.table.*;
 import org.mov.ui.*;
 
 /**
@@ -28,14 +28,19 @@ public class MainMenu implements ActionListener, ContainerListener {
     private JMenuItem filePortfolioNewMenuItem;
     private JMenuItem filePreferencesMenuItem;
     private JMenuItem fileExitMenuItem;
+
     private JMenuItem graphCommodityCodeMenuItem;
     private JMenuItem graphCommodityNameMenuItem;
+
     private JMenuItem tableCompanyListAllMenuItem;
     private JMenuItem tableCompanyListRuleMenuItem;
     private JMenuItem tableIndicesListAllMenuItem;
     private JMenuItem tableIndicesListRuleMenuItem;
     private JMenuItem tableCommoditiesListAllMenuItem;
     private JMenuItem tableCommoditiesListRuleMenuItem;
+
+    private JMenuItem analysisPaperTradeMenuItem;
+
     private JMenuItem windowTileHorizontalMenuItem;
     private JMenuItem windowTileVerticalMenuItem;
     private JMenuItem windowCascadeMenuItem;
@@ -176,6 +181,10 @@ public class MainMenu implements ActionListener, ContainerListener {
 	{
 	    JMenu analysisMenu = 
 		MenuHelper.addMenu(menuBar, "Analysis", 'A');
+
+	    analysisPaperTradeMenuItem = 
+		MenuHelper.addMenuItem(this, analysisMenu,
+				       "Paper Trade");
 	}
 
 	// Window menu
@@ -193,7 +202,6 @@ public class MainMenu implements ActionListener, ContainerListener {
 	    windowGridMenuItem = 
 		MenuHelper.addMenuItem(this, windowMenu, "Arrange all");
 	    windowGridMenuItem.setEnabled(false);
-	    windowMenu.addSeparator();
 	}
 
 	// Build portfolio menus
@@ -274,7 +282,12 @@ public class MainMenu implements ActionListener, ContainerListener {
 
 			CommandManager.getInstance().graphPortfolio(portfolio);
 		    }
-		    
+
+		    // Analysis Menu ******************************************************************************
+
+		    else if (menu == analysisPaperTradeMenuItem)
+			CommandManager.getInstance().paperTrade();
+
 		    // Window Menu ******************************************************************************
 		    else if (menu == windowTileHorizontalMenuItem)
 			CommandManager.getInstance().tileFramesHorizontal();
@@ -332,16 +345,21 @@ public class MainMenu implements ActionListener, ContainerListener {
 	    else
 		title = "Unknown";
 
-	    // Store the menu item in a hash referenced by the window's name
-	    JMenuItem i = MenuHelper.addMenuItem(this, windowMenu, title);
-	    frame_menu_hash.put(o, i);
-	    menu_frame_hash.put(i, o);
-	    if (frame_menu_hash.size() == 1) {
+	    // First window? Then enable window arrange menu items and
+	    // add separator
+	    if (frame_menu_hash.size() == 0) {
 		windowTileHorizontalMenuItem.setEnabled(true);
 		windowTileVerticalMenuItem.setEnabled(true);
 		windowCascadeMenuItem.setEnabled(true);
 		windowGridMenuItem.setEnabled(true);
+
+		windowMenu.addSeparator();
 	    }
+
+	    // Store the menu item in a hash referenced by the window's name
+	    JMenuItem i = MenuHelper.addMenuItem(this, windowMenu, title);
+	    frame_menu_hash.put(o, i);
+	    menu_frame_hash.put(i, o);
 	}
     }
 
@@ -357,11 +375,17 @@ public class MainMenu implements ActionListener, ContainerListener {
 	    windowMenu.remove((JMenuItem)frame_menu_hash.get(o));
 	    menu_frame_hash.remove(frame_menu_hash.get(o));
 	    frame_menu_hash.remove(o);
+
+	    // No more menu items? Then disable window arrange menu items
+	    // and remove separator
 	    if (frame_menu_hash.size() == 0) {
 		windowTileHorizontalMenuItem.setEnabled(false);
 		windowTileVerticalMenuItem.setEnabled(false);
 		windowCascadeMenuItem.setEnabled(false);
 		windowGridMenuItem.setEnabled(false);
+
+		// Window separator is the last menu item
+		windowMenu.remove(windowMenu.getItemCount() - 1);
 	    }
 	}
     }
@@ -377,8 +401,7 @@ public class MainMenu implements ActionListener, ContainerListener {
 
 	// Portfolio menu off of file has the ability to create a new
 	// portfolio
-	filePortfolioNewMenuItem = 
-	    MenuHelper.addMenuItem(this, filePortfolioMenu, "New Portfolio");
+	MenuHelper.addMenuItem(this, filePortfolioMenu, "New Portfolio");
 
 	if(PreferencesManager.getPortfolioNames().length > 0) {
 	    filePortfolioMenu.addSeparator();

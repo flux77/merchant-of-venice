@@ -187,7 +187,7 @@ public class CommandManager {
             final Thread thread = Thread.currentThread();
             ProgressDialogManager.getProgressDialog().addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {thread.interrupt();}
-            });
+		});
             QuoteCache cache = null;
             QuoteModule table = null;
 
@@ -206,13 +206,36 @@ public class CommandManager {
     }
 
     public void openPortfolio(String portfolioName) {
-	Portfolio portfolio = PreferencesManager.loadPortfolio(portfolioName);
 
-	QuoteCache cache = 
-	    new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
-			   QuoteSource.ALL_COMMODITIES);
-	
-	((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, cache));
+	final Thread thread = Thread.currentThread();
+	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+	progress.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    thread.interrupt();
+		}
+	    });
+
+	try {
+	    QuoteCache cache = null;
+	    Portfolio portfolio = 
+		PreferencesManager.loadPortfolio(portfolioName);
+
+	    progress.setTitle("Loading quotes for portfolio");
+	    progress.show();
+
+            if (!thread.isInterrupted()) 
+		cache = 
+		    new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
+				   QuoteSource.ALL_COMMODITIES);
+	    if (!thread.isInterrupted())
+		((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, cache));
+
+	    if (!Thread.currentThread().interrupted())
+		ProgressDialogManager.closeProgressDialog();
+	    	
+	} catch (Exception e) {
+            ProgressDialogManager.closeProgressDialog();
+        }
     }
 
     public void newPortfolio() {
@@ -228,14 +251,27 @@ public class CommandManager {
 	    // Save portfolio so we can update the menu
 	    PreferencesManager.savePortfolio(portfolio);
 	    MainMenu.getInstance().updatePortfolioMenu();
-	    
-	    QuoteCache cache = 
-		new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
-			       QuoteSource.ALL_COMMODITIES);
 
-	    ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, cache));
+	    // Open as normal
+	    openPortfolio(portfolioName);
 	}
     }
+
+    public void graphPortfolio(Portfolio portfolio) {
+	// If no portfolio was given - ask for one
+	if(portfolio == null) {
+
+	}
+
+	// crap need to instantiate a quote cache with
+	// multiple stocks with multiple dates. need to ein venice,
+	// ein quote cache. need to update sources so they can load
+	// in multiple quotes at once. buffer!!
+
+
+
+    }
+
     /** Displays a graph closing prices for stock(s), based on their code. The stock(s) is/are determined by a user prompt */
     public void graphStockByCode() {
         final Thread t = new Thread(new Runnable() {
@@ -296,7 +332,6 @@ public class CommandManager {
                 QuoteCache cache = null;
                 GraphSource dayClose = null;
                 Graph graph = null;
-
 
                 while(iterator.hasNext() && !thread.isInterrupted()) {
                     symbol = (String)iterator.next();

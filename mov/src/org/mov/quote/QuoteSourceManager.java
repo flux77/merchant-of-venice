@@ -99,8 +99,6 @@ public class QuoteSourceManager {
 		sourceInstance = createFileQuoteSource();
 	    else if(quoteSource.equals("database"))
 		sourceInstance = createDatabaseQuoteSource();
-            //	    else if(quoteSource.equalts("internet"))
-            //	sourceInstance = createInternetQuoteSource();
             else
                 sourceInstance = createSamplesQuoteSource();
 	}

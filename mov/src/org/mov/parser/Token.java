@@ -187,10 +187,10 @@ public class Token {
     /** Represents "<code>ema()</code>" symbol */
     public static final int EMA_TOKEN = 51;
 
-    /** Represents "<code>bbl()</code>" symbol */
+    /** Represents "<code>bol_lower()</code>" symbol */
     public static final int BBL_TOKEN = 52;
     
-    /** Represents "<code>bbu()</code>" symbol */
+    /** Represents "<code>bol_upper()</code>" symbol */
     public static final int BBU_TOKEN = 53;
     
     /** Represents "<code>macd()</code>" symbol */
@@ -303,8 +303,8 @@ public class Token {
         tokenStrings[WHILE_TOKEN]              = "while";
         tokenStrings[CORR_TOKEN]               = "corr";
         tokenStrings[EMA_TOKEN]                = "ema";
-        tokenStrings[BBL_TOKEN]                = "bbl";
-        tokenStrings[BBU_TOKEN]                = "bbu";
+        tokenStrings[BBL_TOKEN]                = "bol_lower";
+        tokenStrings[BBU_TOKEN]                = "bol_upper";
         tokenStrings[MACD_TOKEN]               = "macd";
         tokenStrings[MOMENTUM_TOKEN]           = "momentum";
         tokenStrings[OBV_TOKEN]                = "obv";

@@ -73,8 +73,8 @@ import org.mov.util.Locale;
  *                     "abs" "(" SUB_EXPR ")" |
  *                     "corr" "(" STRING "," QUOTE "," SUB_EXPR ["," SUB_EXPR] ")"
  *                     "ema" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ["," SUB_EXPR] ")"
- *                     "bbl" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
- *                     "bbu" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "bol_lower" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "bol_upper" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
  *                     "macd" "(" QUOTE ["," SUB_EXPR] ")" |
  *                     "momentum" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
  *                     "obv" "(" SUB_EXPR ["," SUB_EXPR] ["," SUB_EXPR] ")" |

@@ -66,7 +66,7 @@ public class BBLExpression extends TernaryExpression {
     }
 
     public String toString() {
-	return new String("bbl(" + 
+	return new String("bol_lower(" + 
 			  getChild(0).toString() + ", " +
 			  getChild(1).toString() + ", " +
 			  getChild(2).toString() + ")");

@@ -66,7 +66,7 @@ public class BBUExpression extends TernaryExpression {
     }
 
     public String toString() {
-	return new String("bbu(" + 
+	return new String("bol_upper(" + 
 			  getChild(0).toString() + ", " +
 			  getChild(1).toString() + ", " +
 			  getChild(2).toString() + ")");

@@ -173,53 +173,63 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	return menu;
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
 
-	// They should all be menu actions
-	JMenuItem menu = (JMenuItem)e.getSource();
+	// Handle all menu actions in a separate thread so we dont
+	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+	Thread menuAction = new Thread() {
 
-	// Is it the file menu?
-	if(menu == fileExitMenuItem)
-	    System.exit(0);
-	else if(menu == filePreferencesQuoteMenuItem) {
-	    // Display preferences
-	    newCentredFrame(new PreferencesModule(desktop, PreferencesModule.QUOTE_SOURCE_PAGE));
-	}
+		public void run() {
 
-	// Is it a table menu?
-	if(menu == tableCommoditiesListAllMenuItem ||
-	   menu == tableCompanyListRuleMenuItem ||
-	   menu == tableCompanyListAllMenuItem ||
-	   menu == tableIndicesListAllMenuItem) {
-
-	    handleTableMenuAction(menu);
-	}
-
-	// Is it a graph menu?
-	else if(menu == graphCommodityCodeMenuItem ||
-		menu == graphCommodityNameMenuItem) {
-
-	    handleGraphMenuAction(menu);
-	}
-
-
-	// Is it a window handling function?
-	else if (menu == windowTileHorizontalMenuItem) {
-	    InternalFrameHandler.tileFrames(desktop, 
-					    InternalFrameHandler.HORIZONTAL);
-	}
-	else if (menu == windowTileVerticalMenuItem) {
-	    InternalFrameHandler.tileFrames(desktop, 
-					    InternalFrameHandler.VERTICAL);
-	}
-	else if (menu == windowCascadeMenuItem) {
-	    InternalFrameHandler.tileFrames(desktop, 
-					    InternalFrameHandler.CASCADE);
-	}
-	else if (menu == windowGridMenuItem) {
-	    InternalFrameHandler.tileFrames(desktop, 
-					    InternalFrameHandler.ARRANGE);
-	}
+		    // They should all be menu actions
+		    JMenuItem menu = (JMenuItem)e.getSource();
+		    
+		    // Is it the file menu?
+		    if(menu == fileExitMenuItem)
+			System.exit(0);
+		    else if(menu == filePreferencesQuoteMenuItem) {
+			// Display preferences
+			newCentredFrame(new PreferencesModule(desktop, PreferencesModule.QUOTE_SOURCE_PAGE));
+		    }
+		    
+		    // Is it a table menu?
+		    if(menu == tableCommoditiesListAllMenuItem ||
+		       menu == tableCompanyListRuleMenuItem ||
+		       menu == tableCompanyListAllMenuItem ||
+		       menu == tableIndicesListAllMenuItem) {
+			
+			handleTableMenuAction(menu);
+		    }
+		    
+		    // Is it a graph menu?
+		    else if(menu == graphCommodityCodeMenuItem ||
+			    menu == graphCommodityNameMenuItem) {
+			
+			handleGraphMenuAction(menu);
+		    }
+		    
+		    
+		    // Is it a window handling function?
+		    else if (menu == windowTileHorizontalMenuItem) {
+			InternalFrameHandler.tileFrames(desktop, 
+							InternalFrameHandler.HORIZONTAL);
+		    }
+		    else if (menu == windowTileVerticalMenuItem) {
+			InternalFrameHandler.tileFrames(desktop, 
+							InternalFrameHandler.VERTICAL);
+		    }
+		    else if (menu == windowCascadeMenuItem) {
+			InternalFrameHandler.tileFrames(desktop, 
+							InternalFrameHandler.CASCADE);
+		    }
+		    else if (menu == windowGridMenuItem) {
+			InternalFrameHandler.tileFrames(desktop, 
+							InternalFrameHandler.ARRANGE);
+		    }
+		}
+	    };
+	
+	menuAction.start();
     }
 
     public void handleGraphMenuAction(JMenuItem menu) {
@@ -241,6 +251,9 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	    AnalyserChart chart = new AnalyserChart(desktop);
 	    
 	    // Iterate through companies adding them to the graph
+	    boolean owner =
+		Progress.getInstance().open();
+
 	    while(iterator.hasNext()) {
 		symbol = (String)iterator.next();
 		
@@ -250,6 +263,8 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 
 		chart.add(graph, 0);
 	    }
+
+	    Progress.getInstance().close(owner);
 
 	    chart.redraw();
 	    newFrame(chart);		
@@ -303,7 +318,6 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	// Only continue if user didnt ask for expression then pressed
 	// cancel
 	if(!askedForExpression || expression != null) {
-
 	    // Create cache with stock quotes for this day
 	    QuoteCache cache =
 		new QuoteCache(Quote.getSource().getLatestQuoteDate(),
@@ -329,18 +343,28 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
     private void newFrame(AnalyserModule module, int x, int y,
 			  int width, int height) {
 
-	// Make sure new frame is within bounds
-	if(x < 0) 
-	    x = 0;
-	if(y < 0)
-	    y = 0;
-	if(x + width > desktop.getWidth())
-	    width = desktop.getWidth() - x;
-	if(y + height > desktop.getHeight())
-	    height = desktop.getHeight() - y;
+	// Make sure new frame is within window bounds
+
+	// ORDER IMPORTANT
+	{
+	    if(x > width)
+		x = desktop.getWidth() - width;
+	    if(y > height)
+		y = desktop.getHeight() - height;
+	    if(x < 0) 
+		x = 0;
+	    if(y < 0)
+		y = 0;
+	    
+	    if(x + width > desktop.getWidth())
+		width = desktop.getWidth() - x;
+	    if(y + height > desktop.getHeight())
+		height = desktop.getHeight() - y;
+	}
 	
 	AnalyserFrame frame = new AnalyserFrame(module, x, y, width, height);
 	desktop.add(frame);
+
 	int numframes = (new Integer(System.getProperty("number_of_frames", "0"))).intValue();
 	//	System.setProperty();
 

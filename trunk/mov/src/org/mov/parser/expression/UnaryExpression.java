@@ -18,13 +18,12 @@
 
 package org.mov.parser.expression;
 
-import org.mov.parser.*;
-import org.mov.util.*;
+import org.mov.parser.Expression;
 
 /**
  * Abstract base class for all expressions requiring a single argument.
  */
-abstract public class UnaryExpression extends Expression {
+abstract public class UnaryExpression extends AbstractExpression {
 
     /**
      * Create a new unary expression with the given argument.
@@ -32,9 +31,9 @@ abstract public class UnaryExpression extends Expression {
      * @param	sub	the sub argument
      */
     public UnaryExpression(Expression sub) {
+        super();
         assert sub != null;
-
-	add(sub);
+        setChild(sub, 0);
     }
 
     /**
@@ -43,16 +42,7 @@ abstract public class UnaryExpression extends Expression {
      *
      * @return	<code>1</code>
      */
-    public int getNeededChildren() {
+    public int getChildCount() {
 	return 1;
-    }
-
-    /**
-     * Return the sub expression.
-     *
-     * @return	the single argument
-     */
-    protected Expression get() {
-	return get(0);
     }
 }

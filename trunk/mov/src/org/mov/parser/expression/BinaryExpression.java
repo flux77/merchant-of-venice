@@ -18,13 +18,12 @@
 
 package org.mov.parser.expression;
 
-import org.mov.util.*;
-import org.mov.parser.*;
+import org.mov.parser.Expression;
 
 /**
  * Abstract base class for all expressions requiring two arguments.
  */
-abstract public class BinaryExpression extends Expression {
+abstract public class BinaryExpression extends AbstractExpression {
 
     /**
      * Create a new binary expression with the given left and right
@@ -35,10 +34,10 @@ abstract public class BinaryExpression extends Expression {
      */
     public BinaryExpression(Expression left,
 			    Expression right) {
+        super();
         assert left != null && right != null;
-
-	add(left);
-	add(right);
+        setChild(left, 0);
+        setChild(right, 1);
     }
 
     /**
@@ -47,7 +46,7 @@ abstract public class BinaryExpression extends Expression {
      *
      * @return	<code>2</code>
      */
-    public int getNeededChildren() {
+    public int getChildCount() {
 	return 2;
     }
 
@@ -63,36 +62,18 @@ abstract public class BinaryExpression extends Expression {
     protected String toString(String operator) {
 	String string = "";
 
-	if(getLeft().getNeededChildren() < 2)
-	    string += getLeft().toString();
+	if(getChild(0).getChildCount() < 2)
+	    string += getChild(0).toString();
 	else
-	    string += "(" + getLeft().toString() + ")";
+	    string += "(" + getChild(0).toString() + ")";
 	
 	string += operator;
 	
-	if(getRight().getNeededChildren() < 2)
-	    string += getRight().toString();
+	if(getChild(1).getChildCount() < 2)
+	    string += getChild(1).toString();
 	else
-	    string += "(" + getRight().toString() + ")";
+	    string += "(" + getChild(1).toString() + ")";
 
 	return string;
-    }
-
-    /**
-     * Return the left argument.
-     *
-     * @return	the left argument
-     */
-    protected Expression getLeft() {
-	return get(0);
-    }
-
-    /**
-     * Return the right argument.
-     *
-     * @return	the left argument
-     */
-    protected Expression getRight() {
-	return get(1);
     }
 }

@@ -34,8 +34,8 @@ public class AddExpression extends ArithmeticExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	return getLeft().evaluate(variables, quoteBundle, symbol, day) +
-	    getRight().evaluate(variables, quoteBundle, symbol, day);
+	return getChild(0).evaluate(variables, quoteBundle, symbol, day) +
+	    getChild(1).evaluate(variables, quoteBundle, symbol, day);
     }
 
     public Expression simplify() {
@@ -43,25 +43,25 @@ public class AddExpression extends ArithmeticExpression {
         Expression simplified = super.simplify();
 
         if(simplified == this) {
-            NumberExpression left = (getLeft() instanceof NumberExpression? 
-                                     (NumberExpression)getLeft() : null);
-            NumberExpression right = (getRight() instanceof NumberExpression? 
-                                      (NumberExpression)getRight() : null);
+            NumberExpression left = (getChild(0) instanceof NumberExpression? 
+                                     (NumberExpression)getChild(0) : null);
+            NumberExpression right = (getChild(1) instanceof NumberExpression? 
+                                      (NumberExpression)getChild(1) : null);
 
             // 0+a -> a.
-            if(left != null && left.equals(0.0F))
-                return getRight();
+            if(left != null && left.equals(0.0D))
+                return getChild(1);
 
             // a+0 -> a.
-            else if(right != null && right.equals(0.0F))
-                return getLeft();
+            else if(right != null && right.equals(0.0D))
+                return getChild(0);
 
             // a+a -> 2*a. This doesn't seem like a simplification but
             // remember a could be a complicated expression like:
             // (lag(day_close, 0) * lag(day_open, 0))
-            else if(getLeft().equals(getRight()))
-                return new MultiplyExpression(new NumberExpression(2.0F, getLeft().getType()),
-                                              getLeft());
+            else if(getChild(0).equals(getChild(1)))
+                return new MultiplyExpression(new NumberExpression(2.0D, getChild(0).getType()),
+                                              getChild(0));
         }
         return simplified;
     }
@@ -73,13 +73,13 @@ public class AddExpression extends ArithmeticExpression {
             AddExpression expression = (AddExpression)object;
 
             // (x+y) == (x+y)
-            if(getLeft().equals(expression.getLeft()) &&
-               getRight().equals(expression.getRight()))
+            if(getChild(0).equals(expression.getChild(0)) &&
+               getChild(1).equals(expression.getChild(1)))
                 return true;
 
             // (x+y) == (y+x)
-            if(getLeft().equals(expression.getRight()) &&
-               getRight().equals(expression.getLeft()))
+            if(getChild(0).equals(expression.getChild(1)) &&
+               getChild(1).equals(expression.getChild(0)))
                 return true;
         }
     
@@ -91,7 +91,7 @@ public class AddExpression extends ArithmeticExpression {
     }
 
     public Object clone() {
-        return new AddExpression((Expression)getLeft().clone(), 
-                                 (Expression)getRight().clone());
+        return new AddExpression((Expression)getChild(0).clone(), 
+                                 (Expression)getChild(1).clone());
     }
 }

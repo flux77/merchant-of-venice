@@ -18,13 +18,14 @@
 
 package org.mov.parser.expression;
 
-import org.mov.parser.*;
-import org.mov.util.*;
+import org.mov.parser.Expression;
 
 /**
  * Abstract base class for all expressions requiring three arguments.
  */
-abstract public class TernaryExpression extends Expression {
+abstract public class TernaryExpression extends AbstractExpression {
+
+    private Expression children[] = new Expression[3];
 
     /**
      * Create a new ternary expression with the given three
@@ -37,11 +38,11 @@ abstract public class TernaryExpression extends Expression {
     public TernaryExpression(Expression arg1,
 			     Expression arg2,
 			     Expression arg3) {
+        super();
         assert arg1 != null && arg2 != null && arg3 != null;
-
-	add(arg1);
-	add(arg2);
-	add(arg3);
+        setChild(arg1, 0);
+        setChild(arg2, 1);
+        setChild(arg3, 2);
     }
 
     /**
@@ -50,7 +51,7 @@ abstract public class TernaryExpression extends Expression {
      *
      * @return	<code>3</code>
      */
-    public int getNeededChildren() {
+    public int getChildCount() {
 	return 3;
     }
 }

@@ -37,7 +37,7 @@ public class SqrtExpression extends UnaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-        double number = get().evaluate(variables, quoteBundle, symbol, day);
+        double number = getChild(0).evaluate(variables, quoteBundle, symbol, day);
 
         if(number >= 0)
             return (double)Math.sqrt(number);
@@ -46,7 +46,7 @@ public class SqrtExpression extends UnaryExpression {
     }
 
     public String toString() {
-	return new String("sqrt(" + get().toString() + ")");
+	return new String("sqrt(" + getChild(0).toString() + ")");
     }
 
     /**
@@ -56,7 +56,7 @@ public class SqrtExpression extends UnaryExpression {
      * @return	the type of the expression
      */
     public int checkType() throws TypeMismatchException {
-        int type = get().checkType();
+        int type = getChild(0).checkType();
 
         if(type == FLOAT_TYPE || type == INTEGER_TYPE)
             return getType();
@@ -69,7 +69,7 @@ public class SqrtExpression extends UnaryExpression {
         super.simplify();
 
         // If the child argument is a constant we can precompute.
-        if(get() instanceof NumberExpression) {
+        if(getChild(0) instanceof NumberExpression) {
             try {
                 return new NumberExpression(evaluate(null, null, null, 0), getType());
             }
@@ -88,10 +88,10 @@ public class SqrtExpression extends UnaryExpression {
      * @return either {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
     public int getType() {
-        return get().getType();
+        return getChild(0).getType();
     }
 
     public Object clone() {
-        return new SqrtExpression((Expression)get().clone());
+        return new SqrtExpression((Expression)getChild(0).clone());
     }
 }

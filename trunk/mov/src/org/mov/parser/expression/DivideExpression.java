@@ -34,10 +34,10 @@ public class DivideExpression extends ArithmeticExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	double right = getRight().evaluate(variables, quoteBundle, symbol, day);
+	double right = getChild(1).evaluate(variables, quoteBundle, symbol, day);
 
-	if(right != 0.0F)
-	    return getLeft().evaluate(variables, quoteBundle, symbol, day) / right;
+	if(right != 0.0D)
+	    return getChild(0).evaluate(variables, quoteBundle, symbol, day) / right;
 	else
             throw EvaluationException.divideByZero();
     }
@@ -47,22 +47,22 @@ public class DivideExpression extends ArithmeticExpression {
         Expression simplified = super.simplify();
 
         if(simplified == this) {
-            NumberExpression left = (getLeft() instanceof NumberExpression? 
-                                     (NumberExpression)getLeft() : null);
-            NumberExpression right = (getRight() instanceof NumberExpression? 
-                                      (NumberExpression)getRight() : null);
+            NumberExpression left = (getChild(0) instanceof NumberExpression? 
+                                     (NumberExpression)getChild(0) : null);
+            NumberExpression right = (getChild(1) instanceof NumberExpression? 
+                                      (NumberExpression)getChild(1) : null);
 
             // 0/a -> 0.
-            if(left != null && left.equals(0.0F))
-                return new NumberExpression(0.0F, getType());
+            if(left != null && left.equals(0.0D))
+                return new NumberExpression(0.0D, getType());
 
             // a/1 -> a.
-            else if(right != null && right.equals(1.0F))
-                return getLeft();
+            else if(right != null && right.equals(1.0D))
+                return getChild(0);
             
             // a/a -> 1 (pragmatism over idealism)
-            else if(getLeft().equals(getRight()))
-                return new NumberExpression(1.0F, getType());
+            else if(getChild(0).equals(getChild(1)))
+                return new NumberExpression(1.0D, getType());
         }
         return simplified;
     }
@@ -72,7 +72,7 @@ public class DivideExpression extends ArithmeticExpression {
     }
 
     public Object clone() {
-        return new DivideExpression((Expression)getLeft().clone(), 
-                                    (Expression)getRight().clone());
+        return new DivideExpression((Expression)getChild(0).clone(), 
+                                    (Expression)getChild(1).clone());
     }
 }

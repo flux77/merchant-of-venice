@@ -37,13 +37,13 @@ public class AbsExpression extends UnaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-        double number = get().evaluate(variables, quoteBundle, symbol, day);
+        double number = getChild(0).evaluate(variables, quoteBundle, symbol, day);
 
         return Math.abs(number);
     }
 
     public String toString() {
-	return new String("abs(" + get().toString() + ")");
+	return new String("abs(" + getChild(0).toString() + ")");
     }
 
     /**
@@ -53,7 +53,7 @@ public class AbsExpression extends UnaryExpression {
      * @return	the type of the expression
      */
     public int checkType() throws TypeMismatchException {
-        int type = get().checkType();
+        int type = getChild(0).checkType();
 
         if(type == FLOAT_TYPE || type == INTEGER_TYPE)
             return getType();
@@ -66,7 +66,7 @@ public class AbsExpression extends UnaryExpression {
         super.simplify();
 
         // If the child argument is a constant we can precompute.
-        if(get() instanceof NumberExpression) {
+        if(getChild(0) instanceof NumberExpression) {
             try {
                 return new NumberExpression(evaluate(null, null, null, 0), getType());
             }
@@ -93,10 +93,10 @@ public class AbsExpression extends UnaryExpression {
      * @return either {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
     public int getType() {
-        return get().getType();
+        return getChild(0).getType();
     }
 
     public Object clone() {
-        return new AbsExpression((Expression)get().clone());
+        return new AbsExpression((Expression)getChild(0).clone());
     }
 }

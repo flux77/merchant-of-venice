@@ -40,8 +40,8 @@ public class PercentExpression extends BinaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-        double value = getLeft().evaluate(variables, quoteBundle, symbol, day);
-        double percent = getRight().evaluate(variables, quoteBundle, symbol, day);
+        double value = getChild(0).evaluate(variables, quoteBundle, symbol, day);
+        double percent = getChild(1).evaluate(variables, quoteBundle, symbol, day);
 	return value * percent / 100;
     }
 
@@ -50,8 +50,8 @@ public class PercentExpression extends BinaryExpression {
         super.simplify();
 
         // If both the child arguments are constant we can precompute.
-        if(getLeft() instanceof NumberExpression &&
-           getRight() instanceof NumberExpression) {
+        if(getChild(0) instanceof NumberExpression &&
+           getChild(1) instanceof NumberExpression) {
             try {
                 return new NumberExpression(evaluate(null, null, null, 0),
                                             getType());
@@ -67,8 +67,8 @@ public class PercentExpression extends BinaryExpression {
     }
 
     public String toString() {
-	return new String("percent(" + getLeft().toString() + ", " +
-			  getRight().toString() + ")");
+	return new String("percent(" + getChild(0).toString() + ", " +
+			  getChild(1).toString() + ")");
     }
 
     /** 
@@ -79,8 +79,8 @@ public class PercentExpression extends BinaryExpression {
      */
     public int checkType() throws TypeMismatchException {
 	// returned type is type of first arg
-	int leftType = getLeft().checkType();
-	int rightType = getRight().checkType();
+	int leftType = getChild(0).checkType();
+	int rightType = getChild(1).checkType();
 	
 	if((leftType == FLOAT_TYPE || leftType == INTEGER_TYPE) &&
            (rightType == FLOAT_TYPE || rightType == INTEGER_TYPE))
@@ -95,12 +95,12 @@ public class PercentExpression extends BinaryExpression {
      * @return {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
     public int getType() {
-        return getLeft().getType();
+        return getChild(0).getType();
     }
 
     public Object clone() {
-        return new PercentExpression((Expression)getLeft().clone(), 
-                                     (Expression)getRight().clone());
+        return new PercentExpression((Expression)getChild(0).clone(), 
+                                     (Expression)getChild(1).clone());
     }
 
 }

@@ -75,7 +75,7 @@ public class QuoteExpression extends TerminalExpression {
 
         // This should never be evaluated
         assert false;
-        return 0.0F;
+        return 0.0D;
     }
 
     public String toString() {

@@ -35,7 +35,7 @@ public class NotExpression extends UnaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	if(get().evaluate(variables, quoteBundle, symbol, day) >= Expression.TRUE_LEVEL)
+	if(getChild(0).evaluate(variables, quoteBundle, symbol, day) >= Expression.TRUE_LEVEL)
 	    return FALSE;
 	else
 	    return TRUE;
@@ -46,7 +46,7 @@ public class NotExpression extends UnaryExpression {
         super.simplify();
 
         // If the child argument is a number expression we can precompute
-        if(get() instanceof NumberExpression) {
+        if(getChild(0) instanceof NumberExpression) {
             try {
                 return new NumberExpression(evaluate(null, null, null, 0), BOOLEAN_TYPE);
             }
@@ -59,43 +59,43 @@ public class NotExpression extends UnaryExpression {
         // If the child argument is a logic expression then we can reverse it.
 
         // not(x == y) -> x != y
-        else if(get() instanceof EqualThanExpression) 
-            return new NotEqualExpression(get().get(0), get().get(1));
+        else if(getChild(0) instanceof EqualThanExpression) 
+            return new NotEqualExpression(getChild(0).getChild(0), getChild(0).getChild(1));
 
         // not(x != y) -> x == y
-        else if(get() instanceof NotEqualExpression) 
-            return new EqualThanExpression(get().get(0), get().get(1));
+        else if(getChild(0) instanceof NotEqualExpression) 
+            return new EqualThanExpression(getChild(0).getChild(0), getChild(0).getChild(1));
 
         // not(x < y) -> x >= y
-        else if(get() instanceof LessThanExpression) 
-            return new GreaterThanEqualExpression(get().get(0), get().get(1));
+        else if(getChild(0) instanceof LessThanExpression) 
+            return new GreaterThanEqualExpression(getChild(0).getChild(0), getChild(0).getChild(1));
 
         // not(x > y) -> x <= y
-        else if(get() instanceof GreaterThanExpression) 
-            return new LessThanEqualExpression(get().get(0), get().get(1));
+        else if(getChild(0) instanceof GreaterThanExpression) 
+            return new LessThanEqualExpression(getChild(0).getChild(0), getChild(0).getChild(1));
 
         // not(x <= y) -> x > y
-        else if(get() instanceof LessThanEqualExpression) 
-            return new GreaterThanExpression(get().get(0), get().get(1));
+        else if(getChild(0) instanceof LessThanEqualExpression) 
+            return new GreaterThanExpression(getChild(0).getChild(0), getChild(0).getChild(1));
 
         // not(x >= y) -> x < y
-        else if(get() instanceof GreaterThanEqualExpression) 
-            return new LessThanExpression(get().get(0), get().get(1));
+        else if(getChild(0) instanceof GreaterThanEqualExpression) 
+            return new LessThanExpression(getChild(0).getChild(0), getChild(0).getChild(1));
 
         // not(not(x)) -> x
-        else if(get() instanceof NotExpression)
-            return get().get(0);
+        else if(getChild(0) instanceof NotExpression)
+            return getChild(0).getChild(0);
         else
             return this;
     }
 
     public String toString() {
-	return new String("not(" + get().toString() + ")");
+	return new String("not(" + getChild(0).toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {
 	// sub type must be boolean
-	if(get().checkType() == BOOLEAN_TYPE)
+	if(getChild(0).checkType() == BOOLEAN_TYPE)
 	    return BOOLEAN_TYPE;
 	else
 	    throw new TypeMismatchException();
@@ -111,6 +111,6 @@ public class NotExpression extends UnaryExpression {
     }
 
     public Object clone() {
-        return new NotExpression((Expression)get().clone());
+        return new NotExpression((Expression)getChild(0).clone());
     }
 }

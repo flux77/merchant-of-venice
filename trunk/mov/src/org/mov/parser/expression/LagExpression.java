@@ -41,45 +41,45 @@ public class LagExpression extends BinaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-        int lag = (int)get(1).evaluate(variables, quoteBundle, symbol, day);
-        int quoteKind = ((QuoteExpression)get(0)).getQuoteKind();
+        int lag = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
 
         try {
             return quoteBundle.getQuote(symbol, quoteKind, day, lag);
         }
         catch(MissingQuoteException e) {
             // What should I do in this case?
-            return 0.0F;
+            return 0.0D;
         }
     }
 
     public String toString() {
-	return new String("lag(" + get(0).toString() + ", " +
-			  get(1).toString() + ")");
+	return new String("lag(" + getChild(0).toString() + ", " +
+			  getChild(1).toString() + ")");
     }
 
     public int checkType() throws TypeMismatchException {
 	// Left type must be quote and right type must be number type
-	if((get(0).checkType() == FLOAT_QUOTE_TYPE ||
-            get(0).checkType() == INTEGER_QUOTE_TYPE) &&
-	   get(1).checkType() == INTEGER_TYPE)
+	if((getChild(0).checkType() == FLOAT_QUOTE_TYPE ||
+            getChild(0).checkType() == INTEGER_QUOTE_TYPE) &&
+	   getChild(1).checkType() == INTEGER_TYPE)
 	    return getType();
 	else
 	    throw new TypeMismatchException();
     }
 
     public int getType() {
-        if(get(0).getType() == FLOAT_QUOTE_TYPE)
+        if(getChild(0).getType() == FLOAT_QUOTE_TYPE)
             return FLOAT_TYPE;
         else {
-            assert get(0).getType() == INTEGER_QUOTE_TYPE;
+            assert getChild(0).getType() == INTEGER_QUOTE_TYPE;
             return INTEGER_TYPE;
         }
     }
 
     public Object clone() {
-        return new LagExpression((Expression)get(0).clone(), 
-                                 (Expression)get(1).clone());
+        return new LagExpression((Expression)getChild(0).clone(), 
+                                 (Expression)getChild(1).clone());
     }
 
 }

@@ -18,13 +18,12 @@
 
 package org.mov.parser.expression;
 
-import org.mov.util.*;
-import org.mov.parser.*;
+import org.mov.parser.TypeMismatchException;
 
 /**
  * Abstract base class for all expressions requiring no arguments.
  */
-abstract public class TerminalExpression extends Expression {
+abstract public class TerminalExpression extends AbstractExpression {
 
     /**
      * Create a new terminal expression.
@@ -39,7 +38,7 @@ abstract public class TerminalExpression extends Expression {
      *
      * @return	<code>0</code>
      */
-    public int getNeededChildren() {
+    public int getChildCount() {
 	return 0;
     }
 

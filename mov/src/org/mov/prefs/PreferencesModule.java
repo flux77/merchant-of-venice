@@ -39,8 +39,7 @@ import org.mov.prefs.PreferencesManager;
  * Example:
  * <pre>
  *      // Open a new preferences window displaying the quote source page
- *      PreferencesModule prefs = new PreferencesModule(desktop,
- *				      PreferencesModule.QUOTE_SOURCE_PAGE);
+ *      PreferencesModule prefs = new PreferencesModule(desktop);
  * 
  *	// Create a frame around the module and add to the desktop
  *	ModuleFrame frame = new ModuleFrame(chart, 0, 0, 400, 300);
@@ -58,8 +57,6 @@ public class PreferencesModule extends JPanel
      */
     
     private Vector pages;
-    public static int QUOTE_SOURCE_PAGE = 0;
-    
     private JDesktopPane desktop;
     private PropertyChangeSupport propertySupport;
     private PreferencesPage activePage;
@@ -72,8 +69,6 @@ public class PreferencesModule extends JPanel
      * Create a new Preference Module.
      *
      * @param	desktop	the parent desktop
-     * @param	initialPage	the initial page to display, so far we only
-     *				support 
      */
     public PreferencesModule(JDesktopPane desktop) {
 	
@@ -88,6 +83,9 @@ public class PreferencesModule extends JPanel
         
         pageListModel.addElement((Object)new String("Quote Source"));
 	pages.addElement(new QuoteSourcePage(desktop));
+
+        pageListModel.addElement((Object)new String("Tuning"));
+	pages.addElement(new TuningPage(desktop));
 
 	final JList pageList = new JList(pageListModel);
 
@@ -105,7 +103,6 @@ public class PreferencesModule extends JPanel
 	pageList.setSelectedIndex(0);
 	activePage = (PreferencesPage) pages.elementAt(0);
 
-	//setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	setLayout(new BorderLayout());
 	add(split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 			   pageList,
@@ -122,7 +119,6 @@ public class PreferencesModule extends JPanel
   
 	add(buttonPanel, BorderLayout.SOUTH);
     }
-
 
     /**
      * Overrides the default method.  Determines the preferred size

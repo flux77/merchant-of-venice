@@ -578,6 +578,7 @@ public class PaperTradeModule extends JPanel implements Module,
 		    }
 		    catch(ExpressionException e) {	   
 			// Should not happen - they've already been checked
+                        assert false;
 		    }
 		    
 		    Portfolio portfolio = 

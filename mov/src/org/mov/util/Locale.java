@@ -23,6 +23,8 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.mov.prefs.PreferencesManager;
+
 /**
  * This class implements internationalisation support for Venice. Each text message
  * displayed by Venice is represented by a string symbol (e.g. "OPEN") which describes
@@ -40,6 +42,11 @@ import java.util.regex.Pattern;
  * @see java.util.ResourceBundle
  */
 public class Locale {
+    final private static int numberOfLanguages = LocaleConstants.numberOfLanguages;
+    final private static java.util.Locale[] locales = LocaleConstants.locales;
+    
+    private static java.util.Locale locale = null;
+    
     // This is the string we use if we can't find a matching entry in
     // any of the resource bundles.
     private final static String UNKNOWN = "???";
@@ -58,14 +65,21 @@ public class Locale {
 	if(!resourceBundlesLoaded) {
 	    // First get the user's preferred language
 	    try {
-		primaryResourceBundle = ResourceBundle.getBundle("org.mov.util.locale.venice");
-	    }
+                // input parameter should be one of the constants
+                // defined at the top of the class.
+                // Each of them represent one of MoV acceptable localization.
+		if (locale==null)
+                    primaryResourceBundle = ResourceBundle.getBundle("org.mov.util.locale.venice");
+                else
+                    primaryResourceBundle = ResourceBundle.getBundle("org.mov.util.locale.venice", locale);
+                locale = primaryResourceBundle.getLocale();
+      	    }
 	    catch(Exception e) {
 		// It's OK if we couldn't load the user's preferred locale
 	    }
 
 	    // Also load English as a fallback if the preferred language hasn't
-	    // been fully transalted.
+	    // been fully translated.
 	    try {
 		secondaryResourceBundle = ResourceBundle.getBundle("org.mov.util.locale.venice",
 								   java.util.Locale.ENGLISH);
@@ -89,7 +103,37 @@ public class Locale {
     }
 
     /**
-     * Return the current langauge translation of the text associated
+     * Set the localization as got from saved preferences.
+     * If no preference is set for the language it get the current system language.
+     *
+     * @param newLocale the new localization
+     */
+    public static void setLocale() {
+        PreferencesManager.LanguagePreferences languagePreferences = null;
+	languagePreferences = PreferencesManager.loadLanguageSettings();
+        if (languagePreferences.locale==null) {
+            languagePreferences.locale = Locale.getLocale().getISO3Language();
+        }
+        for (int i = 0; i < numberOfLanguages; i++) {
+            if (languagePreferences.locale.compareTo(locales[i].getISO3Language())==0) {
+                locale = locales[i];
+            }
+        }
+        resourceBundlesLoaded = false;
+        loadResourceBundles();
+    }
+
+    /**
+     * Get the localization.
+     *
+     * @return the current localization
+     */
+    public static java.util.Locale getLocale() {
+	return locale;
+    }
+
+    /**
+     * Return the current language translation of the text associated
      * with the given key.
      *
      * @param key a key which represents a line of text
@@ -123,7 +167,7 @@ public class Locale {
     }
 
     /**
-     * Return the current langauge translation of the text associated
+     * Return the current language translation of the text associated
      * with the given key. Insert the given argument into the text
      * translation. For example if the text object in the internationalisation
      * file looks like:
@@ -143,7 +187,7 @@ public class Locale {
     }
 
     /**
-     * Return the current langauge translation of the text associated
+     * Return the current language translation of the text associated
      * with the given key. Insert the given arguments into the text
      * translation. For example if the text object in the internationalisation
      * file looks like:
@@ -166,7 +210,7 @@ public class Locale {
     }
 
     /**
-     * Return the current langauge translation of the text associated
+     * Return the current language translation of the text associated
      * with the given key. Insert the given arguments into the text
      * translation. For example if the text object in the internationalisation
      * file looks like:
@@ -192,7 +236,7 @@ public class Locale {
     }
 
     /**
-     * Return the current langauge translation of the text associated
+     * Return the current language translation of the text associated
      * with the given key. Insert the given argument into the text
      * translation. For example if the text object in the internationalisation
      * file looks like:
@@ -210,7 +254,7 @@ public class Locale {
     }
 
     /**
-     * Return the current langauge translation of the text associated
+     * Return the current language translation of the text associated
      * with the given key. Insert the given arguments into the text
      * translation. For example if the text object in the internationalisation
      * file looks like:
@@ -230,7 +274,7 @@ public class Locale {
     }
 
     /**
-     * Return the current langauge translation of the text associated
+     * Return the current language translation of the text associated
      * with the given key. Insert the given arguments into the text
      * translation. For example if the text object in the internationalisation
      * file looks like:

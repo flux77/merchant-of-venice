@@ -55,6 +55,7 @@
  		              <ul>
 		                <li><a href="index.html">Main</a></li>
 		                <li><a href="contact.html">Contact Us / Mailing List</a></li>
+  		                <li><a href="http://sourceforge.net/project/showfiles.php?group_id=53631&amp;release_id=152557">Download</a></li>
 		                <li><a href="features.html">Feature List</a></li>
 		                <li><a href="links.html">Links</a></li>
 		                <li><a href="manual.html">Manual</a></li>

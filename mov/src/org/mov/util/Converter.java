@@ -1,6 +1,7 @@
 package org.mov.util;
 
 import java.io.File;
+import java.lang.*;
 import java.util.*;
 
 import org.mov.portfolio.Stock;
@@ -44,7 +45,6 @@ public class Converter {
 	while(string.length() < digits) {
 	    string = zero.concat(string);
 	}
-	
 	return string;
     }
 
@@ -111,15 +111,23 @@ public class Converter {
      */
     public static String priceToString(float price) {
 	int dollars = (int)Math.abs(price);
-	float cents = (price - dollars) * 100;
+	float cents = (Math.abs(price) - dollars) * 100;
+	String sign;
+
+	if(price < 0)
+	    sign = "-";
+	else
+	    sign ="";
 
 	// Dollars or cents?
 	if(dollars > 0) {
-	    return "$" + Integer.toString(dollars) + "." + 
+	    return sign + "$" + Integer.toString(dollars) + "." + 
 		Converter.toFixedString((int)cents, 2);
 	}
 	else
-	    return Converter.toFixedString((int)cents, 2) + "c";
+	    return 
+		sign + 
+		Converter.toFixedString((int)cents, 2) + "c";
     }
 
     /** 

@@ -146,13 +146,6 @@ public class PreferencesManager {
 	public int height;
     }
 
-    /** Web language preferences fields. */
-    public class LanguagePreferences {
-
-        /** Language. */
-	public String locale;
-    }
-
     /**
      * Forces the preferences data to be saved to the backend store (e.g. disk).
      */
@@ -822,30 +815,27 @@ public class PreferencesManager {
 	prefs.put("user", proxyPreferences.user);
 	prefs.put("password", proxyPreferences.password);
 	prefs.putBoolean("authEnabled", proxyPreferences.authEnabled);
-	
     }
 
     /**
-     * Load language settings.
+     * Load language setting. Returns <code>null</code> if there is no language
+     * setting saved in preferences.
      *
-     * @return language preferences.
+     * @return ISO Language Code
      */
-    public static LanguagePreferences loadLanguageSettings() {
+    public static String loadLanguageCode() {
         Preferences prefs = getUserNode("/language");
-        PreferencesManager preferencesManager = new PreferencesManager();
-        LanguagePreferences languagePreferences = preferencesManager.new LanguagePreferences();
-        languagePreferences.locale = prefs.get("locale", null);
-        return languagePreferences;
+        return prefs.get("locale", null);
     }
 
     /**
-     * Save language settings.
+     * Save language setting.
      *
-     * @param languagePreferences the new proxy preferences.
+     * @param ISO Language Code
      */
-    public static void saveLanguageSettings(LanguagePreferences languagePreferences) {
-	Preferences prefs = getUserNode("/language");
-	prefs.put("locale", languagePreferences.locale);
+    public static void saveLanguageCode(String languageCode) {
+        Preferences prefs = getUserNode("/language");
+	prefs.put("locale", languageCode);
     }
 
     /**

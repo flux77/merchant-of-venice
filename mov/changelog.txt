@@ -1,3 +1,11 @@
+Changes for Venice, 0.51 alpha 13/Apr/2005
+==========================================
+
+* Bug Fixes;
+  - Fixed a major bug where if the locale was not set in the
+    preferences, the application crashed at startup with a
+    NullPointerException.
+
 Changes for Venice, 0.5 alpha 13/Mar/2005
 ==========================================
 

@@ -40,9 +40,6 @@ import org.mov.prefs.PreferencesManager;
  * @see java.util.ResourceBundle
  */
 public class Locale {
-    final private static java.util.Locale[] locales = LocaleConstants.locales;
-    final private static int localeCount  = LocaleConstants.locales.length;
-    
     private static java.util.Locale locale = null;
     
     // This is the string we use if we can't find a matching entry in
@@ -115,16 +112,23 @@ public class Locale {
      * If no preference is set for the language it get the current system language.
      */
     public static void setLocale() {
-        PreferencesManager.LanguagePreferences languagePreferences = null;
-	languagePreferences = PreferencesManager.loadLanguageSettings();
-        if (languagePreferences.locale==null) {
-            languagePreferences.locale = Locale.getLocale().getISO3Language();
-        }
-        for (int i = 0; i < localeCount; i++) {
-            if (languagePreferences.locale.compareTo(locales[i].getISO3Language())==0) {
-                locale = locales[i];
+        // Set locale to system default
+        locale = java.util.Locale.getDefault();
+
+        // Override if there is a preference setting for another language
+        String languageCode = PreferencesManager.loadLanguageCode();
+
+        if(languageCode != null) {
+            java.util.Locale[] locales = LocaleConstants.locales;
+
+            for (int i = 0; i < locales.length; i++) {
+                if (languageCode.equals(locales[i].getISO3Language())) {
+                    locale = locales[i];
+                    break;
+                }
             }
         }
+
         resourceBundlesLoaded = false;
         loadResourceBundles();
     }

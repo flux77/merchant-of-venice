@@ -45,8 +45,7 @@ public class LanguagePage extends JPanel implements PreferencesPage {
     
         
     private JDesktopPane desktop = null;
-    private PreferencesManager.LanguagePreferences languagePreferences = null;
-
+    private String languageCode = null;
     
     /**
      * Create a new language preferences page.
@@ -67,16 +66,15 @@ public class LanguagePage extends JPanel implements PreferencesPage {
 	JPanel borderPanel = new JPanel();
         borderPanel.setLayout(new BoxLayout(borderPanel, BoxLayout.PAGE_AXIS));
 	
-	languagePreferences = 
-	    PreferencesManager.loadLanguageSettings();
+        languageCode = PreferencesManager.loadLanguageCode();
         
-        if (languagePreferences.locale == null)
-            languagePreferences.locale = Locale.getLocale().getISO3Language();
+        if (languageCode == null)
+            languageCode = Locale.getLocale().getISO3Language();
 
         for (int i = 0; i < localeCount; i++) {
             radioButtons[i] = new JRadioButton(locales[i].getDisplayLanguage(Locale.getLocale()));
             radioButtons[i].setActionCommand(new Integer(i).toString());
-            if (languagePreferences.locale.compareTo(locales[i].getISO3Language())==0)
+            if (languageCode.equals(locales[i].getISO3Language()))
                 radioButtons[i].setSelected(true);
             
             group.add(radioButtons[i]);
@@ -86,7 +84,7 @@ public class LanguagePage extends JPanel implements PreferencesPage {
                     public void actionPerformed(final ActionEvent e) {
                         String command = group.getSelection().getActionCommand();
                         int i = Integer.parseInt(command);
-                        languagePreferences.locale = locales[i].getISO3Language();
+                        languageCode = locales[i].getISO3Language();
                     }
                 });
         }
@@ -101,7 +99,7 @@ public class LanguagePage extends JPanel implements PreferencesPage {
     }
     
     public void save() {
-	PreferencesManager.saveLanguageSettings(languagePreferences);
+	PreferencesManager.saveLanguageCode(languageCode);
     }
     
     public JComponent getComponent() {

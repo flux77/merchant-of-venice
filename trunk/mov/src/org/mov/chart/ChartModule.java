@@ -274,6 +274,9 @@ public class ChartModule extends JPanel implements Module,
      */
     public void add(Graph graph, QuoteBundle quoteBundle, int level) {
 
+        // Make sure it has at least one value
+        assert graph.getXRange().size() > 0;
+
 	// Add graph to chart
 	chart.add(graph, level);
 
@@ -425,8 +428,16 @@ public class ChartModule extends JPanel implements Module,
     }
 
     /**
-     * Remove all graphs with the given symbol from the chart. Or will
-     * do when its implemented.
+     * Return the number of graphs in the chart.
+     *
+     * @return the number of graphs in the chart
+     */
+    public int count() {
+        return chart.count();
+    }
+
+    /**
+     * Remove all graphs with the given symbol from the chart. 
      *
      * @param name	The name of the graphs to remove
      */
@@ -472,6 +483,11 @@ public class ChartModule extends JPanel implements Module,
 	// Send signal that our frame name has changed
 	propertySupport.
 	    firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 0, 1); 
+
+        // If there are no graphs left then close the window
+        if(count() == 0) 
+	    propertySupport.
+		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
     }
 
     /** 

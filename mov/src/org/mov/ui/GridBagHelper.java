@@ -161,5 +161,31 @@ public class GridBagHelper {
 
 	return text;
     }
+
+    /**
+     * Append a new row containing a label field to the form.
+     *
+     * @param panel form panel
+     * @param field text to display next to the label field
+     * @param labelText label text
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @return the label field
+     */
+    public static JLabel addLabelRow(JPanel panel, String field, String labelText,
+                                     GridBagLayout gridbag,
+                                     GridBagConstraints c) {
+	JLabel labelField = new JLabel(field);
+	c.gridwidth = 1;
+	gridbag.setConstraints(labelField, c);
+	panel.add(labelField);
+
+	JLabel label = new JLabel(labelText);
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(label, c);
+	panel.add(label);
+
+	return label;
+    }
 }
 

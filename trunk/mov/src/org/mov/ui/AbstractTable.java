@@ -19,9 +19,6 @@ public class AbstractTable extends SortedTable {
     private static final Color alternativeBackgroundColor = 
 	new Color(237, 237, 237);
 
-    private int redColumn = -1;
-    private int greenColumn = -1;
-
     class ChangeComparator implements Comparator {
 
 	public int compare(Object firstObject, Object secondObject)
@@ -61,13 +58,7 @@ public class AbstractTable extends SortedTable {
 	    textLabel.setFont(table.getFont());
 
 	    // Set foreground colour to match default foreground colour
-	    // or set it to red/green if its the red/green colum
-	    if(t.getRedColumn() == column)
-		textLabel.setForeground(Color.red.darker());
-	    else if(t.getGreenColumn() == column)
-		textLabel.setForeground(Color.green.darker().darker());
-	    else
-		textLabel.setForeground(table.getForeground());
+	    textLabel.setForeground(table.getForeground());
 
 	    // Make each alternate row a different colour
 	    if(isSelected)
@@ -159,22 +150,6 @@ public class AbstractTable extends SortedTable {
 	super.setModel(model);
 	setDefaultSortComparator(Change.class,
 				 new ChangeComparator());
-    }
-
-    public void setRedColumn(int column) {
-	redColumn = column;
-    }
-
-    public int getRedColumn() {
-	return redColumn;
-    }
-
-    public void setGreenColumn(int column) {
-	greenColumn = column;
-    }
-
-    public int getGreenColumn() {
-	return greenColumn;
     }
 }
 

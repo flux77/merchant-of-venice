@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.mov.parser.EvaluationException;
 import org.mov.quote.MissingQuoteException;
-import org.mov.quote.WeekendDateException;
 import org.mov.quote.Quote;
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.QuoteBundleCache;
@@ -31,14 +30,18 @@ import org.mov.quote.QuoteBundleIterator;
 import org.mov.quote.QuoteCache;
 import org.mov.quote.QuoteRange;
 import org.mov.quote.Symbol;
+import org.mov.quote.WeekendDateException;
 import org.mov.util.TradingDate;
 
 public class GPQuoteBundle implements QuoteBundle {
 
     private QuoteBundle quoteBundle;
+    private int earliestDateOffset;
 
-    public GPQuoteBundle(QuoteBundle quoteBundle) {
+    public GPQuoteBundle(QuoteBundle quoteBundle, int window) {
         this.quoteBundle = quoteBundle;
+
+        earliestDateOffset = getFirstDateOffset() - window;
     }
 
     /** 
@@ -54,8 +57,8 @@ public class GPQuoteBundle implements QuoteBundle {
      */
     public float getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException {
-        assert false;
-        return 0.0F;
+
+        return quoteBundle.getQuote(symbol, quoteType, dateOffset);
     }
 
     /** 
@@ -70,29 +73,22 @@ public class GPQuoteBundle implements QuoteBundle {
      * @param today fast access date offset of current date, see {@link QuoteCache}
      * @param offset offset from current date
      * @return the quote
-     * @exception EvaluationException if the script isn't allow access to the quote.
+     * @exception EvaluationException if the script isn't allowed access to the quote.
      */
     public float getQuote(Symbol symbol, int quoteType, int today, int offset)
-	throws EvaluationException {
+	throws EvaluationException, MissingQuoteException {
         
         // Trying to access a future quote?
         if(offset > 0)
             throw new EvaluationException("future date");
 
-        int dateOffset = today + offset;
+        // Trying to access a date too far into the past?
+        else if(offset < earliestDateOffset)
+            throw new EvaluationException("date too far into the past");
 
-        // If the date is before our first date - don't expand the quote bundle
-        // there might not be enough memory for that. Just use the first date
-        // in the bundle
-        if(dateOffset < getFirstDateOffset())
-            dateOffset = getFirstDateOffset();
-        
-        try {
-            return quoteBundle.getQuote(symbol, quoteType, dateOffset);
-        }
-        catch(MissingQuoteException e) {
-            return 0.0F;
-        }
+        // Date is within range
+        else
+            return quoteBundle.getQuote(symbol, quoteType, today + offset);
     }
 
     /** 
@@ -258,13 +254,4 @@ public class GPQuoteBundle implements QuoteBundle {
         throws WeekendDateException {
         return quoteBundle.dateToOffset(date);
     }
-
-    /**
-     * Free the quote bundle. This will remove the quote bundle from the 
-     * {@link QuoteBundleCache}. This method is optional - quote bundles do not need
-     * to call this when they are done. 
-     */
-    public void free() {
-	quoteBundle.free();
-    }    
 }

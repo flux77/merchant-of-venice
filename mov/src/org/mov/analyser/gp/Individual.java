@@ -20,16 +20,23 @@ package org.mov.analyser.gp;
 
 import java.util.Random;
 
+import org.mov.analyser.OrderComparator;
+import org.mov.analyser.PaperTrade;
 import org.mov.parser.EvaluationException;
-import org.mov.parser.TypeMismatchException;
 import org.mov.parser.Expression;
+import org.mov.parser.TypeMismatchException;
+import org.mov.parser.Variables;
+import org.mov.portfolio.Portfolio;
+import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
+import org.mov.util.TradingDate;
 
 public class Individual implements Comparable {
     
-    private Expression buyRule;
-    private Expression sellRule;
-    private float value;
+    private Expression buyRule = null;
+    private Expression sellRule = null;
+    private Portfolio portfolio = null;
+    private float value = 0.0F;
 
     private final static int CLONE_PERCENT                     = 10;
     private final static int SWAP_PERCENT                      = 5;
@@ -43,6 +50,8 @@ public class Individual implements Comparable {
     private final static int BREED_BY_SWAPPING_AND_RECOMBINING        = 3;
     private final static int BREED_BY_DOUBLE_RECOMBINING              = 4;
 
+    private final static String PORTFOLIO_NAME = "Genetic Programme Portfolio";
+
     public Individual(Expression buyRule, Expression sellRule) {
         this.buyRule = buyRule;
         this.sellRule = sellRule;
@@ -50,9 +59,9 @@ public class Individual implements Comparable {
         checkType();                
     }
 
-    public Individual(Mutator mutator) {
-        buyRule = mutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE);
-        sellRule = mutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE);
+    public Individual(Mutator buyRuleMutator, Mutator sellRuleMutator) {
+        buyRule = buyRuleMutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE);
+        sellRule = sellRuleMutator.createRandomNonTerminal(Expression.BOOLEAN_TYPE);
 
         buyRule = buyRule.simplify();
         sellRule = sellRule.simplify();
@@ -60,7 +69,8 @@ public class Individual implements Comparable {
         checkType();
     }
 
-    public Individual(Random random, Mutator mutator, Individual father, Individual mother) {
+    public Individual(Random random, Mutator buyRuleMutator, Mutator sellRuleMutator, 
+                      Individual father, Individual mother) {
         int breedType = getRandomBreedType(random);
 
         buyRule = (Expression)father.getBuyRule().clone();
@@ -80,11 +90,11 @@ public class Individual implements Comparable {
             if(breedType == BREED_BY_RECOMBINING ||
                breedType == BREED_BY_DOUBLE_RECOMBINING ||
                breedType == BREED_BY_SWAPPING_AND_RECOMBINING) {
-                buyRule = recombine(mutator, buyRule, mother.getBuyRule());
+                buyRule = recombine(buyRuleMutator, buyRule, mother.getBuyRule());
 
                 // Double
                 if(breedType == BREED_BY_DOUBLE_RECOMBINING)
-                    sellRule = recombine(mutator, sellRule, mother.getSellRule());
+                    sellRule = recombine(sellRuleMutator, sellRule, mother.getSellRule());
             }
         }
 
@@ -97,37 +107,89 @@ public class Individual implements Comparable {
                 int randomNumber = random.nextInt(3);
 
                 if(randomNumber == 0 || randomNumber == 2)
-                    buyRule = mutator.mutate(buyRule, 100);
+                    buyRule = buyRuleMutator.mutate(buyRule, 100);
                 if(randomNumber == 1 || randomNumber == 2)
-                    sellRule = mutator.mutate(sellRule, 100);
+                    sellRule = sellRuleMutator.mutate(sellRule, 100);
             }
             else {
-                buyRule = mutator.mutate(buyRule);
-                sellRule = mutator.mutate(sellRule);
+                buyRule = buyRuleMutator.mutate(buyRule);
+                sellRule = sellRuleMutator.mutate(sellRule);
             }
         }
 
         sellRule = sellRule.simplify();
         buyRule = buyRule.simplify();
-
         checkType();        
     }
 
+    // equation is valid only if it fits within the given size range AND
+    // the buy rule references the quote data somehow! I.e. we reject
+    // all equations - no matter how successful - that are only based
+    // on the day of the week, order etc. Sell rule doesn't have to be
+    // based on stock price.
     public boolean isValid(int min, int max) {
-        int sellRuleDepth = sellRule.getDepth();
-        int buyRuleDepth = buyRule.getDepth();
+        int sellRuleSize = sellRule.size();
+        int buyRuleSize = buyRule.size();
 
-        return (sellRuleDepth >= min && sellRuleDepth <= max &&
-                buyRuleDepth >= min && buyRuleDepth <= max);
+        return (sellRuleSize >= min && sellRuleSize <= max &&
+                buyRuleSize >= min && buyRuleSize <= max &&
+                (buyRule.size(Expression.FLOAT_QUOTE_TYPE) > 0 ||
+                 buyRule.size(Expression.INTEGER_QUOTE_TYPE) > 0));
     }
 
-    public float paperTrade(GPQuoteBundle quoteBundle) 
+    public int getTotalEquationSize() {
+        return buyRule.size() + sellRule.size();
+    }
+
+    public float paperTrade(GPQuoteBundle quoteBundle,
+                            OrderComparator orderComparator,
+                            TradingDate startDate,
+                            TradingDate endDate,
+                            float initialCapital,
+                            float stockValue,
+                            int numberStocks,
+                            float tradeCost) 
         throws EvaluationException {
-        
 
+        // Is there a fixed number of stocks?
+        if(stockValue == 0)
+            portfolio = PaperTrade.paperTrade(PORTFOLIO_NAME,
+                                              quoteBundle,
+                                              new Variables(),
+                                              orderComparator,
+                                              startDate,
+                                              endDate,
+                                              getBuyRule(),
+                                              getSellRule(),
+                                              initialCapital,
+                                              numberStocks,
+                                              tradeCost);
+        // Or a fixed value?
+        else {
+            portfolio = PaperTrade.paperTrade(PORTFOLIO_NAME,
+                                              quoteBundle,
+                                              new Variables(),
+                                              orderComparator,
+                                              startDate,
+                                              endDate,
+                                              getBuyRule(),
+                                              getSellRule(),
+                                              initialCapital,
+                                              stockValue,
+                                              tradeCost);
+        }
 
+        // Get final value of portfolio
+        try {
+            value = portfolio.getValue(quoteBundle, endDate);
+        }
+        catch(MissingQuoteException e) {
+            // Already checked...
+            assert false;
+            value = 0.0F;
+        }
 
-        throw new EvaluationException("hiya");
+        return value;
     }
 
     public float getValue() {
@@ -142,18 +204,30 @@ public class Individual implements Comparable {
         return sellRule;
     }
 
+    public Portfolio getPortfolio() {
+        return portfolio;
+    }
+
     public int compareTo(Object object) {
         Individual other = (Individual)object;
 
         if(getValue() < other.getValue())
-            return -1;
-        if(getValue() > other.getValue())
             return 1;
+        if(getValue() > other.getValue())
+            return -1;
         else
             return 0;
     }
 
     public boolean equals(Object object) {
+
+        // TODO: equals shouldn't say the equations are equal unless they
+        // ARE the same equations. Otherwise it should rate them slightly
+        // differently?? I'm not sure.
+        // TODO: Also the 'order' variable isn't defined if the order is
+        // not set. So this variable shouldnt always be generated by
+        // mutator.
+
         Individual other = (Individual)object;
 
         return getValue() == other.getValue();
@@ -194,9 +268,11 @@ public class Individual implements Comparable {
                                                           destinationSubTree.getType());
             
         // It's possible that there is no match in the source for the given type. 
-        if(sourceSubTree != null) 
+        if(sourceSubTree != null) {
+            assert sourceSubTree.getType() == destinationSubTree.getType();
             destination = mutator.insert(destination, destinationSubTree, 
                                          (Expression)sourceSubTree.clone());
+        }
 
         return destination;
     }

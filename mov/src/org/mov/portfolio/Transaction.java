@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.portfolio;
@@ -36,9 +36,9 @@ import org.mov.util.TradingDate;
 public class Transaction implements Cloneable, Comparable {
 
     // Transaction types on any account. Do not change the
-    // value mapping! Otherwise the new version won't be 
+    // value mapping! Otherwise the new version won't be
     // backwards compatible.
-   
+
     /** Withdrawl cash */
     public static final int WITHDRAWAL = 0;
 
@@ -66,7 +66,7 @@ public class Transaction implements Cloneable, Comparable {
     /** Transfer money between two cash accounts */
     public static final int TRANSFER = 8;
 
-    // All possible fields for all possible transactions 
+    // All possible fields for all possible transactions
     private TradingDate date;
     private int type;
     private Money amount;
@@ -92,9 +92,9 @@ public class Transaction implements Cloneable, Comparable {
      * @param	cashAccount2	second related cash account (if any)
      * @param	shareAccount	related share account (if any)
      */
-    public Transaction(int type, TradingDate date, Money amount, 
+    public Transaction(int type, TradingDate date, Money amount,
 		       Symbol symbol, int shares, Money tradeCost,
-		       CashAccount cashAccount, CashAccount cashAccount2, 
+		       CashAccount cashAccount, CashAccount cashAccount2,
 		       ShareAccount shareAccount) {
 	this.type = type;
 	this.date = date;
@@ -109,31 +109,31 @@ public class Transaction implements Cloneable, Comparable {
 
     /**
      * Create a new withdrawal transaction. Money has been withdrawn from
-     * a {@link CashAccount}. 
+     * a {@link CashAccount}.
      *
      * @param	date	date the transaction took place
      * @param	amount	the amount withdrawn
-     * @param	account	cash account 
+     * @param	account	cash account
      */
-    public static Transaction newWithdrawal(TradingDate date, 
+    public static Transaction newWithdrawal(TradingDate date,
 					    Money amount,
 					    CashAccount account) {
-	return new Transaction(WITHDRAWAL, date, amount, null, 0, 
+	return new Transaction(WITHDRAWAL, date, amount, null, 0,
 			       Money.ZERO, account, null, null);
     }
 
     /**
      * Create a new deposit transaction. Money has been deposited into
-     * a {@link CashAccount}. 
+     * a {@link CashAccount}.
      *
      * @param	date	date the transaction took place
      * @param	amount	the amount deposited
-     * @param	account	cash account 
+     * @param	account	cash account
      */
-    public static Transaction newDeposit(TradingDate date, 
+    public static Transaction newDeposit(TradingDate date,
 					 Money amount,
 					 CashAccount account) {
-	return new Transaction(DEPOSIT, date, amount, null, 0, 
+	return new Transaction(DEPOSIT, date, amount, null, 0,
 			       Money.ZERO, account, null, null);
     }
 
@@ -143,12 +143,12 @@ public class Transaction implements Cloneable, Comparable {
      *
      * @param	date	date the transaction took place
      * @param	amount	the amount deposited
-     * @param	account	cash account 
+     * @param	account	cash account
      */
-    public static Transaction newInterest(TradingDate date, 
+    public static Transaction newInterest(TradingDate date,
 					  Money amount,
 					  CashAccount account) {
-	return new Transaction(INTEREST, date, amount, null, 0, 
+	return new Transaction(INTEREST, date, amount, null, 0,
 			       Money.ZERO, account, null, null);
     }
 
@@ -158,12 +158,12 @@ public class Transaction implements Cloneable, Comparable {
      *
      * @param	date	date the transaction took place
      * @param	amount	the amount withdrawn
-     * @param	account	cash account 
+     * @param	account	cash account
      */
-    public static Transaction newFee(TradingDate date, 
+    public static Transaction newFee(TradingDate date,
 				     Money amount,
 				     CashAccount account) {
-	return new Transaction(FEE, date, amount, null, 0, 
+	return new Transaction(FEE, date, amount, null, 0,
 			       Money.ZERO, account, null, null);
     }
 
@@ -176,17 +176,17 @@ public class Transaction implements Cloneable, Comparable {
      * @param	shares	number of shares traded
      * @param	tradeCost	for shares trades, the cost of the trade
      *			including any GST, Stamp Duty, Taxes etc
-     * @param	shareAccount	share account 
-     * @param	cashAccount	cash account 
+     * @param	shareAccount	share account
+     * @param	cashAccount	cash account
      */
-    public static Transaction newAccumulate(TradingDate date, 
+    public static Transaction newAccumulate(TradingDate date,
 					    Money amount,
 					    Symbol symbol,
 					    int shares,
 					    Money tradeCost,
 					    CashAccount cashAccount,
 					    ShareAccount shareAccount) {
-	return new Transaction(ACCUMULATE, date, amount, symbol, shares, 
+	return new Transaction(ACCUMULATE, date, amount, symbol, shares,
 			       tradeCost, cashAccount, null, shareAccount);
     }
 
@@ -199,17 +199,17 @@ public class Transaction implements Cloneable, Comparable {
      * @param	shares	number of shares traded
      * @param	tradeCost	for shares trades, the cost of the trade
      *			including any GST, Stamp Duty, Taxes etc
-     * @param	shareAccount	share account 
-     * @param	cashAccount	cash account 
+     * @param	shareAccount	share account
+     * @param	cashAccount	cash account
      */
-    public static Transaction newReduce(TradingDate date, 
+    public static Transaction newReduce(TradingDate date,
 					Money amount,
 					Symbol symbol,
 					int shares,
 					Money tradeCost,
 					CashAccount cashAccount,
 					ShareAccount shareAccount) {
-	return new Transaction(REDUCE, date, amount, symbol, shares, 
+	return new Transaction(REDUCE, date, amount, symbol, shares,
 			       tradeCost, cashAccount, null, shareAccount);
     }
 
@@ -219,15 +219,15 @@ public class Transaction implements Cloneable, Comparable {
      * @param	date	date the transaction took place
      * @param	amount	the value of the dividend
      * @param	symbol	the stock paying the dividend
-     * @param	shareAccount	share account 
-     * @param	cashAccount	cash account 
+     * @param	shareAccount	share account
+     * @param	cashAccount	cash account
      */
-    public static Transaction newDividend(TradingDate date, 
+    public static Transaction newDividend(TradingDate date,
 					  Money amount,
 					  Symbol symbol,
 					  CashAccount cashAccount,
 					  ShareAccount shareAccount) {
-	return new Transaction(DIVIDEND, date, amount, symbol, 0, 
+	return new Transaction(DIVIDEND, date, amount, symbol, 0,
 			       Money.ZERO, cashAccount, null, shareAccount);
     }
 
@@ -240,14 +240,14 @@ public class Transaction implements Cloneable, Comparable {
      * @param	amount	the value of the dividend
      * @param	symbol	the stock paying the dividend
      * @param	shares	the number of shares gained
-     * @param	shareAccount	share account 
+     * @param	shareAccount	share account
      */
-    public static Transaction newDividendDRP(TradingDate date, 
+    public static Transaction newDividendDRP(TradingDate date,
 					     Money amount,
 					     Symbol symbol,
 					     int shares,
 					     ShareAccount shareAccount) {
-	return new Transaction(DIVIDEND_DRP, date, Money.ZERO, symbol, shares, 
+	return new Transaction(DIVIDEND_DRP, date, Money.ZERO, symbol, shares,
 			       Money.ZERO, null, null, shareAccount);
     }
 
@@ -260,29 +260,29 @@ public class Transaction implements Cloneable, Comparable {
      * @param	cashAccount	source cash account
      * @param	cashAccount2	destination cash account
      */
-    public static Transaction newTransfer(TradingDate date, 
+    public static Transaction newTransfer(TradingDate date,
 					  Money amount,
 					  CashAccount cashAccount,
 					  CashAccount cashAccount2) {
-	return new Transaction(TRANSFER, date, amount, null, 0, 
+	return new Transaction(TRANSFER, date, amount, null, 0,
 			       Money.ZERO, cashAccount, cashAccount2, null);
     }
 
-    /** 
+    /**
      * Convert between a given transaction type and a text string.
      *
      * @param	type	the transaction type
      * @return	string representation of transaction
      */
     public static String typeToString(int type) {
-	String[] typeNames = {Locale.getString("WITHDRAWAL_TRANSACTION"), 
-			      Locale.getString("DEPOSIT_TRANSACTION"), 
-			      Locale.getString("INTEREST_TRANSACTION"), 
+	String[] typeNames = {Locale.getString("WITHDRAWAL_TRANSACTION"),
+			      Locale.getString("DEPOSIT_TRANSACTION"),
+			      Locale.getString("INTEREST_TRANSACTION"),
 			      Locale.getString("FEE_TRANSACTION"),
-			      Locale.getString("ACCUMULATE_TRANSACTION"), 
+			      Locale.getString("ACCUMULATE_TRANSACTION"),
 			      Locale.getString("REDUCE_TRANSACTION"),
-			      Locale.getString("DIVIDEND_TRANSACTION"), 
-			      Locale.getString("DIVIDEND_DRP_TRANSACTION"), 
+			      Locale.getString("DIVIDEND_TRANSACTION"),
+			      Locale.getString("DIVIDEND_DRP_TRANSACTION"),
 			      Locale.getString("TRANSFER_TRANSACTION")};
 
 	if(type < typeNames.length)
@@ -296,23 +296,23 @@ public class Transaction implements Cloneable, Comparable {
     /**
      * Convert between a transaction type string and its transaction type.
      *
-     * @param	type	string representation of the transaction 
+     * @param	type	string representation of the transaction
      * @return	the transaction type
      */
     public static int stringToType(String type) {
 	if(type.equals(Locale.getString("ACCUMULATE_TRANSACTION")))
 	    return Transaction.ACCUMULATE;
-	else if(type.equals(Locale.getString("REDUCE_TRANSACTION"))) 
+	else if(type.equals(Locale.getString("REDUCE_TRANSACTION")))
 	    return Transaction.REDUCE;
-	else if(type.equals(Locale.getString("DEPOSIT_TRANSACTION"))) 
+	else if(type.equals(Locale.getString("DEPOSIT_TRANSACTION")))
 	    return Transaction.DEPOSIT;
-	else if(type.equals(Locale.getString("FEE_TRANSACTION"))) 
+	else if(type.equals(Locale.getString("FEE_TRANSACTION")))
 	    return Transaction.FEE;
-	else if(type.equals(Locale.getString("INTEREST_TRANSACTION"))) 
+	else if(type.equals(Locale.getString("INTEREST_TRANSACTION")))
 	    return Transaction.INTEREST;
 	else if(type.equals(Locale.getString("WITHDRAWAL_TRANSACTION")))
 	    return Transaction.WITHDRAWAL;
-	else if(type.equals(Locale.getString("DIVIDEND_TRANSACTION"))) 
+	else if(type.equals(Locale.getString("DIVIDEND_TRANSACTION")))
 	    return Transaction.DIVIDEND;
 	else if(type.equals(Locale.getString("DIVIDEND_DRP_TRANSACTION")))
 	    return Transaction.DIVIDEND_DRP;
@@ -327,7 +327,7 @@ public class Transaction implements Cloneable, Comparable {
      * by date only.
      *
      * @param	object	other transaction object
-     * @return	<code>-1</code> if this transaction is before; 
+     * @return	<code>-1</code> if this transaction is before;
      *		<code>0</code> if they fall on the same date;
      *		<code>1</code> if this transaction is after
      */
@@ -339,7 +339,7 @@ public class Transaction implements Cloneable, Comparable {
     }
 
     public Object clone() {
-	Transaction clonedTransaction = 
+	Transaction clonedTransaction =
 	    new Transaction(getType(),
 			    getDate(),
 			    getAmount(),
@@ -355,7 +355,7 @@ public class Transaction implements Cloneable, Comparable {
 
     /**
      * Convert this transaction to a CSV string.
-     * 
+     *
      * @return	CSV representation of transaction
      */
     public String toString() {
@@ -363,10 +363,10 @@ public class Transaction implements Cloneable, Comparable {
 	String cashAccountName2 = "";
 	String shareAccountName = "";
 
-	if(getCashAccount() != null) 
+	if(getCashAccount() != null)
 	    cashAccountName = getCashAccount().getName();
 
-	if(getCashAccount2() != null) 
+	if(getCashAccount2() != null)
 	    cashAccountName2 = getCashAccount2().getName();
 
 	if(getShareAccount() != null)
@@ -388,14 +388,14 @@ public class Transaction implements Cloneable, Comparable {
 
     /**
      * Return the type of this transaction.
-     * 
+     *
      * @return	type
      */
     public int getType() {
 	return type;
     }
 
-    /** 
+    /**
      * Return the date this transaction occured on.
      *
      * @return	date
@@ -412,8 +412,8 @@ public class Transaction implements Cloneable, Comparable {
     public Money getAmount() {
 	return amount;
     }
-    
-    /** 
+
+    /**
      * Return the symbol traded if this transaction was a share transaction.
      *
      * @return	symbol or <code>null</code> if this transaction was not a
@@ -423,10 +423,10 @@ public class Transaction implements Cloneable, Comparable {
 	return symbol;
     }
 
-    /** 
+    /**
      * Return the shares traded if this transaction was a share transaction.
      *
-     * @return	number of shares or <code>0</code> if this transaction was 
+     * @return	number of shares or <code>0</code> if this transaction was
      *		not a share transaction
      */
     public int getShares() {
@@ -436,8 +436,8 @@ public class Transaction implements Cloneable, Comparable {
     /**
      * Return the cost of the trade if this transaction was a share
      * transaction.
-     * 
-     * @return cost of trade or <code>0</code> if this transaction was 
+     *
+     * @return cost of trade or <code>0</code> if this transaction was
      *		not a share transaction
      */
     public Money getTradeCost() {
@@ -478,7 +478,7 @@ public class Transaction implements Cloneable, Comparable {
     }
 
     /**
-     * Set the associated cash account. 
+     * Set the associated cash account.
      *
      * @param	cashAccount the new cash account
      * @see	CashAccount
@@ -488,7 +488,7 @@ public class Transaction implements Cloneable, Comparable {
     }
 
     /**
-     * Set the secondary associated cash account. 
+     * Set the secondary associated cash account.
      *
      * @param	cashAccount2 the new secondary cash account
      * @see	CashAccount

@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.portfolio;
@@ -26,7 +26,7 @@ import org.mov.quote.*;
 /** Representation of a share account in a portfolio.
  */
 public class ShareAccount implements Account, Cloneable {
-    
+
     // Current stock holdings
     private HashMap stockHoldings = new HashMap();
 
@@ -52,9 +52,20 @@ public class ShareAccount implements Account, Cloneable {
 	return name;
     }
 
+    public Money getValue(QuoteBundle quoteBundle, TradingDate date)
+        throws MissingQuoteException {
+
+        try {
+            return getValue(quoteBundle, QuoteCache.getInstance().dateToOffset(date));
+        }
+        catch(WeekendDateException e) {
+            throw MissingQuoteException.getInstance();
+        }
+    }
+
     public Money getValue(QuoteBundle quoteBundle, int dateOffset)
 	throws MissingQuoteException {
- 
+
 	Set set = stockHoldings.keySet();
 	Iterator iterator = set.iterator();
         Money value = Money.ZERO;
@@ -63,7 +74,7 @@ public class ShareAccount implements Account, Cloneable {
 	    Symbol symbol = (Symbol)iterator.next();
 	    StockHolding holding = (StockHolding)stockHoldings.get(symbol);
 
-	    value = value.add(quoteBundle.getQuote(holding.getSymbol(), 
+	    value = value.add(quoteBundle.getQuote(holding.getSymbol(),
                                                    Quote.DAY_CLOSE, dateOffset) *
                               holding.getShares());
 	}
@@ -78,14 +89,14 @@ public class ShareAccount implements Account, Cloneable {
 	int type = transaction.getType();
 
 	// Get current holding in this stock
-	StockHolding holding = 
+	StockHolding holding =
 	    (StockHolding)stockHoldings.get(symbol);
 
 	if(type == Transaction.ACCUMULATE ||
 	   type == Transaction.DIVIDEND_DRP) {
             assert shares > 0;
 
-            double averageCost = (transaction.getAmount().doubleValue() / 
+            double averageCost = (transaction.getAmount().doubleValue() /
                                   transaction.getShares());
 
 	    // Do we already own the stock? If so accumulate
@@ -99,9 +110,9 @@ public class ShareAccount implements Account, Cloneable {
 	    // We shouldnt be selling stuff we don't own
 	    assert holding != null;
             assert shares > 0;
-	    
+	
 	    holding.reduce(shares);
-	    
+	
 	    // do we have any left? if not remove stock holding from
 	    // holdings
 	    if(holding.getShares() <= 0)

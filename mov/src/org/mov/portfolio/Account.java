@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.portfolio;
@@ -21,6 +21,7 @@ package org.mov.portfolio;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.QuoteBundle;
 import org.mov.util.Money;
+import org.mov.util.TradingDate;
 
 /**
  * Generic interface for all financial account objects. This interface
@@ -43,10 +44,10 @@ public interface Account {
     public String getName();
 
     /**
-     * Return the type of this account. 
+     * Return the type of this account.
      *
      * @return	type of the account, either {@link #CASH_ACCOUNT} or
-     *		{@link #SHARE_ACCOUNT} 
+     *		{@link #SHARE_ACCOUNT}
      */
     public int getType();
 
@@ -58,6 +59,11 @@ public interface Account {
      */
     public Money getValue(QuoteBundle quoteBundle, int dateOffset)
 	throws MissingQuoteException;
+
+    public Money getValue(QuoteBundle quoteBundle, TradingDate date)
+	throws MissingQuoteException;
+
+
 
     /**
      * Perform a transaction on this account.

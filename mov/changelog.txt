@@ -4,13 +4,23 @@ Changes for Venice, 0.4 alpha 14/Mar/2004
 * Chart Update:
   - Added Bar Chart (Quentin Bossard).
   - Added Candle Stick (Quentin Bossard).
+  - Added Exponentially Weighted Moving Average (Mark Hummel).
   - Added Point & Figure (Mark Hummel).
   - Added RSI.
 
-* Internationalised.
+* Internationalisation:
+  - The text is now fully internationalised.
   - Chinese translation added (Bryan Lin).
   - French translation added (Quentin Bossard).
   - Italian translation added (Alberto Nacher).
+
+* Portfolio Update:
+  - Addeed percent change column to Portfolio account table.
+  - Added portfolio table.
+  - Can now chart the value of just the cash in a portfolio.
+  - Can now chart the value of just the shares in a portfolio.
+  - Can now chart the value of any single account in a portfolio.
+  - Can now chart the number of stocks held in a portfolio.
 
 * Updates to the Gondola Language:
   - You can now specify just "close" instead of typing "lag(close, 0)".
@@ -31,16 +41,20 @@ Changes for Venice, 0.4 alpha 14/Mar/2004
   - Added experimental PostgreSQL support.
 
 * Bug Fixes;
-  - Fixed a bug preventing Portfolio deletion (Bryan Lin).
+  - Fixed a bug preventing Portfolio deletion under Windows (Bryan Lin).
   - Fixed a bug when viewing a Portfolio created from a GP.
   - Fixed various graphing bugs (Bryan Lin, Andrew Leppard).
   - Fixed a bug when the paper trade could never afford to buy any stock.
   - The standard deviation calculation is now correct.
-  - Internet download no longer stops when the date ranges covers a
-    stock market holiday.
+  - Percent change of stock value still wasn't quite right. Fixed.
+  - When sorting by account name in the account table, the "total row"
+    now always appears at the bottom.
+  - Fixed a bug where downloading quotes from Yahoo would stop if
+    there were no quotes for that day (e.g. the exchange was closed).
+  - The application now handles importing empty quote files.
   - Limited precision of generated MetaStock quote files to prevent
     stock quotes like "24.00020014".
-  - The application now handles importing empty quote files.
+  - Words in the online help no longer run together likethis.
 
 Changes for Venice, 0.3 alpha 14/Mar/2004
 ==========================================

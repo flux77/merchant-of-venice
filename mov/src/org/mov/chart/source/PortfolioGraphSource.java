@@ -18,169 +18,163 @@
 
 package org.mov.chart.source;
 
-import org.mov.chart.*;
+import org.mov.chart.Graphable;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
-import org.mov.portfolio.*;
-import org.mov.quote.*;
+import org.mov.portfolio.Account;
+import org.mov.portfolio.Portfolio;
+import org.mov.quote.MissingQuoteException;
+import org.mov.quote.QuoteBundle;
+import org.mov.quote.QuoteCache;
+import org.mov.quote.WeekendDateException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 /**
- * Provides a Portfolio graph source. This class allows portfolios
- * to be graphed.
+ * Provides a Portfolio graph source. This class allows portfolios to be graphed.
  */
 public class PortfolioGraphSource implements GraphSource {
 
     /** Graph the market value (day close) of the portfolio */
     public static final int MARKET_VALUE = 0;
 
-    /** Graph the portfolio showing the profit/loss value */
-    public static final int PROFIT_LOSS = 1;
+    /** Graph the portfolio showing the return value */
+    public static final int RETURN_VALUE = 1;
+
+    /** Graph the portfolio cash value */
+    public static final int CASH_VALUE = 2;
+
+    /** Graph the portfolio share value */
+    public static final int SHARE_VALUE = 3;
+
+    /** Graph the numbre of stocks held */
+    public static final int STOCKS_HELD = 4;
+
+    // Graph the value of a single account in the portfolio
+    private static final int ACCOUNT_VALUE = 5;
 
     private QuoteBundle quoteBundle;
     private int mode;
     private Graphable graphable;
     private Portfolio portfolio;
+    private String accountName;
 
     /**
-     * Provides a graph source for graphing portfolios. This
-     * class allows a portfolio to be graphed in a variety of ways.
+     * Create a graph source to graph the value of a portfolio. This constructor
+     * allows you to graph the market value of the portfolio, the profit/loss made by
+     * the portfolio, and the value of the portfolio's cash or share holdings.
      *
      * @param	portfolio	the portfolio to graph
      * @param	quoteBundle	quote bundle containing all the necessary
      *				quotes to calculate the portfolio value
      *				for every day
-     * @param	mode		<code>MARKET_VALUE</code> for the market
-     *				value of the portfolio; <code>PROFIT_LOSS
-     *				</code> for showing the profit loss
-     *				made
+     * @param	mode		{@link MARKET_VALUE} for the total market value of the portfolio;
+     *                          {@link RETURN_VALUE} for the return moade;
+     *			        {@link CASH_VALUE} for the cash value of the portfolio;
+     *                          {@link STOCKS_HELD} for the number of stocks held in the portfolio;
+     *                          or {@link SHARE_VALUE} for the share value of the portfolio.
      */
     public PortfolioGraphSource(Portfolio portfolio, QuoteBundle quoteBundle,
 				int mode) {
 	this.portfolio = portfolio;
 	this.quoteBundle = quoteBundle;
 	this.mode = mode;
+        this.accountName = null;
 
+        createGraphable();
+    }
+
+    /**
+     * Create a graph source to graph the value of a single account in the portfolio.
+     *
+     * @param	portfolio	the portfolio to graph
+     * @param	quoteBundle	quote bundle containing all the necessary
+     *				quotes to calculate the portfolio value
+     *				for every day
+     * @param   accountName     name of account in portfolio to graph.
+     */
+    public PortfolioGraphSource(Portfolio portfolio, QuoteBundle quoteBundle,
+                                String accountName) {
+	this.portfolio = portfolio;
+	this.quoteBundle = quoteBundle;
+	this.mode = ACCOUNT_VALUE;
+        this.accountName = accountName;
+
+        createGraphable();
+    }
+
+    // This method creates a graphable of the portfolio's value as defined by the
+    // constructor.
+    private void createGraphable() {
 	// If theres no start date - theres no transactions and therefore
-	// nothign to graph
-	if(portfolio.getStartDate() == null)
-	    return;
+	// nothing to graph
+	if(portfolio.getStartDate() != null) {
 
-	// Create a copy of the portfolio without the transactions
-	Portfolio temporaryPortfolio = (Portfolio)portfolio.clone();
-	List transactions = new ArrayList(temporaryPortfolio.getTransactions());
-	Iterator transactionIterator = transactions.iterator();
-	Transaction transaction = (Transaction)transactionIterator.next();
+            // Build graphable so this source can be directly graphed
+            graphable = new Graphable();
 
-	// Remove all transactions now and add them back as we reach
-	// the appropriate dates
-	temporaryPortfolio.removeAllTransactions();
-	
-	// Get start date from first transaction, get end date from
-	// latest date in the bundle
-	TradingDate startDate = transaction.getDate();
-	TradingDate endDate = quoteBundle.getLastDate();
+            // Iterate through each date between the date of the first transaction, and
+            // the latest date in the quote bundle. The portfolio iterator works by
+            // iterating over the portfolio date by date.
+            List dateRange = TradingDate.dateRangeToList(portfolio.getStartDate(),
+                                                         quoteBundle.getLastDate());
+            Iterator portfolioIterator = portfolio.iterator();
 
-	// Iterate through each day between start and end date, recreating
-	// portfolio value on that day
-	List dateRange = TradingDate.dateRangeToList(startDate, endDate);
-	Iterator dateIterator = dateRange.iterator();	
+            for (Iterator dateIterator = dateRange.iterator(); dateIterator.hasNext();) {
 
-	if(mode == MARKET_VALUE) {
-	    createMarketValueGraphable(dateIterator, transactionIterator,
-				       transaction, temporaryPortfolio);
-	}
-	else {
-	    createProfitLossGraphable(dateIterator, transactionIterator,
-				      transaction, temporaryPortfolio);
-	}
+                // Each iteration of the portfolio iterator will advance the portfolio
+                // by one date.
+                TradingDate date = (TradingDate)dateIterator.next();
+                Portfolio portfolio = (Portfolio)portfolioIterator.next();
 
-    }
+                try {
+                    Money value;
 
-    // Create a graphable for the market value of the portfolio over time
-    private void createMarketValueGraphable(Iterator dateIterator,
-					    Iterator transactionIterator,
-					    Transaction transaction,
-					    Portfolio temporaryPortfolio) {
-	// Build graphable so this source can be directly graphed
-	graphable = new Graphable();
+                    if(mode == MARKET_VALUE)
+                        value = portfolio.getValue(quoteBundle, date);
 
-	while(dateIterator.hasNext()) {
-	    TradingDate date = (TradingDate)dateIterator.next();
+                    else if(mode == CASH_VALUE)
+                        value = portfolio.getCashValue();
 
-	    while(transaction != null &&
-		  transaction.getDate().compareTo(date) <= 0) {
-		temporaryPortfolio.addTransaction(transaction);
+                    else if(mode == SHARE_VALUE)
+                        value = portfolio.getShareValue(quoteBundle, date);
 
-		if(transactionIterator.hasNext())
-		    transaction = (Transaction)transactionIterator.next();
-		else
-		    transaction = null; // no more transactions
-	    }
+                    else if(mode == RETURN_VALUE)
+                        value = portfolio.getReturnValue(quoteBundle, date);
 
-	    try {
-		Double value =
-		    new Double(temporaryPortfolio.getValue(quoteBundle, date).doubleValue());
-		graphable.putY((Comparable)date, value);
-	    }
-	    catch(MissingQuoteException e) {
-		// This gets thrown if we couldnt calculate a share value
-		// for a given date. This occurs on public holidays etc.
-		// Its OK. Just don't give a quote for that day!
-	    }
-	}
-    }
+                    else if(mode == STOCKS_HELD) {
+                        // HACK: Stocks held should not be converted to double (or Money!)
+                        // since we might lose accuracy. This is a temporary fix until
+                        // the chart classes are updated and Integer types can be used.
+                        int stocksHeld = portfolio.getStocksHeld().size();
 
-    // Create a graphable which shows the profit gains + losses of the
-    // portfolio over time, without respect to the value
-    private void createProfitLossGraphable(Iterator dateIterator,
-					   Iterator transactionIterator,
-					   Transaction transaction,
-					   Portfolio temporaryPortfolio) {
+                        value = new Money((double)stocksHeld);
+                    }
+                    else {
+                        assert mode == ACCOUNT_VALUE;
+                        assert accountName != null;
 
-	// Build graphable so this source can be directly graphed
-	graphable = new Graphable();
+                        // This is inefficient because it only needs to call this once
+                        // for the portfolio. However, it's cleaner to put it here and
+                        // its impact should be tiny.
+                        Account account = portfolio.findAccountByName(accountName);
+                        assert account != null;
 
-	// Keep track of cash deposited into portfolio.
-	Money depositedCash = Money.ZERO;
+                        value = account.getValue(quoteBundle, date);
+                    }
 
-	while(dateIterator.hasNext()) {
-	    TradingDate date = (TradingDate)dateIterator.next();
+                    graphable.putY((Comparable)date, new Double(value.doubleValue()));
+                }
 
-	    while(transaction != null &&
-		  transaction.getDate().compareTo(date) <= 0) {
-
-		// If its a cash deposit/withdrawal we need to update
-		// our cash value
-		if(transaction.getType() == Transaction.WITHDRAWAL)
-		    depositedCash = depositedCash.subtract(transaction.getAmount());
-		else if(transaction.getType() == Transaction.DEPOSIT)
-		    depositedCash = depositedCash.add(transaction.getAmount());
-
-		temporaryPortfolio.addTransaction(transaction);
-
-		if(transactionIterator.hasNext())
-		    transaction = (Transaction)transactionIterator.next();
-		else
-		    transaction = null; // no more transactions
-	    }
-
-	    try {
-                Money portfolioValue = temporaryPortfolio.getValue(quoteBundle, date);
-		Double value = new Double(portfolioValue.subtract(depositedCash).doubleValue());
-		graphable.putY((Comparable)date, value);
-	    }
-	    catch(MissingQuoteException e) {
-		// This gets thrown if we couldnt calculate a share value
-		// for a given date. This occurs on public holidays etc.
-		// Its OK. Just don't give a quote for that day!
-	    }
-	}
-
+                // OK - just skip that date
+                catch(MissingQuoteException e) { }
+            }
+        }
+        else
+            graphable = null;
     }
 
     public Graphable getGraphable() {
@@ -201,7 +195,7 @@ public class PortfolioGraphSource implements GraphSource {
 	if(value != null) {
 	    String name = portfolio.getName();
 
-	    if(mode == PROFIT_LOSS) {
+	    if(mode == RETURN_VALUE) {
 		name = name.concat(" ");
                 name = name.concat(Locale.getString("PROFIT"));
             }
@@ -219,32 +213,56 @@ public class PortfolioGraphSource implements GraphSource {
     }
 
     public String getYLabel(double value) {
-        return Money.toString(value);
+        if(mode == STOCKS_HELD)
+            return Integer.toString((int)value);
+        else
+            return Money.toString(value);
     }
 
     public double[] getAcceptableMajorDeltas() {
-	double[] major = {0.001D, // 0.1c
-			 0.01D, // 1c
-			 0.1D, // 10c
-			 1.0D, // $1
-			 10.0D, // $10
-			 100.0D, // $100
-			 1000.0D, // $1k
-			 10000.0D, // $10k (secure)
-			 100000.0D, // $100k (well off)
-			 1000000.0D, // $1M (rich)
-			 10000000.0D, // $10M (very rich)
-			 100000000.0D, // $100M (super rich)
-			 1000000000.0D, // $1B (wow)
-			 1000000000.0D}; // $10B (Bill Gates)
-
-	return major;	
+        if(mode == STOCKS_HELD) {
+	    double[] major = {1D,
+                              10D,
+                              100D,
+                              1000D, // 1T
+                              10000D,
+                              100000D,
+                              1000000D, // 1M
+                              10000000D,
+                              100000000D,
+                              1000000000D, // 1B
+                              10000000000D};
+	    return major;
+        }
+        else {
+            double[] major = {0.001D, // 0.1c
+                              0.01D, // 1c
+                              0.1D, // 10c
+                              1.0D, // $1
+                              10.0D, // $10
+                              100.0D, // $100
+                              1000.0D, // $1k
+                              10000.0D, // $10k (secure)
+                              100000.0D, // $100k (well off)
+                              1000000.0D, // $1M (rich)
+                              10000000.0D, // $10M (very rich)
+                              100000000.0D, // $100M (super rich)
+                              1000000000.0D, // $1B (wow)
+                              1000000000.0D}; // $10B (Bill Gates)
+            return major;	
+        }
     }
 
     public double[] getAcceptableMinorDeltas() {
-	double[] minor = {1D, 1.1D, 1.25D, 1.3333D, 1.5D, 2D, 2.25D,
-			 2.5D, 3D, 3.3333D, 4D, 5D, 6D, 6.5D, 7D, 7.5D,
-			 8D, 9D};
-	return minor;
+        if(mode == STOCKS_HELD) {
+	    double[] minor = {1D, 2D, 3D, 4D, 5D, 6D, 8D};
+            return minor;
+        }
+        else {
+            double[] minor = {1D, 1.1D, 1.25D, 1.3333D, 1.5D, 2D, 2.25D,
+                              2.5D, 3D, 3.3333D, 4D, 5D, 6D, 6.5D, 7D, 7.5D,
+                              8D, 9D};
+            return minor;
+        }
     }
 }

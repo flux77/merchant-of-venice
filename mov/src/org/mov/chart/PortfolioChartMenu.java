@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.chart;
@@ -30,25 +30,28 @@ import org.mov.portfolio.*;
 import org.mov.quote.*;
 
 /**
- * Provides a menu which is associated with a stock symbol being graphed. 
+ * Provides a menu which is associated with a stock symbol being graphed.
  * The menu provides a series of options which allow the user
- * to graph related charts and indicators. 
+ * to graph related charts and indicators.
  */
 public class PortfolioChartMenu extends JMenu implements ActionListener {
 
     // Graphs
-    private static final String PROFIT_LOSS = Locale.getString("PROFIT_LOSS");
+    private static final String CASH_VALUE = Locale.getString("CASH_VALUE");
+    private static final String SHARE_VALUE = Locale.getString("SHARE_VALUE");
+    private static final String RETURN_VALUE = Locale.getString("RETURN_VALUE");
+    private static final String STOCKS_HELD = Locale.getString("STOCKS_HELD");
 
     JMenu graphMenu;
     JMenu annotateMenu;
 
     private JMenuItem removeMenu;
-    
+
     private QuoteBundle quoteBundle;
     private Graph graph;
     private ChartModule listener;
     private HashMap map = new HashMap();
-  
+
     private Portfolio portfolio;
 
     /**
@@ -64,7 +67,7 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 
 	super(graph.getName());
 	
-	this.quoteBundle = quoteBundle; 
+	this.quoteBundle = quoteBundle;
 	this.graph = graph;
 	this.listener = listener;
 	this.portfolio = portfolio;
@@ -74,13 +77,25 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 	this.add(graphMenu);
 
 	// Add graph menu items
-	addMenuItem(PROFIT_LOSS);
+	addMenuItem(CASH_VALUE);
+	addMenuItem(SHARE_VALUE);
+	addMenuItem(RETURN_VALUE);
+	addMenuItem(STOCKS_HELD);
 
-	// Add all static menus
+        // Add account menu items
+	graphMenu.addSeparator();
+
+        List accounts = portfolio.getAccounts();
+        for(Iterator iterator = accounts.iterator(); iterator.hasNext();) {
+            Account account = (Account)iterator.next();
+            addMenuItem(account.getName());
+        }
+
+        // Add remove option
 	this.addSeparator();
 	removeMenu = new JMenuItem(Locale.getString("REMOVE"));
 	removeMenu.addActionListener(this);
-	this.add(removeMenu);	    
+	this.add(removeMenu);	
     }
 
     // Add a graph menu item, e.g. "Market Value"
@@ -118,30 +133,55 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 	else {
 	    JCheckBoxMenuItem menu = (JCheckBoxMenuItem)e.getSource();
 	    String text = menu.getText();
-	    
+	
 	    // Handle removing graphs next
 	    if(!menu.getState())
 		removeGraph(text);
-	    
+	
 	    // Ok looks like its adding a graph
-	    else if(text == PROFIT_LOSS) 
+	    else if(text == RETURN_VALUE)
 		addGraph(new LineGraph(new PortfolioGraphSource(portfolio,
-								quoteBundle, 
-								PortfolioGraphSource.PROFIT_LOSS)), 
-			 PROFIT_LOSS, 0);
+								quoteBundle,
+								PortfolioGraphSource.RETURN_VALUE)),
+			 RETURN_VALUE, 0);
+	    else if(text == CASH_VALUE)
+		addGraph(new LineGraph(new PortfolioGraphSource(portfolio,
+								quoteBundle,
+								PortfolioGraphSource.CASH_VALUE)),
+			 CASH_VALUE, 0);
+	    else if(text == SHARE_VALUE)
+		addGraph(new LineGraph(new PortfolioGraphSource(portfolio,
+								quoteBundle,
+								PortfolioGraphSource.SHARE_VALUE)),
+			 SHARE_VALUE, 0);
+
+	    else if(text == STOCKS_HELD)
+		addGraph(new BarGraph(new PortfolioGraphSource(portfolio,
+                                                               quoteBundle,
+                                                               PortfolioGraphSource.STOCKS_HELD)),
+			 STOCKS_HELD);
+
+            // Otherwise it's an account in the portfolio
+            else {
+                String accountName = text;
+                addGraph(new LineGraph(new PortfolioGraphSource(portfolio,
+                                                                quoteBundle,
+                                                                accountName)),
+                         accountName, 0);
+            }
 	}
     }
-    
+
     // Adds graph to chart
     private void addGraph(Graph graph, String mapIdentifier) {
-	map.put(mapIdentifier, graph); 
+	map.put(mapIdentifier, graph);
 	listener.append(graph);
 	listener.redraw();
     }
-    
+
     // Same as above but add at specific index
     private void addGraph(Graph graph, String mapIdentifier, int index) {
-	map.put(mapIdentifier, graph); 
+	map.put(mapIdentifier, graph);
 	listener.append(graph, index);
 	listener.redraw();
     }

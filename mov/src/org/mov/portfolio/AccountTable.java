@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.portfolio;
@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.mov.ui.AbstractTable;
 import org.mov.ui.AbstractTableModel;
+import org.mov.ui.AccountNameFormat;
+import org.mov.ui.ChangeFormat;
 import org.mov.ui.Column;
 import org.mov.util.Locale;
 import org.mov.util.Money;
@@ -39,85 +41,111 @@ import org.mov.quote.QuoteBundle;
  */
 public class AccountTable extends AbstractTable {
 
-    private static final int ACCOUNT_COLUMN = 0;
-    private static final int VALUE_COLUMN = 1;
+    private static final int ACCOUNT_COLUMN        = 0;
+    private static final int MARKET_VALUE_COLUMN   = 1;
+    private static final int PERCENT_CHANGE_COLUMN = 2;
 
     class Model extends AbstractTableModel {
 
-	private QuoteBundle quoteBundle;
-	private Portfolio portfolio;
-	private Object[] accounts;
-	private int dateOffset;
+	private QuoteBundle quoteBundle      = null;
+	private Portfolio todayPortfolio     = null;
+        private Portfolio yesterdayPortfolio = null;
+	private TradingDate date             = null;
 
 	public Model(List columns, Portfolio portfolio, QuoteBundle quoteBundle) {
             super(columns);
 
-	    this.quoteBundle = quoteBundle;
-	    this.portfolio = portfolio;
-
-	    accounts = portfolio.getAccounts().toArray();
-
             // Use the latest date in the quote bundle
-	    dateOffset = quoteBundle.getLastDateOffset();
+	    date = quoteBundle.getLastDate();
+
+	    this.quoteBundle = quoteBundle;
+	    todayPortfolio = portfolio;
+
+            yesterdayPortfolio = portfolio.getPortfolio(date.previous(1));
 	}
 	
 	public int getRowCount() {
 	    // One row per account plus a total row
-	    return accounts.length + 1;
+	    return (todayPortfolio.getAccounts().size() + 1);
 	}
-	
+
+        private Object getAccountValueAt(int row, int column) {
+            Account todayAccount = (Account)todayPortfolio.getAccounts().get(row);
+
+            switch(column) {
+            case(ACCOUNT_COLUMN):
+                return new AccountNameFormat(todayAccount.getName());
+		
+            case(MARKET_VALUE_COLUMN):
+                try {
+                    return todayAccount.getValue(quoteBundle, date);
+                }
+                catch(MissingQuoteException e) {
+                    return Money.ZERO;
+                }
+
+            case(PERCENT_CHANGE_COLUMN):
+                Account yesterdayAccount = (Account)yesterdayPortfolio.getAccounts().get(row);
+
+                try {
+                    Money todayValue = todayAccount.getValue(quoteBundle, date);
+                    Money yesterdayValue = yesterdayAccount.getValue(quoteBundle,
+                                                                     date.previous(1));
+                    return new ChangeFormat(yesterdayValue, todayValue);
+                }
+                catch(MissingQuoteException e) {
+                    return new ChangeFormat(0.0D);
+                }
+
+            default:
+                assert false;
+                return Money.ZERO;
+            }
+        }
+
+        private Object getPortfolioValueAt(int column) {
+            switch(column) {
+            case(ACCOUNT_COLUMN):
+                return AccountNameFormat.TOTAL;
+		
+            case(MARKET_VALUE_COLUMN):
+                try {
+                    return todayPortfolio.getValue(quoteBundle, date);
+                }
+                catch(MissingQuoteException e) {
+                    return Money.ZERO;
+                }
+
+            case(PERCENT_CHANGE_COLUMN):
+                try {
+                    Money todayValue = todayPortfolio.getValue(quoteBundle, date);
+                    Money yesterdayValue =
+                        yesterdayPortfolio.getValue(quoteBundle, date.previous(1));
+
+                    return new ChangeFormat(yesterdayValue, todayValue);
+                }
+                catch(MissingQuoteException e) {
+                    return new ChangeFormat(0.0D);
+                }
+
+            default:
+                assert false;
+                return Money.ZERO;
+            }
+        }
+
 	public Object getValueAt(int row, int column) {
-	    if(row >= getRowCount()) 
+	    if(row >= getRowCount())
 		return "";
-	    
+	
 	    // Account
-	    if(row != (getRowCount() - 1)) {
-		
-		Account account = (Account)accounts[row];
-		
-		switch(column) {
-		case(ACCOUNT_COLUMN):
-		    return account.getName();
-		    
-		case(VALUE_COLUMN):
-		    try {
-			return account.getValue(quoteBundle, dateOffset);
-		    }
-		    catch(MissingQuoteException e) {
-			return Money.ZERO;
-		    }
-		}
-	    }
+	    if(row != (getRowCount() - 1))
+                return getAccountValueAt(row, column);
 
 	    // Total row
-	    else {
-		switch(column) {
-		case(ACCOUNT_COLUMN):
-		    return Locale.getString("TOTAL");
-		    
-		case(VALUE_COLUMN):
-		    // Sum values of all accounts
-		    List accounts = portfolio.getAccounts();
-		    Iterator iterator = accounts.iterator();
-		    Money value = Money.ZERO;
-		    
-		    while(iterator.hasNext()) {
-			Account account = (Account)iterator.next();
-
-			try {
-			    value = value.add(account.getValue(quoteBundle, dateOffset));
-			}
-			catch(MissingQuoteException e) {
-			    // nothing to do 
-			}
-		    }
-
-		    return value;
-		}
-	    }
-
-	    return "";
-	}
+	    else
+                return getPortfolioValueAt(column);
+        }
     }
 
     /**
@@ -129,14 +157,18 @@ public class AccountTable extends AbstractTable {
      */
     public AccountTable(Portfolio portfolio, QuoteBundle quoteBundle) {
         List columns = new ArrayList();
-        columns.add(new Column(ACCOUNT_COLUMN, 
-			       Locale.getString("ACCOUNT"), 
-			       Locale.getString("ACCOUNT_COLUMN_HEADER"), 
-			       String.class, Column.VISIBLE));
-        columns.add(new Column(VALUE_COLUMN, 
-			       Locale.getString("VALUE"), 
-			       Locale.getString("VALUE_COLUMN_HEADER"), 
+        columns.add(new Column(ACCOUNT_COLUMN,
+			       Locale.getString("ACCOUNT"),
+			       Locale.getString("ACCOUNT_COLUMN_HEADER"),
+			       AccountNameFormat.class, Column.VISIBLE));
+        columns.add(new Column(MARKET_VALUE_COLUMN,
+			       Locale.getString("MARKET_VALUE"),
+			       Locale.getString("MARKET_VALUE_COLUMN_HEADER"),
 			       Money.class, Column.VISIBLE));
+        columns.add(new Column(PERCENT_CHANGE_COLUMN,
+			       Locale.getString("PERCENT_CHANGE"),
+			       Locale.getString("PERCENT_CHANGE_COLUMN_HEADER"),
+			       ChangeFormat.class, Column.VISIBLE));
 
 	setModel(new Model(columns, portfolio, quoteBundle));
     }

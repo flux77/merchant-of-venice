@@ -78,30 +78,29 @@ public class MaxExpression extends QuoteExpression {
     /** 
      * Finds the maximum stock quote for a given symbol in a given range. 
      *
-     * @param	quoteBundle	the quote cache to read the quotes from.
+     * @param	quoteBundle	the quote bundle to read the quotes from.
      * @param	symbol	the symbol to use.
      * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
-     * @param	lastDay	fast access date offset in quoteBundle.
+     * @param	lastDay	fast access date offset in cache.
      * @return	the maximum stock quote.
      */
     static public float max(QuoteBundle quoteBundle, String symbol, 
-			    int quote, int days, int lastDay)
-	throws EvaluationException {
+			    int quote, int days, int lastDay) {
 
-	float max = Float.MIN_VALUE;
+	float max = 0.0F;
 	float value;
 	
 	for(int i = lastDay - days + 1; i <= lastDay; i++) {
 
-	    try {
-		value = quoteBundle.getQuote(symbol, quote, i);
-		
-		if(value > max)
-		    max = value;
-	    }
-	    catch(MissingQuoteException e) {
-		// ignore
-	    }
+            try {
+                value = quoteBundle.getQuote(symbol, quote, i);
+                
+                if(value > max)
+                    max = value;
+            }
+            catch(MissingQuoteException e) {
+                // nothing to do
+            }
 	}
 
 	return max;

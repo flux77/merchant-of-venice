@@ -27,40 +27,19 @@ package org.mov.quote;
  * class into a function.
  */
 public class QuoteFunctions {
-    
-    /** 
-     * Deprecated. Move to avg2.
+
+    /**
+     * Find the standard deviation of the given values. This
+     * algorthim will calculate the standard deviation on the values in
+     * the given array in the range [start, end]. Start inclusive, end exclusive.
      *
-     * Average the stock quotes for a given symbol in a given range. 
-     *
-     * @param	quoteBundle	the quote cache to read the quotes from.
-     * @param	symbol	the symbol to use.
-     * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
-es     * @param	lastDay	fast access date offset in cache.
-     * @return	average stock quote.
+     * @param values array of values to analyse 
+     * @param start  analyse values from start
+     * @param end    to end
+     * @return the standard deviation
      */
-    static public float avg(QuoteBundle quoteBundle, String symbol, 
-			    int quote, int days, int lastDay) {
-	float avg = 0;
-
-	// Sum quotes
-	for(int i = lastDay - days + 1; i <= lastDay; i++) {
-	    try {
-		avg += quoteBundle.getQuote(symbol, quote, i);
-	    }
-	    catch(MissingQuoteException e) {
-		// ignore
-	    }
-	}
-
-	// Average
-	avg /= days;
-
-	return avg;
-    }
-
     static public float sd(float[] values, int start, int end) {
-	double average = avg2(values, start, end);
+	double average = avg(values, start, end);
 	int period = end - start;
 
 	double deviationSum = 0;
@@ -69,11 +48,19 @@ es     * @param	lastDay	fast access date offset in cache.
 	}
 
 	return (float)Math.sqrt(deviationSum / period);
-
     }
 
-    // start inclusive, end exclusive
-    static public float avg2(float[] values, int start, int end) {
+    /**
+     * Find the average of the given values. This
+     * algorthim will calculate the average on the values in
+     * the given array in the range [start, end]. Start inclusive, end exclusive.
+     *
+     * @param values array of values to analyse 
+     * @param start  analyse values from start
+     * @param end    to end
+     * @return the average
+     */
+    static public float avg(float[] values, int start, int end) {
 	float avg = 0;
 	int period = end - start;
 

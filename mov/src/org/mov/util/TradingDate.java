@@ -32,10 +32,12 @@ import java.util.regex.*;
  */
 public class TradingDate implements Cloneable, Comparable {
 
-    /** Date format will be in US format, e.g. mm/dd/yy, mm/dd/yyyy etc. */
+    /** Date format will be in US format, e.g. <code>mm/dd/yy</code>, <code>mm/dd/yyyy</code> 
+        etc. */
     public final static int US = 0;		
 
-    /** Date format will be in britsh format, e.g. dd/mm/yy, dd/mm/yyyy etc. */
+    /** Date format will be in britsh format, e.g. <code>dd/mm/yy</code>, <code>dd/mm/yyyy</code> 
+        etc. */
     public final static int BRITISH = 1;	
 
     private int year;

@@ -29,7 +29,6 @@ import javax.swing.table.*;
 import org.mov.ui.*;
 import org.mov.util.*;
 import org.mov.main.*;
-import org.mov.parser.*;
 import org.mov.table.*;
 import org.mov.quote.*;
 
@@ -57,20 +56,18 @@ public class StockHoldingTable extends AbstractTable {
 	    String.class, Integer.class, String.class, String.class,
 	    Change.class}; 
 
-	private QuoteCache cache;
+	private QuoteBundle quoteBundle;
 	private HashMap stockHoldings;
 	private Object[] symbols;
 	private TradingDate date;
 
-	public Model(HashMap stockHoldings, QuoteCache cache) {
-	    this.cache = cache;
+	public Model(HashMap stockHoldings, QuoteBundle quoteBundle) {
+	    this.quoteBundle = quoteBundle;
 	    this.stockHoldings = stockHoldings;
 	    symbols = stockHoldings.keySet().toArray();
 
-	    // Pull first date from cache
-	    Iterator iterator = cache.dateIterator(0);
-	    if(iterator.hasNext())
-		date = (TradingDate)iterator.next();
+	    // Pull first date from quoteBundle
+	    date = quoteBundle.getFirstDate();
 	}
 	
 	public int getRowCount() {
@@ -114,24 +111,22 @@ public class StockHoldingTable extends AbstractTable {
 		    
 		case(DAY_CLOSE_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Quote.DAY_CLOSE, date));
+			(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
 		    
 		case(MARKET_VALUE_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Quote.DAY_CLOSE, date) *
+			(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date) *
 			 stockHolding.getShares());
 		    
 		case(CHANGE_COLUMN):
 		    return 
 			Converter.changeToChange
-			(cache.getQuote(symbol, Quote.DAY_OPEN, date),
-			 cache.getQuote(symbol, Quote.DAY_CLOSE, date));
+			(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date),
+			 quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
 		}
 	    }
-	    catch(EvaluationException e) {
-		System.out.println("exceptioN!!!");
-
-		// should not happen
+	    catch(MissingQuoteException e) {
+		assert false;
 	    }
 
 	    return "";
@@ -143,10 +138,10 @@ public class StockHoldingTable extends AbstractTable {
      * Create a new stock holding table.
      *
      * @param	stockHoldings	stock holdings for ShareAccount
-     * @param	cache		quote cache
+     * @param	quoteBundle	the quote bundle
      */
-    public StockHoldingTable(HashMap stockHoldings, QuoteCache cache) {
-	setModel(new Model(stockHoldings, cache));
+    public StockHoldingTable(HashMap stockHoldings, QuoteBundle quoteBundle) {
+	setModel(new Model(stockHoldings, quoteBundle));
 
 	// If the user double clicks on a row then graph the stock
 	addMouseListener(new MouseAdapter() {

@@ -18,8 +18,6 @@
 
 package org.mov.quote;
 
-import org.mov.parser.*;
-
 /**
  * Interim class containing statistical functions to be performed on
  * stock quotes. This class will eventually be
@@ -35,21 +33,25 @@ public class QuoteFunctions {
      *
      * Average the stock quotes for a given symbol in a given range. 
      *
-     * @param	cache	the quote cache to read the quotes from.
+     * @param	quoteBundle	the quote cache to read the quotes from.
      * @param	symbol	the symbol to use.
      * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
-     * @param	lastDay	fast access date offset in cache.
+es     * @param	lastDay	fast access date offset in cache.
      * @return	average stock quote.
      */
-    static public float avg(QuoteCache cache, String symbol, 
-			    int quote, int days, int lastDay) 
-	throws EvaluationException {
-
+    static public float avg(QuoteBundle quoteBundle, String symbol, 
+			    int quote, int days, int lastDay) {
 	float avg = 0;
 
 	// Sum quotes
-	for(int i = lastDay - days + 1; i <= lastDay; i++) 
-	    avg += cache.getQuote(symbol, quote, i);
+	for(int i = lastDay - days + 1; i <= lastDay; i++) {
+	    try {
+		avg += quoteBundle.getQuote(symbol, quote, i);
+	    }
+	    catch(MissingQuoteException e) {
+		// ignore
+	    }
+	}
 
 	// Average
 	avg /= days;
@@ -88,16 +90,15 @@ public class QuoteFunctions {
 
     /**
      * RSI algorithm 
-     * @param	cache	the quote cache to read the quotes from.
+     * @param	quoteBundle	the quote cache to read the quotes from.
      * @param	symbol	the symbol to use.
      * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
      * @param	days	Number of days to run RSI calculation over
      * @param	lastDay	fast access date offset in cache.
      * @return  the RSI value
      */
-    static public float rsi(QuoteCache cache, String symbol, 
-			    int quote, int days, int lastDay) 
-	throws EvaluationException {
+    static public float rsi(QuoteBundle quoteBundle, String symbol, 
+			    int quote, int days, int lastDay) {
 	System.err.println("Entering RSI for symbol "+symbol);
 
 	//	Vector v = new Vector();
@@ -110,15 +111,21 @@ public class QuoteFunctions {
 	float current;
 	for(int i = lastDay - days + 1; i <= lastDay; i++) {
 	    //	for(int i = 0; i < v.size(); i++) {
-	    current = cache.getQuote(symbol, quote, i);
-	    System.err.println("offset "+i+", value "+current);
-	    if (i < 0) {
-		if (current > last)
-		    upvalues += current;
-		else if (current < last)
-		    downvalues += current;
+
+	    try {
+		current = quoteBundle.getQuote(symbol, quote, i);
+		System.err.println("offset "+i+", value "+current);
+		if (i < 0) {
+		    if (current > last)
+			upvalues += current;
+		    else if (current < last)
+			downvalues += current;
+		}
+		last = current;
 	    }
-	    last = current;
+	    catch(MissingQuoteException e) {
+		// ignore
+	    }
 	}
 
 	float up_average = upvalues / days;

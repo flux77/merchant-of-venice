@@ -66,6 +66,7 @@ public class TransactionDialog extends JInternalFrame
     private JComboBox cashAccountComboBox;
     private JComboBox cashAccountComboBox2;
     private JComboBox shareAccountComboBox;
+    private PortfolioSymbolComboBox symbolComboBox;
 
     private Portfolio portfolio;
 
@@ -118,22 +119,17 @@ public class TransactionDialog extends JInternalFrame
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.FEE));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.INTEREST));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.REDUCE));
-
-	    if(portfolio.countAccounts(Account.CASH_ACCOUNT) >= 2) 
-		typeComboBox.addItem(Transaction.typeToString(Transaction.TRANSFER));
-
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.WITHDRAWAL));
 	}
 	else {
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.DEPOSIT));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.FEE));
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.INTEREST));
-
-	    if(portfolio.countAccounts(Account.CASH_ACCOUNT) >= 2) 
-		typeComboBox.addItem(Transaction.typeToString(Transaction.TRANSFER));
-
 	    typeComboBox.addItem(Transaction.typeToString(Transaction.WITHDRAWAL));
 	}
+
+	if(portfolio.countAccounts(Account.CASH_ACCOUNT) >= 2) 
+	    typeComboBox.addItem(Transaction.typeToString(Transaction.TRANSFER));
 
 	typeComboBox.addActionListener(this);
 
@@ -160,9 +156,15 @@ public class TransactionDialog extends JInternalFrame
 
 	setFrameSize();
 
+	// Some panels use a combo box to get a symbol, others use a text field.
+	// We need to reset this here so that when we try to retrieve the symbol
+	// we try from the combo box first - if its null we try the text field instead
+	symbolComboBox = null;
+	symbolTextField = null;
+
 	// Work out starting panel
 	if(portfolio.countAccounts(Account.SHARE_ACCOUNT) > 0)
-	    transactionPanel = getTradePanel();
+	    transactionPanel = getAccumulatePanel();
 	else
 	    transactionPanel = getCashPanel();
 
@@ -206,6 +208,13 @@ public class TransactionDialog extends JInternalFrame
 	return cashAccountComboBox2; 
     }
 
+    // Get combo box listing symbols traded in the portfolio
+    private JComboBox getSymbolComboBox() {
+	symbolComboBox = new PortfolioSymbolComboBox(portfolio, null);
+	
+	return symbolComboBox;
+    }
+
     // Get combo box listing share accounts
     private JComboBox getShareAccountComboBox() {
 	Vector accounts = portfolio.getAccounts();
@@ -239,31 +248,37 @@ public class TransactionDialog extends JInternalFrame
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 
+	// Cash Account Line
 	JLabel cashAccountLabel = new JLabel("Cash Account");
 	c.gridwidth = 1;
 	gridbag.setConstraints(cashAccountLabel, c);
 	panel.add(cashAccountLabel);
-
 	JComboBox cashAccountComboBox = getCashAccountComboBox();
-
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(cashAccountComboBox, c);
 	panel.add(cashAccountComboBox);
 
+	// Share Account Line
 	JLabel shareAccountLabel = new JLabel("Share Account");
 	c.gridwidth = 1;
 	gridbag.setConstraints(shareAccountLabel, c);
 	panel.add(shareAccountLabel);
-
 	JComboBox shareAccountComboBox = getShareAccountComboBox();
-
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(shareAccountComboBox, c);
 	panel.add(shareAccountComboBox);
 
-	symbolTextField = 
-	    addTextRow(panel, "Symbol", "", gridbag, c, 5);
+	// Symbol Line
+	JLabel symbolLabel = new JLabel("Symbol");
+	c.gridwidth = 1;
+	gridbag.setConstraints(symbolLabel, c);
+	panel.add(symbolLabel);
+	JComboBox symbolComboBox = getSymbolComboBox();
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(symbolComboBox, c);
+	panel.add(symbolComboBox);
 
+	// Amount Line
 	amountTextField = 
 	    addTextRow(panel, "Total Dividend Value", "", gridbag, c, 15);
 
@@ -288,19 +303,25 @@ public class TransactionDialog extends JInternalFrame
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 
+	// Share Account Line
 	JLabel shareAccountLabel = new JLabel("Share Account");
 	c.gridwidth = 1;
 	gridbag.setConstraints(shareAccountLabel, c);
 	panel.add(shareAccountLabel);
-
 	JComboBox shareAccountComboBox = getShareAccountComboBox();
-
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(shareAccountComboBox, c);
 	panel.add(shareAccountComboBox);
 
-	symbolTextField = 
-	    addTextRow(panel, "Symbol", "", gridbag, c, 5);
+	// Symbol Line
+	JLabel symbolLabel = new JLabel("Symbol");
+	c.gridwidth = 1;
+	gridbag.setConstraints(symbolLabel, c);
+	panel.add(symbolLabel);
+	JComboBox symbolComboBox = getSymbolComboBox();
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(symbolComboBox, c);
+	panel.add(symbolComboBox);
 
 	sharesTextField = 
 	    addTextRow(panel, "Shares", "", gridbag, c, 15);
@@ -310,10 +331,10 @@ public class TransactionDialog extends JInternalFrame
 	return borderPanel;
     }
 
-    // Get panel displayed when user enters a share transaction
-    private JPanel getTradePanel() {
+    // Get panel displayed when user enters an accumulate transaction
+    private JPanel getAccumulatePanel() {
 	JPanel borderPanel = new JPanel();
-	TitledBorder titled = new TitledBorder("Share Transaction");
+	TitledBorder titled = new TitledBorder("Accumulate Transaction");
 	borderPanel.setBorder(titled);
 	borderPanel.setLayout(new BorderLayout());
 
@@ -326,34 +347,97 @@ public class TransactionDialog extends JInternalFrame
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 
+	// Cash Account Line
 	JLabel cashAccountLabel = new JLabel("Cash Account");
 	c.gridwidth = 1;
 	gridbag.setConstraints(cashAccountLabel, c);
 	panel.add(cashAccountLabel);
-
 	JComboBox cashAccountComboBox = getCashAccountComboBox();
-
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(cashAccountComboBox, c);
 	panel.add(cashAccountComboBox);
 
+	// Share Account Line
 	JLabel shareAccountLabel = new JLabel("Share Account");
 	c.gridwidth = 1;
 	gridbag.setConstraints(shareAccountLabel, c);
 	panel.add(shareAccountLabel);
-
 	JComboBox shareAccountComboBox = getShareAccountComboBox();
-
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(shareAccountComboBox, c);
 	panel.add(shareAccountComboBox);
 
+	// Symbol Line
 	symbolTextField = 
 	    addTextRow(panel, "Symbol", "", gridbag, c, 5);
 
+	// Number Shares Line
 	sharesTextField = 
 	    addTextRow(panel, "Shares", "", gridbag, c, 15);
 
+	// Share Value Line
+	amountTextField = 
+	    addTextRow(panel, "Total Share Value", "", gridbag, c, 15);
+
+	tradeCostTextField = 
+	    addTextRow(panel, "Trade Cost", "", gridbag, c, 15);
+
+	borderPanel.add(panel, BorderLayout.NORTH);
+
+	return borderPanel;
+    }
+
+    // Get panel displayed when user enters a reduce transaction
+    private JPanel getReducePanel() {
+	JPanel borderPanel = new JPanel();
+	TitledBorder titled = new TitledBorder("Reduce Transaction");
+	borderPanel.setBorder(titled);
+	borderPanel.setLayout(new BorderLayout());
+
+	JPanel panel = new JPanel();
+	GridBagLayout gridbag = new GridBagLayout();
+	GridBagConstraints c = new GridBagConstraints();
+	panel.setLayout(gridbag);
+
+	c.weightx = 1.0;
+	c.ipadx = 5;
+	c.anchor = GridBagConstraints.WEST;
+
+	// Cash Account Line
+	JLabel cashAccountLabel = new JLabel("Cash Account");
+	c.gridwidth = 1;
+	gridbag.setConstraints(cashAccountLabel, c);
+	panel.add(cashAccountLabel);
+	JComboBox cashAccountComboBox = getCashAccountComboBox();
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(cashAccountComboBox, c);
+	panel.add(cashAccountComboBox);
+
+	// Share Account Line
+	JLabel shareAccountLabel = new JLabel("Share Account");
+	c.gridwidth = 1;
+	gridbag.setConstraints(shareAccountLabel, c);
+	panel.add(shareAccountLabel);
+	JComboBox shareAccountComboBox = getShareAccountComboBox();
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(shareAccountComboBox, c);
+	panel.add(shareAccountComboBox);
+
+	// Symbol Line
+	JLabel symbolLabel = new JLabel("Symbol");
+	c.gridwidth = 1;
+	gridbag.setConstraints(symbolLabel, c);
+	panel.add(symbolLabel);
+	JComboBox symbolComboBox = getSymbolComboBox();
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(symbolComboBox, c);
+	panel.add(symbolComboBox);
+
+	// Number Shares Line
+	sharesTextField = 
+	    addTextRow(panel, "Shares", "", gridbag, c, 15);
+
+	// Share Value Line
 	amountTextField = 
 	    addTextRow(panel, "Total Share Value", "", gridbag, c, 15);
 
@@ -494,7 +578,11 @@ public class TransactionDialog extends JInternalFrame
 	width = Math.max(width, preferred.width);
 	height = Math.max(height, preferred.height);
 
-	preferred = getPreferredSizeWithPanel(getTradePanel());
+	preferred = getPreferredSizeWithPanel(getAccumulatePanel());
+	width = Math.max(width, preferred.width);
+	height = Math.max(height, preferred.height);
+
+	preferred = getPreferredSizeWithPanel(getReducePanel());
 	width = Math.max(width, preferred.width);
 	height = Math.max(height, preferred.height);
 
@@ -601,12 +689,18 @@ public class TransactionDialog extends JInternalFrame
 	dateTextField.setText(transaction.getDate().toString("dd/mm/yyyy"));
 	
 	// Now fill in the fields for this panel (depending on type)
-	if(type == Transaction.ACCUMULATE ||
-	   type == Transaction.REDUCE) {
-
+	if(type == Transaction.ACCUMULATE) {
 	    cashAccountComboBox.setSelectedItem(transaction.getCashAccount().getName());
 	    shareAccountComboBox.setSelectedItem(transaction.getShareAccount().getName());
 	    symbolTextField.setText(transaction.getSymbol());
+	    sharesTextField.setText(String.valueOf(transaction.getShares()));
+	    amountTextField.setText(String.valueOf(transaction.getAmount()));
+	    tradeCostTextField.setText(String.valueOf(transaction.getTradeCost()));
+	}
+	else if(type == Transaction.REDUCE) {
+	    cashAccountComboBox.setSelectedItem(transaction.getCashAccount().getName());
+	    shareAccountComboBox.setSelectedItem(transaction.getShareAccount().getName());
+	    symbolComboBox.setSelectedItem(transaction.getSymbol());
 	    sharesTextField.setText(String.valueOf(transaction.getShares()));
 	    amountTextField.setText(String.valueOf(transaction.getAmount()));
 	    tradeCostTextField.setText(String.valueOf(transaction.getTradeCost()));
@@ -620,15 +714,14 @@ public class TransactionDialog extends JInternalFrame
 	    cashAccountComboBox.setSelectedItem(transaction.getCashAccount().getName());
 	}
 	else if(type == Transaction.DIVIDEND) {
-
 	    cashAccountComboBox.setSelectedItem(transaction.getCashAccount().getName());
 	    shareAccountComboBox.setSelectedItem(transaction.getShareAccount().getName());
-	    symbolTextField.setText(transaction.getSymbol());
+	    symbolComboBox.setSelectedItem(transaction.getSymbol());
 	    amountTextField.setText(String.valueOf(transaction.getAmount()));
 	}
 	else if(type == Transaction.DIVIDEND_DRP) {
 	    shareAccountComboBox.setSelectedItem(transaction.getShareAccount().getName());
-	    symbolTextField.setText(transaction.getSymbol());
+	    symbolComboBox.setSelectedItem(transaction.getSymbol());
 	    sharesTextField.setText(String.valueOf(transaction.getShares()));
 	}       
 	else {
@@ -644,9 +737,17 @@ public class TransactionDialog extends JInternalFrame
     private void setTransactionPanel(int type) {
 	getContentPane().remove(transactionPanel);
 	
-	if(type == Transaction.ACCUMULATE ||
-	   type == Transaction.REDUCE) {
-	    transactionPanel = getTradePanel();
+	// Some panels use a combo box to get a symbol, others use a text field.
+	// We need to reset this here so that when we try to retrieve the symbol
+	// we try from the combo box first - if its null we try the text field instead
+	symbolComboBox = null;
+	symbolTextField = null;
+
+	if(type == Transaction.ACCUMULATE) {
+	    transactionPanel = getAccumulatePanel();
+	}
+	else if(type == Transaction.REDUCE) {
+	    transactionPanel = getReducePanel();
 	}
 	else if(type == Transaction.DEPOSIT ||
 		type == Transaction.FEE ||
@@ -665,8 +766,7 @@ public class TransactionDialog extends JInternalFrame
 	    transactionPanel = getTransferPanel();
 	}
 	
-	getContentPane().add(transactionPanel, BorderLayout.CENTER);
-	
+	getContentPane().add(transactionPanel, BorderLayout.CENTER);	
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -715,9 +815,16 @@ public class TransactionDialog extends JInternalFrame
 	TradingDate date = new TradingDate(dateTextField.getText(),
 					   TradingDate.BRITISH);
 
+	// Get symbol - try the combo box first. If it doesn't exist then try the
+	// text field.
 	String symbol = new String("");
-	if(symbolTextField != null) 
+
+	if(symbolComboBox != null) {
+	    symbol = (String)symbolComboBox.getSelectedItem();
+	}
+	else if(symbolTextField != null) {
 	    symbol = symbolTextField.getText();
+	}
 
 	CashAccount cashAccount = null;
 	if(cashAccountComboBox != null) {

@@ -32,10 +32,10 @@ public class NotExpression extends UnaryExpression {
 	super(sub);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	if(getSub().evaluate(cache, symbol, day) >= Expression.TRUE_LEVEL)
+	if(getSub().evaluate(quoteBundle, symbol, day) >= Expression.TRUE_LEVEL)
 	    return FALSE;
 	else
 	    return TRUE;

@@ -18,387 +18,321 @@
 
 package org.mov.quote;
 
-// TODO: Create a quote "transaction" that is a single class that can
-// interface with any "DatabaseSource" so this class doent need to remember
-// whether it contains a single stock or multiple.
-// TODO: Make it handle auto-expand of a single stock
-// TODO: Make a single global cache for the entire programme that can load/
-// delete single stocks and multiple stock days etc. That way multiple
-// requests by the user does not require a db call.
-// TODO: Make it handle if stock "skips" a day which for some reason they
-// sometimes do
-
 import java.util.*;
 
+import org.mov.ui.DesktopManager;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
 import org.mov.util.*;
-import org.mov.parser.*;
 
 /**
- * Caches quote references in a fast access, small memory footprint
- * versatile cache.
- * This cache is meant to be used for all caching of stock quotes over
- * the application. Currently tables and graphs create their own cache
- * and access from that but it is envisaged that at a latter date this
- * class is to be made a singleton. This will allow a central cache of all 
- * quotes for the entire application. It will also mean users who are
- * connecting to an internet quote source will only need to load quotes
- * once per session.
+ * This class contains all the stock quotes currently in memory. Its purpose is to
+ * cache stock quotes so that tasks do not have to query the database or files whenever they
+ * need a quote. While this is a cache it does not control when stock quotes are loaded
+ * or freed, that is controlled by {@link QuoteBundleCache}.
+ * <p>
+ * Tasks should not directly call this class, but should go through a {@link QuoteBundle}.
+ * <p>
+ * When tasks access quotes in a quote cache, either directly or via a quote bundle they
+ * can access quotes in two ways. The first way is specifying the actual date they
+ * are interested in, i.e. a {@link TradingDate}. The other way is specifying a fast
+ * access date offset. The fast access date offset is used when lots of quotes have
+ * to be queried as fast as possible.
+ * <p>
+ * The latest date in the cache has an offset of 0. The previous trading date 
+ * (i.e. not a weekend) has offset -1, the previous one to that -2 etc. 
+ * You can convert to and from fast access dates using {@link #dateToOffset} and 
+ * {@link #offsetToDate}.
  *
- * Example to load in all commodoties on the latest date and cache:
- * <pre>
- *	QuoteCache cache = 
- *		new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
- *			       QuoteSource.ALL_COMMODITIES);
- *	float cbaDayOpen = cache.getQuote("CBA", Quote.DAY_OPEN,
- *				QuoteSourceManager.getSource().getLatestQuoteDate());
- * </pre>
- *
- * @see QuoteSource
+ * @see Quote
+ * @see QuoteBundle
+ * @see QuoteBundleCache
  */
 public class QuoteCache {
-
-    // Load this many quote dates in any one sql query
-    // 96megs holds about 200 trading days
-    //    private final static int QUERY_PACKET_SIZE = 10;
-    private final static int QUERY_PACKET_SIZE = 30;
-
-    // Keep list of dates in cache
-    private ArrayList dates = new ArrayList();
 
     // Cache is organised by a vector of hashmaps, each hashmap 
     // corresponds to a trading day. The hashmap's keys are stock symbols.
     private Vector cache = new Vector();
 
-    // Keep set of stock symbols in cache
-    private TreeSet symbols = new TreeSet();
+    // Keep list of dates in cache
+    private ArrayList dates = new ArrayList();
 
-    // Remember search restriction
-    private int searchRestriction;
+    // Number of quotes in cache
+    private int size = 0;
 
-    // Remember if we loaded a single or multiple stocks
-    private boolean multipleStocks;
+    // Singleton instance of this class
+    private static QuoteCache instance = null;
 
-    // Used for threading
-    private String symbol         = null;
-    private TradingDate date      = null;
-    
-    /**
-     * Create and load cache with all quotes for the given symbol.
-     *
-     * @param	symbol	the symbol to load quotes for.
-     */
-    public QuoteCache(String symbol) {
-        multipleStocks = false;
-        load(QuoteSourceManager.getSource().getQuotesForSymbol(symbol));
+    // Class should only be constructed once by this class
+    private QuoteCache() {
+	// Get the newest quote date - we use this as a reference for all other dates.
+	// The date offset of this date is fixed at 0. The next day is -1.
+	addDate(QuoteSourceManager.getSource().getLastDate());
     }
 
     /**
-     * Create and load cache with all quotes for the given symbols between
-     * the given dates.
+     * Create or return the singleton instance of the quote cache.
      *
-     * @param	symbols	the symbols to load quotes for.
-     * @param	startDate	earliest date to load quotes for.
-     * @param	endDate		latest date to load quotes for.
+     * @return  singleton instance of this class
      */
-    public QuoteCache(Vector symbols, TradingDate startDate,
-		      TradingDate endDate) {
-        multipleStocks = true;
-        load(QuoteSourceManager.getSource().getQuotesForSymbolsAndDates(symbols, startDate, endDate));
-    }
-
-    /**
-     * Create and load cache for all stock quotes on the given day.
-     *
-     * @param	date	the date to load.
-     * @param	type	the type of stocks.
-     * @see QuoteSource
-     */
-    public QuoteCache(TradingDate date, int searchRestriction) {
-	this.multipleStocks = true;
-        load(QuoteSourceManager.getSource().getQuotesForDate(date, searchRestriction));
-    }
-
-    /**
-     * Return a cached stock quote for the given stock and fast access date 
-     * offset. This is the fastest way to retrieve a stock quote.
-     *
-     * @param	symbol	the stock to query.
-     * @param	quote	the quote type. 
-     * @param	date	the date offset. <pre>0</pre> is the latest date in
-     *                  the cache, <pre>1</pre> is the previous date, etc.
-     */
-    public float getQuote(String symbol, int quote, int date) 
-	throws EvaluationException {
-
-	if(containsDate(date)) {
-	    
-	    // First get hashmap of quotes for this date
-	    HashMap quotesForDate = (HashMap)cache.elementAt(-date);
-
-	    // Get stock for this symbol at this date
-	    Quote stockQuote = (Quote)quotesForDate.get(symbol);
-
-	    // No stock? no value
-	    if(stockQuote != null) 
-		return stockQuote.getQuote(quote);
-	    else
-		return 0.0F;
+    public static QuoteCache getInstance() {
+	if(instance != null) {
+	    return instance;
 	}
-
-	// Not found
-	throw new EvaluationException("date out of range");
+	else {
+	    instance = new QuoteCache();
+	    return instance;
+	}
     }
 
-    /**
-     * Return a cached stock quote for the given stock and date.
+    /** 
+     * Get a quote from the cache.
      *
-     * @param	symbol	the stock to query.
-     * @param	quote	the quote type. 
-     * @param	date	the date.
+     * @param symbol    the symbol to load
+     * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
+     *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
+     * @param dateOffset fast access date offset
+     * @return the quote
+     * @exception QuoteNotLoadedException if the quote was not in the cache
      */
-    public float getQuote(String symbol, int quote, TradingDate date) 
-	throws EvaluationException {
+    public float getQuote(String symbol, int quoteType, 
+			  int dateOffset) 
+	throws QuoteNotLoadedException {
+
+	// First get the hash map for the given date
+
+	HashMap symbols = getQuotesForDate(dateOffset);
+	assert symbols != null;
+
+	// Second get the quote for the given symbol on the given date
+
+	Quote quoteValue = (Quote)symbols.get(symbol);
+	if(quoteValue == null) 
+	    throw new QuoteNotLoadedException();
 	
-	return getQuote(symbol, quote, dateToOffset(date));
-    }
-
-
-    /**
-     * Converts a date to a fast access date offset.
-     *
-     * @param	date	the date.
-     * @return	the corresponding date fast access date offset. 
-     *		<pre>0</pre> is the latest date in the cache, <pre>1</pre> is 
-     *		the previous date, etc.
-     */
-    public int dateToOffset(TradingDate date) {
-
-	// Negatve index since date at 1 is *before* date at 0 not after.
-	return -Collections.binarySearch(dates, date, 
-					 new TradingDateComparator(TradingDateComparator.BACKWARDS));
-    }
+	return quoteValue.getQuote(quoteType);
+    }    
 
     /**
-     * Converts a fast access date offset to a date.
+     * Return all the symbols in the cache on the given date.
      *
-     * @param	offset	the fast access date offset.
-     * @return	the corresponding date.
+     * @param dateOffset        fast access date offset
+     * @return list of symbols
      */
-    public TradingDate offsetToDate(int offset) {
-	// Check bounds
-	if(!containsDate(offset))
-	    return null;
-	else
-	    return (TradingDate)dates.get(-offset);
-    }
+    public Vector getSymbols(int dateOffset) {
+	
+	HashMap quotesForDate;
 
-    /**
-     * Return if the cache contains the given date.
-     * If not the cache will try to automatically load it.
-     *
-     * @param	date	the date to check for and autoload into cache.
-     * @return	if the date is now in the cache.
-     */
-    public boolean containsDate(TradingDate date) {
-	return containsDate(dateToOffset(date));
-    }
-
-    /**
-     * Return if the cache contains the given fast access date offset. 
-     * If not the cache will try to automatically load it.
-     *
-     * @param	date	the date offset to check for and autoload into cache.
-     * @return	if the date is now in the cache.
-     */
-    public boolean containsDate(int date) {
-	if(containsDateNoAutoload(date))
-	    return true;
-
-	// If we are caching a single stock we will have already loaded in
-	// all the quotes we can, but if its mulitple stocks we can always
-	// try to load in more (providing the date is OLDER than the dates
-	// in the cache)
-	if(multipleStocks && date < 0) {
-	    // If we dont contain the date try to load it in.
-	    // Keep trying autoloads until either: 
-	    // A) the cache size does not increase
-	    // B) the date is now in the cache
-	    // We do this because its possible that the autoload 'just misses'
-	    // loading our date in.
-	    
-	    int oldsize;
-	    
-	    do {
-		oldsize = dates.size();
-		autoload(date);
-	    }
-	    while(oldsize != dates.size() && !containsDateNoAutoload(date));
-
-	    return(containsDateNoAutoload(date));
+	try {
+	    quotesForDate = getQuotesForDate(dateOffset);
 	}
-	else
-	    return false;
-    }
-
-    /**
-     * Returns an iterator over all the dates in the cache.
-     *
-     * @param	index	the starting index of the iterator
-     * @return	iterator iterator over all the dates
-      */
-    public ListIterator dateIterator(int index) {
-	return dates.listIterator(index);
-    }
-
-    /**
-     * Returns an array of all symbols in the cache.
-     *
-     * @return	an array of symbols
-     */
-    public Object[] getSymbols() {
-	return symbols.toArray();
-    }
-
-    /**
-     * Get the earliest date in the cache.
-     *
-     * @return	the earliest date in the cache.
-     */
-    public TradingDate getStartDate() {
-	// last date in list
-	return (TradingDate)dates.get(dates.size() - 1); 
-    }
-
-    /**
-     * Get the latest date in the cache.
-     *
-     * @return	the latest date in the cache.
-     */
-    public TradingDate getEndDate() {
-	// first date in list	
-	return (TradingDate)dates.get(0); 
-    }
-
-    /**
-     * Return the number of days in the cache.
-     *
-     * @return	the number of days.
-     */
-    public int getNumberDays() {
-	return dates.size();
-    }
-
-    /**
-     * Return the number of symbols in the cache.
-     *
-     * @return	the number of symbols.
-     */
-    public int getNumberSymbols() {
-	return symbols.size();
-    }
-
-    /**
-     * Checks whether the given fast access date offset is in the cache. 
-     * Will not try to autoload the data if it is not.
-     *
-     * @param	date	the date offset.
-     * @return	date in cache.
-     */
-    public boolean containsDateNoAutoload(int date) {
-	if(date <=0 && date > -dates.size())
-	    return true;
-	else
-	    return false;
-    }
-
-    // If the user tries to access a date not in cache we will automatically
-    // load it in. Cache can expand to encompass older dates but the
-    // newest date is FIXED (at index 0).
-    //
-    // NB: Should only be called if theres multiple stocks in cache
-    private void autoload(int date) {
-
-	// Convert to real index
-	date = -date;
-
-	// Loads quotes from database. Loads all quotes from the day requested
-	// [day] up until all the days in the database cache. Will break down
-	// load request into day chunks to reduce memory usage as java's
-	// sql memory code is very inefficient. also this always future
-	// progress metre stuff.
-	int packets = ((date - getNumberDays()) / QUERY_PACKET_SIZE) + 1;
-
-	// Keep expanding by query packet size
-	for(int i = 0; i < packets; i++) {
-	    if((date - getNumberDays()) >  QUERY_PACKET_SIZE)
-		autoloadPacket(getNumberDays() + QUERY_PACKET_SIZE);
-	    else
-		autoloadPacket(date);
+	catch(QuoteNotLoadedException e) {
+	    // no symbols loaded on date
+	    quotesForDate = new HashMap(0);
 	}
+	
+	return new Vector(quotesForDate.keySet());
     }
 
-    // Autoloads in up to specific date 
-    private void autoloadPacket(int date) {
+    // Returns a HashMap containing quotes for that date
+    private HashMap getQuotesForDate(int dateOffset) 
+	throws QuoteNotLoadedException {
 
-	// Calculate end date we have to load from - which is one before
-	// current start date
-	TradingDate end = getStartDate().previous(1);
+	assert dateOffset <= 0;
 
-	// Calculate start date we have to load to
-	TradingDate start = getStartDate().previous(1 + date - 
-						    getNumberDays());
+	if(dateOffset <= -dates.size())
+	    throw new QuoteNotLoadedException();
+	
+	HashMap quotesForDate = (HashMap)cache.elementAt(-dateOffset);
 
-	// Load data from database and load it into cache
-	load(QuoteSourceManager.getSource().getQuotesForDates(start, end,
-							      searchRestriction));
+	if(quotesForDate == null)
+	    throw new QuoteNotLoadedException();
 
+	return quotesForDate;
     }
 
-    // Loads a vector of quotes into the cache. Vector is a vector of
-    // Stock classes.
-    private void load(Vector quotes) {
+    /**
+     * Load all the quotes specified by the given quote range into the cache.
+     *
+     * @param quoteRange        quote range to load
+     */
+    public void load(QuoteRange quoteRange) {
 
-	// Date we are processing
-	TradingDate lastDate = null;
-	int i = 0;
-	HashMap map = null;
+	// Load quote into memory
+	Vector quotes = 
+	    QuoteSourceManager.getSource().loadQuoteRange(quoteRange);
 	
 	// Insert each row of quotes into our cache
-	while(quotes.size() > 0) {
+        Iterator iterator = quotes.iterator();
 
-	    // Process newest date first (quotes is ordered oldest to newest)
-	    Quote quote = (Quote)quotes.remove(quotes.size() - 1);
+        while(iterator.hasNext()) {
 
-	    // If its a new date, create a new HashMap for this date in
-	    // the vector
-	    if(lastDate == null || lastDate.compareTo(quote.getDate()) != 0) {
-		lastDate = quote.getDate(); // new date
-		dates.add(lastDate); // add date to cache
-		cache.add(map = new HashMap());
+            // Get next quote loaded from database
+
+            Quote quote = (Quote)iterator.next();
+            int dateOffset;
+
+	    try {
+		dateOffset = dateToOffset(quote.getDate());
+	    }
+	    catch(WeekendDateException e) {
+		// Shouldn't have a quote for a weekend date!
+		assert false;
+		break;
 	    }
 
-	    // Periodically shrink vector we are removing elements from
-	    // and force GC to keep up. This makes sure we don't require
-	    // a big "spike" of memory to keep this cache in memory and
-	    // the vector returned from the database
-	    if(i++ % 10000 == 0) {
-		quotes.trimToSize();
-		Runtime.getRuntime().gc();
+            // Get hash of quotes for that date
+
+            HashMap quotesForDate;
+
+	    try {
+		quotesForDate = getQuotesForDate(dateOffset);
+	    }
+	    catch(QuoteNotLoadedException e) {
+		// The dateToOffset() call above should have expanded
+		// the quote range so this shouldn't happen
+		assert false;
+
+		quotesForDate = new HashMap(0);
 	    }
 
-	    // Add symbol to our set if its not there already
-	    if(!symbols.contains(quote.getSymbol())) 
-		symbols.add(quote.getSymbol());
+            // Put stock in map and remove symbol and date to reduce memory
+            // (they are our indices so we already know them)
+            Object previousQuote = quotesForDate.put(quote.getSymbol(), quote);
+            quote.setSymbol(null);
+            quote.setDate(null);
 
-	    // Put stock in map and remove symbol and date to reduce memory
-	    map.put(quote.getSymbol(), quote);
-	    quote.setSymbol(null);
-	    quote.setDate(null);
+            // If the quote wasn't already there then increase size counter
+            if(previousQuote == null)
+                size++;
+            
+            // Remove quote from vector to reduce memory
+            iterator.remove();
+        }
+
+        // Trim vectors so we don't take up more size than needed
+        cache.trimToSize();
+        dates.trimToSize();
+    }
+
+    /**
+     * Remove the given quote from the cache. Its OK if the quote isn't loaded.
+     *
+     * @param symbol the symbol of the quote to remove
+     * @param dateOffset the fast access date offset of the quote to remove
+     */
+    public void free(String symbol, int dateOffset) {
+
+	try {
+	    HashMap quotesForDate = getQuotesForDate(dateOffset);
+	    
+	    Quote quote = (Quote)quotesForDate.remove(symbol);
+
+	    // If we actually deleted a quote, then reduce our quote counter.
+	    // We have to check that we actually did remove something from
+	    // the cache, so that our size count is correct. Its OK for the caller
+            // to try to delete a quote that's not in the cache - if it wasn't
+            // then the quote bundles would have to keep track of holidays etc...
+	    if(quote != null) 
+		size--;
+
+	    assert size >= 0;
+	}
+	catch(QuoteNotLoadedException e) {
+	    // This means we've never had any quotes on the given date that
+	    // the caller was trying to free. This sounds like something
+	    // wonky is going on.
+	    assert false;
+	}
+    }
+
+    /**
+     * Convert between a date and its fast access date offset.
+     *
+     * @param date the date
+     * @return fast access date offset
+     * @exception WeekendDateException if the date is on a weekend (there are no
+     *            fast access date offsets for weekend dates)
+     */
+    public int dateToOffset(TradingDate date) 
+	throws WeekendDateException {
+
+        TradingDateComparator comparator = 
+            new TradingDateComparator(TradingDateComparator.BACKWARDS);
+
+	int dateOffset = -Collections.binarySearch(dates, date, comparator);
+
+	// If the date isn't yet in the cache because its too old, then binary search
+	// will return the negative size of dates. If it does, expand the cache.
+	if(dateOffset > dates.size()) {
+	    expandToDate(date);
+	    dateOffset = -Collections.binarySearch(dates, date, comparator);
 	}
 
-	// Trim all vectors etc to needed size
-	cache.trimToSize();
-	dates.trimToSize();
-	Runtime.getRuntime().gc();
+	// Only possible reason date isn't in cache now is because it falls
+	// on a weekend or its a newer date than what is in the cache.
+	if(dateOffset > 0)
+	    throw new WeekendDateException();
+
+        return dateOffset;
     }
-}
+
+    /**
+     * Convert between a fast access date offset and a date.
+     *
+     * @param dateOffset fast access date offset
+     * @return the date
+     */
+    public TradingDate offsetToDate(int dateOffset) {
+    
+	assert dateOffset <= 0;
+
+	// If the date isn't in the cache then expand it
+	while(dateOffset <= -dates.size()) {
+	    TradingDate date = getFirstDate().previous(1);
+	    addDate(date);
+	}
+
+	return (TradingDate)dates.get(-dateOffset);
+    }
+
+    /**
+     * Return the number of quotes in the cache.
+     *
+     * @return the cache size
+     */
+    public int size() {
+	return size;
+    }
+
+    // Get oldest date in cache
+    private TradingDate getFirstDate() {
+        return (TradingDate)dates.get(dates.size() - 1);
+    }
+
+    // Add one day to cache
+    private void addDate(TradingDate date) {
+	
+	// Create a map with 0 initial capacity. I.e. we create an empty one            
+	// because we might not even use it
+	HashMap map = new HashMap(0);           
+	cache.add(map);
+	dates.add(date);	
+    }
+
+    // Expand the quote cache to encompass the given date
+    private void expandToDate(TradingDate date) {
+
+	// Get oldest date in cache. We have all dates from the newest date to this date
+        // already so no need to check if the given date is newer.
+        TradingDate firstDate = getFirstDate();
+
+        // Keep loading dates until our cache holds this date
+        while(date.before(firstDate)) {
+            firstDate = firstDate.previous(1);
+	    addDate(firstDate);
+        }
+    }
+} 
+
+

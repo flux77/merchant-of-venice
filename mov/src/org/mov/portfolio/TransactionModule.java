@@ -29,7 +29,6 @@ import javax.swing.table.*;
 
 import org.mov.main.*;
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.quote.*;
 import org.mov.table.*;
 import org.mov.ui.*;
@@ -436,16 +435,10 @@ public class TransactionModule extends AbstractTable implements Module,
 
     // Create a new transaction
     private void newTransaction() {
-	JDesktopPane desktop = 
-	    org.mov.ui.DesktopManager.getDesktop();
-	TransactionDialog dialog = new TransactionDialog(desktop, portfolio);
-	dialog.newTransaction();
 
-	// Update the table and the portfolio window
-	redraw();
-	portfolioModule.redraw();
+	// Call PortfolioModule's routine to create a new transaction. 
+	portfolioModule.newTransaction();
     }
-
 
     /**
      * Handle widget events.

@@ -113,14 +113,14 @@ public abstract class Expression extends DefaultMutableTreeNode {
     /**
      * Evaluates the given expression and returns the result.
      *
-     * @param	cache	the quote cache containing quote data to use
+     * @param	quoteBundle	the quote bundle containing quote data to use
      * @param	symbol	the current symbol
      * @param	day	current date in cache fast access format
      * @return	the result of the expression
      * @throws	EvaluationException if the expression tries to access
      *		dates outside of the cache
      */
-    abstract public float evaluate(QuoteCache cache, String symbol, int day)
+    abstract public float evaluate(QuoteBundle quoteBundle, String symbol, int day)
 	throws EvaluationException;
 
     /**

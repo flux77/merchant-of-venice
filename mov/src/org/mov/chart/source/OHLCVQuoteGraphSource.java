@@ -20,7 +20,6 @@ package org.mov.chart.source;
 
 import org.mov.chart.*;
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.quote.*;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -28,53 +27,51 @@ import org.mov.ui.ProgressDialogManager;
 import java.util.*;
 
 /**
- * Provides a <code>QuoteCache</code> graph source. This class
+ * Provides a <code>QuoteBundle</code> graph source. This class
  * allows graph sources for day Open, High, Low, Close and
  * Volume (OHLCV).
  */
 public class OHLCVQuoteGraphSource implements GraphSource {
 
-    private QuoteCache cache;
+    private QuoteBundle quoteBundle;
     private int quote;
     private String symbol;
     private Graphable graphable;
 
     /**
-     * Create a new graph source from the cache with the given
+     * Create a new graph source from the quote bundle with the given
      * quote type.
      *
-     * @param	cache	the cache containing stock quotes
+     * @param	quoteBundle the quote bundle containing stock quotes
      * @param	quote	the quote kind, one of: {@link Quote#DAY_OPEN}, 
      * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH} or 
      * {@link Quote#DAY_LOW}
      */
-    public OHLCVQuoteGraphSource(QuoteCache cache, int quote) {
+    public OHLCVQuoteGraphSource(QuoteBundle quoteBundle, int quote) {
 	this.quote = quote;
-	this.cache = cache;
+	this.quoteBundle = quoteBundle;
 
-	// So far only handles a single symbol - so get that symbol
-	symbol = (String)cache.getSymbols()[0];
+	// Should only be a single symbol in the quote bundle anyway
+	symbol = quoteBundle.getFirstSymbol();
 
 	// Build graphable so this source can be directly graphed
 	graphable = new Graphable();
 	Float value;
-	TradingDate date;
-
-	// List of dates is in reverse order so well need to traverse
-	// it backwards to get the dates in chronological order
-	ListIterator iterator = cache.dateIterator(cache.getNumberDays());
 
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setProgress(0);
         progress.setNote("Graphing dates");
-	while(iterator.hasPrevious()) {
-	    date = (TradingDate)iterator.previous();
+
+	for(TradingDate date = quoteBundle.getLastDate();
+	    date.compareTo(quoteBundle.getFirstDate()) >= 0;
+	    date = date.previous(1)) {
+
 	    try {
-		value = new Float(cache.getQuote(symbol, quote, date));
+		value = new Float(quoteBundle.getQuote(symbol, quote, date));
 		graphable.putY((Comparable)date, value);
                 if (progress != null) progress.increment();
 	    }
-	    catch(EvaluationException e) {
+	    catch(MissingQuoteException e) {
 		// ignore
 	    }
 	}	
@@ -94,11 +91,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	// In OHLCV graphs the x axis is in dates
 	TradingDate date = (TradingDate)x;
 
-	if(!cache.containsDate(date)) 
-	    return null;
-
-	try {
-	
+	try {	
 	    if(quote == Quote.DAY_VOLUME) {
 		return
 		    new String("<html>" +
@@ -106,7 +99,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 			       ", " +
 			       date.toLongString() +
 			       "<p>" +
-			       Math.round(cache.
+			       Math.round(quoteBundle.
 					  getQuote(symbol, 
 						   Quote.DAY_VOLUME, 
 						   date)) +
@@ -120,23 +113,22 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 			       date.toLongString() +
 			       "<p>" +
 			       "<font color=red>" + 
-			       cache.getQuote(symbol, 
+			       quoteBundle.getQuote(symbol, 
 					      Quote.DAY_LOW, date) +
 			       " </font>" +
 			       "<font color=green>" + 
-			       cache.getQuote(symbol, 
+			       quoteBundle.getQuote(symbol, 
 					      Quote.DAY_HIGH, date) + 
 			       " </font>" +
-			       cache.getQuote(symbol, 
+			       quoteBundle.getQuote(symbol, 
 					      Quote.DAY_OPEN, date) +
 			       " " + 
-			       cache.getQuote(symbol, 
+			       quoteBundle.getQuote(symbol, 
 					      Quote.DAY_CLOSE, date) +
 			       "</html>");
 	    }
 	}
-	catch(EvaluationException e) {
-	    // Shouldn't happen
+	catch(MissingQuoteException e) {
 	    return null;
 	}
     }

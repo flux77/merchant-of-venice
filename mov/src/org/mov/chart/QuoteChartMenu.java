@@ -53,7 +53,7 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 
     private JMenuItem removeMenu;
     
-    private QuoteCache cache;
+    private QuoteBundle quoteBundle;
     private Graph graph;
     private ChartModule listener;
     private HashMap map = new HashMap();
@@ -67,12 +67,12 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
      * @param	listener	the chart module associated with the menu
      * @param	graph		the graph we are associated with
      */
-    public QuoteChartMenu(ChartModule listener, QuoteCache cache,
+    public QuoteChartMenu(ChartModule listener, QuoteBundle quoteBundle,
 			  Graph graph) {
 
 	super(graph.getName());
 	
-	this.cache = cache; 
+	this.quoteBundle = quoteBundle; 
 	this.graph = graph;
 	this.listener = listener;
 	
@@ -206,27 +206,27 @@ public class QuoteChartMenu extends JMenu implements ActionListener {
 
     // Returns a graph of the day open prices
     private GraphSource getDayOpen() {
-	return new OHLCVQuoteGraphSource(cache, Quote.DAY_OPEN);
+	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
     }
 
     // Returns a graph of the day high prices
     private GraphSource getDayHigh() {
-	return new OHLCVQuoteGraphSource(cache, Quote.DAY_HIGH);
+	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_HIGH);
     }
 
     // Returns a graph of the day low prices
     private GraphSource getDayLow() {
-	return new OHLCVQuoteGraphSource(cache, Quote.DAY_LOW);
+	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_LOW);
     }
 
     // Returns a graph of the day close prices
     private GraphSource getDayClose() {
-	return new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
+	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
     }
 
     // Returns a graph of the day volume prices
     private GraphSource getDayVolume() {
-	return new OHLCVQuoteGraphSource(cache, Quote.DAY_VOLUME);
+	return new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
     }
     
     // Is annotation menu?

@@ -33,13 +33,13 @@ public class RSIExpression extends Expression {
 	add(lag);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 	
-	int days = (int)getArg(0).evaluate(cache, symbol, day);
-	int lastDay = day + (int)getArg(1).evaluate(cache, symbol, day);
+	int days = (int)getArg(0).evaluate(quoteBundle, symbol, day);
+	int lastDay = day + (int)getArg(1).evaluate(quoteBundle, symbol, day);
 	System.err.println("calling rsi on symbol "+symbol);
-	return QuoteFunctions.rsi(cache, symbol, Quote.DAY_CLOSE, days,
+	return QuoteFunctions.rsi(quoteBundle, symbol, Quote.DAY_CLOSE, days,
 				  lastDay);
     }
 

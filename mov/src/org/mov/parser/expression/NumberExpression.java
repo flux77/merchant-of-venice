@@ -34,7 +34,7 @@ public class NumberExpression extends TerminalExpression {
 	this.value = value;
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) {
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) {
 	return value;
     }
 

@@ -39,8 +39,8 @@ import org.mov.ui.*;
  * used to draw any of the required charts.
  * Example:
  * <pre>
- *	QuoteCache cache = new QuoteCache(symbol);
- *	GraphSource dayClose = new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
+ *	QuoteBundle quoteBundle = new QuoteBundle(new QuoteRange(symbol));
+ *	GraphSource dayClose = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
  *	Graph graph = new LineGraph(dayClose);
  *
  *	ChartModule chart = new ChartModule(desktop);
@@ -272,13 +272,13 @@ public class ChartModule extends JPanel implements Module,
      * @param	graph	the new graph to add
      * @param	level	graph level to add the new graph
      */
-    public void add(Graph graph, QuoteCache cache, int level) {
+    public void add(Graph graph, QuoteBundle quoteBundle, int level) {
 
 	// Add graph to chart
 	chart.add(graph, level);
 
 	// Add menu for this quote
-	QuoteChartMenu menu = new QuoteChartMenu(this, cache, graph);
+	QuoteChartMenu menu = new QuoteChartMenu(this, quoteBundle, graph);
 
 	addMenu(menu);
     }
@@ -294,7 +294,7 @@ public class ChartModule extends JPanel implements Module,
             public void actionPerformed(ActionEvent e) {thread.interrupt();}
         });
 
-	QuoteCache cache = null;
+	QuoteBundle quoteBundle = null;
 	Graph graph = null;
 	GraphSource dayClose = null;
 
@@ -305,11 +305,11 @@ public class ChartModule extends JPanel implements Module,
 	    progress.show();
 	    
 	    if (!thread.isInterrupted())
-		cache = new QuoteCache(symbol);
+		quoteBundle = new QuoteBundle(new QuoteRange(symbol));
 	    
 	    if (!thread.isInterrupted())
 		dayClose = 
-		    new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
+		    new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
 	    
 	    if (!thread.isInterrupted())
 		graph = new LineGraph(dayClose);
@@ -317,13 +317,13 @@ public class ChartModule extends JPanel implements Module,
 	    if (!thread.isInterrupted()) {
 
 		final Graph finalGraph = graph;
-		final QuoteCache finalCache = cache;
+		final QuoteBundle finalQuoteBundle = quoteBundle;
 
 		// Invokes on dispatch thread
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 		    
-			    add(finalGraph, finalCache, 0);
+			    add(finalGraph, finalQuoteBundle, 0);
 
 			    // This makes sure the menu updates OK
 			    getTopLevelAncestor().validate();
@@ -374,18 +374,18 @@ public class ChartModule extends JPanel implements Module,
      * Add a new portfolio graph to the specified level. Add new menu
      * for graph.
      *
-     * @param	graph	Portfolio graph
-     * @param	portfolio	Portfolio
-     * @param	cache	quote cache
-     * @param	level	specified level
+     * @param	graph	     the portfolio graph
+     * @param	portfolio    the portfolio
+     * @param	quoteBundle  the quote bundle
+     * @param	level	     specified level
      */
-    public void add(Graph graph, Portfolio portfolio, QuoteCache cache,
+    public void add(Graph graph, Portfolio portfolio, QuoteBundle quoteBundle,
 		    int level) {
 	// Add graph to chart
 	chart.add(graph, level);
 
 	// Add menu for this portfolio
-	PortfolioChartMenu menu = new PortfolioChartMenu(this, cache,
+	PortfolioChartMenu menu = new PortfolioChartMenu(this, quoteBundle,
 							 portfolio, graph);
 	addMenu(menu);
     }

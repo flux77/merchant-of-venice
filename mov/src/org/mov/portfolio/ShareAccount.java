@@ -21,7 +21,6 @@ package org.mov.portfolio;
 import java.util.*;
 
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.quote.*;
 
 /** Representation of a share account in a portfolio.
@@ -53,8 +52,8 @@ public class ShareAccount implements Account, Cloneable {
 	return name;
     }
 
-    public float getValue(QuoteCache cache, TradingDate date) 
-	throws EvaluationException {
+    public float getValue(QuoteBundle quoteBundle, TradingDate date) 
+	throws MissingQuoteException {
  
 	Set set = stockHoldings.keySet();
 	Iterator iterator = set.iterator();
@@ -64,8 +63,8 @@ public class ShareAccount implements Account, Cloneable {
 	    String symbol = (String)iterator.next();
 	    StockHolding holding = (StockHolding)stockHoldings.get(symbol);
 
-	    value += cache.getQuote(holding.getSymbol().toLowerCase(), 
-				    Quote.DAY_CLOSE, date) *
+	    value += quoteBundle.getQuote(holding.getSymbol().toLowerCase(), 
+					  Quote.DAY_CLOSE, date) *
 		holding.getShares();
 	}
 	

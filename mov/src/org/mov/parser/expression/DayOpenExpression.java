@@ -27,7 +27,7 @@ import org.mov.quote.*;
  */
 public class DayOpenExpression extends TerminalExpression {
 
-    public float evaluate(QuoteCache cache, String symbol, int day) {
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) {
 	// shouldnt happen
 	return 0.0F;
     }

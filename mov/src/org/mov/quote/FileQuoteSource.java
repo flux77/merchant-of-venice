@@ -33,62 +33,90 @@ import org.mov.ui.ProgressDialogManager;
  *
  * Example:
  * <pre>
- *	Vector quotes = Quote.getSource().getQuotesForSymbol("CBA");
+ *      QuoteRange quoteRange = new QuoteRange("CBA");
+ *      QuoteBundle quoteBundle = new QuoteBundle(quoteRange);
+ *      try {
+ *	    float = quoteBundle.getQuote("CBA", Quote.DAY_OPEN, 0);
+ *      }
+ *      catch(QuoteNotLoadedException e) {
+ *          //...
+ *      }
  * </pre>
  *
  * @see Quote
+ * @see QuoteRange
+ * @see QuoteBundle
  */
 public class FileQuoteSource implements QuoteSource
 {
     // Construct a map between TradingDates and file names
     private HashMap dateToFile = new HashMap();
 
-    // Buffer last trading date in database
-    private TradingDate latestQuoteDate = null;
+    // Buffer first & last trading date in file database
+    private TradingDate lastDate = null;
+    private TradingDate firstDate = null;
 
     // Filter to convert data into quote
     private QuoteFilter filter;
-
-    // The number of dates in the current source
-    private int num_dates = 0;
     
+    // When reading in the first quote - don't read the whole file,
+    // we don't need it. Make sure we read in this amount and no more.
+    // (Two lines).
+    private final static int ONE_LINE_BUFFER_SIZE = 160;
+
     // Given a name of a file containing a list of day quotes, return the
     // the day 
     private TradingDate getContainedDate(String fileName) 
 	throws java.io.IOException {
 
 	TradingDate date = null;
-	FileReader fr = new FileReader(fileName);
-	BufferedReader br = new BufferedReader(fr);
-	Quote quote = filter.toQuote(br.readLine());
-	if(quote != null)
-	    date = quote.getDate();
-	br.close();
+
+        FileReader fr = new FileReader(fileName);
+        BufferedReader br = new BufferedReader(fr, ONE_LINE_BUFFER_SIZE);
+        Quote quote = filter.toQuote(br.readLine());
+        if(quote != null)
+            date = quote.getDate();
+        br.close();
 
 	return date;
     }
 
-    // Given a name of a file and a stock symbol, return the quote for
-    // that stock in the given file
-    private Quote getContainedQuote(String fileName, String symbol) {
+    // Given a quote range and a file name, return a vector of all
+    // quotes we are looking for in this file.
+    private Vector getContainedQuotes(String fileName, 
+                                      QuoteRange quoteRange) {
 
-	Quote quote = null;
+        Vector quotes = new Vector();
 	String line;
-	boolean found = false;
+
+        assert(fileName != null && quoteRange != null);
 
 	try {
 	    FileReader fr = new FileReader(fileName);
 	    BufferedReader br = new BufferedReader(fr);
 	    line = br.readLine();
 
-	    while(line != null && !found) {
+	    while(line != null) {
+		Quote quote = filter.toQuote(line);
 
-		quote = filter.toQuote(line);
-	    
-		if(quote != null && quote.getSymbol().equals(symbol)) 
-		    found = true;
-		else
-		    line = br.readLine();
+                // Legal quote?
+                if(quote != null) {
+
+                    assert quote.getSymbol() != null;
+
+                    // Is this one of the ones we are looking for?
+                    if(quoteRange.containsSymbol(quote.getSymbol().toLowerCase())) {
+                        quotes.add(quote);
+                        
+                        // If we are only looking for a certain set of
+                        // symbols, exit when we have found them
+                        if(quoteRange.getType() == QuoteRange.GIVEN_SYMBOLS &&
+                           quotes.containsAll(quoteRange.getAllSymbols()))
+                            break;
+                    }
+                }
+
+                line = br.readLine();
 	    }
 		
 	    br.close();
@@ -97,34 +125,7 @@ public class FileQuoteSource implements QuoteSource
 	    DesktopManager.showErrorMessage("Can't load " + fileName);
 	} 
 
-	if(found)
-	    return quote;
-	else
-	    return null;
-    }
-
-    // Is the given stock the same as the type given?
-    private boolean isType(Quote quote, int type) {
-	boolean match = false;
-
-	if(type == INDICES) {
-	    if(quote.getSymbol().startsWith("x"))
-		match = true;
-	}
-	else if(type == COMPANIES_AND_FUNDS) {
-	    if(quote.getSymbol().length() == 3 &&
-	       !quote.getSymbol().startsWith("x"))
-		match = true;
-	    
-	}
-	else if(type == ALL_COMMODITIES) {
-	    if(!quote.getSymbol().startsWith("x"))
-		match = true;
-	}
-	else // ALL_SYMBOLS
-	    match = true;
-
-	return match;
+        return quotes;
     }
 
     /**
@@ -140,6 +141,12 @@ public class FileQuoteSource implements QuoteSource
 	// to our internal format
 	filter = QuoteFilterList.getInstance().getFilter(format);
 
+        // create index
+        createIndex(fileNames);
+    }
+
+    // Create an index, mapping dates to file names
+    private void createIndex(Vector fileNames) {
 	// Create map between TradingDates and file names and record
 	// latest trading date. This allows us to quickly locate the
 	// file containg the given date.
@@ -163,12 +170,14 @@ public class FileQuoteSource implements QuoteSource
 
 	    try {
 		date = getContainedDate(fileName);
-	    
+
 		if(date != null) {
-		    // Buffer the latest quote date 
-		    if(latestQuoteDate == null || date.after(latestQuoteDate))
-			latestQuoteDate = date;
-		    
+		    // Buffer the first and last quote dates 
+		    if(lastDate == null || date.after(lastDate))
+			lastDate = date;
+		    if(firstDate == null || date.before(firstDate))
+                        firstDate = date;
+
 		    // Associate this date with this file
 		    dateToFile.put(date, fileName);
 		}		    
@@ -201,7 +210,7 @@ public class FileQuoteSource implements QuoteSource
      * @param	symbol	the stock symbol.
      * @return	always an empty string.
      */
-    public String getCompanyName(String symbol) {
+    public String getSymbolName(String symbol) {
 	return new String(""); 
     }
 
@@ -212,7 +221,7 @@ public class FileQuoteSource implements QuoteSource
      * @param	symbol	a partial company name.
      * @return	always an empty string.
      */
-    public String getCompanySymbol(String partialCompanyName) {
+    public String getSymbol(String partialSymbolName) {
 	return new String(""); 
     }
 
@@ -225,21 +234,14 @@ public class FileQuoteSource implements QuoteSource
     public boolean symbolExists(String symbol) {
 	// Iterate through all files until we find one containing the
 	// symbol name we are looking for
-
 	Set dates = dateToFile.keySet();
 	Iterator iterator = dates.iterator();
-	TradingDate date;
-	Quote quote;
 
-	// All checks are done in lower case no matter what case the
-	// file format is in
-	symbol = symbol.toLowerCase();
-	
-	while(iterator.hasNext()) {
-	    date = (TradingDate)iterator.next();
-	    quote = getContainedQuote((String)dateToFile.get(date),
-				      symbol);
-	    if(quote != null)
+        while(iterator.hasNext()) {
+	    TradingDate date = (TradingDate)iterator.next();
+            Vector quotes = getContainedQuotes(getFileForDate(date),
+                                               new QuoteRange(symbol));
+	    if(quotes.size() > 0)
 		return true; // found!
 	}
 
@@ -247,67 +249,21 @@ public class FileQuoteSource implements QuoteSource
     }
 
     /**
+     * Return the earliest date we have any stock quotes for.
+     *
+     * @return	the oldest quote date
+     */
+    public TradingDate getFirstDate() {
+        return firstDate;
+    }
+
+    /**
      * Return the latest date we have any stock quotes for.
      *
      * @return	the most recent quote date.
      */
-    public TradingDate getLatestQuoteDate() {
-	return latestQuoteDate;
-    }
-
-    /**
-     * Return a vector of quotes for all stocks in the given date range.
-     * The vector will be in order of date then stock symbol.
-     *
-     * @param	startDate	the start of the date range (inclusive).
-     * @param	endDate		the end of the date range (inclusive).
-     * @param	type		the type of the search.
-     * @return	a vector of stock quotes.
-     * @see Quote
-     */
-    public Vector getQuotesForDates(TradingDate startDate, 
-				    TradingDate endDate, 
-				    int type) {
-
-	Vector quotes = new Vector();
-	Vector dates = Converter.dateRangeToTradingDateVector(startDate,
-							      endDate);
-	Iterator iterator = dates.iterator();
-	TradingDate date;
-
-	// This query might take a while
-        ProgressDialog p = ProgressDialogManager.getProgressDialog();
-        p.setTitle("Loading quotes " + startDate.toShortString() +" to "+ endDate.toShortString());
-        p.setMaximum(dates.size());
-
-	while(iterator.hasNext()) {
-	    date = (TradingDate)iterator.next();
-
-	    quotes.addAll((Collection)getQuotesForDate(date, type));
-
-	    p.increment();
-	}
-
-	ProgressDialogManager.closeProgressDialog();
-
-	return quotes;
-    }
-
-    /**
-     * Return all quotes for the given symbols between the given dates. 
-     * They will be returned in order of date.
-     *
-     * @param	symbols	the symbols to query.
-     * @param	startDate	the first trading date to query for
-     * @param	endDate		the last trading date to query for
-     * @return	a vector of stock quotes.
-     * @see Quote
-     */
-    public Vector getQuotesForSymbolsAndDates(Vector symbols, 
-					      TradingDate startDate,
-					      TradingDate endDate) {
-	// not implemented yet
-	return new Vector();
+    public TradingDate getLastDate() {
+	return lastDate;
     }
 
     /**
@@ -321,91 +277,91 @@ public class FileQuoteSource implements QuoteSource
     }
 
     /**
-     * Return a vector of all quotes in the given date.
-     * The vector will be in order of stock symbol.
-     *
-     * @param	date	the date to return quotes for.
-     * @param	type	the type of the search.
-     * @return	a vector of stock quotes.
-     * @see Quote
-     */
-    public Vector getQuotesForDate(TradingDate date, int type) {
-	Vector quotes = new Vector();
-	String fileName = getFileForDate(date);
-	String line;	
-	Quote quote;
-
-	try {
-	    FileReader fr = new FileReader(fileName);
-	    BufferedReader br = new BufferedReader(fr);
-	    line = br.readLine();
-
-	    while(line != null) {
-		quote = filter.toQuote(line);
-
-		if(quote != null && isType(quote, type)) 
-		    quotes.add((Object)quote);
-
-		line = br.readLine();
-	    }
-
-	    br.close();
-
-	} catch (java.io.IOException ioe) {
-	    DesktopManager.showErrorMessage("Can't load " + fileName);
-	} 
-	return quotes;
-    }
-
-    /**
-     * Return all quotes for the given symbol. They will be returned in
-     * order of date.
-     *
-     * @param	symbol	the symbol to query.
-     * @param   progress the progress dialog to display progress with
-     * @return	a vector of stock quotes.
-     * @see Quote
-     */
-    public Vector getQuotesForSymbol(String symbol) {
-	// Get list of dates available and sort them
-	TreeSet dates = new 
-	    TreeSet(new TradingDateComparator(TradingDateComparator.FORWARDS));
-	dates.addAll(dateToFile.keySet());	
-
-	Iterator iterator = dates.iterator();
-	Vector quotes = new Vector();
-	TradingDate date = null;
-	Quote quote = null;
-
-	// This query might take a while
-        ProgressDialog p = ProgressDialogManager.getProgressDialog();
-        p.setMaximum(dates.size());
-        p.setTitle("Retrieving dates");
-
-	// All checks are done in lower case no matter what case the
-	// file format is in
-	symbol = symbol.toLowerCase();
-	
-	while(iterator.hasNext()) {
-	    date = (TradingDate)iterator.next();
-
-	    quote = getContainedQuote(getFileForDate(date),
-				      symbol);
-	    if(quote != null) 
-		quotes.add(quote);
-
-	    p.increment();
-	}
-
-	ProgressDialogManager.closeProgressDialog();
-
-	return quotes;
-    }
-
-    /**
      * Return all the dates which we have quotes for.
      */
     public Vector getDates() {
 	return new Vector(dateToFile.keySet());
+    }
+
+    /**
+     * Return a vector of quotes for all quotes in the given quote range.
+     *
+     * @param	quoteRange	the range of quotes to load
+     * @return	a vector of stock quotes
+     * @see Quote
+     */
+    public Vector loadQuoteRange(QuoteRange quoteRange) {
+
+        Vector quotes = new Vector();
+
+	// This query might take a while...
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+        try {
+            progress.setNote("Loading Quotes...");
+            progress.setIndeterminate(true);
+	}
+	catch (Exception e) {
+	    assert false; // I'm not sure what this means...?
+	}
+
+        // Work out date range in quote range
+        TradingDate firstDate = quoteRange.getFirstDate();
+        TradingDate lastDate = quoteRange.getLastDate();
+
+        // ... all dates?
+        if(firstDate == null) {
+            firstDate = this.firstDate;
+            lastDate = this.lastDate;
+        }
+
+        Vector dates = Converter.dateRangeToTradingDateVector(firstDate,
+                                                              lastDate);
+
+        // If there are multiple dates, set the progress indicator
+        // to indicate the date we are on. Otherwise set it to
+        // indeterminate.
+        if(dates.size() > 1) {
+            progress.setMaximum(dates.size());
+            progress.setProgress(0);
+            progress.setIndeterminate(false);
+        }
+        else {
+            progress.setIndeterminate(true);
+        }
+
+	Iterator iterator = dates.iterator();
+
+        while(iterator.hasNext()) {
+            TradingDate date = (TradingDate)iterator.next();
+            Quote quote;
+
+            // Load all quotes from the file
+            String fileName = getFileForDate(date);
+
+            if(fileName != null) {
+                quotes.addAll(getContainedQuotes(fileName, quoteRange)); 
+            }
+
+            if(dates.size() > 1)
+               progress.increment();
+        }
+        return quotes;
+    }
+
+    /**
+     * Is the given symbol a market index? 
+     *
+     * @param	symbol to test
+     * @return	yes or no
+     */
+    public boolean isMarketIndex(String symbol) {
+        // HACK. It needs to keep a file which maintains a flag
+        // for whether a symbol is an index or not.
+	assert symbol != null;
+
+	if(symbol.length() == 3 && symbol.toUpperCase().charAt(0) == 'X')
+	    return true;
+	else
+	    return false;
     }
 }

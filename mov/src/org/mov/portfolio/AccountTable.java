@@ -29,7 +29,6 @@ import javax.swing.table.*;
 import org.mov.ui.*;
 import org.mov.util.*;
 import org.mov.table.*;
-import org.mov.parser.*;
 import org.mov.quote.*;
 
 /**
@@ -51,21 +50,19 @@ public class AccountTable extends AbstractTable {
 	private Class[] columnClasses = {
 	    String.class, String.class};
 
-	private QuoteCache cache;
+	private QuoteBundle quoteBundle;
 	private Portfolio portfolio;
 	private Object[] accounts;
 	private TradingDate date;
 
-	public Model(Portfolio portfolio, QuoteCache cache) {
-	    this.cache = cache;
+	public Model(Portfolio portfolio, QuoteBundle quoteBundle) {
+	    this.quoteBundle = quoteBundle;
 	    this.portfolio = portfolio;
 
 	    accounts = portfolio.getAccounts().toArray();
 
-	    // Pull first date from cache
-	    Iterator iterator = cache.dateIterator(0);
-	    if(iterator.hasNext())
-		date = (TradingDate)iterator.next();
+	    // Pull first date from quoteBundle
+	    date = quoteBundle.getFirstDate();
 
 	    // Make sure we dont get an exception when trying to
 	    // work out how much the portfolio is worth on this day
@@ -73,10 +70,10 @@ public class AccountTable extends AbstractTable {
 
 	    while(!validDate) {
 		try {
-		    portfolio.getValue(cache, date);
+		    portfolio.getValue(quoteBundle, date);
 		    validDate = true;
 		}
-		catch(EvaluationException e) {
+		catch(MissingQuoteException e) {
 		    // If we do its cause its a public holiday and we
 		    // can't get quotes for our stocks. So go back a day
 		    date = date.previous(1);
@@ -117,10 +114,10 @@ public class AccountTable extends AbstractTable {
 		case(VALUE_COLUMN):
 		    try {
 			return 
-			    Converter.quoteToString(account.getValue(cache, date));
+			    Converter.quoteToString(account.getValue(quoteBundle, date));
 		    }
-		    catch(EvaluationException e) {
-			// should not happen
+		    catch(MissingQuoteException e) {
+			assert false;
 		    }
 		}
 	    }
@@ -141,10 +138,10 @@ public class AccountTable extends AbstractTable {
 			Account account = (Account)iterator.next();
 
 			try {
-			    value += account.getValue(cache, date);
+			    value += account.getValue(quoteBundle, date);
 			}
-			catch(EvaluationException e) {
-			    // should not happen
+			catch(MissingQuoteException e) {
+			    assert false;
 			}
 		    }
 
@@ -162,9 +159,9 @@ public class AccountTable extends AbstractTable {
      *
      * @param	portfolio	the portfolio to create an account summary
      *				table for
-     * @param	cache		quote cache
+     * @param	quoteBundle	the quote bundle
      */
-    public AccountTable(Portfolio portfolio, QuoteCache cache) {
-	setModel(new Model(portfolio, cache));
+    public AccountTable(Portfolio portfolio, QuoteBundle quoteBundle) {
+	setModel(new Model(portfolio, quoteBundle));
     }
 }

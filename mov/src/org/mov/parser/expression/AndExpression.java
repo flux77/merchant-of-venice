@@ -32,11 +32,11 @@ public class AndExpression extends LogicExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	if(getLeft().evaluate(cache, symbol, day) >= TRUE_LEVEL &&
-	   getRight().evaluate(cache, symbol, day) >= TRUE_LEVEL)
+	if(getLeft().evaluate(quoteBundle, symbol, day) >= TRUE_LEVEL &&
+	   getRight().evaluate(quoteBundle, symbol, day) >= TRUE_LEVEL)
 	    return TRUE;
 	else
 	    return FALSE;

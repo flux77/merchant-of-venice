@@ -65,8 +65,8 @@ public class QuoteModule extends AbstractTable
     private JMenuItem tableClose;
     
     private PropertyChangeSupport propertySupport;
-    private QuoteCache cache;
-    private Object[] symbols;
+    private ScriptQuoteBundle quoteBundle;
+    private Vector symbols;
 
     private Model model;
 
@@ -101,23 +101,21 @@ public class QuoteModule extends AbstractTable
 	    String.class, String.class, Change.class, Float.class};
 
 	private TradingDate date = null;
-	private QuoteCache cache;
-	private Object[] symbols;
+	private ScriptQuoteBundle quoteBundle;
+	private Vector symbols;
 	private EquationSlot[] equationSlots;
 
-	public Model(QuoteCache cache, Object[] symbols,
+	public Model(ScriptQuoteBundle quoteBundle, Vector symbols,
 		     EquationSlot[] equationSlots) {
-	    this.cache = cache;
+	    this.quoteBundle = quoteBundle;
 	    this.symbols = symbols;
 	    this.equationSlots = equationSlots;
 
-	    // Pull first date from cache
-	    Iterator iterator = cache.dateIterator(0);
-	    if(iterator.hasNext())
-		date = (TradingDate)iterator.next();
+	    // Pull first date from quoteBundle
+	    date = quoteBundle.getFirstDate();
 	}
 
-	public void setSymbols(Object[] symbols) {
+	public void setSymbols(Vector symbols) {
 	    this.symbols = symbols;
 	}
 
@@ -126,7 +124,7 @@ public class QuoteModule extends AbstractTable
 	}
 	
 	public int getRowCount() {
-	    return symbols.length;
+	    return symbols.size();
 	}
 
 	public int getColumnCount() {
@@ -152,7 +150,7 @@ public class QuoteModule extends AbstractTable
 	    if(row >= getRowCount()) 
 		return "";
 
-	    String symbol = (String)symbols[row];
+	    String symbol = (String)symbols.elementAt(row);
 
 	    try {
 		switch(column) {
@@ -161,57 +159,57 @@ public class QuoteModule extends AbstractTable
 		    
 		case(VOLUME_COLUMN):
 		    return new Integer
-			((int)cache.getQuote(symbol, Quote.DAY_VOLUME, 
+			((int)quoteBundle.getQuote(symbol, Quote.DAY_VOLUME, 
 					     date));
 		    
 		case(DAY_LOW_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Quote.DAY_LOW, date));
+			(quoteBundle.getQuote(symbol, Quote.DAY_LOW, date));
 		    
 		case(DAY_HIGH_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Quote.DAY_HIGH, date));
+			(quoteBundle.getQuote(symbol, Quote.DAY_HIGH, date));
 		    
 		case(DAY_OPEN_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Quote.DAY_OPEN, date));
+			(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date));
 		    
 		case(DAY_CLOSE_COLUMN):
 		    return Converter.quoteToString
-			(cache.getQuote(symbol, Quote.DAY_CLOSE, date));
+			(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
 		    
 		case(CHANGE_COLUMN):
 		    return 
 			Converter.changeToChange
-			(cache.getQuote(symbol, Quote.DAY_OPEN, date),
-			 cache.getQuote(symbol, Quote.DAY_CLOSE, date));
+			(quoteBundle.getQuote(symbol, Quote.DAY_OPEN, date),
+			 quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date));
 
 		// This column is never visible but is used to determine
 		// the most active stocks
 		case(ACTIVITY_COLUMN):
-		    return new Float(cache.getQuote(symbol, 
+		    return new Float(quoteBundle.getQuote(symbol, 
 						    Quote.DAY_HIGH, date) *
-				     cache.getQuote(symbol, 
+				     quoteBundle.getQuote(symbol, 
 						    Quote.DAY_VOLUME, date));
 		}
 	    }
-	    catch(EvaluationException e) {
-		// should not happen
+	    catch(MissingQuoteException e) {
+		assert false;
 	    }
 
 	    return "";
 	}
     }
 
-    public QuoteModule(QuoteCache cache) {
-	this(cache, null);
+    public QuoteModule(ScriptQuoteBundle quoteBundle) {
+	this(quoteBundle, null);
     }
 
-    public QuoteModule(QuoteCache cache, 
-		      String filterEquationString) {
+    public QuoteModule(ScriptQuoteBundle quoteBundle, 
+                       String filterEquationString) {
 	
 	this.filterEquationString = filterEquationString;
-	this.cache = cache;
+	this.quoteBundle = quoteBundle;
 
 	propertySupport = new PropertyChangeSupport(this);
 
@@ -225,9 +223,9 @@ public class QuoteModule extends AbstractTable
 	}
 
 	// Get list of symbols to display
-	symbols = extractSymbolsUsingRule(filterEquationString, cache);
+	symbols = extractSymbolsUsingRule(filterEquationString, quoteBundle);
 
-	model = new Model(this.cache, symbols, equationSlots);
+	model = new Model(this.quoteBundle, symbols, equationSlots);
 	setModel(model, ACTIVITY_COLUMN, SORT_UP);
 	addMenu();
 
@@ -256,17 +254,22 @@ public class QuoteModule extends AbstractTable
 			    (String)getModel().getValueAt(row, SYMBOL_COLUMN);
 			
 			Vector symbols = new Vector();
-			symbols.add((Object)symbol);
+			symbols.add((Object)symbol.toLowerCase());
 			    
 			CommandManager.getInstance().graphStockBySymbol(symbols);
 		    }
 		}
 	    });
+
+        // Start the table sorted by most active
+        setColumnSortStatus(ACTIVITY_COLUMN, SORT_UP);
+        resort();
     }
    
-    private Object[] extractSymbolsUsingRule(String filterEquation, QuoteCache cache) {
+    private Vector extractSymbolsUsingRule(String filterEquation, 
+                                           ScriptQuoteBundle quoteBundle) {
 
-	Object[] symbols = cache.getSymbols();
+	Vector symbols = quoteBundle.getSymbols(quoteBundle.getFirstDate());
 
 	// If theres no filter string then use all symbols
 	if(filterEquation == null || filterEquation.length() == 0) 
@@ -291,15 +294,15 @@ public class QuoteModule extends AbstractTable
 	    String symbol;
 
             ProgressDialog p = ProgressDialogManager.getProgressDialog();
-            p.setMaximum(symbols.length);
+            p.setMaximum(symbols.size());
             p.setTitle("Filtering quotes");
             
-            // Traverse array
-	    for(int i = 0; i < symbols.length; i++) {
-		symbol = (String)symbols[i];
+            // Traverse symbols
+	    Iterator iterator = symbols.iterator();
+	    while(iterator.hasNext()) {
+		symbol = (String)iterator.next();
 
-		// True for this stock? Then add it to the table
-		if(expression.evaluate(cache, symbol, 0) >=
+		if(expression.evaluate(quoteBundle, symbol, 0) >=
 		   org.mov.parser.Expression.TRUE_LEVEL)
 		    extractedSymbols.add(symbol);
 
@@ -308,10 +311,9 @@ public class QuoteModule extends AbstractTable
                 p.increment();
 	    }
 
-	    return extractedSymbols.toArray();
+	    return extractedSymbols;
 	}
 	catch(EvaluationException e) {
-
 	    // Tell user expression didnt evaluate properly
 	    JOptionPane.
 		showInternalMessageDialog(org.mov.ui.DesktopManager.getDesktop(),
@@ -323,8 +325,8 @@ public class QuoteModule extends AbstractTable
 	    // delete erroneous expression
 	    expression = null;
 
-	    // Return all cache's symbols
-	    return cache.getSymbols();
+	    // Return all quoteBundle's symbols
+	    return quoteBundle.getSymbols(quoteBundle.getFirstDate());
 	}
 	finally {
 	    ProgressDialogManager.closeProgressDialog();
@@ -420,7 +422,7 @@ public class QuoteModule extends AbstractTable
 			filterEquationString = equationString;
 
 			// Get new list of symbols to display
-			symbols = extractSymbolsUsingRule(filterEquationString, cache);
+			symbols = extractSymbolsUsingRule(filterEquationString, quoteBundle);
 
 			// Update table
 			SwingUtilities.invokeLater(new Runnable() {
@@ -490,7 +492,7 @@ public class QuoteModule extends AbstractTable
     }
 
     public String getTitle() {
-	return "Quotes for " + cache.getStartDate().toString("dd/mm/yyyy");
+	return "Quotes for " + quoteBundle.getFirstDate().toString("dd/mm/yyyy");
     }
 
     /**

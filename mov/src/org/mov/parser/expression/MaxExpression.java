@@ -44,13 +44,13 @@ public class MaxExpression extends QuoteExpression {
 	add(lag);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	int days = (int)getArg(1).evaluate(cache, symbol, day);
-	int lastDay = day + (int)getArg(2).evaluate(cache, symbol, day);
+	int days = (int)getArg(1).evaluate(quoteBundle, symbol, day);
+	int lastDay = day + (int)getArg(2).evaluate(quoteBundle, symbol, day);
 
-	return max(cache, symbol, getQuoteKind(), days, lastDay);
+	return max(quoteBundle, symbol, getQuoteKind(), days, lastDay);
     }
 
     public String toString() {
@@ -78,13 +78,13 @@ public class MaxExpression extends QuoteExpression {
     /** 
      * Finds the maximum stock quote for a given symbol in a given range. 
      *
-     * @param	cache	the quote cache to read the quotes from.
+     * @param	quoteBundle	the quote cache to read the quotes from.
      * @param	symbol	the symbol to use.
      * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
-     * @param	lastDay	fast access date offset in cache.
+     * @param	lastDay	fast access date offset in quoteBundle.
      * @return	the maximum stock quote.
      */
-    static public float max(QuoteCache cache, String symbol, 
+    static public float max(QuoteBundle quoteBundle, String symbol, 
 			    int quote, int days, int lastDay)
 	throws EvaluationException {
 
@@ -92,10 +92,16 @@ public class MaxExpression extends QuoteExpression {
 	float value;
 	
 	for(int i = lastDay - days + 1; i <= lastDay; i++) {
-	    value = cache.getQuote(symbol, quote, i);
 
-	    if(value > max)
-		max = value;
+	    try {
+		value = quoteBundle.getQuote(symbol, quote, i);
+		
+		if(value > max)
+		    max = value;
+	    }
+	    catch(MissingQuoteException e) {
+		// ignore
+	    }
 	}
 
 	return max;

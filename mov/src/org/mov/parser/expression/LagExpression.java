@@ -41,11 +41,20 @@ public class LagExpression extends QuoteExpression {
 	add(lag);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	return cache.getQuote(symbol, getQuoteKind(), day +
-			      (int)getArg(1).evaluate(cache, symbol, day));
+	try {
+	    return quoteBundle.getQuote(symbol, getQuoteKind(), day +
+					(int)getArg(1).evaluate(quoteBundle, symbol, day));
+	}
+	catch(MissingQuoteException e) {
+	    // TO BE UPDATED. This means if we can't find a quote we assume its
+	    // 0. This works if the stock has been taken off the list otherwise
+	    // it might produce weird results if a single day for a single stock is
+	    // missing.
+	    return 0.0F;
+	}
     }
 
     public String toString() {

@@ -19,7 +19,6 @@
 package org.mov.portfolio;
 
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.quote.*;
 
 import java.util.*;
@@ -149,6 +148,7 @@ public class Portfolio implements Cloneable {
 		clonedAccount = ((ShareAccount)account).clone();
 	    }
 	    else {
+		assert account.getType() == Account.CASH_ACCOUNT;
 		clonedAccount = ((CashAccount)account).clone();
 	    }
 
@@ -162,7 +162,7 @@ public class Portfolio implements Cloneable {
 		(Transaction)transactionIterator.next();
 	    Transaction clonedTransaction = (Transaction)transaction.clone();
 
-	    // Adjust share/cash accont to it referes to the cloned
+	    // Adjust share/cash account so it referes to the cloned
 	    // portfolio accounts - not the old ones.
 	    if(clonedTransaction.getShareAccount() != null) {
 
@@ -181,6 +181,15 @@ public class Portfolio implements Cloneable {
 		    clonedPortfolio.findAccountByName(accountName);
 
 		clonedTransaction.setCashAccount(cashAccount);
+	    }
+	    if(clonedTransaction.getCashAccount2() != null) {
+
+		String accountName = 
+		    clonedTransaction.getCashAccount2().getName();
+		CashAccount cashAccount2 = (CashAccount)
+		    clonedPortfolio.findAccountByName(accountName);
+
+		clonedTransaction.setCashAccount2(cashAccount2);
 	    }
 	    
 	    clonedPortfolio.addTransaction(clonedTransaction);
@@ -267,7 +276,7 @@ public class Portfolio implements Cloneable {
 	while(iterator.hasNext()) {
 	    Transaction transaction = (Transaction)iterator.next();
 	    if(transaction.getType() == Transaction.ACCUMULATE) 
-		symbolsTraded.add(transaction.getSymbol());
+		symbolsTraded.add(transaction.getSymbol().toLowerCase());
 	}
 
 	return new Vector(symbolsTraded);
@@ -331,12 +340,12 @@ public class Portfolio implements Cloneable {
      * transaction. When it calculates the value it will assume all
      * transactions have taken place.
      *
-     * @param	cache	the quote cache
+     * @param	quoteBundle	the quote bundle
      * @param	date	the date to calculate the value
      * @return	the value
      */
-    public float getValue(QuoteCache cache, TradingDate date) 
-	throws EvaluationException {
+    public float getValue(QuoteBundle quoteBundle, TradingDate date) 
+	throws MissingQuoteException {
 
 	Iterator iterator = accounts.iterator();
 	float value = 0.0F;
@@ -344,7 +353,7 @@ public class Portfolio implements Cloneable {
 	while(iterator.hasNext()) {
 	    Account account = (Account)iterator.next();
 
-	    value += account.getValue(cache, date);
+	    value += account.getValue(quoteBundle, date);
 	}
 	
 	return value;

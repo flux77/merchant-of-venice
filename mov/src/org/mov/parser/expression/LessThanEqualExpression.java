@@ -32,11 +32,11 @@ public class LessThanEqualExpression extends ComparisionExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	if(getLeft().evaluate(cache, symbol, day) <=
-	   getRight().evaluate(cache, symbol, day))
+	if(getLeft().evaluate(quoteBundle, symbol, day) <=
+	   getRight().evaluate(quoteBundle, symbol, day))
 	    return TRUE;
 	else
 	    return FALSE;

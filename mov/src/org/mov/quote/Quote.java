@@ -21,7 +21,6 @@ package org.mov.quote;
 import java.util.*;
 
 import org.mov.util.*;
-import org.mov.parser.*;
 
 /**
  * Representation of a stock quote for a given stock on a given date.
@@ -185,8 +184,8 @@ public class Quote {
      * @param	quote	the quote type <code>DAY_OPEN, DAY_CLOSE, DAY_HIGH,
      *			DAY_VOLUME</code> or <code>DAY_LOW</code>
      */
-    public float getQuote(int quote) 
-	throws EvaluationException {
+    public float getQuote(int quote) {
+
 	switch(quote) {
 	case(DAY_OPEN):
 	    return getDayOpen();
@@ -199,7 +198,8 @@ public class Quote {
 	case(DAY_VOLUME):
 	    return getVolume();
 	default:
-	    throw new EvaluationException("unknown quote type");
+	    assert false;
+	    return 0.0F;
 	}
     }
 

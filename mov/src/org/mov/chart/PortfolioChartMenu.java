@@ -44,7 +44,7 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 
     private JMenuItem removeMenu;
     
-    private QuoteCache cache;
+    private QuoteBundle quoteBundle;
     private Graph graph;
     private ChartModule listener;
     private HashMap map = new HashMap();
@@ -59,12 +59,12 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
      * @param	listener	the chart module associated with the menu
      * @param	graph		the graph we are associated with
      */
-    public PortfolioChartMenu(ChartModule listener, QuoteCache cache,
+    public PortfolioChartMenu(ChartModule listener, QuoteBundle quoteBundle,
 			      Portfolio portfolio, Graph graph) {
 
 	super(graph.getName());
 	
-	this.cache = cache; 
+	this.quoteBundle = quoteBundle; 
 	this.graph = graph;
 	this.listener = listener;
 	this.portfolio = portfolio;
@@ -126,7 +126,7 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 	    // Ok looks like its adding a graph
 	    else if(text == PROFIT_LOSS) 
 		addGraph(new LineGraph(new PortfolioGraphSource(portfolio,
-								cache, 
+								quoteBundle, 
 								PortfolioGraphSource.PROFIT_LOSS)), 
 			 PROFIT_LOSS, 0);
 	}

@@ -37,11 +37,11 @@ public class PercentExpression extends BinaryExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	return getLeft().evaluate(cache, symbol, day) *
-	    (getRight().evaluate(cache, symbol, day) / 100);
+	return getLeft().evaluate(quoteBundle, symbol, day) *
+	    (getRight().evaluate(quoteBundle, symbol, day) / 100);
     }
 
     public String toString() {

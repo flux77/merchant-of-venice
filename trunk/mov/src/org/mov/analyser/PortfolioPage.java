@@ -56,9 +56,12 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
     // Parsed input
     private float initialCapital;
     private float tradeCost;
-    private boolean isNumberStocks;
+    private int mode;
     private int numberStocks;
     private float stockValue;
+
+    public final static int NUMBER_STOCKS_MODE = 0;
+    public final static int STOCK_VALUE_MODE = 1;
 
     public PortfolioPage(JDesktopPane desktop) {
         this.desktop = desktop;
@@ -83,7 +86,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             }
             else if(setting.equals("stock_value"))
                 stockValueTextField.setText(value);            
-            else if(setting.equals("is_number_stocks")) {
+            else if(setting.equals("mode")) {
                 if(value.equals("number_stocks"))
                     numberStocksButton.setSelected(true);
                 else
@@ -94,12 +97,14 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 	    else if(setting.equals("trade_cost"))
 		tradeCostTextField.setText(value);
         }
+
+        checkDisabledStatus();
     }
 
     public void save(String key) {
         HashMap settings = new HashMap();
-        settings.put("is_number_stocks", (numberStocksButton.isSelected()?
-                                          "number_stocks" : "stock_value"));
+        settings.put("mode", (numberStocksButton.isSelected()?
+                              "number_stocks" : "stock_value"));
         settings.put("number_stocks", numberStocksTextField.getText());
         settings.put("stock_value", stockValueTextField.getText());
 	settings.put("initial_capital", initialCapitalTextField.getText());
@@ -109,19 +114,26 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
     }
 
     public boolean parse() {
-        isNumberStocks = true;
         numberStocks = 0;
         stockValue = 0.0F;
 	initialCapital = 0.0F;
 	tradeCost = 0.0F;
 
-        //        isMultipleStockPortfolio = multipleStockCheckBox.isSelected();
+        if(numberStocksButton.isSelected())
+            mode = NUMBER_STOCKS_MODE;
+        else {
+            assert stockValueButton.isSelected();
+            mode = STOCK_VALUE_MODE;
+        }
 
 	try {
-            /*	    if(!valuePerStockTextField.getText().equals(""))
-		valuePerStock = 
-		    Float.parseFloat(valuePerStockTextField.getText());
-            */
+            if(!stockValueTextField.getText().equals(""))
+		stockValue = 
+		    Float.parseFloat(stockValueTextField.getText());
+
+            if(!numberStocksTextField.getText().equals(""))
+		numberStocks = 
+		    Integer.parseInt(numberStocksTextField.getText());
 
 	    if(!initialCapitalTextField.getText().equals(""))
 		initialCapital = 
@@ -148,6 +160,30 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 	    return false;
 	}
 
+        if(mode == NUMBER_STOCKS_MODE && numberStocks <= 0) {
+            JOptionPane.showInternalMessageDialog(desktop, 
+                                                  "Portfolio must have at least one stock.",
+                                                  "Invalid number",
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+        }
+
+        if(mode == STOCK_VALUE_MODE && stockValue <= 0) {
+            JOptionPane.showInternalMessageDialog(desktop, 
+                                                  "Stocks must have a value.",
+                                                  "Invalid number",
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+        }
+
+        if(tradeCost < 0) {
+            JOptionPane.showInternalMessageDialog(desktop, 
+                                                  "Trade cost can't be negative.",
+                                                  "Invalid number",
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+        }
+
 	return true;
     }
 
@@ -163,15 +199,21 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
         return tradeCost;
     }
 
-    public boolean isNumberStocks() {
-        return isNumberStocks;
+    public int getMode() {
+        assert mode == NUMBER_STOCKS_MODE || mode == STOCK_VALUE_MODE;
+
+        return mode;
     }
 
     public float getStockValue() {
+        assert mode == STOCK_VALUE_MODE;
+
         return stockValue;
     }
 
     public int getNumberStocks() {
+        assert mode == NUMBER_STOCKS_MODE;
+
         return numberStocks;
     }
 
@@ -223,6 +265,11 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             
             numberStocksButton = new JRadioButton("Number Stocks");
             numberStocksButton.setSelected(true);
+            numberStocksButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        checkDisabledStatus();
+                    }
+                });
             buttonGroup.add(numberStocksButton);
             
             c.gridwidth = 1;
@@ -240,6 +287,11 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             
             stockValueButton = new JRadioButton("Stock Value");
             stockValueButton.setSelected(true);
+            stockValueButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        checkDisabledStatus();
+                    }
+                });
             buttonGroup.add(stockValueButton);
             
             c.gridwidth = 1;
@@ -254,5 +306,10 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             panel.add(innerPanel, BorderLayout.NORTH);
             add(panel);
         }
+    }
+
+    private void checkDisabledStatus() {
+        numberStocksTextField.setEnabled(numberStocksButton.isSelected());
+        stockValueTextField.setEnabled(stockValueButton.isSelected());
     }
 }

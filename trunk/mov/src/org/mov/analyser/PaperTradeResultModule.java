@@ -286,7 +286,8 @@ public class PaperTradeResultModule extends AbstractTable
         PaperTradeResult result = 
             model.getPaperTradeResult(row);
 
-        CommandManager.getInstance().openPortfolio(result.getPortfolio());
+        CommandManager.getInstance().openPortfolio(result.getPortfolio(),
+                                                   result.getQuoteBundle());
     }
 
     // Removes all the selected results from the table

@@ -29,6 +29,7 @@ import org.mov.analyser.*;
 import org.mov.chart.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
+import org.mov.help.*;
 import org.mov.util.*;
 import org.mov.parser.Expression;
 import org.mov.portfolio.*;
@@ -540,6 +541,15 @@ public class CommandManager {
                                                   JOptionPane.PLAIN_MESSAGE);
             isAboutDialogUp = false;
         }
+    }
+
+    /**
+     * Opens the help module at the default page.
+     */
+    public void openHelp() {
+        HelpModule helpModule = new HelpModule(desktop);
+        
+        getDesktopManager().newFrame(helpModule, false, false);
     }
 
     /** Shows a dialog and imports quotes into Venice */

@@ -1,4 +1,4 @@
-package org.mov.main;
+package org.mov.ui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -18,7 +18,7 @@ import org.mov.prefs.*;
 import org.mov.quote.*;
 import org.mov.ui.AnalyserDesktopManager;
 
-public class AnalyserMenu implements ActionListener, ContainerListener {
+public class MainMenu implements ActionListener, ContainerListener {
 
     private JMenuItem filePreferencesQuoteMenuItem;
     private JMenuItem fileExitMenuItem;
@@ -345,5 +345,6 @@ public class AnalyserMenu implements ActionListener, ContainerListener {
 	}
     }
 }
+
 
 

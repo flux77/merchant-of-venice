@@ -42,10 +42,10 @@ import org.mov.util.Locale;
 
 public class GPGondolaSelectionPanel extends JPanel {
 
-    private final static String fmt = "0.00#";
+    private final static String format = GPModuleConstants.format;
+    private final static double PERCENT_DOUBLE = GPModuleConstants.PERCENT_DOUBLE;
+    private final static int PERCENT_INT = GPModuleConstants.PERCENT_INT;
     private final static int MAX_CHARS_IN_TEXTBOXES = 6;
-    private final static double PERCENT_DOUBLE = 100.0;
-    private final static int PERCENT_INT = 10000;
     
     private JTextField[] percTextField;
     private int[] perc;
@@ -199,12 +199,12 @@ public class GPGondolaSelectionPanel extends JPanel {
     private void setNumericalValues() throws ParseException {
         setDefaultsValuesOnly();
     
-        // df manage the localization.
-        DecimalFormat df = new DecimalFormat(fmt);
+        // decimalFormat manage the localization.
+        DecimalFormat decimalFormat = new DecimalFormat(format);
         for (int i=0; i<perc.length; i++) {
             if(!percTextField[i].getText().equals("")) {
                 perc[i] =
-                    (int) Math.round(PERCENT_DOUBLE*(df.parse(percTextField[i].getText()).doubleValue()));
+                    (int) Math.round(PERCENT_DOUBLE*(decimalFormat.parse(percTextField[i].getText()).doubleValue()));
             }
         }
     }
@@ -232,14 +232,6 @@ public class GPGondolaSelectionPanel extends JPanel {
                                                   JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        // Check total < MaxInt
-        if (total>new Long(Integer.MAX_VALUE).longValue()) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_TOTAL_LOWER_THAN_MAX_INT_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
         return true;
     }
     
@@ -255,9 +247,9 @@ public class GPGondolaSelectionPanel extends JPanel {
     }
         
     public void setTexts() {
-        DecimalFormat df = new DecimalFormat(fmt);
+        DecimalFormat decimalFormat = new DecimalFormat(format);
         for (int i=0; i<percTextField.length; i++)
-            percTextField[i].setText(df.format(perc[i]/PERCENT_DOUBLE));
+            percTextField[i].setText(decimalFormat.format(perc[i]/PERCENT_DOUBLE));
     }
         
     private void setGraphic(String titledBorderText, Dimension preferredSize) {

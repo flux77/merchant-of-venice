@@ -247,27 +247,50 @@ public class CommandManager {
      * @param	portfolioName	name of portfolio to display
      */
     public void openPortfolio(String portfolioName) {
-	Thread thread = Thread.currentThread();
-	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
-        QuoteBundle quoteBundle = null;
+        // We don't run this in a new thread because we call openPortfolio(portfolio)
+        // which will open a new thread for us.
         Portfolio portfolio = 
             PreferencesManager.loadPortfolio(portfolioName);
-        
-        progress.show("Open " + portfolioName);
-        
-        if (!thread.isInterrupted()) { 
-            QuoteRange quoteRange =
-                new QuoteRange(portfolio.getSymbolsTraded(),
-                               QuoteSourceManager.getSource().getLastDate());
-            quoteBundle = new QuoteBundle(quoteRange);
-        }
-        if (!thread.isInterrupted()) {
-            getDesktopManager().newFrame(new PortfolioModule(desktop, portfolio, quoteBundle));
-            ProgressDialogManager.closeProgressDialog(progress);
-        }
+
+        openPortfolio(portfolio);
     }
 
+    /**
+     * Display the portfolio to the user
+     *
+     * @param portfolio the portfolio
+     */
+    public void openPortfolio(final Portfolio portfolio) {
+
+        final Thread thread = new Thread(new Runnable() {
+
+            public void run() {
+                Thread thread = Thread.currentThread();
+                ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+
+                progress.show("Open " + portfolio.getName());
+                
+                QuoteBundle quoteBundle = null;
+                
+                if (!thread.isInterrupted()) { 
+                    QuoteRange quoteRange =
+                        new QuoteRange(portfolio.getSymbolsTraded(),
+                                       QuoteSourceManager.getSource().getLastDate());
+                    quoteBundle = new QuoteBundle(quoteRange);
+                }
+                if (!thread.isInterrupted()) {
+                    getDesktopManager().newFrame(new PortfolioModule(desktop, 
+                                                                     portfolio, quoteBundle));
+                }
+
+                ProgressDialogManager.closeProgressDialog(progress);
+            }
+            });
+        
+        thread.start();
+    }
+    
     /**
      * Open up a new paper trade module. 
      */
@@ -417,7 +440,7 @@ public class CommandManager {
 
 		if(symbols == null) 
 		    symbolsCopy = SymbolListDialog.getSymbols(desktop, 
-							      "Graph stocks by code");
+							      "Graph stocks by symbol");
 		else 
 		    symbolsCopy = new TreeSet(symbols);
                 

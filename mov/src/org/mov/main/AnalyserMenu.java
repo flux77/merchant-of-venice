@@ -15,9 +15,9 @@ import org.mov.table.*;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
-import org.mov.ui.InternalFrameHandler;
+import org.mov.ui.AnalyserDesktopManager;
 
-public class AnalyserMenu implements ActionListener, PropertyChangeListener {
+public class AnalyserMenu implements ActionListener, ContainerListener {
 
     private JMenuItem filePreferencesQuoteMenuItem;
     private JMenuItem fileExitMenuItem;
@@ -38,14 +38,11 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
     private JDesktopPane desktop;
     private JFrame frame;
 
-    static private int DEFAULT_FRAME_WIDTH = 425;
-    static private int DEFAULT_FRAME_HEIGHT = 350;
-
     public AnalyserMenu(JFrame frame, JDesktopPane desktop) {
 
 	this.frame = frame;
 	this.desktop = desktop;
-
+	desktop.addContainerListener(this);
 	JMenuBar menuBar = new JMenuBar();
 
 	// File 
@@ -137,7 +134,6 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	// Window menu
 	{
 	    windowMenu = addMenu(menuBar, "Window");
-	    windowMenu.addSeparator();
 	    windowTileHorizontalMenuItem = addMenuItem(windowMenu, "Tile Horizontally");
 	    windowTileHorizontalMenuItem.setEnabled(false);
 	    windowTileVerticalMenuItem = addMenuItem(windowMenu, "Tile Vertically");
@@ -146,6 +142,7 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	    windowCascadeMenuItem.setEnabled(false);
 	    windowGridMenuItem = addMenuItem(windowMenu, "Arrange all");
 	    windowGridMenuItem.setEnabled(false);
+	    windowMenu.addSeparator();
 	}
 
 	frame.setJMenuBar(menuBar);
@@ -189,7 +186,7 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 			System.exit(0);
 		    else if(menu == filePreferencesQuoteMenuItem) {
 			// Display preferences
-			newCentredFrame(new PreferencesModule(desktop, PreferencesModule.QUOTE_SOURCE_PAGE));
+				    ((AnalyserDesktopManager)(desktop.getDesktopManager())).newCentredFrame(new PreferencesModule(desktop, PreferencesModule.QUOTE_SOURCE_PAGE));
 		    }
 		    
 		    // Is it a table menu?
@@ -211,20 +208,41 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 		    
 		    // Is it a window handling function?
 		    else if (menu == windowTileHorizontalMenuItem) {
-			InternalFrameHandler.tileFrames(desktop, 
-							InternalFrameHandler.HORIZONTAL);
+			AnalyserDesktopManager.tileFrames(desktop, 
+							AnalyserDesktopManager.HORIZONTAL);
 		    }
 		    else if (menu == windowTileVerticalMenuItem) {
-			InternalFrameHandler.tileFrames(desktop, 
-							InternalFrameHandler.VERTICAL);
+			AnalyserDesktopManager.tileFrames(desktop, 
+							AnalyserDesktopManager.VERTICAL);
 		    }
 		    else if (menu == windowCascadeMenuItem) {
-			InternalFrameHandler.tileFrames(desktop, 
-							InternalFrameHandler.CASCADE);
+			AnalyserDesktopManager.tileFrames(desktop, 
+							AnalyserDesktopManager.CASCADE);
 		    }
 		    else if (menu == windowGridMenuItem) {
-			InternalFrameHandler.tileFrames(desktop, 
-							InternalFrameHandler.ARRANGE);
+			AnalyserDesktopManager.tileFrames(desktop, 
+							AnalyserDesktopManager.ARRANGE);
+		    }
+
+		    // Must be a window action
+		    else {
+			Component c = (Component)menu_frame_hash.get(menu);
+			if(c != null) {
+			    JInternalFrame f = null;
+			    if (menu.getText().substring(0,1).equals("(")) {
+				JInternalFrame.JDesktopIcon icon = (JInternalFrame.JDesktopIcon)c;
+				f = icon.getInternalFrame();
+			    } else {
+				f = (JInternalFrame) c;
+			    }
+
+			    try {
+				f.setIcon(false);
+				desktop.setSelectedFrame(f);
+				f.setSelected(true);
+				f.toFront();
+			    } catch (PropertyVetoException e) {}
+			}
 		    }
 		}
 	    };
@@ -267,7 +285,7 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 	    Progress.getInstance().close(owner);
 
 	    chart.redraw();
-	    newFrame(chart);		
+	    ((AnalyserDesktopManager)(desktop.getDesktopManager())).newFrame(chart);
 	}
     }	
 
@@ -324,77 +342,69 @@ public class AnalyserMenu implements ActionListener, PropertyChangeListener {
 			       searchRestriction);
 
 	    // Display table of quotes
-	    newFrame(new QuoteModule(desktop, cache, expression));
+	    ((AnalyserDesktopManager)(desktop.getDesktopManager())).newFrame(new QuoteModule(desktop, cache, expression));
 	}
     }
 
-    private void newFrame(AnalyserModule module) {
-	newFrame(module, 0, 0, DEFAULT_FRAME_WIDTH, DEFAULT_FRAME_HEIGHT);
-    }
-    
-    private void newCentredFrame(AnalyserModule module) {
-	int xOffset = (desktop.getWidth() - DEFAULT_FRAME_WIDTH) / 2;
-	int yOffset = (desktop.getHeight() - DEFAULT_FRAME_HEIGHT) / 2;
+    private Hashtable frame_menu_hash = null;
+    private Hashtable menu_frame_hash = null;
 
-	newFrame(module, xOffset, yOffset, DEFAULT_FRAME_WIDTH,
-		 DEFAULT_FRAME_HEIGHT);
-    }
+    /**
+     * Called by the JDesktopPane to notify of a new JInternalFrame being added to the display
+     *
+     * @param e - ContainerEvent generated by JDesktopPane
+     */
+    public void componentAdded(ContainerEvent e) {
+	Object o = e.getChild();
 
-    private void newFrame(AnalyserModule module, int x, int y,
-			  int width, int height) {
-
-	// Make sure new frame is within window bounds
-
-	// ORDER IMPORTANT
-	{
-	    if(x > width)
-		x = desktop.getWidth() - width;
-	    if(y > height)
-		y = desktop.getHeight() - height;
-	    if(x < 0) 
-		x = 0;
-	    if(y < 0)
-		y = 0;
+	if (o.getClass().getName().equals("org.mov.main.AnalyserFrame") ||
+	    o.getClass().getName().equals("javax.swing.JInternalFrame$JDesktopIcon")) {
+	    if (frame_menu_hash ==  null) {
+		frame_menu_hash = new Hashtable();
+		menu_frame_hash = new Hashtable();
+	    }
 	    
-	    if(x + width > desktop.getWidth())
-		width = desktop.getWidth() - x;
-	    if(y + height > desktop.getHeight())
-		height = desktop.getHeight() - y;
-	}
-	
-	AnalyserFrame frame = new AnalyserFrame(module, x, y, width, height);
-	desktop.add(frame);
+	    String title;
+	    if (o.getClass().getName().equals("org.mov.main.AnalyserFrame"))
+		title = ((AnalyserFrame)o).getTitle();
+	    else if (o.getClass().getName().equals("javax.swing.JInternalFrame$JDesktopIcon"))
+		title = "("+((JInternalFrame.JDesktopIcon)o).getInternalFrame().getTitle()+")";
+	    else
+		title = "Unknown";
 
-	int numframes = (new Integer(System.getProperty("number_of_frames", "0"))).intValue();
-	//	System.setProperty();
-
-	try {
-	    frame.setSelected(true);
-	}
-	catch(PropertyVetoException v) {
-	    // ignore
-	}
-	
-	frame.moveToFront();		    
-    }
-
-    public void propertyChange(PropertyChangeEvent evt) {
-	int numframes = ((Integer)evt.getOldValue()).intValue();
-
-	// Remove the old window menus
-	if (numframes > 0) {
-	    for(int i = 0; i < numframes; i++) {
-		windowMenu.remove(0);
+	    // Store the menu item in a hash referenced by the window's name
+	    JMenuItem i = addMenuItem(windowMenu, title);
+	    frame_menu_hash.put(o, i);
+	    menu_frame_hash.put(i, o);
+	    if (frame_menu_hash.size() == 1) {
+		windowTileHorizontalMenuItem.setEnabled(true);
+		windowTileVerticalMenuItem.setEnabled(true);
+		windowCascadeMenuItem.setEnabled(true);
+		windowGridMenuItem.setEnabled(true);
 	    }
 	}
-	
+    }
 
-	// Put the new ones up
-	numframes = ((Integer)evt.getNewValue()).intValue();
-
-	for(int i = numframes - 1; i >= 0; i--) {
-	    windowMenu.add(new JMenuItem(Toolkit.getProperty("windowname_"+i, "")), 0);
+    /**
+     * Called by the JDesktopPane to notify of a JInternalFrame being removed from the display
+     *
+     * @param e - ContainerEvent generated by JDesktopPane
+     */
+    public void componentRemoved(ContainerEvent e) {
+	Object o = e.getChild();
+	if (o.getClass().getName().equals("org.mov.main.AnalyserFrame") ||
+	    o.getClass().getName().equals("javax.swing.JInternalFrame$JDesktopIcon")) {
+	    windowMenu.remove((JMenuItem)frame_menu_hash.get(o));
+	    menu_frame_hash.remove(frame_menu_hash.get(o));
+	    frame_menu_hash.remove(o);
+	    if (frame_menu_hash.size() == 0) {
+		windowTileHorizontalMenuItem.setEnabled(false);
+		windowTileVerticalMenuItem.setEnabled(false);
+		windowCascadeMenuItem.setEnabled(false);
+		windowGridMenuItem.setEnabled(false);
+	    }
 	}
     }
 }
+
 

@@ -4,6 +4,10 @@ import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+/**
+ * An internal frame designed specifically for holding AnalyserModule objects.  Every visible AnalyserModule should run within
+ * an AnalyserFrame, and is supplied to it upon construction.
+ */
 public class AnalyserFrame extends JInternalFrame
     implements PropertyChangeListener, InternalFrameListener
 {
@@ -17,6 +21,15 @@ public class AnalyserFrame extends JInternalFrame
 
     private AnalyserModule module;
 
+    /**
+     * Standard constructor
+     *
+     * @param module The AnalyserModule to feed to the frame
+     * @param x The X offset of the frame within the desktop area
+     * @param y The Y offset of the frame within the desktop area
+     * @param width The width of the frame
+     * @param height The Height of the frame
+     */
     public AnalyserFrame(AnalyserModule module,
 			 int x, int y, int width, int height) {
 
@@ -46,6 +59,18 @@ public class AnalyserFrame extends JInternalFrame
 	show();	
     }
 
+    /**
+     * Gives a reference to the module running inside the AnalyserFrame
+     *
+     * @return The module running in the frame
+     */
+    public AnalyserModule getModule() {
+	return module;
+    }
+
+    /** 
+     * Standard property change handler that listens for a WINDOW_CLOSE event 
+     */
     public void propertyChange(PropertyChangeEvent event) {
 	String property = event.getPropertyName();
 
@@ -53,10 +78,16 @@ public class AnalyserFrame extends JInternalFrame
 	    dispose();
     }
 
-    public void internalFrameActivated(InternalFrameEvent e) { }
+
+    /* Make sure the internal modules saves its information before destroying it
+     */
     public void internalFrameClosed(InternalFrameEvent e) { 
 	module.save();
     }
+    /**
+     * Standard InternalFrame functions
+     */
+    public void internalFrameActivated(InternalFrameEvent e) { }
     public void internalFrameClosing(InternalFrameEvent e) { }
     public void internalFrameDeactivated(InternalFrameEvent e) { }
     public void internalFrameDeiconified(InternalFrameEvent e) { }
@@ -66,4 +97,5 @@ public class AnalyserFrame extends JInternalFrame
 
     
 }
+
 

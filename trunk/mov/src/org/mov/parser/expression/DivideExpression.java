@@ -31,13 +31,13 @@ public class DivideExpression extends ArithmeticExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	float right = getRight().evaluate(cache, symbol, day);
+	float right = getRight().evaluate(quoteBundle, symbol, day);
 
 	if(right != 0.0F)
-	    return getLeft().evaluate(cache, symbol, day) / right;
+	    return getLeft().evaluate(quoteBundle, symbol, day) / right;
 	else
 	    return 0.0F; // need a divide by 0 exception perhaps
     }

@@ -19,7 +19,6 @@
 package org.mov.quote;
 
 import java.util.*;
-
 import org.mov.util.*;
 
 /**
@@ -28,37 +27,13 @@ import org.mov.util.*;
  * a database, a unique internal format or from the internet.
  */
 public interface QuoteSource {
-
-    /** Only load indices (All Ordinaries, Mining etc) - we assume
-     *  all symbols starting with 'X' are indices. This is *wrong*. */
-    public static final int INDICES = 0;
-
-    /** 
-     * Only load 3 letter symbols which are generally companies +
-     * mutual funds.
-     * Loads all 3 letter symbols except ones starting with 'X' (cause
-     * some of them are indicies) - so skips some legit X symbols. */
-    public static final int COMPANIES_AND_FUNDS = 1;
-    
-    /** 
-     * Load all commodoties listed on the ASX (everything except indices).
-     * We define indices as symbols starting with X. Again this is not quite
-     * right. */
-    public static final int ALL_COMMODITIES = 2;
-
-    /** Indicates a single symbol. */
-    public static final int SINGLE_SYMBOL = 3;
-
-    /** Everything */
-    public static final int ALL_SYMBOLS = 4;
-
     /** 
      * Returns the company name associated with the given symbol. 
      * 
      * @param	symbol	the stock symbol
      * @return	the company name
      */
-    public String getCompanyName(String symbol);
+    public String getSymbolName(String symbol);
 
     /**
      * Returns the symbol associated with the given company. 
@@ -66,7 +41,7 @@ public interface QuoteSource {
      * @param	symbol	a partial company name
      * @return	the company symbol
      */
-    public String getCompanySymbol(String partialCompanyName);
+    public String getSymbol(String partialSymbolName);
 
     /**
      * Returns whether we have any quotes for the given symbol.
@@ -81,61 +56,37 @@ public interface QuoteSource {
      *
      * @return	the most recent quote date
      */
-    public TradingDate getLatestQuoteDate();
+    public TradingDate getLastDate();
 
     /**
-     * Return a vector of quotes for all stocks in the given date range.
-     * The vector will be in order of date then stock symbol.
+     * Return the earliest date we have any stock quotes for.
      *
-     * @param	startDate	the start of the date range (inclusive)
-     * @param	endDate		the end of the date range (inclusive)
-     * @param	type		the type of the search
-     * @return	a vector of stock quotes
-     * @see Quote
+     * @return	the oldest quote date
      */
-    public Vector getQuotesForDates(TradingDate startDate, 
-				    TradingDate endDate, 
-				    int type);
+    public TradingDate getFirstDate();
 
     /**
-     * Return all quotes for the given symbols between the given dates. 
-     * They will be returned in order of date.
+     * Return a vector of quotes for all quotes in the given quote range.
      *
-     * @param	symbols	the symbols to query.
-     * @param	startDate	the first trading date to query for
-     * @param	endDate		the last trading date to query for
-     * @return	a vector of stock quotes.
-     * @see Quote
-     */
-    public Vector getQuotesForSymbolsAndDates(Vector symbols, 
-					      TradingDate startDate,
-					      TradingDate endDate);
-    
-    /**
-     * Return a vector of all quotes in the given date.
-     * The vector will be in order of stock symbol.
-     *
-     * @param	date	the date to return quotes for
-     * @param	type	the type of the search
+     * @param	quoteRange	the range of quotes to load
      * @return	a vector of stock quotes
      * @see Quote
+     * @see QuoteRange
      */
-    public Vector getQuotesForDate(TradingDate date, int type);
-
-    /**
-     * Return all quotes for the given symbol. They will be returned in
-     * order of date.
-     *
-     * @param	symbol	the symbol to query
-     * @return	a vector of stock quotes
-     * @see Quote
-     */
-    public Vector getQuotesForSymbol(String symbol);
+    public Vector loadQuoteRange(QuoteRange quoteRange);
 
     /** 
-     * Return all the dates which we have quotes for.
+     * Return all the dates which we have quotes for (SLOW).
      *
      * @return	a vector of dates
      */
     public Vector getDates(); 
+
+    /**
+     * Is the given symbol a market index? 
+     *
+     * @param	symbol to test
+     * @return	yes or no
+     */
+    public boolean isMarketIndex(String symbol);
 }

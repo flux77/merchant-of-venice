@@ -44,13 +44,13 @@ public class AvgExpression extends QuoteExpression {
 	add(lag);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 	
-	int days = (int)getArg(1).evaluate(cache, symbol, day);
-	int lastDay = day + (int)getArg(2).evaluate(cache, symbol, day);
+	int days = (int)getArg(1).evaluate(quoteBundle, symbol, day);
+	int lastDay = day + (int)getArg(2).evaluate(quoteBundle, symbol, day);
 
-	return QuoteFunctions.avg(cache, symbol, getQuoteKind(), days,
+	return QuoteFunctions.avg(quoteBundle, symbol, getQuoteKind(), days,
 				  lastDay);
     }
 

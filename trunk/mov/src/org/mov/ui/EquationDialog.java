@@ -18,8 +18,6 @@
 
 package org.mov.ui;
 
-import org.mov.parser.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.*;
 import java.beans.*;

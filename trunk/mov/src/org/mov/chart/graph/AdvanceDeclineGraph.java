@@ -16,6 +16,16 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
+
+
+// THIS IS INSANE!! It requires us to load in ALL the quotes from the database! Better way
+// would be to use this SQL query (or one that loads in multiples of these at a time):
+//
+// select count(*) from shares where date = "xxxxxx" and close > open;
+//
+// the above query takes 0.10 sec (or 0.20 for both) vs 0.94. Meaning its 5 times
+// faster. thats not included java processing etc...
+
 package org.mov.chart.graph;
 
 import java.awt.*;
@@ -25,7 +35,6 @@ import java.util.*;
 import org.mov.chart.*;
 import org.mov.chart.source.*;
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
@@ -210,20 +219,16 @@ public class AdvanceDeclineGraph extends AbstractGraph {
 	    int todayAdvanceDecline = 0;
 
 	    if(advance == PreferencesManager.UNDEFINED_INT) {
-		try {
-		    todayAdvanceDecline = calculateAdvanceDecline(date);
+		todayAdvanceDecline = calculateAdvanceDecline(date);
 
 		    // Cache values
 		    //		    PreferencesManager.saveCachedAdvanceDecline(date, 
 		    //						todayAdvanceDecline);
 
 
-		    System.out.println("SAVE date " + date + " value is " +
-				       todayAdvanceDecline);
-		}
-		catch(EvaluationException e) {
-		    // nothing to do
-		}
+		System.out.println("SAVE date " + date + " value is " +
+				   todayAdvanceDecline);
+
 	    }
 	    else {
 		//		System.out.println("LOAD date " + date + " value is " +
@@ -245,24 +250,30 @@ public class AdvanceDeclineGraph extends AbstractGraph {
 	return advanceDecline;
     }
 
-    private int calculateAdvanceDecline(TradingDate date) 
-	throws EvaluationException {
-
+    private int calculateAdvanceDecline(TradingDate date) {
 	int todayAdvanceDecline = 0;
-	QuoteCache cache = new QuoteCache(date, 
-					  QuoteSource.COMPANIES_AND_FUNDS);
-	Object[] symbols = cache.getSymbols();
+	QuoteBundle quoteBundle = new QuoteBundle(new QuoteRange(QuoteRange.ALL_ORDINARIES, date));
+	Vector symbols = quoteBundle.getSymbols(date);
 
-	// Iterate over every three letter symbol
-	for(int i = 0; i < symbols.length; i++) {
-	    float dayOpen = cache.getQuote((String)symbols[i], 
-					   Quote.DAY_OPEN, date);
-	    float dayClose = cache.getQuote((String)symbols[i], 
-					    Quote.DAY_CLOSE, date);
-	    if(dayClose > dayOpen)
-		todayAdvanceDecline++;
-	    else if(dayClose < dayOpen)
-		todayAdvanceDecline--;
+	try {
+	    
+	    // Iterate over every three letter symbol
+	    Iterator iterator = symbols.iterator();
+	    while(iterator.hasNext()) {
+		String symbol = (String)iterator.next();
+		
+		float dayOpen = quoteBundle.getQuote((String)symbol, 
+						     Quote.DAY_OPEN, date);
+		float dayClose = quoteBundle.getQuote((String)symbol, 
+						      Quote.DAY_CLOSE, date);
+		if(dayClose > dayOpen)
+		    todayAdvanceDecline++;
+		else if(dayClose < dayOpen)
+		    todayAdvanceDecline--;
+	    }
+	}
+	catch(MissingQuoteException e) {
+	    // safe to ignore
 	}
 	
 	return todayAdvanceDecline;

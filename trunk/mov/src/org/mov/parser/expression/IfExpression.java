@@ -43,16 +43,16 @@ public class IfExpression extends TernaryExpression {
 	super(arg1, arg2, arg3);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
 	// if(...) then
-	if(getArg(0).evaluate(cache, symbol, day) 
+	if(getArg(0).evaluate(quoteBundle, symbol, day) 
 	   >= Expression.TRUE_LEVEL)
-	    return getArg(1).evaluate(cache, symbol, day);
+	    return getArg(1).evaluate(quoteBundle, symbol, day);
 	// else
 	else
-	    return getArg(2).evaluate(cache, symbol, day);
+	    return getArg(2).evaluate(quoteBundle, symbol, day);
     }
 
     public String toString() {

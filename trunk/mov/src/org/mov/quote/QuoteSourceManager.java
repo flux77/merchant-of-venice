@@ -77,13 +77,13 @@ public class QuoteSourceManager {
 	    else if(quoteSource.equals("database"))
 		sourceInstance = createDatabaseQuoteSource();
 	    else {
-		sourceInstance = createInternetQuoteSource();
+		assert false;
+		// sourceInstance = createInternetQuoteSource();
 	    }
 	}
 
 	return sourceInstance;
     }
-
 
     /**
      * Create a file quote source directly using the user preferences.
@@ -98,19 +98,6 @@ public class QuoteSourceManager {
 	return
 	    new FileQuoteSource(p.get("format", "MetaStock"),
 				ImporterModule.getFileList());
-    }	
-
-    /**
-     * Create an internet quote source directly using the user preferences.
-     *
-     * @return	the internet quote source 
-     */
-    public static SanfordQuoteSource createInternetQuoteSource() {
-	// Get username and password from preferences
-	Preferences p = PreferencesManager.getUserNode("/quote_source/internet");
-	
-	return new SanfordQuoteSource(p.get("username", ""),
-				      p.get("password", ""));
     }
     
     /**

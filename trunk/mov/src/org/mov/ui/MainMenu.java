@@ -29,7 +29,6 @@ import javax.swing.event.*;
 import org.mov.chart.*;
 import org.mov.main.*;
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.portfolio.*;
 import org.mov.prefs.*;
 import org.mov.quote.*;
@@ -273,7 +272,7 @@ public class MainMenu
 		    // Perhaps user selected a module from the window menu?
 		    Component c = (Component)menuItemToModuleHash.get(menu);
 		    
-		    // File Menu ********************************************************************************
+		    // File Menu
 		    if(menu == fileImportQuotesMenuItem) {
 			CommandManager.getInstance().importQuotes();
 		    }
@@ -298,7 +297,7 @@ public class MainMenu
 			    .newFrame(new PreferencesModule(desktop), true, true);
 		    }
 		    
-		    // Quote Menu *******************************************************************************
+		    // Quote Menu
 		    else if(menu == quoteCommoditiesListAllMenuItem)
 			CommandManager.getInstance().quoteListCommoditiesAll();
 		    else if (menu == quoteCommoditiesListRuleMenuItem)
@@ -312,7 +311,7 @@ public class MainMenu
 		    else if (menu == quoteIndicesListRuleMenuItem)
 			CommandManager.getInstance().quoteListIndicesByRule();
 		    
-		    // Graph Menu *******************************************************************************
+		    // Graph Menu
 		    else if (menu == graphCommodityCodeMenuItem) 
 			CommandManager.getInstance().graphStockBySymbol(null);
 		    else if (menu == graphCommodityNameMenuItem)
@@ -331,12 +330,12 @@ public class MainMenu
 			CommandManager.getInstance().graphPortfolio(portfolio);
 		    }
 
-		    // Analysis Menu ******************************************************************************
+		    // Analysis Menu
 
 		    else if (menu == analysisPaperTradeMenuItem)
 			CommandManager.getInstance().paperTrade();
 
-		    // Window Menu ******************************************************************************
+		    // Window Menu
 		    else if (menu == windowTileHorizontalMenuItem)
 			CommandManager.getInstance().tileFramesHorizontal();
 		    else if (menu == windowTileVerticalMenuItem)
@@ -346,22 +345,38 @@ public class MainMenu
 		    else if (menu == windowGridMenuItem)
 			CommandManager.getInstance().tileFramesArrange();
 
-		    // Maybe its a window ??
+                    // If the user selected a window from the Window menu, then
+                    // bring that window to the front
 		    else if(c != null) {
-			JInternalFrame f = null;
-			if (menu.getText().substring(0,1).equals("(")) {
-			    JInternalFrame.JDesktopIcon icon = (JInternalFrame.JDesktopIcon)c;
-			    f = icon.getInternalFrame();
-			} else {
-			    f = (JInternalFrame) c;
-			}
+
+                        Module module;
+
+                        // Get module
+                        try {
+                            module = (Module)c;
+                        } 
+                        catch(ClassCastException e) {
+                            assert false;
+                            return;
+                        }
+                            
+                        // Get frame from module
+                        Component component =  module.getComponent();
+                        while(!(component instanceof JInternalFrame)) {
+                            component = component.getParent();
+                        }
 			
+                        JInternalFrame frame = (JInternalFrame)component;
+
 			try {
-			    f.setIcon(false);
-			    desktop.setSelectedFrame(f);
-			    f.setSelected(true);
-			    f.toFront();
-			} catch (PropertyVetoException exception) {}			
+			    frame.setIcon(false);
+			    desktop.setSelectedFrame(frame);
+			    frame.setSelected(true);
+			    frame.toFront();
+			} 
+                        catch (PropertyVetoException exception) {
+                            assert false;
+                        }			
 		    }
 		    else 
 			assert false;

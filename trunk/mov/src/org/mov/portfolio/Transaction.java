@@ -278,8 +278,10 @@ public class Transaction implements Cloneable, Comparable {
 	if(type < typeNames.length) {
 	    return typeNames[type];
 	}
-	else
+	else {
+	    assert false;
 	    return "Withdrawal";
+	}
     }
 
     /**
@@ -303,10 +305,12 @@ public class Transaction implements Cloneable, Comparable {
 	    return Transaction.WITHDRAWAL;
 	else if(type.equals("Dividend")) 
 	    return Transaction.DIVIDEND;
-	else if(type.equals("Dividend (DRP)"))
+	else if(type.equals("Dividend DRP"))
 	    return Transaction.DIVIDEND_DRP;
-	else
+	else {
+	    assert type.equals("Transfer");
 	    return Transaction.TRANSFER;
+	}
     }
 
     /**
@@ -480,6 +484,16 @@ public class Transaction implements Cloneable, Comparable {
      */
     public void setCashAccount(CashAccount cashAccount) {
 	this.cashAccount = cashAccount;
+    }
+
+    /**
+     * Set the secondary associated cash account. 
+     *
+     * @param	new cash account
+     * @see	CashAccount
+     */
+    public void setCashAccount2(CashAccount cashAccount2) {
+	this.cashAccount2 = cashAccount2;
     }
 
     /**

@@ -50,14 +50,14 @@ public class PaperTrade {
     }
 
 
-    private static boolean sell(QuoteCache cache,
+    private static boolean sell(ScriptQuoteBundle quoteBundle,
 				Portfolio portfolio,
 				CashAccount cashAccount,
 				ShareAccount shareAccount,
 				String symbol,
 				float tradeCost,
 				int day) 
-	throws EvaluationException {
+	throws MissingQuoteException {
 
 	// Make sure we have enough money for the trade
 	if(cashAccount.getValue() >= tradeCost) {
@@ -72,10 +72,10 @@ public class PaperTrade {
 	    if(shares > 0) {
 
 		// How much are they worth? We sell at the day open price
-		float amount = shares * cache.getQuote(symbol, Quote.DAY_OPEN,
-						       day);
+		float amount = shares * quoteBundle.getQuote(symbol, Quote.DAY_OPEN,
+							     day);
 		
-		TradingDate date = cache.offsetToDate(day);
+		TradingDate date = quoteBundle.offsetToDate(day);
 		Transaction sell = Transaction.newReduce(date, amount,
 							 symbol, shares,
 							 tradeCost,
@@ -90,7 +90,7 @@ public class PaperTrade {
 	return false;
     }
 
-    private static boolean buy(QuoteCache cache,
+    private static boolean buy(ScriptQuoteBundle quoteBundle,
 			       Portfolio portfolio,
 			       CashAccount cashAccount,
 			       ShareAccount shareAccount,
@@ -98,12 +98,12 @@ public class PaperTrade {
 			       float amount,				 
 			       float tradeCost,
 			       int day) 
-	throws EvaluationException {
+	throws MissingQuoteException {
 
 
 	// Calculate maximum number of shares we can buy with
 	// the given amount
-	float sharePrice = cache.getQuote(symbol, Quote.DAY_OPEN, day);
+	float sharePrice = quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day);
 	int shares = 
 	    (new Double(Math.floor(amount / sharePrice))).intValue();
 	
@@ -112,7 +112,8 @@ public class PaperTrade {
 	
 	// Make sure we have enough money for the trade
 	if(cashAccount.getValue() >= (tradeCost + amount)) {
-	    TradingDate date = cache.offsetToDate(day);	    
+
+	    TradingDate date = quoteBundle.offsetToDate(day);
 	    Transaction buy = Transaction.newAccumulate(date, amount,
 							symbol, shares,
 							tradeCost,
@@ -128,7 +129,7 @@ public class PaperTrade {
     }
 
     public static Portfolio paperTrade(String portfolioName, 
-				       QuoteCache cache, String symbol,
+				       ScriptQuoteBundle quoteBundle, String symbol,
 				       TradingDate startDate, 
 				       TradingDate endDate,
 				       Expression buy,
@@ -147,50 +148,64 @@ public class PaperTrade {
 	    (CashAccount)
 	    portfolio.findAccountByName(CASH_ACCOUNT_NAME);
 
-	int day = cache.dateToOffset(startDate);
-	int endDay = cache.dateToOffset(endDate);
+	int dateOffset; 
+	int endDateOffset; 
+
+	try {
+	    dateOffset = quoteBundle.dateToOffset(startDate);
+	    endDateOffset = quoteBundle.dateToOffset(endDate);
+	}
+	catch(WeekendDateException e) {
+	    assert(false);
+
+	    dateOffset = endDateOffset = 0;
+	}
 
 	// This is set when we own the stock
 	boolean ownStock = false;
 
-	// Now iterate through each trading day and decide whether
-	// to buy/sell. The last day is used for placing the previous
-	// day's buy/sell orders.
-	while(day < endDay) {
+	// Now iterate through each trading date and decide whether
+	// to buy/sell. The last date is used for placing the previous
+	// date's buy/sell orders.
+	while(dateOffset < endDateOffset) {
 
 	    try {		
 
 		// If we own the stock should we sell?
 		if(ownStock) {
-		    if(sell.evaluate(cache, symbol, day) >= Expression.TRUE) {
-			if(sell(cache, portfolio, cashAccount,
+		    if(sell.evaluate(quoteBundle, symbol, dateOffset) >= Expression.TRUE) {
+			if(sell(quoteBundle, portfolio, cashAccount,
 				shareAccount, symbol, 
-				tradeCost, day + 1))
+				tradeCost, dateOffset + 1))
 			    ownStock = false;
 		    }
 		}
 		
 		// If we don't own the stock should we buy?
 		else {
-		    if(buy.evaluate(cache, symbol, day) >= Expression.TRUE) {
+		    if(buy.evaluate(quoteBundle, symbol, dateOffset) >= Expression.TRUE) {
 			// Spend all our money except for enough to do
 			// a buy and a later sell trade
 			float amount = cashAccount.getValue() - 2 * tradeCost;
 
-			if(buy(cache, portfolio, cashAccount, 
+			if(buy(quoteBundle, portfolio, cashAccount, 
 			       shareAccount, symbol, amount, 
-			       tradeCost, day + 1))
+			       tradeCost, dateOffset + 1))
 			    ownStock = true;
 
 		    }
 		}
 	    }
-	    catch(EvaluationException e) {
-		// we couldnt get a quote for this day - ignore
+	    catch(MissingQuoteException e) {
+		// quote was missing
 	    }
 
-	    // Go to the next trading day
-	    day++;
+	    catch(EvaluationException e) {
+		// Expression didn't evaluate 
+	    }
+
+	    // Go to the next trading date
+	    dateOffset++;
 	}
 
 	return portfolio;

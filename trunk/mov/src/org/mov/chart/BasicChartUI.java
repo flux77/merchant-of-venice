@@ -500,7 +500,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		title = title.concat(", ");
 
 	    companyName = 
-		QuoteSourceManager.getSource().getCompanyName(symbol);
+		QuoteSourceManager.getSource().getSymbolName(symbol);
 
 	    if(companyName != null)
 		title = 

@@ -44,13 +44,13 @@ public class MinExpression extends QuoteExpression {
      * @param	days	the number of days to search
      * @param	lag	the offset from the current day
      */
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	int days = (int)getArg(1).evaluate(cache, symbol, day);
-	int lastDay = day + (int)getArg(2).evaluate(cache, symbol, day);
+	int days = (int)getArg(1).evaluate(quoteBundle, symbol, day);
+	int lastDay = day + (int)getArg(2).evaluate(quoteBundle, symbol, day);
 
-	return min(cache, symbol, getQuoteKind(), days, lastDay);
+	return min(quoteBundle, symbol, getQuoteKind(), days, lastDay);
     }
 
     public String toString() {
@@ -78,13 +78,13 @@ public class MinExpression extends QuoteExpression {
     /** 
      * Finds the minimum stock quote for a given symbol in a given range. 
      *
-     * @param	cache	the quote cache to read the quotes from.
+     * @param	quoteBundle	the quote cache to read the quotes from.
      * @param	symbol	the symbol to use.
      * @param	quote	the quote type we are interested in, e.g. DAY_OPEN.
-     * @param	lastDay	fast access date offset in cache.
+     * @param	lastDay	fast access date offset in quoteBundle.
      * @return	the minimum stock quote.
      */
-    static public float min(QuoteCache cache, String symbol, 
+    static public float min(QuoteBundle quoteBundle, String symbol, 
 			    int quote, int days, int lastDay) 
 	throws EvaluationException {
 
@@ -92,10 +92,16 @@ public class MinExpression extends QuoteExpression {
 	float value;
 
 	for(int i = lastDay - days + 1; i <= lastDay; i++) {
-	    value = cache.getQuote(symbol, quote, i);
 
-	    if(value < min)
-		min = value;
+	    try {
+		value = quoteBundle.getQuote(symbol, quote, i);
+		
+		if(value < min)
+		    min = value;
+	    }
+	    catch(MissingQuoteException e) {
+		// ignore
+	    }
 	}
 
 	return min;

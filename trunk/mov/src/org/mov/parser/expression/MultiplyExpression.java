@@ -31,11 +31,11 @@ public class MultiplyExpression extends ArithmeticExpression {
 	super(left, right);
     }
 
-    public float evaluate(QuoteCache cache, String symbol, int day) 
+    public float evaluate(QuoteBundle quoteBundle, String symbol, int day) 
 	throws EvaluationException {
 
-	return getLeft().evaluate(cache, symbol, day) *
-	    getRight().evaluate(cache, symbol, day);
+	return getLeft().evaluate(quoteBundle, symbol, day) *
+	    getRight().evaluate(quoteBundle, symbol, day);
     }
 
     public String toString() {

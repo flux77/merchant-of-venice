@@ -28,7 +28,6 @@ import javax.swing.table.*;
 
 import org.mov.main.*;
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
 import org.mov.table.*;
@@ -70,7 +69,7 @@ public class PaperTradeResultModule extends AbstractTable
 
     class PaperTradeResult {
 	public Portfolio portfolio;
-	public QuoteCache cache;
+	public QuoteBundle quoteBundle;
 	public float initialCapital;
 	public float tradeCost;
 	public String buyRule;
@@ -78,13 +77,13 @@ public class PaperTradeResultModule extends AbstractTable
 	public TradingDate startDate;	
 	public TradingDate endDate;
 
-	public PaperTradeResult(Portfolio portfolio, QuoteCache cache,
+	public PaperTradeResult(Portfolio portfolio, QuoteBundle quoteBundle,
 				float initialCapital, float tradeCost,
 				String buyRule, String sellRule,
 				TradingDate startDate,
 				TradingDate endDate) {
 	    this.portfolio = portfolio;
-	    this.cache = cache;
+	    this.quoteBundle = quoteBundle;
 	    this.initialCapital = initialCapital;
 	    this.tradeCost = tradeCost;
 	    this.buyRule = buyRule;
@@ -115,12 +114,12 @@ public class PaperTradeResultModule extends AbstractTable
 	    return (PaperTradeResult)results.elementAt(row);
 	}
 
-	public void addResult(Portfolio portfolio, QuoteCache cache,
+	public void addResult(Portfolio portfolio, QuoteBundle quoteBundle,
 			      float initialCapital, float tradeCost,
 			      String buyRule, String sellRule,
 			      TradingDate startDate,
 			      TradingDate endDate) {
-	    results.add((Object)new PaperTradeResult(portfolio, cache,
+	    results.add((Object)new PaperTradeResult(portfolio, quoteBundle,
 						     initialCapital, tradeCost,
 						     buyRule, sellRule,
 						     startDate, endDate));
@@ -148,7 +147,7 @@ public class PaperTradeResultModule extends AbstractTable
 
 	// Calculate the final value of the portfolio 
 	private float finalPortfolioValue(Portfolio portfolio, 
-					  QuoteCache cache,
+					  QuoteBundle quoteBundle,
 					  TradingDate startDate,
 					  TradingDate endDate) {
 	    boolean calculatedEndValue = false;
@@ -160,11 +159,11 @@ public class PaperTradeResultModule extends AbstractTable
 	    while(!calculatedEndValue && endDate.after(startDate)) {
 		try {
 		    endValue = 
-			portfolio.getValue(cache, 
+			portfolio.getValue(quoteBundle, 
 					   endDate);
 		    calculatedEndValue = true;
 		}
-		catch(EvaluationException e) {
+		catch(MissingQuoteException e) {
 		    endDate = endDate.previous(1);
 		}
 	    }
@@ -229,7 +228,7 @@ public class PaperTradeResultModule extends AbstractTable
 
 	    else if(column == FINAL_CAPITAL_COLUMN) {
 		return new Float(finalPortfolioValue(result.portfolio,
-						     result.cache,
+						     result.quoteBundle,
 						     result.startDate,
 						     result.endDate));
 	    }
@@ -241,7 +240,7 @@ public class PaperTradeResultModule extends AbstractTable
 	    else if(column == PERCENT_RETURN_COLUMN) {
 		float startValue = result.initialCapital;
 		float endValue = finalPortfolioValue(result.portfolio,
-						     result.cache,
+						     result.quoteBundle,
 						     result.startDate,
 						     result.endDate);
 
@@ -284,7 +283,7 @@ public class PaperTradeResultModule extends AbstractTable
 			    model.getPaperTradeResult(row);
 			    
 			CommandManager.getInstance().graphPortfolio(result.portfolio,
-								    result.cache,
+								    result.quoteBundle,
 								    result.startDate,
 								    result.endDate);
 		    }
@@ -354,11 +353,11 @@ public class PaperTradeResultModule extends AbstractTable
 					     "Close");
     }
 
-    public void addResult(Portfolio portfolio, QuoteCache cache,
+    public void addResult(Portfolio portfolio, QuoteBundle quoteBundle,
 			  float initialCapital, float tradeCost, 
 			  String buyRule, String sellRule,
 			  TradingDate startDate, TradingDate endDate) {
-	model.addResult(portfolio, cache, initialCapital, tradeCost, 
+	model.addResult(portfolio, quoteBundle, initialCapital, tradeCost, 
 			buyRule, sellRule, startDate, endDate);
 
 	validate();

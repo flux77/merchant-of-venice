@@ -99,7 +99,7 @@ public class CommandManager {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
                 p.setTitle("Displaying list of all companies");
                 p.show();
-                displayStockList(QuoteSource.COMPANIES_AND_FUNDS, null);
+                displayStockList(QuoteRange.ALL_ORDINARIES, null);
 
 		ProgressDialogManager.closeProgressDialog();
             }
@@ -120,8 +120,7 @@ public class CommandManager {
 		    p.setTitle("Displaying quotes of companies by rule \""+expr+"\"");
 		    p.show();
 
-		    displayStockList(QuoteSource.COMPANIES_AND_FUNDS,
-				     expr);
+		    displayStockList(QuoteRange.ALL_ORDINARIES, expr);
                 
 		    ProgressDialogManager.closeProgressDialog();
 		}
@@ -138,7 +137,7 @@ public class CommandManager {
                 p.setTitle("Displaying quotes of all commodities");
                 p.show();
 
-                displayStockList(QuoteSource.ALL_COMMODITIES, null);
+                displayStockList(QuoteRange.ALL_SYMBOLS, null);
 
 		ProgressDialogManager.closeProgressDialog();
             }
@@ -158,7 +157,7 @@ public class CommandManager {
                 p.setTitle("Displaying quotes of commodities by rule \""+expr+"\"");
                 p.show();
 
-                displayStockList(QuoteSource.ALL_COMMODITIES,expr);
+                displayStockList(QuoteRange.ALL_SYMBOLS,expr);
                 ProgressDialogManager.closeProgressDialog();
             }
         });
@@ -173,7 +172,7 @@ public class CommandManager {
                 p.setTitle("Displaying quotes of all indices");
                 p.show();
 
-                displayStockList(QuoteSource.INDICES, null);
+                displayStockList(QuoteRange.MARKET_INDICES, null);
                 ProgressDialogManager.closeProgressDialog();
             }
         });
@@ -191,7 +190,7 @@ public class CommandManager {
                 ProgressDialog p = ProgressDialogManager.getProgressDialog();
                 p.setTitle("Displaying quotes of companies by rule \""+expr+"\"");
                 p.show();
-                displayStockList(QuoteSource.INDICES, expr);
+                displayStockList(QuoteRange.MARKET_INDICES, expr);
             }
         });
         t.start();
@@ -212,18 +211,22 @@ public class CommandManager {
             ProgressDialogManager.getProgressDialog().addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {thread.interrupt();}
 		});
-            QuoteCache cache = null;
+
+            ScriptQuoteBundle quoteBundle = null;
             QuoteModule table = null;
 
-            if (!thread.isInterrupted())
-                cache = new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
-				       searchRestriction);
+            if (!thread.isInterrupted()) {
+		QuoteRange quoteRange = 
+		    new QuoteRange(searchRestriction, 
+				   QuoteSourceManager.getSource().getLastDate());
+		quoteBundle = new ScriptQuoteBundle(quoteRange);
+	    }
 
-            if (!thread.isInterrupted())
-                table = new QuoteModule(cache, expression);
+            if (!thread.isInterrupted()) {
+                table = new QuoteModule(quoteBundle, expression);
+                ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(table);
+	    }
 
-            if (!thread.isInterrupted())
-                ((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(table);//, false);
         } catch (Exception e) {
             ProgressDialogManager.closeProgressDialog();
         }
@@ -244,25 +247,27 @@ public class CommandManager {
 	    });
 
 	try {
-	    QuoteCache cache = null;
+	    QuoteBundle quoteBundle = null;
 	    Portfolio portfolio = 
 		PreferencesManager.loadPortfolio(portfolioName);
 
 	    progress.setTitle("Loading quotes for portfolio");
 	    progress.show();
 
-            if (!thread.isInterrupted()) 
-		cache = 
-		    new QuoteCache(QuoteSourceManager.getSource().getLatestQuoteDate(),
-				   QuoteSource.ALL_COMMODITIES);
-
-	    if (!thread.isInterrupted()) 
-		((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, cache));
-
-	    if (!Thread.currentThread().interrupted())
+            if (!thread.isInterrupted()) { 
+		QuoteRange quoteRange =
+		    new QuoteRange(portfolio.getSymbolsTraded(),
+				   QuoteSourceManager.getSource().getLastDate());
+		quoteBundle = new QuoteBundle(quoteRange);
+	    }
+	    if (!thread.isInterrupted()) {
+		((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(new PortfolioModule(desktop_instance, portfolio, quoteBundle));
 		ProgressDialogManager.closeProgressDialog();
+	    }
 	    	
 	} catch (Exception e) {
+            System.out.println(e);
+
 	    e.printStackTrace();
             ProgressDialogManager.closeProgressDialog();
         }
@@ -330,12 +335,12 @@ public class CommandManager {
      * Graph the given portfolio inbetween the given dates.
      *
      * @param	portfolio	the portfolio to graph
-     * @param	cache		quote cache
+     * @param	quoteBundle		quote bundle
      * @param	startDate	date to graph from
      * @param	endDate		date to graph to
      */
     public void graphPortfolio(Portfolio portfolio, 
-			       QuoteCache cache,
+			       QuoteBundle quoteBundle,
 			       TradingDate startDate,
 			       TradingDate endDate) {
 
@@ -362,19 +367,19 @@ public class CommandManager {
 		    startDate = portfolio.getStartDate();
 
 		if(endDate == null)
-		    endDate = QuoteSourceManager.getSource().getLatestQuoteDate();		
+		    endDate = QuoteSourceManager.getSource().getLastDate();		
 		Vector symbols = portfolio.getSymbolsTraded();
 
-		// Only need to load from cache if there are any stocks
+		// Only need to load from quote bundle if there are any stocks
 		// in the portfolio
-		if(cache == null && symbols.size() > 0) {
-		    cache = new QuoteCache(symbols, startDate, endDate);
+		if(quoteBundle == null && symbols.size() > 0) {
+		    quoteBundle = new QuoteBundle(new QuoteRange(symbols, startDate, endDate));
 		}
 	    }
 
             if (!thread.isInterrupted()) {
 		portfolioGraphSource =
-		    new PortfolioGraphSource(portfolio, cache, 
+		    new PortfolioGraphSource(portfolio, quoteBundle, 
 					     PortfolioGraphSource.MARKET_VALUE);
 	    }
 
@@ -383,7 +388,7 @@ public class CommandManager {
 	    }
 
             if (!thread.isInterrupted()) {	       
-		chart.add(graph, portfolio, cache, 0);
+		chart.add(graph, portfolio, quoteBundle, 0);
 
 		chart.redraw();
 		((DesktopManager)(desktop_instance.getDesktopManager())).newFrame(chart);
@@ -517,7 +522,7 @@ public class CommandManager {
             if(companySet != null) {
                 Iterator iterator = companySet.iterator();
                 String symbol = null;
-                QuoteCache cache = null;
+                QuoteBundle quoteBundle = null;
                 GraphSource dayClose = null;
                 Graph graph = null;
 
@@ -527,17 +532,17 @@ public class CommandManager {
 
                     progress.show();
                     if (!thread.isInterrupted())
-                        cache = new QuoteCache(symbol);
+                        quoteBundle = new QuoteBundle(new QuoteRange(symbol));
 
                     if (!thread.isInterrupted())
                         dayClose = 
-                            new OHLCVQuoteGraphSource(cache, Quote.DAY_CLOSE);
+                            new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
 
                     if (!thread.isInterrupted())
                         graph = new LineGraph(dayClose);
 
                     if (!thread.isInterrupted())
-                        chart.add(graph, cache, 0);
+                        chart.add(graph, quoteBundle, 0);
 
                     chart.redraw();
                 }

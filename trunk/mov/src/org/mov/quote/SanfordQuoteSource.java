@@ -116,7 +116,7 @@ public class SanfordQuoteSource implements QuoteSource {
      * @param	symbol	the stock symbol.
      * @return	the company name.
      */
-    public String getCompanyName(String symbol) {
+    public String getSymbolName(String symbol) {
 
 	if(!connected) 
 	    return null;
@@ -196,7 +196,7 @@ public class SanfordQuoteSource implements QuoteSource {
      * @param	symbol	a partial company name.
      * @return	the company symbol.
      */
-    public String getCompanySymbol(String partialCompanyName) {
+    public String getSymbol(String partialCompanyName) {
 	// Not supported
 	return null;
     }
@@ -209,7 +209,7 @@ public class SanfordQuoteSource implements QuoteSource {
      */
     public boolean symbolExists(String symbol) {
 	// Try to get name of company - if we cant then we dont have it!
-	return (getCompanyName(symbol) == null)? false : true;
+	return (getSymbolName(symbol) == null)? false : true;
     }
 
     /**
@@ -217,13 +217,46 @@ public class SanfordQuoteSource implements QuoteSource {
      *
      * @return	the most recent quote date.
      */
-    public TradingDate getLatestQuoteDate() {
+    public TradingDate getLastDate() {
 
 	// Get and return last trading day
 	TradingDate date = new TradingDate();
 	date = date.previous(1);
 
 	return date;
+    }
+
+    /**
+     * Return the earliest date we have any stock quotes for.
+     *
+     * @return	the oldest quote date
+     */
+    public TradingDate getFirstDate() {
+        assert false;
+	return null;
+    }
+
+    /**
+     * Is the given symbol a market index? 
+     *
+     * @param	symbol to test
+     * @return	yes or no
+     */
+    public boolean isMarketIndex(String symbol) {
+        assert false;
+        return false;
+    }
+
+    /**
+     * Return a vector of quotes for all quotes in the given quote range.
+     *
+     * @param	quoteRange	the range of quotes to load
+     * @return	a vector of stock quotes
+     * @see Quote, QuoteRange
+     */
+    public Vector loadQuoteRange(QuoteRange quoteRange) {
+        assert false;
+        return null;
     }
 
     /**
@@ -418,25 +451,8 @@ public class SanfordQuoteSource implements QuoteSource {
 
     // Is the given stock the same as the type given?
     private boolean isType(Quote quote, int type) {
-	boolean match = false;
-
-	if(type == INDICES) {
-	    if(quote.getSymbol().startsWith("x"))
-		match = true;
-	}
-	else if(type == COMPANIES_AND_FUNDS) {
-	    if(quote.getSymbol().length() == 3 &&
-	       !quote.getSymbol().startsWith("x"))
-		match = true;
-	}
-	else if(type == ALL_COMMODITIES) {
-	    if(!quote.getSymbol().startsWith("x"))
-		match = true;
-	}
-	else // ALL_SYMBOLS
-	    match = true;
-
-	return match;
+        assert false;
+        return true;
     }
 
     /** 

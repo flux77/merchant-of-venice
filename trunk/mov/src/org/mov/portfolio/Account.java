@@ -21,7 +21,6 @@ package org.mov.portfolio;
 import java.util.*;
 
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.quote.*;
 
 /**
@@ -55,12 +54,11 @@ public interface Account {
     /**
      * Return the value of this account on the given day.
      *
-     * @param	cache	the quote cache
+     * @param	quoteBundle	the quote bundle
      * @param	date	the date to calculate
      */
-    public float getValue(QuoteCache cache, TradingDate date)
-	throws EvaluationException;
-
+    public float getValue(QuoteBundle quoteBundle, TradingDate date)
+	throws MissingQuoteException;
 
     /**
      * Perform a transaction on this account.

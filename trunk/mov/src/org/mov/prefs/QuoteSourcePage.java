@@ -226,8 +226,10 @@ public class QuoteSourcePage extends JPanel
 	    pane.addTab("Files", files);
 	}
 
-	// Internet Pane
-	{
+	// Internet Pane - temporary disabled. I can no longer connect to Sanford
+        // using this code. I'll need to find a public site on the web where I can
+        // download quotes from.
+	if(false) {
 	    p = PreferencesManager.getUserNode("/quote_source/internet");
 
 	    useInternet = new JRadioButton("Use Internet", true);

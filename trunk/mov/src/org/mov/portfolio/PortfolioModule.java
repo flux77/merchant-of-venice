@@ -47,7 +47,7 @@ public class PortfolioModule extends JPanel implements Module,
 
     private JDesktopPane desktop;
     private Portfolio portfolio;
-    private QuoteCache cache;
+    private QuoteBundle quoteBundle;
 
     private JMenuBar menuBar;
     private JMenuItem accountNewCashAccount;
@@ -74,14 +74,14 @@ public class PortfolioModule extends JPanel implements Module,
      *
      * @param	desktop	the current desktop
      * @param	portfolio	the portfolio to display
-     * @param	cache	quote cache
+     * @param	quoteBundle	quote bundle
      */
     public PortfolioModule(JDesktopPane desktop, Portfolio portfolio, 
-			   QuoteCache cache) {
+			   QuoteBundle quoteBundle) {
 
 	this.desktop = desktop;
 	this.portfolio = portfolio;
-	this.cache = cache;
+	this.quoteBundle = quoteBundle;
 
 	propertySupport = new PropertyChangeSupport(this);
 
@@ -189,7 +189,7 @@ public class PortfolioModule extends JPanel implements Module,
 		    ShareAccount shareAccount = (ShareAccount)account;
 		    table =
 			new StockHoldingTable(shareAccount.getStockHoldings(),
-					      cache);
+					      quoteBundle);
 		    
 		    scrolledTable = new JScrollPane(table);
 		    add(scrolledTable);
@@ -202,7 +202,7 @@ public class PortfolioModule extends JPanel implements Module,
 	    addLabel("Summary");
 	    
 	    accountTable =
-		new AccountTable(portfolio, cache);
+		new AccountTable(portfolio, quoteBundle);
 
 	    scrolledTable = new JScrollPane(accountTable);
 	    add(scrolledTable);
@@ -404,7 +404,7 @@ public class PortfolioModule extends JPanel implements Module,
 		historyFrame.setSelected(true);
 	    }
 	    catch(PropertyVetoException e) {
-		    assert false;
+		assert false;
 	    }
 	}
 	else {
@@ -610,8 +610,13 @@ public class PortfolioModule extends JPanel implements Module,
 	checkMenuDisabledStatus(); // enable transaction menu
     }
 
-    // Create a new transaction
-    private void newTransaction() {
+    /**
+     * Open a new transaction dialog to allow the user to enter a new
+     * transaction. When the dialog is closed it will call redraw() on
+     * both the portfolio module window and the transaction module window
+     * (if its open) to ensure everything is kept in-sync.
+     */
+    public void newTransaction() {
 	JDesktopPane desktop = 
 	    org.mov.ui.DesktopManager.getDesktop();
 	TransactionDialog dialog = new TransactionDialog(desktop, portfolio);

@@ -65,7 +65,7 @@ public class SymbolListDialog {
 	    // Parse what the user inputed
 	    if(company != null) {
 		String symbol = 
-		    QuoteSourceManager.getSource().getCompanySymbol(company);
+		    QuoteSourceManager.getSource().getSymbol(company);
 		
 		// Not recognised?
 		if(symbol == null) {

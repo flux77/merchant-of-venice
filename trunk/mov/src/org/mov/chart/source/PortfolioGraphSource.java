@@ -20,7 +20,6 @@ package org.mov.chart.source;
 
 import org.mov.chart.*;
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
 import org.mov.ui.ProgressDialog;
@@ -36,7 +35,7 @@ public class PortfolioGraphSource implements GraphSource {
     /** Graph the portfolio showing the profit/loss value */
     public static final int PROFIT_LOSS = 1;
 
-    private QuoteCache cache;
+    private QuoteBundle quoteBundle;
     private int mode;
     private Graphable graphable;
     private Portfolio portfolio;
@@ -46,7 +45,7 @@ public class PortfolioGraphSource implements GraphSource {
      * class allows a portfolio to be graphed in a variety of ways.
      *
      * @param	portfolio	the portfolio to graph
-     * @param	cache		quote cache containing all the necessary
+     * @param	quoteBundle	quote bundle containing all the necessary
      *				quotes to calculate the portfolio value
      *				for every day
      * @param	mode		<code>MARKET_VALUE</code> for the market
@@ -54,10 +53,10 @@ public class PortfolioGraphSource implements GraphSource {
      *				</code> for showing the profit loss
      *				made
      */
-    public PortfolioGraphSource(Portfolio portfolio, QuoteCache cache,
+    public PortfolioGraphSource(Portfolio portfolio, QuoteBundle quoteBundle,
 				int mode) {
 	this.portfolio = portfolio;
-	this.cache = cache;
+	this.quoteBundle = quoteBundle;
 	this.mode = mode;
 
 	// If theres no start date - theres no transactions and therefore
@@ -77,9 +76,9 @@ public class PortfolioGraphSource implements GraphSource {
 	temporaryPortfolio.removeAllTransactions();
 	
 	// Get start date from first transaction, get end date from
-	// latest date in cache
+	// latest date in the bundle
 	TradingDate startDate = transaction.getDate();
-	TradingDate endDate = cache.getEndDate();
+	TradingDate endDate = quoteBundle.getLastDate();
 
 	// Iterate through each day between start and end date, recreating
 	// portfolio value on that day
@@ -121,10 +120,10 @@ public class PortfolioGraphSource implements GraphSource {
 
 	    try {
 		Float value = 
-		    new Float(temporaryPortfolio.getValue(cache, date));
+		    new Float(temporaryPortfolio.getValue(quoteBundle, date));
 		graphable.putY((Comparable)date, value);
 	    }
-	    catch(EvaluationException e) {
+	    catch(MissingQuoteException e) {
 		// This gets thrown if we couldnt calculate a share value
 		// for a given date. This occurs on public holidays etc.
 		// Its OK. Just don't give a quote for that day!
@@ -170,11 +169,11 @@ public class PortfolioGraphSource implements GraphSource {
 
 	    try {
 		Float value = 
-		    new Float(temporaryPortfolio.getValue(cache, date) -
+		    new Float(temporaryPortfolio.getValue(quoteBundle, date) -
 			      depositedCash);
 		graphable.putY((Comparable)date, value);
 	    }
-	    catch(EvaluationException e) {
+	    catch(MissingQuoteException e) {
 		// This gets thrown if we couldnt calculate a share value
 		// for a given date. This occurs on public holidays etc.
 		// Its OK. Just don't give a quote for that day!

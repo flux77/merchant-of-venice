@@ -21,7 +21,6 @@ package org.mov.portfolio;
 import java.util.*;
 
 import org.mov.util.*;
-import org.mov.parser.*;
 import org.mov.quote.*;
 
 /** Representation of a cash account in a portfolio.
@@ -84,7 +83,7 @@ public class CashAccount implements Account, Cloneable {
 	return name;
     }
 
-    public float getValue(QuoteCache cache, TradingDate date) {
+    public float getValue(QuoteBundle quoteBundle, TradingDate date) {
 	return capital;
     }
 

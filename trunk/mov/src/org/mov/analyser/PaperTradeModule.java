@@ -70,7 +70,7 @@ public class PaperTradeModule extends JPanel implements Module,
     private int bRange;
     private int cRange;
 
-    private QuoteCache cache;
+    private ScriptQuoteBundle quoteBundle;
 
     // Single result table for entire application
     private static ModuleFrame resultsFrame = null;
@@ -386,7 +386,7 @@ public class PaperTradeModule extends JPanel implements Module,
 		    public void run() {
 
 			// Read data from GUI and load quote data
-			if(parseInterface() && loadQuoteCache()) {
+			if(parseInterface() && loadQuoteBundle()) {
 			    // If its OK generate and display portfolios
 			    displayPaperTrades(paperTrade());
 			}
@@ -495,6 +495,22 @@ public class PaperTradeModule extends JPanel implements Module,
 	    return false;
 	}
 
+        try {
+            int offset = QuoteCache.getInstance().dateToOffset(fromDate);
+        }
+        catch(WeekendDateException e) {
+            buildPaperTradeError("From date is on a weekend");
+	    return false;
+        }
+
+        try {
+            int offset = QuoteCache.getInstance().dateToOffset(toDate);
+        }
+        catch(WeekendDateException e) {
+            buildPaperTradeError("To date is on a weekend");
+	    return false;
+        }
+
 	if(symbols.size() == 0) {
 	    buildPaperTradeError("Need to specify a commodity to trade");
 	    return false;
@@ -563,7 +579,7 @@ public class PaperTradeModule extends JPanel implements Module,
 		    Portfolio portfolio = 
 			PaperTrade.paperTrade("Paper Trade of " + 
 					      symbol.toUpperCase(),
-					      cache,
+					      quoteBundle,
 					      symbol,
 					      fromDate,
 					      toDate,
@@ -587,7 +603,7 @@ public class PaperTradeModule extends JPanel implements Module,
 	return paperTradeData;
     }
 
-    private boolean loadQuoteCache() {
+    private boolean loadQuoteBundle() {
 	final Thread thread = Thread.currentThread();
 	ProgressDialog progress = 
 	    ProgressDialogManager.getProgressDialog();
@@ -603,27 +619,8 @@ public class PaperTradeModule extends JPanel implements Module,
 	try {
 	    progress.setTitle("Loading quotes for paper trade");
 	    progress.show();
-		
-	    cache = new QuoteCache((String)symbols.first());
 
-	    // Skip non trading days. Non trading days wont be in
-	    // the cache and will have positive offsets.
-	    while(cache.dateToOffset(fromDate) > 0 &&
-		  fromDate.before(toDate))
-		fromDate = fromDate.next(1);
-	    
-	    while(cache.dateToOffset(toDate) > 0 &&
-		  toDate.after(fromDate))
-		toDate = toDate.previous(1);
-	    
-	    // This error will happen if the entire date range does
-	    // not cover a single trading day
-	    if(cache.dateToOffset(fromDate) > 0 ||
-	       cache.dateToOffset(toDate) > 0) {
-		buildPaperTradeError("Invalid date range");
-		return false;
-	}
-
+	    quoteBundle = new ScriptQuoteBundle(new QuoteRange((String)symbols.first()));	   
 	} catch (Exception e) {
 	    // nothing to do
 	}
@@ -664,7 +661,7 @@ public class PaperTradeModule extends JPanel implements Module,
 		    // Add each portfolio separately
 		    for(int i = 0; i < paperTrades.length; i++) {	
 			resultsModule.addResult(paperTrades[i].portfolio,
-						cache,
+						quoteBundle,
 						initialCapital,
 						tradeCost,
 						paperTrades[i].buyRuleString,

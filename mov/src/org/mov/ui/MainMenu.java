@@ -66,6 +66,9 @@ public class MainMenu
     private JMenuItem windowCascadeMenuItem;
     private JMenuItem windowGridMenuItem;
 
+    private JMenuItem helpAboutMenuItem;
+
+    private JMenu helpMenu;
     private JMenu windowMenu;
     private JMenu filePortfolioMenu;
     private JMenu graphPortfolioMenu;
@@ -248,6 +251,12 @@ public class MainMenu
 	    windowGridMenuItem.setEnabled(false);
 	}
 
+        // Help menu
+        {
+            helpMenu = MenuHelper.addMenu(menuBar, "Help", 'H');
+            helpAboutMenuItem = MenuHelper.addMenuItem(this, helpMenu, "About");
+        }
+
 	// Build portfolio menus
 	updatePortfolioMenu();
 
@@ -331,7 +340,6 @@ public class MainMenu
 		    }
 
 		    // Analysis Menu
-
 		    else if (menu == analysisPaperTradeMenuItem)
 			CommandManager.getInstance().paperTrade();
 
@@ -344,6 +352,10 @@ public class MainMenu
 			CommandManager.getInstance().tileFramesCascade();
 		    else if (menu == windowGridMenuItem)
 			CommandManager.getInstance().tileFramesArrange();
+
+                    // Help Menu
+                    else if (menu == helpAboutMenuItem)
+                        CommandManager.getInstance().openAboutDialog();
 
                     // If the user selected a window from the Window menu, then
                     // bring that window to the front

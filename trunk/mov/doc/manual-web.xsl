@@ -58,6 +58,7 @@
 		                <li><a href="features.html">Feature List</a></li>
 		                <li><a href="links.html">Links</a></li>
 		                <li><a href="manual.html">Manual</a></li>
+                                <li><a href="screenshots.html">Screenshots</a></li>
 		              </ul>
 
 		              <h3>

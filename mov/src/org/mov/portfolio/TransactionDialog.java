@@ -153,8 +153,8 @@ public class TransactionDialog extends JInternalFrame
 	TradingDate today = new TradingDate();
 
 	dateTextField = 
-	    addTextRow(mainPanel, "Date", today.toString("dd/mm/yyyy"), 
-		       gridbag, c, 10);
+	    GridBagHelper.addTextRow(mainPanel, "Date", today.toString("dd/mm/yyyy"), 
+                                     gridbag, c, 10);
 
 	JPanel buttonPanel = new JPanel();
 	okButton = new JButton("OK");
@@ -293,7 +293,7 @@ public class TransactionDialog extends JInternalFrame
 
 	// Amount Line
 	amountTextField = 
-	    addTextRow(panel, "Total Dividend Value", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, "Total Dividend Value", "", gridbag, c, 15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -337,7 +337,7 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(symbolComboBox);
 
 	sharesTextField = 
-	    addTextRow(panel, "Shares", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, "Shares", "", gridbag, c, 15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -382,18 +382,18 @@ public class TransactionDialog extends JInternalFrame
 
 	// Symbol Line
 	symbolTextField = 
-	    addTextRow(panel, "Symbol", "", gridbag, c, 5);
+	    GridBagHelper.addTextRow(panel, "Symbol", "", gridbag, c, 5);
 
 	// Number Shares Line
 	sharesTextField = 
-	    addTextRow(panel, "Shares", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, "Shares", "", gridbag, c, 15);
 
 	// Share Value Line
 	amountTextField = 
-	    addTextRow(panel, "Total Share Value", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, "Total Share Value", "", gridbag, c, 15);
 
 	tradeCostTextField = 
-	    addTextRow(panel, "Trade Cost", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, "Trade Cost", "", gridbag, c, 15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -448,14 +448,14 @@ public class TransactionDialog extends JInternalFrame
 
 	// Number Shares Line
 	sharesTextField = 
-	    addTextRow(panel, "Shares", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, "Shares", "", gridbag, c, 15);
 
 	// Share Value Line
 	amountTextField = 
-	    addTextRow(panel, "Total Share Value", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, "Total Share Value", "", gridbag, c, 15);
 
 	tradeCostTextField = 
-	    addTextRow(panel, "Trade Cost", "", gridbag, c, 15);
+	    GridBagHelper.addTextRow(panel, "Trade Cost", "", gridbag, c, 15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -490,8 +490,8 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(cashAccountComboBox);
 	
 	amountTextField =
-	    addTextRow(panel, "Amount", "", gridbag, c,
-		       15);
+	    GridBagHelper.addTextRow(panel, "Amount", "", gridbag, c,
+                                     15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -535,31 +535,12 @@ public class TransactionDialog extends JInternalFrame
 	panel.add(cashAccountComboBox2);
 	
 	amountTextField =
-	    addTextRow(panel, "Amount", "", gridbag, c,
-		       15);
+	    GridBagHelper.addTextRow(panel, "Amount", "", gridbag, c,
+                                     15);
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
 	return borderPanel;
-    }
-
-    // Helper method which adds a new text field in a new row to the given 
-    // grid bag layout.
-    private JTextField addTextRow(JPanel panel, String field, String value,
-				  GridBagLayout gridbag,
-				  GridBagConstraints c,
-				  int length) {
-	JLabel label = new JLabel(field);
-	c.gridwidth = 1;
-	gridbag.setConstraints(label, c);
-	panel.add(label);
-
-	JTextField text = new JTextField(value, length);
-	c.gridwidth = GridBagConstraints.REMAINDER;
-	gridbag.setConstraints(text, c);
-	panel.add(text);
-
-	return text;
     }
 
     private Dimension getPreferredSizeWithPanel(JPanel panel) {

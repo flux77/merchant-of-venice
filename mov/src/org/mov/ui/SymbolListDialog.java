@@ -1,24 +1,24 @@
-package org.mov.util;
+package org.mov.ui;
 
 import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 
 import org.mov.quote.*;
-import org.mov.ui.TextDialog;
+import org.mov.util.*;
 
 /**
  * A set of dialogs used for querying the user for commodities either
  * by name or symbol.
  */
-public class CommodityListQuery {
+public class SymbolListDialog {
 
-    private CommodityListQuery() {
+    private SymbolListDialog() {
 	// Cannot instantiate this class
     }
 
     /**
-     * Open a new <code>CommodityListQuery</code> dialog. Ask the user
+     * Open a new <code>SymbolListDialog</code> dialog. Ask the user
      * to enter a partial name of a company and return the appropriate
      * symbol.
      *
@@ -27,8 +27,8 @@ public class CommodityListQuery {
      * @return	a sorted set containing a single commodity string or
      * <code>null</code> if the user cancelled the dialog
      */
-    public static SortedSet getCommodityByName(JDesktopPane parent, 
-					       String title) {
+    public static SortedSet getSymbolByName(JDesktopPane parent, 
+					    String title) {
 	SortedSet companySet;
 	String company;
 	boolean invalidResponse;
@@ -80,7 +80,7 @@ public class CommodityListQuery {
     }
 
     /**
-     * Open a new <code>CommodityListQuery</code> dialog. Ask the user
+     * Open a new <code>SymbolListDialog</code> dialog. Ask the user
      * to enter a list of company symbols. It will test to make each is
      * a valid symbol.
      *
@@ -89,8 +89,8 @@ public class CommodityListQuery {
      * @return	a sorted set containing at least one company symbol string or
      * <code>null</code> if the user cancelled the dialog
      */
-    public static SortedSet getCommoditiesByCode(JDesktopPane parent, 
-						 String title) {
+    public static SortedSet getSymbols(JDesktopPane parent, 
+				       String title) {
 	SortedSet companySet;
 	String symbol;
 	String companies;

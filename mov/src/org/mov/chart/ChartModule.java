@@ -569,7 +569,7 @@ public class ChartModule extends JPanel implements Module,
 	    Thread menuAction = new Thread() {
 		    public void run() {
 			SortedSet symbols = 
-			    CommodityListQuery.getCommoditiesByCode(desktop, "Add Graph");
+			    SymbolListDialog.getSymbols(desktop, "Add Graph");
 			// Did the user select anything?
 			if(symbols != null) {
 

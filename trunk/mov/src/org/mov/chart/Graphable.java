@@ -208,4 +208,12 @@ public class Graphable {
 	
 	return values;
     }
+
+    public LinkedHashMap getMap() {
+	return map;
+    }
+
+    public LinkedHashMap getCharMap() {
+	return charMap;
+    }
 }

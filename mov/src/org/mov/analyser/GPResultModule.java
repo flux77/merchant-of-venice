@@ -49,7 +49,7 @@ import org.mov.ui.ExpressionEditorDialog;
 import org.mov.ui.MenuHelper;
 import org.mov.ui.PriceFormat;
 
-public class PaperTradeResultModule extends AbstractTable implements Module {
+public class GPResultModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
 
     private static final int START_DATE_COLUMN = 0;
@@ -57,14 +57,12 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     private static final int SYMBOLS_COLUMN = 2;
     private static final int BUY_RULE_COLUMN = 3;
     private static final int SELL_RULE_COLUMN = 4;
-    private static final int A_COLUMN = 5;
-    private static final int B_COLUMN = 6;
-    private static final int C_COLUMN = 7;
-    private static final int TRADE_COST_COLUMN = 8;
-    private static final int NUMBER_OF_TRADES_COLUMN = 9;
-    private static final int INITIAL_CAPITAL_COLUMN = 10;
-    private static final int FINAL_CAPITAL_COLUMN = 11;
-    private static final int PERCENT_RETURN_COLUMN = 12;
+    private static final int TRADE_COST_COLUMN = 5;
+    private static final int NUMBER_OF_TRADES_COLUMN = 6;
+    private static final int GENERATION_COLUMN = 7;
+    private static final int INITIAL_CAPITAL_COLUMN = 8;
+    private static final int FINAL_CAPITAL_COLUMN = 9;
+    private static final int PERCENT_RETURN_COLUMN = 10;
 
     private Model model;
 
@@ -86,8 +84,8 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 	    results = new ArrayList();
 	}
 
-	public PaperTradeResult getResult(int row) {
-	    return (PaperTradeResult)results.get(row);
+	public GPResult getResult(int row) {
+	    return (GPResult)results.get(row);
 	}
 
         public void removeAllResults() {
@@ -137,8 +135,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 	    if(row >= getRowCount()) 
 		return "";
 
-	    PaperTradeResult result = 
-		(PaperTradeResult)results.get(row);
+	    GPResult result = (GPResult)results.get(row);
 
 	    if(column == START_DATE_COLUMN) 
 		return result.getStartDate();
@@ -155,14 +152,8 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 	    else if(column == SELL_RULE_COLUMN) 
 		return result.getSellRule();
 
-	    else if(column == A_COLUMN) 
-		return new Integer(result.getA());
-
-	    else if(column == B_COLUMN) 
-		return new Integer(result.getB());
-
-	    else if(column == C_COLUMN) 
-		return new Integer(result.getC());
+	    else if(column == GENERATION_COLUMN) 
+		return new Integer(result.getGeneration());
 
 	    else if(column == TRADE_COST_COLUMN)
 		return new PriceFormat(result.getTradeCost());
@@ -186,23 +177,22 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 	}
     }
 
-    public PaperTradeResultModule() {
+    public GPResultModule() {
         List columns = new ArrayList();
         columns.add(new Column(START_DATE_COLUMN, "Start Date", "Start Date", 
-                               TradingDate.class, true));
-        columns.add(new Column(END_DATE_COLUMN, "End Date", "End Date", TradingDate.class, true));
+                               TradingDate.class, false));
+        columns.add(new Column(END_DATE_COLUMN, "End Date", "End Date", TradingDate.class, false));
         columns.add(new Column(SYMBOLS_COLUMN, "Symbols", "Symbols", String.class, true));
         columns.add(new Column(BUY_RULE_COLUMN, "Buy Rule", "Buy Rule", String.class, true));
         columns.add(new Column(SELL_RULE_COLUMN, "Sell Rule", "Sell Rule", String.class, true));
-        columns.add(new Column(A_COLUMN, "A", "A", Integer.class, false));
-        columns.add(new Column(B_COLUMN, "B", "B", Integer.class, false));
-        columns.add(new Column(C_COLUMN, "C", "C", Integer.class, false));
         columns.add(new Column(TRADE_COST_COLUMN, "Trade Cost", "Trade Cost", 
                                PriceFormat.class, false));
         columns.add(new Column(NUMBER_OF_TRADES_COLUMN, "Number of Trades", "No. Trades", 
                                Integer.class, false));
+        columns.add(new Column(GENERATION_COLUMN, "Generation Number", "Generation", 
+                               Integer.class, true));
         columns.add(new Column(INITIAL_CAPITAL_COLUMN, "Initial Capital", "Initial Capital", 
-                               PriceFormat.class, true));
+                               PriceFormat.class, false));
         columns.add(new Column(FINAL_CAPITAL_COLUMN, "Final Capital", "Final Capital", 
                                PriceFormat.class, false));
         columns.add(new Column(PERCENT_RETURN_COLUMN, "Return", "Return", 
@@ -230,6 +220,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     // If the user double clicks on a result with the LMB, graph the portfolio.
     // If the user right clicks over the table, open up a popup menu.
     private void handleMouseClicked(MouseEvent event) {
+
         Point point = event.getPoint();
 
         // Right click on the table - raise menu
@@ -281,6 +272,15 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     }});
             menu.add(popupRemoveMenuItem);
 
+            JMenuItem popupRemoveAllMenuItem = new JMenuItem("Remove All");
+            popupRemoveAllMenuItem.setEnabled(model.getRowCount() > 0);
+            popupRemoveAllMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        model.removeAllResults();
+                        checkMenuDisabledStatus();
+                    }});
+            menu.add(popupRemoveAllMenuItem);
+
             menu.show(this, point.x, point.y);
         }
 
@@ -294,15 +294,29 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     private void graphSelectedResult() {
         // Get result at row
         int row = getSelectedRow();
-
+        
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            PaperTradeResult result = model.getResult(row);
-        
+            GPResult result = model.getResult(row);
+            
             CommandManager.getInstance().graphPortfolio(result.getPortfolio(),
                                                         result.getQuoteBundle(),
                                                         result.getStartDate(),
                                                         result.getEndDate());
+        }
+    }
+
+    // Opens first selected result
+    private void openSelectedResult() {
+        // Get result at row
+        int row = getSelectedRow();
+        
+        // Don't do anything if we couldn't retrieve the selected row
+        if(row != -1) {
+            GPResult result = model.getResult(row);
+            
+            CommandManager.getInstance().openPortfolio(result.getPortfolio(),
+                                                       result.getQuoteBundle());
         }
     }
 
@@ -313,7 +327,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            final PaperTradeResult result = model.getResult(row);
+            final GPResult result = model.getResult(row);
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {
@@ -332,7 +346,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 
         // Don't do anything if we couldn't retrieve the selected row
         if(row != -1) {
-            final PaperTradeResult result = model.getResult(row);
+            final GPResult result = model.getResult(row);
 
             Thread thread = new Thread(new Runnable() {
                     public void run() {
@@ -341,20 +355,6 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     }});
             
             thread.start();
-        }
-    }
-
-    // Opens first selected result
-    private void openSelectedResult() {
-        // Get result at row
-        int row = getSelectedRow();
-
-        // Don't do anything if we couldn't retrieve the selected row
-        if(row != -1) {
-            PaperTradeResult result = model.getResult(row);
-            
-            CommandManager.getInstance().openPortfolio(result.getPortfolio(),
-                                                       result.getQuoteBundle());
         }
     }
 
@@ -417,7 +417,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     graphSelectedResult();
                 }});
         resultMenu.add(graphMenuItem);
-       
+
 	resultMenu.addSeparator();
 
         viewBuyRuleMenuItem = new JMenuItem("View Buy Rule");        
@@ -433,7 +433,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                     viewSellRule();
                 }});
         resultMenu.add(viewSellRuleMenuItem);
-
+        
 	resultMenu.addSeparator();
 
         removeMenuItem = new JMenuItem("Remove");        
@@ -494,7 +494,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     }
 
     public String getTitle() {
-	return "Paper Trade Results";
+	return "Genetic Programme Results";
     }
 
     public void addModuleChangeListener(PropertyChangeListener listener) {

@@ -206,15 +206,19 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
     }
 
     public float getStockValue() {
-        assert mode == STOCK_VALUE_MODE;
-
-        return stockValue;
+        if (mode == STOCK_VALUE_MODE)
+            return stockValue;
+        else {
+            return 0.0F;
+        }
     }
 
     public int getNumberStocks() {
-        assert mode == NUMBER_STOCKS_MODE;
-
-        return numberStocks;
+        if(mode == NUMBER_STOCKS_MODE)
+            return numberStocks;
+        else {
+            return 0;
+        }
     }
 
     private void layoutPage() {
@@ -263,7 +267,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             c.ipadx = 5;
             c.anchor = GridBagConstraints.WEST;
             
-            numberStocksButton = new JRadioButton("Number Stocks");
+            numberStocksButton = new JRadioButton("Number of Stocks");
             numberStocksButton.setSelected(true);
             numberStocksButton.addActionListener(new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {

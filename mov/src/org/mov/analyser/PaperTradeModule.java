@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.analyser;
@@ -52,7 +52,7 @@ import org.mov.util.TradingDate;
 
 public class PaperTradeModule extends JPanel implements Module {
 
-    private PropertyChangeSupport propertySupport;   
+    private PropertyChangeSupport propertySupport;
     private JDesktopPane desktop;
     private ScriptQuoteBundle quoteBundle;
 
@@ -148,7 +148,7 @@ public class PaperTradeModule extends JPanel implements Module {
     public void addModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
     }
-    
+
     /**
      * Remove a property change listener for module change events.
      *
@@ -157,7 +157,7 @@ public class PaperTradeModule extends JPanel implements Module {
     public void removeModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
     }
-    
+
     /**
      * Return frame icon for table module.
      *
@@ -165,7 +165,7 @@ public class PaperTradeModule extends JPanel implements Module {
      */
     public ImageIcon getFrameIcon() {
 	return null;
-    }    
+    }
 
     /**
      * Return displayed component for this module.
@@ -195,14 +195,14 @@ public class PaperTradeModule extends JPanel implements Module {
     }
 
     private void run() {
-        Thread t = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
                 public void run() {
                     Thread thread = Thread.currentThread();
 
                     // Before we paper trade, save our interface results
                     // so if the programme crashes etc our stuff is still there
                     save();
-                    
+
                     // Read data from GUI and load quote data
                     if(parse()) {
                         List paperTradeResults = getPaperTradeResults();
@@ -212,8 +212,8 @@ public class PaperTradeModule extends JPanel implements Module {
                     }
                 }
             });
-        
-        t.start();
+
+        thread.start();
     }
 
     // Read data from interface and display if there are any errors.
@@ -234,42 +234,54 @@ public class PaperTradeModule extends JPanel implements Module {
         else
             return true;
     }
-   
-    private PaperTradeResult paperTrade(ProgressDialog progress, 
+
+    private PaperTradeResult paperTrade(ProgressDialog progress,
                                         ScriptQuoteBundle quoteBundle,
-                                        Variables variables)
+                                        String quoteRangeDescription,
+                                        OrderComparator orderComparator,
+                                        TradingDate startDate,
+                                        TradingDate endDate,
+                                        Expression buyRule,
+                                        Expression sellRule,
+                                        float initialCapital,
+                                        int mode,
+                                        float stockValue,
+                                        int numberStocks,
+                                        float tradeCost,
+                                        Variables variables,
+                                        int a, int b, int c)
         throws EvaluationException {
 
         Portfolio portfolio;
 
-        if(portfolioPage.getMode() == PortfolioPage.STOCK_VALUE_MODE) {
-            portfolio = PaperTrade.paperTrade("Paper Trade of " + 
-                                              quoteBundle.getQuoteRange().getDescription(),
+        if(mode == PortfolioPage.STOCK_VALUE_MODE) {
+            portfolio = PaperTrade.paperTrade("Paper Trade of " +
+                                              quoteRangeDescription,
                                               quoteBundle,
                                               variables,
-                                              quoteRangePage.getOrderComparator(quoteBundle),
-                                              quoteRangePage.getQuoteRange().getFirstDate(),
-                                              quoteRangePage.getQuoteRange().getLastDate(),
-                                              rulesPage.getBuyRule(),
-                                              rulesPage.getSellRule(),
-                                              portfolioPage.getInitialCapital(),
-                                              portfolioPage.getStockValue(),
-                                              portfolioPage.getTradeCost());
+                                              orderComparator,
+                                              startDate,
+                                              endDate,
+                                              buyRule,
+                                              sellRule,
+                                              initialCapital,
+                                              stockValue,
+                                              tradeCost);
         }
         else {
             assert portfolioPage.getMode() == PortfolioPage.NUMBER_STOCKS_MODE;
-            portfolio = PaperTrade.paperTrade("Paper Trade of " + 
-                                              quoteBundle.getQuoteRange().getDescription(),
+            portfolio = PaperTrade.paperTrade("Paper Trade of " +
+                                              quoteRangeDescription,
                                               quoteBundle,
                                               variables,
-                                              quoteRangePage.getOrderComparator(quoteBundle),
-                                              quoteRangePage.getQuoteRange().getFirstDate(),
-                                              quoteRangePage.getQuoteRange().getLastDate(),
-                                              rulesPage.getBuyRule(),
-                                              rulesPage.getSellRule(),
-                                              portfolioPage.getInitialCapital(),
-                                              portfolioPage.getNumberStocks(),
-                                              portfolioPage.getTradeCost());
+                                              orderComparator,
+                                              startDate,
+                                              endDate,
+                                              buyRule,
+                                              sellRule,
+                                              initialCapital,
+                                              numberStocks,
+                                              tradeCost);
         }
 
         // Running the equation means we might need to load in
@@ -277,70 +289,101 @@ public class PaperTradeModule extends JPanel implements Module {
         progress.setNote("Paper Trading...");
         progress.increment();
 
-        return new BasicPaperTradeResult(portfolio, 
-                                         quoteBundle, 
-                                         portfolioPage.getInitialCapital(),
-                                         portfolioPage.getTradeCost(),
-                                         rulesPage.getBuyRule().toString(), 
-                                         rulesPage.getSellRule().toString(), 
-                                         quoteRangePage.getQuoteRange().getFirstDate(),
-                                         quoteRangePage.getQuoteRange().getLastDate());
-
+        return new PaperTradeResult(portfolio,
+                                    quoteBundle,
+                                    initialCapital,
+                                    tradeCost,
+                                    buyRule.toString(),
+                                    sellRule.toString(),
+                                    a, b, c,
+                                    startDate,
+                                    endDate);
     }
 
     private List getPaperTradeResults() {
-        ProgressDialog progress = 
+        ProgressDialog progress =
             ProgressDialogManager.getProgressDialog();
 
         Thread thread = Thread.currentThread();
         progress.setIndeterminate(true);
         progress.show("Paper Trade");
 
+        // Get a copy of the values in the GUI, so that if the user changes
+        // them, it won't screw up the paper trade.
+        boolean isFamilyEnabled = rulesPage.isFamilyEnabled();
+        int aRange = rulesPage.getARange();
+        int bRange = rulesPage.getBRange();
+        int cRange = rulesPage.getCRange();
+        TradingDate startDate = quoteRangePage.getQuoteRange().getFirstDate();
+        TradingDate endDate = quoteRangePage.getQuoteRange().getLastDate();
+        Expression buyRule = rulesPage.getBuyRule();
+        Expression sellRule = rulesPage.getSellRule();
+        float initialCapital = portfolioPage.getInitialCapital();
+        int mode = portfolioPage.getMode();
+        float stockValue = portfolioPage.getStockValue();
+        int numberStocks = portfolioPage.getNumberStocks();
+        float tradeCost = portfolioPage.getTradeCost();
+
         quoteBundle = new ScriptQuoteBundle(quoteRangePage.getQuoteRange());
 
-        List symbols = quoteBundle.getAllSymbols();
+        OrderComparator orderComparator = quoteRangePage.getOrderComparator(quoteBundle);
+        String quoteRangeDescription = quoteBundle.getQuoteRange().getDescription();
 
         // If we are using a rule family, how many equations are in the family?
         // Otherwise it's just a single equation.
-        int numberEquations = (rulesPage.isFamilyEnabled()? 
-                               rulesPage.getARange() * rulesPage.getBRange() * 
-                               rulesPage.getCRange() :
-                               1);
-        
+        int numberEquations = (isFamilyEnabled ? aRange * bRange * cRange : 1);
+
         progress.setIndeterminate(false);
         progress.setMaximum(numberEquations);
         progress.setProgress(0);
         progress.setNote("Paper Trading...");
         progress.setMaster(true);
-        
+
         // Iterate through all possible paper trade equations
         List paperTradeResults = new ArrayList(numberEquations);
-            
+
         try {
             Variables variables = new Variables();
 
             // If the user has selected rule family, then iterate through
             // each combination of a, b, c
-            if(rulesPage.isFamilyEnabled()) {
+            if(isFamilyEnabled) {
                 variables.add("a", Expression.INTEGER_TYPE);
                 variables.add("b", Expression.INTEGER_TYPE);
                 variables.add("c", Expression.INTEGER_TYPE);
-                
-                for(int a = 1; a <= rulesPage.getARange(); a++) {
+
+                for(int a = 1; a <= aRange; a++) {
+                    if(thread.isInterrupted())
+                        break;
+
                     variables.setValue("a", a);
 
-                    for(int b = 1; b <= rulesPage.getBRange(); b++) {
+                    for(int b = 1; b <= bRange; b++) {
+                        if(thread.isInterrupted())
+                            break;
+
                         variables.setValue("b", b);
 
-                        for(int c = 1; c <= rulesPage.getCRange(); c++) {
-                            if (!thread.isInterrupted()) {
-                                variables.setValue("c", c);                       
-                                paperTradeResults.add(paperTrade(progress, 
-                                                                 quoteBundle,
-                                                                 variables));
-                            }
-                            else
+                        for(int c = 1; c <= cRange; c++) {
+                            if(thread.isInterrupted())
                                 break;
+
+                            variables.setValue("c", c);
+                            paperTradeResults.add(paperTrade(progress,
+                                                             quoteBundle,
+                                                             quoteRangeDescription,
+                                                             orderComparator,
+                                                             startDate,
+                                                             endDate,
+                                                             buyRule,
+                                                             sellRule,
+                                                             initialCapital,
+                                                             mode,
+                                                             stockValue,
+                                                             numberStocks,
+                                                             tradeCost,
+                                                             variables,
+                                                             a, b, c));
                         }
                     }
                 }
@@ -348,22 +391,35 @@ public class PaperTradeModule extends JPanel implements Module {
 
             // Otherwise there is only one equation and one result.
             else if (!thread.isInterrupted())
-                paperTradeResults.add(paperTrade(progress, quoteBundle, variables));
+                paperTradeResults.add(paperTrade(progress,
+                                                 quoteBundle,
+                                                 quoteRangeDescription,
+                                                 orderComparator,
+                                                 startDate,
+                                                 endDate,
+                                                 buyRule,
+                                                 sellRule,
+                                                 initialCapital,
+                                                 mode,
+                                                 stockValue,
+                                                 numberStocks,
+                                                 tradeCost,
+                                                 variables,
+                                                 0, 0, 0));
 
         } catch(EvaluationException e) {
             ProgressDialogManager.closeProgressDialog(progress);
             progress = null;
 
-            JOptionPane.showInternalMessageDialog(desktop, 
+            JOptionPane.showInternalMessageDialog(desktop,
                                                   e.getReason() + ".",
                                                   "Error executing paper trade",
                                                   JOptionPane.ERROR_MESSAGE);
-            
+
             return null;
         }
 
         ProgressDialogManager.closeProgressDialog(progress);
-
 	return paperTradeResults;
     }
 
@@ -376,7 +432,7 @@ public class PaperTradeModule extends JPanel implements Module {
 		    // Dispaly results table if its not already up (or if it
 		    // was closed we need to create a new one)
 		    if(resultsFrame == null || resultsFrame.isClosed()) {
-			resultsFrame = 
+			resultsFrame =
 			    CommandManager.getInstance().newPaperTradeResultTable();
 		    }
 		    else {
@@ -392,9 +448,9 @@ public class PaperTradeModule extends JPanel implements Module {
 		    }
 
 		    // Send result to result table for display
-		    PaperTradeResultModule resultsModule = 
+		    PaperTradeResultModule resultsModule =
 			(PaperTradeResultModule)resultsFrame.getModule();
-		    
+		
                     resultsModule.addResults(paperTradeResults);
 		}});
     }

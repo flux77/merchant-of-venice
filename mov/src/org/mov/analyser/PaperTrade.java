@@ -35,14 +35,14 @@ public class PaperTrade {
     private final static String SHARE_ACCOUNT_NAME = "Share Account";
 
     private class Environment {
-        public ScriptQuoteBundle quoteBundle;
+        public QuoteBundle quoteBundle;
         public Portfolio portfolio;
         public CashAccount cashAccount;
         public ShareAccount shareAccount;
         public int startDateOffset;
         public int endDateOffset;
 
-        public Environment(ScriptQuoteBundle quoteBundle,
+        public Environment(QuoteBundle quoteBundle,
                            String portfolioName,
                            TradingDate startDate,
                            TradingDate endDate,
@@ -101,10 +101,9 @@ public class PaperTrade {
 	    // Only sell if we have any!
 	    if(shares > 0) {
 
-		// How much are they worth? We sell at the day open price
-		float amount = shares * environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN,
-                                                                         day);
-		
+		// How much are they worth? We sell at the day open price.
+		float amount = 
+                    shares * environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN, day);
 		TradingDate date = environment.quoteBundle.offsetToDate(day);
 		Transaction sell = Transaction.newReduce(date, 
                                                          amount,
@@ -152,7 +151,6 @@ public class PaperTrade {
 							environment.shareAccount);
 
 	    environment.portfolio.addTransaction(buy);
-
 	    return true;
 	}
 	
@@ -160,7 +158,7 @@ public class PaperTrade {
     }
 
     private static void sellTrades(Environment environment, 
-                                   ScriptQuoteBundle quoteBundle,
+                                   QuoteBundle quoteBundle,
                                    Variables variables, 
                                    Expression sell,
                                    int dateOffset,
@@ -201,7 +199,7 @@ public class PaperTrade {
     }
 
     private static void buyTrades(Environment environment,
-                                  ScriptQuoteBundle quoteBundle,
+                                  QuoteBundle quoteBundle,
                                   Variables variables,
                                   Expression buy,
                                   int dateOffset,
@@ -216,9 +214,8 @@ public class PaperTrade {
         // If we have enough money, iterate through stocks available today -
         // should we buy any of it?
         if((stockValue + 2 * tradeCost) <= environment.cashAccount.getValue()) {
-            
             int order = 0;
-            
+
             // Iterate through stocks available today - should we buy or sell any of it?
             for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
                 
@@ -226,7 +223,7 @@ public class PaperTrade {
 
                 // Skip if we already own it
                 if(!environment.shareAccount.isHolding(symbol)) {
-                    
+
                     // If we care about the order, make sure the "order" variable is set
                     if(orderComparator != null)
                         variables.setValue("order", order);
@@ -247,8 +244,8 @@ public class PaperTrade {
                         // Ignore and move on
                     }
                 }
-                
-                order++;                    
+
+                order++;
             }
         }
     }
@@ -269,7 +266,7 @@ public class PaperTrade {
     }
 
     public static Portfolio paperTrade(String portfolioName,
-                                       ScriptQuoteBundle quoteBundle, 
+                                       QuoteBundle quoteBundle, 
                                        Variables variables,
                                        OrderComparator orderComparator,
                                        TradingDate startDate, 
@@ -294,8 +291,6 @@ public class PaperTrade {
             variables.add("order", Expression.INTEGER_TYPE);
         if(!variables.contains("held"))
             variables.add("held", Expression.INTEGER_TYPE, 0);
-        else
-            variables.setValue("held", 0);
 
         // Now iterate through each trading date and decide whether
 	// to buy/sell. The last date is used for placing the previous
@@ -322,7 +317,7 @@ public class PaperTrade {
     }
 
     public static Portfolio paperTrade(String portfolioName,
-                                       ScriptQuoteBundle quoteBundle, 
+                                       QuoteBundle quoteBundle, 
                                        Variables variables,
                                        OrderComparator orderComparator,
                                        TradingDate startDate, 
@@ -347,8 +342,6 @@ public class PaperTrade {
             variables.add("order", Expression.INTEGER_TYPE);
         if(!variables.contains("held"))
             variables.add("held", Expression.INTEGER_TYPE, 0);
-        else
-            variables.setValue("held", 0);
 
         // Now iterate through each trading date and decide whether
 	// to buy/sell. The last date is used for placing the previous

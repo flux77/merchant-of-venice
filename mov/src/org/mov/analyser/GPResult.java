@@ -18,40 +18,34 @@
 
 package org.mov.analyser;
 
-import java.util.*;
+import java.util.List;
+import java.util.Iterator;
 
-import org.mov.portfolio.*;
+import org.mov.analyser.gp.Individual;
+import org.mov.portfolio.Transaction;
+import org.mov.portfolio.Portfolio;
 import org.mov.quote.*;
 import org.mov.util.*;
 
-public class PaperTradeResult {
-    private Portfolio portfolio;
-    private ScriptQuoteBundle quoteBundle;
+public class GPResult {
+    private Individual individual;
+    private QuoteBundle quoteBundle;
     private float initialCapital;
     private float tradeCost;
-    private String buyRule;
-    private String sellRule;
-    private int a;
-    private int b;
-    private int c;
+    private int generation;
     private TradingDate startDate;	
     private TradingDate endDate;
     
-    public PaperTradeResult(Portfolio portfolio, ScriptQuoteBundle quoteBundle,
-                            float initialCapital, float tradeCost,
-                            String buyRule, String sellRule,
-                            int a, int b, int c,
-                            TradingDate startDate,
-                            TradingDate endDate) {
-        this.portfolio = portfolio;
+    public GPResult(Individual individual, QuoteBundle quoteBundle,
+                    float initialCapital, float tradeCost,
+                    int generation,
+                    TradingDate startDate,
+                    TradingDate endDate) {
+        this.individual = individual;
         this.quoteBundle = quoteBundle;
         this.initialCapital = initialCapital;
         this.tradeCost = tradeCost;
-        this.buyRule = buyRule;
-        this.sellRule = sellRule;
-        this.a = a;
-        this.b = b;
-        this.c = c;
+        this.generation = generation;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -82,23 +76,15 @@ public class PaperTradeResult {
     }
 
     public String getBuyRule() {
-        return buyRule;
+        return individual.getBuyRule().toString();
     }
 
     public String getSellRule() {
-        return sellRule;
+        return individual.getSellRule().toString();
     }
 
-    public int getA() {
-        return a;
-    }
-
-    public int getB() {
-        return b;
-    }
-
-    public int getC() {
-        return c;
+    public int getGeneration() {
+        return generation;
     }
 
     public float getTradeCost() {
@@ -122,7 +108,7 @@ public class PaperTradeResult {
         float finalCapital = 0.0F;
         
         try {
-            finalCapital = portfolio.getValue(getQuoteBundle(), getEndDate());
+            finalCapital = getPortfolio().getValue(getQuoteBundle(), getEndDate());
         }
         catch(MissingQuoteException e) {
             // Already checked...
@@ -133,10 +119,10 @@ public class PaperTradeResult {
     }
 
     public Portfolio getPortfolio() {
-        return portfolio;
+        return individual.getPortfolio();
     }
 
-    public ScriptQuoteBundle getQuoteBundle() {
+    public QuoteBundle getQuoteBundle() {
         return quoteBundle;
     }
 }

@@ -39,8 +39,11 @@ public class ModuleFrame extends JInternalFrame
      */
     public ModuleFrame(Module module, boolean centre, boolean honourSize) {
 
-	// Resizable, closable etc
-	super(module.getTitle(), true, true, true, true);
+	super(module.getTitle(), 
+	      honourSize? false : true, // resizable
+	      true,   // closable
+	      honourSize? false : true, // maximisable
+	      true);  // iconifiable
 
 	this.module = module;
 

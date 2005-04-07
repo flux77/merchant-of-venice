@@ -49,6 +49,7 @@ import org.mov.analyser.ga.GAIndividual;
 import org.mov.parser.Expression;
 import org.mov.parser.ExpressionException;
 import org.mov.parser.Parser;
+import org.mov.parser.Token;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.prefs.PreferencesManager;
@@ -148,6 +149,9 @@ public class GARulesPage extends JPanel implements AnalyserPage {
     public boolean parse() {
         
         if (!checkNumberFormat())
+            return false;
+        
+        if (!checkParameters())
             return false;
         
         // We need to specify the variables that are given to the buy/sell rule
@@ -336,6 +340,32 @@ public class GARulesPage extends JPanel implements AnalyserPage {
                                                     Locale.getString("ERROR_PARSING_RULES"),
                                                     JOptionPane.ERROR_MESSAGE);
                 return false;
+            }
+        }
+        return true;
+    }
+    
+    private boolean checkParameters() {
+        // Get words of Gondola lexicon
+        String[] words = Token.wordsOfGondola();
+        
+        // Get parameters defined by user in GA
+        int sizeOfIndividual = GARulesPageModule.getRowCount();
+        String[] parameters = new String[sizeOfIndividual];
+        
+        // Check if there is at least one parameter that is a substring or equal to
+        // one of the words of Gondola lexicon.
+        // This prevent syntax errors in managing the rules.
+        for (int ii=0; ii<sizeOfIndividual; ii++) {
+            parameters[ii]=(String)GARulesPageModule.getValueAt(ii, 
+                    GARulesPageModule.PARAMETER_COLUMN);
+            for (int jj=0; jj<words.length; jj++) {
+                if (words[jj].indexOf(parameters[ii]) >= 0) {
+                    JOptionPane.showInternalMessageDialog(desktop, Locale.getString("ERROR_PARSING_PARAMETER", parameters[ii], words[jj]),
+                                                        Locale.getString("ERROR_PARSING_RULES"),
+                                                        JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
             }
         }
         return true;

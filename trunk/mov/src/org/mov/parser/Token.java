@@ -233,20 +233,12 @@ public class Token {
     private String stringValue;
     
     /**
-     * Perform lexical analysis on the given string. Extract the first
-     * symbol found from the given string, set the passed token object
-     * to represent this symbol then return the given string sans the
-     * extracted symbol.
+     * Return a string containing all the words of Gondola language.
      *
-     * @param   variables variables that will be assumed to be defined
-     *                    for the equation
-     * @param	token	the token to use to represent the first symbol found
-     * @param	string	the string to extract the first symbol from
-     * @return	the string minus the first symbol
+     * @return	the string of words
      */
     
-    public static String stringToToken(Variables variables, Token token, String string)
-    throws ParserException {
+    public static String[] wordsOfGondola() {
         
         String[] tokenStrings = new String[FIXED_LENGTH_TOKENS];
 
@@ -309,7 +301,28 @@ public class Token {
         tokenStrings[MOMENTUM_TOKEN]           = "momentum";
         tokenStrings[OBV_TOKEN]                = "obv";
         tokenStrings[SD_TOKEN]                 = "sd";
-       
+        
+        return tokenStrings;
+    }
+    
+    /**
+     * Perform lexical analysis on the given string. Extract the first
+     * symbol found from the given string, set the passed token object
+     * to represent this symbol then return the given string sans the
+     * extracted symbol.
+     *
+     * @param   variables variables that will be assumed to be defined
+     *                    for the equation
+     * @param	token	the token to use to represent the first symbol found
+     * @param	string	the string to extract the first symbol from
+     * @return	the string minus the first symbol
+     */
+    
+    public static String stringToToken(Variables variables, Token token, String string)
+    throws ParserException {
+        
+        String[] tokenStrings = wordsOfGondola();
+
         boolean matched = false;
         
         // Is it a float or an integer number?

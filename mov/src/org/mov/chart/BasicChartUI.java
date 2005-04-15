@@ -283,6 +283,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
 	//or draw any lines
 	drawLines(g, (Chart)c, height);
+	drawPoints(g, (Chart)c, height);
     }
 
     public BufferedImage getImage() {
@@ -364,6 +365,41 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     }
 
 
+    private void drawPoints(Graphics g, Chart chart, int height) {
+	if (chart.getDrawnPointsX() != null &&
+	    chart.getDrawnPointsY() != null) {
+
+	    Vector xs, ys;
+
+	    xs = chart.getDrawnPointsX();
+	    ys = chart.getDrawnPointsY();
+
+	    Color prev = g.getColor();
+	    g.setColor(Color.MAGENTA);
+	    
+	    if (xs.size() == 1) {
+		int x1 = ((Integer)xs.elementAt(0)).intValue();
+		int y1 = ((Integer)ys.elementAt(0)).intValue();
+
+		g.drawLine(x1,y1,x1+1,y1+1);
+	    } else {
+		for (int i = 0; i < xs.size()-1; i++) {
+		    int x1 = ((Integer)xs.elementAt(i)).intValue();
+		    int y1 = ((Integer)ys.elementAt(i)).intValue();
+		    int x2 = ((Integer)xs.elementAt(i+1)).intValue();
+		    int y2 = ((Integer)ys.elementAt(i+1)).intValue();
+		    
+		    g.drawLine(x1,y1,x2,y2);
+		}
+	    }
+
+	    g.setColor(prev);
+	    g.setPaintMode();
+	}
+	
+    }
+    
+
     //Paint any lines which have been drawn on the chart. 
     private void drawLines(Graphics g, Chart chart, int height) {
 	
@@ -397,7 +433,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    g.setPaintMode();
 	    
 	}
-}
+    }
 
     // For the given X value, return the X coordinate
     private int getXCoordinate(Chart chart, Comparable x) {

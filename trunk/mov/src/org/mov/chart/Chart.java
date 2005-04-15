@@ -57,6 +57,7 @@ public class Chart extends JComponent implements MouseListener {
     // When drawning on the graph, keep track of the start and end x
     private Vector startDrawnLinesX, startDrawnLinesY;
     private Vector endDrawnLinesX, endDrawnLinesY;
+    private Vector pointsOnChartX, pointsOnChartY;
 
     // Are we in a zoomed in view?
     private boolean zoomedIn = false;
@@ -77,6 +78,8 @@ public class Chart extends JComponent implements MouseListener {
 	startDrawnLinesY = new Vector();
 	endDrawnLinesX = new Vector();
 	endDrawnLinesY = new Vector();
+	pointsOnChartX = new Vector();
+	pointsOnChartY = new Vector();
     }
 
     // Create a vector of iterators containing the x range iterators
@@ -504,49 +507,97 @@ public class Chart extends JComponent implements MouseListener {
 	repaint();
     }
 
-    // Find the line ending at x,y and delete it
+    /**
+     * Puts a point on a chart.
+     *
+     * @param	x	the x coordinate 
+     * @param   y       the y coordinate 
+     */
+    
+    public void setPoint(Integer x, Integer y) {
+		
+	pointsOnChartX.add(x);
+	pointsOnChartY.add(y);
+	repaint();
+    }
+
+    
+    // Generates the equation of the line passing through points specified
+    // by index and returns the difference of when x,y are applied to this
+    // equation.
+
+    public double getDifference(Integer x, Integer y, int index) {
+
+	double slope = 1.0;
+	double intersect;
+	double diff = 10.0;
+
+	Integer tmp = (Integer)endDrawnLinesX.elementAt(index);	   
+	int x1 = tmp.intValue();	   	    
+	tmp = (Integer)endDrawnLinesY.elementAt(index);
+	int y1 = tmp.intValue();	    
+	tmp = (Integer)startDrawnLinesX.elementAt(index);
+	int x2 = tmp.intValue();	    
+	tmp = (Integer)startDrawnLinesY.elementAt(index);
+	int y2 = tmp.intValue();
+	
+	if (x2 == x1) {
+	    slope = 0;		
+	} else {
+	    slope = ( (double)(y1) - (double)(y2)) / ((double)(x1) - (double)(x2));
+	}
+	
+	if (x2 != x1) {
+	    intersect = (double)(y2) - slope * (double)(x2);
+	} else {
+	    intersect = (double)(x2);
+	}
+	
+	Integer tmpx = (Integer)(x);
+	Integer tmpy = (Integer)(y);
+	
+	double candX = (double)(tmpx.intValue());
+	double candY = (double)(tmpy.intValue());
+	
+	if (x2 != x1) {
+	    diff = candY - (slope * candX + intersect);
+	} else {
+	    diff = candY - intersect;
+	}
+	
+	return diff;
+    }
+
+
+    /** 
+     * Find the line intersecting at x,y and delete it
+     *
+     * @param x        the x coordinate of the selected point
+     * @param y        the y coordinate of the selected point 
+     */
+    
     public void setErase(Integer x, Integer y) {
 	int i;
 	int deleteCount = 0;
 
-	for (i = 0; i < endDrawnLinesY.size(); i++) {
+	for (i = 0; i < pointsOnChartX.size(); i++) {
+	    int x1 = ((Integer)pointsOnChartX.elementAt(i)).intValue();
+	    int y1 = ((Integer)pointsOnChartY.elementAt(i)).intValue();
 
-	    double slope = 1.0;
-	    double intersect;
-	    double diff = 10.0;
+	    int diff1 = Math.abs(x.intValue() - x1);
+	    int diff2 = Math.abs(y.intValue() - y1);
 
-	    Integer tmp = (Integer)endDrawnLinesX.elementAt(i);	   
-	    int x1 = tmp.intValue();	   	    
-	    tmp = (Integer)endDrawnLinesY.elementAt(i);
-	    int y1 = tmp.intValue();	    
-	    tmp = (Integer)startDrawnLinesX.elementAt(i);
-	    int x2 = tmp.intValue();	    
-	    tmp = (Integer)startDrawnLinesY.elementAt(i);
-	    int y2 = tmp.intValue();	    
-	    
-	    if (x2 == x1) {
-		slope = 0;		
-	    } else {
-		slope = ( (double)(y1) - (double)(y2)) / ((double)(x1) - (double)(x2));
+	    if (diff1 < 20 &&
+		diff2 < 20) {
+		pointsOnChartX.remove(i);
+		pointsOnChartY.remove(i);
+		break;
 	    }
+	}
+	
+	for (i = 0; i < endDrawnLinesY.size(); i++) {	    
 
-	    if (x2 != x1) {
-		intersect = (double)(y2) - slope * (double)(x2);
-	    } else {
-		intersect = (double)(x2);
-	    }
-
-	    Integer tmpx = (Integer)(x);
-	    Integer tmpy = (Integer)(y);
-
-	    double candX = (double)(tmpx.intValue());
-	    double candY = (double)(tmpy.intValue());
-
-	    if (x2 != x1) {
-		diff = candY - (slope * candX + intersect);
-	    } else {
-		diff = candY - intersect;
-	    }
+	    double diff = getDifference(x,y,i);
 
 	    if (Math.abs(diff) <= 3.0) {
 		endDrawnLinesX.remove(i);
@@ -558,6 +609,71 @@ public class Chart extends JComponent implements MouseListener {
 	    }
 	}
 	
+    }
+    
+    /**
+     * Find the line intersecting at x,y.
+     * Return the coordinate of the end point which the user has chosen.
+     
+     @param x         The X Coordinate of the selected point.
+     @param y         The Y Coordinate of the selected point.
+
+    */
+
+    public Integer[] move(Integer x, Integer y) {
+	int i;
+	int deleteCount = 0;
+	Integer rv[] = null;
+
+	for (i = 0; i < endDrawnLinesY.size(); i++) {
+
+	    double diff = getDifference(x,y,i);
+	    
+	    if (Math.abs(diff) <= 3.0) {
+		
+		rv = new Integer[2];
+		
+		Integer tmp = (Integer)endDrawnLinesX.elementAt(i);	   
+		int x1 = tmp.intValue();	   	    
+		tmp = (Integer)endDrawnLinesY.elementAt(i);
+		int y1 = tmp.intValue();	    
+		tmp = (Integer)startDrawnLinesX.elementAt(i);
+		int x2 = tmp.intValue();	    
+		tmp = (Integer)startDrawnLinesY.elementAt(i);
+		int y2 = tmp.intValue();
+
+		/* Determine which end of the line the user has
+		   chosen to move. */
+
+		double dist1 = Math.sqrt(
+					 ((x1 - x.intValue()) * 
+					  (x1 - x.intValue())) + 
+					 ((y1 - y.intValue()) * 
+					  (y1 - y.intValue())));
+
+		double dist2 = Math.sqrt(
+					  ((x2 - x.intValue()) * 
+					   (x2 - x.intValue())) + 
+					  ((y2 - y.intValue()) * 
+					   (y2 - y.intValue())));
+		
+		if (dist1 < dist2) {
+		    rv[0] = (Integer)startDrawnLinesX.elementAt(i);
+		    rv[1] = (Integer)startDrawnLinesY.elementAt(i);
+		} else {
+		    rv[0] = (Integer)endDrawnLinesX.elementAt(i);
+		    rv[1] = (Integer)endDrawnLinesY.elementAt(i);
+		}
+
+		endDrawnLinesX.remove(i);
+		endDrawnLinesY.remove(i);
+		startDrawnLinesX.remove(i);
+		startDrawnLinesY.remove(i);
+		
+		break;		
+	    }
+	}
+	return rv;
     }
 
     /**
@@ -589,6 +705,14 @@ public class Chart extends JComponent implements MouseListener {
     }
     public Vector getDrawnLineEndY() {
 	return endDrawnLinesY;
+    }
+
+    public Vector getDrawnPointsX() {
+	return pointsOnChartX;
+    }
+
+    public Vector getDrawnPointsY() {
+	return pointsOnChartY;
     }
 
     /**

@@ -150,6 +150,15 @@ public class ChartModule extends JPanel implements Module,
     private JButton zoomIn = null;
     private JButton paintOnChart = null;
     private JButton eraseOnChart = null;
+    private JButton moveOnChart = null;
+    private JButton scribbleOnChart = null;    
+
+    // Modes
+    private static final int SELECTING = 0;
+    private static final int DRAWING = 1;
+    private static final int MOVING = 2;
+    private static final int ERASING = 3;
+    private static final int SCRIBBLING = 4;
 
     // Menus
     private JMenuItem addMenuItem = null;
@@ -160,13 +169,9 @@ public class ChartModule extends JPanel implements Module,
     private boolean previousDefaultZoomState = false;
     private boolean zoomInEnabled = false;
 
-    //Perhaps we can combine the following two indicators
-    // into one variable to simplify the interface logic:
-    // e.g integer EditingMode = {none, drawing, erasing} 
-    private boolean inDrawMode = false;  
-    private boolean inEraseMode = false; 
-    private boolean newLine = false;
-
+    private int viewMode = SELECTING;
+    private boolean newLine = false;    
+    
     private JDesktopPane desktop;
 
     // Frame Icon
@@ -178,6 +183,8 @@ public class ChartModule extends JPanel implements Module,
     private String zoomInImage = "toolbarButtonGraphics/general/ZoomIn24.gif";
     private String paintInImage = "toolbarButtonGraphics/general/Edit24.gif";
     private String eraseInImage = "toolbarButtonGraphics/general/Remove24.gif";
+    private String moveInImage = "toolbarButtonGraphics/general/Edit24.gif";
+    private String scribbleInImage = "toolbarButtonGraphics/general/Edit24.gif";
     
     //Index chart indicator - Index charts have aggregate graph sources
     private boolean indexChart = false;
@@ -276,6 +283,8 @@ public class ChartModule extends JPanel implements Module,
         URL zoomInImageURL = ClassLoader.getSystemResource(zoomInImage);
 	URL paintInImageURL = ClassLoader.getSystemResource(paintInImage);
 	URL eraseInImageURL = ClassLoader.getSystemResource(eraseInImage);
+	URL moveInImageURL = ClassLoader.getSystemResource(moveInImage);
+	URL scribbleInImageURL = ClassLoader.getSystemResource(scribbleInImage);
 
         // If either image is not available, then do not create the
         // toolbar
@@ -303,12 +312,27 @@ public class ChartModule extends JPanel implements Module,
 	    paintOnChart.setEnabled(true);
 	    toolBar.add(paintOnChart);
 
+	    // Create image on toolbar to move lines on graph
+	    ImageIcon moveOnChartIcon = new ImageIcon(moveInImageURL);
+	    moveOnChart = new JButton(moveOnChartIcon);
+	    moveOnChart.addActionListener(this);
+	    moveOnChart.setEnabled(true);
+	    toolBar.add(moveOnChart);
+
+	    // Create image on toolbar to scribble on graph
+	    ImageIcon scribbleOnChartIcon = new ImageIcon(scribbleInImageURL);
+	    scribbleOnChart = new JButton(scribbleOnChartIcon);
+	    scribbleOnChart.addActionListener(this);
+	    scribbleOnChart.setEnabled(true);
+	    toolBar.add(scribbleOnChart);
+
 	    // Create image on toolbar to delete lines on graph
 	    ImageIcon eraseOnChartIcon = new ImageIcon(eraseInImageURL);
 	    eraseOnChart = new JButton(eraseOnChartIcon);
 	    eraseOnChart.addActionListener(this);
 	    eraseOnChart.setEnabled(true);
 	    toolBar.add(eraseOnChart);
+	    
 
             add(toolBar, BorderLayout.WEST);
         }
@@ -641,7 +665,8 @@ public class ChartModule extends JPanel implements Module,
 	Comparable x = chart.getXAtPoint(e.getX());
 	Integer y = new Integer(e.getY());
 	
-	if(x != null && !inDrawMode && !inEraseMode) {
+	if(x != null &&
+	   viewMode == SELECTING) {
 	    chart.setHighlightedStart(x);
 	}
 
@@ -649,9 +674,18 @@ public class ChartModule extends JPanel implements Module,
 	   zoom levels - so when user zooms the lines stay fixed.
 	*/
 
-	if (x != null && inDrawMode) {
+	if (x != null && viewMode == DRAWING) {
 	    chart.setDrawnLineStart(new Integer(e.getX()),y);
 	    newLine = true;
+	}
+
+	if (x != null && viewMode == MOVING) {
+	    Integer[] start;
+ 	    
+	    if ( (start = chart.move(new Integer(e.getX()),y)) != null) {
+		chart.setDrawnLineStart(start[0], start[1]);
+		newLine = true;
+	    }
 	}
 	
     }
@@ -659,12 +693,12 @@ public class ChartModule extends JPanel implements Module,
  	Comparable x = chart.getXAtPoint(e.getX());
 	Integer y = new Integer(e.getY());
 
-	if (x != null && inDrawMode) {
+	if (x != null && (viewMode == DRAWING || viewMode == MOVING)) {
 	    chart.setDrawnLineEnd(new Integer(e.getX()),y, newLine);
 	    if (newLine) {
 		newLine = false;
 	    }
-	}
+	}	
 
     }
     public void mouseDragged(MouseEvent e) {
@@ -674,23 +708,27 @@ public class ChartModule extends JPanel implements Module,
 
 	// can now zoom in!
 	// As long as we're not in an editing mode.
-        if(zoomIn != null && !inDrawMode && !inEraseMode) {
+        if(zoomIn != null && viewMode == SELECTING) {
             zoomIn.setEnabled(zoomInEnabled = true);
 	}
 
-	if(x != null && !inDrawMode)
+	if(x != null && viewMode != DRAWING && viewMode != MOVING)
 	    chart.setHighlightedEnd(x);
 	
-	if (x != null && inDrawMode) {
+	if (x != null && (viewMode == DRAWING || viewMode == MOVING)) {
 	    chart.setDrawnLineEnd(new Integer(e.getX()),y, newLine);
 	    
 	    if (newLine) {
 		newLine = false;
 	    }
 	}
-	
-	if (x != null && inEraseMode) {
+       	
+	if (x != null && viewMode == ERASING) {
 	    chart.setErase(new Integer(e.getX()),y);
+	}
+
+	if (x != null && viewMode == SCRIBBLING) {
+	    chart.setPoint(new Integer(e.getX()), y);
 	}
 
     }
@@ -734,33 +772,80 @@ public class ChartModule extends JPanel implements Module,
 	*/
 
 	else if(paintOnChart != null && e.getSource() == paintOnChart) {
-	    if (!inDrawMode) {	
+	    if (viewMode != DRAWING) {	
 		previousDefaultZoomState = defaultZoomEnabled;
 		defaultZoom.setEnabled(defaultZoomEnabled = false);
-		inDrawMode = true;
-		inEraseMode = false;
+		viewMode = DRAWING;
 		paintOnChart.setSelected(true);
 		eraseOnChart.setSelected(false);
+		moveOnChart.setSelected(false);
+		scribbleOnChart.setSelected(false);
 	    } else {		
 		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
 		eraseOnChart.setSelected(false);
 		paintOnChart.setSelected(false);
-		inDrawMode = false;
+		moveOnChart.setSelected(false);
+		scribbleOnChart.setSelected(false);		
+		viewMode = SELECTING;
 	    }
 	}
 	else if(eraseOnChart != null && e.getSource() == eraseOnChart) {  
-	    if (!inEraseMode) {	
+	    if (viewMode != ERASING) {	
 		previousDefaultZoomState = defaultZoomEnabled;
 		defaultZoom.setEnabled(defaultZoomEnabled = false);
-		inEraseMode = true;
-		inDrawMode = false;
+		viewMode = ERASING;
+
 		eraseOnChart.setSelected(true);
 		paintOnChart.setSelected(false);
+		moveOnChart.setSelected(false);
+		scribbleOnChart.setSelected(false);
 	    } else {		
 		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
 		eraseOnChart.setSelected(false);
 		paintOnChart.setSelected(false);
-		inEraseMode = false;		
+		moveOnChart.setSelected(false);
+		scribbleOnChart.setSelected(false);
+		
+		viewMode = SELECTING;
+	    }
+	}
+	else if(scribbleOnChart != null && e.getSource() == scribbleOnChart) {
+	    if (viewMode != SCRIBBLING) {	
+		previousDefaultZoomState = defaultZoomEnabled;
+		defaultZoom.setEnabled(defaultZoomEnabled = false);
+
+		viewMode = SCRIBBLING;
+		paintOnChart.setSelected(false);
+		eraseOnChart.setSelected(false);
+		moveOnChart.setSelected(false);
+		scribbleOnChart.setSelected(true);
+	    } else {		
+		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
+		eraseOnChart.setSelected(false);
+		paintOnChart.setSelected(false);
+		moveOnChart.setSelected(false);
+		scribbleOnChart.setSelected(false);
+		viewMode = SELECTING;
+	    }
+	}
+
+	else if(moveOnChart != null && e.getSource() == moveOnChart) {
+	    if (viewMode != MOVING) {	
+		previousDefaultZoomState = defaultZoomEnabled;
+		defaultZoom.setEnabled(defaultZoomEnabled = false);
+
+		viewMode = MOVING;
+		paintOnChart.setSelected(false);
+		eraseOnChart.setSelected(false);
+		moveOnChart.setSelected(true);
+		scribbleOnChart.setSelected(false);
+	    } else {		
+		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
+		eraseOnChart.setSelected(false);
+		paintOnChart.setSelected(false);
+		moveOnChart.setSelected(false);
+		scribbleOnChart.setSelected(false);
+		viewMode = SELECTING;
 	    }
 	}
 

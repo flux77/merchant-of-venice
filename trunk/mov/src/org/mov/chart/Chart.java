@@ -500,9 +500,11 @@ public class Chart extends JComponent implements MouseListener {
 	if (newLine) {
 	    endDrawnLinesX.add(x);
 	    endDrawnLinesY.add(y);
-	} else {
-	    endDrawnLinesX.setElementAt(x, endDrawnLinesX.size()-1);
-	    endDrawnLinesY.setElementAt(y, endDrawnLinesY.size()-1);
+	} else {	    
+	    if (endDrawnLinesX.size() > 0) {
+		endDrawnLinesX.setElementAt(x, endDrawnLinesX.size()-1);
+		endDrawnLinesY.setElementAt(y, endDrawnLinesY.size()-1);
+	    }
 	}
 	repaint();
     }

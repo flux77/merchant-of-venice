@@ -56,6 +56,10 @@ public class InternetImport {
     private final static String END_DAY     = "_ED_";
     private final static String END_MONTH   = "_EM_";
     private final static String END_YEAR    = "_EY_";
+    
+    // Retrieve quotes in batches of MAX_NUMBER_OF_RETRIEVAL_DAYS. This
+    // limit should be safe since Yahoo allows up to 200 days.
+    private final static int MAX_NUMBER_OF_RETRIEVAL_DAYS = 100;
 
     // Each Yahoo site uses the same URL formatting. So we define it once here.
     private final static String YAHOO_PATTERN = ("?s=" + SYMBOL + "&a=" + START_MONTH + 
@@ -72,7 +76,9 @@ public class InternetImport {
     }
 
     /**
-     * Import quotes from Yahoo into Venice.
+     * Retrieve quotes from Yahoo. Will fire multiple request
+     * if the specified period is above the maximum number of
+     * quotes yahoo supports.
      *
      * @param report report to log warnings and errors
      * @param symbol symbol to import
@@ -84,12 +90,55 @@ public class InternetImport {
     public static List importSymbol(Report report, Symbol symbol,
                                     TradingDate startDate, TradingDate endDate)
         throws IOException {
+        
+        List result = new ArrayList();
 
+        // retrieve in parts since Yahoo only provides quotes for a limited time period.
+        TradingDate retrievalStartDate;
+        TradingDate retrievalEndDate = endDate;
+        do {
+            // determine startDate for retrieval
+            retrievalStartDate = retrievalEndDate.previous(MAX_NUMBER_OF_RETRIEVAL_DAYS);
+            if(retrievalStartDate.before(startDate)) {
+                retrievalStartDate = startDate;
+            }
+            // retrieve quotes and add to result
+            List quotes = retrieveQuotes(report, symbol, retrievalStartDate, retrievalEndDate);
+            result.addAll(quotes);
+            
+            // determine endDate for next retrieval
+            retrievalEndDate = retrievalStartDate.previous(1);
+        } while(!retrievalEndDate.before(startDate));
+        
+        if(result.size() == 0) {
+            report.addError(Locale.getString("YAHOO") + ":" + 
+                    symbol + ":" +
+                    Locale.getString("ERROR") + ": " +
+                    Locale.getString("NO_QUOTES_FOUND"));
+        }
+        return result;
+    }
+    
+    /**
+     * Retrieve quotes from Yahoo. 
+     * Do not exceed the specified MAX_NUMBER_OF_RETRIEVAL_DAYS!
+     *
+     * @param report report to log warnings and errors
+     * @param symbol symbol to import
+     * @param startDate start of date range to import
+     * @param endDate end of date range to import
+     * @return list of quotes
+     * @exception IOException if there was an error retrieving the quotes
+     */
+    private static List retrieveQuotes(Report report, Symbol symbol, 
+                                       TradingDate startDate, TradingDate endDate)
+    	throws IOException {
+        
         List quotes = new ArrayList();
         String URLString = constructURL(symbol, startDate, endDate);
         QuoteFilter filter = new YahooQuoteFilter(symbol);
 
-	PreferencesManager.ProxyPreferences proxyPreferences =
+        PreferencesManager.ProxyPreferences proxyPreferences =
             PreferencesManager.loadProxySettings();
 
         try {
@@ -155,10 +204,7 @@ public class InternetImport {
         
         catch(FileNotFoundException e) {
             // Don't abort the import if there are no quotes for a given symbol
-            report.addError(Locale.getString("YAHOO") + ":" + 
-                            symbol + ":" +
-                            Locale.getString("ERROR") + ": " +
-                            Locale.getString("NO_QUOTES_FOUND"));
+            // empty list will be returned
         }
 
         catch(IOException e) {
@@ -166,7 +212,7 @@ public class InternetImport {
             throw new IOException();
         } 
         
-        return quotes;        
+        return quotes;       
     }
 
     /**

@@ -152,6 +152,7 @@ public class ChartModule extends JPanel implements Module,
     private JButton eraseOnChart = null;
     private JButton moveOnChart = null;
     private JButton scribbleOnChart = null;    
+    private JButton editOnChart = null;
 
     // Modes
     private static final int SELECTING = 0;
@@ -159,6 +160,7 @@ public class ChartModule extends JPanel implements Module,
     private static final int MOVING = 2;
     private static final int ERASING = 3;
     private static final int SCRIBBLING = 4;
+    private static final int EDITING = 5;
 
     // Menus
     private JMenuItem addMenuItem = null;
@@ -185,6 +187,7 @@ public class ChartModule extends JPanel implements Module,
     private String eraseInImage = "toolbarButtonGraphics/general/Remove24.gif";
     private String moveInImage = "toolbarButtonGraphics/general/Edit24.gif";
     private String scribbleInImage = "toolbarButtonGraphics/general/Edit24.gif";
+    private String editInImage = "toolbarButtonGraphics/general/Edit24.gif";
     
     //Index chart indicator - Index charts have aggregate graph sources
     private boolean indexChart = false;
@@ -284,7 +287,7 @@ public class ChartModule extends JPanel implements Module,
 	URL paintInImageURL = ClassLoader.getSystemResource(paintInImage);
 	URL eraseInImageURL = ClassLoader.getSystemResource(eraseInImage);
 	URL moveInImageURL = ClassLoader.getSystemResource(moveInImage);
-	URL scribbleInImageURL = ClassLoader.getSystemResource(scribbleInImage);
+	URL scribbleInImageURL = ClassLoader.getSystemResource(scribbleInImage);	URL editInImageURL = ClassLoader.getSystemResource(editInImage);
 
         // If either image is not available, then do not create the
         // toolbar
@@ -326,6 +329,13 @@ public class ChartModule extends JPanel implements Module,
 	    scribbleOnChart.setEnabled(true);
 	    toolBar.add(scribbleOnChart);
 
+	    // Create image on toolbar to put text on graph
+	    ImageIcon editOnChartIcon = new ImageIcon(editInImageURL);
+	    editOnChart = new JButton(editOnChartIcon);
+	    editOnChart.addActionListener(this);
+	    editOnChart.setEnabled(true);
+	    toolBar.add(editOnChart);	    
+
 	    // Create image on toolbar to delete lines on graph
 	    ImageIcon eraseOnChartIcon = new ImageIcon(eraseInImageURL);
 	    eraseOnChart = new JButton(eraseOnChartIcon);
@@ -333,7 +343,6 @@ public class ChartModule extends JPanel implements Module,
 	    eraseOnChart.setEnabled(true);
 	    toolBar.add(eraseOnChart);
 	    
-
             add(toolBar, BorderLayout.WEST);
         }
     }
@@ -698,7 +707,15 @@ public class ChartModule extends JPanel implements Module,
 	    if (newLine) {
 		newLine = false;
 	    }
-	}	
+	}
+
+	if (x != null && viewMode == EDITING) {
+	    String val = JOptionPane.showInputDialog(this,"Enter text", "Text", JOptionPane.OK_CANCEL_OPTION);
+	   
+	    if (val != null) {
+		chart.setText(val,new Integer(e.getX()), y);
+	    }
+	}
 
     }
     public void mouseDragged(MouseEvent e) {
@@ -775,17 +792,12 @@ public class ChartModule extends JPanel implements Module,
 	    if (viewMode != DRAWING) {	
 		previousDefaultZoomState = defaultZoomEnabled;
 		defaultZoom.setEnabled(defaultZoomEnabled = false);
-		viewMode = DRAWING;
-		paintOnChart.setSelected(true);
-		eraseOnChart.setSelected(false);
-		moveOnChart.setSelected(false);
-		scribbleOnChart.setSelected(false);
+		viewMode = DRAWING;		
+		activateButton(paintOnChart);
+
 	    } else {		
 		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
-		eraseOnChart.setSelected(false);
-		paintOnChart.setSelected(false);
-		moveOnChart.setSelected(false);
-		scribbleOnChart.setSelected(false);		
+		activateButton(null);
 		viewMode = SELECTING;
 	    }
 	}
@@ -795,16 +807,11 @@ public class ChartModule extends JPanel implements Module,
 		defaultZoom.setEnabled(defaultZoomEnabled = false);
 		viewMode = ERASING;
 
-		eraseOnChart.setSelected(true);
-		paintOnChart.setSelected(false);
-		moveOnChart.setSelected(false);
-		scribbleOnChart.setSelected(false);
+		activateButton(eraseOnChart);
 	    } else {		
 		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
-		eraseOnChart.setSelected(false);
-		paintOnChart.setSelected(false);
-		moveOnChart.setSelected(false);
-		scribbleOnChart.setSelected(false);
+
+		activateButton(null);
 		
 		viewMode = SELECTING;
 	    }
@@ -815,16 +822,10 @@ public class ChartModule extends JPanel implements Module,
 		defaultZoom.setEnabled(defaultZoomEnabled = false);
 
 		viewMode = SCRIBBLING;
-		paintOnChart.setSelected(false);
-		eraseOnChart.setSelected(false);
-		moveOnChart.setSelected(false);
-		scribbleOnChart.setSelected(true);
+		activateButton(scribbleOnChart);
 	    } else {		
 		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
-		eraseOnChart.setSelected(false);
-		paintOnChart.setSelected(false);
-		moveOnChart.setSelected(false);
-		scribbleOnChart.setSelected(false);
+		activateButton(null);
 		viewMode = SELECTING;
 	    }
 	}
@@ -835,16 +836,24 @@ public class ChartModule extends JPanel implements Module,
 		defaultZoom.setEnabled(defaultZoomEnabled = false);
 
 		viewMode = MOVING;
-		paintOnChart.setSelected(false);
-		eraseOnChart.setSelected(false);
-		moveOnChart.setSelected(true);
-		scribbleOnChart.setSelected(false);
+		activateButton(moveOnChart);
 	    } else {		
 		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
-		eraseOnChart.setSelected(false);
-		paintOnChart.setSelected(false);
-		moveOnChart.setSelected(false);
-		scribbleOnChart.setSelected(false);
+		activateButton(null);
+		viewMode = SELECTING;
+	    }
+	}
+
+	else if (editOnChart != null && e.getSource() == editOnChart) {
+	    if (viewMode != EDITING) {
+		previousDefaultZoomState = defaultZoomEnabled;
+		defaultZoom.setEnabled(defaultZoomEnabled = false);
+
+		viewMode = EDITING;
+		activateButton(editOnChart);
+	    } else {
+		defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
+		activateButton(null);
 		viewMode = SELECTING;
 	    }
 	}
@@ -881,6 +890,29 @@ public class ChartModule extends JPanel implements Module,
 		};
 	
 	    menuAction.start();
+	}
+    }
+
+
+    /**
+     *
+     * Activate chart button b, and deactivate all the rest of the
+     * buttons. 
+     *
+     * @param JButton b      Chart Drawing button to activate
+     *
+    */
+
+    public void activateButton(JButton b) {
+	
+	paintOnChart.setSelected(false);
+	eraseOnChart.setSelected(false);
+	moveOnChart.setSelected(false);
+	scribbleOnChart.setSelected(false);
+	editOnChart.setSelected(false);
+
+	if (b != null) {
+	    b.setSelected(true);	    
 	}
     }
 

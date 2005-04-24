@@ -55,9 +55,8 @@ public class Chart extends JComponent implements MouseListener {
     private Comparable endHighlightedX;
 
     // When drawning on the graph, keep track of the start and end x
-    private Vector startDrawnLinesX, startDrawnLinesY;
-    private Vector endDrawnLinesX, endDrawnLinesY;
-    private Vector pointsOnChartX, pointsOnChartY;
+    private Vector startDrawnLines, endDrawnLines, pointsOnChart;
+    private HashMap textOnChart;
 
     // Are we in a zoomed in view?
     private boolean zoomedIn = false;
@@ -74,12 +73,10 @@ public class Chart extends JComponent implements MouseListener {
 	addMouseListener(this);
 	updateUI();
 
-	startDrawnLinesX = new Vector();
-	startDrawnLinesY = new Vector();
-	endDrawnLinesX = new Vector();
-	endDrawnLinesY = new Vector();
-	pointsOnChartX = new Vector();
-	pointsOnChartY = new Vector();
+	startDrawnLines = new Vector();
+	endDrawnLines = new Vector();
+	pointsOnChart = new Vector();
+	textOnChart = new HashMap(); 
     }
 
     // Create a vector of iterators containing the x range iterators
@@ -482,8 +479,7 @@ public class Chart extends JComponent implements MouseListener {
      */
 
     public void setDrawnLineStart(Integer x, Integer y) {
-	startDrawnLinesX.add(x);
-	startDrawnLinesY.add(y);
+	startDrawnLines.add(new Coordinate(x,y));
 	repaint();
     }
 
@@ -498,12 +494,11 @@ public class Chart extends JComponent implements MouseListener {
     public void setDrawnLineEnd(Integer x, Integer y, boolean newLine) {
 	
 	if (newLine) {
-	    endDrawnLinesX.add(x);
-	    endDrawnLinesY.add(y);
+	    endDrawnLines.add(new Coordinate(x,y));
 	} else {	    
-	    if (endDrawnLinesX.size() > 0) {
-		endDrawnLinesX.setElementAt(x, endDrawnLinesX.size()-1);
-		endDrawnLinesY.setElementAt(y, endDrawnLinesY.size()-1);
+	    if (endDrawnLines.size() > 0) {
+		endDrawnLines.setElementAt(new Coordinate(x,y), 
+					    endDrawnLines.size() - 1);
 	    }
 	}
 	repaint();
@@ -518,8 +513,7 @@ public class Chart extends JComponent implements MouseListener {
     
     public void setPoint(Integer x, Integer y) {
 		
-	pointsOnChartX.add(x);
-	pointsOnChartY.add(y);
+	pointsOnChart.add(new Coordinate(x,y));
 	repaint();
     }
 
@@ -534,14 +528,12 @@ public class Chart extends JComponent implements MouseListener {
 	double intersect;
 	double diff = 10.0;
 
-	Integer tmp = (Integer)endDrawnLinesX.elementAt(index);	   
-	int x1 = tmp.intValue();	   	    
-	tmp = (Integer)endDrawnLinesY.elementAt(index);
-	int y1 = tmp.intValue();	    
-	tmp = (Integer)startDrawnLinesX.elementAt(index);
-	int x2 = tmp.intValue();	    
-	tmp = (Integer)startDrawnLinesY.elementAt(index);
-	int y2 = tmp.intValue();
+	Coordinate tmp = (Coordinate)endDrawnLines.elementAt(index);
+	int x1 = tmp.getX().intValue();
+	int y1 = tmp.getY().intValue();
+	tmp = (Coordinate)startDrawnLines.elementAt(index);
+	int x2 = tmp.getX().intValue();	    
+	int y2 = tmp.getY().intValue();
 	
 	if (x2 == x1) {
 	    slope = 0;		
@@ -582,31 +574,39 @@ public class Chart extends JComponent implements MouseListener {
 	int i;
 	int deleteCount = 0;
 
-	for (i = 0; i < pointsOnChartX.size(); i++) {
-	    int x1 = ((Integer)pointsOnChartX.elementAt(i)).intValue();
-	    int y1 = ((Integer)pointsOnChartY.elementAt(i)).intValue();
+	Iterator it, it2;
+
+	it = textOnChart.keySet().iterator();
+
+	while (it.hasNext()) {
+	    Coordinate c = (Coordinate)it.next();
+	    if (Math.abs(c.getX().intValue() - x.intValue()) < 20 &&
+		Math.abs(c.getY().intValue() - y.intValue()) < 20) {
+		textOnChart.remove(c);
+	    }
+	}
+
+	for (i = 0; i < pointsOnChart.size(); i++) {
+	    int x1 = ((Coordinate)pointsOnChart.elementAt(i)).getX().intValue();
+	    int y1 = ((Coordinate)pointsOnChart.elementAt(i)).getY().intValue();
 
 	    int diff1 = Math.abs(x.intValue() - x1);
 	    int diff2 = Math.abs(y.intValue() - y1);
 
 	    if (diff1 < 20 &&
 		diff2 < 20) {
-		pointsOnChartX.remove(i);
-		pointsOnChartY.remove(i);
+		pointsOnChart.remove(i);
 		break;
 	    }
 	}
 	
-	for (i = 0; i < endDrawnLinesY.size(); i++) {	    
+	for (i = 0; i < endDrawnLines.size(); i++) {	    
 
 	    double diff = getDifference(x,y,i);
 
 	    if (Math.abs(diff) <= 3.0) {
-		endDrawnLinesX.remove(i);
-		endDrawnLinesY.remove(i);
-		startDrawnLinesX.remove(i);
-		startDrawnLinesY.remove(i);
-		
+		endDrawnLines.remove(i);
+		startDrawnLines.remove(i);
 		break;		
 	    }
 	}
@@ -627,7 +627,7 @@ public class Chart extends JComponent implements MouseListener {
 	int deleteCount = 0;
 	Integer rv[] = null;
 
-	for (i = 0; i < endDrawnLinesY.size(); i++) {
+	for (i = 0; i < endDrawnLines.size(); i++) {
 
 	    double diff = getDifference(x,y,i);
 	    
@@ -635,14 +635,12 @@ public class Chart extends JComponent implements MouseListener {
 		
 		rv = new Integer[2];
 		
-		Integer tmp = (Integer)endDrawnLinesX.elementAt(i);	   
-		int x1 = tmp.intValue();	   	    
-		tmp = (Integer)endDrawnLinesY.elementAt(i);
-		int y1 = tmp.intValue();	    
-		tmp = (Integer)startDrawnLinesX.elementAt(i);
-		int x2 = tmp.intValue();	    
-		tmp = (Integer)startDrawnLinesY.elementAt(i);
-		int y2 = tmp.intValue();
+		Coordinate tmp = (Coordinate)endDrawnLines.elementAt(i);	   
+		int x1 = tmp.getX().intValue();	   	    
+		int y1 = tmp.getY().intValue();	    
+		tmp = (Coordinate)startDrawnLines.elementAt(i);
+		int x2 = tmp.getX().intValue();	    
+		int y2 = tmp.getY().intValue();
 
 		/* Determine which end of the line the user has
 		   chosen to move. */
@@ -660,22 +658,42 @@ public class Chart extends JComponent implements MouseListener {
 					   (y2 - y.intValue())));
 		
 		if (dist1 < dist2) {
-		    rv[0] = (Integer)startDrawnLinesX.elementAt(i);
-		    rv[1] = (Integer)startDrawnLinesY.elementAt(i);
+		    rv[0] = ((Coordinate)startDrawnLines.elementAt(i)).getX();
+		    rv[1] = ((Coordinate)startDrawnLines.elementAt(i)).getY();
 		} else {
-		    rv[0] = (Integer)endDrawnLinesX.elementAt(i);
-		    rv[1] = (Integer)endDrawnLinesY.elementAt(i);
+		    rv[0] = ((Coordinate)endDrawnLines.elementAt(i)).getX();
+		    rv[1] = ((Coordinate)endDrawnLines.elementAt(i)).getY();
 		}
-
-		endDrawnLinesX.remove(i);
-		endDrawnLinesY.remove(i);
-		startDrawnLinesX.remove(i);
-		startDrawnLinesY.remove(i);
 		
+		endDrawnLines.remove(i);
+		startDrawnLines.remove(i);
+			
 		break;		
 	    }
 	}
 	return rv;
+    }
+
+    /** 
+     * Put text at x,y.
+     *
+     * @param x        the x coordinate of the selected point
+     * @param y        the y coordinate of the selected point 
+     */
+
+    public void setText(String text, Integer x, Integer y) {
+	
+	textOnChart.put(new Coordinate(x,y), text);	
+	repaint();
+    }
+
+    /** 
+     * Return all the text drawon the chart
+     *
+     */
+
+    public HashMap getText() {
+	return textOnChart;
     }
 
     /**
@@ -696,25 +714,16 @@ public class Chart extends JComponent implements MouseListener {
 	return endHighlightedX;
     }
 
-    public Vector getDrawnLineStartX() {
-	return startDrawnLinesX;
-    }
-    public Vector getDrawnLineStartY() {
-	return startDrawnLinesY;
-    }
-    public Vector getDrawnLineEndX() {
-	return endDrawnLinesX;
-    }
-    public Vector getDrawnLineEndY() {
-	return endDrawnLinesY;
+    public Vector getDrawnLineStart() {
+	return startDrawnLines;
     }
 
-    public Vector getDrawnPointsX() {
-	return pointsOnChartX;
+    public Vector getDrawnLineEnd() {
+	return endDrawnLines;
     }
 
-    public Vector getDrawnPointsY() {
-	return pointsOnChartY;
+    public Vector getDrawnPoints() {
+	return pointsOnChart;
     }
 
     /**

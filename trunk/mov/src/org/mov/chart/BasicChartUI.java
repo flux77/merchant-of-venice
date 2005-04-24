@@ -284,6 +284,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	//or draw any lines
 	drawLines(g, (Chart)c, height);
 	drawPoints(g, (Chart)c, height);
+	drawText(g, (Chart)c, height);
     }
 
     public BufferedImage getImage() {
@@ -365,29 +366,32 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     }
 
 
+    /*
+      Show free hand lines drawn on chart.
+    */
+
     private void drawPoints(Graphics g, Chart chart, int height) {
-	if (chart.getDrawnPointsX() != null &&
-	    chart.getDrawnPointsY() != null) {
-
-	    Vector xs, ys;
-
-	    xs = chart.getDrawnPointsX();
-	    ys = chart.getDrawnPointsY();
-
+	if (chart.getDrawnPoints() != null) {
+	    
+	    Vector points;
+		
+	    
+	    points = chart.getDrawnPoints();
+		
 	    Color prev = g.getColor();
 	    g.setColor(Color.MAGENTA);
 	    
-	    if (xs.size() == 1) {
-		int x1 = ((Integer)xs.elementAt(0)).intValue();
-		int y1 = ((Integer)ys.elementAt(0)).intValue();
+	    if (points.size() == 1) {
+		int x1 = ((Coordinate)points.elementAt(0)).getX().intValue();
+		int y1 = ((Coordinate)points.elementAt(0)).getY().intValue();
 
 		g.drawLine(x1,y1,x1+1,y1+1);
 	    } else {
-		for (int i = 0; i < xs.size()-1; i++) {
-		    int x1 = ((Integer)xs.elementAt(i)).intValue();
-		    int y1 = ((Integer)ys.elementAt(i)).intValue();
-		    int x2 = ((Integer)xs.elementAt(i+1)).intValue();
-		    int y2 = ((Integer)ys.elementAt(i+1)).intValue();
+		for (int i = 0; i < points.size()-1; i++) {
+		    int x1 = ((Coordinate)points.elementAt(i)).getX().intValue();
+		    int y1 = ((Coordinate)points.elementAt(i)).getY().intValue();
+		    int x2 = ((Coordinate)points.elementAt(i+1)).getX().intValue();
+		    int y2 = ((Coordinate)points.elementAt(i+1)).getY().intValue();
 		    
 		    g.drawLine(x1,y1,x2,y2);
 		}
@@ -403,25 +407,19 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     //Paint any lines which have been drawn on the chart. 
     private void drawLines(Graphics g, Chart chart, int height) {
 	
-	if (chart.getDrawnLineStartX() != null &&
-	    chart.getDrawnLineStartY() != null &&
-	    chart.getDrawnLineEndX() != null &&
-	    chart.getDrawnLineEndY() != null) {
-	    
+	if (chart.getDrawnLineStart() != null) {
 	    int i;
 
-	    Vector startXs, startYs, endXs, endYs;
+	    Vector start, end;
 
-	    startXs = chart.getDrawnLineStartX();
-	    startYs = chart.getDrawnLineStartY();
-	    endXs = chart.getDrawnLineEndX();
-	    endYs = chart.getDrawnLineEndY();
+	    start = chart.getDrawnLineStart();
+	    end = chart.getDrawnLineEnd();
 
-	    for (i = 0; i < endXs.size(); i++) {
-		int startX = ((Integer)startXs.elementAt(i)).intValue();
-		int startY = ((Integer)startYs.elementAt(i)).intValue();
-		int endX = ((Integer)endXs.elementAt(i)).intValue();
-		int endY = ((Integer)endYs.elementAt(i)).intValue();
+	    for (i = 0; i < end.size(); i++) {
+		int startX = ((Coordinate)start.elementAt(i)).getX().intValue();
+		int startY = ((Coordinate)start.elementAt(i)).getY().intValue();
+		int endX = ((Coordinate)end.elementAt(i)).getX().intValue();
+		int endY = ((Coordinate)end.elementAt(i)).getY().intValue();
 
 		Color prev = g.getColor();
 
@@ -433,6 +431,30 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    g.setPaintMode();
 	    
 	}
+    }
+
+    /* 
+       Show text added to chart by drawing.
+    */
+
+    private void drawText(Graphics g, Chart chart, int height) {
+	Color prev = g.getColor();
+
+	g.setColor(Color.BLACK);
+
+	HashMap map = chart.getText();
+	Iterator it = map.values().iterator();
+	Iterator it2 = map.keySet().iterator();
+	while (it.hasNext()) {
+	    String val = (String)it.next();
+	    if (it2.hasNext()) {
+		Coordinate key = (Coordinate)it2.next();
+		g.drawString(val, key.getX().intValue(), key.getY().intValue());
+	    }
+	}
+       
+	g.setColor(prev);
+	g.setPaintMode();
     }
 
     // For the given X value, return the X coordinate

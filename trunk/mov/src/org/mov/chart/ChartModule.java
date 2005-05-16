@@ -180,14 +180,16 @@ public class ChartModule extends JPanel implements Module,
     private String frameIcon = "org/mov/images/TableIcon.gif";
 
     // ToolBar Images - these are from jlfgr-1.0.jar
-    // Editing images (paint, erase ) aren't quite appropriate
+    // Editing images (paint, erase, text scribble, move ) aren't the
+    // best we could have but at least there are unique icons for
+    // different functions.
     private String defaultZoomImage = "toolbarButtonGraphics/general/Zoom24.gif";
     private String zoomInImage = "toolbarButtonGraphics/general/ZoomIn24.gif";
     private String paintInImage = "toolbarButtonGraphics/general/Edit24.gif";
     private String eraseInImage = "toolbarButtonGraphics/general/Remove24.gif";
-    private String moveInImage = "toolbarButtonGraphics/general/Edit24.gif";
-    private String scribbleInImage = "toolbarButtonGraphics/general/Edit24.gif";
-    private String editInImage = "toolbarButtonGraphics/general/Edit24.gif";
+    private String moveInImage = "toolbarButtonGraphics/general/Move24.gif";
+    private String scribbleInImage = "toolbarButtonGraphics/general/Scribble24.gif";
+    private String editInImage = "toolbarButtonGraphics/general/Text24.gif";
     
     //Index chart indicator - Index charts have aggregate graph sources
     private boolean indexChart = false;

@@ -28,6 +28,8 @@ package org.mov.chart;
 public class Coordinate
 {
 
+    protected static final int BREAK = -1; //End of coordinates/Out of bounds marker 
+
     private Integer x;
     private Integer y;
 

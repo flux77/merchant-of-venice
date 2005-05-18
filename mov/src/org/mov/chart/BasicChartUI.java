@@ -393,7 +393,13 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		    int x2 = ((Coordinate)points.elementAt(i+1)).getX().intValue();
 		    int y2 = ((Coordinate)points.elementAt(i+1)).getY().intValue();
 		    
-		    g.drawLine(x1,y1,x2,y2);
+		    if (x1 == Coordinate.BREAK || y1 == Coordinate.BREAK) {
+			g.drawLine(x2,y2,x2+1,y2+1);
+		    } else if (x2 == Coordinate.BREAK || x2 == Coordinate.BREAK) {
+			g.drawLine(x1,y1,x1+1,y1+1);
+		    } else {
+			g.drawLine(x1,y1,x2,y2);
+		    }
 		}
 	    }
 

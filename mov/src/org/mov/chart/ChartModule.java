@@ -719,6 +719,10 @@ public class ChartModule extends JPanel implements Module,
 	    }
 	}
 
+	if (x != null && viewMode == SCRIBBLING) {
+	    chart.setPoint(new Integer(Coordinate.BREAK), new Integer(Coordinate.BREAK));
+	}
+
     }
     public void mouseDragged(MouseEvent e) {
 

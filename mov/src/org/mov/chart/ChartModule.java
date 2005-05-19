@@ -905,7 +905,7 @@ public class ChartModule extends JPanel implements Module,
      * Activate chart button b, and deactivate all the rest of the
      * buttons. 
      *
-     * @param JButton b      Chart Drawing button to activate
+     * @param b      Chart Drawing button to activate
      *
     */
 

@@ -165,7 +165,7 @@ public class Chart extends JComponent implements MouseListener {
     public Vector getXRange() {
 	return xRange;
     }
-
+    
     /**
      * Get the first X value that appears in the chart.
      */
@@ -460,10 +460,10 @@ public class Chart extends JComponent implements MouseListener {
     }
 
     /**
-     * Sets the start point of a new line draw on the graph.
+     * Sets the end X point of the highlighted region. 
      *      
      * @param	x	the starting x value
-     * @param	y	the starting y value
+     *
      */
     public void setHighlightedEnd(Comparable x) {
 	endHighlightedX = x;

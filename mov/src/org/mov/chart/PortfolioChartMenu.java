@@ -46,7 +46,7 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 
     private JMenuItem removeMenu;
 
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private Graph graph;
     private ChartModule listener;
     private HashMap map = new HashMap();
@@ -61,7 +61,7 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
      * @param	listener	the chart module associated with the menu
      * @param	graph		the graph we are associated with
      */
-    public PortfolioChartMenu(ChartModule listener, QuoteBundle quoteBundle,
+    public PortfolioChartMenu(ChartModule listener, EODQuoteBundle quoteBundle,
 			      Portfolio portfolio, Graph graph) {
 
 	super(graph.getSourceName());

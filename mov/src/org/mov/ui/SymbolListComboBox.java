@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.SortedSet;
 import javax.swing.JComboBox;
 
-import org.mov.quote.QuoteRange;
+import org.mov.quote.EODQuoteRange;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
 import org.mov.util.Locale;
@@ -50,19 +50,19 @@ public class SymbolListComboBox extends JComboBox {
 	//setPrototypeDisplayValue("avg(close, 15, 15) > 121");
     }
     
-    public QuoteRange getQuoteRange()
+    public EODQuoteRange getQuoteRange()
         throws SymbolFormatException {
         
         String text = getText();
         
         if(text.equals(ALL_ORDINARIES))
-            return new QuoteRange(QuoteRange.ALL_ORDINARIES);
+            return new EODQuoteRange(EODQuoteRange.ALL_ORDINARIES);
         else if(text.equals(ALL_SYMBOLS))
-            return new QuoteRange(QuoteRange.ALL_SYMBOLS);
+            return new EODQuoteRange(EODQuoteRange.ALL_SYMBOLS);
         else if(text.equals(MARKET_INDICES))
-            return new QuoteRange(QuoteRange.MARKET_INDICES);
+            return new EODQuoteRange(EODQuoteRange.MARKET_INDICES);
         else if(text == null)
-            return new QuoteRange(QuoteRange.ALL_ORDINARIES);
+            return new EODQuoteRange(EODQuoteRange.ALL_ORDINARIES);
         else {
             // Convert the text string to a sorted set of symbol
             // strings and also check to see if they exist
@@ -72,7 +72,7 @@ public class SymbolListComboBox extends JComboBox {
             if(symbolSet.isEmpty())
                 throw new SymbolFormatException(Locale.getString("MISSING_SYMBOLS"));
             else
-                return new QuoteRange(new ArrayList(symbolSet));
+                return new EODQuoteRange(new ArrayList(symbolSet));
         }
     }
 

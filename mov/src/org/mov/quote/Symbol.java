@@ -39,10 +39,12 @@ import org.mov.util.Locale;
  * <code>toLowerCase()</code> calls required, and have a single place to store symbol 
  * parsing code. 
  *
- * <p>To reduce memory symbols are stored canonically. That is there is a single
+ * <p>To reduce memory, symbols are stored canonically. That is there is a single
  * object for each symbol. For example the string symbol "CBA" would be represented by
  * a single class, no matter where it was used. So instead of instantiating a new
- * symbol class, you find the canonical object using the find method.
+ * symbol class, you find the canonical object using the {@link #find} method.
+ *
+ * @author Andrew Leppard
  */
 public class Symbol implements Cloneable, Comparable {
 

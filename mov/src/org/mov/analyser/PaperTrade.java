@@ -38,8 +38,8 @@ import org.mov.portfolio.StockHolding;
 import org.mov.portfolio.Transaction;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
-import org.mov.quote.QuoteCache;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteCache;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 
@@ -80,10 +80,10 @@ public class PaperTrade {
     private class Environment {
 
         // Direct access to quote cache to avoid calling getInstance() method
-        public QuoteCache quoteCache;
+        public EODQuoteCache quoteCache;
 
         // Historical quote data
-        public QuoteBundle quoteBundle;
+        public EODQuoteBundle quoteBundle;
 
         // Current portfolio
         public Portfolio portfolio;
@@ -115,7 +115,7 @@ public class PaperTrade {
          * @param endDate last date of trading
          * @param capital initial capital for trading
          */
-        public Environment(QuoteBundle quoteBundle,
+        public Environment(EODQuoteBundle quoteBundle,
                            String portfolioName,
                            TradingDate startDate,
                            TradingDate endDate,
@@ -124,7 +124,7 @@ public class PaperTrade {
                            String tradeValueSell) {
 
             this.quoteBundle = quoteBundle;
-            this.quoteCache = QuoteCache.getInstance();
+            this.quoteCache = EODQuoteCache.getInstance();
             
             this.tradeValueBuy = tradeValueBuy;
             this.tradeValueSell = tradeValueSell;
@@ -277,7 +277,7 @@ public class PaperTrade {
      * @param orderCache cache of ordered symbols
      */
     private static void sellTrades(Environment environment,
-                                   QuoteBundle quoteBundle,
+                                   EODQuoteBundle quoteBundle,
                                    Variables variables,
                                    Expression sell,
                                    Expression buy,
@@ -351,7 +351,7 @@ public class PaperTrade {
      * @param stockValue amount of money to spend on stock
      */
     private static void buyTrades(Environment environment,
-                                  QuoteBundle quoteBundle,
+                                  EODQuoteBundle quoteBundle,
                                   Variables variables,
                                   Expression buy,
                                   int dateOffset,
@@ -432,7 +432,7 @@ public class PaperTrade {
     private static int getHoldingTime(Environment environment, StockHolding stockHolding,
                                       int dateOffset) {
         try {
-            return (1 - (QuoteCache.getInstance().dateToOffset(stockHolding.getDate()) -
+            return (1 - (EODQuoteCache.getInstance().dateToOffset(stockHolding.getDate()) -
                          dateOffset));
 
         }
@@ -460,7 +460,7 @@ public class PaperTrade {
      * @return the portfolio at the close of the last day's trade
      */
     public static Portfolio paperTrade(String portfolioName,
-                                       QuoteBundle quoteBundle,
+                                       EODQuoteBundle quoteBundle,
                                        Variables variables,
                                        OrderCache orderCache,
                                        TradingDate startDate,
@@ -532,7 +532,7 @@ public class PaperTrade {
      * @return the portfolio at the close of the last day's trade
      */
     public static Portfolio paperTrade(String portfolioName,
-                                       QuoteBundle quoteBundle,
+                                       EODQuoteBundle quoteBundle,
                                        Variables variables,
                                        OrderCache orderCache,
                                        TradingDate startDate,
@@ -598,7 +598,7 @@ public class PaperTrade {
      * Set the information for the tip of the next day.
      */
     private static void setTip(Environment environment,
-                                  QuoteBundle quoteBundle,
+                                  EODQuoteBundle quoteBundle,
                                   Variables variables,
                                   Expression buy,
                                   Expression sell,
@@ -620,16 +620,16 @@ public class PaperTrade {
                     tradeCost, symbols, orderCache);
         
     }
-    
+
     private static void setSellTip(Environment environment,
-                                  QuoteBundle quoteBundle,
-                                  Variables variables,
-                                  Expression sell,
-                                  int dateOffset,
-                                  Money tradeCost,
-                                  List symbols,
-                                  OrderCache orderCache) {
-                                      
+                                   EODQuoteBundle quoteBundle,
+                                   Variables variables,
+                                   Expression sell,
+                                   int dateOffset,
+                                   Money tradeCost,
+                                   List symbols,
+                                   OrderCache orderCache) {
+        
         // Count the sell tip for the next day
                                       
         int order = 0;
@@ -688,7 +688,7 @@ public class PaperTrade {
     }
     
     private static void setBuyTip(Environment environment,
-                                  QuoteBundle quoteBundle,
+                                  EODQuoteBundle quoteBundle,
                                   Variables variables,
                                   Expression buy,
                                   int dateOffset,

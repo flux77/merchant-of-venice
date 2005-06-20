@@ -25,9 +25,9 @@ import java.util.Set;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.quote.MissingQuoteException;
+import org.mov.quote.EODQuoteBundle;
+import org.mov.quote.EODQuoteCache;
 import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteCache;
 import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 
@@ -84,18 +84,18 @@ public class ShareAccount extends AbstractAccount implements Cloneable {
 	return name;
     }
 
-    public Money getValue(QuoteBundle quoteBundle, TradingDate date)
+    public Money getValue(EODQuoteBundle quoteBundle, TradingDate date)
         throws MissingQuoteException {
 
         try {
-            return getValue(quoteBundle, QuoteCache.getInstance().dateToOffset(date));
+            return getValue(quoteBundle, EODQuoteCache.getInstance().dateToOffset(date));
         }
         catch(WeekendDateException e) {
             throw MissingQuoteException.getInstance();
         }
     }
 
-    public Money getValue(QuoteBundle quoteBundle, int dateOffset)
+    public Money getValue(EODQuoteBundle quoteBundle, int dateOffset)
 	throws MissingQuoteException {
 
 	Set set = stockHoldings.keySet();

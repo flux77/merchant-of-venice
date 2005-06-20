@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.HashMap;
 
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 
 /**
  * Caches the order of stock quotes in a quote bundle. The GP allows the user
@@ -42,7 +42,7 @@ import org.mov.quote.QuoteBundle;
 public class OrderCache {
 
     // The quote bundle containing the quotes we are ordering
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
     // A comparator which orders the quotes
     private OrderComparator orderComparator;
@@ -56,7 +56,7 @@ public class OrderCache {
      * @param quoteBundle the quotes to order
      * @param orderComparator the method of ordering
      */
-    public OrderCache(QuoteBundle quoteBundle, OrderComparator orderComparator) {
+    public OrderCache(EODQuoteBundle quoteBundle, OrderComparator orderComparator) {
         this.quoteBundle = quoteBundle;
         this.orderComparator = orderComparator;
 

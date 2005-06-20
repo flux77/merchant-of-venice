@@ -50,6 +50,8 @@ public class TextViewDialog {
 
     /** Display text with a fixed-width font. */
     public final static int FIXED_WIDTH = 0;
+
+    /** Display text with a proportional width font. */
     public final static int PROPORTIONAL = 1;
 
     private TextViewDialog(String text, String title, int rows, int columns, int fontType,
@@ -160,7 +162,7 @@ public class TextViewDialog {
      * @param title the title of the dialog
      * @param rows the height of the text box in characters
      * @param columns the width of the text box in characters
-     * @param fontType type of font, either {@link FIXED_WIDTH} or {@link PROPORTIONAL}.
+     * @param fontType type of font, either {@link #FIXED_WIDTH} or {@link #PROPORTIONAL}.
      * @param buttons a list of choices to be given to the user
      * @return button pressed
      */

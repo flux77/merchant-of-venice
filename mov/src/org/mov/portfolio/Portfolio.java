@@ -19,8 +19,8 @@
 package org.mov.portfolio;
 
 import org.mov.quote.MissingQuoteException;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteCache;
+import org.mov.quote.EODQuoteBundle;
+import org.mov.quote.EODQuoteCache;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
 import org.mov.quote.WeekendDateException;
@@ -427,11 +427,11 @@ public class Portfolio implements Cloneable {
      * @param	date	the date to calculate the value
      * @return	the value
      */
-    public Money getValue(QuoteBundle quoteBundle, TradingDate date)
+    public Money getValue(EODQuoteBundle quoteBundle, TradingDate date)
 	throws MissingQuoteException {
 
         try {
-            return getValue(quoteBundle, QuoteCache.getInstance().dateToOffset(date));
+            return getValue(quoteBundle, EODQuoteCache.getInstance().dateToOffset(date));
         }
         catch(WeekendDateException e) {
             throw MissingQuoteException.getInstance();
@@ -448,7 +448,7 @@ public class Portfolio implements Cloneable {
      * @param	dateOffset fast date offset
      * @return	the value
      */
-     public Money getValue(QuoteBundle quoteBundle, int dateOffset)
+     public Money getValue(EODQuoteBundle quoteBundle, int dateOffset)
  	throws MissingQuoteException {
 
          Money value = Money.ZERO;
@@ -510,7 +510,7 @@ public class Portfolio implements Cloneable {
      * @param	date            the date
      * @return	the value
      */
-    public Money getShareValue(QuoteBundle quoteBundle, TradingDate date)
+    public Money getShareValue(EODQuoteBundle quoteBundle, TradingDate date)
 	throws MissingQuoteException {
         Money value = Money.ZERO;
 
@@ -531,7 +531,7 @@ public class Portfolio implements Cloneable {
      * @param	date            the date
      * @return	the value
      */
-    public Money getReturnValue(QuoteBundle quoteBundle, TradingDate date)
+    public Money getReturnValue(EODQuoteBundle quoteBundle, TradingDate date)
 	throws MissingQuoteException {
 
         // The profit loss is calculated as the value of the Portfolio minus

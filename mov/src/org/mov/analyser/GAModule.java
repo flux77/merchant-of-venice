@@ -47,7 +47,7 @@ import org.mov.parser.Expression;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.quote.QuoteBundle;
-import org.mov.quote.ScriptQuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
 import org.mov.util.Locale;
@@ -58,7 +58,7 @@ public class GAModule extends JPanel implements Module {
 
     private PropertyChangeSupport propertySupport;
     private JDesktopPane desktop;
-    private ScriptQuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
     // Single result table for entire application
     private static ModuleFrame resultsFrame = null;
@@ -296,7 +296,7 @@ public class GAModule extends JPanel implements Module {
         Expression sellRule = GARulesPage.getSellRule();
 
         // Get the quote bundle
-        quoteBundle = new ScriptQuoteBundle(quoteRangePage.getQuoteRange());
+        quoteBundle = new EODQuoteBundle(quoteRangePage.getQuoteRange());
         OrderComparator orderComparator = quoteRangePage.getOrderComparator(quoteBundle);
         OrderCache orderCache = new OrderCache(quoteBundle, orderComparator);
         
@@ -379,14 +379,14 @@ public class GAModule extends JPanel implements Module {
     }
     
     private List getResults(GeneticAlgorithm geneticAlgorithm,
-                                int breedingPopulation,
-                                int displayPopulation,
-                                QuoteBundle quoteBundle,
-                                TradingDate startDate,
-                                TradingDate endDate,
-                                Money initialCapital,
-                                Money tradeCost,
-                                int generation) {
+                            int breedingPopulation,
+                            int displayPopulation,
+                            EODQuoteBundle quoteBundle,
+                            TradingDate startDate,
+                            TradingDate endDate,
+                            Money initialCapital,
+                            Money tradeCost,
+                            int generation) {
         // Create a list of results from the top breeding individuals
         List results = new ArrayList();
         int displayCount = Math.min(breedingPopulation, displayPopulation);

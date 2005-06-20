@@ -19,7 +19,7 @@
 package org.mov.portfolio;
 
 import org.mov.quote.MissingQuoteException;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
@@ -60,7 +60,7 @@ public interface Account {
      * @param	quoteBundle	the quote bundle
      * @param	dateOffset fast date offset
      */
-    public Money getValue(QuoteBundle quoteBundle, int dateOffset)
+    public Money getValue(EODQuoteBundle quoteBundle, int dateOffset)
 	throws MissingQuoteException;
 
     /**
@@ -69,7 +69,7 @@ public interface Account {
      * @param quoteBundle the quote bundle
      * @param date        the date
      */
-    public Money getValue(QuoteBundle quoteBundle, TradingDate date)
+    public Money getValue(EODQuoteBundle quoteBundle, TradingDate date)
 	throws MissingQuoteException;
 
     /**

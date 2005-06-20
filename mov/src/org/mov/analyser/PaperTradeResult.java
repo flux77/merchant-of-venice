@@ -27,7 +27,7 @@ import org.mov.util.TradingDate;
 
 public class PaperTradeResult {
     private Portfolio portfolio;
-    private ScriptQuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private Money initialCapital;
     private Money tradeCost;
     private String buyRule;
@@ -39,9 +39,7 @@ public class PaperTradeResult {
     private TradingDate endDate;
     private String tip;
 
-
-    
-    public PaperTradeResult(Portfolio portfolio, ScriptQuoteBundle quoteBundle,
+    public PaperTradeResult(Portfolio portfolio, EODQuoteBundle quoteBundle,
                             Money initialCapital, Money tradeCost,
                             String buyRule, String sellRule,
                             int a, int b, int c,
@@ -139,7 +137,7 @@ public class PaperTradeResult {
         return portfolio;
     }
 
-    public ScriptQuoteBundle getQuoteBundle() {
+    public EODQuoteBundle getQuoteBundle() {
         return quoteBundle;
     }
     

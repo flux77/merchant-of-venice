@@ -35,7 +35,7 @@ import org.mov.util.TradingDateFormatException;
  *
  * @author Andrew Leppard
  */
-public class MetaStockQuoteFilter implements QuoteFilter {
+public class MetaStockQuoteFilter implements EODQuoteFilter {
 
     // Format used for writing stock quotes
     private NumberFormat format = null;
@@ -64,8 +64,8 @@ public class MetaStockQuoteFilter implements QuoteFilter {
      * @return	the stock quote
      * @exception QuoteFormatException if the quote could not be parsed
      */
-    public Quote toQuote(String quoteLine) throws QuoteFormatException {
-	Quote quote = null;
+    public EODQuote toEODQuote(String quoteLine) throws QuoteFormatException {
+	EODQuote quote = null;
 
 	if(quoteLine != null) {
 	    String[] quoteParts = quoteLine.split(",");
@@ -96,8 +96,8 @@ public class MetaStockQuoteFilter implements QuoteFilter {
                     float day_low = Float.parseFloat(quoteParts[i++]);
                     float day_close = Float.parseFloat(quoteParts[i++]);
                     int day_volume = Integer.parseInt(quoteParts[i++]);
-                    quote = new Quote(symbol, date, day_volume, day_low, day_high,
-                                      day_open, day_close);
+                    quote = new EODQuote(symbol, date, day_volume, day_low, day_high,
+                                         day_open, day_close);
                 } 
                 catch(NumberFormatException e) {
                     throw new QuoteFormatException(Locale.getString("ERROR_PARSING_NUMBER",
@@ -116,7 +116,7 @@ public class MetaStockQuoteFilter implements QuoteFilter {
      * @param	quote	a stock quote
      * @return	string version of the quote
      */
-    public String toString(Quote quote) {
+    public String toString(EODQuote quote) {
         if(format == null) {
             format = NumberFormat.getInstance();
             format.setMinimumIntegerDigits(1);

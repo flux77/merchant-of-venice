@@ -831,7 +831,7 @@ public class PreferencesManager {
     /**
      * Save language setting.
      *
-     * @param ISO Language Code
+     * @param languageCode ISO Language Code
      */
     public static void saveLanguageCode(String languageCode) {
         Preferences prefs = getUserNode("/language");

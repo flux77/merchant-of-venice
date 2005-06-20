@@ -27,12 +27,12 @@ import org.mov.util.TradingDate;
 import org.mov.util.TradingDateComparator;
 
 /**
- * This class contains all the stock quotes currently in memory. Its purpose is to
- * cache stock quotes so that tasks do not have to query the database or files whenever they
- * need a quote. While this is a cache it does not control when stock quotes are loaded
- * or freed, that is controlled by {@link QuoteBundleCache}.
+ * This class contains all the end-of-day stock quotes currently in memory. Its purpose is to
+ * cache end-of-day stock quotes so that tasks do not have to query the database or files 
+ * whenever they need a quote. While this is a cache it does not control when stock quotes are
+ * loaded or freed, that is controlled by {@link EODQuoteBundleCache}.
  * <p>
- * Tasks should not directly call this class, but should go through a {@link QuoteBundle}.
+ * Tasks should not directly call this class, but should go through a {@link EODQuoteBundle}.
  * <p>
  * When tasks access quotes in a quote cache, either directly or via a quote bundle they
  * can access quotes in two ways. The first way is specifying the actual date they
@@ -46,11 +46,11 @@ import org.mov.util.TradingDateComparator;
  * {@link #offsetToDate}.
  *
  * @author Andrew Leppard
- * @see Quote
- * @see QuoteBundle
- * @see QuoteBundleCache
+ * @see EODQuote
+ * @see EODQuoteBundle
+ * @see EODQuoteBundleCache
  */
-public class QuoteCache {
+public class EODQuoteCache {
 
     // Cache is organised by a list of hashmaps, each hashmap
     // corresponds to a trading day. The hashmap's keys are stock symbols.
@@ -63,9 +63,9 @@ public class QuoteCache {
     private int size = 0;
 
     // Singleton instance of this class
-    private static QuoteCache instance = null;
+    private static EODQuoteCache instance = null;
 
-    private class QuoteCacheQuote {
+    private class EODQuoteCacheQuote {
         // Floats have more than enough precision to hold quotes. So we
         // store them as floats rather than doubles to reduce memory.
         public int day_volume;
@@ -74,8 +74,8 @@ public class QuoteCache {
         public float day_open;
         public float day_close;
 
-        public QuoteCacheQuote(int day_volume, float day_low, float day_high,
-                               float day_open, float day_close) {
+        public EODQuoteCacheQuote(int day_volume, float day_low, float day_high,
+                                  float day_open, float day_close) {
             this.day_volume = day_volume;
             this.day_low = day_low;
             this.day_high = day_high;
@@ -112,7 +112,7 @@ public class QuoteCache {
     }
 
     // Class should only be constructed once by this class
-    private QuoteCache() {
+    private EODQuoteCache() {
         cache = new ArrayList();
         dates = new ArrayList();
 
@@ -127,9 +127,9 @@ public class QuoteCache {
      *
      * @return  singleton instance of this class
      */
-    public static synchronized QuoteCache getInstance() {
+    public static synchronized EODQuoteCache getInstance() {
 	if(instance == null)
-	    instance = new QuoteCache();
+	    instance = new EODQuoteCache();
 
         return instance;
     }
@@ -162,7 +162,7 @@ public class QuoteCache {
 	throws QuoteNotLoadedException {
 
 	// Get the quote cache quote for the given symbol + date
-	QuoteCacheQuote quote = getQuoteCacheQuote(symbol, dateOffset);
+	EODQuoteCacheQuote quote = getQuoteCacheQuote(symbol, dateOffset);
 
 	if(quote != null)
             return quote.getQuote(quoteType);
@@ -232,7 +232,7 @@ public class QuoteCache {
             HashMap symbols = (HashMap)cache.get(-dateOffset);
 
             if(symbols != null) {
-                QuoteCacheQuote quote = (QuoteCacheQuote)symbols.get(symbol);
+                EODQuoteCacheQuote quote = (EODQuoteCacheQuote)symbols.get(symbol);
                 if (quote != null)
                     return true;
             }
@@ -241,7 +241,7 @@ public class QuoteCache {
     }
 
     // Returns the quote cache object for the given date
-    private QuoteCacheQuote getQuoteCacheQuote(Symbol symbol, int dateOffset)
+    private EODQuoteCacheQuote getQuoteCacheQuote(Symbol symbol, int dateOffset)
         throws QuoteNotLoadedException {
 
 	// First get the hash map for the given date
@@ -249,7 +249,7 @@ public class QuoteCache {
 	assert symbols != null;
 
 	// Second get the quote for the given symbol on the given date
-	return  (QuoteCacheQuote)symbols.get(symbol);
+	return  (EODQuoteCacheQuote)symbols.get(symbol);
     }
 
     // Returns a HashMap containing quotes for that date
@@ -274,7 +274,7 @@ public class QuoteCache {
      *
      * @param quote the quote
      */
-    public void load(Quote quote) {
+    public void load(EODQuote quote) {
         load(quote.getSymbol(),
              quote.getDate(),
              quote.getDayVolume(),
@@ -326,8 +326,8 @@ public class QuoteCache {
         // Lots of stocks don't change between days, so check to see if
         // this stock's quote is identical to yesterdays. If so then
         // just use that
-        QuoteCacheQuote yesterdayQuote = null;
-        QuoteCacheQuote todayQuote = null;
+        EODQuoteCacheQuote yesterdayQuote = null;
+        EODQuoteCacheQuote todayQuote = null;
 
         try {
             yesterdayQuote = getQuoteCacheQuote(symbol, dateOffset - 1);
@@ -340,8 +340,8 @@ public class QuoteCache {
            yesterdayQuote.equals(day_volume, day_low, day_high, day_open, day_close))
             todayQuote = yesterdayQuote;
         else
-            todayQuote = new QuoteCacheQuote(day_volume, day_low, day_high,
-                                             day_open, day_close);
+            todayQuote = new EODQuoteCacheQuote(day_volume, day_low, day_high,
+                                                day_open, day_close);
 
         // Put stock in map and remove symbol and date to reduce memory
         // (they are our indices so we already know them)

@@ -44,7 +44,7 @@ import org.mov.parser.EvaluationException;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.portfolio.Portfolio;
-import org.mov.quote.ScriptQuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
 import org.mov.util.Locale;
@@ -55,7 +55,7 @@ public class PaperTradeModule extends JPanel implements Module {
 
     private PropertyChangeSupport propertySupport;
     private JDesktopPane desktop;
-    private ScriptQuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
     // Single result table for entire application
     private static ModuleFrame resultsFrame = null;
@@ -247,7 +247,7 @@ public class PaperTradeModule extends JPanel implements Module {
     }
 
     private PaperTradeResult paperTrade(ProgressDialog progress,
-                                        ScriptQuoteBundle quoteBundle,
+                                        EODQuoteBundle quoteBundle,
                                         String quoteRangeDescription,
                                         OrderCache orderCache,
                                         TradingDate startDate,
@@ -343,7 +343,7 @@ public class PaperTradeModule extends JPanel implements Module {
         Money tradeCost = portfolioPage.getTradeCost();
         
 
-        quoteBundle = new ScriptQuoteBundle(quoteRangePage.getQuoteRange());
+        quoteBundle = new EODQuoteBundle(quoteRangePage.getQuoteRange());
 
         OrderComparator orderComparator = quoteRangePage.getOrderComparator(quoteBundle);
         OrderCache orderCache = new OrderCache(quoteBundle, orderComparator);

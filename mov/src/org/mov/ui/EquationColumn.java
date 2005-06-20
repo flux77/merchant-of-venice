@@ -27,7 +27,7 @@ import org.mov.parser.EvaluationException;
 import org.mov.parser.Expression;
 import org.mov.parser.Variables;
 import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.TradingDate;
@@ -81,12 +81,12 @@ public class EquationColumn extends Column implements Cloneable {
         this.expression = expression;
     }
 
-    public void recalculate(QuoteBundle quoteBundle, List quotes) throws EvaluationException {
+    public void recalculate(EODQuoteBundle quoteBundle, List quotes) throws EvaluationException {
         results = new HashMap();
         calculate(quoteBundle, quotes);
     }
 
-    public void calculate(QuoteBundle quoteBundle, List quotes) throws EvaluationException {
+    public void calculate(EODQuoteBundle quoteBundle, List quotes) throws EvaluationException {
         assert results != null;
 
         if(expression != null) {

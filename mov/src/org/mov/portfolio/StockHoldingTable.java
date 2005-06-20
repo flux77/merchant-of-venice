@@ -42,7 +42,7 @@ import org.mov.util.TradingDate;
 import org.mov.main.CommandManager;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 
 /**
@@ -66,12 +66,12 @@ public class StockHoldingTable extends AbstractTable {
     private Model model;
 
     class Model extends AbstractTableModel {
-	private QuoteBundle quoteBundle;
+	private EODQuoteBundle quoteBundle;
 	private HashMap stockHoldings;
 	private Object[] symbols;
 	private TradingDate date;
 
-	public Model(List columns, HashMap stockHoldings, QuoteBundle quoteBundle) {
+	public Model(List columns, HashMap stockHoldings, EODQuoteBundle quoteBundle) {
             super(columns);
 
 	    this.stockHoldings = stockHoldings;
@@ -206,7 +206,7 @@ public class StockHoldingTable extends AbstractTable {
      * @param	stockHoldings	stock holdings for ShareAccount
      * @param	quoteBundle	the quote bundle
      */
-    public StockHoldingTable(HashMap stockHoldings, QuoteBundle quoteBundle) {
+    public StockHoldingTable(HashMap stockHoldings, EODQuoteBundle quoteBundle) {
         List columns = new ArrayList();
         columns.add(new Column(SYMBOL_COLUMN,
 			       Locale.getString("SYMBOL"),

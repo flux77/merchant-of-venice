@@ -37,7 +37,7 @@ import org.mov.chart.source.OHLCVIndexQuoteGraphSource;
 import org.mov.ui.DesktopManager;
 import org.mov.util.Locale;
 import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.util.ImageFilter;
 import org.mov.util.BMPFile;
@@ -55,10 +55,11 @@ import org.mov.util.BMPFile;
  *
  * @author Andrew Leppard
  */
-public class QuoteChartMenu extends JMenu {
+
+public class EODQuoteChartMenu extends JMenu {
 
     // Graph's quotes
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
     // Charting module
     private ChartModule listener;
@@ -100,8 +101,8 @@ public class QuoteChartMenu extends JMenu {
      * @param   symbol          the symbol being graphed
      * @param	graph		the graph we are associated with
      */
-    public QuoteChartMenu(final ChartModule listener, QuoteBundle quoteBundle,
-			  Symbol symbol, Graph graph, boolean indexChart) {
+    public EODQuoteChartMenu(final ChartModule listener, EODQuoteBundle quoteBundle,
+                             Symbol symbol, Graph graph, boolean indexChart) {
 	super(graph.getSourceName());
 	menuName = graph.getSourceName();
 

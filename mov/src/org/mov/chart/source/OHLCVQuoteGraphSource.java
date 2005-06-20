@@ -25,15 +25,17 @@ import org.mov.util.TradingDate;
 import org.mov.quote.*;
 
 /**
- * Provides a <code>QuoteBundle</code> graph source. This class
+ * Provides a <code>EODQuoteBundle</code> graph source. This class
  * allows graph sources for day Open, High, Low, Close and
  * Volume (OHLCV).
  *
  * @author Andrew Leppard
  */
+
+// rename to EODQuoteGraphSource?
 public class OHLCVQuoteGraphSource implements GraphSource {
 
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private int quote;
     private Symbol symbol;
     private Graphable graphable;
@@ -47,7 +49,7 @@ public class OHLCVQuoteGraphSource implements GraphSource {
      * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH} or
      * {@link Quote#DAY_LOW}
      */
-    public OHLCVQuoteGraphSource(QuoteBundle quoteBundle, int quote) {
+    public OHLCVQuoteGraphSource(EODQuoteBundle quoteBundle, int quote) {
 	this.quote = quote;
 	this.quoteBundle = quoteBundle;
 

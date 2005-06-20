@@ -30,14 +30,14 @@ import org.mov.util.TradingDate;
 
 public class GPResult {
     private Individual individual;
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private Money initialCapital;
     private Money tradeCost;
     private int generation;
     private TradingDate startDate;	
     private TradingDate endDate;
     
-    public GPResult(Individual individual, QuoteBundle quoteBundle,
+    public GPResult(Individual individual, EODQuoteBundle quoteBundle,
                     Money initialCapital, Money tradeCost,
                     int generation,
                     TradingDate startDate,
@@ -123,7 +123,7 @@ public class GPResult {
         return individual.getPortfolio();
     }
 
-    public QuoteBundle getQuoteBundle() {
+    public EODQuoteBundle getQuoteBundle() {
         return quoteBundle;
     }
 }

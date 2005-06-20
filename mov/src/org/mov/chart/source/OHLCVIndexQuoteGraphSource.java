@@ -28,13 +28,13 @@ import org.mov.quote.*;
 import java.util.*;
 
 /**
- * Provides a <code>QuoteBundle</code> index source. This class
+ * Provides a <code>EODQuoteBundle</code> index source. This class
  * allows index sources for day Open, High, Low, Close and
  * Volume (OHLCV).
  */
 public class OHLCVIndexQuoteGraphSource implements GraphSource {
 
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private int quote;
     private Symbol symbol;
     private Graphable graphable;
@@ -49,7 +49,7 @@ public class OHLCVIndexQuoteGraphSource implements GraphSource {
      * {@link Quote#DAY_CLOSE}, {@link Quote#DAY_HIGH} or 
      * {@link Quote#DAY_LOW}
      */
-    public OHLCVIndexQuoteGraphSource(QuoteBundle quoteBundle, int quote) {	
+    public OHLCVIndexQuoteGraphSource(EODQuoteBundle quoteBundle, int quote) {	
 	this.quote = quote;
 	this.quoteBundle = quoteBundle;
 	

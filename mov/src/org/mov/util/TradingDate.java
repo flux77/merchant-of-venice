@@ -36,6 +36,8 @@ import org.mov.util.Locale;
  * and size (as small as possible). It produces a much smaller and faster
  * date class than using the Calendar hierarchy. It also beats java.util.Date
  * by not using deprecated methods.
+ *
+ * @author Andrew Leppard
  */
 public class TradingDate implements Cloneable, Comparable {
 

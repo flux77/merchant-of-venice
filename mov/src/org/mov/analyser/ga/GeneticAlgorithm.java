@@ -35,7 +35,7 @@ import org.mov.parser.EvaluationException;
 import org.mov.parser.Variables;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.MissingQuoteException;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
@@ -72,7 +72,7 @@ public class GeneticAlgorithm {
     private Random random;
     
     // Historical quote data
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     
     // Cache of stock quote order
     private OrderCache orderCache;
@@ -134,7 +134,7 @@ public class GeneticAlgorithm {
      * @param highest highest GA individual to know the highest bound for generating new individuals
      * @param variables variables containing the parameters of GA
      */
-    public GeneticAlgorithm(QuoteBundle quoteBundle,
+    public GeneticAlgorithm(EODQuoteBundle quoteBundle,
                             OrderCache orderCache,
                             Expression buyRule,
                             Expression sellRule,
@@ -407,19 +407,19 @@ public class GeneticAlgorithm {
      * @param tradeValueSell the sell value of a stock
      * @return portfolio of individual after paper trading
      */
-    public Portfolio paperTrade(QuoteBundle quoteBundle,
-                            OrderCache orderCache,
-                            TradingDate startDate,
-                            TradingDate endDate,
-                            Expression buyRule,
-                            Expression sellRule,
-                            Money initialCapital,
-                            Money stockValue,
-                            int numberStocks,
-                            Money tradeCost,
-                            Variables variables,
-                            String tradeValueBuy,
-                            String tradeValueSell)
+    public Portfolio paperTrade(EODQuoteBundle quoteBundle,
+                                OrderCache orderCache,
+                                TradingDate startDate,
+                                TradingDate endDate,
+                                Expression buyRule,
+                                Expression sellRule,
+                                Money initialCapital,
+                                Money stockValue,
+                                int numberStocks,
+                                Money tradeCost,
+                                Variables variables,
+                                String tradeValueBuy,
+                                String tradeValueSell)
         throws EvaluationException {
 
         Portfolio portfolio = null;

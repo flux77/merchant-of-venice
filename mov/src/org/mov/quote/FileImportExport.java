@@ -37,7 +37,9 @@ import org.mov.util.Report;
  * Import quotes from files into Venice or export them to files.
  *
  * @author Andrew Leppard
- * @see InternetImport, ImportQuoteModule, ExportQuoteModule
+ * @see ExportQuoteModule
+ * @see ImportQuoteModule
+ * @see InternetImport
  */
 public class FileImportExport {
 
@@ -54,7 +56,7 @@ public class FileImportExport {
      * @param file quote file to import
      * @return list of quotes
      */
-    public static List importFile(Report report, QuoteFilter filter, File file) {
+    public static List importFile(Report report, EODQuoteFilter filter, File file) {
         List quotes = new ArrayList();
         String fileName = file.getName();
 
@@ -67,7 +69,7 @@ public class FileImportExport {
 
 	    while(line != null) {
                 try {
-                    Quote quote = filter.toQuote(line);
+                    EODQuote quote = filter.toEODQuote(line);
                     quotes.add(quote);
                     verify(report, fileName, lineNumber, quote);
                 }
@@ -101,7 +103,7 @@ public class FileImportExport {
      * @param quotes list of quotes to export
      * @exception IOException if there was an error writing the file
      */
-    public static void exportFile(QuoteFilter filter, File file, List quotes)
+    public static void exportFile(EODQuoteFilter filter, File file, List quotes)
         throws IOException {
 
         // Don't bother creating empty files
@@ -112,7 +114,7 @@ public class FileImportExport {
             
             // Iterate through stocks printing them to file
             for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-                Quote quote = (Quote)iterator.next();
+                EODQuote quote = (EODQuote)iterator.next();
                 printWriter.println(filter.toString(quote));
             }
             
@@ -129,7 +131,7 @@ public class FileImportExport {
      * @param lineNumber the line number in the quote file or the quote
      * @param quote the quote
      */
-    private static void verify(Report report, String fileName, int lineNumber, Quote quote) {
+    private static void verify(Report report, String fileName, int lineNumber, EODQuote quote) {
         try {
             quote.verify();
         }

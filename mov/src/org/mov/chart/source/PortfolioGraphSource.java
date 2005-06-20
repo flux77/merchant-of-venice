@@ -25,7 +25,7 @@ import org.mov.util.TradingDate;
 import org.mov.portfolio.Account;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.MissingQuoteException;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import java.util.Iterator;
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class PortfolioGraphSource implements GraphSource {
     // Graph the value of a single account in the portfolio
     private static final int ACCOUNT_VALUE = 5;
 
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private int mode;
     private Graphable graphable;
     private Portfolio portfolio;
@@ -75,7 +75,7 @@ public class PortfolioGraphSource implements GraphSource {
      *                          {@link #STOCKS_HELD} for the number of stocks held in the portfolio;
      *                          or {@link #SHARE_VALUE} for the share value of the portfolio.
      */
-    public PortfolioGraphSource(Portfolio portfolio, QuoteBundle quoteBundle,
+    public PortfolioGraphSource(Portfolio portfolio, EODQuoteBundle quoteBundle,
 				int mode) {
 	this.portfolio = portfolio;
 	this.quoteBundle = quoteBundle;
@@ -94,7 +94,7 @@ public class PortfolioGraphSource implements GraphSource {
      *				for every day
      * @param   accountName     name of account in portfolio to graph.
      */
-    public PortfolioGraphSource(Portfolio portfolio, QuoteBundle quoteBundle,
+    public PortfolioGraphSource(Portfolio portfolio, EODQuoteBundle quoteBundle,
                                 String accountName) {
 	this.portfolio = portfolio;
 	this.quoteBundle = quoteBundle;

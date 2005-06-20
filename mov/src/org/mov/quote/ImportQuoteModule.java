@@ -66,7 +66,10 @@ import org.mov.util.TradingDateFormatException;
  * classes.
  *
  * @author Andrew Leppard
- * @see FileImportExport, InternetImport, DatabaseQuoteSource, ExportQuoteModule
+ * @see DatabaseQuoteSource
+ * @see ExportQuoteModule
+ * @see FileImportExport
+ * @see InternetImport
  */
 public class ImportQuoteModule extends JPanel implements Module {
 
@@ -88,7 +91,7 @@ public class ImportQuoteModule extends JPanel implements Module {
     List symbols;
 
     // Parsed fields for file import
-    QuoteFilter filter;
+    EODQuoteFilter filter;
     File files[];
 
     /**
@@ -141,11 +144,11 @@ public class ImportQuoteModule extends JPanel implements Module {
             titledPanel.add(fromFiles);
             
             formatComboBox = new JComboBox();
-            List formats = QuoteFilterList.getInstance().getList();
+            List formats = EODQuoteFilterList.getInstance().getList();
             String selectedFilter = p.get("fileFilter", "MetaStock");
             
             for(Iterator iterator = formats.iterator(); iterator.hasNext();) {
-                QuoteFilter filter = (QuoteFilter)iterator.next();
+                EODQuoteFilter filter = (EODQuoteFilter)iterator.next();
                 formatComboBox.addItem(filter.getName());
                 if(filter.getName().equals(selectedFilter))
                     formatComboBox.setSelectedItem(filter.getName());
@@ -374,7 +377,7 @@ public class ImportQuoteModule extends JPanel implements Module {
             if(files.length != 0) {
                 // Get quote filter format
                 String format = (String)formatComboBox.getSelectedItem();
-                filter = QuoteFilterList.getInstance().getFilter(format);
+                filter = EODQuoteFilterList.getInstance().getFilter(format);
                 return true;
             }
         }

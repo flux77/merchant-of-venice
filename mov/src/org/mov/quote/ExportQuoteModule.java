@@ -61,7 +61,9 @@ import org.mov.util.TradingDate;
  * exporting is handled by other classes.
  *
  * @author Andrew Leppard
- * @see FileImportExport, DatabaseQuoteSource, ImportQuoteModule
+ * @see DatabaseQuoteSource
+ * @see FileImportExport
+ * @see ImportQuoteModule
  */
 public class ExportQuoteModule extends JPanel implements Module {
 
@@ -73,7 +75,7 @@ public class ExportQuoteModule extends JPanel implements Module {
     private JTextField fileNamesTextField;
 
     // Parsed Fields for file export
-    private QuoteFilter filter;
+    private EODQuoteFilter filter;
     private String fileNames;
    
     /**
@@ -116,11 +118,11 @@ public class ExportQuoteModule extends JPanel implements Module {
             titledPanel.add(label);
 
             formatComboBox = new JComboBox();
-            List formats = QuoteFilterList.getInstance().getList();
+            List formats = EODQuoteFilterList.getInstance().getList();
             String selectedFilter = p.get("fileFilter", "MetaStock");
             
             for(Iterator iterator = formats.iterator(); iterator.hasNext();) {
-                QuoteFilter filter = (QuoteFilter)iterator.next();
+                EODQuoteFilter filter = (EODQuoteFilter)iterator.next();
                 formatComboBox.addItem(filter.getName());
                 if(filter.getName().equals(selectedFilter))
                     formatComboBox.setSelectedItem(filter.getName());
@@ -196,7 +198,7 @@ public class ExportQuoteModule extends JPanel implements Module {
     private void parseFields() {
         // Parse quote format
         String format = (String)formatComboBox.getSelectedItem();
-        filter = QuoteFilterList.getInstance().getFilter(format);
+        filter = EODQuoteFilterList.getInstance().getFilter(format);
 
         // And get file name format
         fileNames = fileNamesTextField.getText();
@@ -244,8 +246,8 @@ public class ExportQuoteModule extends JPanel implements Module {
             //progress.setNote(Locale.getString("EXPORTING_FILE", fileName));
                 
             // Load quotes from source and place them in a list ready to write
-            QuoteRange quoteRange = new QuoteRange(QuoteRange.ALL_SYMBOLS, date);
-            QuoteBundle quoteBundle = new ScriptQuoteBundle(quoteRange);
+            EODQuoteRange quoteRange = new EODQuoteRange(EODQuoteRange.ALL_SYMBOLS, date);
+            EODQuoteBundle quoteBundle = new  EODQuoteBundle(quoteRange);
             List quotes = new ArrayList();
 
             for(Iterator innerIterator = quoteBundle.iterator(); innerIterator.hasNext();)

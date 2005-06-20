@@ -25,13 +25,14 @@ import javax.swing.SwingUtilities;
 
 import org.mov.parser.EvaluationException;
 import org.mov.quote.MissingQuoteException;
+import org.mov.quote.EODQuote;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.util.Locale;
 
-public class QuoteModel extends AbstractTableModel {
-    private QuoteBundle quoteBundle;
+public class EODQuoteModel extends AbstractTableModel {
+    private EODQuoteBundle quoteBundle;
     private EquationColumn[] equationColumns;
     private List quotes;
 
@@ -50,8 +51,8 @@ public class QuoteModel extends AbstractTableModel {
     public static final int PERCENT_CHANGE_COLUMN = 8;
     public static final int ACTIVITY_COLUMN       = 9;
 
-    public QuoteModel(QuoteBundle quoteBundle, List quotes, 
-                      int displayDate, int displaySymbol) {
+    public EODQuoteModel(EODQuoteBundle quoteBundle, List quotes, 
+                         int displayDate, int displaySymbol) {
         super();
 
         this.quoteBundle = quoteBundle;
@@ -131,7 +132,7 @@ public class QuoteModel extends AbstractTableModel {
         if(row >= getRowCount())
             return "";
 
-        Quote quote = (Quote)quotes.get(row);
+        EODQuote quote = (EODQuote)quotes.get(row);
         
         switch(column) {
         case(SYMBOL_COLUMN):
@@ -208,7 +209,7 @@ public class QuoteModel extends AbstractTableModel {
         return equationColumns;
     }
     
-    public void setEquationColumns(QuoteBundle quoteBundle, EquationColumn[] equationColumns) {
+    public void setEquationColumns(EODQuoteBundle quoteBundle, EquationColumn[] equationColumns) {
         Thread thread = Thread.currentThread();
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setIndeterminate(true);

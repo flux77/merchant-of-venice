@@ -61,7 +61,7 @@ public class PortfolioModule extends JPanel implements Module,
 
     private JDesktopPane desktop;
     private Portfolio portfolio;
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
     private JMenuBar menuBar;
     private JMenuItem accountNewCashAccount;
@@ -93,7 +93,7 @@ public class PortfolioModule extends JPanel implements Module,
      * @param	quoteBundle	quote bundle
      */
     public PortfolioModule(JDesktopPane desktop, Portfolio portfolio,
-			   QuoteBundle quoteBundle) {
+			   EODQuoteBundle quoteBundle) {
 
 	this.desktop = desktop;
 	this.portfolio = portfolio;

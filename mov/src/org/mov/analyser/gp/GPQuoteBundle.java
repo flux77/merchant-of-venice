@@ -24,28 +24,27 @@ import java.util.List;
 import org.mov.parser.EvaluationException;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteBundleIterator;
-import org.mov.quote.QuoteCache;
-import org.mov.quote.QuoteRange;
+import org.mov.quote.EODQuoteBundle;
+import org.mov.quote.EODQuoteBundleIterator;
+import org.mov.quote.EODQuoteCache;
+import org.mov.quote.EODQuoteRange;
 import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.TradingDate;
 
 /**
- * This class is a specialised version of the QuoteBundle tailored specifically
- * for the GP. It differs from ScriptQuoteBundle in that it enforces a
- * window of dates. This window prevents the GP expressions from accessing quotes
+ * This class is a specialised version of the EODQuoteBundle tailored specifically
+ * for the GP. It differs from in that it enforces a window of dates.
+ * This window prevents the GP expressions from accessing quotes
  * too far in the past which would slow down calculations (e.g. calculating the
  * average value of a stock for the last 3,000 days), and also prevents GP expressions
  * accessing quotes that would be in their future.
  *
  * @author Andrew Leppard
- * @see org.mov.quote.ScriptQuoteBundle
+ * @see org.mov.quote.EODQuoteBundle
  */
-public class GPQuoteBundle implements QuoteBundle {
+public class GPQuoteBundle extends EODQuoteBundle {
 
-    private QuoteBundle quoteBundle;
     private int window;
 
     /**
@@ -55,26 +54,10 @@ public class GPQuoteBundle implements QuoteBundle {
      * @param window prevent access to quotes this many days before
      *               the first quote in the given quote bundle
      */
-    public GPQuoteBundle(QuoteBundle quoteBundle, int window) {
-        this.quoteBundle = quoteBundle;
+    public GPQuoteBundle(EODQuoteBundle quoteBundle, int window) {
+        super(quoteBundle.getQuoteRange());
+
         this.window = window;
-    }
-
-    /**
-     * Get a stock quote. If the stock is earlier than the first date in the bundle, the
-     * bundle will be expand to include the new date given.
-     *
-     * @param symbol  the stock symbol
-     * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
-     *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
-     * @param dateOffset fast access date offset, see {@link QuoteCache}
-     * @return the quote
-     * @exception MissingQuoteException if the quote was not found
-     */
-    public double getQuote(Symbol symbol, int quoteType, int dateOffset)
-	throws MissingQuoteException {
-
-        return quoteBundle.getQuote(symbol, quoteType, dateOffset);
     }
 
     /**
@@ -86,7 +69,7 @@ public class GPQuoteBundle implements QuoteBundle {
      * @param symbol  the stock symbol
      * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
      *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
-     * @param today fast access date offset of current date, see {@link QuoteCache}
+     * @param today fast access date offset of current date, see {@link EODQuoteCache}
      * @param offset offset from current date
      * @return the quote
      * @exception EvaluationException if the script isn't allowed access to the quote.
@@ -104,76 +87,7 @@ public class GPQuoteBundle implements QuoteBundle {
 
         // Date is within range
         else
-            return quoteBundle.getQuote(symbol, quoteType, today + offset);
-    }
-
-    /**
-     * Get a stock quote.
-     *
-     * @param symbol  the stock symbol
-     * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
-     *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
-     * @param date the date
-     * @return the quote
-     * @exception MissingQuoteException if the quote was not found
-     */
-    public double getQuote(Symbol symbol, int quoteType, TradingDate date)
-        throws MissingQuoteException {
-
-	double quote;
-
-	try {
-	    quote = getQuote(symbol, quoteType, QuoteCache.getInstance().dateToOffset(date));
-	}
-	catch(WeekendDateException e) {
-	    throw MissingQuoteException.getInstance();
-	}
-
-	return quote;
-    }
-
-    /**
-     * Return whether the given quote should be in this quote bundle.
-     *
-     * @param symbol    the symbol
-     * @param dateOffset fast access date offset, see {@link QuoteCache}
-     * @return  <code>true</code> if this symbol should be in the quote bundle,
-     *          <code>false</code> otherwise
-     */
-    public boolean containsQuote(Symbol symbol, int dateOffset) {
-        return quoteBundle.containsQuote(symbol, dateOffset);
-    }
-
-    /**
-     * Return whether the given quote should be in this quote bundle.
-     *
-     * @param symbol    the symbol
-     * @param date      the date
-     * @return  <code>true</code> if this symbol should be in the quote bundle,
-     *          <code>false</code> otherwise
-     */
-    public boolean containsQuote(Symbol symbol, TradingDate date) {
-        return quoteBundle.containsQuote(symbol, date);
-    }
-
-    /**
-     * Return an iterator over this quote bundle. The iterator will return, in order,
-     * all the quotes in this bundle.
-     *
-     * @return iterator over the quotes
-     * @see Quote
-     */
-    public Iterator iterator() {
-        return new QuoteBundleIterator(this);
-    }
-
-    /**
-     * Return the quote range which specifies this quote bundle.
-     *
-     * @return the quote range
-     */
-    public QuoteRange getQuoteRange() {
-	return quoteBundle.getQuoteRange();
+            return getQuote(symbol, quoteType, today + offset);
     }
 
     /**
@@ -181,102 +95,7 @@ public class GPQuoteBundle implements QuoteBundle {
      *
      * @param quoteRange        the new quote range
      */
-    public void setQuoteRange(QuoteRange quoteRange) {
+    public void setQuoteRange(EODQuoteRange quoteRange) {
         assert false;
-    }
-
-    /**
-     * Return the first symbol in the quote bundle.
-     *
-     * @return the first symbol
-     */
-    public Symbol getFirstSymbol() {
-        return quoteBundle.getFirstSymbol();
-    }
-
-    /**
-     * Returns all the symbols in the quote bundle.
-     *
-     * @return all symbols
-     */
-    public List getAllSymbols() {
-        return quoteBundle.getAllSymbols();
-    }
-
-    /**
-     * Returns all the symbols listed in this quote bundle for the given date.
-     *
-     * @param dateOffset fast access date offset, see {@link QuoteCache}
-     * @return all symbols
-     */
-    public List getSymbols(int dateOffset) {	
-        return quoteBundle.getSymbols(dateOffset);
-    }
-
-    /**
-     * Returns all the symbols listed in this quote bundle for the given date.
-     *
-     * @param date the date
-     * @return all symbols
-     */
-    public List getSymbols(TradingDate date) {
-        return quoteBundle.getSymbols(date);
-    }
-
-    /**
-     * Return the first date in this quote bundle.
-     *
-     * @return the earliest date
-     */
-    public TradingDate getFirstDate() {
-        return quoteBundle.getFirstDate();
-    }
-
-    /**
-     * Return the last date in this quote bundle.
-     *
-     * @return the latest date
-     */
-    public TradingDate getLastDate() {
-        return quoteBundle.getLastDate();
-    }
-
-    /**
-     * Return the fast access date offset of the first date in this quote bundle
-     *
-     * @return the first date offset, see {@link QuoteCache}
-     */
-    public int getFirstDateOffset() {
-        return quoteBundle.getFirstDateOffset();
-    }
-
-    /**
-     * Return the fast access date offset of the last date in this quote bundle
-     *
-     * @return the first date offset, see {@link QuoteCache}
-     */
-    public int getLastDateOffset() {
-        return quoteBundle.getLastDateOffset();
-    }
-
-    /**
-     * Convert between a fast access date offset to an actual date.
-     *
-     * @param dateOffset        fast access date offset, see {@link QuoteCache}
-     * @return the date
-     */
-    public TradingDate offsetToDate(int dateOffset) {
-        return quoteBundle.offsetToDate(dateOffset);
-    }
-
-    /**
-     * Convert between a date and a fast access date offset.
-     *
-     * @param date the date
-     * @return fast access date offset, see {@link QuoteCache}
-     */
-    public int dateToOffset(TradingDate date)
-        throws WeekendDateException {
-        return quoteBundle.dateToOffset(date);
     }
 }

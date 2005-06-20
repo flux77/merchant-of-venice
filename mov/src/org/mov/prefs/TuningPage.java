@@ -27,7 +27,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.mov.quote.QuoteCache;
+import org.mov.quote.EODQuoteCache;
 import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
@@ -66,8 +66,8 @@ public class TuningPage extends JPanel implements PreferencesPage
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
 
-        int currentCachedQuotes = (QuoteCache.isInstantiated()?
-                                   QuoteCache.getInstance().size() :
+        int currentCachedQuotes = (EODQuoteCache.isInstantiated()?
+                                   EODQuoteCache.getInstance().size() :
                                    0);
         GridBagHelper.addLabelRow(borderPanel, 
                                   Locale.getString("CURRENT_CACHED_QUOTES"), 

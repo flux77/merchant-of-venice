@@ -32,7 +32,7 @@ import org.mov.parser.Expression;
 import org.mov.parser.ExpressionException;
 import org.mov.parser.Parser;
 import org.mov.parser.Variables;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 import org.mov.ui.EquationComboBox;
@@ -50,7 +50,7 @@ public class CustomGraphUI implements GraphUI {
 
     // Variables to allow us to run the equation to check it for errors
     private Graphable source;
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private Symbol symbol;
 
     // The graph's user interface
@@ -67,7 +67,7 @@ public class CustomGraphUI implements GraphUI {
      *
      * @param settings the initial settings
      */
-    public CustomGraphUI(HashMap settings, Graphable source, QuoteBundle quoteBundle,
+    public CustomGraphUI(HashMap settings, Graphable source, EODQuoteBundle quoteBundle,
                          Symbol symbol) {
         this.source = source;
         this.quoteBundle = quoteBundle;
@@ -161,7 +161,7 @@ public class CustomGraphUI implements GraphUI {
      */
     public static Graphable createCustom(Expression indicator,
                                          Graphable source,
-                                         QuoteBundle quoteBundle,
+                                         EODQuoteBundle quoteBundle,
                                          Symbol symbol)
         throws EvaluationException {
 

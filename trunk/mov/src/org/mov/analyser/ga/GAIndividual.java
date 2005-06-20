@@ -60,8 +60,8 @@ public class GAIndividual {
      * Create a new individual with the given parameters.
      *
      * @param parameters the name of parameters
-     * @param values the values of parameters
-     * @param values the types of parameters (integer or float)
+     * @param values     the values of parameters
+     * @param types      the types of parameters (integer or float)
      */
     public GAIndividual(String[] parameters, double[] values, int[] types) {
         
@@ -167,12 +167,11 @@ public class GAIndividual {
     /**
      * Set the final value of the individual after paper trading.
      *
-     * @param the final value
+     * @param value the final value
      */
     public void setValue(Money value) {
         this.value = value;
     }
-
     
     /**
      * Get the portfolio according to individual.
@@ -186,7 +185,7 @@ public class GAIndividual {
     /**
      * Set the portfolio according to individual.
      *
-     * @param the portfolio
+     * @param portfolio the portfolio
      */
     public void setPortfolio(Portfolio portfolio) {
         this.portfolio = portfolio;

@@ -33,7 +33,7 @@ import org.mov.util.TradingDateFormatException;
  *
  * @author Andrew Leppard
  */
-public class EzyChartQuoteFilter implements QuoteFilter {
+public class EzyChartQuoteFilter implements EODQuoteFilter {
 
     /**
      * Creates an instance of the filter.
@@ -59,8 +59,8 @@ public class EzyChartQuoteFilter implements QuoteFilter {
      * @return	the stock quote
      * @exception QuoteFormatException if the quote could not be parsed
      */
-    public Quote toQuote(String quoteLine) throws QuoteFormatException {
-	Quote quote = null;
+    public EODQuote toEODQuote(String quoteLine) throws QuoteFormatException {
+	EODQuote quote = null;
 
 	if(quoteLine != null) {
 	    String[] quoteParts = quoteLine.split(",");
@@ -93,8 +93,8 @@ public class EzyChartQuoteFilter implements QuoteFilter {
                     float day_low = Float.parseFloat(quoteParts[i++]) / 100;
                     float day_close = Float.parseFloat(quoteParts[i++]) / 100;
                     int day_volume = Integer.parseInt(quoteParts[i++]);
-                    quote = new Quote(symbol, date, day_volume, day_low, day_high,
-                                      day_open, day_close);
+                    quote = new EODQuote(symbol, date, day_volume, day_low, day_high,
+                                         day_open, day_close);
                 } 
                 catch(NumberFormatException e) {
                     throw new QuoteFormatException(Locale.getString("ERROR_PARSING_NUMBER",
@@ -113,7 +113,7 @@ public class EzyChartQuoteFilter implements QuoteFilter {
      * @param	quote	a stock quote
      * @return	string version of the quote
      */
-    public String toString(Quote quote) {
+    public String toString(EODQuote quote) {
 	return new String(quote.getSymbol() + "," + 
 			  quote.getDate().toString("yymmdd") + "," +
 			  Math.round(quote.getDayOpen()*100) + "," +

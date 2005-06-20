@@ -38,7 +38,7 @@ public class GAResult {
     private GAIndividual individual;
     private Expression buyRule;
     private Expression sellRule;
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private Money initialCapital;
     private Money tradeCost;
     private int generation;
@@ -47,7 +47,7 @@ public class GAResult {
     
     public GAResult(GAIndividual individual,
                     Expression buyRule, Expression sellRule,
-                    QuoteBundle quoteBundle,
+                    EODQuoteBundle quoteBundle,
                     Money initialCapital, Money tradeCost,
                     int generation,
                     TradingDate startDate,
@@ -153,7 +153,7 @@ public class GAResult {
         return individual.getPortfolio();
     }
 
-    public QuoteBundle getQuoteBundle() {
+    public EODQuoteBundle getQuoteBundle() {
         return quoteBundle;
     }
 }

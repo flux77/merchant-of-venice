@@ -41,8 +41,8 @@ import org.mov.ui.ProgressDialogManager;
  *
  * Example:
  * <pre>
- *      QuoteRange quoteRange = new QuoteRange("CBA");
- *      QuoteBundle quoteBundle = new QuoteBundle(quoteRange);
+ *      EODQuoteRange quoteRange = new EODQuoteRange("CBA");
+ *      EODQuoteBundle quoteBundle = new EODQuoteBundle(quoteRange);
  *      try {
  *	    float = quoteBundle.getQuote("CBA", Quote.DAY_OPEN, 0);
  *      }
@@ -52,8 +52,8 @@ import org.mov.ui.ProgressDialogManager;
  * </pre>
  *
  * @see Quote
- * @see QuoteRange
- * @see QuoteBundle
+ * @see EODQuoteRange
+ * @see EODQuoteBundle
  */
 public class FileQuoteSource implements QuoteSource
 {
@@ -72,7 +72,7 @@ public class FileQuoteSource implements QuoteSource
     private TradingDate firstDate = null;
 
     // Filter to convert data into quote
-    private QuoteFilter filter;
+    private EODQuoteFilter filter;
 
     /**
      * Creates a new quote source using the list of files specified in the user
@@ -85,7 +85,7 @@ public class FileQuoteSource implements QuoteSource
 
 	// Set filter to whatever is defined in the preferences to filter
 	// to our internal format
-	filter = QuoteFilterList.getInstance().getFilter(format);
+	filter = EODQuoteFilterList.getInstance().getFilter(format);
 
         this.fileURLs = fileURLs;
     }
@@ -103,7 +103,7 @@ public class FileQuoteSource implements QuoteSource
         // return its date
         while(line != null) {
             try {
-                Quote quote = filter.toQuote(line);
+                EODQuote quote = filter.toEODQuote(line);
                 return quote.getDate();
             }
             catch(QuoteFormatException e) {
@@ -118,7 +118,7 @@ public class FileQuoteSource implements QuoteSource
     // Given a quote range and a file name, return a list of all
     // quotes we are looking for in this file.
     private List getContainedQuotes(URL fileURL,
-                                    QuoteRange quoteRange) {
+                                    EODQuoteRange quoteRange) {
 
         List quotes = new ArrayList();
 	String line;
@@ -132,7 +132,7 @@ public class FileQuoteSource implements QuoteSource
 
 	    while(line != null) {
                 try {
-                    Quote quote = filter.toQuote(line);
+                    EODQuote quote = filter.toEODQuote(line);
 
                     // Is this one of the ones we are looking for?
                     if(quoteRange.containsSymbol(quote.getSymbol())) {
@@ -140,7 +140,7 @@ public class FileQuoteSource implements QuoteSource
 
                         // If we are only looking for a certain set of
                         // symbols, exit when we have found them
-                        if(quoteRange.getType() == QuoteRange.GIVEN_SYMBOLS &&
+                        if(quoteRange.getType() == EODQuoteRange.GIVEN_SYMBOLS &&
                            quotes.containsAll(quoteRange.getAllSymbols()))
                             break;
                     }
@@ -284,7 +284,7 @@ public class FileQuoteSource implements QuoteSource
             for(Iterator iterator = dateToURL.keySet().iterator(); iterator.hasNext();) {
                 TradingDate date = (TradingDate)iterator.next();
                 List quotes = getContainedQuotes(getURLForDate(date),
-                                                 new QuoteRange(symbol));
+                                                 new EODQuoteRange(symbol));
                 if(quotes.size() > 0)
                     return true; // found!
             }
@@ -361,16 +361,16 @@ public class FileQuoteSource implements QuoteSource
      *
      * @param	quoteRange	the range of quotes to load
      * @return  <code>TRUE</code> if the operation suceeded
-     * @see Quote
-     * @see QuoteCache
+     * @see EODQuote
+     * @see EODQuoteCache
      */
-    public boolean loadQuoteRange(QuoteRange quoteRange) {
+    public boolean loadQuoteRange(EODQuoteRange quoteRange) {
 
         if(checkFiles()) {
             // This needs to be before the progress dialog otherwise
             // we might end up (during an import) trying to open 3
             // progress dialogs within one thread which is illegal.
-            QuoteCache quoteCache = QuoteCache.getInstance();
+            EODQuoteCache quoteCache = EODQuoteCache.getInstance();
 
             // This query might take a while...
             Thread thread = Thread.currentThread();
@@ -413,7 +413,7 @@ public class FileQuoteSource implements QuoteSource
                                         
                     // Load quotes into cache
                     for(Iterator quoteIterator = quotes.iterator(); quoteIterator.hasNext();) {
-                        Quote quote = (Quote)quoteIterator.next();
+                        EODQuote quote = (EODQuote)quoteIterator.next();
                         quoteCache.load(quote);
                     }
                 }
@@ -469,13 +469,13 @@ public class FileQuoteSource implements QuoteSource
                 throw MissingQuoteException.getInstance();
             
             // Get all ordinaries for that date
-            QuoteRange quoteRange = new QuoteRange(QuoteRange.ALL_ORDINARIES, date);
+            EODQuoteRange quoteRange = new EODQuoteRange(EODQuoteRange.ALL_ORDINARIES, date);
             List quotes = getContainedQuotes(fileURL, quoteRange);
             
             int advanceDecline = 0;
             
             for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-                Quote quote = (Quote)iterator.next();
+                EODQuote quote = (EODQuote)iterator.next();
                 
                 if(quote.getDayClose() > quote.getDayOpen())
                     advanceDecline++;

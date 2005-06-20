@@ -27,21 +27,22 @@ import org.mov.parser.EvaluationException;
 import org.mov.util.TradingDate;
 
 /**
- * When a task requires stock quotes, it should create an instance of this class which represents
- * all the task's required quotes. The task can then access quotes from this class,
- * which in turn reads its stock quotes from a global quote cache - {@link QuoteCache}.
+ * When a task requires end-of-day stock quotes, it should create an instance of this class 
+ * which represents all the task's required quotes. The task can then access quotes from 
+ * this class, which in turn reads its stock quotes from the global end-of-day quote cache -
+ * {@link EODQuoteCache}.
  * <p>
  * The purpose of this class is therefore to group together a set of quotes that are
  * needed by a single task. This grouping allows the quotes to be loaded in at one time,
  * which is much faster than loading them in quote by quote.
  * <p>
  * Also by placing a set of quotes in a bundle it simplifies caching. Caching is performed
- * by {@link QuoteBundleCache}.
+ * by {@link EODQuoteBundleCache}.
  *
  * Example:
  * <pre>
- *      QuoteRange quoteRange = new QuoteRange("CBA");
- *      QuoteBundle quoteBundle = new ScriptQuoteBundle(quoteRange);
+ *      EODQuoteRange quoteRange = new QuoteRange("CBA");
+ *      EODQuoteBundle quoteBundle = new EODQuoteBundle(quoteRange);
  *      try {
  *	    double = quoteBundle.getQuote("CBA", Quote.DAY_OPEN, 0);
  *      }
@@ -51,24 +52,24 @@ import org.mov.util.TradingDate;
  * </pre>
  *
  * @author Andrew Leppard
- * @see QuoteBundle
  * @see GPQuoteBundle
- * @see Quote
- * @see QuoteRange
- * @see QuoteBundleCache
- * @see QuoteCache
+ * @see EODQuote
+ * @see EODQuoteRange
+ * @see EODQuoteBundleCache
+ * @see EODQuoteCache
+ * @see IDQuoteBundle
  * @see Symbol
  */
-public class ScriptQuoteBundle implements QuoteBundle {
+public class EODQuoteBundle implements QuoteBundle {
 
     // Quotes contained in this bundle
-    private QuoteRange quoteRange;
+    private EODQuoteRange quoteRange;
 
     /** For speed reasons, keep reference to the global quote cache */
-    protected QuoteCache quoteCache;
+    protected EODQuoteCache quoteCache;
 
     /** For speed reasons, keep reference to the global quote bundle cache */
-    protected QuoteBundleCache quoteBundleCache;
+    protected EODQuoteBundleCache quoteBundleCache;
 
     // Start and end date offsets (marked as 1 which indicates an illegal
     // date offset, date offsets start from 0 and go down).
@@ -76,28 +77,28 @@ public class ScriptQuoteBundle implements QuoteBundle {
     private int lastDateOffset = 1;
 
     /**
-     * Create a new quote bundle that represents the quotes in the given
+     * Create a new end-of-day quote bundle that represents the quotes in the given
      * quote range.
      *
      * @param quoteRange      the quote range
      */
-    public ScriptQuoteBundle(QuoteRange quoteRange) {
+    public EODQuoteBundle(EODQuoteRange quoteRange) {
 	this.quoteRange = quoteRange;
 
-	quoteCache = QuoteCache.getInstance();
-	quoteBundleCache = QuoteBundleCache.getInstance();
+	quoteCache = EODQuoteCache.getInstance();
+	quoteBundleCache = EODQuoteBundleCache.getInstance();
 
 	// Load it in now if its not already
 	quoteBundleCache.load(this);
     }
 
     /**
-     * Create a new quote bundle with the same quote range as the given
+     * Create a new end-of-day quote bundle with the same quote range as the given
      * quote bundle.
      *
      * @param quoteBundle      the quote bundle to copy
      */
-    public ScriptQuoteBundle(QuoteBundle quoteBundle) {
+    public EODQuoteBundle(EODQuoteBundle quoteBundle) {
         this(quoteBundle.getQuoteRange());
     }
 
@@ -108,7 +109,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @param symbol  the stock symbol
      * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
      *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
-     * @param dateOffset fast access date offset, see {@link QuoteCache}
+     * @param dateOffset fast access date offset, see {@link EODQuoteCache}
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
@@ -131,12 +132,12 @@ public class ScriptQuoteBundle implements QuoteBundle {
                 // If the quote is still null, maybe we need to expand the bundle?
                 // First check to make sure the new date is older than any date in
                 // the cache
-                 if(getQuoteRange().getFirstDate() != null && dateOffset < getFirstDateOffset()) {
+                if(getQuoteRange().getFirstDate() != null && dateOffset < getFirstDateOffset()) {
                     try {
                         quote = tryExpand(symbol, quoteType, dateOffset);
                     }
                     catch(QuoteNotLoadedException e3) {
-
+                        
                         // We tried everyting - we just don't have it
                         throw MissingQuoteException.getInstance();
                     }
@@ -159,7 +160,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @param symbol  the stock symbol
      * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
      *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
-     * @param today fast access date offset of current date, see {@link QuoteCache}
+     * @param today fast access date offset of current date, see {@link EODQuoteCache}
      * @param offset offset from current date
      * @return the quote
      * @exception EvaluationException if the script isn't allow access to the quote.
@@ -200,7 +201,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * Return whether the given quote should be in this quote bundle.
      *
      * @param symbol    the symbol
-     * @param dateOffset fast access date offset, see {@link QuoteCache}
+     * @param dateOffset fast access date offset, see {@link EODQuoteCache}
      * @return  <code>true</code> if this symbol should be in the quote bundle,
      *          <code>false</code> otherwise
      */
@@ -241,7 +242,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @see Quote
      */
     public Iterator iterator() {
-        return new QuoteBundleIterator(this);
+        return new EODQuoteBundleIterator(this);
     }
 
     /**
@@ -249,7 +250,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      *
      * @return the quote range
      */
-    public QuoteRange getQuoteRange() {
+    public EODQuoteRange getQuoteRange() {
 	return quoteRange;
     }
 
@@ -258,7 +259,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      *
      * @param quoteRange        the new quote range
      */
-    public void setQuoteRange(QuoteRange quoteRange) {
+    public void setQuoteRange(EODQuoteRange quoteRange) {
         this.quoteRange = quoteRange;
 
         // Clear buffered start/end date offsets
@@ -292,7 +293,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	if(!quoteBundleCache.isLoaded(this))
 	    quoteBundleCache.load(this);
 
-	if(getQuoteRange().getType() == QuoteRange.GIVEN_SYMBOLS) {
+	if(getQuoteRange().getType() == EODQuoteRange.GIVEN_SYMBOLS) {
             // We can't just call getQuoteRange().getAllSymbols() because
             // for the given quote range it is possible we don't have any
             // quotes for them. So make sure all the given symbols are
@@ -312,11 +313,11 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	    return presentSymbols;
 	}
 		
-	else if(getQuoteRange().getType() == QuoteRange.ALL_SYMBOLS) {
+	else if(getQuoteRange().getType() == EODQuoteRange.ALL_SYMBOLS) {
 	    return quoteCache.getSymbols(firstDateOffset, lastDateOffset);
 	}
 	
-	else if(getQuoteRange().getType() == QuoteRange.ALL_ORDINARIES) {
+	else if(getQuoteRange().getType() == EODQuoteRange.ALL_ORDINARIES) {
 	
 	    List ourSymbols = new ArrayList();
 	    List symbols = quoteCache.getSymbols(firstDateOffset, lastDateOffset);
@@ -334,7 +335,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
 	}
 	
 	else {
-	    assert getQuoteRange().getType() == QuoteRange.MARKET_INDICES;
+	    assert getQuoteRange().getType() == EODQuoteRange.MARKET_INDICES;
 	
 	    List ourSymbols = new ArrayList();
 	    List symbols = quoteCache.getSymbols(firstDateOffset, lastDateOffset);
@@ -364,7 +365,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
     /**
      * Returns all the symbols listed in this quote bundle for the given date.
      *
-     * @param dateOffset fast access date offset, see {@link QuoteCache}
+     * @param dateOffset fast access date offset, see {@link EODQuoteCache}
      * @return all symbols
      */
     public List getSymbols(int dateOffset) {	
@@ -413,7 +414,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
     /**
      * Return the fast access date offset of the first date in this quote bundle
      *
-     * @return the first date offset, see {@link QuoteCache}
+     * @return the first date offset, see {@link EODQuoteCache}
      */
     public int getFirstDateOffset() {
 	if(firstDateOffset == 1) {
@@ -447,7 +448,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
     /**
      * Return the fast access date offset of the last date in this quote bundle
      *
-     * @return the first date offset, see {@link QuoteCache}
+     * @return the first date offset, see {@link EODQuoteCache}
      */
     public int getLastDateOffset() {
 	if(lastDateOffset == 1) {
@@ -481,9 +482,10 @@ public class ScriptQuoteBundle implements QuoteBundle {
     /**
      * Convert between a fast access date offset to an actual date.
      *
-     * @param dateOffset        fast access date offset, see {@link QuoteCache}
+     * @param dateOffset        fast access date offset, see {@link EODQuoteCache}
      * @return the date
      */
+
     public TradingDate offsetToDate(int dateOffset) {
         return quoteCache.offsetToDate(dateOffset);
     }
@@ -492,7 +494,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * Convert between a date and a fast access date offset.
      *
      * @param date the date
-     * @return fast access date offset, see {@link QuoteCache}
+     * @return fast access date offset, see {@link EODQuoteCache}
      */
     public int dateToOffset(TradingDate date)
         throws WeekendDateException {
@@ -511,7 +513,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
      * @param symbol  the stock symbol
      * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
      *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
-     * @param dateOffset fast access date offset, see {@link QuoteCache}
+     * @param dateOffset fast access date offset, see {@link EODQuoteCache}
      * @return the quote
      * @exception QuoteNotLoaded if the quote was not found
      */
@@ -533,7 +535,7 @@ public class ScriptQuoteBundle implements QuoteBundle {
     private double tryExpand(Symbol symbol, int quoteType, int dateOffset)
         throws QuoteNotLoadedException {
 
-        QuoteRange expandedQuoteRange = (QuoteRange)getQuoteRange().clone();
+        EODQuoteRange expandedQuoteRange = (EODQuoteRange)getQuoteRange().clone();
         
         TradingDate date = quoteCache.offsetToDate(dateOffset);
         expandedQuoteRange.setFirstDate(date);

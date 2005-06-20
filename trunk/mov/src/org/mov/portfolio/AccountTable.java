@@ -30,7 +30,7 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.quote.MissingQuoteException;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 
 /**
  * Display an account summary in a swing table for a portfolio. The table
@@ -46,12 +46,12 @@ public class AccountTable extends AbstractTable {
 
     class Model extends AbstractTableModel {
 
-	private QuoteBundle quoteBundle      = null;
+	private EODQuoteBundle quoteBundle   = null;
 	private Portfolio todayPortfolio     = null;
         private Portfolio yesterdayPortfolio = null;
 	private TradingDate date             = null;
 
-	public Model(List columns, Portfolio portfolio, QuoteBundle quoteBundle) {
+	public Model(List columns, Portfolio portfolio, EODQuoteBundle quoteBundle) {
             super(columns);
 
             // Use the latest date in the quote bundle
@@ -154,7 +154,7 @@ public class AccountTable extends AbstractTable {
      *				table for
      * @param	quoteBundle	the quote bundle
      */
-    public AccountTable(Portfolio portfolio, QuoteBundle quoteBundle) {
+    public AccountTable(Portfolio portfolio, EODQuoteBundle quoteBundle) {
         List columns = new ArrayList();
         columns.add(new Column(ACCOUNT_COLUMN,
 			       Locale.getString("ACCOUNT"),

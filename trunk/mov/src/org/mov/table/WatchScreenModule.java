@@ -44,17 +44,18 @@ import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
+import org.mov.quote.EODQuote;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
-import org.mov.quote.ScriptQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.ui.AbstractTable;
 import org.mov.ui.Column;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
 import org.mov.ui.MenuHelper;
-import org.mov.ui.QuoteModel;
+import org.mov.ui.EODQuoteModel;
 import org.mov.ui.SymbolListDialog;
 import org.mov.ui.TextDialog;
 
@@ -63,8 +64,10 @@ import org.mov.ui.TextDialog;
  * user to build and modify a watch screen which can be used to monior a group
  * of stocks.
  *
+ * @author Andrew Leppard
  * @see WatchScreen
  */
+
 public class WatchScreenModule extends AbstractTable implements Module, ActionListener {
 
     // Main menu items
@@ -85,10 +88,10 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     private JMenuItem popupTableSymbols = null;
 
     private PropertyChangeSupport propertySupport;
-    private ScriptQuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
     private WatchScreen watchScreen;
-    private QuoteModel model;
+    private EODQuoteModel model;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
@@ -104,14 +107,14 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
      * @param quoteBundle watch screen quotes
      */
     public WatchScreenModule(WatchScreen watchScreen,
-                             ScriptQuoteBundle quoteBundle) {
+                             EODQuoteBundle quoteBundle) {
 
         this.watchScreen = watchScreen;
 	this.quoteBundle = quoteBundle;
 	propertySupport = new PropertyChangeSupport(this);
 
-        model = new QuoteModel(quoteBundle, getQuotes(), Column.HIDDEN, Column.VISIBLE);
-	setModel(model, QuoteModel.SYMBOL_COLUMN, SORT_UP);
+        model = new EODQuoteModel(quoteBundle, getQuotes(), Column.HIDDEN, Column.VISIBLE);
+	setModel(model, EODQuoteModel.SYMBOL_COLUMN, SORT_UP);
 	showColumns(model);
 	addMenu();
 	model.addTableModelListener(this);
@@ -175,7 +178,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             for(int i = 0; i < selectedRows.length; i++) {
                 Symbol symbol
                     = (Symbol)model.getValueAt(selectedRows[i],
-                                               QuoteModel.SYMBOL_COLUMN);
+                                               EODQuoteModel.SYMBOL_COLUMN);
                 symbols.add(symbol);
             }
             // Graph the highlighted symbols
@@ -345,7 +348,8 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
-                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], QuoteModel.SYMBOL_COLUMN);
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i],
+                                                         EODQuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
             }
@@ -370,7 +374,8 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             // because if we start to remove them in this loop the getValueAt()
             // function won't work properly.
             for(int i = 0; i < selectedRows.length; i++) {
-                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], QuoteModel.SYMBOL_COLUMN);
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
+                                                         EODQuoteModel.SYMBOL_COLUMN);
                 symbols.add(symbol);
             }
 
@@ -405,7 +410,8 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
-                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], QuoteModel.SYMBOL_COLUMN);
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
+                                                         EODQuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
             }
@@ -504,20 +510,20 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
         for(Iterator iterator = watchScreen.getSymbols().iterator();
             iterator.hasNext();) {
             Symbol symbol = (Symbol)iterator.next();
-            Quote quote;
+            EODQuote quote;
 
             try {
                 quote =
-                    new Quote(symbol,
-                              lastDate,
-                              (int)quoteBundle.getQuote(symbol, Quote.DAY_VOLUME, lastDate),
-                              quoteBundle.getQuote(symbol, Quote.DAY_LOW, lastDate),
-                              quoteBundle.getQuote(symbol, Quote.DAY_HIGH, lastDate),
-                              quoteBundle.getQuote(symbol, Quote.DAY_OPEN, lastDate),
-                              quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, lastDate));
+                    new EODQuote(symbol,
+                                 lastDate,
+                                 (int)quoteBundle.getQuote(symbol, Quote.DAY_VOLUME, lastDate),
+                                 quoteBundle.getQuote(symbol, Quote.DAY_LOW, lastDate),
+                                 quoteBundle.getQuote(symbol, Quote.DAY_HIGH, lastDate),
+                                 quoteBundle.getQuote(symbol, Quote.DAY_OPEN, lastDate),
+                                 quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, lastDate));
             }
             catch(MissingQuoteException e) {
-                quote = new Quote(symbol, lastDate, 0, 0.0D, 0.0D, 0.0D, 0.0D);
+                quote = new EODQuote(symbol, lastDate, 0, 0.0D, 0.0D, 0.0D, 0.0D);
             }
 
             quotes.add(quote);

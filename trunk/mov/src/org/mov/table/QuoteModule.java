@@ -51,6 +51,8 @@ import org.mov.ui.*;
 /**
  * Venice module for displaying a table of stock quotes. This module allows a user
  * to display a table of specific stock quotes on specific days.
+ *
+ * @author Andrew Leppard
  */
 public class QuoteModule extends AbstractTable implements Module, ActionListener {
 
@@ -69,9 +71,9 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     private JMenuItem popupTableSymbols = null;
 
     private PropertyChangeSupport propertySupport;
-    private ScriptQuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
-    private QuoteModel model;
+    private EODQuoteModel model;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
@@ -96,7 +98,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
      *                     on the last date in the quote bundle, otherwise
      *                     display them all. 
      */
-    public QuoteModule(ScriptQuoteBundle quoteBundle,
+    public QuoteModule(EODQuoteBundle quoteBundle,
                        boolean singleDate) {
 	this(quoteBundle, null, singleDate);
     }
@@ -114,7 +116,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
      *                     on the last date in the quote bundle, otherwise
      *                     display them all. 
      */
-    public QuoteModule(ScriptQuoteBundle quoteBundle,
+    public QuoteModule(EODQuoteBundle quoteBundle,
                        String filterEquationString,
                        boolean singleDate) {
 	
@@ -129,13 +131,13 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
         // If we are listing stocks on a single day then don't bother showing
         // the date column. On the other hand if we are only listing a single
         // stock then don't bother showing the symbol column
-        model = new QuoteModel(quoteBundle, quotes, 
-                               singleDate? Column.HIDDEN : Column.VISIBLE,
-                               quoteBundle.getAllSymbols().size() == 1? 
-                               Column.HIDDEN : Column.VISIBLE);
+        model = new EODQuoteModel(quoteBundle, quotes, 
+                                  singleDate? Column.HIDDEN : Column.VISIBLE,
+                                  quoteBundle.getAllSymbols().size() == 1? 
+                                  Column.HIDDEN : Column.VISIBLE);
 	setModel(model, 
-                 quoteBundle.getAllSymbols().size() == 1? QuoteModel.DATE_COLUMN :
-                 QuoteModel.ACTIVITY_COLUMN, SORT_UP);
+                 quoteBundle.getAllSymbols().size() == 1? EODQuoteModel.DATE_COLUMN :
+                 EODQuoteModel.ACTIVITY_COLUMN, SORT_UP);
 	model.addTableModelListener(this);
         showColumns(model);
         resort();
@@ -200,7 +202,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                 Symbol symbol
                     = (Symbol)model.getValueAt(selectedRows[i],
                                                
-                                               QuoteModel.SYMBOL_COLUMN);
+                                               EODQuoteModel.SYMBOL_COLUMN);
                 symbols.add(symbol);
             }
 
@@ -211,7 +213,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
     // This function extracts all quotes from the quote bundle and returns
     // them as a list of Quotes.
-    private List extractAllQuotes(ScriptQuoteBundle quoteBundle) {
+    private List extractAllQuotes(EODQuoteBundle quoteBundle) {
         List quotes = new ArrayList();
         Iterator iterator = quoteBundle.iterator();
         TradingDate lastDate = quoteBundle.getLastDate();
@@ -231,7 +233,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     // equation to equate to true. If there is no equation (string is null or
     // empty) then extract all the quotes.
     private List extractQuotesUsingRule(String filterEquation,
-                                        ScriptQuoteBundle quoteBundle) {      
+                                        EODQuoteBundle quoteBundle) {      
 
         // If there is no rule, then just return all quotes
 	if(filterEquation == null || filterEquation.length() == 0) 
@@ -413,7 +415,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                             if(symbol.equals(quote.getSymbol())) {
                                 // Select row and make it visible
                                 setRowSelectionInterval(i, i);
-                                setVisible(i, QuoteModel.SYMBOL_COLUMN);
+                                setVisible(i, EODQuoteModel.SYMBOL_COLUMN);
                                 return;
                             }
                         }
@@ -528,7 +530,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	}
 
 	else if(e.getSource() == sortByMostActive) {
-	    setColumnSortStatus(QuoteModel.ACTIVITY_COLUMN, SORT_UP);
+	    setColumnSortStatus(EODQuoteModel.ACTIVITY_COLUMN, SORT_UP);
 	    resort();
 	    validate();
 	    repaint();
@@ -547,7 +549,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
             for(int i = 0; i < selectedRows.length; i++) {
                 Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
-                                                         QuoteModel.SYMBOL_COLUMN);
+                                                         EODQuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
             }
@@ -565,7 +567,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
             for(int i = 0; i < selectedRows.length; i++) {
                 Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
-                                                         QuoteModel.SYMBOL_COLUMN);
+                                                         EODQuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
             }

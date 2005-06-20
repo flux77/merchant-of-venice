@@ -22,7 +22,7 @@ import java.lang.String;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
-import org.mov.quote.QuoteCache;
+import org.mov.quote.EODQuoteCache;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.Locale;
@@ -109,7 +109,7 @@ public class TradingDateDialog {
         
         // The date parsed. Make sure it isn't on a weekend
         try {
-            dateOffset = QuoteCache.getInstance().dateToOffset(date);
+            dateOffset = EODQuoteCache.getInstance().dateToOffset(date);
         }
         catch(WeekendDateException e) {
             JOptionPane.showInternalMessageDialog(parent, 

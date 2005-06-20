@@ -33,8 +33,7 @@ import org.mov.main.CommandManager;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
 import org.mov.parser.ExpressionFactory;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.ScriptQuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
 import org.mov.util.Locale;
@@ -255,7 +254,7 @@ public class GPModule extends JPanel implements Module {
 
         // quote bundle should load window days before quote range...
         GPQuoteBundle quoteBundle =
-            new GPQuoteBundle(new ScriptQuoteBundle(quoteRangePage.getQuoteRange()), window);
+            new GPQuoteBundle(new EODQuoteBundle(quoteRangePage.getQuoteRange()), window);
         OrderComparator orderComparator = quoteRangePage.getOrderComparator(quoteBundle);
         OrderCache orderCache = new OrderCache(quoteBundle, orderComparator);
         
@@ -270,17 +269,17 @@ public class GPModule extends JPanel implements Module {
             
             GeneticProgramme geneticProgramme =
                 new GeneticProgramme(quoteBundle,
-                                    GPGondolaSelection,
-                                    orderCache,
-                                    startDate,
-                                    endDate,
-                                    initialCapital,
-                                    stockValue,
-                                    numberStocks,
-                                    tradeCost,
-                                    breedingPopulation,
-                                    tradeValueBuy,
-                                    tradeValueSell);
+                                     GPGondolaSelection,
+                                     orderCache,
+                                     startDate,
+                                     endDate,
+                                     initialCapital,
+                                     stockValue,
+                                     numberStocks,
+                                     tradeCost,
+                                     breedingPopulation,
+                                     tradeValueBuy,
+                                     tradeValueSell);
             
             for(int generation = 1; generation <= numberGenerations; generation++) {
                 if(thread.isInterrupted())
@@ -359,7 +358,7 @@ public class GPModule extends JPanel implements Module {
     private List getResults(GeneticProgramme geneticProgramme,
                                 int breedingPopulation,
                                 int displayPopulation,
-                                QuoteBundle quoteBundle,
+                                EODQuoteBundle quoteBundle,
                                 TradingDate startDate,
                                 TradingDate endDate,
                                 Money initialCapital,

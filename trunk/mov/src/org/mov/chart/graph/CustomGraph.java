@@ -30,8 +30,7 @@ import org.mov.util.Locale;
 import org.mov.parser.Parser;
 import org.mov.parser.Expression;
 import org.mov.parser.ExpressionException;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.ScriptQuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 
 /**
@@ -48,7 +47,7 @@ public class CustomGraph extends AbstractGraph {
     private Graphable indicatorGraphable = null;
 
     // Quote bundle containing quotes to graph
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
     // Current symbol
     private Symbol symbol;
@@ -64,10 +63,10 @@ public class CustomGraph extends AbstractGraph {
      * @param   symbol      the symbol to apply the expression
      * @param   quoteBundle the quote bundle containing the quotes
      */
-    public CustomGraph(GraphSource source, Symbol symbol, QuoteBundle quoteBundle) {
+    public CustomGraph(GraphSource source, Symbol symbol, EODQuoteBundle quoteBundle) {
         super(source);
         this.symbol = symbol;
-        this.quoteBundle = new ScriptQuoteBundle(quoteBundle);
+        this.quoteBundle = quoteBundle;
         setSettings(new HashMap());
     }
 
@@ -103,11 +102,10 @@ public class CustomGraph extends AbstractGraph {
      */
     public static Graphable createCustom(Expression indicator,
                                          Graphable source,
-                                         QuoteBundle quoteBundle,
+                                         EODQuoteBundle quoteBundle,
                                          Symbol symbol) {
         try {
-            return CustomGraphUI.createCustom(indicator, source,
-                                              quoteBundle, symbol);
+            return CustomGraphUI.createCustom(indicator, source, quoteBundle, symbol);
         }
         catch(ExpressionException e) {
             // Should have already been checked

@@ -49,10 +49,9 @@ import org.mov.prefs.PreferencesManager;
 import org.mov.quote.ImportQuoteModule;
 import org.mov.quote.ExportQuoteModule;
 import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteRange;
+import org.mov.quote.EODQuoteBundle;
+import org.mov.quote.EODQuoteRange;
 import org.mov.quote.QuoteSourceManager;
-import org.mov.quote.ScriptQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.table.PortfolioTableModule;
 import org.mov.table.QuoteModule;
@@ -152,7 +151,7 @@ public class CommandManager {
      * @param quoteBundle fully loaded quote bundle
      */
     public void tableTransactions(final Portfolio portfolio,
-                              final QuoteBundle quoteBundle) {
+                              final EODQuoteBundle quoteBundle) {
         PortfolioModule porfolioModule = new PortfolioModule(desktop, portfolio, quoteBundle);
         desktopManager.newFrame(porfolioModule);
         porfolioModule.tablePortfolio();
@@ -163,7 +162,7 @@ public class CommandManager {
                 public void run() {
                     String title =
                         new String(Locale.getString("LIST_IT",
-						    QuoteRange.getDescription(type)));
+						    EODQuoteRange.getDescription(type)));
                     tableStocks(title, type, null, null, null);
                 }
             });
@@ -174,7 +173,7 @@ public class CommandManager {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
                     SortedSet symbolsCopy;
-		    String description = QuoteRange.getDescription(QuoteRange.GIVEN_SYMBOLS);
+		    String description = EODQuoteRange.getDescription(EODQuoteRange.GIVEN_SYMBOLS);
                     String title =
                         new String(Locale.getString("LIST_IT", description));
 
@@ -199,7 +198,7 @@ public class CommandManager {
                     }
 
                     if(symbolsCopy != null && symbolsCopy.size() > 0)
-                        tableStocks(title, QuoteRange.GIVEN_SYMBOLS, null, symbolsCopy, null);
+                        tableStocks(title, EODQuoteRange.GIVEN_SYMBOLS, null, symbolsCopy, null);
                 }
             });
         thread.start();
@@ -210,7 +209,7 @@ public class CommandManager {
                 public void run() {
 		
                     String title = new String(Locale.getString("LIST_IT_BY_DATE",
-							       QuoteRange.getDescription(type)));
+							       EODQuoteRange.getDescription(type)));
                     TradingDate date = TradingDateDialog.getDate(desktop,
                                                                  title,
                                                                  Locale.getString("DATE"));
@@ -225,7 +224,7 @@ public class CommandManager {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
                     String title = new String(Locale.getString("LIST_IT_BY_RULE",
-							       QuoteRange.getDescription(type)));
+							       EODQuoteRange.getDescription(type)));
                     String rule = ExpressionQuery.getExpression(desktop,
                                                                 title,
                                                                 Locale.getString("RULE"));
@@ -239,8 +238,8 @@ public class CommandManager {
     private void tableStocks(String title, int type, String rule, SortedSet symbols,
                              TradingDate date) {
 	Thread thread = Thread.currentThread();
-        ScriptQuoteBundle quoteBundle = null;
-        QuoteRange quoteRange = null;
+        EODQuoteBundle quoteBundle = null;
+        EODQuoteRange quoteRange = null;
         QuoteModule table = null;
         ProgressDialog progressDialog = ProgressDialogManager.getProgressDialog();
         progressDialog.show(title);
@@ -248,9 +247,9 @@ public class CommandManager {
 
         if (!thread.isInterrupted()) {
 
-            if(type == QuoteRange.GIVEN_SYMBOLS) {
+            if(type == EODQuoteRange.GIVEN_SYMBOLS) {
                 quoteRange =
-                    new QuoteRange(new ArrayList(symbols));
+                    new EODQuoteRange(new ArrayList(symbols));
                 singleDate = false;
             }
             else {
@@ -266,7 +265,7 @@ public class CommandManager {
                     // the thead. So this shouldn't be null here.
                     assert date != null;
 
-                    quoteRange = new QuoteRange(type, date.previous(1), date);
+                    quoteRange = new EODQuoteRange(type, date.previous(1), date);
                 }
 
                 singleDate = true;
@@ -274,7 +273,7 @@ public class CommandManager {
         }
 
         if (!thread.isInterrupted())
-            quoteBundle = new ScriptQuoteBundle(quoteRange);
+            quoteBundle = new EODQuoteBundle(quoteRange);
 
         if (!thread.isInterrupted()) {
             table = new QuoteModule(quoteBundle, rule, singleDate);
@@ -314,15 +313,16 @@ public class CommandManager {
 
                 progress.show(Locale.getString("OPEN_PORTFOLIO", portfolio.getName()));
 
-                QuoteBundle quoteBundle = null;
+                EODQuoteBundle quoteBundle = null;
                 TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
 
                 if(lastDate != null) {
                     if(!thread.isInterrupted()) {
-                        QuoteRange quoteRange =
-                            new QuoteRange(QuoteRange.ALL_SYMBOLS, lastDate.previous(1), lastDate);
+                        EODQuoteRange quoteRange =
+                            new EODQuoteRange(EODQuoteRange.ALL_SYMBOLS, lastDate.previous(1),
+                                              lastDate);
 
-                        quoteBundle = new ScriptQuoteBundle(quoteRange);
+                        quoteBundle = new EODQuoteBundle(quoteRange);
                     }
 
                     if(!thread.isInterrupted())
@@ -343,7 +343,7 @@ public class CommandManager {
      * @param quoteBundle fully loaded quote bundle
      */
     public void openPortfolio(final Portfolio portfolio,
-                              final QuoteBundle quoteBundle) {
+                              final EODQuoteBundle quoteBundle) {
         desktopManager.newFrame(new PortfolioModule(desktop,
                                                     portfolio, quoteBundle));
     }
@@ -452,15 +452,16 @@ public class CommandManager {
 
                 progress.show(Locale.getString("OPEN_WATCH_SCREEN", watchScreen.getName()));
 
-                ScriptQuoteBundle quoteBundle = null;
+                EODQuoteBundle quoteBundle = null;
                 TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
 
                 if(lastDate != null) {
                     if(!thread.isInterrupted()) {
-                        QuoteRange quoteRange =
-                            new QuoteRange(QuoteRange.ALL_SYMBOLS, lastDate.previous(1), lastDate);
+                        EODQuoteRange quoteRange =
+                            new EODQuoteRange(EODQuoteRange.ALL_SYMBOLS, lastDate.previous(1),
+                                              lastDate);
 
-                        quoteBundle = new ScriptQuoteBundle(quoteRange);
+                        quoteBundle = new EODQuoteBundle(quoteRange);
                     }
 
                     if(!thread.isInterrupted())
@@ -548,7 +549,7 @@ public class CommandManager {
      * @param quoteBundle fully loaded quote bundle
      */
     public void graphPortfolio(Portfolio portfolio,
-                               QuoteBundle quoteBundle) {
+                               EODQuoteBundle quoteBundle) {
         graphPortfolio(portfolio, quoteBundle, null, null);
     }
 
@@ -561,7 +562,7 @@ public class CommandManager {
      * @param	endDate		date to graph to
      */
     public void graphPortfolio(Portfolio portfolio,
-			       QuoteBundle quoteBundle,
+			       EODQuoteBundle quoteBundle,
 			       TradingDate startDate,
 			       TradingDate endDate) {
 
@@ -592,7 +593,7 @@ public class CommandManager {
                     endDate = startDate;
             }
 
-            quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbolsTraded, startDate,
+            quoteBundle = new EODQuoteBundle(new EODQuoteRange(symbolsTraded, startDate,
                                                                endDate));
         }
 
@@ -620,12 +621,12 @@ public class CommandManager {
         tablePortfolio(portfolio, null, null, null);
     }
 
-    public void tablePortfolio(Portfolio portfolio, QuoteBundle quoteBundle) {
+    public void tablePortfolio(Portfolio portfolio, EODQuoteBundle quoteBundle) {
         tablePortfolio(portfolio, quoteBundle, null, null);
     }
 
     public void tablePortfolio(Portfolio portfolio,
-                               QuoteBundle quoteBundle,
+                               EODQuoteBundle quoteBundle,
                                TradingDate startDate,
                                TradingDate endDate) {
 
@@ -652,7 +653,7 @@ public class CommandManager {
                     endDate = startDate;
             }
 
-            quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbolsTraded, startDate,
+            quoteBundle = new EODQuoteBundle(new EODQuoteRange(symbolsTraded, startDate,
                                                                endDate));
         }
 
@@ -802,7 +803,7 @@ public class CommandManager {
             ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 
             Iterator iterator = symbols.iterator();
-            QuoteBundle quoteBundle = null;
+            EODQuoteBundle quoteBundle = null;
             GraphSource dayClose = null;
             Graph graph = null;
 
@@ -824,7 +825,7 @@ public class CommandManager {
             while(iterator.hasNext() && !thread.isInterrupted()) {
                 Symbol symbol = (Symbol)iterator.next();
 
-                quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
+                quoteBundle = new EODQuoteBundle(new EODQuoteRange(symbol));
 
                 if(thread.isInterrupted())
                     break;
@@ -858,7 +859,7 @@ public class CommandManager {
             Thread thread = Thread.currentThread();
             ProgressDialog progress = ProgressDialogManager.getProgressDialog();
             Iterator iterator = symbols.iterator();
-            QuoteBundle quoteBundle = null;
+            EODQuoteBundle quoteBundle = null;
             GraphSource dayClose = null;
             Graph graph = null;
 
@@ -877,7 +878,7 @@ public class CommandManager {
 
             progress.show(Locale.getString("GRAPH_SYMBOLS", title));
 
-	    quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbols));
+	    quoteBundle = new EODQuoteBundle(new EODQuoteRange(symbols));
 
 	    dayClose =
 		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);

@@ -34,7 +34,7 @@ import org.mov.util.TradingDateFormatException;
  *
  * @author Andrew Leppard
  */
-public class InsightTraderQuoteFilter implements QuoteFilter {
+public class InsightTraderQuoteFilter implements EODQuoteFilter {
 
     /**
      * Creates an instance of the filter.
@@ -60,8 +60,8 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
      * @return	the stock quote
      * @exception QuoteFormatException if the quote could not be parsed
      */
-    public Quote toQuote(String quoteLine) throws QuoteFormatException {
-	Quote quote = null;
+    public EODQuote toEODQuote(String quoteLine) throws QuoteFormatException {
+	EODQuote quote = null;
 
 	if(quoteLine != null) {
 	    String[] quoteParts = quoteLine.split(" ");
@@ -96,8 +96,8 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
                     
                     // Convert volume from 1/100th volume to real volume
                     int day_volume = Integer.parseInt(quoteParts[i++]) * 100;
-                    quote = new Quote(symbol, date, day_volume, day_low, day_high,
-                                      day_open, day_close);
+                    quote = new EODQuote(symbol, date, day_volume, day_low, day_high,
+                                         day_open, day_close);
                 } 
                 catch(NumberFormatException e) {
                     throw new QuoteFormatException(Locale.getString("ERROR_PARSING_NUMBER",
@@ -117,7 +117,7 @@ public class InsightTraderQuoteFilter implements QuoteFilter {
      * @param	quote	a stock quote
      * @return	string version of the quote
      */
-    public String toString(Quote quote) {
+    public String toString(EODQuote quote) {
 	return new String(quote.getSymbol() + " " + 
 			  quote.getDate().toString("mm/dd/yy") + " " +
 			  Math.round(quote.getDayOpen()*100) + " " +

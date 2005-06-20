@@ -44,7 +44,8 @@ import org.mov.util.TradingDate;
  * Import quotes from Yahoo into Venice.
  *
  * @author Andrew Leppard
- * @see FileImportExport, ImportQuoteModule
+ * @see FileImportExport
+ * @see ImportQuoteModule
  */
 public class InternetImport {
 
@@ -136,7 +137,7 @@ public class InternetImport {
         
         List quotes = new ArrayList();
         String URLString = constructURL(symbol, startDate, endDate);
-        QuoteFilter filter = new YahooQuoteFilter(symbol);
+        EODQuoteFilter filter = new YahooQuoteFilter(symbol);
 
         PreferencesManager.ProxyPreferences proxyPreferences =
             PreferencesManager.loadProxySettings();
@@ -155,7 +156,7 @@ public class InternetImport {
 
                 if(line != null) {
                     try {
-                        Quote quote = filter.toQuote(line);     
+                        EODQuote quote = filter.toEODQuote(line);     
                         quotes.add(quote);
                         verify(report, quote);
                     }                    
@@ -257,7 +258,7 @@ public class InternetImport {
      * @param report the report
      * @param quote the quote
      */
-    private static void verify(Report report, Quote quote) {
+    private static void verify(Report report, EODQuote quote) {
         try {
             quote.verify();
         }

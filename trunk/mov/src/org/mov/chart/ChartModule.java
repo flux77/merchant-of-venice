@@ -39,7 +39,7 @@ import org.mov.ui.*;
  * used to draw any of the required charts.
  * Example:
  * <pre>
- *	QuoteBundle quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
+ *	EODQuoteBundle quoteBundle = new EODQuoteBundle(new EODQuoteRange(symbol));
  *	GraphSource dayClose = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
  *	Graph graph = new LineGraph(dayClose, Locale.getString("LINE_CHART"), true);
  *
@@ -390,7 +390,7 @@ public class ChartModule extends JPanel implements Module,
      * @param	graph	the new graph to add
      * @param	level	graph level to add the new graph
      */
-    public void add(Graph graph, Symbol symbol, QuoteBundle quoteBundle, int level) {
+    public void add(Graph graph, Symbol symbol, EODQuoteBundle quoteBundle, int level) {
 
 	// Make sure it has at least one value
         assert graph.getXRange().size() > 0;
@@ -399,7 +399,8 @@ public class ChartModule extends JPanel implements Module,
 	chart.add(graph, level);
 
 	// Add menu for this quote
-	QuoteChartMenu menu = new QuoteChartMenu(this, quoteBundle, symbol, graph,indexChart);
+	EODQuoteChartMenu menu = new EODQuoteChartMenu(this, quoteBundle, symbol,
+                                                       graph,indexChart);
 
 	addMenu(menu);
     }
@@ -411,7 +412,7 @@ public class ChartModule extends JPanel implements Module,
 
         final Thread thread = Thread.currentThread();
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-	QuoteBundle quoteBundle = null;
+	EODQuoteBundle quoteBundle = null;
 	Graph graph = null;
 	GraphSource dayClose = null;
 
@@ -420,7 +421,7 @@ public class ChartModule extends JPanel implements Module,
 	    progress.show(Locale.getString("LOADING_QUOTES_FOR", symbol.toString()));
 	
 	    if (!thread.isInterrupted())
-		quoteBundle = new ScriptQuoteBundle(new QuoteRange(symbol));
+		quoteBundle = new EODQuoteBundle(new EODQuoteRange(symbol));
 	
 	    if (!thread.isInterrupted())
 		dayClose =
@@ -432,7 +433,7 @@ public class ChartModule extends JPanel implements Module,
 	    if (!thread.isInterrupted()) {
 
 		final Graph finalGraph = graph;
-		final QuoteBundle finalQuoteBundle = quoteBundle;
+		final EODQuoteBundle finalQuoteBundle = quoteBundle;
 
 		// Invokes on dispatch thread
 		SwingUtilities.invokeLater(new Runnable() {
@@ -493,7 +494,7 @@ public class ChartModule extends JPanel implements Module,
      * @param	quoteBundle  the quote bundle
      * @param	level	     specified level
      */
-    public void add(Graph graph, Portfolio portfolio, QuoteBundle quoteBundle,
+    public void add(Graph graph, Portfolio portfolio, EODQuoteBundle quoteBundle,
 		    int level) {
 
 	// Add graph to chart

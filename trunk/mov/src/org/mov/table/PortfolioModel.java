@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.MissingQuoteException;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
@@ -35,7 +35,7 @@ import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
 public class PortfolioModel extends AbstractTableModel {
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private Portfolio portfolio;
     private List values;
 
@@ -59,7 +59,7 @@ public class PortfolioModel extends AbstractTableModel {
     }
 
     public PortfolioModel(Portfolio portfolio,
-                          QuoteBundle quoteBundle) {
+                          EODQuoteBundle quoteBundle) {
         super();
 
         // It's valid to pass in a null quote bundle, but only if the portfolio has

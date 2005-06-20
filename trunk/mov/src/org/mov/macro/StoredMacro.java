@@ -62,7 +62,7 @@ public class StoredMacro {
  
     /**
      * @param name
-     * @param location
+     * @param filename
      * @param on_startup
      * @param start_sequence
      * @param in_menu

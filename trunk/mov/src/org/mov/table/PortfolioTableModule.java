@@ -43,14 +43,14 @@ public class PortfolioTableModule extends AbstractTable
     private JMenuItem tableClose;
 
     private PropertyChangeSupport propertySupport;
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
     private Portfolio portfolio;
     private PortfolioModel model;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
 
-    public PortfolioTableModule(Portfolio portfolio, QuoteBundle quoteBundle) {
+    public PortfolioTableModule(Portfolio portfolio, EODQuoteBundle quoteBundle) {
 	
 	this.quoteBundle = quoteBundle;
         this.portfolio = portfolio;

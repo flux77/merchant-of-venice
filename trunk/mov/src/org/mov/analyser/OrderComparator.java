@@ -25,7 +25,7 @@ import org.mov.parser.Expression;
 import org.mov.parser.Variables;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 
 /**
@@ -86,7 +86,7 @@ public class OrderComparator implements Comparator {
     public final static int EQUATION              = 14;
 
     // Quote data to used for ordering
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
     // Equation used for order (only if orderByKey == EQUATION).
     private Expression orderByEquation;
@@ -107,7 +107,7 @@ public class OrderComparator implements Comparator {
      * @param quoteBundle quote data used for ordering
      * @param orderByKey method of ordering
      */
-    public OrderComparator(QuoteBundle quoteBundle, int orderByKey) {
+    public OrderComparator(EODQuoteBundle quoteBundle, int orderByKey) {
         this.quoteBundle = quoteBundle;
         this.orderByKey = orderByKey;
 
@@ -123,7 +123,7 @@ public class OrderComparator implements Comparator {
      * @param quoteBundle quote data used for ordering
      * @param orderByEquation equation used for ordering
      */
-    public OrderComparator(QuoteBundle quoteBundle, Expression orderByEquation) {
+    public OrderComparator(EODQuoteBundle quoteBundle, Expression orderByEquation) {
         this.quoteBundle = quoteBundle;
         this.orderByEquation = orderByEquation;
         this.orderByKey = EQUATION;

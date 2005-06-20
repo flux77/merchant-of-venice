@@ -41,8 +41,8 @@ import org.mov.util.TradingDate;
  *
  * Example:
  * <pre>
- *      QuoteRange quoteRange = new QuoteRange("CBA");
- *      QuoteBundle quoteBundle = new QuoteBundle(quoteRange);
+ *      EODQuoteRange quoteRange = new EODQuoteRange("CBA");
+ *      EODQuoteBundle quoteBundle = new EODQuoteBundle(quoteRange);
  *      try {
  *	    float = quoteBundle.getQuote("CBA", Quote.DAY_OPEN, 0);
  *      }
@@ -53,8 +53,9 @@ import org.mov.util.TradingDate;
  *
  * @author Andrew Leppard
  * @see Quote
- * @see QuoteRange
- * @see QuoteBundle
+ * @see EODQuote
+ * @see EODQuoteRange
+ * @see EODQuoteBundle
  */
 public class DatabaseQuoteSource implements QuoteSource
 {
@@ -131,7 +132,7 @@ public class DatabaseQuoteSource implements QuoteSource
     private String fileName;
 
     // Fields for samples mode
-    private QuoteFilter filter;
+    private EODQuoteFilter filter;
     private List fileURLs;
 
     /**
@@ -460,10 +461,10 @@ public class DatabaseQuoteSource implements QuoteSource
      *
      * @param	quoteRange	the range of quotes to load
      * @return  <code>TRUE</code> if the operation suceeded
-     * @see Quote
-     * @see QuoteCache
+     * @see EODQuote
+     * @see EODQuoteCache
      */
-    public boolean loadQuoteRange(QuoteRange quoteRange) {
+    public boolean loadQuoteRange(EODQuoteRange quoteRange) {
         
 	String queryString = buildSQLString(quoteRange);
         boolean success;
@@ -493,7 +494,7 @@ public class DatabaseQuoteSource implements QuoteSource
                 monitor.interrupt();
 
                 if(!thread.isInterrupted()) {
-                    QuoteCache quoteCache = QuoteCache.getInstance();
+                    EODQuoteCache quoteCache = EODQuoteCache.getInstance();
 
                     while (RS.next()) {
                         quoteCache.load(Symbol.find(RS.getString(SYMBOL_FIELD)),
@@ -567,7 +568,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
     // Creates an SQL statement that will return all the quotes in the given
     // quote range.
-    private String buildSQLString(QuoteRange quoteRange) {
+    private String buildSQLString(EODQuoteRange quoteRange) {
         //
         // 1. Create select line
         //
@@ -580,7 +581,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	
         String filterString = new String("");
 	
-        if(quoteRange.getType() == QuoteRange.GIVEN_SYMBOLS) {
+        if(quoteRange.getType() == EODQuoteRange.GIVEN_SYMBOLS) {
             List symbols = quoteRange.getAllSymbols();
             
             if(symbols.size() == 1) {
@@ -607,15 +608,15 @@ public class DatabaseQuoteSource implements QuoteSource
                 filterString = filterString.concat(") ");
             }
         }
-        else if(quoteRange.getType() == QuoteRange.ALL_SYMBOLS) {
+        else if(quoteRange.getType() == EODQuoteRange.ALL_SYMBOLS) {
             // nothing to do
         }
-        else if(quoteRange.getType() == QuoteRange.ALL_ORDINARIES) {
+        else if(quoteRange.getType() == EODQuoteRange.ALL_ORDINARIES) {
             filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
                                                left(SYMBOL_FIELD, 1) + " != 'X' ");
         }
         else {
-            assert quoteRange.getType() == QuoteRange.MARKET_INDICES;
+            assert quoteRange.getType() == EODQuoteRange.MARKET_INDICES;
             
             filterString = filterString.concat("LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
                                                left(SYMBOL_FIELD, 1) + " = 'X' ");
@@ -790,7 +791,7 @@ public class DatabaseQuoteSource implements QuoteSource
             // Remove duplicates
             List newQuotes = new ArrayList();
             for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-                Quote quote = (Quote)iterator.next();
+                EODQuote quote = (EODQuote)iterator.next();
 
                 if(!containsQuote(existingQuotes, quote))
                     newQuotes.add(quote);
@@ -815,9 +816,9 @@ public class DatabaseQuoteSource implements QuoteSource
      * @param quote the quote to search for
      * @return <code>true</code> if the quote is in the list, <code>false</code> otherwise
      */
-    private boolean containsQuote(List quotes, Quote quote) {
+    private boolean containsQuote(List quotes, EODQuote quote) {
         for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-            Quote containedQuote = (Quote)iterator.next();
+            EODQuote containedQuote = (EODQuote)iterator.next();
 
             if(containedQuote.getSymbol().equals(quote.getSymbol()) &&
                containedQuote.getDate().equals(quote.getDate()))
@@ -843,7 +844,7 @@ public class DatabaseQuoteSource implements QuoteSource
         
         try {
             while(iterator.hasNext()) {
-                Quote quote = (Quote)iterator.next();
+                EODQuote quote = (EODQuote)iterator.next();
                 
                 String insertQuery = new String("INSERT INTO " + SHARE_TABLE_NAME +
                                                 " VALUES (" +
@@ -885,7 +886,7 @@ public class DatabaseQuoteSource implements QuoteSource
         
         // Build single query to insert stocks for a whole day into
         for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-            Quote quote = (Quote)iterator.next();
+            EODQuote quote = (EODQuote)iterator.next();
             
             if(firstQuote) {
                 insertString.append("INSERT INTO " + SHARE_TABLE_NAME +
@@ -1136,7 +1137,7 @@ public class DatabaseQuoteSource implements QuoteSource
         
         // Check if all the quotes have the same symbol or fall on the same date.
         for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-            Quote quote = (Quote)iterator.next();
+            EODQuote quote = (EODQuote)iterator.next();
 
             if(symbol == null || date == null) {
                 symbol = quote.getSymbol();
@@ -1172,7 +1173,7 @@ public class DatabaseQuoteSource implements QuoteSource
         // and do a slow SQL query which checks each one individually.
         else {
             for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-                Quote quote = (Quote)iterator.next();
+                EODQuote quote = (EODQuote)iterator.next();
                 buffer.append("(" + SYMBOL_FIELD + " = '" + quote.getSymbol() + "' AND " +
                               DATE_FIELD + " = '" + quote.getDate() + "')");
                 if(iterator.hasNext())
@@ -1208,9 +1209,9 @@ public class DatabaseQuoteSource implements QuoteSource
                 // Retrieve matching quotes
                 while(RS.next()) {
                     try {
-                        matchingQuotes.add(new Quote(Symbol.find(RS.getString(SYMBOL_FIELD)),
-                                                     new TradingDate(RS.getDate(DATE_FIELD)),
-                                                     0, 0.0, 0.0, 0.0, 0.0));
+                        matchingQuotes.add(new EODQuote(Symbol.find(RS.getString(SYMBOL_FIELD)),
+                                                        new TradingDate(RS.getDate(DATE_FIELD)),
+                                                        0, 0.0, 0.0, 0.0, 0.0));
                     }
                     catch(SymbolFormatException e) {
                         // This can't happen because we are only matching already known

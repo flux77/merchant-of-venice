@@ -23,18 +23,19 @@ import java.util.*;
 import org.mov.util.*;
 
 /**
- * Iterator for traversing Quotes in a QuoteBundle. This iterator allows the user to
+ * Iterator for traversing EODQuotes in an EODQuoteBundle. This iterator allows the user to
  * traverse each quote in any quote bundle. The quotes will be pulled out in date then
- * symbol order. To get an interator for a QuoteBundle, use the {@link QuoteBundle#iterator}
- * method.
+ * symbol order. To get an interator for a EODQuoteBundle, use the
+ * {@link EODQuoteBundle#iterator} method.
  *
- * @see Quote
- * @see QuoteBundle
+ * @author Andrew Leppard
+ * @see EODQuote
+ * @see EODQuoteBundle
  */
-public class QuoteBundleIterator implements Iterator {
+public class EODQuoteBundleIterator implements Iterator {
 
     private Iterator symbolsIterator;
-    private QuoteBundle quoteBundle;
+    private EODQuoteBundle quoteBundle;
 
     private TradingDate nextDate;
     private Symbol nextSymbol;
@@ -44,7 +45,7 @@ public class QuoteBundleIterator implements Iterator {
     /**
      * Create a new iterator over the given quote bundle.
      */
-    public QuoteBundleIterator(QuoteBundle quoteBundle) {
+    public EODQuoteBundleIterator(EODQuoteBundle quoteBundle) {
         this.quoteBundle = quoteBundle;
 
         nextDate = quoteBundle.getFirstDate();
@@ -111,7 +112,7 @@ public class QuoteBundleIterator implements Iterator {
     }
 
     /**
-     * Return the next Quote in the QuoteBundle.
+     * Return the next Quote in the EODQuoteBundle.
      *
      * @return quote the next quote
      */
@@ -120,7 +121,7 @@ public class QuoteBundleIterator implements Iterator {
             int dateOffset;
 
             try {
-                dateOffset = QuoteCache.getInstance().dateToOffset(nextDate);
+                dateOffset = EODQuoteCache.getInstance().dateToOffset(nextDate);
             }
             catch(WeekendDateException e) {
                 // hasNext() should have sorted this out
@@ -129,10 +130,11 @@ public class QuoteBundleIterator implements Iterator {
             }
 
             try {
-                Quote quote =
-                    new Quote(nextSymbol,
+                EODQuote quote =
+                    new EODQuote(nextSymbol,
                               nextDate,
-                              (int)quoteBundle.getQuote(nextSymbol, Quote.DAY_VOLUME, dateOffset),
+                              (int)quoteBundle.getQuote(nextSymbol, Quote.DAY_VOLUME,
+                                                        dateOffset),
                               quoteBundle.getQuote(nextSymbol, Quote.DAY_LOW, dateOffset),
                               quoteBundle.getQuote(nextSymbol, Quote.DAY_HIGH, dateOffset),
                               quoteBundle.getQuote(nextSymbol, Quote.DAY_OPEN, dateOffset),
@@ -152,7 +154,7 @@ public class QuoteBundleIterator implements Iterator {
     }
 
     /**
-     * Return whether the QuoteBundle has anymore Quotes.
+     * Return whether the EODQuoteBundle has anymore Quotes.
      *
      * @return whether there are anymore quotes
      */
@@ -161,7 +163,7 @@ public class QuoteBundleIterator implements Iterator {
     }
 
     /**
-     * Removing Quotes from the QuoteBundle is not supported.
+     * Removing Quotes from the EODQuoteBundle is not supported.
      */
     public void remove() {
         throw new UnsupportedOperationException();

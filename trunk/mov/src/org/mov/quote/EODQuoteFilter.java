@@ -20,11 +20,11 @@ package org.mov.quote;
 
 /**
  * Provides an interface for converting to/from a text string containing a 
- * single quote from/to the internal stock quote object. 
- * All quotes are stored internally in MetaStock format, that is volume is 
- * the real amount and all quotes are in dollars.
+ * single end-of-day quote from/to the internal stock quote object. 
+ *
+ * @author Andrew Leppard
  */
-public interface QuoteFilter {
+public interface EODQuoteFilter {
 
     /**
      * Return the name of the filter.
@@ -41,7 +41,7 @@ public interface QuoteFilter {
      * @return	the stock quote
      * @exception QuoteFormatException if the quote could not be parsed
      */
-    public Quote toQuote(String quoteLine) throws QuoteFormatException;
+    public EODQuote toEODQuote(String quoteLine) throws QuoteFormatException;
 
     /**
      * Convert the given stock quote to a string line.
@@ -49,5 +49,5 @@ public interface QuoteFilter {
      * @param	quote	a stock quote
      * @return	string version of the quote
      */
-    public String toString(Quote quote);
+    public String toString(EODQuote quote);
 }

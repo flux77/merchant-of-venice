@@ -458,25 +458,25 @@ public class MainMenu implements ActionListener, ModuleListener
                 }
                 
                 else if(menu == quoteCommoditiesListAllMenuItem)
-                    CommandManager.getInstance().tableStocks(QuoteRange.ALL_SYMBOLS);
+                    CommandManager.getInstance().tableStocks(EODQuoteRange.ALL_SYMBOLS);
                 else if (menu == quoteCommoditiesListRuleMenuItem)
-                    CommandManager.getInstance().tableStocksByRule(QuoteRange.ALL_SYMBOLS);
+                    CommandManager.getInstance().tableStocksByRule(EODQuoteRange.ALL_SYMBOLS);
                 else if (menu == quoteCommoditiesListDateMenuItem)
-                    CommandManager.getInstance().tableStocksByDate(QuoteRange.ALL_SYMBOLS);
+                    CommandManager.getInstance().tableStocksByDate(EODQuoteRange.ALL_SYMBOLS);
                 
                 else if(menu == quoteCompanyListAllMenuItem)
-                    CommandManager.getInstance().tableStocks(QuoteRange.ALL_ORDINARIES);
+                    CommandManager.getInstance().tableStocks(EODQuoteRange.ALL_ORDINARIES);
                 else if (menu == quoteCompanyListRuleMenuItem)
-                    CommandManager.getInstance().tableStocksByRule(QuoteRange.ALL_ORDINARIES);
+                    CommandManager.getInstance().tableStocksByRule(EODQuoteRange.ALL_ORDINARIES);
                 else if (menu == quoteCompanyListDateMenuItem)
-                    CommandManager.getInstance().tableStocksByDate(QuoteRange.ALL_ORDINARIES);
+                    CommandManager.getInstance().tableStocksByDate(EODQuoteRange.ALL_ORDINARIES);
                 
                 else if (menu == quoteIndicesListAllMenuItem)
-                    CommandManager.getInstance().tableStocks(QuoteRange.MARKET_INDICES);
+                    CommandManager.getInstance().tableStocks(EODQuoteRange.MARKET_INDICES);
                 else if (menu == quoteIndicesListRuleMenuItem)
-                    CommandManager.getInstance().tableStocksByRule(QuoteRange.MARKET_INDICES);
+                    CommandManager.getInstance().tableStocksByRule(EODQuoteRange.MARKET_INDICES);
                 else if (menu == quoteIndicesListDateMenuItem)
-                    CommandManager.getInstance().tableStocksByDate(QuoteRange.MARKET_INDICES);
+                    CommandManager.getInstance().tableStocksByDate(EODQuoteRange.MARKET_INDICES);
                 
                 else if (menu == quoteStocksListSymbolsMenuItem)
                     CommandManager.getInstance().tableStocks(null);

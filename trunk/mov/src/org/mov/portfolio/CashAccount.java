@@ -21,7 +21,7 @@ package org.mov.portfolio;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 
 /**
  * Representation of a cash account in a portfolio.
@@ -109,11 +109,11 @@ public class CashAccount extends AbstractAccount implements Cloneable {
 	return name;
     }
 
-    public Money getValue(QuoteBundle quoteBundle, int dateOffset) {
+    public Money getValue(EODQuoteBundle quoteBundle, int dateOffset) {
 	return capital;
     }
 
-    public Money getValue(QuoteBundle quoteBundle, TradingDate date) {
+    public Money getValue(EODQuoteBundle quoteBundle, TradingDate date) {
 	return capital;
     }
 

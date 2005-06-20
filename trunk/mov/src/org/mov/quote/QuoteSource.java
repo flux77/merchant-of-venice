@@ -74,10 +74,9 @@ public interface QuoteSource {
      *
      * @param	quoteRange	the range of quotes to load
      * @return  <code>TRUE</code> if the operation suceeded
-     * @see Quote
-     * @see QuoteCache
+     * @see EODQuoteCache
      */
-    public boolean loadQuoteRange(QuoteRange quoteRange);
+    public boolean loadQuoteRange(EODQuoteRange quoteRange);
 
     /**
      * Returns whether the source contains any quotes for the given date.

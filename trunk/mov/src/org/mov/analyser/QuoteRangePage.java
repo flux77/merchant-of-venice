@@ -43,9 +43,9 @@ import org.mov.prefs.PreferencesManager;
 import org.mov.parser.Expression;
 import org.mov.parser.ExpressionException;
 import org.mov.parser.Parser;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteCache;
-import org.mov.quote.QuoteRange;
+import org.mov.quote.EODQuoteBundle;
+import org.mov.quote.EODQuoteCache;
+import org.mov.quote.EODQuoteRange;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.SymbolFormatException;
 import org.mov.quote.WeekendDateException;
@@ -87,7 +87,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     private JComboBox dateRangePeriodComboBox;
 
     // Parsed data
-    private QuoteRange quoteRange;
+    private EODQuoteRange quoteRange;
     private Expression orderByEquation;
     private TradingDate startDate;
     private TradingDate endDate;
@@ -217,7 +217,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         }
 
         try {
-            int offset = QuoteCache.getInstance().dateToOffset(startDate);
+            int offset = EODQuoteCache.getInstance().dateToOffset(startDate);
         }
         catch(WeekendDateException e) {
             JOptionPane.showInternalMessageDialog(desktop,
@@ -229,7 +229,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         }
 
         try {
-            int offset = QuoteCache.getInstance().dateToOffset(endDate);
+            int offset = EODQuoteCache.getInstance().dateToOffset(endDate);
         }
         catch(WeekendDateException e) {
             JOptionPane.showInternalMessageDialog(desktop,
@@ -279,7 +279,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         return Locale.getString("QUOTE_RANGE_PAGE_TITLE");
     }
 
-    public QuoteRange getQuoteRange() {
+    public EODQuoteRange getQuoteRange() {
         return quoteRange;
     }
 
@@ -297,7 +297,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	return dateRangePeriod;
     }
 
-    public OrderComparator getOrderComparator(QuoteBundle quoteBundle) {
+    public OrderComparator getOrderComparator(EODQuoteBundle quoteBundle) {
         if(orderByKeyButton.isSelected()) {
             // Set order (e.g. by volume).
             return new OrderComparator(quoteBundle, orderByKeyComboBox.getSelectedIndex());

@@ -26,11 +26,11 @@ import java.util.List;
 import org.mov.prefs.PreferencesManager;
 
 /**
- * This class is responsible for caching quote bundles. When a {@link QuoteBundle} is created it
- * tries to load itself into memory by calling the <code>load()</code> method in this class.
- * When this method is called, this class will make sure that all of its quotes are loaded
- * in the {@link QuoteCache}. If not, it will try and load only the quotes not present
- * in the quote cache.
+ * This class is responsible for caching quote bundles. When a {@link EODQuoteBundle} is
+ * created it tries to load itself into memory by calling the <code>load()</code> method in
+ * this class. When this method is called, this class will make sure that all of its quotes 
+ * are loaded in the {@link EODQuoteCache}. If not, it will try and load only the quotes not 
+ * present in the quote cache.
  * <p>
  * When this class loads quotes into the quote cache, it will check to make sure the
  * quote cache hasn't got too big. If it has, it will free up the quotes used only by
@@ -40,25 +40,25 @@ import org.mov.prefs.PreferencesManager;
  * quote bundle tries to access the cache it might not find its quote.
  * If thats the case, it will call <code>load()</code> again to reload the quotes.
  *
- * @see Quote
- * @see QuoteBundle
- * @see QuoteCache
+ * @see EODQuote
+ * @see EODQuoteBundle
+ * @see EODQuoteCache
  * @see Symbol
  */
-public class QuoteBundleCache {
+public class EODQuoteBundleCache {
 
     // Singleton instance of class
-    private static QuoteBundleCache instance = null;
+    private static EODQuoteBundleCache instance = null;
 
     // Loaded quote bundle stack
     private List loadedQuoteBundles;
 
     // For speed reasons keep copy of quote cache instance
-    private QuoteCache quoteCache;
+    private EODQuoteCache quoteCache;
 
     // Class should only be constructed once by this class
-    private QuoteBundleCache() {
-	quoteCache = QuoteCache.getInstance();
+    private EODQuoteBundleCache() {
+	quoteCache = EODQuoteCache.getInstance();
 	loadedQuoteBundles = Collections.synchronizedList(new ArrayList());
     }
 
@@ -67,9 +67,9 @@ public class QuoteBundleCache {
      *
      * @return  singleton instance of this class
      */
-    public static synchronized QuoteBundleCache getInstance() {
+    public static synchronized EODQuoteBundleCache getInstance() {
 	if(instance == null)
-	    instance = new QuoteBundleCache();
+	    instance = new EODQuoteBundleCache();
 
         return instance;
     }
@@ -82,10 +82,10 @@ public class QuoteBundleCache {
      * @param quoteBundle the quote bundle to expand
      * @param expandedQuoteRange        the quote bundles new quote range
      */
-    public void expand(QuoteBundle quoteBundle, QuoteRange expandedQuoteRange) {
+    public void expand(EODQuoteBundle quoteBundle, EODQuoteRange expandedQuoteRange) {
 
         // Check dates for expansion
-        QuoteRange oldQuoteRange = quoteBundle.getQuoteRange();
+        EODQuoteRange oldQuoteRange = quoteBundle.getQuoteRange();
         assert expandedQuoteRange.getFirstDate() != null;
         assert expandedQuoteRange.getFirstDate().before(oldQuoteRange.getFirstDate()) ||
                expandedQuoteRange.getLastDate().after(oldQuoteRange.getLastDate());
@@ -105,9 +105,9 @@ public class QuoteBundleCache {
      * Make sure all the quotes needed by the quote bundle are in the quote cache.
      *
      * @param quoteBundle       the quote bundle to load
-     * @see QuoteCache
+     * @see EODQuoteCache
      */
-    public void load(QuoteBundle quoteBundle) {
+    public void load(EODQuoteBundle quoteBundle) {
 	if(!isLoaded(quoteBundle)) {
             loadedQuoteBundles.add(quoteBundle);
 
@@ -117,7 +117,7 @@ public class QuoteBundleCache {
     }
     
     // Make sure all the quotes in the given quote range into the quote cache.
-    private boolean forceLoad(QuoteRange quoteRange) {
+    private boolean forceLoad(EODQuoteRange quoteRange) {
         // Go thorugh all loaded quote bundles to reduce the
         // possibility of reloading quotes that are already in
         // the cache
@@ -125,7 +125,7 @@ public class QuoteBundleCache {
             Iterator iterator = loadedQuoteBundles.iterator();
         
             while(iterator.hasNext()) {
-                QuoteBundle traverse = (QuoteBundle)iterator.next();            
+                EODQuoteBundle traverse = (EODQuoteBundle)iterator.next();            
                 
                 // Don't check against last entry - that one contains the
                 // new quote bundle
@@ -155,7 +155,7 @@ public class QuoteBundleCache {
             synchronized(loadedQuoteBundles) {
                 while(quoteCache.size() > maximumCachedQuotes &&
                       loadedQuoteBundles.size() > 1) {
-                    free((QuoteBundle)loadedQuoteBundles.get(0));
+                    free((EODQuoteBundle)loadedQuoteBundles.get(0));
                 }
             }
         }
@@ -168,7 +168,7 @@ public class QuoteBundleCache {
      * @param quoteBundle       the quote bundle to check
      * @return <code>true</code> if the quote bundle is loaded
      */
-    public boolean isLoaded(QuoteBundle quoteBundle) {
+    public boolean isLoaded(EODQuoteBundle quoteBundle) {
         return loadedQuoteBundles.contains(quoteBundle);
     }
 
@@ -179,7 +179,7 @@ public class QuoteBundleCache {
      *
      * @param quoteBundle       the quote bundle to free
      */
-    private void free(QuoteBundle quoteBundle) {
+    private void free(EODQuoteBundle quoteBundle) {
 	// Now traverse each quote in bundle, check to see if its used by any other
 	// bundle. If not, then free.
 	int firstDateOffset = quoteBundle.getFirstDateOffset();
@@ -217,7 +217,7 @@ public class QuoteBundleCache {
             iterator.next();
 
 	while(iterator.hasNext()) {
-	    QuoteBundle quoteBundle = (QuoteBundle)iterator.next();
+	    EODQuoteBundle quoteBundle = (EODQuoteBundle)iterator.next();
 
 	    if(quoteBundle.containsQuote(symbol, dateOffset))
 		return true;

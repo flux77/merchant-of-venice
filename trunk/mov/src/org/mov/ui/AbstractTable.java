@@ -36,7 +36,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 
-import org.mov.quote.QuoteBundle;
+import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.util.Locale;
 import org.mov.util.Money;
@@ -224,8 +224,8 @@ public class AbstractTable extends SortedTable {
         return showColumnsMenu;
     }
 
-    protected void applyEquations(final QuoteBundle quoteBundle,
-                                  final QuoteModel model) {
+    protected void applyEquations(final EODQuoteBundle quoteBundle,
+                                  final EODQuoteModel model) {
 	// Handle all action in a separate thread so we dont
 	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
 	Thread thread = new Thread() {

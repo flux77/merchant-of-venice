@@ -18,6 +18,7 @@
 
 package org.mov.quote;
 
+import org.mov.ui.QuoteFormat;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingTime;
 
@@ -38,34 +39,55 @@ public class IDQuote implements Quote {
     // Time of quote
     private TradingTime time;
 
+    // Current volume
+    private int current_volume;
+
+    // Current low
+    private double current_low;
+
+    // Current high
+    private double current_high;
+
+    // Day open
+    private double day_open;
+
+    // Last trade price
+    private double last;
+
     // Last bid price
     private double bid;
 
     // Last ask price
     private double ask;
 
-    // Last trade price
-    private double last;
-
     /**
      * Create a new intra-day stock quote.
      *
-     * @param	symbol	the stock symbol
-     * @param	date	the date of this stock quote
-     * @param   time    the time of this stock quote
-     * @param   bid     the bid price
-     * @param   ask     the ask price
-     * @param   last    the price at the last trade
+     * @param	symbol	       the stock symbol
+     * @param	date	       the date of this stock quote
+     * @param   time           the time of this stock quote
+     * @param   current_volume the number of shares traded so far today
+     * @param   current_low    the current day low
+     * @param   current_high   the current day high
+     * @param	day_open       the opening quote on this date
+     * @param   last           the last trade price
+     * @param   bid            the last bid price
+     * @param   ask            the last ask price
      */
     public IDQuote(Symbol symbol, TradingDate date, TradingTime time,
-                   double bid, double ask, double last) {
+                   int current_volume, double current_low, double current_high,
+                   double day_open, double last, double bid, double ask) {
         setSymbol(symbol);
         setDate(date);
         setTime(time);
 
+        this.current_volume = current_volume;
+        this.current_low = current_low;
+        this.current_high = current_high;
+        this.day_open = day_open;
+        this.last = last;
         this.bid = bid;
         this.ask = ask;
-        this.last = last;
     }
 
     /**
@@ -96,6 +118,51 @@ public class IDQuote implements Quote {
     }
 
     /**
+     * Return the current day volume.
+     *
+     * @return	the current day volume
+     */
+    public int getDayVolume() {
+	return current_volume;
+    }
+
+    /**
+     * Return the current day low.
+     *
+     * @return	the current day low
+     */
+    public double getDayLow() {
+	return current_low;
+    }
+
+    /**
+     * Return the current day high.
+     *
+     * @return	the current day high
+     */
+    public double getDayHigh() {
+	return current_high;
+    }
+
+    /**
+     * Return the day open.
+     *
+     * @return	the day open
+     */
+    public double getDayOpen() {
+	return day_open;
+    }
+
+    /**
+     * Return the last trade value.
+     *
+     * @return	the last trade value.
+     */
+    public double getDayClose() {
+	return last;
+    }
+
+    /**
      * Return the bid price.
      *
      * @return the bid price.
@@ -111,15 +178,6 @@ public class IDQuote implements Quote {
      */
     public double getAsk() {
         return ask;
-    }
-
-    /**
-     * Return the last traded price.
-     *
-     * @return the last price.
-     */
-    public double getLast() {
-        return last;
     }
 
     /**
@@ -153,14 +211,40 @@ public class IDQuote implements Quote {
         throws UnsupportedOperationException {
 
 	switch(quote) {
+	case(DAY_OPEN):
+	    return getDayOpen();
+	case(DAY_CLOSE):
+	    return getDayClose();
+	case(DAY_LOW):
+	    return getDayLow();
+	case(DAY_HIGH):
+	    return getDayHigh();
+	case(DAY_VOLUME):
+	    return getDayVolume();
 	case(BID):
 	    return getBid();
 	case(ASK):
 	    return getAsk();
-	case(LAST):
-	    return getLast();
 	default:
             throw new UnsupportedOperationException();
 	}
     }
+
+    /**
+     * Return a string representation of the stock quote.
+     *
+     * @return	a string representation of the stock quote.
+     */
+    public String toString() {
+	return new String(getSymbol() + ", " + 
+                          getDate() + ", " +
+                          getTime() + ", " +
+			  QuoteFormat.quoteToString(getDayOpen()) + ", " + 
+                          QuoteFormat.quoteToString(getDayHigh()) + ", " + 
+			  QuoteFormat.quoteToString(getDayLow()) + ", " + 
+                          QuoteFormat.quoteToString(getDayClose()) + ", " + 
+			  getDayVolume() + ", " +
+                          QuoteFormat.quoteToString(getBid()) + ", " + 
+                          QuoteFormat.quoteToString(getAsk()));
+    }    
 }

@@ -20,30 +20,30 @@ package org.mov.util;
 
 /**
  * An exception which is raised when there is a problem parsing a
- * date.
+ * time.
  *
  * @author Andrew Leppard
  */
-public class TradingDateFormatException extends Throwable {
+public class TradingTimeFormatException extends Throwable {
 
-    private String date;
+    private String time;
 
     /** 
-     * Create a new trading date format exception.
+     * Create a new trading time format exception.
      *
-     * @param date the date being parsed.
+     * @param time the time being parsed.
      */
-    public TradingDateFormatException(String date) {
-        super(Locale.getString("ERROR_PARSING_DATE", date));
-        this.date = date;
+    public TradingTimeFormatException(String time) {
+        super(Locale.getString("ERROR_PARSING_TIME", time));
+        this.time = time;
     }
 
     /**
-     * Return the date string being parsed.
+     * Return the time string being parsed.
      *
-     * @return the date being parsed.
+     * @return the time being parsed.
      */
-    public String getDate() {
-        return date;
+    public String getTime() {
+        return time;
     }
 }

@@ -225,18 +225,18 @@ public class EODQuote implements Quote {
      * @return	<code>1</code> if they are equal; <code>0</code> otherwise
      */
     public boolean equals(EODQuote quote) {
-	 return (getSymbol().equals(quote.getSymbol()) &&
-                 getDate().equals(quote.getDate()) &&
-                 Math.abs(getDayLow() - quote.getDayLow()) < EPSILON &&
-                 Math.abs(getDayHigh() - quote.getDayHigh()) < EPSILON &&
-                 Math.abs(getDayOpen() - quote.getDayOpen()) < EPSILON &&
-                 Math.abs(getDayClose() - quote.getDayClose()) < EPSILON &&
-                 getDayVolume() == quote.getDayVolume());
+        return (getSymbol().equals(quote.getSymbol()) &&
+                getDate().equals(quote.getDate()) &&
+                Math.abs(getDayLow() - quote.getDayLow()) < EPSILON &&
+                Math.abs(getDayHigh() - quote.getDayHigh()) < EPSILON &&
+                Math.abs(getDayOpen() - quote.getDayOpen()) < EPSILON &&
+                Math.abs(getDayClose() - quote.getDayClose()) < EPSILON &&
+                getDayVolume() == quote.getDayVolume());
     }
 
     public double getQuote(int quote)
         throws UnsupportedOperationException {
-
+        
 	switch(quote) {
 	case(DAY_OPEN):
 	    return getDayOpen();

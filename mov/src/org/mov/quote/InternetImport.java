@@ -97,6 +97,7 @@ public class InternetImport {
         // retrieve in parts since Yahoo only provides quotes for a limited time period.
         TradingDate retrievalStartDate;
         TradingDate retrievalEndDate = endDate;
+
         do {
             // determine startDate for retrieval
             retrievalStartDate = retrievalEndDate.previous(MAX_NUMBER_OF_RETRIEVAL_DAYS);
@@ -113,9 +114,9 @@ public class InternetImport {
         
         if(result.size() == 0) {
             report.addError(Locale.getString("YAHOO") + ":" + 
-                    symbol + ":" +
-                    Locale.getString("ERROR") + ": " +
-                    Locale.getString("NO_QUOTES_FOUND"));
+                            symbol + ":" +
+                            Locale.getString("ERROR") + ": " +
+                            Locale.getString("NO_QUOTES_FOUND"));
         }
         return result;
     }
@@ -137,7 +138,7 @@ public class InternetImport {
         
         List quotes = new ArrayList();
         String URLString = constructURL(symbol, startDate, endDate);
-        EODQuoteFilter filter = new YahooQuoteFilter(symbol);
+        EODQuoteFilter filter = new YahooEODQuoteFilter(symbol);
 
         PreferencesManager.ProxyPreferences proxyPreferences =
             PreferencesManager.loadProxySettings();

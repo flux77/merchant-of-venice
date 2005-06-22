@@ -93,7 +93,7 @@ public class TradingDate implements Cloneable, Comparable {
 
     /**
      * Create a new date from the given string. We can parse the following
-     * date string:
+     * date strings:
      * <p>
      * <table>
      * <tr><td><pre>YYMMDD</pre></td><td>e.g. "010203"</td></tr>
@@ -112,7 +112,7 @@ public class TradingDate implements Cloneable, Comparable {
      * <tr><td><pre>DD-MONTH-YYYY</pre></td><td>e.g. "3-February-2001"</td></tr>
      * </table>
      *
-     * @param	date	the date string to convert from
+     * @param	date	the date string to parse
      * @param	type	either <code>BRITISH</code> or <code>US</code>
      * @exception   TradingDateException if the date couldn't be parsed
      */
@@ -212,7 +212,7 @@ public class TradingDate implements Cloneable, Comparable {
         catch(StringIndexOutOfBoundsException e) {
             throw new TradingDateFormatException(date);
         }
-
+        
         // Simple range checking.
         if(month == 0 || month > 12 || day == 0 || day > 31)
             throw new TradingDateFormatException(date);

@@ -47,6 +47,79 @@ public class TradingTime implements Cloneable, Comparable {
     }
 
     /*
+     * Create a new time from the given string. We can parse the following
+     * time strings:
+     * <p>
+     * <table>
+     * <tr><td><pre>H:MMAP</pre></td><td>e.g. "4:02pm"</td></tr>
+     * <tr><td><pre>HH:MMAP</pre></td><td>e.g. "04:02pm"</td></tr>
+     * </table>
+     *
+     * @param time the time string to parse
+     * @exception TradingTimeException if the time couldn't be parsed
+     */
+    public TradingTime(String time)
+        throws TradingTimeFormatException {
+
+        hour = 0;
+        minute = 0;
+        second = 0;
+
+        time = time.toUpperCase();
+
+        try {
+            int colonIndex = time.indexOf(':');
+
+            // H:MMAP or HH:MMAP (AP = "AM" or "PM")
+            if(colonIndex >= 0 && (time.length() == 6 || time.length() == 7)) {
+                int i = 0;
+
+                // HOUR
+                assert colonIndex != -1;
+
+                hour = Integer.parseInt(time.substring(i, colonIndex));
+                if(hour == 12)
+                    hour = 0;
+
+                i = colonIndex + 1;
+
+                // MINUTE
+                int dayIndex = time.indexOf('A');
+                if(dayIndex == -1)
+                    dayIndex = time.indexOf('P');
+                if(dayIndex == -1)
+                    throw new TradingTimeFormatException(time);
+
+                minute = Integer.parseInt(time.substring(i, dayIndex));
+
+                // AM or PM
+                i = dayIndex;
+                if(time.substring(i).equals("AM"));
+                else if(time.substring(i).equals("PM"))
+                    hour += 12;
+                else
+                    throw new TradingTimeFormatException(time);
+            }
+
+            // We don't recognise the format
+            else
+                throw new TradingTimeFormatException(time);
+        }
+
+        // If we can't parse, throw an exception
+        catch(NumberFormatException e) {
+            throw new TradingTimeFormatException(time);
+        }
+        catch(StringIndexOutOfBoundsException e) {
+            throw new TradingTimeFormatException(time);
+        }
+
+        // Simple range checking
+        if(hour > 23 || minute > 59 || second > 62)
+            throw new TradingTimeFormatException(time);
+    }
+
+    /*
      * Create a clone of this time.
      *
      * @return	a clone of this time.

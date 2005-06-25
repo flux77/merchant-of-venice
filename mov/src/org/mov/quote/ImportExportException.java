@@ -18,20 +18,21 @@
 
 package org.mov.quote;
 
-/**
- * An exception which is raised when there is a problem parsing a 
- * symbol string.
- *
- * @author Andrew Leppard
- */
-public class SymbolFormatException extends Throwable {
+import java.lang.Throwable;
 
-    /** 
-     * Create a new symbol format exception with the given error reason.
+/**
+ * This exception represents an error importing or exporting a quote to
+ * or from Venice.
+ */
+public class ImportExportException extends Throwable {
+
+    /**
+     * Create an exception that represents the error condition that occurs when
+     * an import or export fails.
      *
-     * @param message the reason why the string isn't a valid symbol
+     * @param message the failure reason
      */
-    public SymbolFormatException(String message) {
+    public ImportExportException(String message) {
         super(message);
     }
 }

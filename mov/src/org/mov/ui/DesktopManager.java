@@ -84,7 +84,7 @@ public class DesktopManager
     /**
      * Add a listener to list for module events.
      *
-     * @param moduleListener the class to be informed about module events.
+     * @param moduleListener the object to be informed about module events.
      */
     public void addModuleListener(ModuleListener moduleListener) {
 	moduleListeners.add(ModuleListener.class, moduleListener);
@@ -93,7 +93,7 @@ public class DesktopManager
     /**
      * Remove a listener of module events.
      *
-     * @param moduleListener the class to no longer be informeda bout
+     * @param moduleListener the object to no longer be informed about
      *                       module events.
      */
     public void removeModuleListener(ModuleListener moduleListener) {

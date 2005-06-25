@@ -39,12 +39,12 @@ import org.mov.util.Report;
  * @author Andrew Leppard
  * @see ExportQuoteModule
  * @see ImportQuoteModule
- * @see InternetImport
+ * @see YahooEODQuoteImport
  */
-public class FileImportExport {
+public class FileEODQuoteImportExport {
 
     // This class is not instantiated.
-    private FileImportExport() {
+    private FileEODQuoteImportExport() {
         assert false;
     }
 

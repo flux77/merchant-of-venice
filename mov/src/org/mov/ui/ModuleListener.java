@@ -18,11 +18,13 @@
 
 package org.mov.ui;
 
-import java.util.*;
+import java.util.EventListener;
 
 /**
  * Interface for classes that are listening for module events. Module
  * events are triggered when modules are added, removed or renamed.
+ *
+ * @author Andrew Leppard
  */
 public interface ModuleListener extends EventListener {
    

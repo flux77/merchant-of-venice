@@ -71,6 +71,14 @@ public class YahooIDQuoteFilter implements IDQuoteFilter {
             String[] quoteParts = quoteLine.split(",");
             int i = 0;
 
+            /* Remove quotation marks. */
+            for (i = 0; i < quoteParts.length; i++) {
+                quoteParts[i] = quoteParts[i].replace('"', ' ');
+                quoteParts[i] = quoteParts[i].trim();
+            }
+            
+            i = 0;
+
 	    if(quoteParts.length == 9) {
                 try {
                     Symbol symbol = Symbol.find(quoteParts[i++]);

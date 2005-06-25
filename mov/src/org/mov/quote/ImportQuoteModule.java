@@ -50,6 +50,7 @@ import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
 import org.mov.prefs.ProxyPage;
 import org.mov.prefs.PreferencesManager;
+import org.mov.ui.DesktopManager;
 import org.mov.ui.GridBagHelper;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
@@ -68,8 +69,8 @@ import org.mov.util.TradingDateFormatException;
  * @author Andrew Leppard
  * @see DatabaseQuoteSource
  * @see ExportQuoteModule
- * @see FileImportExport
- * @see InternetImport
+ * @see FileEODQuoteImportExport
+ * @see YahooEODQuoteImport
  */
 public class ImportQuoteModule extends JPanel implements Module {
 
@@ -324,7 +325,7 @@ public class ImportQuoteModule extends JPanel implements Module {
                 progress.setNote(Locale.getString("IMPORTING_FILE", file.getName()));
                 
                 // Load quotes from internet
-                List quotes = FileImportExport.importFile(report, filter, file);
+                List quotes = FileEODQuoteImportExport.importFile(report, filter, file);
                 
                 // Import into database
                 if(quotes.size() > 0) {
@@ -420,7 +421,8 @@ public class ImportQuoteModule extends JPanel implements Module {
                     progress.setNote(Locale.getString("IMPORTING_SYMBOL", symbol.toString()));
                     
                     // Load quotes from internet
-                    List quotes = InternetImport.importSymbol(report, symbol, startDate, endDate);
+                    List quotes =
+                       YahooEODQuoteImport.importSymbol(report, symbol, startDate, endDate);
                     
                     // Import into database
                     if(quotes.size() > 0) {
@@ -440,8 +442,9 @@ public class ImportQuoteModule extends JPanel implements Module {
                     progress.increment();
                 }
             }
-            catch(IOException e) {
-                // An error message will have already been displayed
+
+            catch(ImportExportException e) {
+                DesktopManager.showErrorMessage(e.getMessage());
             }
 
             ProgressDialogManager.closeProgressDialog(progress);

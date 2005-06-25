@@ -62,7 +62,7 @@ import org.mov.util.TradingDate;
  *
  * @author Andrew Leppard
  * @see DatabaseQuoteSource
- * @see FileImportExport
+ * @see FileEODQuoteImportExport
  * @see ImportQuoteModule
  */
 public class ExportQuoteModule extends JPanel implements Module {
@@ -259,7 +259,7 @@ public class ExportQuoteModule extends JPanel implements Module {
             
             // Export into fileq
             try {
-                FileImportExport.exportFile(filter, new File(fileName), quotes);
+                FileEODQuoteImportExport.exportFile(filter, new File(fileName), quotes);
             }
             catch(IOException e) {
                 DesktopManager.showErrorMessage(Locale.getString("ERROR_WRITING_TO_FILE",

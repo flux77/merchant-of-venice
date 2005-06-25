@@ -18,20 +18,26 @@
 
 package org.mov.quote;
 
+import java.util.EventListener;
+
 /**
- * An exception which is raised when there is a problem parsing a 
- * symbol string.
+ * Interface for classes that are listening for when new intra-day
+ * quotes are downloaded. All classes that are quote listeners
+ * will receive an event when a new intra-day quote has been
+ * downloaded and they should refresh any intra-day quote displays.
  *
  * @author Andrew Leppard
+ * @see IDQuoteCache
+ * @see QuoteEvent
  */
-public class SymbolFormatException extends Throwable {
 
-    /** 
-     * Create a new symbol format exception with the given error reason.
+public interface QuoteListener extends EventListener {
+
+    /**
+     * Called when a new intra-day quote has been downloaded.
      *
-     * @param message the reason why the string isn't a valid symbol
+     * @param quoteEvent the quote event
      */
-    public SymbolFormatException(String message) {
-        super(message);
-    }
+    public void newQuote(QuoteEvent quoteEvent);
+
 }

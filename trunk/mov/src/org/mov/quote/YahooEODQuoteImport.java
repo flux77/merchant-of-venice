@@ -34,20 +34,19 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mov.ui.DesktopManager;
 import org.mov.prefs.PreferencesManager;
 import org.mov.util.Locale;
 import org.mov.util.Report;
 import org.mov.util.TradingDate;
 
 /**
- * Import quotes from Yahoo into Venice.
+ * Import end-of-day quotes from Yahoo into Venice.
  *
  * @author Andrew Leppard
- * @see FileImportExport
+ * @see FileEODQuoteImportExport
  * @see ImportQuoteModule
  */
-public class InternetImport {
+public class YahooEODQuoteImport {
 
     // The following symbols will be replaced by the quote, date range we are after:
     private final static String SYMBOL      = "_SYM_";
@@ -72,7 +71,7 @@ public class InternetImport {
         ("http://ichart.finance.yahoo.com/table.csv" + YAHOO_PATTERN);
          
     // This class is not instantiated.
-    private InternetImport() {
+    private YahooEODQuoteImport() {
         assert false;
     }
 
@@ -86,11 +85,11 @@ public class InternetImport {
      * @param startDate start of date range to import
      * @param endDate end of date range to import
      * @return list of quotes
-     * @exception IOException if there was an error retrieving the quotes
+     * @exception ImportExportException if there was an error retrieving the quotes
      */
     public static List importSymbol(Report report, Symbol symbol,
                                     TradingDate startDate, TradingDate endDate)
-        throws IOException {
+        throws ImportExportException {
         
         List result = new ArrayList();
 
@@ -130,11 +129,11 @@ public class InternetImport {
      * @param startDate start of date range to import
      * @param endDate end of date range to import
      * @return list of quotes
-     * @exception IOException if there was an error retrieving the quotes
+     * @exception ImportExportException if there was an error retrieving the quotes
      */
     private static List retrieveQuotes(Report report, Symbol symbol, 
                                        TradingDate startDate, TradingDate endDate)
-    	throws IOException {
+    	throws ImportExportException {
         
         List quotes = new ArrayList();
         String URLString = constructURL(symbol, startDate, endDate);
@@ -174,34 +173,29 @@ public class InternetImport {
         }
 
 	catch(BindException e) {
-	    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_CONNECT_ERROR",
+            throw new ImportExportException(Locale.getString("UNABLE_TO_CONNECT_ERROR",
                                                              e.getMessage()));
-            throw new IOException();
 	}
 
 	catch(ConnectException e) {
-	    DesktopManager.showErrorMessage(Locale.getString("UNABLE_TO_CONNECT_ERROR",
+            throw new ImportExportException(Locale.getString("UNABLE_TO_CONNECT_ERROR",
                                                              e.getMessage()));
-            throw new IOException();
 	}
 
 	catch(UnknownHostException e) {
-	    DesktopManager.showErrorMessage(Locale.getString("UNKNOWN_HOST_ERROR",
+            throw new ImportExportException(Locale.getString("UNKNOWN_HOST_ERROR",
                                                              e.getMessage()));
-            throw new IOException();
 	}
 
 	catch(NoRouteToHostException e) {
-	    DesktopManager.showErrorMessage(Locale.getString("DESTINATION_UNREACHABLE_ERROR",
+            throw new ImportExportException(Locale.getString("DESTINATION_UNREACHABLE_ERROR",
                                                              e.getMessage()));
-            throw new IOException();
 	}
 
 	catch(MalformedURLException e) {
-	    DesktopManager.showErrorMessage(Locale.getString("INVALID_PROXY_ERROR",
+            throw new ImportExportException(Locale.getString("INVALID_PROXY_ERROR",
                                                              proxyPreferences.host,
                                                              proxyPreferences.port));
-            throw new IOException();
 	}
         
         catch(FileNotFoundException e) {
@@ -210,8 +204,7 @@ public class InternetImport {
         }
 
         catch(IOException e) {
-            DesktopManager.showErrorMessage(Locale.getString("ERROR_DOWNLOADING_QUOTES"));
-            throw new IOException();
+            throw new ImportExportException(Locale.getString("ERROR_DOWNLOADING_QUOTES"));
         } 
         
         return quotes;       

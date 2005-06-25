@@ -18,20 +18,26 @@
 
 package org.mov.quote;
 
+import java.util.EventObject;
+import java.util.List;
+
 /**
- * An exception which is raised when there is a problem parsing a 
- * symbol string.
+ * Representation of an event indicating that a new intra-day
+ * quote has been downloaded.
  *
  * @author Andrew Leppard
+ * @see IDQuoteCache
+ * @see QuoteEvent
  */
-public class SymbolFormatException extends Throwable {
 
-    /** 
-     * Create a new symbol format exception with the given error reason.
+public class QuoteEvent extends EventObject {
+
+    /**
+     * Create a new quote event based on the given module.
      *
-     * @param message the reason why the string isn't a valid symbol
+     * @param symbols list of new symbols downloaded
      */
-    public SymbolFormatException(String message) {
-        super(message);
+    public QuoteEvent(List symbols) {
+        super((Object)symbols);
     }
 }

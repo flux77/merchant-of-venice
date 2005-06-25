@@ -18,6 +18,8 @@
 
 package org.mov.util;
 
+import java.text.NumberFormat;
+
 /**
  * A replacement time for java.util.Calendar.
  *
@@ -32,6 +34,9 @@ public class TradingTime implements Cloneable, Comparable {
     private int hour;
     private int minute;
     private int second;
+
+    // Format to display minutes and seconds
+    private static NumberFormat format = null;
 
     /**
      * Create a new time from the given hour, minute and second.
@@ -189,5 +194,35 @@ public class TradingTime implements Cloneable, Comparable {
      */
     public int getSecond() {
         return second;
+    }
+
+    /**
+     * Returns a string version of the time.
+     *
+     * @return string version
+     */
+    public String toString() {
+        return (getHour() + ":" +
+                getNumberFormat().format(getMinute()) + ":" +
+                getNumberFormat().format(getSecond()));
+    }
+
+    /**
+     * Return the format suitable for displaying the minute and second
+     * fields.
+     *
+     * @return the number format.
+     */
+    private static NumberFormat getNumberFormat() {
+        // Synchronisation cannot cause issues here. So this code
+        // isn't synchronised.
+        if(format == null) {
+            format = NumberFormat.getInstance();
+            format.setMinimumIntegerDigits(2);
+            format.setMinimumFractionDigits(0);
+            format.setMaximumFractionDigits(0);
+        }
+
+        return format;
     }
 }

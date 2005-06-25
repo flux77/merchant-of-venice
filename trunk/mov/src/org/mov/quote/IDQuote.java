@@ -40,16 +40,16 @@ public class IDQuote implements Quote {
     private TradingTime time;
 
     // Current volume
-    private int current_volume;
+    private int currentVolume;
 
     // Current low
-    private double current_low;
+    private double currentLow;
 
     // Current high
-    private double current_high;
+    private double currentHigh;
 
     // Day open
-    private double day_open;
+    private double dayOpen;
 
     // Last trade price
     private double last;
@@ -66,28 +66,64 @@ public class IDQuote implements Quote {
      * @param	symbol	       the stock symbol
      * @param	date	       the date of this stock quote
      * @param   time           the time of this stock quote
-     * @param   current_volume the number of shares traded so far today
-     * @param   current_low    the current day low
-     * @param   current_high   the current day high
-     * @param	day_open       the opening quote on this date
+     * @param   currentVolume  the number of shares traded so far today
+     * @param   currentLow     the current day low
+     * @param   currentHigh    the current day high
+     * @param	dayOpen        the opening quote on this date
      * @param   last           the last trade price
      * @param   bid            the last bid price
      * @param   ask            the last ask price
      */
     public IDQuote(Symbol symbol, TradingDate date, TradingTime time,
-                   int current_volume, double current_low, double current_high,
-                   double day_open, double last, double bid, double ask) {
+                   int currentVolume, double currentLow, double currentHigh,
+                   double dayOpen, double last, double bid, double ask) {
         setSymbol(symbol);
         setDate(date);
         setTime(time);
 
-        this.current_volume = current_volume;
-        this.current_low = current_low;
-        this.current_high = current_high;
-        this.day_open = day_open;
+        this.currentVolume = currentVolume;
+        this.currentLow = currentLow;
+        this.currentHigh = currentHigh;
+        this.dayOpen = dayOpen;
         this.last = last;
         this.bid = bid;
         this.ask = ask;
+    }
+
+    /**
+     * Clean up the quote. This fixes any irregularities that might exist in the quote,
+     * such as the day low not being the lowest quote. This function does not
+     * throw an exception, unlike {@link EODQuote#verify}. The reason is that the
+     * intra-day quotes are downloaded all the time and it would only annoy the user
+     * constanty see any warnig messages displayed.
+     */
+    public void verify() {
+        if(currentLow > dayOpen || currentLow > last || currentLow > currentHigh)
+            currentLow = Math.min(Math.min(dayOpen, last), currentHigh);
+        
+        if(currentHigh < dayOpen || currentHigh < last || currentHigh < currentLow)
+            currentHigh = Math.max(Math.max(dayOpen, last), currentLow);
+
+        if(currentLow < 0)
+            currentLow = 0;
+
+        if(currentHigh < 0)
+            currentHigh = 0;
+
+        if(dayOpen < 0)
+            dayOpen = 0;
+
+        if(last < 0)
+            last = 0;
+
+        if(bid < 0)
+            bid = 0;
+
+        if(ask < 0)
+            ask = 0;
+
+        if(currentVolume < 0)
+            currentVolume = 0;
     }
 
     /**
@@ -123,7 +159,7 @@ public class IDQuote implements Quote {
      * @return	the current day volume
      */
     public int getDayVolume() {
-	return current_volume;
+	return currentVolume;
     }
 
     /**
@@ -132,7 +168,7 @@ public class IDQuote implements Quote {
      * @return	the current day low
      */
     public double getDayLow() {
-	return current_low;
+	return currentLow;
     }
 
     /**
@@ -141,7 +177,7 @@ public class IDQuote implements Quote {
      * @return	the current day high
      */
     public double getDayHigh() {
-	return current_high;
+	return currentHigh;
     }
 
     /**
@@ -150,7 +186,7 @@ public class IDQuote implements Quote {
      * @return	the day open
      */
     public double getDayOpen() {
-	return day_open;
+	return dayOpen;
     }
 
     /**

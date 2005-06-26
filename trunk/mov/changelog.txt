@@ -1,3 +1,10 @@
+Changes for Venice, 0.6 alpha 1/Aug/2005
+=========================================
+
+* Bug Fixes;
+  - Importing more than 200 days worth of quote data now works.
+    (Dennis van den Berg).
+
 Changes for Venice, 0.51 alpha 13/Apr/2005
 ==========================================
 

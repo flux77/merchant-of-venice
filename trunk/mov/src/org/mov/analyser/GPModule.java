@@ -298,8 +298,10 @@ public class GPModule extends JPanel implements Module {
                         break;
                     
                     // "Generation x of y (%)"
+                    int perc = Math.min((new Double((100.0D*actualBreedingPopulation)/breedingPopulation)).intValue(),
+                            (new Double((100.0D*individual)/population)).intValue());
                     progress.setNote(Locale.getString("GENERATION_OF",
-                                                        (new Double((100.0D*actualBreedingPopulation)/breedingPopulation)).intValue(),
+                                                        perc,
                                                         generation,
                                                         numberGenerations));
                     

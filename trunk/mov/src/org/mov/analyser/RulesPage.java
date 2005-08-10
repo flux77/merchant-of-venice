@@ -177,6 +177,10 @@ public class RulesPage extends JPanel implements AnalyserPage {
         
         variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
         variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+        variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
         
         if (buyRuleString.length() == 0) {
             JOptionPane.showInternalMessageDialog(desktop, Locale

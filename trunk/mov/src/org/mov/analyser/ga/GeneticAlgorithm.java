@@ -22,7 +22,6 @@
  */
 package org.mov.analyser.ga;
 
-import java.lang.System;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeMap;
@@ -235,7 +234,7 @@ public class GeneticAlgorithm {
                 // individual 'compete' to see if it gets to breed next round.
                 // If the individual is fit enough, it'll get a chance to breed.
                 competeForBreeding(individual, value);
-                validIndividual = true;                    
+                if (value!=null && individual!=null) validIndividual = true;                    
             }
             catch(EvaluationException e) {
                 // If there is a problem running the equation then
@@ -363,26 +362,15 @@ public class GeneticAlgorithm {
         // If the individual made a loss or broke even, then we are just going to get
         // rubbish if we breed from it, so even if it is the best we've seen so far, it
         // gets ignored.
-        if(value.isGreaterThan(initialCapital)) {
-            // If there is another individual with exactly the same value,
-            // we give the new up.
-            GAIndividual sameTradeIndividual =
-                (GAIndividual)nextBreedingPopulation.get(value);
-            
-            if(sameTradeIndividual == null) {
-                // Our individual is a unique butterfly. It'll get in only if the
-                // breeding population isn't full yet, or it is better than an
-                // existing individual.
-                if(nextBreedingPopulation.size() < breedingPopulationSize)
+        if(individual!=null && value!=null && value.isGreaterThan(initialCapital)) {
+            if(nextBreedingPopulation.size() < breedingPopulationSize) {
+                nextBreedingPopulation.put(value, individual);
+            } else {
+                Money weakestValue = (Money)nextBreedingPopulation.firstKey();
+
+                if(value.isGreaterThan(weakestValue)) {
+                    nextBreedingPopulation.remove(weakestValue);
                     nextBreedingPopulation.put(value, individual);
-                
-                else {
-                    Money weakestValue = (Money)nextBreedingPopulation.firstKey();
-                    
-                    if(value.isGreaterThan(weakestValue)) {
-                        nextBreedingPopulation.remove(weakestValue);
-                        nextBreedingPopulation.put(value, individual);
-                    }
                 }
             }
         }

@@ -46,9 +46,10 @@ public class GAIndividual {
     
     // The following define the probabilities that two inviduals
     // will be breed by the following methods.
-    private final static int MOTHER    = 40;
-    private final static int FATHER    = 40;
-    private final static int MUTATION  = 20;
+    // These numbers will be overwritten by what is got from GA user interface.
+    private static int MOTHER    = 40;
+    private static int FATHER    = 40;
+    private static int MUTATION  = 20;
 
     // The following enumerate the different methods that indivudals can
     // "breed" or be combined.
@@ -225,5 +226,17 @@ public class GAIndividual {
      */
     public int type(int index) {
         return types[index];
+    }
+    
+    /**
+     * Set the random mutation constants.
+     *
+     * @param randomPercentage the randomness percentage used in GA algorithm
+     */
+    public static void setRandomPercentage(int randomPercentage) {
+        int rest = (100 - randomPercentage) % 2;
+        MOTHER    = (int)((100 - randomPercentage + rest) / 2);
+        FATHER    = (int)((100 - randomPercentage - rest) / 2);
+        MUTATION  = randomPercentage;
     }
 }

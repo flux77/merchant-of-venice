@@ -852,6 +852,23 @@ trading date, -1 means the previous trading date, etc.</para>
 CBA over 30 days ending in yesterday.</para>
 </section>
 
+<section name="Cosine">
+<para>The cosine function returns the cosine of the given value.</para>
+<para><code>cos(VALUE)</code></para>
+<para>Where VALUE can be any float or integer.
+<para>Example:</para>
+<para><code>cos(0)</code></para>
+<para>Returns 1.0</para>
+<para><code>cos(3.141592653589793/2)</code></para>
+<para>Returns 0.0</para>
+<para><code>cos(3.141592653589793)</code></para>
+<para>Returns -1.0</para>
+<para><code>cos((3*3.141592653589793)/2)</code></para>
+<para>Returns 0.0</para>
+<para><code>cos(2*3.141592653589793)</code></para>
+<para>Returns 1.0</para>
+</section>
+
 <section name="Day">
 <para>The day function returns the current day of the month.</para>
 <para><code>day()</code></para>
@@ -874,6 +891,15 @@ CBA over 30 days ending in yesterday.</para>
 <para>Example:</para>
 <para><code>dayofyear()</code></para>
 <para>Returns the current day of the year, which might be 365, if it is New Years Eve.</para>
+</section>
+
+<section name="Exponential">
+<para>The exp function returns the exponential of the given value.</para>
+<para><code>exp(VALUE)</code></para>
+<para>Where VALUE is any float or integer.</para>
+<para>Example:</para>
+<para><code>exp(0)</code></para>
+<para>Returns 1.0</para>
 </section>
 
 <section name="Exponential Moving Average">
@@ -946,6 +972,17 @@ trading date, -1 means the previous trading date, etc.</para>
 <para>Returns the day high value of the current stock, 5 days previous.</para>
 <para>The expression <code>lag(close, 0)</code> is the same as <code>lag(close)</code> and they can both be
 abbreviated to <code>close</code>; similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+</section>
+
+<section name="Logarithm">
+<para>The log function returns the natural logarithm of the given value.</para>
+<para><code>log(VALUE)</code></para>
+<para>Where VALUE is any positive float or integer.</para>
+<para>Example:</para>
+<para><code>log(1)</code></para>
+<para>Returns 0.0</para>
+<para><code>log(exp(1)))</code></para>
+<para>Returns 1.0</para>
 </section>
 
 <section name="Minimum">
@@ -1045,6 +1082,23 @@ trading date, -1 means the previous trading date, etc.</para>
 <para>Example:</para>
 <para><code>rsi()</code></para>
 <para>Returns the RSI of the current stock.</para>
+</section>
+
+<section name="Sine">
+<para>The sine function returns the sine of the given value.</para>
+<para><code>sin(VALUE)</code></para>
+<para>Where VALUE can be any float or integer.
+<para>Example:</para>
+<para><code>sin(0)</code></para>
+<para>Returns 0.0</para>
+<para><code>sin(3.141592653589793/2)</code></para>
+<para>Returns 1.0</para>
+<para><code>sin(3.141592653589793)</code></para>
+<para>Returns 0.0</para>
+<para><code>sin((3*3.141592653589793)/2)</code></para>
+<para>Returns -1.0</para>
+<para><code>sin(2*3.141592653589793)</code></para>
+<para>Returns 0.0</para>
 </section>
 
 <section name="Square Root">
@@ -1188,7 +1242,7 @@ symbols by the given options, or by entering an equation.</para>
 </section>
 <section name="The Rules Page">
 <para>The rules page defines the buy/sell rules that trigger trades. Venice
-supports the concept of <highlight>Rule Famillies</highlight>. The idea is that you
+supports the concept of <highlight>Rule Families</highlight>. The idea is that you
 might want to try several hundred very similar equations.
 For example, if you wanted to trigger a buy on a moving average, you might
 have the following buy equation:
@@ -1198,7 +1252,13 @@ by entering the equation: <code>avg(close, a, 0) > avg(close, b, 0)</code>.
 Then making sure the <highlight>Enable multiple rules</highlight> checkbox is ticked.
 Then entering the maximum values for <code>a</code> and <code>b</code> into the <highlight>Range</highlight> entries.</para>
 <para>Venice makes two additional variables available to paper trade equations:</para>
-<list><item><code>held</code> - defines the number of days that the stock has been
+<list><item><code>daysfromstart</code> - defines the number of days that has been passed
+      from the beginning of the paper trade. For example in the 10th day of trade daysfromstart is equal to 10.
+</item>
+<item><code>capital</code> - defines the capital of the portfolio calculated
+      from the beginning of the paper trade. It is a float number.
+</item>
+<item><code>held</code> - defines the number of days that the stock has been
       held.
 </item>
 <item><code>order</code> - if you selected any order besides <highlight>No Real Order</highlight> this variable
@@ -1207,6 +1267,12 @@ Then entering the maximum values for <code>a</code> and <code>b</code> into the 
       <code>order</code> will be set to 0. For example, if you are ordering
       by volume decreasing, the stock with the highest volume will be
       analysed first, and the <code>order</code> variable will be set to 0.
+</item>
+<item><code>stockcapital</code> - defines the capital of the stock calculated
+      from when the stock has been bought.
+      If the stock is not held stockcapital is equal to 0.0. It is a float number.
+</item>
+<item><code>transactions</code> - defines the number of transactions done from the beginning of the paper trade.
 </item>
 </list>
 <para>Some example values:</para>
@@ -1380,12 +1446,60 @@ the former button to transform the inserted values to percentages.</para>
 <para>Genetic Algorithm is similar to <link to="Genetic Programming">Genetic Programming Module</link>.
 Differently from Genetic Programming, you have to write a buy and a sell rule with many parameters as you wish.
 Then you have to declare the minimum and the maximum values for each parameter.
-If you'll use minimum and maximum values of float type (2.3, 1.7, 1.1, ...) you'll use that parameter as float,
+If you use minimum and maximum values of float type (2.3, 1.7, 1.1, ...) you'll use that parameter as float,
 so be aware to put it in the rules so that it doesn't generate syntax error.
-If you'll use minimum and maximum values of integer type (2, 3, 4, ...) you'll use that parameter as integer,
+If you use minimum and maximum values of integer type (2, 3, 4, ...) you'll use that parameter as integer,
 so be aware to put it in the rules so that it doesn't generate syntax error.
 The Genetic Algorithm process will modifiy the parameter values inside the rules,
 according to the range inserted.</para>
+
+<para>A frequently asked question is the following: I've tried the genetic algorithm, but it doesn't work,
+it is not able to finish or it stops after having found just some solutions.
+Well, the answer is: the genetic algorithm doesn't assure the ending of itself, even more, sometimes it cannot
+find neither one solution. The only hint that can be done is choosing the buy and sell rules the best you can,
+so that the genetic algorithm can find out a solution more easily, if a solution exists!
+The following sections show you two examples which can help you.</para>
+
+<section name="RSI Example">
+<para>A simple example is to use the following rules: buy rule: <code>rsi(14)<32.0 + paramBuy</code>,
+sell rule: <code>rsi(14)>72.0 + paramSell</code>. If you set paramBuy and paramSell with values changing from 0.0 to 1.0,
+I suppose you to find good solutions to the most of the trading periods. Pain attention to the parameters' setting;
+In this example we've set the parameters as float, otherwise set as integer you would have had only few solutions (4):
+(0,0), (0,1), (1,0), and (1,1), and the algorithm could not work properly.</para>
+</section>
+
+<section name="Neural Network Example">
+<para>A more complex but interesting example are the artificial neural networks.
+If you do not know anything about neural networks you can look at the Joone project on sourceforge.
+Here you can find just an example of neural networks of whom weights are got from the genetic selection of the
+genetic algorithm. And this is the only thing that can be done in genetic algorithm analysis section.
+For the sake of simplicity we use the sigmoid function, so the neuron is modelled by the Gondola expression:
+<code>(1.0/(1.0+exp(-1.0*input)))</code>.
+The neurons are input for the hidden layer through the synapses, so each hidden layer will be 
+<code>((v11*inputneuron1 + ... ) + v1n*inputneuronn)</code>.
+The same process can be applied for the output layer.
+At the end you obtain one output neuron for the buy rule and one for the sell rule that can be used
+in Venice.</para>
+
+<para>If you want a quick couple of rules, I give you the rules that represent two artificial neural networks of
+4 input neurons and 6 hidden neurons and 1 output neuron.
+The first neural network can be used for the buy rule, the second for the sell rule.
+The input are open, close, high and low, but you can modifiy as you like as soon as you've practised with
+that expressions.
+The parameters that you have to set are: v11 .. v64 (24 parameters), w11 .. w16 (6 parameters),
+y11 .. y64 (24 parameters), z11 .. z16 (6 parameters). I put them ranging from -1.0 to 1.0.</para>
+
+<para>Here the long skeleton of buy rule to be inserted in the genetic algorithm section: 
+<code>(1.0/(1.0+exp(-1.0*(((((((w11*(1.0/(1.0+exp(-1.0*((((v11*(1.0/(1.0+exp((-1.0)*open))))+(v12*(1.0/(1.0+exp((-1.0)*close)))))+(v13*(1.0/(1.0+exp((-1.0)*low)))))+(v14*(1.0/(1.0+exp((-1.0)*high)))))))))+(w12*(1.0/(1.0+exp(-1.0*((((v21*(1.0/(1.0+exp((-1.0)*open))))+(v22*(1.0/(1.0+exp((-1.0)*close)))))+(v23*(1.0/(1.0+exp((-1.0)*low)))))+(v24*(1.0/(1.0+exp((-1.0)*high))))))))))+(w13*(1.0/(1.0+exp(-1.0*((((v31*(1.0/(1.0+exp((-1.0)*open))))+(v32*(1.0/(1.0+exp((-1.0)*close)))))+(v33*(1.0/(1.0+exp((-1.0)*low)))))+(v34*(1.0/(1.0+exp((-1.0)*high))))))))))+(w14*(1.0/(1.0+exp(-1.0*((((v41*(1.0/(1.0+exp((-1.0)*open))))+(v42*(1.0/(1.0+exp((-1.0)*close)))))+(v43*(1.0/(1.0+exp((-1.0)*low)))))+(v44*(1.0/(1.0+exp((-1.0)*high))))))))))+(w15*(1.0/(1.0+exp(-1.0*((((v51*(1.0/(1.0+exp((-1.0)*open))))+(v52*(1.0/(1.0+exp((-1.0)*close)))))+(v53*(1.0/(1.0+exp((-1.0)*low)))))+(v54*(1.0/(1.0+exp((-1.0)*high))))))))))+(w16*(1.0/(1.0+exp(-1.0*((((v61*(1.0/(1.0+exp((-1.0)*open))))+(v62*(1.0/(1.0+exp((-1.0)*close)))))+(v63*(1.0/(1.0+exp((-1.0)*low)))))+(v64*(1.0/(1.0+exp((-1.0)*high))))))))))))))>0.5
+</code>
+</para>
+
+<para>Here the long skeleton of sell rule to be inserted in the genetic algorithm section: 
+<code>(1.0/(1.0+exp(-1.0*(((((((z11*(1.0/(1.0+exp(-1.0*((((y11*(1.0/(1.0+exp((-1.0)*open))))+(y12*(1.0/(1.0+exp((-1.0)*close)))))+(y13*(1.0/(1.0+exp((-1.0)*low)))))+(y14*(1.0/(1.0+exp((-1.0)*high)))))))))+(z12*(1.0/(1.0+exp(-1.0*((((y21*(1.0/(1.0+exp((-1.0)*open))))+(y22*(1.0/(1.0+exp((-1.0)*close)))))+(y23*(1.0/(1.0+exp((-1.0)*low)))))+(y24*(1.0/(1.0+exp((-1.0)*high))))))))))+(z13*(1.0/(1.0+exp(-1.0*((((y31*(1.0/(1.0+exp((-1.0)*open))))+(y32*(1.0/(1.0+exp((-1.0)*close)))))+(y33*(1.0/(1.0+exp((-1.0)*low)))))+(y34*(1.0/(1.0+exp((-1.0)*high))))))))))+(z14*(1.0/(1.0+exp(-1.0*((((y41*(1.0/(1.0+exp((-1.0)*open))))+(y42*(1.0/(1.0+exp((-1.0)*close)))))+(y43*(1.0/(1.0+exp((-1.0)*low)))))+(y44*(1.0/(1.0+exp((-1.0)*high))))))))))+(z15*(1.0/(1.0+exp(-1.0*((((y51*(1.0/(1.0+exp((-1.0)*open))))+(y52*(1.0/(1.0+exp((-1.0)*close)))))+(y53*(1.0/(1.0+exp((-1.0)*low)))))+(y54*(1.0/(1.0+exp((-1.0)*high))))))))))+(z16*(1.0/(1.0+exp(-1.0*((((y61*(1.0/(1.0+exp((-1.0)*open))))+(y62*(1.0/(1.0+exp((-1.0)*close)))))+(y63*(1.0/(1.0+exp((-1.0)*low)))))+(y64*(1.0/(1.0+exp((-1.0)*high))))))))))))))>0.5
+</code>
+</para>
+
+</section>
 </chapter>
 
 </chapter>

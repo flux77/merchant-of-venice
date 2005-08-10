@@ -306,6 +306,7 @@ public class PaperTrade {
             }
 
             variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
+            variables.setValue("stockcapital", getStockCapital(environment, stockHolding, symbol, dateOffset));
 
             try {
                 // If you want to buy the stock, do not sell it.
@@ -362,6 +363,7 @@ public class PaperTrade {
         throws EvaluationException {
 
         variables.setValue("held", 0);
+        variables.setValue("stockcapital", 0);
 
         // If we have enough money, iterate through stocks available today -
         // should we buy any of it?
@@ -428,6 +430,7 @@ public class PaperTrade {
      * @param environment the paper trade environment
      * @param stockHolding to query
      * @param dateOffset current date
+     * @return the holding time
      */
     private static int getHoldingTime(Environment environment, StockHolding stockHolding,
                                       int dateOffset) {
@@ -441,6 +444,55 @@ public class PaperTrade {
             return 0;
         }
     }
+
+
+    /**
+     * Return the actual capital of the given stock.
+     *
+     * @param environment the paper trade environment
+     * @param stockHolding to query
+     * @param dateOffset current date
+     * @param symbol the stock of whom you want to know the capital owned
+     * @return the actual capital of the given stock
+     */
+    private static double getStockCapital(Environment environment, StockHolding stockHolding,
+                                      Symbol symbol, int dateOffset) {
+        double retValue = 0.0D;
+        try {
+                // Set the actual value of capital for the stock
+                int shares = stockHolding.getShares();
+                double price = environment.quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, dateOffset);
+                retValue = (double)price*shares;
+        }
+        catch(MissingQuoteException e) {
+            // do nothing
+        }
+        finally {
+            return retValue;
+        }
+    }
+
+
+    /**
+     * Return the actual capital of the portfolio.
+     *
+     * @param environment the paper trade environment
+     * @param dateOffset current date
+     * @return the actual capital of the portfolio
+     */
+    private static double getCapital(Environment environment, int dateOffset) {
+        double retValue = 0.0D;
+        try {
+            retValue = environment.portfolio.getValue(environment.quoteBundle, dateOffset).doubleValue();
+        }
+        catch(MissingQuoteException e) {
+            // Ignore and move on
+        }
+        finally {
+            return retValue;
+        }
+    }
+
 
     /**
      * Perform paper trading using a fixed stock value. This method will try to keep
@@ -489,12 +541,39 @@ public class PaperTrade {
             variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
         if(!variables.contains("held"))
             variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        if(!variables.contains("daysfromstart"))
+            variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        if(!variables.contains("transactions"))
+            variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        if(!variables.contains("capital"))
+            variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+        if(!variables.contains("stockcapital"))
+            variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+        
+        // daysfromstart
+        int daysRest = (int)(-1) * dateOffset;
 
         // Now iterate through each trading date and decide whether
 	// to buy/sell. The last date is used for placing the previous
 	// date's buy/sell orders.
 	while(dateOffset < environment.endDateOffset) {
-
+            
+            // Set the value of days elapsed from the begin of the Paper Trade process
+            variables.setValue("daysfromstart", daysRest + dateOffset);
+            
+            // Set the value of the number of transactions done until now
+            variables.setValue("transactions", environment.portfolio.countTransactions());
+            
+            // Set the value of actual capital
+            variables.setValue("capital", getCapital(environment, dateOffset));
+            
+            try {
+                variables.setValue("capital", environment.portfolio.getValue(quoteBundle, dateOffset).doubleValue());
+            }
+            catch(MissingQuoteException e) {
+                // Ignore and move on
+            }
+            
             // Get all the (ordered) symbols that we can trade for today and
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);
@@ -561,12 +640,32 @@ public class PaperTrade {
             variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
         if(!variables.contains("held"))
             variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        if(!variables.contains("daysfromstart"))
+            variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        if(!variables.contains("transactions"))
+            variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        if(!variables.contains("capital"))
+            variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+        if(!variables.contains("stockcapital"))
+            variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
 
+        // daysfromstart
+        int daysRest = (int)(-1) * dateOffset;
+        
         // Now iterate through each trading date and decide whether
 	// to buy/sell. The last date is used for placing the previous
 	// date's buy/sell orders.
 	while(dateOffset < environment.endDateOffset) {
 
+            // Set the value of days elapsed from the begin of the Paper Trade process
+            variables.setValue("daysfromstart", daysRest + dateOffset);
+            
+            // Set the value of the number of transactions done until now
+            variables.setValue("transactions", environment.portfolio.countTransactions());
+            
+            // Set the value of actual capital
+            variables.setValue("capital", getCapital(environment, dateOffset));
+            
             // Get all the (ordered) symbols that we can trade for today and
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);
@@ -658,9 +757,11 @@ public class PaperTrade {
                 Symbol symbolHolding = stockHolding.getSymbol();
                 if (symbolHolding.toString().compareTo(symbol.toString())==0) {
                     variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
+                    variables.setValue("stockcapital", getStockCapital(environment, stockHolding, symbol, dateOffset));
                     break;
                 } else {
                     variables.setValue("held", 0);
+                    variables.setValue("stockcapital", 0.0D);
                 }
             }
 
@@ -698,6 +799,8 @@ public class PaperTrade {
                                       
         // Count the buy tip for the next day
         variables.setValue("held", 0);
+        
+        variables.setValue("stockcapital", 0.0D);
 
         int order = 0;
         

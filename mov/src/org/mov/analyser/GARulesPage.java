@@ -91,7 +91,7 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         
         this.desktop = desktop;
         this.GARulesPageModule = new GARulesPageModule(desktop);
-        layoutPage(preferredSize);
+        setGraphic(preferredSize);
         
     }
     
@@ -163,6 +163,10 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         
         variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
         variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+        variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
         
         // Insert all the parameters in variables.
         // We use lowestGAIndividual, but highestGAIndividual should be the same.
@@ -383,15 +387,14 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         GARulesPageModule.removeSelectedResults();
     }
     
-    private void layoutPage(Dimension preferredSize) {
+    private void setGraphic(Dimension preferredSize) {
         
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        GridBagLayout gridbag = new GridBagLayout();
         
-        // Rules panel
         TitledBorder equationTitled = new TitledBorder(Locale.getString("RULES_PAGE_TITLE"));
-        JPanel panel = new JPanel();
-        panel.setBorder(equationTitled);
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        this.setBorder(equationTitled);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setPreferredSize(preferredSize);
         
         JPanel panelUp = new JPanel();
         JPanel panelDown = new JPanel();
@@ -403,7 +406,6 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         panelDown.setBorder(titledBorderSectionDown);
         
         JPanel innerPanel = new JPanel();
-        GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         innerPanel.setLayout(gridbag);
 
@@ -419,16 +421,12 @@ public class GARulesPage extends JPanel implements AnalyserPage {
                                                                 Locale.getString("SELL_RULE"), 
                                                                 "", gridbag, c);
 
-        
-        // Parameters panel
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        
+                
         // GARulesPageModule is already declared as global variable
         GARulesPageModule.setLayout(new BoxLayout(GARulesPageModule, BoxLayout.Y_AXIS));
         
         JScrollPane upDownScrollPane = new JScrollPane(GARulesPageModule);
         upDownScrollPane.setLayout(new ScrollPaneLayout());
-        upDownScrollPane.setPreferredSize(preferredSize);
         
         JButton addButton = new JButton(Locale.getString("ADD"));
         addButton.addActionListener(new ActionListener() {

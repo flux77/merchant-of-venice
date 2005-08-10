@@ -122,6 +122,10 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
             Variables variables = new Variables();
             variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
             variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
+            variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
+            variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
+            variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+            variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
             if (tradeValueBuyByEquationButton.isSelected()) {
                 Expression tradeValueBuyExpression = Parser.parse(variables, tradeValueBuyTextField.getText());
             }

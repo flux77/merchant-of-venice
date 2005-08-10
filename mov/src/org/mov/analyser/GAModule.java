@@ -274,10 +274,12 @@ public class GAModule extends JPanel implements Module {
         Money tradeCost = portfolioPage.getTradeCost();
         int breedingPopulation = GAPage.getBreedingPopulation();
         int displayPopulation = GAPage.getDisplayPopulation();
+        int randomPercentage = GAPage.getRandomPercentage();
         Money stockValue = portfolioPage.getStockValue();
         int numberStocks = portfolioPage.getNumberStocks();
         String tradeValueBuy = tradeValuePage.getTradeValueBuy();
         String tradeValueSell = tradeValuePage.getTradeValueSell();
+        GAIndividual.setRandomPercentage(randomPercentage);
         GAIndividual lowestGAIndividual = GARulesPage.getLowestIndividual();
         GAIndividual highestGAIndividual = GARulesPage.getHighestIndividual();
         
@@ -288,6 +290,10 @@ public class GAModule extends JPanel implements Module {
         Variables variables = new Variables();
         variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
         variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+        variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
         for (int ii=0; ii<lowestGAIndividual.size(); ii++)
             variables.add(lowestGAIndividual.parameter(ii), lowestGAIndividual.type(ii), Variable.CONSTANT);
  
@@ -344,8 +350,10 @@ public class GAModule extends JPanel implements Module {
                         break;
                     
                     // "Generation x of y (%)"
+                    int perc = Math.min((new Double((100.0D*actualBreedingPopulation)/breedingPopulation)).intValue(),
+                            (new Double((100.0D*individual)/population)).intValue());
                     progress.setNote(Locale.getString("GENERATION_OF",
-                                                        (new Double((100.0D*actualBreedingPopulation)/breedingPopulation)).intValue(),
+                                                        perc,
                                                         generation,
                                                         numberGenerations));
                     

@@ -75,12 +75,14 @@ public class GAPage extends JPanel implements AnalyserPage {
     private JTextField populationTextField;
     private JTextField breedingPopulationTextField;
     private JTextField displayPopulationTextField;
+    private JTextField randomPercentageTextField;
 
     // Parsed input
     private int generations;
     private int population;
     private int breedingPopulation;
     private int displayPopulation;
+    private int randomPercentage;
 
     /** Minimum number of quote days an equation can see. */
     private final static int MINIMUM_WINDOW_SIZE = 3;
@@ -114,6 +116,8 @@ public class GAPage extends JPanel implements AnalyserPage {
                 breedingPopulationTextField.setText(value);
             else if(setting.equals("display_population"))
                 displayPopulationTextField.setText(value);
+            else if(setting.equals("random_percentage"))
+                randomPercentageTextField.setText(value);
         }
     }
 
@@ -124,6 +128,7 @@ public class GAPage extends JPanel implements AnalyserPage {
 	settings.put("population", populationTextField.getText());
 	settings.put("breeding_population", breedingPopulationTextField.getText());
 	settings.put("display_population", displayPopulationTextField.getText());
+	settings.put("random_percentage", randomPercentageTextField.getText());
 
         PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
                                                     settings);
@@ -134,6 +139,7 @@ public class GAPage extends JPanel implements AnalyserPage {
         population = 0;
         breedingPopulation = 0;
         displayPopulation = 0;
+        randomPercentage = 20;
 
         try {
 	    if(!generationsTextField.getText().equals(""))
@@ -151,12 +157,16 @@ public class GAPage extends JPanel implements AnalyserPage {
 	    if(!displayPopulationTextField.getText().equals(""))
 		displayPopulation =
 		    Integer.parseInt(displayPopulationTextField.getText());
+
+	    if(!randomPercentageTextField.getText().equals(""))
+		randomPercentage =
+		    Integer.parseInt(randomPercentageTextField.getText());
 	}
 	catch(NumberFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("ERROR_PARSING_NUMBER",
                                                                    e.getMessage()),
-                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  Locale.getString("INVALID_GA_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
 	}
@@ -164,7 +174,7 @@ public class GAPage extends JPanel implements AnalyserPage {
         if(displayPopulation > breedingPopulation) {
             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("DISPLAY_POPULATION_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  Locale.getString("INVALID_GA_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
@@ -172,7 +182,7 @@ public class GAPage extends JPanel implements AnalyserPage {
         if(generations <= 0) {
             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("NO_GENERATION_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  Locale.getString("INVALID_GA_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
@@ -180,7 +190,7 @@ public class GAPage extends JPanel implements AnalyserPage {
         if(population <= 0) {
             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("NO_INDIVIDUAL_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  Locale.getString("INVALID_GA_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
@@ -188,7 +198,7 @@ public class GAPage extends JPanel implements AnalyserPage {
         if(breedingPopulation <= 0) {
             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("NO_BREEDING_INDIVIDUAL_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  Locale.getString("INVALID_GA_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
@@ -196,7 +206,15 @@ public class GAPage extends JPanel implements AnalyserPage {
         if(displayPopulation <= 0) {
             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("NO_DISPLAY_INDIVIDUAL_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
+                                                  Locale.getString("INVALID_GA_ERROR"),
+                                                  JOptionPane.ERROR_MESSAGE);
+	    return false;
+        }
+
+        if(randomPercentage < 0 || randomPercentage > 100) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("ERROR_GA_RANDOM_PERCENTAGE_ERROR"),
+                                                  Locale.getString("INVALID_GA_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
@@ -252,6 +270,16 @@ public class GAPage extends JPanel implements AnalyserPage {
         return displayPopulation;
     }
 
+    /**
+     * Return the percentage of the likelihood of changing a GA parameter in a random manner
+     *  instead of a combination of mother and father rules.
+     *
+     * @return the percentage
+     */
+    public int getRandomPercentage() {
+        return randomPercentage;
+    }
+    
     private void layoutPage() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -287,6 +315,11 @@ public class GAPage extends JPanel implements AnalyserPage {
         displayPopulationTextField =
             GridBagHelper.addTextRow(innerPanel,
                                      Locale.getString("DISPLAY_POPULATION"), "",
+                                     gridbag, c, 7);
+
+        randomPercentageTextField =
+            GridBagHelper.addTextRow(innerPanel,
+                                     Locale.getString("RANDOM_PERCENTAGE"), "",
                                      gridbag, c, 7);
 
         panel.add(innerPanel, BorderLayout.NORTH);

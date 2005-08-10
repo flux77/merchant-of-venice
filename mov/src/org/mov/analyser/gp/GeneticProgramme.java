@@ -18,7 +18,6 @@
 
 package org.mov.analyser.gp;
 
-import java.lang.System;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeMap;
@@ -132,6 +131,8 @@ public class GeneticProgramme {
      * @param numberStocks number of stocks in the portfolio
      * @param tradeCost the cost of a trade
      * @param breedingPopulationSize number of individuals that can breed
+     * @param tradeValueBuy value for buying a stock
+     * @param tradeValueSell value for selling a stock
      */
     public GeneticProgramme(GPQuoteBundle quoteBundle,
                             GPGondolaSelection GPGondolaSelection,
@@ -203,7 +204,7 @@ public class GeneticProgramme {
                     // individual 'compete' to see if it gets to breed next round.
                     // If the individual is fit enough, it'll get a chance to breed.
                     competeForBreeding(individual, value);
-                    validIndividual = true;                    
+                    if (individual!=null && value!=null) validIndividual = true;                    
                 }
                 catch(EvaluationException e) {
                     // If there is a problem running the equation then
@@ -366,7 +367,7 @@ public class GeneticProgramme {
         // If the individual made a loss or broke even, then we are just going to get
         // rubbish if we breed from it, so even if it is the best we've seen so far, it
         // gets ignored.
-        if(value.isGreaterThan(initialCapital)) {
+        if(individual!=null && value!=null && value.isGreaterThan(initialCapital)) {
             // If there is another individual with exactly the same value -
             // we assume it made the same trades. Replace this individual
             // ONLY if the new individual is smaller in size. This puts a small

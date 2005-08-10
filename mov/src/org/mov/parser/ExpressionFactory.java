@@ -245,6 +245,18 @@ public class ExpressionFactory {
         case(Token.SD_TOKEN):
             expression = new SDExpression(arg1, arg2, arg3);
             break;
+        case(Token.SIN_TOKEN):
+            expression = new SineExpression(arg1);
+            break;
+        case(Token.COS_TOKEN):
+            expression = new CosineExpression(arg1);
+            break;
+        case(Token.LOG_TOKEN):
+            expression = new LogarithmExpression(arg1);
+            break;
+        case(Token.EXP_TOKEN):
+            expression = new ExponentialExpression(arg1);
+            break;
         default:
             // No such token
             assert false;
@@ -262,6 +274,10 @@ public class ExpressionFactory {
         Variables variables = new Variables();
         variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
         variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
+        variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+        variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
         
         if(inputExpressionString.length() == 0) {
             expression = null;

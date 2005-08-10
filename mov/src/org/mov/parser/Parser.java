@@ -79,6 +79,13 @@ import org.mov.util.Locale;
  *                     "momentum" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
  *                     "obv" "(" SUB_EXPR ["," SUB_EXPR] ["," SUB_EXPR] ")" |
  *                     "sd" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
+ *                     "sin" "(" SUB_EXPR ")" |
+ *                     "cos" "(" SUB_EXPR ")" |
+ *                     "log" "(" SUB_EXPR ")" |
+ *                     "exp" "(" SUB_EXPR ")" |
+ *                     "dayfromstart" "(" ")" |
+ *                     "capital" "(" ")" |
+ *                     "stockcapital" "(" ")" |
  * FLOW_CONTROL      = "if"  "(" SUB_EXPR ")" EXPR "else" EXPR |
  *                     "for" "(" SUB_EXPR ";" SUB_EXPR ";" SUB_EXPR ")" EXPR |
  *                     "while" "(" SUB_EXPR ")" EXPR
@@ -319,7 +326,11 @@ public class Parser {
                 tokens.match(Token.MACD_TOKEN) ||
                 tokens.match(Token.MOMENTUM_TOKEN) ||
                 tokens.match(Token.OBV_TOKEN) ||
-                tokens.match(Token.SD_TOKEN))
+                tokens.match(Token.SD_TOKEN) ||
+                tokens.match(Token.SIN_TOKEN) ||
+                tokens.match(Token.COS_TOKEN) ||
+                tokens.match(Token.LOG_TOKEN) ||
+                tokens.match(Token.EXP_TOKEN))
 	    expression = parseFunction(variables, tokens);
 
         // ABBREVIATION QUOTE FUNCTIONS
@@ -515,6 +526,7 @@ public class Parser {
 	parseLeftParenthesis(variables, tokens);
 
 	switch(function.getType()) {
+            
 	case(Token.LAG_TOKEN):
 	case(Token.MACD_TOKEN):
 	    arg1 = parseQuote(variables, tokens);
@@ -648,6 +660,10 @@ public class Parser {
 	case(Token.NOT_TOKEN):
         case(Token.SQRT_TOKEN):
         case(Token.ABS_TOKEN):
+	case(Token.SIN_TOKEN):
+	case(Token.COS_TOKEN):
+	case(Token.LOG_TOKEN):
+	case(Token.EXP_TOKEN):
 	    arg1 = parseSubExpression(variables, tokens);
 	    break;
 	

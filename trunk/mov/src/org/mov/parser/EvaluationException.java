@@ -161,6 +161,11 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException SQUARE_ROOT_NEGATIVE_EXCEPTION =
         new EvaluationException(Locale.getString("SQUARE_ROOT_NEGATIVE_ERROR"));
 
+    /** An exception which is thrown when trying to calculate the logarithm
+        of a negative number. */
+    public static EvaluationException LOGARITHM_NEGATIVE_EXCEPTION =
+        new EvaluationException(Locale.getString("LOGARITHM_NEGATIVE_EXCEPTION"));
+
     /**
      * Create a new evaluation exception with the given error reason.
      * Make any exception without a run-time error message static so the

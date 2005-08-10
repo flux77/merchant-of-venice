@@ -205,8 +205,20 @@ public class Token {
     /** Represents "<code>sd()</code>" symbol */
     public static final int SD_TOKEN = 57;
     
+    /** Represents "<code>sin()</code>" symbol */
+    public static final int SIN_TOKEN = 58;
+    
+    /** Represents "<code>cos()</code>" symbol */
+    public static final int COS_TOKEN = 59;
+    
+    /** Represents "<code>log()</code>" symbol */
+    public static final int LOG_TOKEN = 60;
+    
+    /** Represents "<code>exp()</code>" symbol */
+    public static final int EXP_TOKEN = 61;
+    
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 58;
+    private static final int FIXED_LENGTH_TOKENS = 62;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -301,6 +313,10 @@ public class Token {
         tokenStrings[MOMENTUM_TOKEN]           = "momentum";
         tokenStrings[OBV_TOKEN]                = "obv";
         tokenStrings[SD_TOKEN]                 = "sd";
+        tokenStrings[SIN_TOKEN]                = "sin";
+        tokenStrings[COS_TOKEN]                = "cos";
+        tokenStrings[LOG_TOKEN]                = "log";
+        tokenStrings[EXP_TOKEN]                = "exp";
         
         return tokenStrings;
     }

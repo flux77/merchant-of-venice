@@ -1,9 +1,31 @@
-Changes for Venice, 0.6 alpha 1/Aug/2005
-=========================================
+Changes for Venice, 0.6 beta 1/Sep/2005
+=======================================
+
+* Updates to Gondola Language:
+  - Added sin() (Alberto Nacher).
+  - Added cos() (Alberto Nacher).
+  - Added log() (Alberto Nacher).
+  - Added exp() (Alberto Nacher).
+
+* Updates to Paper Trade:
+  - The current capital, number of transactions and start of paper trade
+    now available to paper trade (Alberto Nacher).
+
+* Tuning:
+  - Portfolio and Watch Screens now only load the quotes they use,
+    previously they'd load the entire day's quotes.
 
 * Bug Fixes;
-  - Importing more than 200 days worth of quote data now works.
-    (Dennis van den Berg).
+  - Can now import more than 200 days of quote data from Yahoo in one
+    transaction (Dennis van den Berg).
+  - Fixed a bug where the quote sub-system, when expanding the date
+    range of a bundle of quotes, would attempt to re-load some quotes
+    that were already loaded.
+  - Venice no longer runs out of memory when importing very large
+    quote files (>10MB).
+  - Fixed a user interface bug where adding new equations to a
+    table resulted in any present equation columns being removed and
+    then re-added.
 
 Changes for Venice, 0.51 alpha 13/Apr/2005
 ==========================================

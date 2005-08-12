@@ -1280,7 +1280,7 @@ Then entering the maximum values for <code>a</code> and <code>b</code> into the 
 </code></item>
 <item>Sell Rule: <code>order &lt; a || held &gt; b
 </code></item>
-<item>Enable multiple fules: Ticked
+<item>Enable multiple rules: Ticked
 </item>
 <item>Range a: 1 to: 10
 </item>
@@ -1378,13 +1378,15 @@ come up with any principles that can be generally applied.</para>
 </section>
 
 <section name="The GP Parameters Page">
-<para>The genetic programming (GP) parameters page defines the Genetic Programme settings.
-You can set the number of <highlight>Generations</highlight>
-to run; you can set the <highlight>Population</highlight> size; you can set
-the <highlight>Breeding Population</highlight>, and you can set
-the <highlight>Display Population</highlight>. The display population is
-the number of highest returning individuals that are displayed when that
-generation has completed.</para>
+<para>The genetic programming (GP) parameters page defines the Genetic Programme
+settings. You can set the number of <highlight>Generations</highlight>
+to run, the <highlight>Population</highlight> size, the <highlight>Breeding Population</highlight> size,
+the <highlight>Display Population</highlight> size and the <highlight>Window Size</highlight>.
+The display population is the number of highest returning individuals that are
+displayed when that generation has completed. The Window Size is the maximum
+number of quote days that an individual will be able to base its buy/sell
+evaluation on.
+</para>
 <para>Some example values:</para>
 <list><item>Generations: 50
 </item>
@@ -1393,6 +1395,8 @@ generation has completed.</para>
 <item>Breeding Population: 250
 </item>
 <item>Display Population: 5
+</item>
+<item>Window Size: 60
 </item>
 </list>
 </section>

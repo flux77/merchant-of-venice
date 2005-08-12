@@ -2,7 +2,7 @@
 <project name="Venice" default="run" basedir=".">
 
   <!-- Current version we are working towards -->
-  <property name="VERSION" value="0.5alpha"/>
+  <property name="VERSION" value="0.6alpha"/>
 
   <!-- Paths -->
   <property name="api" value="${basedir}/api"/>
@@ -11,8 +11,14 @@
   <property name="release" value="${basedir}/release"/>
   <property name="report" value="${basedir}/report"/>
   <property name="src" value="${basedir}/src"/>
+  <property name="lib" value="${basedir}/lib"/>
   <property name="test" value="${basedir}/test"/>
   <property name="web" value="${basedir}/web"/>
+
+  <!-- Libraries -->
+  <property name="lib.hsql" value="${lib}/hsqldb.jar"/>
+  <property name="lib.jython" value="${lib}/jython.jar"/>
+  <property name="lib.mysql" value="${lib}/mysql-connector-java-3.1.7-bin.jar"/>
 
   <!-- Online help -->
   <property name="help" value="${src}/org/mov/help/doc"/>
@@ -282,6 +288,9 @@
       <classpath>
         <pathelement path="${java.class.path}"/>
         <pathelement path="${src}"/>
+        <pathelement path="${lib.hsql}"/>
+        <pathelement path="${lib.mysql}"/>
+        <pathelement path="${lib.jython}"/>
       </classpath>
     </java>
   </target>

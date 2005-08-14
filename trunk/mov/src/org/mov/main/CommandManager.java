@@ -315,11 +315,11 @@ public class CommandManager {
 
                 EODQuoteBundle quoteBundle = null;
                 TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
-
+                
                 if(lastDate != null) {
                     if(!thread.isInterrupted()) {
                         EODQuoteRange quoteRange =
-                            new EODQuoteRange(EODQuoteRange.ALL_SYMBOLS, lastDate.previous(1),
+                            new EODQuoteRange(portfolio.getStocksHeld(), lastDate.previous(1),
                                               lastDate);
 
                         quoteBundle = new EODQuoteBundle(quoteRange);
@@ -458,7 +458,7 @@ public class CommandManager {
                 if(lastDate != null) {
                     if(!thread.isInterrupted()) {
                         EODQuoteRange quoteRange =
-                            new EODQuoteRange(EODQuoteRange.ALL_SYMBOLS, lastDate.previous(1),
+                            new EODQuoteRange(watchScreen.getSymbols(), lastDate.previous(1),
                                               lastDate);
 
                         quoteBundle = new EODQuoteBundle(quoteRange);

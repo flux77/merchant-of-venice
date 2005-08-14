@@ -256,6 +256,8 @@ public class AbstractTable extends SortedTable {
                                                    containsEquation);
                                         menuItem.setState(containsEquation);
                                     }
+
+                                    model.fireTableStructureChanged();
                                 }});
 		    }
 		}

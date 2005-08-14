@@ -104,7 +104,9 @@ public class EODQuoteBundle implements QuoteBundle {
 
     /**
      * Get a stock quote. If the stock is earlier than the first date in the bundle, the
-     * bundle will be expand to include the new date given.
+     * bundle will be expand to include the new date given. If the stock symbol is not
+     * included in the original symbol list, the quote bundle will be expanded to include
+     * it.
      *
      * @param symbol  the stock symbol
      * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
@@ -129,22 +131,19 @@ public class EODQuoteBundle implements QuoteBundle {
             }
             catch(QuoteNotLoadedException e2) {
 
-                // If the quote is still null, maybe we need to expand the bundle?
-                // First check to make sure the new date is older than any date in
-                // the cache
-                if(getQuoteRange().getFirstDate() != null && dateOffset < getFirstDateOffset()) {
+                // If the quote is still null, maybe it's because it isn't in the quote range.
+                // Examine whether we can expand the quote range to include it.
+                if(tryExpand(symbol, dateOffset)) {
                     try {
-                        quote = tryExpand(symbol, quoteType, dateOffset);
+                        quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
                     }
                     catch(QuoteNotLoadedException e3) {
-                        
                         // We tried everyting - we just don't have it
                         throw MissingQuoteException.getInstance();
                     }
                 }
                 else
                     throw MissingQuoteException.getInstance();
-
             }
         }
 
@@ -530,19 +529,41 @@ public class EODQuoteBundle implements QuoteBundle {
         throw QuoteNotLoadedException.getInstance();
     }
 
-    // Try to expand the quote bundle so that it includes the current date.
-    // Now reload the quote from the cache and return.
-    private double tryExpand(Symbol symbol, int quoteType, int dateOffset)
-        throws QuoteNotLoadedException {
-
+    /**
+     * Try to expand the new quote bundle so that it include a new
+     * date and/or a new symbol. This function is passed the 
+     *
+     * @param symbol possibly new symbol to include
+     * @param dateOffset possibly new date to include
+     * @return <code>true</code> if the quote range was expanded, or
+     *         <code>false</code> if the quote range already includes
+     *         the symbol and date range.
+     */
+    private boolean tryExpand(Symbol symbol, int dateOffset) {
+        boolean success = false;
         EODQuoteRange expandedQuoteRange = (EODQuoteRange)getQuoteRange().clone();
         
-        TradingDate date = quoteCache.offsetToDate(dateOffset);
-        expandedQuoteRange.setFirstDate(date);
-        quoteBundleCache.expand(this, expandedQuoteRange);
+        // We can expand a quote range by expanding it to cover an older date
+        if(getQuoteRange().getFirstDate() != null && dateOffset < getFirstDateOffset()) {
 
-        // Now try loading the quote again!
-        return quoteCache.getQuote(symbol, quoteType, dateOffset);
+            TradingDate date = quoteCache.offsetToDate(dateOffset);
+            expandedQuoteRange.setFirstDate(date);
+            success = true;
+        }
+        
+        // Expand a list of symbols to include another
+        if(getQuoteRange().getType() == EODQuoteRange.GIVEN_SYMBOLS &&
+           !getQuoteRange().containsSymbol(symbol)) {
+            
+            expandedQuoteRange.addSymbol(symbol);
+            success = true;
+        }   
+
+        // Load expanded quote cache
+        if(success)
+            quoteBundleCache.expand(this, expandedQuoteRange);
+
+        return success;
     }
 }
 

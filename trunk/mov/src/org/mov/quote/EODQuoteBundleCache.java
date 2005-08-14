@@ -79,19 +79,17 @@ public class EODQuoteBundleCache {
      * When this function is called, the quote bundle should still have its old
      * quote range. It will be updated by this function.
      *
-     * @param quoteBundle the quote bundle to expand
-     * @param expandedQuoteRange        the quote bundles new quote range
+     * @param quoteBundle        the quote bundle to expand
+     * @param expandedQuoteRange the quote bundles new quote range
      */
     public void expand(EODQuoteBundle quoteBundle, EODQuoteRange expandedQuoteRange) {
+        // If the quote bundle is already loaded, then clip the expanded quote range
+        // so we don't try and re-load any of the load symbols.
+        if(isLoaded(quoteBundle)) 
+            expandedQuoteRange = quoteBundle.getQuoteRange().clip(expandedQuoteRange);
 
-        // Check dates for expansion
-        EODQuoteRange oldQuoteRange = quoteBundle.getQuoteRange();
-        assert expandedQuoteRange.getFirstDate() != null;
-        assert expandedQuoteRange.getFirstDate().before(oldQuoteRange.getFirstDate()) ||
-               expandedQuoteRange.getLastDate().after(oldQuoteRange.getLastDate());
-
-        // If the quote bundle isn't in our loaded list, put it there
-        if(!isLoaded(quoteBundle)) 
+        // Otherwise place the quote bundle in the list as we will now load it.
+        else
             loadedQuoteBundles.add(quoteBundle);
 
         // Load the quotes from the expanded quote bundle
@@ -124,24 +122,17 @@ public class EODQuoteBundleCache {
         synchronized(loadedQuoteBundles) {
             Iterator iterator = loadedQuoteBundles.iterator();
         
-            while(iterator.hasNext()) {
+            while(iterator.hasNext() && !quoteRange.isEmpty()) {
                 EODQuoteBundle traverse = (EODQuoteBundle)iterator.next();            
-                
+
                 // Don't check against last entry - that one contains the
                 // new quote bundle
-                if(iterator.hasNext()) {
+                if(iterator.hasNext())
                     quoteRange = traverse.getQuoteRange().clip(quoteRange);
-                    
-                    // If the quote range is null it means that the range
-                    // contains no quotes, meaning its entirely contained
-                    // by already loaded quote ranges
-                    if(quoteRange == null)
-                        break;
-                }
             }
         }
         
-        if(quoteRange != null) { 
+        if(!quoteRange.isEmpty()) { 
             // Load the quote range into the quote cache. Return immediately if
             // we couldn't load it.
             if(!QuoteSourceManager.getSource().loadQuoteRange(quoteRange))

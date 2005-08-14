@@ -29,15 +29,14 @@ import java.util.List;
  * @see IDQuoteCache
  * @see QuoteEvent
  */
-
 public class QuoteEvent extends EventObject {
 
     /**
      * Create a new quote event based on the given module.
      *
-     * @param symbols list of new symbols downloaded
+     * @param quoteCache The intra-day quote cache
      */
-    public QuoteEvent(List symbols) {
-        super((Object)symbols);
+    public QuoteEvent(IDQuoteCache quoteCache) {
+        super(quoteCache);
     }
 }

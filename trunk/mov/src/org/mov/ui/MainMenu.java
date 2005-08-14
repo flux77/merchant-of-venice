@@ -705,12 +705,17 @@ public class MainMenu implements ActionListener, ModuleListener
         }
     }
 
-    // doc me
+    /**
+     * Disable the menus. This shadows the menus and disables user action.
+     */
     public void disableMenus() {
         for(int i = 0; i < menuBar.getMenuCount(); i++)
             menuBar.getMenu(i).setEnabled(false);
     }
 
+    /**
+     * Enable the menus. This re-enables the menus and allows user actions.
+     */
     public void enableMenus() {
         for(int i = 0; i < menuBar.getMenuCount(); i++)
             menuBar.getMenu(i).setEnabled(true);

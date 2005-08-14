@@ -230,8 +230,6 @@ public class EODQuoteModel extends AbstractTableModel {
         }
 
         ProgressDialogManager.closeProgressDialog(progress);        
-
-        fireTableStructureChanged();
     }
 
     public int getColumnCount() {

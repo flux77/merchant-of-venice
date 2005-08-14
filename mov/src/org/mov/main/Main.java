@@ -32,6 +32,8 @@ import org.mov.ui.GPLViewDialog;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
 import org.mov.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The top level class which contains the main() function. This class builds

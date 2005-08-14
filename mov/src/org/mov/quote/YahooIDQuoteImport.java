@@ -42,7 +42,6 @@ import org.mov.util.Locale;
  *
  * @author Andrew Leppard
  */
-
 public class YahooIDQuoteImport {
 
     // The following symbols will be replaced by the quote, date range we are after:
@@ -60,9 +59,9 @@ public class YahooIDQuoteImport {
     }
 
     /**
-     * Retrieve quotes from Yahoo.
+     * Retrieve intra-day quotes from Yahoo.
      *
-     * @param list the symbols to import.
+     * @param symbols the symbols to import.
      * @exception ImportExportException if there was an error retrieving the quotes
      */
     public static List importSymbols(List symbols)

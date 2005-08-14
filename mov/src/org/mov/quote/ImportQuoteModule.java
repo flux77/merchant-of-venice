@@ -69,7 +69,7 @@ import org.mov.util.TradingDateFormatException;
  * @author Andrew Leppard
  * @see DatabaseQuoteSource
  * @see ExportQuoteModule
- * @see FileEODQuoteImportExport
+ * @see FileEODQuoteImport
  * @see YahooEODQuoteImport
  */
 public class ImportQuoteModule extends JPanel implements Module {
@@ -323,18 +323,9 @@ public class ImportQuoteModule extends JPanel implements Module {
                 
                 // Update progress dialog
                 progress.setNote(Locale.getString("IMPORTING_FILE", file.getName()));
-                
-                // Load quotes from internet
-                List quotes = FileEODQuoteImportExport.importFile(report, filter, file);
-                
-                // Import into database
-                if(quotes.size() > 0) {
-                    int fileQuotesImported = database.importQuotes(quotes);
-                    report.addMessage(file.getName() + ": " +
-                                      Locale.getString("IMPORTED_QUOTES", 
-                                                       fileQuotesImported));
-                    quotesImported += fileQuotesImported;
-                }
+
+                // Import quotes from the given file
+                quotesImported += importQuotesFromSingleFile(database, report, file);
                 
                 // Stop if the user hit cancel
                 if(Thread.currentThread().isInterrupted())
@@ -346,6 +337,30 @@ public class ImportQuoteModule extends JPanel implements Module {
             ProgressDialogManager.closeProgressDialog(progress);
             displayReport(report, quotesImported);
         }
+    }
+
+    // DOC
+    private int importQuotesFromSingleFile(DatabaseQuoteSource database, Report report, File file) {
+        int quotesImported = 0;
+        FileEODQuoteImport importer = new FileEODQuoteImport(report, filter);
+
+        if(importer.open(file)) {
+            while(importer.isNext()) {
+                List quotes = importer.importNext();
+
+                // Import into database
+                if(quotes.size() > 0)
+                    quotesImported += database.importQuotes(quotes);
+            }
+
+            importer.close();
+        }
+
+        if(quotesImported > 0)
+            report.addMessage(file.getName() + ": " +
+                              Locale.getString("IMPORTED_QUOTES", 
+                                               quotesImported));
+        return quotesImported;
     }
 
     /**

@@ -39,7 +39,6 @@ public class EODQuoteRangeTest extends TestCase
             fail("Couldn't create symbol CBA");
         }
 
-
         // Test Partial Overlap
         //
         // quoteRange      [----------]
@@ -77,7 +76,7 @@ public class EODQuoteRangeTest extends TestCase
                                         new TradingDate(2000, 12, 1));
         clippedQuoteRange = quoteRange2.clip(quoteRange);
 
-        assertTrue(clippedQuoteRange == null);
+        assertTrue(clippedQuoteRange.isEmpty());
 
         // Test Contained
         // quoteRange   [----------]    -> [----------]
@@ -100,7 +99,7 @@ public class EODQuoteRangeTest extends TestCase
                                         new TradingDate(2000, 12, 1));
         clippedQuoteRange = quoteRange2.clip(quoteRange);
 
-        assertTrue(clippedQuoteRange == null);
+        assertTrue(clippedQuoteRange.isEmpty());
 
    }
 }

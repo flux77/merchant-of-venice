@@ -92,8 +92,6 @@ public class EODQuoteRange implements Cloneable {
 	this.type = GIVEN_SYMBOLS;
 	this.firstDate = null;
 	this.lastDate = null;
-
-	assert symbols.size() > 0;
     }
 
     /**
@@ -107,8 +105,6 @@ public class EODQuoteRange implements Cloneable {
 	this.type = GIVEN_SYMBOLS;
 	this.firstDate = null;
 	this.lastDate = null;
-
-	assert symbols.size() > 0;
     }
 
     /**
@@ -120,13 +116,11 @@ public class EODQuoteRange implements Cloneable {
      * @param lastDate  latest date
      */
     public EODQuoteRange(List symbols, TradingDate firstDate,
-		      TradingDate lastDate) {
+                         TradingDate lastDate) {
 	this.symbols = new ArrayList(symbols);
 	this.type = GIVEN_SYMBOLS;
 	this.firstDate = firstDate;
 	this.lastDate = lastDate;
-
-	assert symbols.size() > 0;
     }
 
     /**
@@ -140,8 +134,6 @@ public class EODQuoteRange implements Cloneable {
 	this.type = GIVEN_SYMBOLS;
 	this.firstDate = date;
 	this.lastDate = date;
-
-	assert symbols.size() > 0;
     }
 
     /**
@@ -299,6 +291,17 @@ public class EODQuoteRange implements Cloneable {
     }
 
     /**
+     * Return whether this quote range includes any quotes. This function checks
+     * for a null quote range, not an empty quote cache.
+     *
+     * @return <code>true</code> if this quote range covers an empty range,
+     *         <code>false</code> otherwise.
+     */
+    public boolean isEmpty() {
+        return (type == GIVEN_SYMBOLS && symbols.size() == 0);
+    }
+
+    /**
      * Get the type of the quote range.
      *
      * @return one of {@link #ALL_ORDINARIES}, {@link #ALL_SYMBOLS},
@@ -338,6 +341,19 @@ public class EODQuoteRange implements Cloneable {
 	
 	    return QuoteSourceManager.getSource().isMarketIndex(symbol);
 	}
+    }
+
+    /**
+     * Expand the quote range to include a new symbol. This function is only valid
+     * for quote ranges that have explicitly given a set of symbols.
+     *
+     * @param symbol new symbol
+     */
+    public void addSymbol(Symbol symbol) {
+        assert type == GIVEN_SYMBOLS;
+
+        if(!symbols.contains(symbol))
+            symbols.add(symbol);
     }
 
     /**
@@ -522,7 +538,9 @@ public class EODQuoteRange implements Cloneable {
 		}
 		else {
 		    assert overlapType == CONTAINS;
-		    return null;
+		    return new EODQuoteRange(new ArrayList(),
+                                             quoteRange.getFirstDate(),
+                                             quoteRange.getLastDate());
 		}
 	    }
 	    else

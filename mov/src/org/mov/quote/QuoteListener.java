@@ -30,7 +30,6 @@ import java.util.EventListener;
  * @see IDQuoteCache
  * @see QuoteEvent
  */
-
 public interface QuoteListener extends EventListener {
 
     /**
@@ -38,6 +37,6 @@ public interface QuoteListener extends EventListener {
      *
      * @param quoteEvent the quote event
      */
-    public void newQuote(QuoteEvent quoteEvent);
+    public void newQuotes(QuoteEvent quoteEvent);
 
 }

@@ -18,6 +18,7 @@
 
 package org.mov.quote;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.mov.parser.EvaluationException;
@@ -27,7 +28,8 @@ import org.mov.util.TradingDate;
  * When a task requires intra-day stock quotes, it should create an instance of this class
  * which represents all the task's required quotes. The task can then access quotes
  * from this class, which in turn reads its stock quotes from the global intra-day quote
- * cache - {@link IDQuoteCache}.
+ * cache - {@link IDQuoteCache}. To be notified of new intra-day quotes call
+ * {@link IDQuoteCache#addQuoteListener}.
  * <p>
  * Example:
  * <pre>
@@ -47,9 +49,14 @@ import org.mov.util.TradingDate;
  * @see Symbol
  */
 public class IDQuoteBundle implements QuoteBundle {
-    
+
+    // Current date of all intra-day quotes
     private TradingDate date;
+
+    // List of symbols in quote bundle
     private List symbols;
+
+    // Reference to global intra-day quote cache
     private IDQuoteCache quoteCache;
 
     /**
@@ -60,21 +67,41 @@ public class IDQuoteBundle implements QuoteBundle {
      */
     public IDQuoteBundle(List symbols) {
         this.symbols = symbols;
+        
+        // Tell the quote sync to download intra-day quotes for these symbols
+        IDQuoteSync.getInstance().addSymbols(symbols);
     }
 
-    public double getQuote(Symbol symbol, int quoteType, int now, int offset)
+    public double getQuote(Symbol symbol, int quoteType, int now, int timeOffset)
 	throws EvaluationException, MissingQuoteException {
 
-        return 0.0D;
+        return getQuote(symbol, quoteType, now + timeOffset);
     }
 
-    public double getQuote(Symbol symbol, int quoteType, int offset)
+    public double getQuote(Symbol symbol, int quoteType, int timeOffset)
 	throws MissingQuoteException {
-        
-        return 0.0D;
+
+        double quote;
+
+        try {
+            quote = quoteCache.getQuote(symbol, quoteType, timeOffset);
+        }
+        catch(QuoteNotLoadedException e) {
+
+            // Expand the quote range to include the symbol if we don't already have it
+            if(!symbols.contains(symbol)) {
+                symbols.add(symbol);
+                IDQuoteSync.getInstance().addSymbols(symbols);
+            }
+
+            // The symbol won't be available until next polling period
+            throw MissingQuoteException.getInstance();
+        }
+
+        return quote;
     }
 
-    public TradingDate offsetToDate(int offset) {
+    public TradingDate offsetToDate(int timeOffset) {
         // The entire quote bundle is on the same date
         return date;
     }

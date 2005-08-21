@@ -25,12 +25,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -64,6 +67,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     private JMenuItem applyEquations;
     private JMenuItem applyFilter;
     private JMenuItem sortByMostActive;
+    private JMenuItem exportMenu;
     private JMenuItem tableClose;
 
     // Poup menu items
@@ -323,6 +327,12 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             
             tableMenu.addSeparator();
             
+            exportMenu =
+                MenuHelper.addMenuItem(this, tableMenu,
+                                       Locale.getString("EXPORT"));
+            
+            tableMenu.addSeparator();
+            
             tableClose = MenuHelper.addMenuItem(this, tableMenu,
                                                 Locale.getString("CLOSE"));	
             
@@ -389,6 +399,56 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 		}};
 	
 	thread.start();
+    }
+
+    // Allow the user to export all the content of the table.
+    // The fields use ; as separator char as in csv format.
+    private void exportTable() {
+
+        File f;
+        String filename = "";
+        String userDir = System.getProperty("user.home");
+        JFileChooser chooser = new JFileChooser();
+        chooser.setMultiSelectionEnabled(false);
+
+        int rv = chooser.showSaveDialog(DesktopManager.getDesktop());
+
+        if (rv == JFileChooser.APPROVE_OPTION) {
+            
+            List quotes = model.getQuotes();
+            
+            f = chooser.getSelectedFile();		
+            filename = f.getAbsolutePath();
+            
+            // Save file in the system
+            try {
+                RandomAccessFile fileToBeSaved = new RandomAccessFile(filename, "rw");
+                // Write header
+                for (int ii=0; ii<model.getColumnCount(); ii++) {
+                    Column column = model.getColumn(ii);
+                    if ((column.getVisible() == Column.VISIBLE) &&
+                            (ii!=EODQuoteModel.PERCENT_CHANGE_COLUMN)) {
+                        fileToBeSaved.writeBytes(column.getShortName() + ";");
+                    }
+                }
+                fileToBeSaved.writeBytes("\n");
+                // Write rest of the table
+                for (int ii=0; ii<model.getRowCount(); ii++) {
+                    for (int jj=0; jj<model.getColumnCount(); jj++) {
+                        Column column = model.getColumn(jj);
+                        if ((column.getVisible() == Column.VISIBLE) &&
+                            (jj!=EODQuoteModel.PERCENT_CHANGE_COLUMN)) {
+                            fileToBeSaved.writeBytes(model.getValueAt(ii,jj).toString() + ";");
+                        }
+                    }
+                    fileToBeSaved.writeBytes("\n");
+                }
+                fileToBeSaved.close();
+            } catch (Exception ex) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_WRITING_TO_FILE",
+                                                                  f.toString()));
+            }
+        }
     }
 
     // Allow the user to type in a symbol string, then make sure the symbol
@@ -534,6 +594,10 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	    resort();
 	    validate();
 	    repaint();
+	}
+
+	else if(e.getSource() == exportMenu) {
+	    exportTable();
 	}
 
         // Find symbol

@@ -47,7 +47,7 @@ abstract public class ArithmeticExpression extends BinaryExpression {
      * @return	the type of the expression
      */
     public int checkType() throws TypeMismatchException {
-	// Types must be the same and not boolean or quote
+	// Types must be integer or float and not boolean or quote.
 	int leftType = getChild(0).checkType();
 	int rightType = getChild(1).checkType();
 

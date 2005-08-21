@@ -567,13 +567,6 @@ public class PaperTrade {
             // Set the value of actual capital
             variables.setValue("capital", getCapital(environment, dateOffset));
             
-            try {
-                variables.setValue("capital", environment.portfolio.getValue(quoteBundle, dateOffset).doubleValue());
-            }
-            catch(MissingQuoteException e) {
-                // Ignore and move on
-            }
-            
             // Get all the (ordered) symbols that we can trade for today and
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);

@@ -67,6 +67,24 @@ public class Mutator {
     // (i.e. we modify the expression tree at the mutation point).
     private final static int MODIFICATION_MUTATION_PERCENT = 70;
 
+    /** SUBTYPE
+     * The subtype concept is introduced in Mutator class to pilot the GP process,
+     * so that less time is wasted to find the best fitting expressions.
+     * The type concept is present in Expression class and it is widely used in Gondola,
+     * the subtype concept is a weaker tool, that only suggests the GP what to find
+     * for the best fit in an expression.
+     * For example in lag(close,xxx), we would like xxx be a INTEGER_TYPE expression,
+     * by the point of view of the type, but an integer is not enough,
+     * we also need that this integer be small and negative,
+     * because xxx is the number of days of delay.
+     * So we pilot the GP to find a small negative integer using
+     * the subtype NEGATIVE_SHORT_INTEGER_SUBTYPE.
+     */
+    private final static int NO_SUBTYPE = 0;
+    private final static int POSITIVE_SHORT_INTEGER_SUBTYPE = 1;
+    private final static int NEGATIVE_SHORT_INTEGER_SUBTYPE = 2;
+    private final static int SMOOTHING_CONSTANT_SUBTYPE = 3;
+
     // Random number generator
     private Random random;
 
@@ -106,22 +124,34 @@ public class Mutator {
      * @return a randomly generated expression
      */
     public Expression createRandom(int type) {
-        return createRandom(null, type, 1);
+        return createRandom(null, type, this.NO_SUBTYPE, 1);
     }
 
     /**
-     * Create a new random expression of the given type at the given level. The
+     * Create a new random expression of the given type and subType.
+     *
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @return a randomly generated expression
+     */
+    public Expression createRandom(int type, int subType) {
+        return createRandom(null, type, subType, 1);
+    }
+
+    /**
+     * Create a new random expression of the given type,subType at the given level. The
      * level parameter is used to vary the probability of the expression
      * being a non-terminal or a terminal expression. As the level of the expression
      * tree gets larger, the probability of creating a non-terminal child
      * expression decreases.
      *
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
      * @param level the level in the tree
      * @return a randomly generated expression
      */
-    public Expression createRandom(int type, int level) {
-        return createRandom(null, type, level);
+    public Expression createRandom(int type, int subType, int level) {
+        return createRandom(null, type, subType, level);
     }
 
     /**
@@ -131,32 +161,35 @@ public class Mutator {
      *
      * @param model initial expression to work with
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
      * @param level the level in the tree
      * @return a randomly generated expression
-     * @see #createRandom(int type, int level)
+     * @see #createRandom(int type, int subType, int level)
      */
-    public Expression createRandom(Expression model, int type, int level) {
+    public Expression createRandom(Expression model, int type, int subType, int level) {
         boolean terminal = true;
 
-        if(level < 1)
+        if(level < 1) {
             terminal = false;
-        else {
+        } else {
             // Work out percent chance of non-terminate symbol
             double branchPercent = (double)BRANCH_FACTOR / (double)level;
             double percent = random.nextDouble() * 100;
 
-            if(branchPercent > percent)
+            if(branchPercent > percent) {
                 terminal = false;
+            }
         }
 
         // If the type is a boolean then there isn't much point generating
         // the boolean terminal expressions TRUE or FALSE because our
         // simplification code will just simplify it out of existence,
         // e.g. "and or a" would just become "a".
-        if(type == Expression.BOOLEAN_TYPE || !terminal)
-            return createRandomNonTerminal(model, type, level + 1);
-        else
-            return createRandomTerminal(type);
+        if(type == Expression.BOOLEAN_TYPE || !terminal) {
+            return createRandomNonTerminal(model, type, subType, level + 1);
+        } else {
+            return createRandomTerminal(type, subType);
+        }
     }
 
     /**
@@ -169,19 +202,34 @@ public class Mutator {
      * @return a randomly generated non-terminal expression
      */
     public Expression createRandomNonTerminal(int type) {
-        return createRandomNonTerminal(null, type, 1);
+        return createRandomNonTerminal(null, type, this.NO_SUBTYPE, 1);
     }
 
     /**
-     * Create a new random non-terminal expression of the given type
+     * Create a  new random non-terminal expression of the given type and subType.
+     * A terminal expression is one that has children, e.g. an operator
+     * such as plus. (Thus plus operator would have two children, e.g.
+     * 1 and 1).
+     *
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @return a randomly generated non-terminal expression
+     */
+    public Expression createRandomNonTerminal(int type, int subType) {
+        return createRandomNonTerminal(null, type, subType, 1);
+    }
+
+    /**
+     * Create a new random non-terminal expression of the given type and subType
      * at the given level.
      *
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
      * @param level the level in the tree
      * @return a randomly generated non-terminal expression
      */
-    public Expression createRandomNonTerminal(int type, int level) {
-        return createRandomNonTerminal(null, type, level);
+    public Expression createRandomNonTerminal(int type, int subType, int level) {
+        return createRandomNonTerminal(null, type, subType, level);
     }
 
     /**
@@ -189,18 +237,24 @@ public class Mutator {
      *
      * @param model initial expression to work with
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
      * @param level the level in the tree
      * @return a randomly generated non-terminal expression
-     * @see #createRandom(int type, int level)
+     * @see #createRandom(int type, int subType, int level)
      */
-    public Expression createRandomNonTerminal(Expression model, int type, int level) {
-        if(type == Expression.BOOLEAN_TYPE)
+    public Expression createRandomNonTerminal(Expression model, int type, int subType, int level) {
+        if(type == Expression.BOOLEAN_TYPE) {
             return createRandomNonTerminalBoolean(model, level);
-        else if(type == Expression.FLOAT_TYPE)
+        } else if(type == Expression.FLOAT_TYPE) {
             return createRandomNonTerminalFloat(model, level);
-        else if(type == Expression.INTEGER_TYPE)
+        } else if((type == Expression.INTEGER_TYPE) && (subType == this.POSITIVE_SHORT_INTEGER_SUBTYPE)) {
+            return createRandomNonTerminalPositiveShortInteger(model, level);
+        } else if((type == Expression.INTEGER_TYPE) && (subType == this.NEGATIVE_SHORT_INTEGER_SUBTYPE)) {
+            return createRandomNonTerminalNegativeShortInteger(model, level);
+        // At the end of all integer type, we put the integer type with no subType.
+        } else if(type == Expression.INTEGER_TYPE) {
             return createRandomNonTerminalInteger(model, level);
-        else {
+        } else {
             // Quote types are all terminal!
             assert(type == Expression.FLOAT_QUOTE_TYPE ||
                    type == Expression.INTEGER_QUOTE_TYPE);
@@ -217,72 +271,119 @@ public class Mutator {
      * @return a randomly generated terminal expression
      */
     public Expression createRandomTerminal(int type) {
-        int randomNumber;
+        return createRandomTerminal(type, this.NO_SUBTYPE);
+    }
+    
+    /**
+     * Creates a random terminal expression of the given type and subType. A terminal
+     * expression is one that does not have any children, e.g. a number
+     * or a variable expression.
+     *
+     * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
+     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @return a randomly generated terminal expression
+     */
+    public Expression createRandomTerminal(int type, int subType) {
+        
+        int randomNumber = 0;
 
         switch(type) {
-        case Expression.BOOLEAN_TYPE:
-            randomNumber = random.nextInt(2);
+            
+            case Expression.BOOLEAN_TYPE:
+                randomNumber = random.nextInt(2);
 
-            if(randomNumber == 0)
-                return new NumberExpression(true);
-            else {
-                assert randomNumber == 1;
-                return new NumberExpression(false);
-            }
+                if(randomNumber == 0) {
+                    return new NumberExpression(true);
+                } else {
+                    assert randomNumber == 1;
+                    return new NumberExpression(false);
+                }
 
-        case Expression.FLOAT_TYPE:
-            return new NumberExpression(50 - random.nextDouble() * 100);
+            case Expression.FLOAT_TYPE:
+                if(subType == this.SMOOTHING_CONSTANT_SUBTYPE) {
+                    // Generate an ordinary number that fit for the smoothing constant.
+                    return new NumberExpression(0.01D + random.nextDouble() * (1.0D - 0.01D));
+                }
 
-        case Expression.INTEGER_TYPE:
+                randomNumber = GPGondolaSelection.getRandomToGenerateTerminalFloat(allowHeld);
 
-            randomNumber = GPGondolaSelection.getRandomToGenerateInteger(allowHeld, allowOrder);
+                if(randomNumber == 0) {
+                    // Generate an ordinary number
+                    return new NumberExpression(50 - random.nextDouble() * 100);
+                } else if(randomNumber == 1) {
+                    return new GetVariableExpression("capital", Expression.FLOAT_TYPE);
+                } else if(randomNumber == 2) {
+                    assert allowHeld;
+                    return new GetVariableExpression("stockcapital", Expression.FLOAT_TYPE);
+                } 
 
-            if(randomNumber == 0)
-                // Generate an ordinary number
-                return new NumberExpression(50 - random.nextInt(100));
-            else if(randomNumber == 1)
-                return new DayOfYearExpression();
-            else if(randomNumber == 2)
-                return new MonthExpression();
-            else if(randomNumber == 3)
-                return new DayExpression();
-            else if(randomNumber == 4)
-                return new DayOfWeekExpression();
-            else {
-                if(allowOrder && allowHeld) {
-                    if(randomNumber == 5)
+            case Expression.INTEGER_TYPE:
+
+                // Generate an ordinary number small and negative.
+                if(subType == this.NEGATIVE_SHORT_INTEGER_SUBTYPE) {
+                    return new NumberExpression(0 - random.nextInt(50));
+                }
+
+                randomNumber = GPGondolaSelection.getRandomToGenerateTerminalInteger(allowHeld, allowOrder);
+
+                if(randomNumber == 0) {
+
+                    // Generate an ordinary number small and positive.
+                    if(subType == this.POSITIVE_SHORT_INTEGER_SUBTYPE) {
+                        return new NumberExpression(50 - random.nextInt(50));
+                    }
+
+                    // Generate an ordinary number
+                    return new NumberExpression(50 - random.nextInt(100));
+
+                } else if(randomNumber == 1) {
+                    return new DayOfYearExpression();
+                } else if(randomNumber == 2) {
+                    return new MonthExpression();
+                } else if(randomNumber == 3) {
+                    return new DayExpression();
+                } else if(randomNumber == 4) {
+                    return new DayOfWeekExpression();
+                } else if(randomNumber == 5) {
+                    return new GetVariableExpression("daysfromstart", Expression.INTEGER_TYPE);
+                } else if(randomNumber == 6) {
+                    return new GetVariableExpression("transactions", Expression.INTEGER_TYPE);
+                } else {
+                    if(allowOrder && allowHeld) {
+                        if(randomNumber == 7) {
+                            return new GetVariableExpression("held", Expression.INTEGER_TYPE);
+                        } else {
+                            return new GetVariableExpression("order", Expression.INTEGER_TYPE);
+                        }
+                    } else if(allowHeld) {
                         return new GetVariableExpression("held", Expression.INTEGER_TYPE);
-                    else
+                    } else {
+                        assert allowOrder;
                         return new GetVariableExpression("order", Expression.INTEGER_TYPE);
+                    }
                 }
-                else if(allowHeld)
-                    return new GetVariableExpression("held", Expression.INTEGER_TYPE);
-                else {
-                    assert allowOrder;
-                    return new GetVariableExpression("order", Expression.INTEGER_TYPE);
+
+            case Expression.FLOAT_QUOTE_TYPE:
+                
+                randomNumber = GPGondolaSelection.getRandomToGenerateFloatQuote();
+
+                if(randomNumber == 0) {
+                    return new QuoteExpression(Quote.DAY_OPEN);
+                } else if(randomNumber == 1) {
+                    return new QuoteExpression(Quote.DAY_HIGH);
+                } else if(randomNumber == 2) {
+                    return new QuoteExpression(Quote.DAY_LOW);
+                } else {
+                    assert randomNumber == 3;
+                    return new QuoteExpression(Quote.DAY_CLOSE);
                 }
-            }
 
-        case Expression.FLOAT_QUOTE_TYPE:
-            randomNumber = GPGondolaSelection.getRandomToGenerateFloatQuote();
+            case Expression.INTEGER_QUOTE_TYPE:
+                return new QuoteExpression(Quote.DAY_VOLUME);
 
-            if(randomNumber == 0)
-                return new QuoteExpression(Quote.DAY_OPEN);
-            else if(randomNumber == 1)
-                return new QuoteExpression(Quote.DAY_HIGH);
-            else if(randomNumber == 2)
-                return new QuoteExpression(Quote.DAY_LOW);
-            else {
-                assert randomNumber == 3;
-                return new QuoteExpression(Quote.DAY_CLOSE);
-            }
-
-        case Expression.INTEGER_QUOTE_TYPE:
-            return new QuoteExpression(Quote.DAY_VOLUME);
-
-        default:
-            assert false;
-            return null;
+            default:
+                assert false;
+                return null;
         }
     }
 
@@ -298,42 +399,42 @@ public class Mutator {
 
         if(randomNumber == 0) {
             return new NotExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE));
-        }
-        else if(randomNumber == 1) {
+            
+        } else if(randomNumber == 1) {
             Expression first = getChild(model, level, 0);
             return new EqualThanExpression(first,
                                            getChild(model, level, 1, first.getType()));
-        }
-        else if(randomNumber == 2) {
+            
+        } else if(randomNumber == 2) {
             Expression first = getChild(model, level, 0);
             return new GreaterThanEqualExpression(first,
                                                   getChild(model, level, 1, first.getType()));
-        }
-        else if(randomNumber == 3) {
+            
+        } else if(randomNumber == 3) {
             Expression first = getChild(model, level, 0);
             return new GreaterThanExpression(first,
                                              getChild(model, level, 1, first.getType()));
-        }
-        else if(randomNumber == 4) {
+            
+        } else if(randomNumber == 4) {
             Expression first = getChild(model, level, 0);
             return new LessThanEqualExpression(first,
                                                getChild(model, level, 1, first.getType()));
-        }
-        else if(randomNumber == 5) {
+            
+        } else if(randomNumber == 5) {
             Expression first = getChild(model, level, 0);
             return new LessThanExpression(first,
                                           getChild(model, level, 1, first.getType()));
-        }
-        else if(randomNumber == 6) {
+            
+        } else if(randomNumber == 6) {
             Expression first = getChild(model, level, 0);
             return new NotEqualExpression(first,
                                           getChild(model, level, 1, first.getType()));
-        }
-        else if(randomNumber == 7) {
+            
+        } else if(randomNumber == 7) {
             return new AndExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE),
                                      getChild(model, level, 1, Expression.BOOLEAN_TYPE));
-        }
-        else {
+            
+        } else {
             assert randomNumber == 8;
             return new OrExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE),
                                     getChild(model, level, 1, Expression.BOOLEAN_TYPE));
@@ -368,57 +469,112 @@ public class Mutator {
             return numberExpression;
         }
 
-        int randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
+        int randomNumber = GPGondolaSelection.getRandomToGenerateFloat();
         
-        if(randomNumber == 0)
+        if(randomNumber == 0) {
             return createRandomTerminal(Expression.FLOAT_TYPE);
-        else if(randomNumber == 1)
+            
+        } else if(randomNumber == 1) {
             return new AddExpression(getChild(model, level, 0, Expression.FLOAT_TYPE),
-                                     getChild(model, level, 1, Expression.FLOAT_TYPE));
-        else if(randomNumber == 2)
+                                     getChild(model, level, 1));
+            
+        } else if(randomNumber == 2) {
             return new SubtractExpression(getChild(model, level, 0, Expression.FLOAT_TYPE),
-                                          getChild(model, level, 1, Expression.FLOAT_TYPE));
-        else if(randomNumber == 3)
+                                          getChild(model, level, 1));
+            
+        } else if(randomNumber == 3) {
             return new MultiplyExpression(getChild(model, level, 0, Expression.FLOAT_TYPE),
-                                          getChild(model, level, 1, Expression.FLOAT_TYPE));
-        else if(randomNumber == 4)
+                                          getChild(model, level, 1));
+            
+        } else if(randomNumber == 4) {
             return new DivideExpression(getChild(model, level, 0, Expression.FLOAT_TYPE),
-                                        getChild(model, level, 1, Expression.FLOAT_TYPE));
-        else if(randomNumber == 5)
+                                        getChild(model, level, 1));
+            
+        } else if(randomNumber == 5) {
             return new PercentExpression(getChild(model, level, 0, Expression.FLOAT_TYPE),
                                          getChild(model, level, 1));
-        else if(randomNumber == 6)
+            
+        } else if(randomNumber == 6) {
             return new IfExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE),
                                     getChild(model, level, 1, Expression.FLOAT_TYPE),
                                     getChild(model, level, 2, Expression.FLOAT_TYPE));
-        else if(randomNumber == 7)
+            
+        } else if(randomNumber == 7) {
             return new LagExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE));
-        else if(randomNumber == 8)
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 8) {
             return new MinExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
-        else if(randomNumber == 9)
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 9) {
             return new MaxExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
-        else if(randomNumber == 10)
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 10) {
             return new SumExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
-        else if(randomNumber == 11)
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 11) {
             return new SqrtExpression(getChild(model, level, 0, Expression.FLOAT_TYPE));
 
-        else if(randomNumber == 12)
+        } else if(randomNumber == 12) {
             return new AbsExpression(getChild(model, level, 0, Expression.FLOAT_TYPE));
-        else if(randomNumber == 13)
-            return new RSIExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE));
-        else {
-            assert randomNumber == 14;
+            
+        } else if(randomNumber == 13) {
+            return new CosineExpression(getChild(model, level, 0));
+            
+        } else if(randomNumber == 14) {
+            return new SineExpression(getChild(model, level, 0));
+            
+        } else if(randomNumber == 15) {
+            return new LogarithmExpression(getChild(model, level, 0));
+            
+        } else if(randomNumber == 16) {
+            return new ExponentialExpression(getChild(model, level, 0));
+            
+        } else if(randomNumber == 17) {
             return new AvgExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 18) {
+            return new EMAExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
+                                     createRandomTerminal(Expression.FLOAT_TYPE, this.SMOOTHING_CONSTANT_SUBTYPE));
+
+        } else if(randomNumber == 19) {
+            return new MACDExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 20) {
+            return new MomentumExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 21) {
+            return new RSIExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 22) {
+            return new StandardDeviationExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 23) {
+            return new BBLExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else {
+            assert randomNumber == 24;
+            return new BBUExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
         }
     }
 
@@ -450,80 +606,270 @@ public class Mutator {
             return numberExpression;
         }
 
-        int randomNumber = 0;
-        // Count until randomNumber is ok.
-        // If it is 13, that is to say rsi() function,
-        // we must change it, because rsi() is not an integer return function.
-        do {
-            randomNumber = GPGondolaSelection.getRandomToGenerateExpression();
-        } while (randomNumber==13);
+        int randomNumber = GPGondolaSelection.getRandomToGenerateInteger();
 
-        if(randomNumber == 0)
+        if(randomNumber == 0) {
             return createRandomTerminal(Expression.INTEGER_TYPE);
-        else if(randomNumber == 1)
+            
+        } else if(randomNumber == 1) {
             return new AddExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE));
-        else if(randomNumber == 2)
+                                     getChild(model, level, 1));
+            
+        } else if(randomNumber == 2) {
             return new SubtractExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
-                                          getChild(model, level, 1, Expression.INTEGER_TYPE));
-        else if(randomNumber == 3)
+                                          getChild(model, level, 1));
+            
+        } else if(randomNumber == 3) {
             return new MultiplyExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
-                                          getChild(model, level, 1, Expression.INTEGER_TYPE));
-        else if(randomNumber == 4)
+                                          getChild(model, level, 1));
+            
+        } else if(randomNumber == 4) {
             return new DivideExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
-                                        getChild(model, level, 1, Expression.INTEGER_TYPE));
-        else if(randomNumber == 5)
+                                        getChild(model, level, 1));
+            
+        } else if(randomNumber == 5) {
             return new PercentExpression(getChild(model, level, 0, Expression.INTEGER_TYPE),
                                          getChild(model, level, 1));
-        else if(randomNumber == 6)
+            
+        } else if(randomNumber == 6) {
             return new IfExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE),
                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
-        else if(randomNumber == 7)
+            
+        } else if(randomNumber == 7) {
             return new LagExpression(new QuoteExpression(Quote.DAY_VOLUME),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE));
-        else if(randomNumber == 8)
+                                   getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 8) {
             return new MinExpression(new QuoteExpression(Quote.DAY_VOLUME),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
-        else if(randomNumber == 9)
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 9) {
             return new MaxExpression(new QuoteExpression(Quote.DAY_VOLUME),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
-        else if(randomNumber == 10)
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 10) {
             return new SumExpression(new QuoteExpression(Quote.DAY_VOLUME),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
-                                     getChild(model, level, 2, Expression.INTEGER_TYPE));
-        else if(randomNumber == 11)
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 11) {
             return new SqrtExpression(getChild(model, level, 0, Expression.INTEGER_TYPE));
 
-        else if(randomNumber == 12)
+        } else if(randomNumber == 12) {
             return new AbsExpression(getChild(model, level, 0, Expression.INTEGER_TYPE));
-        //else if(randomNumber == 13)
-        //    rsi() function never executed, because it does not return an integer
-        else {
-            assert randomNumber == 14;
+            
+        } else if(randomNumber == 13) {
             return new AvgExpression(new QuoteExpression(Quote.DAY_VOLUME),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 14) {
+            return new EMAExpression(new QuoteExpression(Quote.DAY_VOLUME),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
+                                     createRandomTerminal(Expression.FLOAT_TYPE, this.SMOOTHING_CONSTANT_SUBTYPE));
+
+        } else if(randomNumber == 15) {
+            return new MACDExpression(new QuoteExpression(Quote.DAY_VOLUME),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 16) {
+            return new MomentumExpression(new QuoteExpression(Quote.DAY_VOLUME),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 17) {
+            return new StandardDeviationExpression(new QuoteExpression(Quote.DAY_VOLUME),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 18) {
+            return new BBLExpression(new QuoteExpression(Quote.DAY_VOLUME),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 19) {
+            return new BBUExpression(new QuoteExpression(Quote.DAY_VOLUME),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else {
+            assert randomNumber == 20;
+            return new OBVExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
                                      getChild(model, level, 2, Expression.INTEGER_TYPE));
         }
     }
 
 
-    private Expression getChild(Expression model, int level, int arg, int type) {
+    /**
+     * Create a random non-terminal {@link Expression#INTEGER_TYPE} expression.
+     * The number should be a positive short integer
+     * {@link Mutator#POSITIVE_SHORT_INTEGER_SUBTYPE}.
+     *
+     * @param model model expression
+     * @param level tree level
+     * @return randomly generated non-terminal integer expression
+     */
+    private Expression createRandomNonTerminalPositiveShortInteger(Expression model, int level) {
 
-        // Case 1: The expression doesn't have this many children or
-        // it has a child here but it is a different type. So create
-        // a new argument.
-        if(model == null || arg >= model.getChildCount() ||
-           model.getChild(arg).getType() != type) {
-            return createRandom(null, type, level);
+        // If we are mutating an existing number expression then favour
+        // just modifying the number's value rather than replacing it
+        // with a random expressions. This helps keep the equation size down and
+        // favours trying different values.
+        if(model != null &&
+           model instanceof NumberExpression &&
+           FAVOUR_NUMBER_PERCENT > random.nextInt(100)) {
+
+            NumberExpression numberExpression = (NumberExpression)model;
+            double step = random.nextDouble() * 4.0D;
+            double value = Math.pow(2.0D, step);
+
+            numberExpression.setValue(numberExpression.getValue() + value);
+            return numberExpression;
         }
 
-        // Case 2: It has an argument of the right type
-        else
-            return model.getChild(arg);
+        int randomNumber = GPGondolaSelection.getRandomToGeneratePositiveShortInteger();
+
+        if(randomNumber == 0) {
+            return createRandomTerminal(Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE);
+            
+        } else if(randomNumber == 1) {
+            return new AddExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 2) {
+            return new SubtractExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                          getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 3) {
+            return new MultiplyExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                          getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 4) {
+            return new DivideExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                        getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 5) {
+            return new PercentExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                         getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 6) {
+            return new IfExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE),
+                                    getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
+                                    getChild(model, level, 2, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 7) {
+            return new SqrtExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+
+        } else if(randomNumber == 8) {
+            return new AbsExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 9) {
+            assert randomNumber == 10;
+            /* We put also the following model: (+1)*(generic float expression).
+             * The generic float can be got from any econometric function.
+             * This permits to use all the functions in a positive small integer number,
+             * the conversion to integer is obtained with a multiply expression,
+             * that is the simplest method to got the conversion in Gondola.
+            */ 
+            return new MultiplyExpression(new NumberExpression(1),
+                                          getChild(model, level, 1, Expression.FLOAT_TYPE));
+                        
+        } else {
+            assert randomNumber == 10;
+            /* We put also the following model: (generic integer expression).
+             * The generic integer can be got from any econometric function.
+             * This permits to use all the functions in a positive small integer number.
+            */ 
+            return createRandomNonTerminal(model, Expression.INTEGER_TYPE, this.NO_SUBTYPE, level);
+            
+        }
     }
+
+
+    /**
+     * Create a random non-terminal {@link Expression#INTEGER_TYPE} expression.
+     * The number should be a negative small integer
+     * {@link Mutator#NEGATIVE_SHORT_INTEGER_SUBTYPE}.
+     *
+     * @param model model expression
+     * @param level tree level
+     * @return randomly generated non-terminal integer expression
+     */
+    private Expression createRandomNonTerminalNegativeShortInteger(Expression model, int level) {
+
+        // If we are mutating an existing number expression then favour
+        // just modifying the number's value rather than replacing it
+        // with a random expressions. This helps keep the equation size down and
+        // favours trying different values.
+        if(model != null &&
+           model instanceof NumberExpression &&
+           FAVOUR_NUMBER_PERCENT > random.nextInt(100)) {
+
+            NumberExpression numberExpression = (NumberExpression)model;
+            double step = random.nextDouble() * 4.0D;
+            double value = Math.pow(2.0D, step);
+
+            numberExpression.setValue(numberExpression.getValue() - value);
+            return numberExpression;
+        }
+
+        int randomNumber = GPGondolaSelection.getRandomToGenerateNegativeShortInteger();
+
+        if(randomNumber == 0) {
+            return createRandomTerminal(Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE);
+            
+        } else if(randomNumber == 1) {
+            return new AddExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 2) {
+            return new SubtractExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
+                                          getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 3) {
+            return new MultiplyExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
+                                          getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 4) {
+            return new DivideExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
+                                        getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 5) {
+            return new PercentExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
+                                         getChild(model, level, 1, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 6) {
+            return new IfExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE),
+                                    getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
+                                    getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+            
+        } else if(randomNumber == 7) {
+            /* We put also the following model: (-1)*(generic float expression).
+             * The generic float can be got from any econometric function.
+             * This permits to use all the functions in a negative small integer number,
+             * the conversion to integer is obtained with a multiply expression,
+             * that is the simplest method to got the conversion in Gondola.
+            */ 
+            return new MultiplyExpression(new NumberExpression(-1),
+                                          getChild(model, level, 1, Expression.FLOAT_TYPE));
+            
+        } else {
+            assert randomNumber == 8;
+            /* We put also the following model: (-1)*(generic integer expression).
+             * The generic integer can be got from any econometric function.
+             * This permits to use all the functions in a negative small integer number.
+            */ 
+            return new MultiplyExpression(new NumberExpression(-1),
+                                          getChild(model, level, 1, Expression.INTEGER_TYPE));
+            
+        }
+    }
+
 
     // creates a float or integer type
     private Expression getChild(Expression model, int level, int arg) {
@@ -537,17 +883,39 @@ public class Mutator {
 
             int randomNumber = GPGondolaSelection.getRandomToGenerateFloatInteger();
 
-            if(randomNumber == 0)
-                return createRandom(null, Expression.FLOAT_TYPE, level);
-            else {
+            if(randomNumber == 0) {
+                return createRandom(null, Expression.FLOAT_TYPE, this.NO_SUBTYPE, level);
+            } else {
                 assert randomNumber == 1;
-                return createRandom(null, Expression.INTEGER_TYPE, level);
+                return createRandom(null, Expression.INTEGER_TYPE, this.NO_SUBTYPE, level);
             }
         }
 
         // Case 2: It has an argument of the right type
-        else
+        else {
             return model.getChild(arg);
+        }
+    }
+
+    // create a child with no subType defined
+    private Expression getChild(Expression model, int level, int arg, int type) {
+        return getChild(model, level, arg, type, this.NO_SUBTYPE);
+    }
+
+    private Expression getChild(Expression model, int level, int arg, int type, int subType) {
+
+        // Case 1: The expression doesn't have this many children or
+        // it has a child here but it is a different type. So create
+        // a new argument.
+        if(model == null || arg >= model.getChildCount() ||
+           model.getChild(arg).getType() != type) {
+            return createRandom(null, type, subType, level);
+        }
+
+        // Case 2: It has an argument of the right type
+        else {
+            return model.getChild(arg);
+        }
     }
 
     /**
@@ -656,11 +1024,11 @@ public class Mutator {
      */
     public Expression modify(Expression root, Expression destination) {
         if(destination == root) {
-            Expression newExpression = createRandom(destination.getType(), 1);
+            Expression newExpression = createRandom(destination.getType(), this.NO_SUBTYPE, 1);
             newExpression = newExpression.simplify();
             return newExpression;
         } else {
-            Expression newExpression = createRandom(destination, destination.getType(), 1);
+            Expression newExpression = createRandom(destination, destination.getType(), this.NO_SUBTYPE, 1);
             newExpression = newExpression.simplify();
             return insert(root, destination, newExpression);
         }
@@ -687,19 +1055,20 @@ public class Mutator {
         // Mutations do not always occur. Use the given percent to work
         // out whether one should occur.
         int randomPercent = random.nextInt(100);
-        if(percent < randomPercent)
+        if(percent < randomPercent) {
             return expression;
+        }
 
         // Mutate
         int randomTypePercent = random.nextInt(100);
-        if(INSERTION_MUTATION_PERCENT > randomTypePercent)
+        if(INSERTION_MUTATION_PERCENT > randomTypePercent) {
             expression = mutateByInsertion(expression);
-        else {
+        } else {
             randomTypePercent -= INSERTION_MUTATION_PERCENT;
 
-            if(DELETION_MUTATION_PERCENT > randomTypePercent)
+            if(DELETION_MUTATION_PERCENT > randomTypePercent) {
                 expression = mutateByDeletion(expression);
-            else {
+            } else {
                 randomTypePercent -= DELETION_MUTATION_PERCENT;
 
                 expression = mutateByModification(expression);
@@ -750,9 +1119,10 @@ public class Mutator {
         // a random expression is closer to an insertion mutation than
         // deletion. So just skip the whole deletion idea and try a random
         // mutation somewhere.
-        if(destination.isRoot() || destination.getChildCount() == 0)
+        if(destination.isRoot() || destination.getChildCount() == 0) {
             return mutateByModification(expression);
-        else
+        } else {
             return delete(expression, destination);
+        }
     }
 }

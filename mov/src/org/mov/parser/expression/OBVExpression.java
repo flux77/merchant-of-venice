@@ -78,7 +78,7 @@ public class OBVExpression extends TernaryExpression {
     }
 
     public int checkType() throws TypeMismatchException {
-	// First type must be quote, second and third types must be integer value
+	// All inputs must be integer values.
 	if(getChild(0).checkType() == INTEGER_TYPE &&
 	   getChild(1).checkType() == INTEGER_TYPE &&
 	   getChild(2).checkType() == INTEGER_TYPE)

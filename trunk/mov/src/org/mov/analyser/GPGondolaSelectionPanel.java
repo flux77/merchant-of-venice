@@ -50,7 +50,12 @@ public class GPGondolaSelectionPanel extends JPanel {
     private int[] perc;
     private int[] defValues;
     private String[] defTextFieldValues;
-    private boolean heldAndOrder = false;
+    
+    // In some panels last and/or last but one elements could
+    // be not enough to permit GP working.
+    // So we have to check that other percentages in the same panel are different from zero.
+    private boolean isLastEnough = true;
+    private boolean isLastButOneEnough = true;
 
     private JDesktopPane desktop;
     private Random random = new Random(System.currentTimeMillis());
@@ -58,8 +63,7 @@ public class GPGondolaSelectionPanel extends JPanel {
     public GPGondolaSelectionPanel(int elements,
                                    JDesktopPane desktop,
                                    int[] defaultValues,
-                                   String[] defaultTextFieldValues,
-                                   String titledBorderText) {
+                                   String[] defaultTextFieldValues) {
         
         this.desktop = desktop;
         
@@ -68,56 +72,72 @@ public class GPGondolaSelectionPanel extends JPanel {
         defValues = defaultValues;
         defTextFieldValues = defaultTextFieldValues;
         
-        setGraphic(titledBorderText);
+        setGraphic();
         
     }
     
-    public void setHeldAndOrder() {
-        heldAndOrder = true;
+    public void setLastNotEnough() {
+        isLastEnough = false;
     }
-
+    
+    public void setLastButOneNotEnough() {
+        isLastButOneEnough = false;
+    }
+    
     public int getRandom() {
         return this.getRandom(true,true);
     }
     
-    public int getRandom(boolean allowHeld, boolean allowOrder) {
+    public int getRandom(boolean isOkLast) {
+        return this.getRandom(true,isOkLast);
+    }
+    
+    public int getRandom(boolean isOkLastButOne, boolean isOkLast) {
+        
         int retValue = 0;
         
         int total = 0;
         int totalLength = perc.length;
-        if (!allowHeld) {
-            totalLength--;
-        }
-        if (!allowOrder) {
-            totalLength--;
-        }
-        for (int i=0; i<totalLength; i++) {
-            total += perc[i];
+
+        for (int ii=0; ii<totalLength; ii++) {
+            // skip last and/or last but one from the count
+            // according to input parameters
+            if(((!isOkLastButOne) && (ii==(totalLength-2))) ||
+                ((!isOkLast) && (ii==(totalLength-1)))){
+                continue;
+            }
+            total += perc[ii];
         }
         int randomValue = random.nextInt(total);
         
         int totalMin = 0;
         int totalMax = 0;
-        for (int i=0; i<totalLength; i++) {
-            totalMax = totalMin + perc[i];
-            if ((randomValue >= totalMin) && (randomValue < totalMax)) {
-                retValue = i;
+        for (int ii=0; ii<totalLength; ii++) {
+            // skip last and/or last but one from the count
+            // according to input parameters
+            if(((!isOkLastButOne) && (ii==(totalLength-2))) ||
+                ((!isOkLast) && (ii==(totalLength-1)))){
+                continue;
             }
-            totalMin += perc[i];
+            totalMax = totalMin + perc[ii];
+            if ((randomValue >= totalMin) && (randomValue < totalMax)) {
+                retValue = ii;
+            }
+            totalMin += perc[ii];
         }
         return retValue;
     }
 
     public void save(HashMap settings, String idStr) {
-	for (int i=0; i<percTextField.length; i++) {
-            settings.put(idStr + (new Integer(i)).toString(), percTextField[i].getText());
+	for (int ii=0; ii<percTextField.length; ii++) {
+            settings.put(idStr + (new Integer(ii)).toString(), percTextField[ii].getText());
         }
     }
     
     public void load(String setting, String idStr, String value) {
-	for (int i=0; i<percTextField.length; i++) {
-            if(setting.equals(idStr + (new Integer(i)).toString())) {
-                percTextField[i].setText(value);
+	for (int ii=0; ii<percTextField.length; ii++) {
+            if(setting.equals(idStr + (new Integer(ii)).toString())) {
+                percTextField[ii].setText(value);
             }
         }
     }
@@ -126,18 +146,18 @@ public class GPGondolaSelectionPanel extends JPanel {
     public void fit() {
         if (isAllValuesAcceptable()) {
             int total = 0;
-            for (int i=0; i<perc.length; i++) {
-                total += perc[i];
+            for (int ii=0; ii<perc.length; ii++) {
+                total += perc[ii];
             }
 
             // Set dummy values according to PERCENT_INT that is the maximum
             int[] dummyPerc = new int[perc.length];
-            for (int i=0; i<perc.length; i++) {
-                dummyPerc[i] = Math.round((perc[i] * PERCENT_INT) / total);
+            for (int ii=0; ii<perc.length; ii++) {
+                dummyPerc[ii] = Math.round((perc[ii] * PERCENT_INT) / total);
             }
             int dummyTotal = 0;
-            for (int i=0; i<perc.length; i++) {
-                dummyTotal += dummyPerc[i];
+            for (int ii=0; ii<perc.length; ii++) {
+                dummyTotal += dummyPerc[ii];
             }
             // Adjust approximations of Math.round method
             int count=0;
@@ -152,8 +172,8 @@ public class GPGondolaSelectionPanel extends JPanel {
                 count++;
             }
             // Set new values
-            for (int i=0; i<perc.length; i++) {
-                perc[i] = dummyPerc[i];
+            for (int ii=0; ii<perc.length; ii++) {
+                perc[ii] = dummyPerc[ii];
             }
             // Update the text in the user interface
             setTexts();
@@ -165,8 +185,8 @@ public class GPGondolaSelectionPanel extends JPanel {
         boolean retValue = false;
         if (isAllValuesAcceptable()) {
             int total = 0;
-            for (int i=0; (i<perc.length); i++) {
-                total += perc[i];
+            for (int ii=0; (ii<perc.length); ii++) {
+                total += perc[ii];
             }
             if (total==PERCENT_INT) {
                 retValue = true;
@@ -210,18 +230,18 @@ public class GPGondolaSelectionPanel extends JPanel {
     
         // decimalFormat manage the localization.
         DecimalFormat decimalFormat = new DecimalFormat(format);
-        for (int i=0; i<perc.length; i++) {
-            if(!percTextField[i].getText().equals("")) {
-                perc[i] =
-                    (int) Math.round(PERCENT_DOUBLE*(decimalFormat.parse(percTextField[i].getText()).doubleValue()));
+        for (int ii=0; ii<perc.length; ii++) {
+            if(!percTextField[ii].getText().equals("")) {
+                perc[ii] =
+                    (int) Math.round(PERCENT_DOUBLE*(decimalFormat.parse(percTextField[ii].getText()).doubleValue()));
             }
         }
     }
     
     private boolean isAllValuesPositive() {
         boolean returnValue = true;
-        for (int i=0; i<perc.length; i++) {
-            returnValue = returnValue && (perc[i]>=0);
+        for (int ii=0; ii<perc.length; ii++) {
+            returnValue = returnValue && (perc[ii]>=0);
         }
         return returnValue;
     }
@@ -231,11 +251,14 @@ public class GPGondolaSelectionPanel extends JPanel {
         // We should consider the absence of held and order -> totalIntegerModified
         long total = 0;
         int totalLength = perc.length;
-        if (heldAndOrder) {
-            totalLength -= 2;
-        }
-        for (int i=0; (i<totalLength); i++) {
-            total += perc[i];
+        for (int ii=0; (ii<totalLength); ii++) {
+            // skip last and/or last but one from the count
+            // according to the type of panel
+            if(((!isLastButOneEnough) && (ii==(totalLength-2))) ||
+                ((!isLastEnough) && (ii==(totalLength-1)))){
+                continue;
+            }
+            total += perc[ii];
         }
         // Check total == 0
         if (total==0) {
@@ -249,32 +272,29 @@ public class GPGondolaSelectionPanel extends JPanel {
     }
     
     public void setDefaultsValuesOnly() {
-        for (int i=0; i<perc.length; i++) {
-            perc[i]=defValues[i];
+        for (int ii=0; ii<perc.length; ii++) {
+            perc[ii]=defValues[ii];
         }
     }
         
     public void setDefaults() {
-        for (int i=0; i<perc.length; i++) {
-            perc[i]=defValues[i];
+        for (int ii=0; ii<perc.length; ii++) {
+            perc[ii]=defValues[ii];
         }
         this.setTexts();
     }
         
     public void setTexts() {
         DecimalFormat decimalFormat = new DecimalFormat(format);
-        for (int i=0; i<percTextField.length; i++) {
-            percTextField[i].setText(decimalFormat.format(perc[i]/PERCENT_DOUBLE));
+        for (int ii=0; ii<percTextField.length; ii++) {
+            percTextField[ii].setText(decimalFormat.format(perc[ii]/PERCENT_DOUBLE));
         }
     }
         
-    private void setGraphic(String titledBorderText) {
+    private void setGraphic() {
         
         GridBagLayout gridbag = new GridBagLayout();
         
-        TitledBorder titledBorder = new TitledBorder(titledBorderText);
-        
-        this.setBorder(titledBorder);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         JPanel upDownPanel = new JPanel();
@@ -314,9 +334,9 @@ public class GPGondolaSelectionPanel extends JPanel {
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
 
-        for (int i=0; i<percTextField.length; i++) {
-            percTextField[i] =
-                GridBagHelper.addTextRow(innerPanel, defTextFieldValues[i], "",
+        for (int ii=0; ii<percTextField.length; ii++) {
+            percTextField[ii] =
+                GridBagHelper.addTextRow(innerPanel, defTextFieldValues[ii], "",
                                      gridbag, c,
                                      MAX_CHARS_IN_TEXTBOXES);
         }

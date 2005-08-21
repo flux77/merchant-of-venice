@@ -82,7 +82,7 @@ public class GPQuoteBundle extends EODQuoteBundle {
             throw EvaluationException.FUTURE_DATE_EXCEPTION;
 
         // Trying to access a date too far into the past?
-        else if(offset <= window)
+        else if(Math.abs(offset) > Math.abs(window))
             throw EvaluationException.PAST_DATE_EXCEPTION;
 
         // Date is within range

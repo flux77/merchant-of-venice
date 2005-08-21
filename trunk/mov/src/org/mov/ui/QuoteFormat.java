@@ -65,8 +65,8 @@ public class QuoteFormat implements Comparable {
         if(format == null) {
             format = NumberFormat.getInstance();
             format.setMinimumIntegerDigits(1);
-            format.setMinimumFractionDigits(3);
-            format.setMaximumFractionDigits(3);
+            format.setMinimumFractionDigits(5);
+            format.setMaximumFractionDigits(5);
         }
 
         return format;

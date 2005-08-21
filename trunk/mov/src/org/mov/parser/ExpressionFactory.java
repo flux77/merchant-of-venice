@@ -243,7 +243,7 @@ public class ExpressionFactory {
             expression = new OBVExpression(arg1, arg2, arg3);
             break;
         case(Token.SD_TOKEN):
-            expression = new SDExpression(arg1, arg2, arg3);
+            expression = new StandardDeviationExpression(arg1, arg2, arg3);
             break;
         case(Token.SIN_TOKEN):
             expression = new SineExpression(arg1);

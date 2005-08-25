@@ -47,6 +47,7 @@ public class MainMenu implements ActionListener, ModuleListener
     private JMenuItem filePortfolioNewMenuItem;
     private JMenuItem fileImportPreferencesMenuItem;
     private JMenuItem fileImportQuotesMenuItem;
+    private JMenuItem fileSyncIDQuotesMenuItem;
     private JMenuItem fileExportPreferencesMenuItem;
     private JMenuItem fileExportQuotesMenuItem;
     private JMenuItem filePreferencesMenuItem;
@@ -87,6 +88,7 @@ public class MainMenu implements ActionListener, ModuleListener
     private JMenu windowMenu;
     private JMenu filePortfolioMenu;
     private JMenu fileImportMenu;
+    private JMenu fileSyncMenu;
     private JMenu fileExportMenu;
     private JMenu graphPortfolioMenu;
     private JMenu tablePortfolioMenu;
@@ -163,17 +165,25 @@ public class MainMenu implements ActionListener, ModuleListener
         // File -> Import -> Preferences
         fileImportPreferencesMenuItem =
             MenuHelper.addMenuItem(this, fileImportMenu, Locale.getString("PREFERENCES"));
-        // File -> Import -> Quotes
+        // File -> Import -> End of Day Quotes
         fileImportQuotesMenuItem =
-            MenuHelper.addMenuItem(this, fileImportMenu, Locale.getString("QUOTES"));
+            MenuHelper.addMenuItem(this, fileImportMenu, Locale.getString("END_OF_DAY_QUOTES"));
+        
+        // File -> Sync
+        fileSyncMenu = MenuHelper.addMenu(fileMenu, Locale.getString("SYNC"));
+        // File -> Import -> Sync Intra-day Quotes
+        fileSyncIDQuotesMenuItem =
+            MenuHelper.addMenuItem(this, fileSyncMenu, Locale.getString("INTRA_DAY_QUOTES"));
+        fileSyncIDQuotesMenuItem.setEnabled(false);
+
         // File -> Export
         fileExportMenu = MenuHelper.addMenu(fileMenu, Locale.getString("EXPORT"), 'E');
         // File -> Export -> Preferences
         fileExportPreferencesMenuItem =
             MenuHelper.addMenuItem(this, fileExportMenu, Locale.getString("PREFERENCES"));
-        // File -> Export -> Quotes
+        // File -> Export -> End of Day Quotes
         fileExportQuotesMenuItem =
-            MenuHelper.addMenuItem(this, fileExportMenu, Locale.getString("QUOTES"));
+            MenuHelper.addMenuItem(this, fileExportMenu, Locale.getString("END_OF_DAY_QUOTES"));
         // File -> Preferences
         filePreferencesMenuItem = MenuHelper.addMenuItem(this, fileMenu,
                 Locale.getString("PREFERENCES"), 'R');
@@ -426,6 +436,9 @@ public class MainMenu implements ActionListener, ModuleListener
                 }
                 else if(menu == fileImportQuotesMenuItem) {
                     CommandManager.getInstance().importQuotes();
+                }
+                else if(menu == fileSyncIDQuotesMenuItem) {
+                    CommandManager.getInstance().syncIDQuotes();
                 }
                 else if(menu == filePortfolioNewMenuItem)
                     CommandManager.getInstance().newPortfolio();

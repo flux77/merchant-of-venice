@@ -28,11 +28,50 @@ public class TradingTimeTest extends TestCase {
         TradingTime time = null;
 
         try {
+            // HH:MM:SS
+            time = new TradingTime("04:59:32");
+            assertTrue(time.getHour() == 4 &&
+                       time.getMinute() == 59 &&
+                       time.getSecond() == 32);
+
+            time = new TradingTime("12:01:59");
+            assertTrue(time.getHour() == 12 &&
+                       time.getMinute() == 01 &&
+                       time.getSecond() == 59);
+
+            time = new TradingTime("23:59:00");
+            assertTrue(time.getHour() == 23 &&
+                       time.getMinute() == 59 &&
+                       time.getSecond() == 0);
+
+            // HH:MM
+            time = new TradingTime("04:59");
+            assertTrue(time.getHour() == 4 &&
+                       time.getMinute() == 59 &&
+                       time.getSecond() == 0);
+
+            time = new TradingTime("12:01");
+            assertTrue(time.getHour() == 12 &&
+                       time.getMinute() == 01 &&
+                       time.getSecond() == 0);
+
+            time = new TradingTime("23:59");
+            assertTrue(time.getHour() == 23 &&
+                       time.getMinute() == 59 &&
+                       time.getSecond() == 0);
+
+            // H:MMAP
             time = new TradingTime("4:12PM");
             assertTrue(time.getHour() == 16 &&
                        time.getMinute() == 12 &&
                        time.getSecond() == 0);
 
+            time = new TradingTime("1:00am");
+            assertTrue(time.getHour() == 1 &&
+                       time.getMinute() == 0 &&
+                       time.getSecond() == 0);
+            
+            // HH:MMAP
             time = new TradingTime("11:59AM");
             assertTrue(time.getHour() == 11 &&
                        time.getMinute() == 59 &&
@@ -52,12 +91,6 @@ public class TradingTimeTest extends TestCase {
             assertTrue(time.getHour() == 0 &&
                        time.getMinute() == 0 &&
                        time.getSecond() == 0);
-
-            time = new TradingTime("1:00am");
-            assertTrue(time.getHour() == 1 &&
-                       time.getMinute() == 0 &&
-                       time.getSecond() == 0);
-
 
         }
         catch(TradingTimeFormatException e) {

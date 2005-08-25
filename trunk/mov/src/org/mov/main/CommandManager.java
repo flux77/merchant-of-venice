@@ -53,6 +53,7 @@ import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.EODQuoteRange;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.Symbol;
+import org.mov.quote.IDQuoteSyncModule;
 import org.mov.table.PortfolioTableModule;
 import org.mov.table.QuoteModule;
 import org.mov.table.WatchScreen;
@@ -86,6 +87,7 @@ public class CommandManager {
     private boolean isAboutDialogUp = false;
     private boolean isLicenseDialogUp = false;
     private JInternalFrame importQuoteModuleFrame = null;
+    private JInternalFrame syncIDQuoteModuleFrame = null;
     private JInternalFrame exportQuoteModuleFrame = null;
     private JInternalFrame preferencesModuleFrame = null;
 
@@ -995,6 +997,20 @@ public class CommandManager {
 	}
     }
 		
+    /**
+     * Displays the intra-day quote quote sync module that allows the user
+     * to automatically download new intra-day quotes into the application.
+     */
+    public void syncIDQuotes() {
+        // Only allow one copy of the sync module to be displayed
+        synchronized(this) {
+            if(!wakeIfPresent(syncIDQuoteModuleFrame)) {
+                IDQuoteSyncModule module = new IDQuoteSyncModule(desktop);
+                syncIDQuoteModuleFrame = desktopManager.newFrame(module, true, true, false);
+            }
+        }
+    }
+
     /**
      * Displays the export quotes modules that allows the user to export
      * quotes from the application.

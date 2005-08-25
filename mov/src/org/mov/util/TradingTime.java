@@ -56,6 +56,8 @@ public class TradingTime implements Cloneable, Comparable {
      * time strings:
      * <p>
      * <table>
+     * <tr><td><pre>HH:MM</pre></td><td>e.g. "16:02"</td></tr>
+     * <tr><td><pre>HH:MM:SS</pre></td><td>e.g. "16:02:00"</td></tr>
      * <tr><td><pre>H:MMAP</pre></td><td>e.g. "4:02pm"</td></tr>
      * <tr><td><pre>HH:MMAP</pre></td><td>e.g. "04:02pm"</td></tr>
      * </table>
@@ -74,18 +76,35 @@ public class TradingTime implements Cloneable, Comparable {
 
         try {
             int colonIndex = time.indexOf(':');
+            int i = 0;
 
-            // H:MMAP or HH:MMAP (AP = "AM" or "PM")
-            if(colonIndex >= 0 && (time.length() == 6 || time.length() == 7)) {
-                int i = 0;
+            // HH:MM or HH:MM:SS
+            if(colonIndex >= 0 && (time.length() == 5 || time.length() == 8)) {
 
                 // HOUR
-                assert colonIndex != -1;
-
                 hour = Integer.parseInt(time.substring(i, colonIndex));
-                if(hour == 12)
-                    hour = 0;
+                i = colonIndex + 1;
 
+                // MINUTE
+                colonIndex = time.indexOf(':', i);
+
+                if(colonIndex == -1)
+                    minute = Integer.parseInt(time.substring(i));
+                else {
+                    minute = Integer.parseInt(time.substring(i, colonIndex));
+
+                    // SECOND
+                    i = colonIndex + 1;
+
+                    second = Integer.parseInt(time.substring(i));
+                }
+            }
+
+            // H:MMAP or HH:MMAP (AP = "AM" or "PM")
+            else if(colonIndex >= 0 && (time.length() == 6 || time.length() == 7)) {
+
+                // HOUR
+                hour = Integer.parseInt(time.substring(i, colonIndex));
                 i = colonIndex + 1;
 
                 // MINUTE
@@ -98,12 +117,17 @@ public class TradingTime implements Cloneable, Comparable {
                 minute = Integer.parseInt(time.substring(i, dayIndex));
 
                 // AM or PM
-                i = dayIndex;
-                if(time.substring(i).equals("AM"));
-                else if(time.substring(i).equals("PM"))
-                    hour += 12;
-                else
-                    throw new TradingTimeFormatException(time);
+                if(time.length() > 5) {
+                    if(hour == 12)
+                        hour = 0;
+
+                    i = dayIndex;
+                    if(time.substring(i).equals("AM"));
+                    else if(time.substring(i).equals("PM"))
+                        hour += 12;
+                    else
+                        throw new TradingTimeFormatException(time);
+                }
             }
 
             // We don't recognise the format
@@ -202,7 +226,7 @@ public class TradingTime implements Cloneable, Comparable {
      * @return string version
      */
     public String toString() {
-        return (getHour() + ":" +
+        return (getNumberFormat().format(getHour()) + ":" +
                 getNumberFormat().format(getMinute()) + ":" +
                 getNumberFormat().format(getSecond()));
     }

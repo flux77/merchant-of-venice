@@ -42,6 +42,8 @@ import org.mov.table.WatchScreen;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
+import org.mov.util.TradingTime;
+import org.mov.util.TradingTimeFormatException;
 
 /**
  * The Preferences Manager contains a set of routines for loading and saving all
@@ -144,6 +146,25 @@ public class PreferencesManager {
 
 	/** Height of main window. */
 	public int height;
+    }
+
+    /** Intra-day Quote Sync preferences fields. */
+    public class IDQuoteSyncPreferences {
+        
+        /** Is syncing enabled? */
+        public boolean isEnabled;
+
+        /** Symbols to automatically sync. */
+        public String symbols;
+
+        /** Time exchange opens. */
+        public TradingTime openTime;
+
+        /** Time exchange closes. */
+        public TradingTime closeTime;
+
+        /** Polling period in seconds. */
+        public int period;
     }
 
     /**
@@ -978,5 +999,50 @@ public class PreferencesManager {
 	prefs.putInt("default_y", displayPreferences.y);
 	prefs.putInt("default_width", displayPreferences.width);
 	prefs.putInt("default_height", displayPreferences.height);
+    }
+
+    /**
+     * Load intra-day quote sync module preferences.
+     *
+     * @return the preferences.
+     * @see SyncIDQuoteModule
+     */
+    public static IDQuoteSyncPreferences loadIDQuoteSyncPreferences() {
+        Preferences prefs = getUserNode("/id_quote_sync");
+        PreferencesManager preferencesManager = new PreferencesManager();
+        IDQuoteSyncPreferences idQuoteSyncPreferences =
+            preferencesManager.new IDQuoteSyncPreferences();
+
+        idQuoteSyncPreferences.isEnabled = prefs.getBoolean("isEnabled", false);
+        idQuoteSyncPreferences.symbols = prefs.get("symbols", "");
+
+        try {
+            idQuoteSyncPreferences.openTime = new TradingTime(prefs.get("openTime", "9:00:00"));
+            idQuoteSyncPreferences.closeTime = new TradingTime(prefs.get("closeTime", "16:00:00"));
+        }
+        catch(TradingTimeFormatException e) {
+            /* This should not happen - but deal with the possibility gracefully. */
+            idQuoteSyncPreferences.openTime = new TradingTime(9, 0, 0);
+            idQuoteSyncPreferences.closeTime = new TradingTime(16, 0, 0);
+        }
+
+        idQuoteSyncPreferences.period = prefs.getInt("period", 60);
+        return idQuoteSyncPreferences;
+    }
+
+    /**
+     * Save intra-day quote sync module preferences.
+     *
+     * @param preferences the preferences.
+     * @see SyncIDQuoteModule
+     */
+    public static void saveIDQuoteSyncPreferences(IDQuoteSyncPreferences idQuoteSyncPreferences) {
+        Preferences prefs = getUserNode("/id_quote_sync");
+        prefs.putBoolean("isEnabled", idQuoteSyncPreferences.isEnabled);
+        prefs.put("symbols", idQuoteSyncPreferences.symbols);
+        prefs.put("openTime", idQuoteSyncPreferences.openTime.toString());
+        prefs.put("closeTime", idQuoteSyncPreferences.closeTime.toString());
+        prefs.putInt("period", idQuoteSyncPreferences.period);
+
     }
 }

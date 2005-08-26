@@ -18,11 +18,27 @@
 
 package org.mov.ui;
 
+/**
+ * Representation of a column in a table.
+ *
+ * @author Andrew Leppard
+ * @see AbstractTableModel
+ */
 public class Column {
+
+    // Column number
     private int number;
+
+    // Full name of column which appears in menus etc
     private String fullName;
+
+    // Short name of column which appears in the table header
     private String shortName;
+
+    // Data type displayed in column
     private Class type;
+
+    // Information about whether the column is visible or not
     private int visible;
 
     /** The column is currently hidden. */
@@ -34,6 +50,15 @@ public class Column {
     /** The column is always hidden. */
     public final static int ALWAYS_HIDDEN = 2;
 
+    /**
+     * Create a new column.
+     *
+     * @param number    The column number
+     * @param fullName  The full name of the column which appears in menus etc.
+     * @param shortName The short name of the column which appears in the table header.
+     * @param type      Data type displayed in column.
+     * @param visible   Either {@link #HIDDEN}, {@link #VISIBLE} or {@link #ALWAYS_HIDDEN}.
+     */
     public Column(int number, String fullName, String shortName, Class type, int visible) {
         this.number = number;
         this.fullName = fullName;
@@ -42,30 +67,65 @@ public class Column {
         this.visible = visible;
     }
 
+    /**
+     * Get the column number.
+     *
+     * @return Column number.
+     */
     public int getNumber() {
         return number;
     }
 
+    /**
+     * Get the data type of the data in the column.
+     *
+     * @return Type of column's data.
+     */
     public Class getType() {
         return type;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
+    /**
+     * Set the short name of the column.
+     *
+     * @param name New short name of the column.
+     */
+    public void setShortName(String name) {
+        this.shortName = name;
     }
 
+    /**
+     * Get the short name of the column.
+     *
+     * @return Short name of column.
+     */
     public String getShortName() {
         return shortName;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    /**
+     * Set the full name of the column.
+     *
+     * @param name New full name of the column.
+     */
+    public void setFullName(String name) {
+        this.fullName = name;
     }
 
+    /**
+     * Get the full name of the column.
+     *
+     * @return Full name of column.
+     */
     public String getFullName() {
         return fullName;
     }
 
+    /**
+     * Return whether the column is visible.
+     *
+     * @return Either {@link #HIDDEN}, {@link #VISIBLE} or {@link #ALWAYS_HIDDEN}.
+     */
     public int getVisible() {
         return visible;
     }

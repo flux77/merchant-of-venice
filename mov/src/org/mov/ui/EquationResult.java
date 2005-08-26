@@ -20,35 +20,79 @@ package org.mov.ui;
 
 import org.mov.parser.expression.NumberExpression;
 
+/**
+ * Representation of a result to be displayed in an {@link EquationColumn}.
+ * This class is the type of the results displayed in that column.
+ *
+ * @author Andrew Leppard
+ * @see AbstractTable
+ * @see AbstractTableModel
+ * @see EODQuoteModel
+ * @see EquationColumn
+ */
 public class EquationResult implements Comparable {
+
+    // Set to true if the result actually contains a result. Set to false
+    // if the result is empty.
     boolean isResult;
+
+    // Equation result type, e.g. {@link org.mov.parser.Expression#BOOLEAN_TYPE},
+    // {@link org.mov.parser.Expression#FLOAT_TYPE} etc
     int type;
+
+    // Result
     double result;
 
+    /** Empty or missing result. */
     public final static EquationResult EMPTY = new EquationResult();
 
+    // Create a new result
     private EquationResult() {
         result = 0.0D;
         isResult = false;
     }
 
+    /**
+     * Create a new result.
+     *
+     * @param type   Type of the result, e.g. {@link org.mov.parser.Expression#BOOLEAN_TYPE}
+     * @param result Value of result.
+     */
     public EquationResult(int type, double result) {
         isResult = true;
         this.type = type;
         this.result = result;
     }
 
+    /**
+     * Get result value.
+     *
+     * @return Result value.
+     */
     public double getResult() {
         return result;
     }
 
+    /**
+     * Return a string representation of the result.
+     *
+     * @return String value.
+     */
     public String toString() {
         if(isResult)
             return NumberExpression.toString(type, result);
         else
             return "";
     }
-
+    
+    /**
+     * Compare this result to another result.
+     *
+     * @param object Result to compare with.
+     * @return <code>-1</code>if the result is before this result;
+     *         <code>0</code>if the results are equal;
+     *         <code>1</code> if the result is after this result.
+     */
     public int compareTo(Object object) {
         EquationResult result = (EquationResult)object;
         if(getResult() < result.getResult())

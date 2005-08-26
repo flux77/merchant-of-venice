@@ -42,6 +42,16 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
+/**
+ * Helper for constructing tables. The abstract table sets up the look & feel for
+ * tables in Venice. It also provides column sorting and helper methods for
+ * equation columns.
+ *
+ * @author Andrew Leppard
+ * @see AbstractTableModel
+ * @see Column
+ * @see EquationColumn
+ */
 public class AbstractTable extends SortedTable {
 
     // Default values for rendering table rows
@@ -63,12 +73,18 @@ public class AbstractTable extends SortedTable {
     // List of show equation column menu items
     private List showEquationColumnMenuItems;
 
-    class StockQuoteRenderer extends JPanel implements TableCellRenderer
+    /**
+     * Class for rendering all cells in the table. Not just stock quotes.
+     */
+    private class StockQuoteRenderer extends JPanel implements TableCellRenderer
     {
 	private JLabel textLabel = new JLabel();
 	private JLabel iconLabel = new JLabel();
 	private Component glue = Box.createHorizontalGlue();
 
+        /**
+         * Create a new rendered for rendering a table cell.
+         */
 	public StockQuoteRenderer() {
 	    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 	}
@@ -113,6 +129,11 @@ public class AbstractTable extends SortedTable {
 	    return this;
 	}
 
+        /**
+         * Render the {@link ChangeFormat} change which displays a stock's change.
+         * This requires extra work because it will display an arrow showing the
+         * stock change direction.
+         */
 	private void renderChangeComponent(JTable table, Object value,
 					   boolean isSelected,
 					   boolean hasFocus,
@@ -144,6 +165,9 @@ public class AbstractTable extends SortedTable {
 	}
     }
 
+    /**
+     * Create a new table.
+     */
     public AbstractTable() {
 
 	setShowGrid(true);
@@ -180,6 +204,11 @@ public class AbstractTable extends SortedTable {
                               new ImageIcon(unchangedImageResource) : null);
     }
 
+    /**
+     * Set the model which describes the table's columns.
+     *
+     * @param model Table model.
+     */
     protected void showColumns(AbstractTableModel model) {
         for(int i = 0; i < model.getColumnCount(); i++) {
             Column column = model.getColumn(i);
@@ -188,6 +217,12 @@ public class AbstractTable extends SortedTable {
         }
     }
 
+    /**
+     * Helper method to create and return the "show columns" menu which allows
+     * the user to select which columns are visible.
+     *
+     * @param model Table model.
+     */
     protected JMenu createShowColumnMenu(AbstractTableModel model) {
         boolean foundEquationColumn = false;
 
@@ -224,6 +259,14 @@ public class AbstractTable extends SortedTable {
         return showColumnsMenu;
     }
 
+    /**
+     * Helper method to display a dialog to let the user set equations. The
+     * user can input equations which are compiled and run against all the quotes
+     * in the table. The results are shown in columns which are made visible.
+     *
+     * @param quoteBundle Quote bundle
+     * @param model       Table model.
+     */
     protected void applyEquations(final EODQuoteBundle quoteBundle,
                                   final EODQuoteModel model) {
 	// Handle all action in a separate thread so we dont

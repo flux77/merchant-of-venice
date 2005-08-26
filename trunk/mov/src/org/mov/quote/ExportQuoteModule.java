@@ -346,8 +346,6 @@ public class ExportQuoteModule extends JPanel implements Module {
      * Called when window is closing. We handle the saving explicitly so
      * this is only called when the user clicks on the close button in the
      * top right hand of the window. Dont trigger a save event for this.
-     *
-     * @return	enclose module in scroll bar
      */
     public void save() {
         // Same as hitting cancel - do not save anything

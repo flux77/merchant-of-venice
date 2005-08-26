@@ -31,6 +31,17 @@ import org.mov.quote.Quote;
 import org.mov.quote.Symbol;
 import org.mov.util.Locale;
 
+/**
+ * Table model to display end of day quotes to the user. This model tells a table
+ * how to display end of day quotes by describing the columns and how to populate
+ * the table with quotes using data from a {@link EODQuoteBundle}.
+ *
+ * @author Andrew Leppard
+ * @see AbstractTable
+ * @see AbstractTableModel
+ * @see Column
+ * @see EquationColumn
+ */
 public class EODQuoteModel extends AbstractTableModel {
     private EODQuoteBundle quoteBundle;
     private EquationColumn[] equationColumns;
@@ -40,17 +51,48 @@ public class EODQuoteModel extends AbstractTableModel {
     public final static int EQUATION_COLUMN_COUNT = 5;
 
     // Column ennumeration
+
+    /** Symbol column number. */
     public static final int SYMBOL_COLUMN         = 0;
+
+    /** Date column number. */
     public static final int DATE_COLUMN           = 1;
+
+    /** Volume column number. */
     public static final int VOLUME_COLUMN         = 2;
+
+    /** Day low column number. */
     public static final int DAY_LOW_COLUMN        = 3;
+
+    /** Day high column number. */
     public static final int DAY_HIGH_COLUMN       = 4;
+
+    /** Day open column number. */
     public static final int DAY_OPEN_COLUMN       = 5;
+
+    /** Day close column number. */
     public static final int DAY_CLOSE_COLUMN      = 6;
+
+    /** Point change column number. */
     public static final int POINT_CHANGE_COLUMN   = 7;
+
+    /** Percent change column number. */
     public static final int PERCENT_CHANGE_COLUMN = 8;
+
+    /** Activity column number. */
     public static final int ACTIVITY_COLUMN       = 9;
 
+    /**
+     * Create a new end of day quote model. This quote model 
+     *
+     * @param quoteBundle   Quote bundle
+     * @param quotes        A list of {@link Quote}s which contain
+     *                      the quote symbols and dates to table.
+     * @param displayDate   Display the date column? Either {@link Column#HIDDEN},
+     *                      {@link Column#VISIBLE} or {@link Column#ALWAYS_HIDDEN}.
+     * @param displaySymbol Display the symbol column? Either {@link Column#HIDDEN},
+     *                      {@link Column#VISIBLE} or {@link Column#ALWAYS_HIDDEN}.
+     */ 
     public EODQuoteModel(EODQuoteBundle quoteBundle, List quotes, 
                          int displayDate, int displaySymbol) {
         super();
@@ -104,17 +146,27 @@ public class EODQuoteModel extends AbstractTableModel {
         equationColumns = createEquationColumns(ACTIVITY_COLUMN + 1);
     }
 
+    /**
+     * Return the list of quotes in the table.
+     *
+     * @return Tabled quotes.
+     */
     public List getQuotes() {
         return quotes;
     }
     
+    /**
+     * Set the list of quotes to table.
+     *
+     * @param quotes New quotes to table.
+     */
     public void setQuotes(List quotes) {
         this.quotes = quotes;
 
         // Recalculate the equations for each quote
         for(int i = 0; i < equationColumns.length; i++) {
             try {
-                equationColumns[i].recalculate(quoteBundle, quotes);
+                equationColumns[i].calculate(quoteBundle, quotes);
             }
             catch(EvaluationException e) {
                 displayErrorMessage(e.getReason());
@@ -124,10 +176,22 @@ public class EODQuoteModel extends AbstractTableModel {
         fireTableDataChanged();                       
     }
 
+    /**
+     * Return the number of rows in the table.
+     *
+     * @return Number of rows in table.
+     */
     public int getRowCount() {
         return quotes.size();
     }
 
+    /**
+     * Return the value at the given table cell.
+     *
+     * @param row    Row number.
+     * @param column Column number.
+     * @return Value to display in cell.
+     */
     public Object getValueAt(int row, int column) {
         if(row >= getRowCount())
             return "";
@@ -205,10 +269,23 @@ public class EODQuoteModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Return the array of equation columns.
+     *
+     * @return Array of equation columns.
+     * @see Column
+     * @see EquationColumn
+     */
     public EquationColumn[] getEquationColumns() {
         return equationColumns;
     }
     
+    /**
+     * Set the equation columns. This function also calculates their values.
+     *
+     * @param quoteBundle     Quote bundle to calculate quotes.
+     * @param equationColumns New equation columns
+     */
     public void setEquationColumns(EODQuoteBundle quoteBundle, EquationColumn[] equationColumns) {
         Thread thread = Thread.currentThread();
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
@@ -232,10 +309,21 @@ public class EODQuoteModel extends AbstractTableModel {
         ProgressDialogManager.closeProgressDialog(progress);        
     }
 
+    /**
+     * Return the number of columns in the table.
+     *
+     * @return Number of columns in table.
+     */
     public int getColumnCount() {
         return super.getColumnCount() + equationColumns.length;
     }
 
+    /**
+     * Return a column.
+     *
+     * @param columnNumber Number of column.
+     * @return Column
+     */
     public Column getColumn(int columnNumber) {
         if(columnNumber < super.getColumnCount())
             return super.getColumn(columnNumber);
@@ -246,6 +334,11 @@ public class EODQuoteModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Display an error message to the user.
+     *
+     * @param message The message to display.
+     */
     private void displayErrorMessage(final String message) {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -257,6 +350,12 @@ public class EODQuoteModel extends AbstractTableModel {
             });
     }
 
+    /**
+     * Create the equation columns.
+     *
+     * @param columnNumber Column number.
+     * @return Array of equation columns.
+     */
     private EquationColumn[] createEquationColumns(int columnNumber) {
         EquationColumn[] equationColumns = new EquationColumn[EQUATION_COLUMN_COUNT];
 

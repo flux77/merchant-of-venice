@@ -32,14 +32,42 @@ import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.TradingDate;
 
+/**
+ * Representation of an equation column in a table. An equation column is a column
+ * in quote tables that displays the results of a user equation applied to the
+ * data in the table. The data type of the data displayed in the column will
+ * be {@link EquationResult}.
+ *
+ * @author Andrew Leppard
+ * @see AbstractTable
+ * @see AbstractTableModel
+ * @see EODQuoteModel
+ * @see EquationResult
+ */
 public class EquationColumn extends Column implements Cloneable {
+
+    // Text of equation
     private String equation;
+
+    // Compiled equation
     private Expression expression;
 
-    // Contains a mapping between Symbol and TradingDate concatenated with
-    // result for that date.
+    // A map which allows you to find the result of an equation for a given symbol
+    // on a given trading date. The map is a mapping of the concatenation of
+    // the symbol and the trading date string, to an EquationResult.
     private Map results;
 
+    /**
+     * Create a new equation column.
+     *
+     * @param number     The column number
+     * @param fullName   The full name of the column which appears in menus etc.
+     * @param shortName  The short name of the column which appears in the table header.
+     * @param visible    Either {@link Column#HIDDEN}, {@link Column#VISIBLE} or
+     *                   {@link Column#ALWAYS_HIDDEN}.
+     * @param equation   Text of equation.
+     * @param expression Compiled equation.
+     */
     public EquationColumn(int number, 
                           String fullName, 
                           String shortName,
@@ -52,42 +80,58 @@ public class EquationColumn extends Column implements Cloneable {
         this.results = new HashMap();
     }
 
-    public EquationColumn(int number, 
-                          String fullName, 
-                          String shortName,
-                          int visible,
-                          String equation, 
-                          Expression expression,
-                          Map results) {
-        super(number, fullName, shortName, EquationResult.class, visible);
-        this.equation = equation;
-        this.expression = expression;
-        this.results = results;
-    }
-
+    /**
+     * Return the text version of the equation.
+     *
+     * @return Text version of the equation.
+     */
     public String getEquation() {
         return equation;
     }
 
+    /**
+     * Set the text version of the equation.
+     *
+     * @param equation New equation text.
+     */
     public void setEquation(String equation) {
         this.equation = equation;
     }
 
+    /**
+     * Get the compiled equation.
+     *
+     * @return Compiled equation.
+     */
     public Expression getExpression() {
         return expression;
     }
 
+    /**
+     * Set the compiled equation.
+     *
+     * @param expression Compiled equation.
+     */
     public void setExpression(Expression expression) {
         this.expression = expression;
     }
 
-    public void recalculate(EODQuoteBundle quoteBundle, List quotes) throws EvaluationException {
-        results = new HashMap();
-        calculate(quoteBundle, quotes);
-    }
-
+    /**
+     * Execute the equation and calculate the result for each quote. This function takes a list
+     * of quotes, rather than extracting them from the quote bundle, because typically the
+     * table (and therefore this column) does not display all the quotes in the quote bundle.
+     * The reason is that to display a single day's quotes requires the loading of two day's
+     * worth of quotes. Two days are needed to calculate the quote change values.
+     *
+     * @param quoteBundle Quote Bundle containing quotes
+     * @param quotes      A list of {@link Quote}s which contain the symbols and dates to
+     *                    evaluate. A result will be calculated for each quote in the list.
+     * @throws EvaluationException If there was an error evaluating an expression, such
+     *         as divide by zero.
+     * @see Quote
+     */
     public void calculate(EODQuoteBundle quoteBundle, List quotes) throws EvaluationException {
-        assert results != null;
+        results = new HashMap();
 
         if(expression != null) {
             for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
@@ -109,6 +153,14 @@ public class EquationColumn extends Column implements Cloneable {
         }
     }
    
+    /**
+     * Return the result of the equation for the given symbol on the given date.
+     *
+     * @param symbol Query the result for this symbol.
+     * @param date   Query the result for this date.
+     * @return The equation result or {@link EquationResult#EMPTY} if there is
+     *         currently no result for the given symbol and date.
+     */
     public EquationResult getResult(Symbol symbol, TradingDate date) {
         // If we don't have that many results, just return an empty
         // result. This will show up as an empty cell in the table
@@ -124,6 +176,11 @@ public class EquationColumn extends Column implements Cloneable {
         return equationResult;
     }
 
+    /**
+     * Clone this equation column.
+     *
+     * @return Cloned equation column.
+     */
     public Object clone() {
         return new EquationColumn(getNumber(), getFullName(), getShortName(),
                                   getVisible(), getEquation(), getExpression());

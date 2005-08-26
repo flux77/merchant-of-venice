@@ -1005,7 +1005,7 @@ public class PreferencesManager {
      * Load intra-day quote sync module preferences.
      *
      * @return the preferences.
-     * @see SyncIDQuoteModule
+     * @see org.mov.quote.IDQuoteSyncModule
      */
     public static IDQuoteSyncPreferences loadIDQuoteSyncPreferences() {
         Preferences prefs = getUserNode("/id_quote_sync");
@@ -1033,8 +1033,8 @@ public class PreferencesManager {
     /**
      * Save intra-day quote sync module preferences.
      *
-     * @param preferences the preferences.
-     * @see SyncIDQuoteModule
+     * @param idQuoteSyncPreferences the preferences.
+     * @see org.mov.quote.IDQuoteSyncModule
      */
     public static void saveIDQuoteSyncPreferences(IDQuoteSyncPreferences idQuoteSyncPreferences) {
         Preferences prefs = getUserNode("/id_quote_sync");

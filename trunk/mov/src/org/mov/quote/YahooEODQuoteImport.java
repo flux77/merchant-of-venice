@@ -43,7 +43,7 @@ import org.mov.util.TradingDate;
  * Import end-of-day quotes from Yahoo into Venice.
  *
  * @author Andrew Leppard
- * @see FileEODQuoteImportExport
+ * @see FileEODQuoteImport
  * @see ImportQuoteModule
  */
 public class YahooEODQuoteImport {

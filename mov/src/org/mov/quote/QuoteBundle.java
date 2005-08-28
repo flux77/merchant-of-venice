@@ -27,7 +27,6 @@ import org.mov.util.TradingDate;
  * of either end-of-day or intra-day quotes.
  *
  * @author Andrew Leppard
- * @see EODQuoteBundle
  */
 
 public interface QuoteBundle {
@@ -43,7 +42,7 @@ public interface QuoteBundle {
      * @param now       fast access offset of current quote, for end-of-day quotes this
      *                  is the fast access date offset (see {@link EODQuoteCache}). For
      *                  intra-day quotes, it is the fast access time offset (see
-     *                  {@link IDQuoteCache}.
+     *                  {@link IDQuoteCache}).
      * @param offset    modifier offset to fast access offset
      * @return the quote
      * @exception EvaluationException if the script isn't allow access to the quote.
@@ -51,6 +50,25 @@ public interface QuoteBundle {
      */
     public double getQuote(Symbol symbol, int quoteType, int now, int offset)
 	throws EvaluationException, MissingQuoteException;
+
+
+    /**
+     * Get a stock quote. If the stock is earlier than the first date in the bundle, the
+     * bundle will be expand to include the new date given. If the stock symbol is not
+     * included in the original symbol list, the quote bundle will be expanded to include
+     * it.
+     *
+     * @param symbol  the stock symbol
+     * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
+     *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
+     * @param offset    fast access offset of current quote, for end-of-day quotes this
+     *                  is the fast access date offset (see {@link EODQuoteCache}). For
+     *                  intra-day quotes, it is the fast access time offset (see
+     * @return the quote
+     * @exception MissingQuoteException if the quote was not found
+     */
+    public double getQuote(Symbol symbol, int quoteType, int offset)
+	throws MissingQuoteException;
 
     /**
      * Convert between a fast access offset to an actual date. Intra-day quotes
@@ -61,6 +79,14 @@ public interface QuoteBundle {
      * @param offset  fast access offset, see {@link EODQuoteCache}
      * @return the date
      */
-
     public TradingDate offsetToDate(int offset);
+
+    /**
+     * Retrieve the fast access offset from the given quote.
+     *
+     * @param quote quote
+     * @return fast access offset
+     */
+    public int getOffset(Quote quote)
+        throws WeekendDateException;
 }

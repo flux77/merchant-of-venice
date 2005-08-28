@@ -392,7 +392,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
         // Apply equations to watch screen
         else if(e.getSource() == applyEquationsMenuItem)
-            applyEquations(quoteBundle, model);
+            applyEquations(model);
         
         // Delete watch screen
         else if(e.getSource() == deleteWatchScreen)

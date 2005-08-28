@@ -21,28 +21,33 @@ package org.mov.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mov.quote.IDQuote;
 import org.mov.quote.MissingQuoteException;
-import org.mov.quote.EODQuote;
-import org.mov.quote.EODQuoteBundle;
+import org.mov.quote.QuoteBundle;
 import org.mov.quote.Quote;
 import org.mov.quote.Symbol;
+import org.mov.quote.WeekendDateException;
 import org.mov.util.Locale;
 
+// redoc all comments
+
 /**
- * Table model to display end of day quotes to the user. This model tells a table
- * how to display end of day quotes by describing the columns and how to populate
- * the table with quotes from a quote bundle.
+// REDOC
+ * Table model to display intra-day quotes to the user. This model tells a table
+ * how to display intra-day quotes by describing the columns and how to populate
+ * the table with quotes using data from a quote bundle.
  *
  * @author Andrew Leppard
  * @see AbstractTable
  * @see Column
  * @see EquationColumn
- * @see QuoteBundle
  */
-public class EODQuoteModel extends AbstractQuoteModel {
+public class MixedQuoteModel extends AbstractQuoteModel {
+
+    // SORT eod module columns to match this?
 
     // Quote bundle
-    private EODQuoteBundle quoteBundle;
+    private QuoteBundle quoteBundle;
 
     // Column ennumeration
 
@@ -52,30 +57,37 @@ public class EODQuoteModel extends AbstractQuoteModel {
     /** Date column number. */
     public static final int DATE_COLUMN           = 1;
 
-    /** Volume column number. */
-    public static final int VOLUME_COLUMN         = 2;
-
-    /** Day low column number. */
-    public static final int DAY_LOW_COLUMN        = 3;
-
-    /** Day high column number. */
-    public static final int DAY_HIGH_COLUMN       = 4;
-
-    /** Day open column number. */
-    public static final int DAY_OPEN_COLUMN       = 5;
-
     /** Day close column number. */
-    public static final int DAY_CLOSE_COLUMN      = 6;
+    public static final int LAST_COLUMN           = 2;
 
     /** Point change column number. */
-    public static final int POINT_CHANGE_COLUMN   = 7;
+    public static final int POINT_CHANGE_COLUMN   = 3;
 
     /** Percent change column number. */
-    public static final int PERCENT_CHANGE_COLUMN = 8;
+    public static final int PERCENT_CHANGE_COLUMN = 4;
+
+    /** Day low column number. */
+    public static final int BID_COLUMN            = 5;
+
+    /** Day low column number. */
+    public static final int ASK_COLUMN            = 6;
+
+    /** Day open column number. */
+    public static final int DAY_OPEN_COLUMN       = 7;
+
+    /** Day high column number. */
+    public static final int DAY_HIGH_COLUMN       = 8;
+
+    /** Day low column number. */
+    public static final int DAY_LOW_COLUMN        = 9;
+
+    /** Volume column number. */
+    public static final int VOLUME_COLUMN         = 10;
 
     /** Activity column number. */
-    public static final int ACTIVITY_COLUMN       = 9;
+    public static final int ACTIVITY_COLUMN       = 11;
 
+    // redoc
     /**
      * Create a new end of day quote model. This quote model 
      *
@@ -87,8 +99,8 @@ public class EODQuoteModel extends AbstractQuoteModel {
      * @param displaySymbol Display the symbol column? Either {@link Column#HIDDEN},
      *                      {@link Column#VISIBLE} or {@link Column#ALWAYS_HIDDEN}.
      */ 
-    public EODQuoteModel(EODQuoteBundle quoteBundle, List quotes, 
-                         int displayDate, int displaySymbol) {
+    public MixedQuoteModel(QuoteBundle quoteBundle, List quotes, 
+                           int displayDate, int displaySymbol) {
         super(quoteBundle, quotes, ACTIVITY_COLUMN + 1);
 
         this.quoteBundle = quoteBundle;
@@ -102,25 +114,9 @@ public class EODQuoteModel extends AbstractQuoteModel {
 			       Locale.getString("DATE"), 
 			       Locale.getString("DATE_COLUMN_HEADER"),
                                Symbol.class, displayDate));
-        columns.add(new Column(VOLUME_COLUMN, 
-			       Locale.getString("VOLUME"), 
-			       Locale.getString("VOLUME_COLUMN_HEADER"),
-                               Integer.class, Column.VISIBLE));
-        columns.add(new Column(DAY_LOW_COLUMN, 
-			       Locale.getString("DAY_LOW"), 
-			       Locale.getString("DAY_LOW_COLUMN_HEADER"),
-                               QuoteFormat.class, Column.VISIBLE));
-        columns.add(new Column(DAY_HIGH_COLUMN, 
-			       Locale.getString("DAY_HIGH"), 
-			       Locale.getString("DAY_HIGH_COLUMN_HEADER"),
-                               QuoteFormat.class, Column.VISIBLE));
-        columns.add(new Column(DAY_OPEN_COLUMN, 
-			       Locale.getString("DAY_OPEN"), 
-			       Locale.getString("DAY_OPEN_COLUMN_HEADER"),
-                               QuoteFormat.class, Column.VISIBLE));
-        columns.add(new Column(DAY_CLOSE_COLUMN, 
-			       Locale.getString("DAY_CLOSE"), 
-			       Locale.getString("DAY_CLOSE_COLUMN_HEADER"),
+        columns.add(new Column(LAST_COLUMN, 
+			       Locale.getString("LAST"), 
+			       Locale.getString("LAST_COLUMN_HEADER"),
                                QuoteFormat.class, Column.VISIBLE));
         columns.add(new Column(POINT_CHANGE_COLUMN, 
 			       Locale.getString("POINT_CHANGE"),
@@ -130,6 +126,30 @@ public class EODQuoteModel extends AbstractQuoteModel {
 			       Locale.getString("PERCENT_CHANGE"), 
 			       Locale.getString("PERCENT_CHANGE_COLUMN_HEADER"),
 			       ChangeFormat.class, Column.VISIBLE));
+        columns.add(new Column(BID_COLUMN, 
+			       Locale.getString("BID"), 
+			       Locale.getString("BID_COLUMN_HEADER"),
+                               QuoteFormat.class, Column.HIDDEN));
+        columns.add(new Column(LAST_COLUMN, 
+			       Locale.getString("ASK"), 
+			       Locale.getString("ASK_COLUMN_HEADER"),
+                               QuoteFormat.class, Column.HIDDEN));
+        columns.add(new Column(DAY_OPEN_COLUMN, 
+			       Locale.getString("DAY_OPEN"), 
+			       Locale.getString("DAY_OPEN_COLUMN_HEADER"),
+                               QuoteFormat.class, Column.VISIBLE));
+        columns.add(new Column(DAY_HIGH_COLUMN, 
+			       Locale.getString("DAY_HIGH"), 
+			       Locale.getString("DAY_HIGH_COLUMN_HEADER"),
+                               QuoteFormat.class, Column.VISIBLE));
+        columns.add(new Column(DAY_LOW_COLUMN, 
+			       Locale.getString("DAY_LOW"), 
+			       Locale.getString("DAY_LOW_COLUMN_HEADER"),
+                               QuoteFormat.class, Column.VISIBLE));
+        columns.add(new Column(VOLUME_COLUMN, 
+			       Locale.getString("VOLUME"), 
+			       Locale.getString("VOLUME_COLUMN_HEADER"),
+                               Integer.class, Column.VISIBLE));
 	columns.add(new Column(ACTIVITY_COLUMN, 
 			       Locale.getString("ACTIVITY"), 
 			       Locale.getString("ACTIVITY_COLUMN_HEADER"),
@@ -148,7 +168,13 @@ public class EODQuoteModel extends AbstractQuoteModel {
         if(row >= getRowCount())
             return "";
 
-        EODQuote quote = (EODQuote)getQuotes().get(row);
+        Quote quote = (Quote)getQuotes().get(row);
+        IDQuote idQuote = null;
+        
+        // All the quotes in this table should be IDQuotes, but
+        // they don't have to be
+        if(quote instanceof IDQuote)
+            idQuote = (IDQuote)quote;
         
         switch(column) {
         case(SYMBOL_COLUMN):
@@ -156,6 +182,67 @@ public class EODQuoteModel extends AbstractQuoteModel {
             
         case(DATE_COLUMN):
             return quote.getDate();
+
+        case(LAST_COLUMN):
+            return new QuoteFormat(quote.getDayClose());
+
+        case(POINT_CHANGE_COLUMN):
+            // Change is calculated by the percent gain between
+            // yesterday's day close and today's day close. If we don't
+            // have yesterday's day close available, we just use today's
+            // day open.
+            double finalQuote = quote.getDayClose();
+            double initialQuote = quote.getDayOpen();
+
+            try {
+                int offset = quoteBundle.getOffset(quote);
+
+                initialQuote =  quoteBundle.getQuote(quote.getSymbol(),
+                                                     Quote.DAY_CLOSE, 
+                                                     offset - 1);
+            }
+            catch(MissingQuoteException e) {
+                // No big deal - we default to day open
+            }
+            catch(WeekendDateException e) {
+                // Should not happen
+                assert false;
+            }
+
+            return new PointChangeFormat(initialQuote, finalQuote);
+            
+        case(PERCENT_CHANGE_COLUMN):
+            finalQuote = quote.getDayClose();
+            initialQuote = quote.getDayOpen();
+            
+            try {
+                int offset = quoteBundle.getOffset(quote);
+
+                initialQuote = quoteBundle.getQuote(quote.getSymbol(),
+                                                    Quote.DAY_CLOSE, 
+                                                    offset - 1);
+            }
+            catch(MissingQuoteException e) {
+                // No big deal - we default to day open
+            }
+            catch(WeekendDateException e) {
+                // Should not happen
+                assert false;
+            }
+
+            return new ChangeFormat(initialQuote, finalQuote);
+
+        case(BID_COLUMN):
+            if(idQuote != null)
+                return new QuoteFormat(idQuote.getBid());
+            else
+                return new QuoteFormat(0.0D);
+
+        case(ASK_COLUMN):
+            if(idQuote != null)
+                return new QuoteFormat(idQuote.getAsk());
+            else
+                return new QuoteFormat(0.0D);            
             
         case(VOLUME_COLUMN):
             return new Integer(quote.getDayVolume());
@@ -169,44 +256,6 @@ public class EODQuoteModel extends AbstractQuoteModel {
         case(DAY_OPEN_COLUMN):
             return new QuoteFormat(quote.getDayOpen());
 		
-        case(DAY_CLOSE_COLUMN):
-            return new QuoteFormat(quote.getDayClose());
-            
-        case(POINT_CHANGE_COLUMN):
-            // Change is calculated by the percent gain between
-            // yesterday's day close and today's day close. If we don't
-            // have yesterday's day close available, we just use today's
-            // day open.
-            double finalQuote = quote.getDayClose();
-            double initialQuote = quote.getDayOpen();
-            
-            try {
-                initialQuote = 
-                    quoteBundle.getQuote(quote.getSymbol(),
-                                         Quote.DAY_CLOSE, 
-                                         quote.getDate().previous(1));
-            }
-            catch(MissingQuoteException e) {
-                // No big deal - we default to day open
-            }
-            
-            return new PointChangeFormat(initialQuote, finalQuote);
-            
-        case(PERCENT_CHANGE_COLUMN):
-            finalQuote = quote.getDayClose();
-            initialQuote = quote.getDayOpen();
-            
-            try {
-                initialQuote = quoteBundle.getQuote(quote.getSymbol(),
-                                                    Quote.DAY_CLOSE, 
-                                                    quote.getDate().previous(1));
-            }
-            catch(MissingQuoteException e) {
-                // No big deal - we default to day open
-            }
-            
-            return new ChangeFormat(initialQuote, finalQuote);
-            
         case(ACTIVITY_COLUMN):
             // This column is never visible but is used to determine
             // the most active stocks - I don't actually know how to

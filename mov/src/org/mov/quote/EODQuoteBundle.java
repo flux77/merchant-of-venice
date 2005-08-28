@@ -500,6 +500,19 @@ public class EODQuoteBundle implements QuoteBundle {
         return quoteCache.dateToOffset(date);
     }
 
+    /**
+     * Retrieve the fast access offset from the given quote.
+     *
+     * @param quote quote
+     * @return fast access offset
+     * @exception WeekendDateException if the date falls on a weekend.
+     */
+    public int getOffset(Quote quote)
+        throws WeekendDateException {
+
+        return dateToOffset(quote.getDate());
+    }
+
     public String toString() {
         return quoteRange.toString();
     }

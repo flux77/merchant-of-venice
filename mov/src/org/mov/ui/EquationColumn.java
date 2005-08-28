@@ -27,7 +27,7 @@ import org.mov.parser.EvaluationException;
 import org.mov.parser.Expression;
 import org.mov.parser.Variables;
 import org.mov.quote.Quote;
-import org.mov.quote.EODQuoteBundle;
+import org.mov.quote.QuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.TradingDate;
@@ -130,7 +130,7 @@ public class EquationColumn extends Column implements Cloneable {
      *         as divide by zero.
      * @see Quote
      */
-    public void calculate(EODQuoteBundle quoteBundle, List quotes) throws EvaluationException {
+    public void calculate(QuoteBundle quoteBundle, List quotes) throws EvaluationException {
         results = new HashMap();
 
         if(expression != null) {
@@ -138,10 +138,10 @@ public class EquationColumn extends Column implements Cloneable {
                 Quote quote = (Quote)iterator.next();
                 
                 try {
-                    int dateOffset = quoteBundle.dateToOffset(quote.getDate());
+                    int offset = quoteBundle.getOffset(quote);
                     double result = expression.evaluate(new Variables(), 
                                                         quoteBundle, quote.getSymbol(), 
-                                                        dateOffset);
+                                                        offset);
                     results.put(quote.getSymbol().toString() + quote.getDate().toString(),
                                 new EquationResult(expression.getType(), result));
                 }

@@ -36,7 +36,6 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 
-import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.util.Locale;
 import org.mov.util.Money;
@@ -264,11 +263,9 @@ public class AbstractTable extends SortedTable {
      * user can input equations which are compiled and run against all the quotes
      * in the table. The results are shown in columns which are made visible.
      *
-     * @param quoteBundle Quote bundle
-     * @param model       Table model.
+     * @param model Quote table model.
      */
-    protected void applyEquations(final EODQuoteBundle quoteBundle,
-                                  final EODQuoteModel model) {
+    protected void applyEquations(final AbstractQuoteModel model) {
 	// Handle all action in a separate thread so we dont
 	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
 	Thread thread = new Thread() {
@@ -282,7 +279,7 @@ public class AbstractTable extends SortedTable {
                         final EquationColumn[] equationColumns = dialog.getEquationColumns();
 
                         // Load equation columns with data
-                        model.setEquationColumns(quoteBundle, equationColumns);
+                        model.setEquationColumns(equationColumns);
 
                         SwingUtilities.invokeLater(new Runnable() {
 				public void run() {

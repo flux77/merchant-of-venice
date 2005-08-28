@@ -582,7 +582,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	}
 
 	else if(e.getSource() == applyEquations) {
-	    applyEquations(quoteBundle, model);
+	    applyEquations(model);
 	}
 
 	else if(e.getSource() == applyFilter) {

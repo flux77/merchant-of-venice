@@ -21,7 +21,7 @@ package org.mov.ui;
 import java.util.List;
 
 /**
- * Helper for constructing table models. The abstract table model allows you to
+ * Helper for constructing table models. This abstract table model allows you to
  * pass a list of columns for describing a table. The model will then take care
  * of returning information to the table about each column.
  *

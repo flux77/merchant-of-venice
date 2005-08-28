@@ -105,4 +105,14 @@ public class IDQuoteBundle implements QuoteBundle {
         // The entire quote bundle is on the same date
         return date;
     }
+
+    /**
+     * Retrieve the fast access offset from the given quote.
+     *
+     * @param quote quote
+     * @return fast access offset
+     */
+    public int getOffset(Quote quote) {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -75,6 +75,8 @@ public class MixedQuoteBundle implements QuoteBundle {
     // And IDQuoteCache?
     // apparently EODQuoteBundle already has getLastDateOffset(). So just rename it?
 
+    // gets a getOffset(Quote quote) method?? but what about ID quotes?
+
     public int getFirstOffset() {
         return eodQuoteBundle.getFirstDateOffset();
     }
@@ -86,12 +88,15 @@ public class MixedQuoteBundle implements QuoteBundle {
             return eodQuoteBundle.getLastDateOffset();
     }
 
+    // I really dont think these two are needed as all the quote bundles
+    // go the same way, i.e. to get yesterday's quote you take 1 off the
+    // offset? (right?) right.
     public int getNextOffset(int offset) {
-        return ++offset;
+        return(offset + 1);
     }
 
-    public int getLastOffset(int offset) {
-        return --offset;
+    public int getPreviousOffset(int offset) {
+        return(offset - 1);
     }
 
     // returns if there are any ID quotes available for the symbols we are interested in.
@@ -118,5 +123,18 @@ public class MixedQuoteBundle implements QuoteBundle {
         }
 
         return isIDAvailable;
+    }
+
+    /**
+     * Retrieve the fast access offset from the given quote.
+     *
+     * @param quote quote
+     * @return fast access offset
+     * @exception WeekendDateException if the date falls on a weekend.
+     */
+    public int getOffset(Quote quote)
+        throws WeekendDateException {
+
+        throw new UnsupportedOperationException();
     }
 }

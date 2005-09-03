@@ -111,7 +111,10 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
      * @return	the graph name
      */
     public String getName() {
-	return graph.getSourceName();
+        if(graph != null)
+            return graph.getSourceName();
+        else
+            return "";
     }
 
     /**

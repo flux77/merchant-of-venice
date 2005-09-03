@@ -112,6 +112,9 @@ public class CommandManager {
 	return instance;
     }
 
+    public DesktopManager getDesktopManager() {
+        return desktopManager;
+    }
 
     public void setDesktopManager(DesktopManager desktopManager) {
 	this.desktopManager = desktopManager;
@@ -153,7 +156,7 @@ public class CommandManager {
      * @param quoteBundle fully loaded quote bundle
      */
     public void tableTransactions(final Portfolio portfolio,
-                              final EODQuoteBundle quoteBundle) {
+                                  final EODQuoteBundle quoteBundle) {
         PortfolioModule porfolioModule = new PortfolioModule(desktop, portfolio, quoteBundle);
         desktopManager.newFrame(porfolioModule);
         porfolioModule.tablePortfolio();

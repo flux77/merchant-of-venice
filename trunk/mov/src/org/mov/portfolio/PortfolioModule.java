@@ -438,11 +438,9 @@ public class PortfolioModule extends JPanel implements Module,
 	    }
 	}
 	else {
-	    historyModule =
-		new TransactionModule(this, portfolio);
-	
-	    historyFrame =
-                ((org.mov.ui.DesktopManager)(desktop.getDesktopManager())).newFrame(historyModule);
+            DesktopManager desktopManager = CommandManager.getInstance().getDesktopManager();
+            historyModule = new TransactionModule(this, portfolio);
+	    historyFrame = desktopManager.newFrame(historyModule);
 	}
     }
 

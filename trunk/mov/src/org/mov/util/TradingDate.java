@@ -532,17 +532,17 @@ public class TradingDate implements Cloneable, Comparable {
         // language.
         String months[][] =
             {{"jan", "january", "janvier", "enero", "januar", "gennaio", "januari"},
-             {"feb", "february", "février", "febrero", "februar", "febbraio", "februari"},
-             {"mar", "march", "mars", "marzo", "marts", "märz", "marzo"},
+             {"feb", "february", "f\351vrier", "febrero", "februar", "febbraio", "februari"},
+             {"mar", "march", "mars", "marzo", "marts", "m\344rz", "marzo"},
              {"apr", "april", "avril", "abril", "aprile"},
              {"may", "mai", "mayo", "maj", "maggio"},
              {"jun", "june", "juin", "junio", "juni", "giugno"},
              {"jul", "july", "juillet", "julio", "juli", "luglio"},
-             {"aug", "august", "août", "agosto", "augsti"},
+             {"aug", "august", "ao\373t", "agosto", "augsti"},
              {"sep", "september", "septembre", "septiembre","settembre"},
              {"oct", "october", "octobre", "octubre", "oktober", "ottobre"},
              {"nov", "november", "novembre", "noviembre"},
-             {"dec", "december", "décembre", "diciembre", "dezember","dicembre", "desember"}};
+             {"dec", "december", "d\351cembre", "diciembre", "dezember","dicembre", "desember"}};
 
         monthString = monthString.toLowerCase();
 

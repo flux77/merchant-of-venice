@@ -49,7 +49,7 @@ import org.mov.quote.EODQuoteRange;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.SymbolFormatException;
 import org.mov.quote.WeekendDateException;
-import org.mov.ui.EquationComboBox;
+import org.mov.ui.ExpressionComboBox;
 import org.mov.ui.GridBagHelper;
 import org.mov.ui.SymbolListComboBox;
 import org.mov.util.Locale;
@@ -80,15 +80,15 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     private JTextField endDateTextField;
     private SymbolListComboBox symbolListComboBox;
     private JRadioButton orderByKeyButton;
-    private JRadioButton orderByEquationButton;
+    private JRadioButton orderByExpressionButton;
     private JComboBox orderByKeyComboBox;
-    private EquationComboBox orderByEquationComboBox;
+    private ExpressionComboBox orderByExpressionComboBox;
     private JCheckBox multipleDateRangesCheckBox;
     private JComboBox dateRangePeriodComboBox;
 
     // Parsed data
     private EODQuoteRange quoteRange;
-    private Expression orderByEquation;
+    private Expression orderByExpression;
     private TradingDate startDate;
     private TradingDate endDate;
     private int dateRangePeriod;
@@ -126,12 +126,12 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
                 if(value.equals("orderByKey"))
                     orderByKeyButton.setSelected(true);
                 else
-                    orderByEquationButton.setSelected(true);
+                    orderByExpressionButton.setSelected(true);
             }
             else if(setting.equals("by_key"))
                 orderByKeyComboBox.setSelectedItem(value);
             else if(setting.equals("by_equation"))
-                orderByEquationComboBox.setEquationText(value);
+                orderByExpressionComboBox.setExpressionText(value);
 	    else if(setting.equals("is_multiple_date_ranges")) {
 		if(allowMultipleDateRanges)
 		    multipleDateRangesCheckBox.setSelected(value.equals("1"));
@@ -155,7 +155,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         settings.put("symbols", symbolListComboBox.getText());
         settings.put("by", orderByKeyButton.isSelected()? "orderByKey" : "orderByEquation");
         settings.put("by_key", orderByKeyComboBox.getSelectedItem());
-        settings.put("by_equation", orderByEquationComboBox.getEquationText());
+        settings.put("by_equation", orderByExpressionComboBox.getExpressionText());
 	if(allowMultipleDateRanges) {
 	    settings.put("is_multiple_date_ranges",
 			 multipleDateRangesCheckBox.isSelected()? "1" : "0");
@@ -251,9 +251,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             return false;
         }
 
-        if(orderByEquationButton.isSelected()) {
+        if(orderByExpressionButton.isSelected()) {
             try {
-                orderByEquation = Parser.parse(orderByEquationComboBox.getEquationText());
+                orderByExpression = Parser.parse(orderByExpressionComboBox.getExpressionText());
             }
             catch(ExpressionException e) {
                 JOptionPane.showInternalMessageDialog(desktop,
@@ -303,9 +303,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             return new OrderComparator(quoteBundle, orderByKeyComboBox.getSelectedIndex());
         }
         else {
-            // Order by equation
-            assert orderByEquationButton.isSelected();
-            return new OrderComparator(quoteBundle, orderByEquation);
+            // Order by expression
+            assert orderByExpressionButton.isSelected();
+            return new OrderComparator(quoteBundle, orderByExpression);
         }
     }
 
@@ -473,22 +473,22 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	    c.ipadx = 5;
 	    c.anchor = GridBagConstraints.WEST;
 
-            orderByEquationButton = new JRadioButton(Locale.getString("BY_EQUATION"));
-            orderByEquationButton.addActionListener(new ActionListener() {
+            orderByExpressionButton = new JRadioButton(Locale.getString("BY_EQUATION"));
+            orderByExpressionButton.addActionListener(new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
                         checkDisabledStatus();
                     }});
 
-            buttonGroup.add(orderByEquationButton);
+            buttonGroup.add(orderByExpressionButton);
 
             c.gridwidth = 1;
-            gridbag.setConstraints(orderByEquationButton, c);
-            innerPanel.add(orderByEquationButton);
+            gridbag.setConstraints(orderByExpressionButton, c);
+            innerPanel.add(orderByExpressionButton);
 
-            orderByEquationComboBox = new EquationComboBox();
+            orderByExpressionComboBox = new ExpressionComboBox();
             c.gridwidth = GridBagConstraints.REMAINDER;
-            gridbag.setConstraints(orderByEquationComboBox, c);
-            innerPanel.add(orderByEquationComboBox);
+            gridbag.setConstraints(orderByExpressionComboBox, c);
+            innerPanel.add(orderByExpressionComboBox);
 
             panel.add(innerPanel, BorderLayout.NORTH);
 	    add(panel);
@@ -497,7 +497,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 
     private void checkDisabledStatus() {
         orderByKeyComboBox.setEnabled(orderByKeyButton.isSelected());
-        orderByEquationComboBox.setEnabled(orderByEquationButton.isSelected());
+        orderByExpressionComboBox.setEnabled(orderByExpressionButton.isSelected());
 
 	if(allowMultipleDateRanges)
 	    dateRangePeriodComboBox.setEnabled(multipleDateRangesCheckBox.isSelected());

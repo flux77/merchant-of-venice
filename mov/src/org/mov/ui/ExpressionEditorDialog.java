@@ -37,41 +37,53 @@ import javax.swing.border.TitledBorder;
 
 import org.mov.main.ModuleFrame;
 import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.StoredEquation;
+import org.mov.prefs.StoredExpression;
 import org.mov.util.Locale;
 
+/**
+ * A dialog for adding, editing and viewing stored expressions. A stored expression is
+ * an expression with a name that is saved in user preferences. Stored expressions can be
+ * quickly recalled (and modified) anywhere Venice  accepts expressions.
+ *
+ * @author Andrew Leppard
+ * @see org.mov.prefs.StoredExpression
+ * @see org.mov.prefs.EquationPage
+ * @see org.mov.parser.Expression
+ */
 public class ExpressionEditorDialog {
 
     private boolean isUp = true;
     private boolean wasCancelled = false;
     private JInternalFrame internalFrame;
 
-    // Equation we are working with
+    // Expression we are working with
     private String name;
-    private String equation;
+    private String expression;
 
     // Width of text field: Name: [<-width->]
     private final static int NAME_WIDTH = 20;
 
-    // Minimum & preferred size to display equation */
-    private final static int EQUATION_ROWS = 14;
-    private final static int EQUATION_COLUMNS = 30;
+    // Minimum & preferred size to display expression */
+    private final static int EXPRESSION_ROWS = 14;
+    private final static int EXPRESSION_COLUMNS = 30;
 
     // Whether we should display just the OK button or the OK and 
     // the cancel button
     private final static int OK_BUTTON        = 0;
     private final static int OK_CANCEL_BUTTON = 1;
 
+    // Create a new expression editor dialog.
     private ExpressionEditorDialog(String title, boolean displayName, 
-                                   String name, String equation,
+                                   String name, String expression,
                                    int buttonArray, boolean isEditable) {
 	this.name = name;
-        this.equation = equation;
+        this.expression = expression;
         assert buttonArray == OK_BUTTON || buttonArray == OK_CANCEL_BUTTON;
 
         buildDialog(title, displayName, buttonArray, isEditable);
     }
 
+    // Build the dialog's GUI
     private void buildDialog(String title, final boolean displayName, int buttonArray, 
 			     boolean isEditable) {
         internalFrame = new JInternalFrame(title,
@@ -95,28 +107,28 @@ public class ExpressionEditorDialog {
             panel.add(namePanel, BorderLayout.NORTH);
         }
 
-        JPanel equationPanel = new JPanel();
-        final JTextArea equationEditor = new JTextArea(EQUATION_ROWS,
-						       EQUATION_COLUMNS);
-        equationEditor.setText(equation);
-        equationEditor.setEditable(isEditable);
+        JPanel expressionPanel = new JPanel();
+        final JTextArea expressionEditor = new JTextArea(EXPRESSION_ROWS,
+						       EXPRESSION_COLUMNS);
+        expressionEditor.setText(expression);
+        expressionEditor.setEditable(isEditable);
 
         TitledBorder titledBorder = new TitledBorder(Locale.getString("EQUATION"));
-        equationPanel.setLayout(new BorderLayout());
-        equationPanel.setBorder(titledBorder);
-        equationPanel.add(new JScrollPane(equationEditor));
+        expressionPanel.setLayout(new BorderLayout());
+        expressionPanel.setBorder(titledBorder);
+        expressionPanel.add(new JScrollPane(expressionEditor));
 
-        panel.add(equationPanel, BorderLayout.CENTER);
+        panel.add(expressionPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         JButton okButton = new JButton(Locale.getString("OK"));
         okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    // Update equation
+                    // Update expression
 		    if(displayName)
 			setName(nameField.getText());
 
-                    setEquation(equationEditor.getText());
+                    setExpression(expressionEditor.getText());
 		    wasCancelled = false;
                     close();
                 }});
@@ -127,7 +139,7 @@ public class ExpressionEditorDialog {
             JButton cancelButton = new JButton(Locale.getString("CANCEL"));
             cancelButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        // User cancelled dialog so don't modify equation
+                        // User cancelled dialog so don't modify expression
 			wasCancelled = true;
                         close();
                     }});
@@ -177,12 +189,12 @@ public class ExpressionEditorDialog {
 	this.name = name;
     }
 
-    private String getEquation() {
-        return equation;
+    private String getExpression() {
+        return expression;
     }
 
-    private void setEquation(String equation) {
-        this.equation = equation;
+    private void setExpression(String expression) {
+        this.expression = expression;
     }
 
     private boolean waitUntilClosed() {
@@ -197,115 +209,161 @@ public class ExpressionEditorDialog {
 	return wasCancelled;
     }
 
-    // make sure you run this in its own thread - not in the swing dispatch thread!
-    public static StoredEquation showAddDialog(List storedEquations, String title,
-					       String equation) {
+    /**
+     * Show a dialog which allows the user to add a new stored expression.
+     * Make sure you run this in its own thread - not in the swing dispatch thread!
+     *
+     * @param storedExpressions current stored expressions.
+     * @param title title of dialog.
+     * @param expression initial expression text
+     * @return New stored expression or <code>null</code> if the user cancelled
+     *         the dialog.
+     */
+    public static StoredExpression showAddDialog(List storedExpressions, String title,
+                                                 String expression) {
 	boolean isValid = false;
 	String name = "";
-	StoredEquation storedEquation = null;
+	StoredExpression storedExpression = null;
 	
 	while(!isValid) {
 	    ExpressionEditorDialog dialog = new ExpressionEditorDialog(title, true, 
 								       name,
-								       equation,
+								       expression,
 								       OK_CANCEL_BUTTON,
 								       true);
 	    boolean wasCancelled = dialog.waitUntilClosed();
 	    name = dialog.getName();
-	    equation = dialog.getEquation();
+	    expression = dialog.getExpression();
 
 	    if(!wasCancelled) {
-		isValid = validateStoredEquation(storedEquations, null, name);
+		isValid = validateStoredExpression(storedExpressions, null, name);
 
 		if(isValid) 
-		    storedEquation = new StoredEquation(name, equation);
+		    storedExpression = new StoredExpression(name, expression);
 	    }
 	    else
 		isValid = true;
 	}
 		
-	return storedEquation;
+	return storedExpression;
     }
 
-    // make sure you run this in its own thread - not in the swing dispatch thread!
-    public static StoredEquation showAddDialog(List storedEquations, String title) {
-	return showAddDialog(storedEquations, title, "");
+    /**
+     * Show a dialog which allows the user to add a new stored expression.
+     * Make sure you run this in its own thread - not in the swing dispatch thread!
+     *
+     * @param storedExpressions current stored expressions.
+     * @param title title of dialog.
+     * @return New stored expression or <code>null</code> if the user cancelled
+     *         the dialog.
+     */
+    public static StoredExpression showAddDialog(List storedExpressions, String title) {
+	return showAddDialog(storedExpressions, title, "");
     }
 
-    // make sure you run this in its own thread - not in the swing dispatch thread!
-    public static StoredEquation showAddDialog(String title, String equation) {
-	List storedEquations = PreferencesManager.loadStoredEquations();
-	StoredEquation storedEquation = showAddDialog(storedEquations, title, equation);
+    /**
+     * Show a dialog which allows the user to add a new stored expression.
+     * Make sure you run this in its own thread - not in the swing dispatch thread!
+     *
+     * @param title title of dialog.
+     * @param expression initial expression text
+     * @return New stored expression or <code>null</code> if the user cancelled
+     *         the dialog.
+     */
+    public static StoredExpression showAddDialog(String title, String expression) {
+	List storedExpressions = PreferencesManager.loadStoredExpressions();
+	StoredExpression storedExpression = showAddDialog(storedExpressions, title, expression);
 
-	// If the user added an equation, save it to the preferences and make
+	// If the user added an expression, save it to the preferences and make
 	// sure all the combo boxes are updated.
-	if(storedEquation != null) {
-	    storedEquations.add(storedEquation);
-	    PreferencesManager.saveStoredEquations(storedEquations);
-	    EquationComboBox.updateEquations();
+	if(storedExpression != null) {
+	    storedExpressions.add(storedExpression);
+	    PreferencesManager.saveStoredExpressions(storedExpressions);
+	    ExpressionComboBox.updateExpressions();
 	}
 
-	return storedEquation;
+	return storedExpression;
     }
 
-    // make sure you run this in its own thread - not in the swing dispatch thread!
-    public static String showEditDialog(String title, String equation) {
+    /**
+     * Show a dialog which allows the user to edit a current stored expression.
+     * Make sure you run this in its own thread - not in the swing dispatch thread!
+     *
+     * @param title title of dialog.
+     * @param expression current expression text
+     * @return Edited expression text.
+     */
+    public static String showEditDialog(String title, String expression) {
         ExpressionEditorDialog dialog = new ExpressionEditorDialog(title, false, "",
-                                                                   equation,
+                                                                   expression,
                                                                    OK_CANCEL_BUTTON,
                                                                    true);
         dialog.waitUntilClosed();
-        return dialog.getEquation();
+        return dialog.getExpression();
     }
 
-    // make sure you run this in its own thread - not in the swing dispatch thread!
-    public static StoredEquation showEditDialog(List storedEquations, String title, 
-						StoredEquation storedEquation) {
+    /**
+     * Show a dialog which allows the user to edit a current stored expression.
+     * Make sure you run this in its own thread - not in the swing dispatch thread!
+     *
+     * @param storedExpressions current stored expressions.
+     * @param title title of dialog.
+     * @param storedExpression current expression.
+     * @return Edited stored expression.
+     */
+    public static StoredExpression showEditDialog(List storedExpressions, String title, 
+                                                  StoredExpression storedExpression) {
 	boolean isValid = false;
-	String oldName = new String(storedEquation.name);
-	String name = storedEquation.name;
-	String equation = storedEquation.equation;
+	String oldName = new String(storedExpression.name);
+	String name = storedExpression.name;
+	String expression = storedExpression.expression;
 
 	while(!isValid) {
 	    ExpressionEditorDialog dialog = new ExpressionEditorDialog(title, true, 
 								       name,
-								       equation,
+								       expression,
 								       OK_CANCEL_BUTTON,
 								       true);
 	    boolean wasCancelled = dialog.waitUntilClosed();
 	    name = dialog.getName();
-	    equation = dialog.getEquation();
+	    expression = dialog.getExpression();
 
 	    if(!wasCancelled) {
-		isValid = validateStoredEquation(storedEquations, oldName, name);
+		isValid = validateStoredExpression(storedExpressions, oldName, name);
 
 		if(isValid) {
-		    storedEquation.name = name;
-		    storedEquation.equation = equation;
+		    storedExpression.name = name;
+		    storedExpression.expression = expression;
 		}
 	    }
 	    else
 		isValid = true;
 	}
 
-	return storedEquation;
+	return storedExpression;
     }
 
-    // make sure you run this in its own thread - not in the swing dispatch thread!
-    public static void showViewDialog(String title, String equation) {
+    /**
+     * Show a dialog which allows the user to view a current stored expression.
+     * Make sure you run this in its own thread - not in the swing dispatch thread!
+     *
+     * @param title title of dialog.
+     * @param expression expression text
+     */
+    public static void showViewDialog(String title, String expression) {
         ExpressionEditorDialog dialog = new ExpressionEditorDialog(title, false, "", 
-                                                                   equation,
+                                                                   expression,
                                                                    OK_BUTTON,
                                                                    false);
         dialog.waitUntilClosed();
     }
 
-    // Check that a stored equation is valid after the user has modified it.
-    // Check for things like missing equation name or duplicate equation names.
-    // Don't check the equation for syntax as we can't do this without knowing
-    // the variables that will be predefined for that equation.
-    private static boolean validateStoredEquation(List storedEquations, String oldName,
-						  String newName) {
+    // Check that a stored expression is valid after the user has modified it.
+    // Check for things like missing expression name or duplicate expression names.
+    // Don't check the expression for syntax as we can't do this without knowing
+    // the variables that will be predefined for that expression.
+    private static boolean validateStoredExpression(List storedExpressions, String oldName,
+                                                    String newName) {
 
 	boolean isValid = true;
 
@@ -318,12 +376,12 @@ public class ExpressionEditorDialog {
 	}
 
 	// If the name was changed, make sure it wasn't changed to an
-	// existing stored equation's name.
+	// existing stored expression's name.
 	else if(oldName == null || !newName.equals(oldName)) {
 	    boolean isDuplicateName = false;
 	    
-	    for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
-		StoredEquation traverse = (StoredEquation)iterator.next();
+	    for(Iterator iterator = storedExpressions.iterator(); iterator.hasNext();) {
+		StoredExpression traverse = (StoredExpression)iterator.next();
 		if(traverse.name.equals(newName))
 		    isDuplicateName = true;
 		

@@ -37,7 +37,16 @@ import org.mov.parser.ExpressionException;
 import org.mov.parser.Parser;
 import org.mov.util.Locale;
 
-public class EquationColumnDialog extends JInternalFrame implements ActionListener {
+/**
+ * A dialog which allows the user to set the user column expressions in a table.
+ * All the quotes tables in venice (e.g. the historical quote data tables and the
+ * watch screen), allow the user five rows of expression columns (refered to as
+ * equation columns in the UI). This dialog allows the user to edit the
+ * expressions in those columns.
+ *
+ * @author Andrew Leppard
+ */
+public class ExpressionColumnDialog extends JInternalFrame implements ActionListener {
 
     private JButton okButton;
     private JButton cancelButton;
@@ -46,18 +55,19 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
     private JPanel transactionPanel;
 
     // Fields of a transaction
-    private JComboBox equationColumnComboBox;
+    private JComboBox expressionColumnComboBox;
     private JTextField columnNameTextField;
-    private EquationComboBox equationComboBox;
+    private ExpressionComboBox expressionComboBox;
 
     private boolean isDone = false;
 
-    private EquationColumn[] equationColumns;
-    private int currentEquationColumn = 0;
+    private ExpressionColumn[] expressionColumns;
+    private int currentExpressionColumn = 0;
 
     private boolean OKButtonPressed;
 
-    public EquationColumnDialog(int equationColumnCount) {
+    // TODO: This should just be "showDialog()".
+    public ExpressionColumnDialog(int expressionColumnCount) {
 	super(Locale.getString("APPLY_EQUATIONS"));
 
 	getContentPane().setLayout(new BorderLayout());
@@ -77,7 +87,7 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
 	gridbag.setConstraints(typeLabel, c);
 	mainPanel.add(typeLabel);
 
-	equationColumnComboBox = new JComboBox();
+	expressionColumnComboBox = new JComboBox();
 
 	String[] numbers = {Locale.getString("ONE"),
                             Locale.getString("TWO"),
@@ -85,14 +95,14 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
                             Locale.getString("FOUR"),
                             Locale.getString("FIVE")};
 
-	for(int i = 0; i < equationColumnCount; i++)
-	    equationColumnComboBox.addItem(numbers[i]);
+	for(int i = 0; i < expressionColumnCount; i++)
+	    expressionColumnComboBox.addItem(numbers[i]);
 
-	equationColumnComboBox.addActionListener(this);
+	expressionColumnComboBox.addActionListener(this);
 
 	c.gridwidth = GridBagConstraints.REMAINDER;
-	gridbag.setConstraints(equationColumnComboBox, c);
-	mainPanel.add(equationColumnComboBox);
+	gridbag.setConstraints(expressionColumnComboBox, c);
+	mainPanel.add(expressionColumnComboBox);
 
         c.fill = GridBagConstraints.HORIZONTAL;
 
@@ -100,8 +110,8 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
 	    GridBagHelper.addTextRow(mainPanel, Locale.getString("COLUMN_NAME"), "",
                                      gridbag, c, 18);
 
-	equationComboBox =
-	    GridBagHelper.addEquationRow(mainPanel, Locale.getString("EQUATION"), "",
+	expressionComboBox =
+	    GridBagHelper.addExpressionRow(mainPanel, Locale.getString("EQUATION"), "",
                                          gridbag, c);
 
 	JPanel buttonPanel = new JPanel();
@@ -122,14 +132,14 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
 	setBounds(x, y, size.width, size.height);
     }
 
-    public boolean showDialog(EquationColumn[] equationColumns) {
+    public boolean showDialog(ExpressionColumn[] expressionColumns) {
 
-	// Creat copy of equation columns to work with
-	this.equationColumns = new EquationColumn[equationColumns.length];
-	for(int i = 0; i < equationColumns.length; i++)
-	    this.equationColumns[i] = (EquationColumn)equationColumns[i].clone();
+	// Creat copy of expression columns to work with
+	this.expressionColumns = new ExpressionColumn[expressionColumns.length];
+	for(int i = 0; i < expressionColumns.length; i++)
+	    this.expressionColumns[i] = (ExpressionColumn)expressionColumns[i].clone();
 
-	displayEquationColumn(0);
+	displayExpressionColumn(0);
 
 	DesktopManager.getDesktop().add(this);
 	show();
@@ -146,45 +156,45 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
 	return OKButtonPressed;
     }
 
-    public EquationColumn[] getEquationColumns() {
-	return equationColumns;
+    public ExpressionColumn[] getExpressionColumns() {
+	return expressionColumns;
     }
 
-    private void saveEquationColumn(int column) {
+    private void saveExpressionColumn(int column) {
 	// Store new values the user has typed in
-	equationColumns[column].setShortName(columnNameTextField.getText());
-	equationColumns[column].setEquation(equationComboBox.getEquationText());
+	expressionColumns[column].setShortName(columnNameTextField.getText());
+	expressionColumns[column].setExpressionText(expressionComboBox.getExpressionText());
     }
 
-    private void displayEquationColumn(int column) {
-	currentEquationColumn = column;
+    private void displayExpressionColumn(int column) {
+	currentExpressionColumn = column;
 
-	columnNameTextField.setText(equationColumns[column].getShortName());
-	equationComboBox.setEquationText(equationColumns[column].getEquation());
+	columnNameTextField.setText(expressionColumns[column].getShortName());
+	expressionComboBox.setExpressionText(expressionColumns[column].getExpressionText());
     }
 
-    // Make sure the expression field is correct in each equation column. If
-    // any of the equations do not parse then display an error dialog to
+    // Make sure the expression field is correct in each expression column. If
+    // any of the expressions do not parse then display an error dialog to
     // the user.
-    private boolean parseEquations() {
+    private boolean parseExpressions() {
         boolean success = true;
         int i = 0;
 
         try {
-            for(i = 0; i < equationColumns.length; i++) {
-                String equationString = equationColumns[i].getEquation();
+            for(i = 0; i < expressionColumns.length; i++) {
+                String expressionString = expressionColumns[i].getExpressionText();
 
-                if(equationString != null && equationString.length() > 0)
-                    equationColumns[i].setExpression(Parser.parse(equationString));
+                if(expressionString != null && expressionString.length() > 0)
+                    expressionColumns[i].setExpression(Parser.parse(expressionString));
                 else
-                    equationColumns[i].setExpression(null);
+                    expressionColumns[i].setExpression(null);
             }
         }
         catch(ExpressionException e) {
             JOptionPane.
                 showInternalMessageDialog(this,
                                           e.getReason(),
-                                          Locale.getString("ERROR_PARSING_EQUATION"),
+                                          Locale.getString("ERROR_PARSING_EXPRESSION"),
                                           JOptionPane.ERROR_MESSAGE);
             success = false;
         }
@@ -195,26 +205,26 @@ public class EquationColumnDialog extends JInternalFrame implements ActionListen
     public void actionPerformed(ActionEvent e) {
 
 	if(e.getSource() == okButton) {
-	    saveEquationColumn(currentEquationColumn);
+	    saveExpressionColumn(currentExpressionColumn);
 
-            if(parseEquations()) {
+            if(parseExpressions()) {
                 OKButtonPressed = true;
                 dispose();
                 isDone = true;
             }
 	}
 	else if(e.getSource() == cancelButton) {
-	    saveEquationColumn(currentEquationColumn);
+	    saveExpressionColumn(currentExpressionColumn);
 
 	    OKButtonPressed = false;
 	    dispose();
 	    isDone = true;
 	}
 
-	else if(e.getSource() == equationColumnComboBox) {
+	else if(e.getSource() == expressionColumnComboBox) {
 	    // Save the current values and display new ones
-	    saveEquationColumn(currentEquationColumn);
-	    displayEquationColumn(equationColumnComboBox.getSelectedIndex());
+	    saveExpressionColumn(currentExpressionColumn);
+	    displayExpressionColumn(expressionColumnComboBox.getSelectedIndex());
 	}
     }	
 }

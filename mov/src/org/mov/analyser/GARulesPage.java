@@ -53,7 +53,7 @@ import org.mov.parser.Token;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.prefs.PreferencesManager;
-import org.mov.ui.EquationComboBox;
+import org.mov.ui.ExpressionComboBox;
 import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
@@ -64,8 +64,8 @@ public class GARulesPage extends JPanel implements AnalyserPage {
 
     // Swing components
     private JCheckBox ruleFamilyEnabledCheckBox;
-    private EquationComboBox buyRuleEquationComboBox;
-    private EquationComboBox sellRuleEquationComboBox;
+    private ExpressionComboBox buyRuleExpressionComboBox;
+    private ExpressionComboBox sellRuleExpressionComboBox;
     private JTextField parameterTextField;
     private JTextField minValueTextField;
     private JTextField maxValueTextField;
@@ -110,9 +110,9 @@ public class GARulesPage extends JPanel implements AnalyserPage {
             String value = (String) settings.get((Object) setting);
             
             if (setting.equals("buy_rule"))
-                buyRuleEquationComboBox.setEquationText(value);
+                buyRuleExpressionComboBox.setExpressionText(value);
             else if (setting.equals("sell_rule"))
-                sellRuleEquationComboBox.setEquationText(value);
+                sellRuleExpressionComboBox.setExpressionText(value);
         }
         
         HashMap settingsParam =
@@ -137,8 +137,8 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         HashMap settings = new HashMap();
 
         GARulesPageModule.save(settingsParam, idStr);
-        settings.put("buy_rule", buyRuleEquationComboBox.getEquationText());
-        settings.put("sell_rule", sellRuleEquationComboBox.getEquationText());
+        settings.put("buy_rule", buyRuleExpressionComboBox.getExpressionText());
+        settings.put("sell_rule", sellRuleExpressionComboBox.getExpressionText());
 
         PreferencesManager.saveAnalyserPageSettings(key + idStr,
                                                     settingsParam);
@@ -158,8 +158,8 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         // expressions so they can be parsed properly.
         Variables variables = new Variables();
         
-        String buyRuleString = buyRuleEquationComboBox.getEquationText();
-        String sellRuleString = sellRuleEquationComboBox.getEquationText();
+        String buyRuleString = buyRuleExpressionComboBox.getExpressionText();
+        String sellRuleString = sellRuleExpressionComboBox.getExpressionText();
         
         variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
         variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
@@ -341,8 +341,8 @@ public class GARulesPage extends JPanel implements AnalyserPage {
                 dbl = Double.valueOf(str).doubleValue();
             } catch (NumberFormatException nfe) {
                 JOptionPane.showInternalMessageDialog(desktop, Locale.getString("ERROR_PARSING_NUMBER", str),
-                                                    Locale.getString("ERROR_PARSING_RULES"),
-                                                    JOptionPane.ERROR_MESSAGE);
+                                                      Locale.getString("ERROR_PARSING_RULES"),
+                                                      JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         }
@@ -365,9 +365,10 @@ public class GARulesPage extends JPanel implements AnalyserPage {
                     GARulesPageModule.PARAMETER_COLUMN);
             for (int jj=0; jj<words.length; jj++) {
                 if (words[jj].indexOf(parameters[ii]) >= 0) {
-                    JOptionPane.showInternalMessageDialog(desktop, Locale.getString("ERROR_PARSING_PARAMETER", parameters[ii], words[jj]),
-                                                        Locale.getString("ERROR_PARSING_RULES"),
-                                                        JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showInternalMessageDialog(desktop, Locale.getString("ERROR_PARSING_PARAMETER",
+                                                                                    parameters[ii], words[jj]),
+                                                          Locale.getString("ERROR_PARSING_RULES"),
+                                                          JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
             }
@@ -391,8 +392,8 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         
         GridBagLayout gridbag = new GridBagLayout();
         
-        TitledBorder equationTitled = new TitledBorder(Locale.getString("RULES_PAGE_TITLE"));
-        this.setBorder(equationTitled);
+        TitledBorder expressionTitled = new TitledBorder(Locale.getString("RULES_PAGE_TITLE"));
+        this.setBorder(expressionTitled);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setPreferredSize(preferredSize);
         
@@ -414,13 +415,13 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        buyRuleEquationComboBox = GridBagHelper.addEquationRow(innerPanel,
-                                                               Locale.getString("BUY_RULE"), "",
-                                                               gridbag, c);
-        sellRuleEquationComboBox = GridBagHelper.addEquationRow(innerPanel,
-                                                                Locale.getString("SELL_RULE"), 
-                                                                "", gridbag, c);
-
+        buyRuleExpressionComboBox = GridBagHelper.addExpressionRow(innerPanel,
+                                                                   Locale.getString("BUY_RULE"), "",
+                                                                   gridbag, c);
+        sellRuleExpressionComboBox = GridBagHelper.addExpressionRow(innerPanel,
+                                                                    Locale.getString("SELL_RULE"), 
+                                                                    "", gridbag, c);
+        
                 
         // GARulesPageModule is already declared as global variable
         GARulesPageModule.setLayout(new BoxLayout(GARulesPageModule, BoxLayout.Y_AXIS));

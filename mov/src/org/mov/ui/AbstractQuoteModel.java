@@ -30,18 +30,18 @@ import org.mov.util.Locale;
 /**
  * Helper for constructing quote table models. This abstract table model allows
  * you to pass a list of columns for describing a table. The model append
- * a list of equation columns that let the user apply equations to quotes in the
+ * a list of expression columns that let the user apply expressions to quotes in the
  * table. The model will then care care of returning information to the table
- * about each column and recomputing the equation columns as necessary.
+ * about each column and recomputing the expression columns as necessary.
  *
  * @author Andrew Leppard
  * @see Column
- * @see EquationColumn
+ * @see ExpressionColumn
  */
 public abstract class AbstractQuoteModel extends AbstractTableModel {
 
-    /** The number of equation columns to display for tables that support them. */
-    public final static int EQUATION_COLUMN_COUNT = 5;
+    /** The number of expression columns to display for tables that support them. */
+    public final static int EXPRESSION_COLUMN_COUNT = 5;
 
     // Quote bundle
     private QuoteBundle quoteBundle;
@@ -49,55 +49,55 @@ public abstract class AbstractQuoteModel extends AbstractTableModel {
     // List of quotes to be displayed in table
     private List quotes;
 
-    // Array of equation columns
-    private EquationColumn[] equationColumns;
+    // Array of expression columns
+    private ExpressionColumn[] expressionColumns;
     
     /**
      * Create a new quote table model with no columns.
      *
-     * @param quoteBundle         Quote bundle
-     * @param quotes              A list of {@link Quote}s which contain
-     *                            the quote symbols and dates to table.
-     * @param firstEquationColumn The column number of the first equation
-     *                            column.
+     * @param quoteBundle           Quote bundle
+     * @param quotes                A list of {@link org.mov.quote.Quote}s which contain
+     *                              the quote symbols and dates to table.
+     * @param firstExpressionColumn The column number of the first expression
+     *                              column.
      */
     public AbstractQuoteModel(QuoteBundle quoteBundle,
                               List quotes,
-                              int firstEquationColumn) {
+                              int firstExpressionColumn) {
         super();
         this.quoteBundle = quoteBundle;
         this.quotes = quotes;
 
-        equationColumns = createEquationColumns(firstEquationColumn);
+        expressionColumns = createExpressionColumns(firstExpressionColumn);
     }
 
     /**
-     * Return the array of equation columns.
+     * Return the array of expression columns.
      *
-     * @return Array of equation columns.
+     * @return Array of expression columns.
      * @see Column
-     * @see EquationColumn
+     * @see ExpressionColumn
      */
-    public EquationColumn[] getEquationColumns() {
-        return equationColumns;
+    public ExpressionColumn[] getExpressionColumns() {
+        return expressionColumns;
     }
     
     /**
-     * Set the equation columns. This function also calculates their values.
+     * Set the expression columns. This function also calculates their values.
      *
-     * @param equationColumns New equation columns
+     * @param expressionColumns New expression columns
      */
-    public void setEquationColumns(EquationColumn[] equationColumns) {
+    public void setExpressionColumns(ExpressionColumn[] expressionColumns) {
         Thread thread = Thread.currentThread();
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setIndeterminate(true);
         progress.show(Locale.getString("APPLYING_EQUATIONS"));
 
-        this.equationColumns = equationColumns;
+        this.expressionColumns = expressionColumns;
 
-        for(int i = 0; i < this.equationColumns.length; i++) {
+        for(int i = 0; i < this.expressionColumns.length; i++) {
             try {
-                this.equationColumns[i].calculate(quoteBundle, quotes);
+                this.expressionColumns[i].calculate(quoteBundle, quotes);
             }
             catch(EvaluationException e) {
                 displayErrorMessage(e.getReason());
@@ -117,7 +117,7 @@ public abstract class AbstractQuoteModel extends AbstractTableModel {
      * @return Number of columns in table.
      */
     public int getColumnCount() {
-        return super.getColumnCount() + equationColumns.length;
+        return super.getColumnCount() + expressionColumns.length;
     }
 
     /**
@@ -131,8 +131,8 @@ public abstract class AbstractQuoteModel extends AbstractTableModel {
             return super.getColumn(columnNumber);
         else {
             columnNumber -= super.getColumnCount();
-            assert columnNumber <= equationColumns.length;
-            return equationColumns[columnNumber];
+            assert columnNumber <= expressionColumns.length;
+            return expressionColumns[columnNumber];
         }
     }
 
@@ -153,10 +153,10 @@ public abstract class AbstractQuoteModel extends AbstractTableModel {
     public void setQuotes(List quotes) {
         this.quotes = quotes;
 
-        // Recalculate the equations for each quote
-        for(int i = 0; i < equationColumns.length; i++) {
+        // Recalculate the expressions for each quote
+        for(int i = 0; i < expressionColumns.length; i++) {
             try {
-                equationColumns[i].calculate(quoteBundle, quotes);
+                expressionColumns[i].calculate(quoteBundle, quotes);
             }
             catch(EvaluationException e) {
                 displayErrorMessage(e.getReason());
@@ -192,22 +192,22 @@ public abstract class AbstractQuoteModel extends AbstractTableModel {
     }
 
     /**
-     * Create the equation columns.
+     * Create the expression columns.
      *
      * @param columnNumber Column number.
-     * @return Array of equation columns.
+     * @return Array of expression columns.
      */
-    private EquationColumn[] createEquationColumns(int columnNumber) {
-        EquationColumn[] equationColumns = new EquationColumn[EQUATION_COLUMN_COUNT];
+    private ExpressionColumn[] createExpressionColumns(int columnNumber) {
+        ExpressionColumn[] expressionColumns = new ExpressionColumn[EXPRESSION_COLUMN_COUNT];
 
-        for(int i = 0; i < equationColumns.length; i++)
-            equationColumns[i] = new EquationColumn(columnNumber++, 
-						    Locale.getString("EQUATION_NUMBER", (i + 1)),
-						    Locale.getString("EQUATION_COLUMN_HEADER", 
-								     (i + 1)),
-                                                    Column.HIDDEN,
-                                                    "",
-                                                    null);
-        return equationColumns;
+        for(int i = 0; i < expressionColumns.length; i++)
+            expressionColumns[i] = new ExpressionColumn(columnNumber++, 
+                                                        Locale.getString("EQUATION_NUMBER", (i + 1)),
+                                                        Locale.getString("EQUATION_COLUMN_HEADER", 
+                                                                         (i + 1)),
+                                                        Column.HIDDEN,
+                                                        "",
+                                                        null);
+        return expressionColumns;
     }
 }

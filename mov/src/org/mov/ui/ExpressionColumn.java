@@ -33,91 +33,91 @@ import org.mov.quote.WeekendDateException;
 import org.mov.util.TradingDate;
 
 /**
- * Representation of an equation column in a table. An equation column is a column
- * in quote tables that displays the results of a user equation applied to the
- * data in the table. The data type of the data displayed in the column will
- * be {@link EquationResult}.
+ * Representation of an expression column in a table. An expression column is a
+ * column in quote tables that displays the results of a user expression applied to
+ * the data in the table. The data type of the data displayed in the column will
+ * be {@link ExpressionResult}.
  *
  * @author Andrew Leppard
  * @see AbstractTable
  * @see AbstractTableModel
  * @see EODQuoteModel
- * @see EquationResult
+ * @see ExpressionResult
  */
-public class EquationColumn extends Column implements Cloneable {
+public class ExpressionColumn extends Column implements Cloneable {
 
-    // Text of equation
-    private String equation;
+    // Text of expression
+    private String expressionText;
 
-    // Compiled equation
+    // Compiled expression
     private Expression expression;
 
-    // A map which allows you to find the result of an equation for a given symbol
+    // A map which allows you to find the result of an expression for a given symbol
     // on a given trading date. The map is a mapping of the concatenation of
-    // the symbol and the trading date string, to an EquationResult.
+    // the symbol and the trading date string, to an ExpressionResult.
     private Map results;
 
     /**
-     * Create a new equation column.
+     * Create a new expression column.
      *
-     * @param number     The column number
-     * @param fullName   The full name of the column which appears in menus etc.
-     * @param shortName  The short name of the column which appears in the table header.
-     * @param visible    Either {@link Column#HIDDEN}, {@link Column#VISIBLE} or
-     *                   {@link Column#ALWAYS_HIDDEN}.
-     * @param equation   Text of equation.
-     * @param expression Compiled equation.
+     * @param number         The column number
+     * @param fullName       The full name of the column which appears in menus etc.
+     * @param shortName      The short name of the column which appears in the table header.
+     * @param visible        Either {@link Column#HIDDEN}, {@link Column#VISIBLE} or
+     *                       {@link Column#ALWAYS_HIDDEN}.
+     * @param expressionText Text of expression.
+     * @param expression     Compiled expression.
      */
-    public EquationColumn(int number, 
-                          String fullName, 
-                          String shortName,
-                          int visible,
-                          String equation, 
-                          Expression expression) {
-        super(number, fullName, shortName, EquationResult.class, visible);
-        this.equation = equation;
+    public ExpressionColumn(int number, 
+                            String fullName, 
+                            String shortName,
+                            int visible,
+                            String expressionText, 
+                            Expression expression) {
+        super(number, fullName, shortName, ExpressionResult.class, visible);
+        this.expressionText = expressionText;
         this.expression = expression;
         this.results = new HashMap();
     }
 
     /**
-     * Return the text version of the equation.
+     * Return the text version of the expression.
      *
-     * @return Text version of the equation.
+     * @return Text version of the expression.
      */
-    public String getEquation() {
-        return equation;
+    public String getExpressionText() {
+        return expressionText;
     }
 
     /**
-     * Set the text version of the equation.
+     * Set the text version of the expression.
      *
-     * @param equation New equation text.
+     * @param expressionText New expression text.
      */
-    public void setEquation(String equation) {
-        this.equation = equation;
+    public void setExpressionText(String expressionText) {
+        this.expressionText = expressionText;
     }
 
     /**
-     * Get the compiled equation.
+     * Get the compiled expression.
      *
-     * @return Compiled equation.
+     * @return Compiled expression.
      */
     public Expression getExpression() {
         return expression;
     }
 
     /**
-     * Set the compiled equation.
+     * Set the compiled expression.
      *
-     * @param expression Compiled equation.
+     * @param expression Compiled expression.
      */
     public void setExpression(Expression expression) {
         this.expression = expression;
     }
 
     /**
-     * Execute the equation and calculate the result for each quote. This function takes a list
+     * Execute the expression and calculate the result for each quote. This function takes a list
      * of quotes, rather than extracting them from the quote bundle, because typically the
      * table (and therefore this column) does not display all the quotes in the quote bundle.
      * The reason is that to display a single day's quotes requires the loading of two day's
@@ -143,7 +143,7 @@ public class EquationColumn extends Column implements Cloneable {
                                                         quoteBundle, quote.getSymbol(), 
                                                         offset);
                     results.put(quote.getSymbol().toString() + quote.getDate().toString(),
-                                new EquationResult(expression.getType(), result));
+                                new ExpressionResult(expression.getType(), result));
                 }
                 catch(WeekendDateException e) {
                     // Shouldn't happen
@@ -154,35 +154,35 @@ public class EquationColumn extends Column implements Cloneable {
     }
    
     /**
-     * Return the result of the equation for the given symbol on the given date.
+     * Return the result of the expression for the given symbol on the given date.
      *
      * @param symbol Query the result for this symbol.
      * @param date   Query the result for this date.
-     * @return The equation result or {@link EquationResult#EMPTY} if there is
+     * @return The expression result or {@link ExpressionResult#EMPTY} if there is
      *         currently no result for the given symbol and date.
      */
-    public EquationResult getResult(Symbol symbol, TradingDate date) {
+    public ExpressionResult getResult(Symbol symbol, TradingDate date) {
         // If we don't have that many results, just return an empty
         // result. This will show up as an empty cell in the table
         // and be sorted as so the result was 0.0.
-        EquationResult equationResult = null;
-
+        ExpressionResult expressionResult = null;
+        
         if(results != null)
-            equationResult = (EquationResult)results.get(symbol.toString() + date.toString());
+            expressionResult = (ExpressionResult)results.get(symbol.toString() + date.toString());
 
-        if(equationResult == null)
-            equationResult = EquationResult.EMPTY;
+        if(expressionResult == null)
+            expressionResult = ExpressionResult.EMPTY;
 
-        return equationResult;
+        return expressionResult;
     }
 
     /**
-     * Clone this equation column.
+     * Clone this expression column.
      *
-     * @return Cloned equation column.
+     * @return Cloned expression column.
      */
     public Object clone() {
-        return new EquationColumn(getNumber(), getFullName(), getShortName(),
-                                  getVisible(), getEquation(), getExpression());
+        return new ExpressionColumn(getNumber(), getFullName(), getShortName(),
+                                    getVisible(), getExpressionText(), getExpression());
     }
 }

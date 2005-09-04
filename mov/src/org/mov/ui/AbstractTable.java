@@ -40,16 +40,17 @@ import org.mov.quote.Symbol;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
+import org.mov.util.TradingTime;
 
 /**
  * Helper for constructing tables. The abstract table sets up the look & feel for
  * tables in Venice. It also provides column sorting and helper methods for
- * equation columns.
+ * expression columns.
  *
  * @author Andrew Leppard
  * @see AbstractTableModel
  * @see Column
- * @see EquationColumn
+ * @see ExpressionColumn
  */
 public class AbstractTable extends SortedTable {
 
@@ -69,8 +70,8 @@ public class AbstractTable extends SortedTable {
     private ImageIcon downImageIcon;
     private ImageIcon unchangedImageIcon;
 
-    // List of show equation column menu items
-    private List showEquationColumnMenuItems;
+    // List of show expression column menu items
+    private List showExpressionColumnMenuItems;
 
     /**
      * Class for rendering all cells in the table. Not just stock quotes.
@@ -181,7 +182,8 @@ public class AbstractTable extends SortedTable {
 	setDefaultRenderer(QuoteFormat.class, new StockQuoteRenderer());
 	setDefaultRenderer(String.class, new StockQuoteRenderer());
 	setDefaultRenderer(TradingDate.class, new StockQuoteRenderer());
-        setDefaultRenderer(EquationResult.class, new StockQuoteRenderer());
+	setDefaultRenderer(TradingTime.class, new StockQuoteRenderer());
+        setDefaultRenderer(ExpressionResult.class, new StockQuoteRenderer());
         setDefaultRenderer(PointChangeFormat.class, new StockQuoteRenderer());
         setDefaultRenderer(Symbol.class, new StockQuoteRenderer());
 
@@ -223,21 +225,21 @@ public class AbstractTable extends SortedTable {
      * @param model Table model.
      */
     protected JMenu createShowColumnMenu(AbstractTableModel model) {
-        boolean foundEquationColumn = false;
+        boolean foundExpressionColumn = false;
 
         JMenu showColumnsMenu = new JMenu(Locale.getString("SHOW_COLUMNS"));
-        showEquationColumnMenuItems = new ArrayList();
+        showExpressionColumnMenuItems = new ArrayList();
 
         for(int i = 0; i < model.getColumnCount(); i++) {
             final Column column = model.getColumn(i);
 
             if(column.getVisible() != Column.ALWAYS_HIDDEN) {
-                boolean isEquationColumn = (column instanceof EquationColumn);
+                boolean isExpressionColumn = (column instanceof ExpressionColumn);
 
-                // Insert a bar between the ordinary columns and the equation
+                // Insert a bar between the ordinary columns and the expression
                 // columns
-                if(!foundEquationColumn && isEquationColumn) {
-                    foundEquationColumn = true;
+                if(!foundExpressionColumn && isExpressionColumn) {
+                    foundExpressionColumn = true;
                     showColumnsMenu.addSeparator();
                 }
 
@@ -251,50 +253,50 @@ public class AbstractTable extends SortedTable {
 
                 showMenuItem.setState(column.getVisible() == Column.VISIBLE);
                 
-                if(isEquationColumn)
-                    showEquationColumnMenuItems.add(showMenuItem);
+                if(isExpressionColumn)
+                    showExpressionColumnMenuItems.add(showMenuItem);
             }
         }
         return showColumnsMenu;
     }
 
     /**
-     * Helper method to display a dialog to let the user set equations. The
-     * user can input equations which are compiled and run against all the quotes
+     * Helper method to display a dialog to let the user set expressions. The
+     * user can input expressions which are compiled and run against all the quotes
      * in the table. The results are shown in columns which are made visible.
      *
      * @param model Quote table model.
      */
-    protected void applyEquations(final AbstractQuoteModel model) {
+    protected void applyExpressions(final AbstractQuoteModel model) {
 	// Handle all action in a separate thread so we dont
 	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
 	Thread thread = new Thread() {
 
 		public void run() {
-		    final EquationColumnDialog dialog =
-                        new EquationColumnDialog(model.getEquationColumns().length);
+		    final ExpressionColumnDialog dialog =
+                        new ExpressionColumnDialog(model.getExpressionColumns().length);
 
-		    // Did the user modify the equation columns?
-		    if(dialog.showDialog(model.getEquationColumns())) {
-                        final EquationColumn[] equationColumns = dialog.getEquationColumns();
+		    // Did the user modify the expression columns?
+		    if(dialog.showDialog(model.getExpressionColumns())) {
+                        final ExpressionColumn[] expressionColumns = dialog.getExpressionColumns();
 
-                        // Load equation columns with data
-                        model.setEquationColumns(equationColumns);
+                        // Load expression columns with data
+                        model.setExpressionColumns(expressionColumns);
 
                         SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-				    // Make sure all columns with an equation
+				    // Make sure all columns with an expression
 				    // are visible and all without are not.
 				    // Also update check box menus
-				    for(int i = 0; i < equationColumns.length; i++) {
-                                        boolean containsEquation =
-                                            equationColumns[i].getEquation().length() > 0;
+				    for(int i = 0; i < expressionColumns.length; i++) {
+                                        boolean containsExpression =
+                                            expressionColumns[i].getExpressionText().length() > 0;
                                         JCheckBoxMenuItem menuItem =
-                                            (JCheckBoxMenuItem)showEquationColumnMenuItems.get(i);
+                                            (JCheckBoxMenuItem)showExpressionColumnMenuItems.get(i);
 			
-                                        showColumn(equationColumns[i].getNumber(),
-                                                   containsEquation);
-                                        menuItem.setState(containsEquation);
+                                        showColumn(expressionColumns[i].getNumber(),
+                                                   containsExpression);
+                                        menuItem.setState(containsExpression);
                                     }
 
                                     model.fireTableStructureChanged();

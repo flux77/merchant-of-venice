@@ -40,7 +40,7 @@ import org.mov.util.Locale;
  * @author Andrew Leppard
  * @see AbstractTable
  * @see Column
- * @see EquationColumn
+ * @see ExpressionColumn
  */
 public class MixedQuoteModel extends AbstractQuoteModel {
 
@@ -57,35 +57,38 @@ public class MixedQuoteModel extends AbstractQuoteModel {
     /** Date column number. */
     public static final int DATE_COLUMN           = 1;
 
+    /** Time column number. */
+    public static final int TIME_COLUMN           = 2;
+
     /** Day close column number. */
-    public static final int LAST_COLUMN           = 2;
+    public static final int LAST_COLUMN           = 3;
 
     /** Point change column number. */
-    public static final int POINT_CHANGE_COLUMN   = 3;
+    public static final int POINT_CHANGE_COLUMN   = 4;
 
     /** Percent change column number. */
-    public static final int PERCENT_CHANGE_COLUMN = 4;
+    public static final int PERCENT_CHANGE_COLUMN = 5;
 
     /** Day low column number. */
-    public static final int BID_COLUMN            = 5;
+    public static final int BID_COLUMN            = 6;
 
     /** Day low column number. */
-    public static final int ASK_COLUMN            = 6;
+    public static final int ASK_COLUMN            = 7;
 
     /** Day open column number. */
-    public static final int DAY_OPEN_COLUMN       = 7;
+    public static final int DAY_OPEN_COLUMN       = 8;
 
     /** Day high column number. */
-    public static final int DAY_HIGH_COLUMN       = 8;
+    public static final int DAY_HIGH_COLUMN       = 9;
 
     /** Day low column number. */
-    public static final int DAY_LOW_COLUMN        = 9;
+    public static final int DAY_LOW_COLUMN        = 10;
 
     /** Volume column number. */
-    public static final int VOLUME_COLUMN         = 10;
+    public static final int VOLUME_COLUMN         = 11;
 
     /** Activity column number. */
-    public static final int ACTIVITY_COLUMN       = 11;
+    public static final int ACTIVITY_COLUMN       = 12;
 
     // redoc
     /**
@@ -114,6 +117,10 @@ public class MixedQuoteModel extends AbstractQuoteModel {
 			       Locale.getString("DATE"), 
 			       Locale.getString("DATE_COLUMN_HEADER"),
                                Symbol.class, displayDate));
+        columns.add(new Column(DATE_COLUMN, 
+			       Locale.getString("TIME"), 
+			       Locale.getString("TIME_COLUMN_HEADER"),
+                               Symbol.class, Column.HIDDEN));
         columns.add(new Column(LAST_COLUMN, 
 			       Locale.getString("LAST"), 
 			       Locale.getString("LAST_COLUMN_HEADER"),
@@ -182,6 +189,12 @@ public class MixedQuoteModel extends AbstractQuoteModel {
             
         case(DATE_COLUMN):
             return quote.getDate();
+
+        case(TIME_COLUMN):
+            if(idQuote != null)
+                return idQuote.getTime();
+            else
+                return null;
 
         case(LAST_COLUMN):
             return new QuoteFormat(quote.getDayClose());
@@ -265,8 +278,8 @@ public class MixedQuoteModel extends AbstractQuoteModel {
             return new Double(quote.getDayHigh() * quote.getDayVolume());
             
         default:
-            EquationColumn equationColumn = (EquationColumn)getColumn(column);
-            return equationColumn.getResult(quote.getSymbol(), quote.getDate());
+            ExpressionColumn expressionColumn = (ExpressionColumn)getColumn(column);
+            return expressionColumn.getResult(quote.getSymbol(), quote.getDate());
         }
     }
 }

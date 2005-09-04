@@ -39,57 +39,57 @@ import javax.swing.event.PopupMenuListener;
 import org.mov.main.CommandManager;
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.PreferencesModule;
-import org.mov.prefs.StoredEquation;
+import org.mov.prefs.StoredExpression;
 import org.mov.util.Locale;
 
 /**
- * Extension of JComboBox used for displaying an editable equation field
+ * Extension of JComboBox used for displaying an editable expression field
  * in the venice application. This ComboBox allows the user to select
- * equations entered in the Functions preferences page. This way the user
- * does not have to keep typing in the same equations multiple times.
+ * expressions entered in the Functions preferences page. This way the user
+ * does not have to keep typing in the same expressions multiple times.
  *
  * <pre>
- *	EquationComboBox comboBox = new EquationComboBox();
+ *	ExpressionComboBox comboBox = new ExpressionComboBox();
  *	panel.add(comboBox);
  * </pre>
  */
-public class EquationComboBox extends JComboBox implements PopupMenuListener {
+public class ExpressionComboBox extends JComboBox implements PopupMenuListener {
 
-    // Array of user's stored equations, entered via the prefs page or elsewhere
-    static List storedEquations;
+    // Array of user's stored expressions, entered via the prefs page or elsewhere
+    static List storedExpressions;
 
     private boolean isDialogUp = false;
     private JTextField textField;
 
     /**
-     * Create a new equation combo box.
+     * Create a new expression combo box.
      */
-    public EquationComboBox() {
+    public ExpressionComboBox() {
 	this("");
     }
 
     /**
-     * Create a new equation combo box with the given default equation
+     * Create a new expression combo box with the given default expression
      * text.
      *
-     * @param	equationText	equation text to display
+     * @param	expressionText	expression text to display
      */
-    public EquationComboBox(String equationText) {
+    public ExpressionComboBox(String expressionText) {
 	super();
 
 	setEditable(true);
 
-	// We have to load in the stored equations from preferences
-	// before we set the first equation - as it may have a name
+	// We have to load in the stored expressions from preferences
+	// before we set the first expression - as it may have a name
 	// Only do this the first time we are constructed - the stored
-	// equations are not stored per instance
-	if(storedEquations == null)
-	    updateEquations();
+	// expressions are not stored per instance
+	if(storedExpressions == null)
+	    updateExpressions();
 
-	setEquationText(equationText);
+	setExpressionText(expressionText);
 
         // The combo box must be big enough to hold this text. This makes it
-        // as wide as the equation combo box. Yes but on 1.4.1 it makes them short!
+        // as wide as the expression combo box. Yes but on 1.4.1 it makes them short!
         //	setPrototypeDisplayValue("avg(day_close, 15, 15) > 121");
 
 	// We want to know just before the popup items become visible
@@ -116,83 +116,83 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
    }
 
     /**
-     * Return the equation string in the ComboBox. If a name of an
-     * equation is in the box then its equation will be returned.
+     * Return the expression string in the ComboBox. If a name of an
+     * expression is in the box then its expression will be returned.
      *
-     * @return	equation string
+     * @return	expression string
      */
-    public String getEquationText() {
+    public String getExpressionText() {
 
 	// Get text displayed in combo box
 	String text = getText();
 
-	// Check to see if its a stored equation name - if it is
-	// well return the actual equation - not its name
-	StoredEquation storedEquation = findStoredEquationByName(text);
+	// Check to see if its a stored expression name - if it is
+	// well return the actual expression - not its name
+	StoredExpression storedExpression = findStoredExpressionByName(text);
 
-	if(storedEquation != null)
-	    return storedEquation.equation;
+	if(storedExpression != null)
+	    return storedExpression.expression;
 	else
 	    return text;
     }
 
     /**
-     * Return whether the current displayed equation is a stored equation.
-     * A stored equation is one the user has entered and can refer
+     * Return whether the current displayed expression is a stored expression.
+     * A stored expression is one the user has entered and can refer
      * to by using a keyword.
      *
-     * @return <code>true</code> if it is a stored equation.
+     * @return <code>true</code> if it is a stored expression.
      */
-    public boolean isStoredEquation() {
-	return findStoredEquationByName(getText()) != null;
+    public boolean isStoredExpression() {
+	return findStoredExpressionByName(getText()) != null;
     }
 
     /**
-     * Set the equation string in the ComboBox. If the given equation
+     * Set the expression string in the ComboBox. If the given expression
      * has a name, then the name will be displayed in the comboBox
-     * instead of the equation.
+     * instead of the expression.
      *
-     * @param	equationText	equation text to display
+     * @param	expressionText	expression text to display
      */
-    public void setEquationText(String equationText) {
-	// Check to see if the equation has a name. If it has then
-	// display the name instead of the equation
-	StoredEquation storedEquation = findStoredEquationByEquation(equationText);
+    public void setExpressionText(String expressionText) {
+	// Check to see if the expression has a name. If it has then
+	// display the name instead of the expression
+	StoredExpression storedExpression = findStoredExpressionByExpression(expressionText);
 	
-	if(storedEquation != null)
-	    setSelectedItem(storedEquation.name);
+	if(storedExpression != null)
+	    setSelectedItem(storedExpression.name);
 	else
-	    setSelectedItem(equationText);
+	    setSelectedItem(expressionText);
     }
 
     /**
-     * Tell all equation ComboBoxes that the stored equations have
+     * Tell all expression ComboBoxes that the stored expressions have
      * been modified by the user and that their popup menus need to be
      * changed.
      */
-    public static void updateEquations() {
-	// Load equations from preferences
-	storedEquations = PreferencesManager.loadStoredEquations();
+    public static void updateExpressions() {
+	// Load expressions from preferences
+	storedExpressions = PreferencesManager.loadStoredExpressions();
     }
 
-    // Searches through list of equations for the one with the given name
-    private StoredEquation findStoredEquationByName(String name) {
-	for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
-	    StoredEquation storedEquation = (StoredEquation)iterator.next();
-	    if(storedEquation.name.equals(name))
-		return storedEquation;
+    // Searches through list of expressions for the one with the given name
+    private StoredExpression findStoredExpressionByName(String name) {
+	for(Iterator iterator = storedExpressions.iterator(); iterator.hasNext();) {
+	    StoredExpression storedExpression = (StoredExpression)iterator.next();
+	    if(storedExpression.name.equals(name))
+		return storedExpression;
 	}
 
 	// If we got here we couldn't find it
 	return null;
     }
 
-    // Searches through list of equations for the one with the given equation
-    private StoredEquation findStoredEquationByEquation(String equation) {
-	for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
-	    StoredEquation storedEquation = (StoredEquation)iterator.next();
-	    if(storedEquation.equation.equals(equation))
-		return storedEquation;
+    // Searches through list of expressions for the one with the given expression
+    private StoredExpression findStoredExpressionByExpression(String expression) {
+	for(Iterator iterator = storedExpressions.iterator(); iterator.hasNext();) {
+	    StoredExpression storedExpression = (StoredExpression)iterator.next();
+	    if(storedExpression.expression.equals(expression))
+		return storedExpression;
 	}
 
 	// If we got here we couldn't find it
@@ -201,9 +201,9 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
 
     // Rebuild option items in this combo box
     private void updateItems() {
-	// First construct a new menu that begins with the current equation
-	// shown, then a sorted list of all the stored equations. If the
-	// current equation is a stored equation, make sure we don't show it
+	// First construct a new menu that begins with the current expression
+	// shown, then a sorted list of all the stored expressions. If the
+	// current expression is a stored expression, make sure we don't show it
 	// twice.
 
 	// Construct menu items
@@ -214,11 +214,11 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
 
 	List stored = new ArrayList();
 	
-	for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
-	    StoredEquation storedEquation = (StoredEquation)iterator.next();
+	for(Iterator iterator = storedExpressions.iterator(); iterator.hasNext();) {
+	    StoredExpression storedExpression = (StoredExpression)iterator.next();
 
-	    if(!storedEquation.name.equals(current))
-		stored.add(storedEquation.name);
+	    if(!storedExpression.name.equals(current))
+		stored.add(storedExpression.name);
 	}
 
 	Collections.sort(stored);
@@ -251,15 +251,15 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
                     if(!isDialogUp) {
                         isDialogUp = true;
 
-			StoredEquation storedEquation = 
-                            ExpressionEditorDialog.showAddDialog(storedEquations, 
+			StoredExpression storedExpression = 
+                            ExpressionEditorDialog.showAddDialog(storedExpressions, 
 								 Locale.getString("ADD_EQUATION"),
 								 getText());
 
-			if(storedEquation != null) {
-			    setEquationText(storedEquation.name);
-			    storedEquations.add(storedEquation);
-			    PreferencesManager.saveStoredEquations(storedEquations);
+			if(storedExpression != null) {
+			    setExpressionText(storedExpression.name);
+			    storedExpressions.add(storedExpression);
+			    PreferencesManager.saveStoredExpressions(storedExpressions);
 			}
 
                         isDialogUp = false;
@@ -273,9 +273,9 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
 	if(!isDialogUp) {
 	    isDialogUp = true;
 
-	    StoredEquation storedEquation = findStoredEquationByName(getText());
+	    StoredExpression storedExpression = findStoredExpressionByName(getText());
 
-	    if(storedEquation != null) {
+	    if(storedExpression != null) {
 		int option = 
 		    JOptionPane.showInternalConfirmDialog(DesktopManager.getDesktop(),
 							  Locale.getString("SURE_DELETE_EQUATION",
@@ -283,9 +283,9 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
 							  Locale.getString("DELETE_EQUATION"),
 							  JOptionPane.YES_NO_OPTION);
 		if(option == JOptionPane.YES_OPTION) {
-		    storedEquations.remove(storedEquation);
-		    PreferencesManager.saveStoredEquations(storedEquations);
-		    setEquationText("");
+		    storedExpressions.remove(storedExpression);
+		    PreferencesManager.saveStoredExpressions(storedExpressions);
+		    setExpressionText("");
 		}       
 	    }		
 
@@ -299,30 +299,30 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
                     if(!isDialogUp) {
                         isDialogUp = true;
 
-			if(isStoredEquation()) {
-			    // Edit the stored equation - provides an equation
-			    // name field as well as the equation field.
-			    StoredEquation storedEquation = 
-				findStoredEquationByName(getText());
-			    if (storedEquation != null) {
-				storedEquation = 
-				    ExpressionEditorDialog.showEditDialog(storedEquations,
+			if(isStoredExpression()) {
+			    // Edit the stored expression - provides an expression
+			    // name field as well as the expression field.
+			    StoredExpression storedExpression = 
+				findStoredExpressionByName(getText());
+			    if (storedExpression != null) {
+				storedExpression = 
+				    ExpressionEditorDialog.showEditDialog(storedExpressions,
 									  Locale.getString("EDIT_EQUATION"),
-									  storedEquation);
-				setEquationText(storedEquation.equation);
-				PreferencesManager.saveStoredEquations(storedEquations);
+									  storedExpression);
+				setExpressionText(storedExpression.expression);
+				PreferencesManager.saveStoredExpressions(storedExpressions);
 			    }
 			}
 			else {
-			    // Edit the equation - but do not provide an
-			    // equation name field as this isn't a stored
-			    // equation.
-			    String equationText = getEquationText();
-			    String newEquationText = 
+			    // Edit the expression - but do not provide an
+			    // expression name field as this isn't a stored
+			    // expression.
+			    String expressionText = getExpressionText();
+			    String newExpressionText = 
 				ExpressionEditorDialog.showEditDialog(Locale.getString("EDIT_EQUATION"),
-								      equationText);
+								      expressionText);
 
-			    setEquationText(newEquationText);
+			    setExpressionText(newExpressionText);
 			}
                         isDialogUp = false;
                     }
@@ -352,10 +352,10 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
             
             menu.add(editMenuItem);
 
-            boolean isStoredEquation = isStoredEquation();
+            boolean isStoredExpression = isStoredExpression();
 
             JMenuItem addMenuItem = new JMenuItem(Locale.getString("ADD"));
-            addMenuItem.setEnabled(!isStoredEquation);
+            addMenuItem.setEnabled(!isStoredExpression);
             addMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
 			showAddDialog();
@@ -363,7 +363,7 @@ public class EquationComboBox extends JComboBox implements PopupMenuListener {
             menu.add(addMenuItem);
             
             JMenuItem deleteMenuItem = new JMenuItem(Locale.getString("DELETE"));
-            deleteMenuItem.setEnabled(isStoredEquation);
+            deleteMenuItem.setEnabled(isStoredExpression);
             deleteMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
 			showDeleteDialog();

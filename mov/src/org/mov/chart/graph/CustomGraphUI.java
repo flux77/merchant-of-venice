@@ -35,7 +35,7 @@ import org.mov.parser.Variables;
 import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
-import org.mov.ui.EquationComboBox;
+import org.mov.ui.ExpressionComboBox;
 import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
@@ -48,14 +48,14 @@ import org.mov.util.TradingDate;
  */
 public class CustomGraphUI implements GraphUI {
 
-    // Variables to allow us to run the equation to check it for errors
+    // Variables to allow us to run the expression to check it for errors
     private Graphable source;
     private EODQuoteBundle quoteBundle;
     private Symbol symbol;
 
     // The graph's user interface
     private JPanel panel;
-    private EquationComboBox indicatorComboBox;
+    private ExpressionComboBox indicatorComboBox;
     private JCheckBox isPrimaryCheckBox;
 
     // String name of settings
@@ -89,9 +89,9 @@ public class CustomGraphUI implements GraphUI {
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
 
-        indicatorComboBox = GridBagHelper.addEquationRow(panel,
-                                                         Locale.getString("CUSTOM"),
-                                                         "", layout, c);
+        indicatorComboBox = GridBagHelper.addExpressionRow(panel,
+                                                           Locale.getString("CUSTOM"),
+                                                           "", layout, c);
         isPrimaryCheckBox = GridBagHelper.addCheckBoxRow(panel,
                                                          Locale.getString("IS_PRIMARY"),
                                                          true, layout, c);
@@ -116,13 +116,13 @@ public class CustomGraphUI implements GraphUI {
 
     public HashMap getSettings() {
         HashMap settings = new HashMap();
-        settings.put(INDICATOR, indicatorComboBox.getEquationText());
+        settings.put(INDICATOR, indicatorComboBox.getExpressionText());
         settings.put(IS_PRIMARY, isPrimaryCheckBox.isSelected()? "1" : "0");
         return settings;
     }
 
     public void setSettings(HashMap settings) {
-        indicatorComboBox.setEquationText(getIndicatorText(settings));
+        indicatorComboBox.setExpressionText(getIndicatorText(settings));
         isPrimaryCheckBox.setSelected(isPrimaryCheckBox.isSelected());
     }
 
@@ -156,7 +156,7 @@ public class CustomGraphUI implements GraphUI {
      * @param     source              the source containing the dates to work with
      * @param     symbol              the symbol to apply the expression
      * @param     quoteBundle         the quote bundle containing the quotes
-     * @exception EvaluationException if there was an error evaluating the equation
+     * @exception EvaluationException if there was an error evaluating the expression
      * @return    the custom graph
      */
     public static Graphable createCustom(Expression indicator,

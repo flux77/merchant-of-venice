@@ -21,22 +21,22 @@ package org.mov.ui;
 import org.mov.parser.expression.NumberExpression;
 
 /**
- * Representation of a result to be displayed in an {@link EquationColumn}.
+ * Representation of a result to be displayed in an {@link ExpressionColumn}.
  * This class is the type of the results displayed in that column.
  *
  * @author Andrew Leppard
  * @see AbstractTable
  * @see AbstractTableModel
  * @see EODQuoteModel
- * @see EquationColumn
+ * @see ExpressionColumn
  */
-public class EquationResult implements Comparable {
+public class ExpressionResult implements Comparable {
 
     // Set to true if the result actually contains a result. Set to false
     // if the result is empty.
     boolean isResult;
 
-    // Equation result type, e.g. {@link org.mov.parser.Expression#BOOLEAN_TYPE},
+    // Expression result type, e.g. {@link org.mov.parser.Expression#BOOLEAN_TYPE},
     // {@link org.mov.parser.Expression#FLOAT_TYPE} etc
     int type;
 
@@ -44,10 +44,10 @@ public class EquationResult implements Comparable {
     double result;
 
     /** Empty or missing result. */
-    public final static EquationResult EMPTY = new EquationResult();
+    public final static ExpressionResult EMPTY = new ExpressionResult();
 
     // Create a new result
-    private EquationResult() {
+    private ExpressionResult() {
         result = 0.0D;
         isResult = false;
     }
@@ -58,7 +58,7 @@ public class EquationResult implements Comparable {
      * @param type   Type of the result, e.g. {@link org.mov.parser.Expression#BOOLEAN_TYPE}
      * @param result Value of result.
      */
-    public EquationResult(int type, double result) {
+    public ExpressionResult(int type, double result) {
         isResult = true;
         this.type = type;
         this.result = result;
@@ -94,7 +94,7 @@ public class EquationResult implements Comparable {
      *         <code>1</code> if the result is after this result.
      */
     public int compareTo(Object object) {
-        EquationResult result = (EquationResult)object;
+        ExpressionResult result = (ExpressionResult)object;
         if(getResult() < result.getResult())
             return -1;
         if(getResult() > result.getResult())

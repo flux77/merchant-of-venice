@@ -58,6 +58,9 @@ public class Main extends JFrame {
     /** Release date, e.g. 13/Jan/2003 */
     public static String RELEASE_DATE = "13/" + Locale.getString("AUG") + "/2005";
 
+    /** Copyright date range, e.g. "2003-5" */
+    public static String COPYRIGHT_DATE_RANGE = "2003-5";
+
     /**
      * Get the main frame for the current application
      * @return The frame
@@ -78,7 +81,7 @@ public class Main extends JFrame {
         for(int i = 0; i < title.length(); i++)
             System.out.print("-");
         System.out.println("");
-        System.out.println(Locale.getString("COPYRIGHT", "2003-5") + ", " +
+        System.out.println(Locale.getString("COPYRIGHT", COPYRIGHT_DATE_RANGE) + ", " +
 			   "Andrew Leppard (aleppard@picknowl.com.au)");
         System.out.println(Locale.getString("SEE_LICENSE"));
 

@@ -42,7 +42,7 @@ import org.mov.parser.Parser;
 import org.mov.parser.Variable;
 import org.mov.parser.Variables;
 import org.mov.prefs.PreferencesManager;
-import org.mov.ui.EquationComboBox;
+import org.mov.ui.ExpressionComboBox;
 import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 
@@ -79,9 +79,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
     // Swing components
     private JCheckBox ruleFamilyEnabledCheckBox;
     
-    private EquationComboBox buyRuleEquationComboBox;
+    private ExpressionComboBox buyRuleExpressionComboBox;
     
-    private EquationComboBox sellRuleEquationComboBox;
+    private ExpressionComboBox sellRuleExpressionComboBox;
     
     private JTextField aRangeTextField;
     
@@ -126,11 +126,11 @@ public class RulesPage extends JPanel implements AnalyserPage {
             String value = (String) settings.get((Object) setting);
             
             if (setting.equals("buy_rule"))
-                buyRuleEquationComboBox.setEquationText(value);
+                buyRuleExpressionComboBox.setExpressionText(value);
             else if (setting.equals("is_rule_family"))
                 ruleFamilyEnabledCheckBox.setSelected(value.equals("1"));
             else if (setting.equals("sell_rule"))
-                sellRuleEquationComboBox.setEquationText(value);
+                sellRuleExpressionComboBox.setExpressionText(value);
             else if (setting.equals("arange"))
                 aRangeTextField.setText(value);
             else if (setting.equals("brange"))
@@ -147,8 +147,8 @@ public class RulesPage extends JPanel implements AnalyserPage {
     public void save(String key) {
         HashMap settings = new HashMap();
         
-        settings.put("buy_rule", buyRuleEquationComboBox.getEquationText());
-        settings.put("sell_rule", sellRuleEquationComboBox.getEquationText());
+        settings.put("buy_rule", buyRuleExpressionComboBox.getExpressionText());
+        settings.put("sell_rule", sellRuleExpressionComboBox.getExpressionText());
         settings.put("is_rule_family",
                      ruleFamilyEnabledCheckBox.isSelected() ? "1" : "0");
         settings.put("arange", aRangeTextField.getText());
@@ -166,8 +166,8 @@ public class RulesPage extends JPanel implements AnalyserPage {
         
         isFamilyEnabled = ruleFamilyEnabledCheckBox.isSelected();
         
-        String buyRuleString = buyRuleEquationComboBox.getEquationText();
-        String sellRuleString = sellRuleEquationComboBox.getEquationText();
+        String buyRuleString = buyRuleExpressionComboBox.getExpressionText();
+        String sellRuleString = sellRuleExpressionComboBox.getExpressionText();
         
         if (isFamilyEnabled) {
             variables.add("a", Expression.INTEGER_TYPE, Variable.CONSTANT);
@@ -336,9 +336,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
         
         // Rules panel
         {
-            TitledBorder equationTitled = new TitledBorder(Locale.getString("RULES_PAGE_TITLE"));
+            TitledBorder expressionTitled = new TitledBorder(Locale.getString("RULES_PAGE_TITLE"));
             JPanel panel = new JPanel();
-            panel.setBorder(equationTitled);
+            panel.setBorder(expressionTitled);
             panel.setLayout(new BorderLayout());
             
             JPanel innerPanel = new JPanel();
@@ -351,12 +351,12 @@ public class RulesPage extends JPanel implements AnalyserPage {
             c.anchor = GridBagConstraints.WEST;
             c.fill = GridBagConstraints.HORIZONTAL;
             
-            buyRuleEquationComboBox = GridBagHelper.addEquationRow(innerPanel,
-                                                                   Locale.getString("BUY_RULE"), "",
-                                                                   gridbag, c);
-            sellRuleEquationComboBox = GridBagHelper.addEquationRow(innerPanel,
-                                                                    Locale.getString("SELL_RULE"), 
-                                                                    "", gridbag, c);
+            buyRuleExpressionComboBox = GridBagHelper.addExpressionRow(innerPanel,
+                                                                       Locale.getString("BUY_RULE"), "",
+                                                                       gridbag, c);
+            sellRuleExpressionComboBox = GridBagHelper.addExpressionRow(innerPanel,
+                                                                        Locale.getString("SELL_RULE"), 
+                                                                        "", gridbag, c);
             
             panel.add(innerPanel, BorderLayout.NORTH);
             add(panel);

@@ -25,51 +25,51 @@ import java.util.List;
 import org.mov.ui.AbstractTable;
 import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
-import org.mov.ui.EquationComboBox;
+import org.mov.ui.ExpressionComboBox;
 import org.mov.ui.ExpressionEditorDialog;
 import org.mov.util.Locale;
 
 /**
- * The table in the Equation Preferences page that lists stored equations.
+ * The table in the Expression Preferences page that lists stored expressions.
  */
 public class EquationTable extends AbstractTable {
     private static final int NAME_COLUMN = 0;
-    private static final int EQUATION_COLUMN = 1;
+    private static final int EXPRESSION_COLUMN = 1;
 
     private Model model;
 
-    // Current list of stored equations in the table
-    private List storedEquations;
+    // Current list of stored expressions in the table
+    private List storedExpressions;
 
     private class Model extends AbstractTableModel {
 
-	private List storedEquations;
+	private List storedExpressions;
 
-	public Model(List columns, List storedEquations) {
+	public Model(List columns, List storedExpressions) {
 	    super(columns);
-	    this.storedEquations = storedEquations;
+	    this.storedExpressions = storedExpressions;
 	}
 	
 	public int getRowCount() {
-	    return storedEquations.size();
+	    return storedExpressions.size();
 	}
 
 	public Object getValueAt(int row, int column) {
-	    assert row < storedEquations.size();
-	    StoredEquation storedEquation = 
-		(StoredEquation)storedEquations.get(row);
+	    assert row < storedExpressions.size();
+	    StoredExpression storedExpression = 
+		(StoredExpression)storedExpressions.get(row);
 
 	    if(column == NAME_COLUMN) 
-		return storedEquation.name;
+		return storedExpression.name;
 	    else
-		return storedEquation.equation;
+		return storedExpression.expression;
 	}
         
     }
 
     /**
-     * Create a new equation table. The equation table will be initially populated from
-     * the current stored equations.
+     * Create a new expression table. The expression table will be initially populated from
+     * the current stored expressions.
      */
     public EquationTable() {
 	List columns = new ArrayList();
@@ -77,30 +77,30 @@ public class EquationTable extends AbstractTable {
 			       Locale.getString("NAME"), 
 			       Locale.getString("NAME_COLUMN_HEADER"), 
 			       String.class, Column.VISIBLE));
-	columns.add(new Column(EQUATION_COLUMN, 
+	columns.add(new Column(EXPRESSION_COLUMN, 
 			       Locale.getString("EQUATION"), 
 			       Locale.getString("FULL_EQUATION_COLUMN_HEADER"), 
 			       String.class, Column.VISIBLE));
 
-	storedEquations = PreferencesManager.loadStoredEquations();
+	storedExpressions = PreferencesManager.loadStoredExpressions();
 
-	model = new Model(columns, storedEquations);
+	model = new Model(columns, storedExpressions);
 	setModel(model);
 	showColumns(model);
     }
 
     /** 
-     * Display a dialog asking the user to enter a new stored equation.
+     * Display a dialog asking the user to enter a new stored expression.
      */
     public void add() {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
-		    StoredEquation storedEquation = 
-			ExpressionEditorDialog.showAddDialog(storedEquations, 
+		    StoredExpression storedExpression = 
+			ExpressionEditorDialog.showAddDialog(storedExpressions, 
 							     Locale.getString("ADD_EQUATION"));
 
-		    if(storedEquation != null) {
-                        storedEquations.add(storedEquation);
+		    if(storedExpression != null) {
+                        storedExpressions.add(storedExpression);
                         setModel(model);
                         model.fireTableDataChanged();
 			repaint();
@@ -112,19 +112,19 @@ public class EquationTable extends AbstractTable {
     }
 
     /** 
-     * Display a dialog allowing the user to edit the stored equation.
+     * Display a dialog allowing the user to edit the stored expression.
      *
-     * @param row the row of the stored equation to edit.
+     * @param row the row of the stored expression to edit.
      */
     public void edit(int row) {
-	if(row >= 0 && row < storedEquations.size()) {
-	    final StoredEquation storedEquation = (StoredEquation)storedEquations.get(row);
+	if(row >= 0 && row < storedExpressions.size()) {
+	    final StoredExpression storedExpression = (StoredExpression)storedExpressions.get(row);
 
 	    Thread thread = new Thread(new Runnable() {
 		    public void run() {
-			ExpressionEditorDialog.showEditDialog(storedEquations,
+			ExpressionEditorDialog.showEditDialog(storedExpressions,
 							      Locale.getString("EDIT_EQUATION"), 
-							      storedEquation);
+							      storedExpression);
                         model.fireTableDataChanged();
 			repaint();
 		    }
@@ -135,7 +135,7 @@ public class EquationTable extends AbstractTable {
     }
 
     /**
-     * Delete the stored equations in the given rows.
+     * Delete the stored expressions in the given rows.
      */
     public void delete(int[] rows) {
 	// Remove the last row first, then the second to last, etc...
@@ -143,8 +143,8 @@ public class EquationTable extends AbstractTable {
 
 	for(int i = rows.length - 1; i >= 0; i--) {
 	    int row = rows[i];
-	    if(row >= 0 && row < storedEquations.size())
-		storedEquations.remove(row);
+	    if(row >= 0 && row < storedExpressions.size())
+		storedExpressions.remove(row);
 	}
 
 	// For some reason we need to do an explicit repaint call
@@ -154,11 +154,11 @@ public class EquationTable extends AbstractTable {
     }
     
     /**
-     * Replace the stored equations in preferences with the stored equations in
-     * this table. Make sure everything is in-sync with the new equations.
+     * Replace the stored expressions in preferences with the stored expressions in
+     * this table. Make sure everything is in-sync with the new expressions.
      */
     public void save() {
-	PreferencesManager.saveStoredEquations(storedEquations);
-	EquationComboBox.updateEquations();
+	PreferencesManager.saveStoredExpressions(storedExpressions);
+	ExpressionComboBox.updateExpressions();
     }
 }

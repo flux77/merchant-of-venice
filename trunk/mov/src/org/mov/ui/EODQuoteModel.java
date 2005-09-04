@@ -36,8 +36,8 @@ import org.mov.util.Locale;
  * @author Andrew Leppard
  * @see AbstractTable
  * @see Column
- * @see EquationColumn
- * @see QuoteBundle
+ * @see ExpressionColumn
+ * @see org.mov.quote.QuoteBundle
  */
 public class EODQuoteModel extends AbstractQuoteModel {
 
@@ -216,8 +216,8 @@ public class EODQuoteModel extends AbstractQuoteModel {
             return new Double(quote.getDayHigh() * quote.getDayVolume());
             
         default:
-            EquationColumn equationColumn = (EquationColumn)getColumn(column);
-            return equationColumn.getResult(quote.getSymbol(), quote.getDate());
+            ExpressionColumn expressionColumn = (ExpressionColumn)getColumn(column);
+            return expressionColumn.getResult(quote.getSymbol(), quote.getDate());
         }
     }
 }

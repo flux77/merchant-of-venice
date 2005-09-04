@@ -39,7 +39,6 @@ import org.mov.chart.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.help.HelpModule;
-import org.mov.util.ExpressionQuery;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.portfolio.Portfolio;
@@ -60,6 +59,7 @@ import org.mov.table.WatchScreen;
 import org.mov.table.WatchScreenModule;
 import org.mov.importer.PreferencesXML;
 import org.mov.ui.DesktopManager;
+import org.mov.ui.ExpressionQuery;
 import org.mov.ui.GPLViewDialog;
 import org.mov.ui.MainMenu;
 import org.mov.ui.ProgressDialog;
@@ -921,7 +921,8 @@ public class CommandManager {
 				   Main.LONG_VERSION + " / " +
                                    Main.RELEASE_DATE + "\n" +
 
-				   Locale.getString("COPYRIGHT", "2003-4") + ", " +
+				   Locale.getString("COPYRIGHT",
+                                                    Main.COPYRIGHT_DATE_RANGE) + ", " +
 				   "Andrew Leppard\n\n" +
 
                                    "Andrew Leppard (aleppard@picknow.com.au)\n\n" +

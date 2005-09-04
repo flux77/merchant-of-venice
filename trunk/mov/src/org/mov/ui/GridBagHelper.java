@@ -79,25 +79,25 @@ public class GridBagHelper {
     }
 
     /**
-     * Append a new row containing an equation combo box button to the form.
+     * Append a new row containing an expression combo box button to the form.
      *
      * @param panel form panel
-     * @param field text to display next to equation combo box
+     * @param field text to display next to expression combo box
      * @param value initial value of combo box
      * @param gridbag the form's gridbag
      * @param c the form's constraints
      * @return the combo box
      */
-    public static EquationComboBox addEquationRow(JPanel panel, String field, 
-                                                  String value,
-                                                  GridBagLayout gridbag,
-                                                  GridBagConstraints c) {
+    public static ExpressionComboBox addExpressionRow(JPanel panel, String field, 
+                                                      String value,
+                                                      GridBagLayout gridbag,
+                                                      GridBagConstraints c) {
 	JLabel label = new JLabel(field);
 	c.gridwidth = 1;
 	gridbag.setConstraints(label, c);
 	panel.add(label);
 
-	EquationComboBox comboBox = new EquationComboBox(value);
+	ExpressionComboBox comboBox = new ExpressionComboBox(value);
         if(c.gridx != -1)
             c.gridx++;
 	c.gridwidth = GridBagConstraints.REMAINDER;

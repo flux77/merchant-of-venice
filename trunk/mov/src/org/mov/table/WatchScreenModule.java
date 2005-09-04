@@ -80,7 +80,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     private JMenuItem tableClose;
     private JMenuItem renameWatchScreen;
     private JMenuItem deleteWatchScreen;
-    private JMenuItem applyEquationsMenuItem;
+    private JMenuItem applyExpressionsMenuItem;
 
     // Poup menu items
     private JMenuItem popupRemoveSymbols = null;
@@ -199,8 +199,8 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             
             tableMenu.addSeparator();
 
-            applyEquationsMenuItem = MenuHelper.addMenuItem(this, tableMenu,
-                                                            Locale.getString("APPLY_EQUATIONS"));
+            applyExpressionsMenuItem = MenuHelper.addMenuItem(this, tableMenu,
+                                                              Locale.getString("APPLY_EQUATIONS"));
 
             tableMenu.addSeparator();
             
@@ -390,9 +390,9 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
         else if(e.getSource() == addSymbols)
             addSymbols();
 
-        // Apply equations to watch screen
-        else if(e.getSource() == applyEquationsMenuItem)
-            applyEquations(model);
+        // Apply expressions to watch screen
+        else if(e.getSource() == applyExpressionsMenuItem)
+            applyExpressions(model);
         
         // Delete watch screen
         else if(e.getSource() == deleteWatchScreen)

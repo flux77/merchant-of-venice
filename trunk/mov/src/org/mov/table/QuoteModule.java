@@ -44,12 +44,17 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.mov.main.*;
-import org.mov.util.ExpressionQuery;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.parser.*;
 import org.mov.quote.*;
-import org.mov.ui.*;
+import org.mov.ui.AbstractTable;
+import org.mov.ui.Column;
+import org.mov.ui.DesktopManager;
+import org.mov.ui.EODQuoteModel;
+import org.mov.ui.ExpressionQuery;
+import org.mov.ui.MenuHelper;
+import org.mov.ui.SymbolListDialog;
 
 /**
  * Venice module for displaying a table of stock quotes. This module allows a user
@@ -64,7 +69,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     private JMenuItem findSymbol;
     private JMenuItem graphSymbols;
     private JMenuItem tableSymbols;
-    private JMenuItem applyEquations;
+    private JMenuItem applyExpressions;
     private JMenuItem applyFilter;
     private JMenuItem sortByMostActive;
     private JMenuItem exportMenu;
@@ -82,8 +87,8 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
 
-    // Current equation we are filtering by
-    private String filterEquationString;
+    // Current expression we are filtering by
+    private String filterExpressionString;
 
     // If set to true we only display the quotes for the last date in the
     // quote bundle
@@ -109,28 +114,28 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
     /**
      * Create a new module that only lists the quotes in the given bundle where
-     * the filter equation returns true. Set the <code>singleDate</code> flag
+     * the filter expression returns true. Set the <code>singleDate</code> flag
      * if you want to display a single day's trading - and don't want to display
-     * the quotes from the bundle that may appear from executing some equations.
+     * the quotes from the bundle that may appear from executing some expressions.
      * (e.g. comparing today's prices to yesterdays).
      *
      * @param quoteBundle quotes to table
-     * @param filterEquationString equation string to filter by
+     * @param filterExpressionString expression string to filter by
      * @param singleDate if this is set to true then only display the quotes
      *                     on the last date in the quote bundle, otherwise
      *                     display them all. 
      */
     public QuoteModule(EODQuoteBundle quoteBundle,
-                       String filterEquationString,
+                       String filterExpressionString,
                        boolean singleDate) {
 	
-	this.filterEquationString = filterEquationString;
+	this.filterExpressionString = filterExpressionString;
 	this.quoteBundle = quoteBundle;
         this.singleDate = singleDate;
 	propertySupport = new PropertyChangeSupport(this);
 
 	// Get list of quotes to display
-	List quotes = extractQuotesUsingRule(filterEquationString, quoteBundle);
+	List quotes = extractQuotesUsingRule(filterExpressionString, quoteBundle);
 
         // If we are listing stocks on a single day then don't bother showing
         // the date column. On the other hand if we are only listing a single
@@ -234,20 +239,20 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     }
 
     // Extract all quotes from the quote bundle which cause the given
-    // equation to equate to true. If there is no equation (string is null or
+    // expression to equate to true. If there is no expression (string is null or
     // empty) then extract all the quotes.
-    private List extractQuotesUsingRule(String filterEquation,
+    private List extractQuotesUsingRule(String filterExpression,
                                         EODQuoteBundle quoteBundle) {      
 
         // If there is no rule, then just return all quotes
-	if(filterEquation == null || filterEquation.length() == 0) 
+	if(filterExpression == null || filterExpression.length() == 0) 
             return extractAllQuotes(quoteBundle);
 
-        // First parse the equation
+        // First parse the expression
         Expression expression = null;
         
         try {
-            expression = Parser.parse(filterEquationString);
+            expression = Parser.parse(filterExpressionString);
         }
         catch(ExpressionException e) {
             // We should have already checked the string for errors before here
@@ -295,7 +300,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	    // delete erroneous expression
 	    expression = null;
 
-            // If the equation didn't evaluate then just return all the quotes
+            // If the expression didn't evaluate then just return all the quotes
             return extractAllQuotes(quoteBundle);
 	}
     }
@@ -313,7 +318,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             
             tableMenu.addSeparator();
 
-            applyEquations =
+            applyExpressions =
                 MenuHelper.addMenuItem(this, tableMenu,
                                        Locale.getString("APPLY_EQUATIONS"));
             
@@ -366,7 +371,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	checkMenuDisabledStatus();
     }
 
-    // Allow the user to show only stocks where the given equation is true
+    // Allow the user to show only stocks where the given expression is true
     private void applyFilter() {
 	// Handle all action in a separate thread so we dont
 	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
@@ -377,18 +382,18 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 		    JDesktopPane desktop =
 			org.mov.ui.DesktopManager.getDesktop();
 
-		    String equationString =
+		    String expressionString =
 			ExpressionQuery.getExpression(desktop,
 						      Locale.getString("FILTER_BY_RULE"),
 						      Locale.getString("BY_RULE"),
-						      filterEquationString);
+						      filterExpressionString);
 
-		    if(equationString != null) {
-			filterEquationString = equationString;
+		    if(expressionString != null) {
+			filterExpressionString = expressionString;
 
 			// Get new list of symbols to display
 			final List quotes =
-                            extractQuotesUsingRule(filterEquationString, quoteBundle);
+                            extractQuotesUsingRule(filterExpressionString, quoteBundle);
 
 			// Update table
 			SwingUtilities.invokeLater(new Runnable() {
@@ -581,8 +586,8 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
 	}
 
-	else if(e.getSource() == applyEquations) {
-	    applyEquations(model);
+	else if(e.getSource() == applyExpressions) {
+	    applyExpressions(model);
 	}
 
 	else if(e.getSource() == applyFilter) {

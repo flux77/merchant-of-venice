@@ -237,43 +237,43 @@ public class PreferencesManager {
     }
 
     /**
-     * Load the list of all stored equations.
+     * Load the list of all stored expressions.
      *
-     * @return the list of stored equations.
-     * @see StoredEquation
+     * @return the list of stored expressions.
+     * @see StoredExpression
      */
-    public static synchronized List loadStoredEquations() {
-	List storedEquations = new ArrayList();
+    public static synchronized List loadStoredExpressions() {
+	List storedExpressions = new ArrayList();
 	Preferences prefs = getUserNode("/equations");
 
 	try {
 	    String[] keys = prefs.keys();
 	    for(int i = 0; i < keys.length; i++)
-		storedEquations.add(new StoredEquation(keys[i], prefs.get(keys[i], "")));
+		storedExpressions.add(new StoredExpression(keys[i], prefs.get(keys[i], "")));
 	}
 	catch(BackingStoreException e) {
 	    // ignore
 	}
 
-	return storedEquations;
+	return storedExpressions;
     }
 
     /**
-     * Save the list of all stored equations.
+     * Save the list of all stored expressions.
      *
-     * @param storedEquations the stored equations.
-     * @see StoredEquation
+     * @param storedExpressions the stored expressions.
+     * @see StoredExpression
      */
-    public static synchronized void saveStoredEquations(List storedEquations) {
+    public static synchronized void saveStoredExpressions(List storedExpressions) {
 	try {
-	    // Remove old equations
+	    // Remove old expressions
 	    Preferences prefs = getUserNode("/equations");
 	    prefs.removeNode();
 	    prefs = getUserNode("/equations");
 
-	    for(Iterator iterator = storedEquations.iterator(); iterator.hasNext();) {
-		StoredEquation storedEquation = (StoredEquation)iterator.next();
-		prefs.put(storedEquation.name, storedEquation.equation);
+	    for(Iterator iterator = storedExpressions.iterator(); iterator.hasNext();) {
+		StoredExpression storedExpression = (StoredExpression)iterator.next();
+		prefs.put(storedExpression.name, storedExpression.expression);
 	    }
 	}
 	catch(BackingStoreException e) {

@@ -16,15 +16,19 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
- package org.mov.util;
+package org.mov.ui;
 
-import javax.swing.*;
+import javax.swing.JDesktopPane;
+import javax.swing.JOptionPane;
 
-import org.mov.parser.*;
-import org.mov.ui.*;
+import org.mov.parser.Expression;
+import org.mov.parser.ExpressionException;
+import org.mov.parser.Parser;
 
 /**
  * A dialog used for querying the user for an expression string.
+ *
+ * @author Andrew Leppard
  */
 public class ExpressionQuery {
 
@@ -73,8 +77,8 @@ public class ExpressionQuery {
 	    invalidResponse = false;
 
 	    // Prompt user for expression
-	    EquationDialog dlg = new EquationDialog(parent, prompt, title,
-						    expressionString);
+	    ExpressionDialog dlg = new ExpressionDialog(parent, prompt, title,
+                                                        expressionString);
 	    expressionString = dlg.showDialog();
 
 	    // Parse expression checking for type errors

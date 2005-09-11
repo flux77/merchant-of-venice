@@ -19,6 +19,9 @@
 package org.mov.util;
 
 import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Date;
 
 /**
  * A replacement time for java.util.Calendar.
@@ -31,12 +34,29 @@ import java.text.NumberFormat;
  */
 public class TradingTime implements Cloneable, Comparable {
 
+    // Hour from 0 to 23.
     private int hour;
+
+    // Minute from 0 to 59
     private int minute;
+
+    // Second from 0 to 62 (leap seconds)
     private int second;
 
     // Format to display minutes and seconds
     private static NumberFormat format = null;
+
+    /** Number of hours in one day. */
+    public final static int HOURS_IN_DAY = 24;
+
+    /** Number of minutes in one hour. */
+    public final static int MINUTES_IN_HOUR = 60;
+
+    /** Number of seconds in one minute. */
+    public final static int SECONDS_IN_MINUTE = 60;
+
+    /** Number of milliseconds in one second. */
+    public final static int MILLISECONDS_IN_SECOND = 1000;
 
     /**
      * Create a new time from the given hour, minute and second.
@@ -49,6 +69,17 @@ public class TradingTime implements Cloneable, Comparable {
         this.hour = hour;
         this.minute = minute;
         this.second = second;
+    }
+
+    /**
+     * Create a new time set to now.
+     */
+    public TradingTime() {
+	GregorianCalendar calendar = new GregorianCalendar();
+	calendar.setTime(new Date());
+	hour = calendar.get(Calendar.HOUR_OF_DAY);
+	minute = calendar.get(Calendar.MINUTE);
+	second = calendar.get(Calendar.SECOND);
     }
 
     /*
@@ -146,6 +177,38 @@ public class TradingTime implements Cloneable, Comparable {
         // Simple range checking
         if(hour > 23 || minute > 59 || second > 62)
             throw new TradingTimeFormatException(time);
+    }
+
+    /**
+     * Tests if this time is before the specified time.
+     *
+     * @param	time the specified time to compare
+     * @return	<code>true</code> if the given time is before this one
+     */
+    public boolean before(Object time) {
+	return (compareTo(time) < 0);
+    }
+
+    /**
+     * Tests if this time is after the specified time.
+     *
+     * @param	time the specified time to compare
+     * @return	<code>true</code> if the specified time is before this one;
+     *		<code>false</code> otherwise.
+     */
+    public boolean after(Object time) {
+	return (compareTo(time) > 0);
+    }
+
+    /**
+     * Compares this time with the specified object.
+     *
+     * @param	time the specified time to compare
+     * @return	<code>true</code> if the specified time is equal;
+     * <code>false</code> otherwise.
+     */
+    public boolean equals(Object time) {
+	return (compareTo(time) == 0);
     }
 
     /*

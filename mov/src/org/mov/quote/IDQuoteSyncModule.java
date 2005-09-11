@@ -201,15 +201,18 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     }
 
     /**
-     * Configure Venice to sync Intra-day quotes according to the values given on the user interface.
+     * Configure Venice to sync Intra-day quotes according to the values given on the user
+     * interface.
      */
     private void sync() {
-
         // Parse sync configuration parameters
         if (parse()) {
 
             // Save configuration parameters to preferences
             saveConfiguration();
+
+            // Activate configuration
+            activateConfiguration();
 
             // Tell frame we want to close
             propertySupport.firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
@@ -281,6 +284,17 @@ public class IDQuoteSyncModule extends JPanel implements Module {
         prefs.closeTime = closeTime;
         prefs.period = period;
         PreferencesManager.saveIDQuoteSyncPreferences(prefs);
+    }
+
+    /**
+     * Activate configuration. Call the module that automatically downloads
+     * intra-day quotes and update it for the new settings.
+     */
+    private void activateConfiguration() {
+        IDQuoteSync.getInstance().setPeriod(period);
+        IDQuoteSync.getInstance().addSymbols(symbolList);
+        IDQuoteSync.getInstance().setTimeRange(openTime, closeTime);
+        IDQuoteSync.getInstance().setEnabled(isEnabled);
     }
 
     /**

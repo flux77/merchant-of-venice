@@ -376,6 +376,18 @@ public class TradingDate implements Cloneable, Comparable {
     }
 
     /**
+     * Return whether the current date falls on a weekend.
+     *
+     * @return <code>true</code> if the current date is on a weekend.
+     */
+    public boolean isWeekend() {
+        Calendar date = this.toCalendar();
+
+        return(date.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
+               date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
+    }
+
+    /**
      * Compare the current date to the specified object.
      *
      * @see #compareTo(TradingDate)
@@ -566,6 +578,20 @@ public class TradingDate implements Cloneable, Comparable {
      */
     public Date toDate() {
 	return this.toCalendar().getTime();
+    }
+
+    /**
+     * Convert this object and a {@link TradingTime} to a java.util.Date.
+     *
+     * @return <code>java.util.Date</code>
+     */
+    public Date toDate(TradingTime time) {
+        Calendar calendar = toCalendar();
+        calendar.set(Calendar.HOUR_OF_DAY, time.getHour());
+        calendar.set(Calendar.MINUTE, time.getMinute());
+        calendar.set(Calendar.SECOND, time.getSecond());
+        
+        return calendar.getTime();
     }
 
     /**

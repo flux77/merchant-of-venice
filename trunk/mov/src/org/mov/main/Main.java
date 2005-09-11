@@ -22,18 +22,22 @@ import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import org.mov.macro.MacroManager;
 import org.mov.prefs.PreferencesManager;
+import org.mov.quote.IDQuoteSync;
 import org.mov.quote.QuoteSourceManager;
+import org.mov.quote.Symbol;
+import org.mov.quote.SymbolFormatException;
 import org.mov.ui.GPLViewDialog;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
 import org.mov.util.Locale;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The top level class which contains the main() function. This class builds
@@ -179,6 +183,24 @@ public class Main extends JFrame {
         } catch (java.lang.NoClassDefFoundError err) {
             System.out.println(Locale.getString("NO_JYTHON_ERROR"));
         }
+
+        // Start up intra-day quote sync
+        PreferencesManager.IDQuoteSyncPreferences idQuoteSyncPreferences =
+            PreferencesManager.loadIDQuoteSyncPreferences();
+        IDQuoteSync.getInstance().setPeriod(idQuoteSyncPreferences.period);
+
+        try {
+            List symbols = new ArrayList(Symbol.toSortedSet(idQuoteSyncPreferences.symbols,
+                                                            false));
+            
+            IDQuoteSync.getInstance().addSymbols(symbols);
+        } catch(SymbolFormatException e) {
+            // Ignore error in preferences
+        }
+
+        IDQuoteSync.getInstance().setTimeRange(idQuoteSyncPreferences.openTime,
+                                               idQuoteSyncPreferences.closeTime);
+        IDQuoteSync.getInstance().setEnabled(idQuoteSyncPreferences.isEnabled);
     }
 }
 

@@ -295,7 +295,7 @@ public class ImportQuoteModule extends JPanel implements Module {
         p.put("fileFilter", (String)formatComboBox.getSelectedItem());
     }
 
-    /*
+    /**
      * Import quotes from files.
      */
     private void importQuotesFromFiles() {
@@ -334,12 +334,20 @@ public class ImportQuoteModule extends JPanel implements Module {
                 progress.increment();
             }
 
+            QuoteSourceManager.flush();
             ProgressDialogManager.closeProgressDialog(progress);
             displayReport(report, quotesImported);
         }
     }
 
-    // DOC
+    /**
+     * Import quotes from single file.
+     *
+     * @param database database to store quotes
+     * @param report   report to update
+     * @param file     file to import
+     * @return number of quotes imported
+     */
     private int importQuotesFromSingleFile(DatabaseQuoteSource database, Report report, File file) {
         int quotesImported = 0;
         FileEODQuoteImport importer = new FileEODQuoteImport(report, filter);
@@ -462,6 +470,7 @@ public class ImportQuoteModule extends JPanel implements Module {
                 DesktopManager.showErrorMessage(e.getMessage());
             }
 
+            QuoteSourceManager.flush();
             ProgressDialogManager.closeProgressDialog(progress);
             displayReport(report, quotesImported);
         }
@@ -543,6 +552,7 @@ public class ImportQuoteModule extends JPanel implements Module {
 
         // Give the user the option of viewing the import report
         Object[] options = {Locale.getString("OK"), Locale.getString("VIEW_REPORT")};
+
         int option = JOptionPane.showInternalOptionDialog(desktop, 
                                                           message, 
                                                           Locale.getString("IMPORT_COMPLETE_TITLE"),

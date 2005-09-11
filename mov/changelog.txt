@@ -2,6 +2,8 @@ Changes for Venice, 0.6 beta 1/Sep/2005
 =======================================
 
 * Updates to Gondola Language:
+  - Performance improvements due to stronger internal typing
+    (Alberto Nacher).
   - Added sin() (Alberto Nacher).
   - Added cos() (Alberto Nacher).
   - Added log() (Alberto Nacher).
@@ -26,6 +28,8 @@ Changes for Venice, 0.6 beta 1/Sep/2005
   - Fixed a user interface bug where adding new equations to a
     table resulted in any present equation columns being removed and
     then re-added.
+  - Fixed an introduced bug in 0.5 where you needed to reload Venice
+    after importing new quotes.
 
 Changes for Venice, 0.51 alpha 13/Apr/2005
 ==========================================

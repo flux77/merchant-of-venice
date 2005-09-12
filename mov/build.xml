@@ -43,8 +43,8 @@
       <format property="today" pattern="ddmmyyyy"/>
     </tstamp>
     <mkdir dir="${backup}"/>
-    <get src="http://cvs.sourceforge.net/cvstarballs/mov-cvsroot.tar.gz"
-         dest="${backup}/backup-${today}.tar.gz"
+    <get src="http://cvs.sourceforge.net/cvstarballs/mov-cvsroot.tar.bz2"
+         dest="${backup}/backup-${today}.tar.bz2"
 	 verbose="true"/>
   </target>
 

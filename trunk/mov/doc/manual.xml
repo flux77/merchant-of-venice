@@ -855,7 +855,7 @@ CBA over 30 days ending in yesterday.</para>
 <section name="Cosine">
 <para>The cosine function returns the cosine of the given value.</para>
 <para><code>cos(VALUE)</code></para>
-<para>Where VALUE can be any float or integer.
+<para>Where VALUE can be any float or integer.</para>
 <para>Example:</para>
 <para><code>cos(0)</code></para>
 <para>Returns 1.0</para>
@@ -1087,7 +1087,7 @@ trading date, -1 means the previous trading date, etc.</para>
 <section name="Sine">
 <para>The sine function returns the sine of the given value.</para>
 <para><code>sin(VALUE)</code></para>
-<para>Where VALUE can be any float or integer.
+<para>Where VALUE can be any float or integer.</para>
 <para>Example:</para>
 <para><code>sin(0)</code></para>
 <para>Returns 0.0</para>
@@ -1465,7 +1465,7 @@ so that the genetic algorithm can find out a solution more easily, if a solution
 The following sections show you two examples which can help you.</para>
 
 <section name="RSI Example">
-<para>A simple example is to use the following rules: buy rule: <code>rsi(14)<32.0 + paramBuy</code>,
+<para>A simple example is to use the following rules: buy rule: <code>rsi(14)&lt;32.0 + paramBuy</code>,
 sell rule: <code>rsi(14)>72.0 + paramSell</code>. If you set paramBuy and paramSell with values changing from 0.0 to 1.0,
 I suppose you to find good solutions to the most of the trading periods. Pain attention to the parameters' setting;
 In this example we've set the parameters as float, otherwise set as integer you would have had only few solutions (4):

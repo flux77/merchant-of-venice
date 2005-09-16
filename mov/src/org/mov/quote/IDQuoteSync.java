@@ -222,6 +222,27 @@ public class IDQuoteSync {
     }
     
     /**
+     * Return whether the automatic downloading of intra-day quotes is enabled.
+     *
+     * @return <code>true</code> if enabled.
+     */
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    /**
+     * Return whether the automatic downloading of intra-day quotes is running.
+     * This function does not return whether we are currently in the processing
+     * of downloading new quotes. Instead it returns whether the timer is currently
+     * active and we are periodically downloading new intra-day quotes.
+     *
+     * @return <code>true</code> if running.
+     */
+    public boolean isRunning() {
+        return(syncTimer != null);
+    }
+
+    /**
      * Return the list of symbols of the intra-day quotes to download.
      *
      * @return symbols list

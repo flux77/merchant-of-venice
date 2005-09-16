@@ -174,7 +174,7 @@ public class MainMenu implements ActionListener, ModuleListener
         // File -> Import -> Sync Intra-day Quotes
         fileSyncIDQuotesMenuItem =
             MenuHelper.addMenuItem(this, fileSyncMenu, Locale.getString("INTRA_DAY_QUOTES"));
-        fileSyncIDQuotesMenuItem.setEnabled(false);
+        //        fileSyncIDQuotesMenuItem.setEnabled(false);
 
         // File -> Export
         fileExportMenu = MenuHelper.addMenu(fileMenu, Locale.getString("EXPORT"), 'E');

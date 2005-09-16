@@ -27,6 +27,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +45,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import org.mov.main.Module;
@@ -541,28 +543,43 @@ public class ImportQuoteModule extends JPanel implements Module {
      * @param report the report to display
      * @param quotesImported the number of quotes imported
      */
-    private void displayReport(Report report, int quotesImported) {
-        String message = Locale.getString("IMPORTED_QUOTES", quotesImported);
-
-        if((report.getErrorCount() + report.getWarningCount()) > 0)
-            message = message.concat("\n" +
-                                     Locale.getString("IMPORTED_WARNINGS", 
-                                                      report.getErrorCount(),
-                                                      report.getWarningCount()));
-
-        // Give the user the option of viewing the import report
-        Object[] options = {Locale.getString("OK"), Locale.getString("VIEW_REPORT")};
-
-        int option = JOptionPane.showInternalOptionDialog(desktop, 
-                                                          message, 
-                                                          Locale.getString("IMPORT_COMPLETE_TITLE"),
-                                                          JOptionPane.DEFAULT_OPTION,
-                                                          JOptionPane.INFORMATION_MESSAGE,
-                                                          null,
-                                                          options,
-                                                          options[0]);
-        if(option == 1)
-            TextViewDialog.showTextDialog(report.getText(), Locale.getString("IMPORT_REPORT"));
+    private void displayReport(final Report report, final int quotesImported) {
+        // TODO: Hmm!
+        //        try {
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        String message = Locale.getString("IMPORTED_QUOTES", quotesImported);
+                        
+                        if((report.getErrorCount() + report.getWarningCount()) > 0)
+                            message = message.concat("\n" +
+                                                     Locale.getString("IMPORTED_WARNINGS", 
+                                                                      report.getErrorCount(),
+                                                                      report.getWarningCount()));
+                        
+                        // Give the user the option of viewing the import report
+                        Object[] options = {Locale.getString("OK"), Locale.getString("VIEW_REPORT")};
+                        
+                        int option =
+                            JOptionPane.showInternalOptionDialog(desktop, 
+                                                                 message, 
+                                                                 Locale.getString("IMPORT_COMPLETE_TITLE"),
+                                                                 JOptionPane.DEFAULT_OPTION,
+                                                                 JOptionPane.INFORMATION_MESSAGE,
+                                                                 null,
+                                                                 options,
+                                                                 options[0]);
+                        if(option == 1)
+                            TextViewDialog.showTextDialog(report.getText(), Locale.getString("IMPORT_REPORT"));
+                        
+                    }
+                });
+            //        }
+    //        catch(InterruptedException e) {
+            // don't care
+    //   }
+    //    catch(InvocationTargetException e) {
+            // don't care
+    //    }
     }
 
     /**

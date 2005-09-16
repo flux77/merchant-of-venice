@@ -25,25 +25,27 @@ import org.mov.parser.EvaluationException;
 import org.mov.util.TradingDate;
 
 // TODO: Doc
-
-// what do we do if it isn't enabled? if its disabled, i want the day close difference etc
-// to be properly displayed. This won't do that... maybe we need to check the id quote bundle
-// and if it's availabe use it, otherwise shift the quotes down. That way we don't have
-// to make up a half-arsed quote. When the quotes come in, the bundle "shifts".
-
-// how can I do tht without stuffing things up?
 public class MixedQuoteBundle implements QuoteBundle {
 
+    // Contains the end of day quotes
     private EODQuoteBundle eodQuoteBundle;
-    private IDQuoteBundle idQuoteBundle;
-    private IDQuoteCache idQuoteCache;
-    private boolean isIDAvailable;
-    
-    public MixedQuoteBundle(List symbols) {
-        idQuoteCache = IDQuoteCache.getInstance();
-        isIDAvailable = false;
 
-        eodQuoteBundle = new EODQuoteBundle(new EODQuoteRange(symbols));
+    // Contains the intra-day quotes
+    private IDQuoteBundle idQuoteBundle;
+    
+    /**
+     * Create a new mixed quote bundle that contains the end of day quotes from
+     * between the two dates given and the current day's intra-day quotes.
+     * The quote bundle should be given at least two days of end of day quotes to
+     * properly calculate quote change, in case the intra-day quotes are not
+     * available.
+     *
+     * @param symbols the symbols to load
+     * @param firstDate the first end of day quotes to load
+     * @param lastDate the last end of day quotes to load
+     */
+    public MixedQuoteBundle(List symbols, TradingDate firstDate, TradingDate lastDate) {
+        eodQuoteBundle = new EODQuoteBundle(new EODQuoteRange(symbols, firstDate, lastDate));
         idQuoteBundle = new IDQuoteBundle(symbols);
     }
 
@@ -64,7 +66,7 @@ public class MixedQuoteBundle implements QuoteBundle {
 
     public TradingDate offsetToDate(int dateOffset) {
         if(dateOffset > eodQuoteBundle.getLastDateOffset())
-            return idQuoteBundle.offsetToDate(dateOffset);
+            return idQuoteBundle.offsetToDate(0);
         else
             return eodQuoteBundle.offsetToDate(dateOffset);
     }
@@ -82,47 +84,22 @@ public class MixedQuoteBundle implements QuoteBundle {
     }
 
     public int getLastOffset() {
-        if(isIDAvailable())
+        if(useIDQuotes())
             return eodQuoteBundle.getLastDateOffset() + 1;
         else
             return eodQuoteBundle.getLastDateOffset();
     }
 
-    // I really dont think these two are needed as all the quote bundles
-    // go the same way, i.e. to get yesterday's quote you take 1 off the
-    // offset? (right?) right.
-    public int getNextOffset(int offset) {
-        return(offset + 1);
-    }
-
-    public int getPreviousOffset(int offset) {
-        return(offset - 1);
-    }
-
-    // returns if there are any ID quotes available for the symbols we are interested in.
-    private boolean isIDAvailable() {
-        if(!isIDAvailable) {
-            List symbols = eodQuoteBundle.getQuoteRange().getAllSymbols();
-
-            // If any of the symbols are present in the intra-day quote cahce, then
-            // we mark intra-day quotes as available.
-            for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
-                Symbol symbol = (Symbol)iterator.next();
-
-                try {
-                    double value = idQuoteCache.getQuote(symbol, Quote.DAY_CLOSE, 0);
-
-                    // The quote cache has the quote so ID quotes are available
-                    isIDAvailable = true;
-                    break;
-                }
-                catch(QuoteNotLoadedException e) {
-                    // quote not available - try next symbol
-                }
-            }
-        }
-
-        return isIDAvailable;
+    /**
+     * Return whether we should display intra-day quotes or end of day quotes.
+     * This decision will be made solely on the basis of whether the intra-day quote
+     * sync is running. If we are not automatically downloading intra-day quotes,
+     * then display end of day quotes.
+     *
+     * @return <code>true</code> if we should display intra-day quotes.
+     */
+    private boolean useIDQuotes() {
+        return IDQuoteSync.getInstance().isRunning();
     }
 
     /**
@@ -132,9 +109,10 @@ public class MixedQuoteBundle implements QuoteBundle {
      * @return fast access offset
      * @exception WeekendDateException if the date falls on a weekend.
      */
-    public int getOffset(Quote quote)
-        throws WeekendDateException {
-
-        throw new UnsupportedOperationException();
+    public int getOffset(Quote quote) throws WeekendDateException {
+        if(quote.getDate().after(eodQuoteBundle.getLastDate()))
+            return eodQuoteBundle.getLastDateOffset() + 1;
+        else
+            return eodQuoteBundle.getOffset(quote);
     }
 }

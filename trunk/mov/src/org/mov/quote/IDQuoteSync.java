@@ -206,7 +206,7 @@ public class IDQuoteSync {
     /**
      * Set whether the automatic downloading of intra-day quotes is enabled.
      *
-     * @param enabled enabled status
+     * @param isEnabled enabled status
      */
     public void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;

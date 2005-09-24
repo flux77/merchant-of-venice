@@ -77,10 +77,10 @@ public class EODQuoteModel extends AbstractQuoteModel {
     public static final int ACTIVITY_COLUMN       = 9;
 
     /**
-     * Create a new end of day quote model. This quote model 
+     * Create a new end of day quote model.
      *
      * @param quoteBundle   Quote bundle
-     * @param quotes        A list of {@link Quote}s which contain
+     * @param quotes        A list of {@link EODQuote} which contain
      *                      the quote symbols and dates to table.
      * @param displayDate   Display the date column? Either {@link Column#HIDDEN},
      *                      {@link Column#VISIBLE} or {@link Column#ALWAYS_HIDDEN}.

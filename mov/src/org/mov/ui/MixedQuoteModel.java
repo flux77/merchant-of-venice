@@ -29,22 +29,18 @@ import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.Locale;
 
-// redoc all comments
-
 /**
-// REDOC
- * Table model to display intra-day quotes to the user. This model tells a table
- * how to display intra-day quotes by describing the columns and how to populate
- * the table with quotes using data from a quote bundle.
+ * Table model to display a mixture of end of day and intra-day quotes to the user.
+ * This model tells a table how to display the quotes by describing the columns and
+ * how to populate the table with quotes using data from a quote bundle.
  *
  * @author Andrew Leppard
  * @see AbstractTable
  * @see Column
  * @see ExpressionColumn
+ * @see org.mov.quote.MixedQuoteBundle
  */
 public class MixedQuoteModel extends AbstractQuoteModel {
-
-    // SORT eod module columns to match this?
 
     // Quote bundle
     private QuoteBundle quoteBundle;
@@ -90,12 +86,11 @@ public class MixedQuoteModel extends AbstractQuoteModel {
     /** Activity column number. */
     public static final int ACTIVITY_COLUMN       = 12;
 
-    // redoc
     /**
-     * Create a new end of day quote model. This quote model 
+     * Create a new mixed quote model.
      *
      * @param quoteBundle   Quote bundle
-     * @param quotes        A list of {@link Quote}s which contain
+     * @param quotes        A list of {@link Quote} which contain
      *                      the quote symbols and dates to table.
      * @param displayDate   Display the date column? Either {@link Column#HIDDEN},
      *                      {@link Column#VISIBLE} or {@link Column#ALWAYS_HIDDEN}.
@@ -175,11 +170,9 @@ public class MixedQuoteModel extends AbstractQuoteModel {
         if(row >= getRowCount())
             return "";
 
+        // Quotes in this table are a mixture of intra-day and end of day quotes.
         Quote quote = (Quote)getQuotes().get(row);
         IDQuote idQuote = null;
-        
-        // All the quotes in this table should be IDQuotes, but
-        // they don't have to be
         if(quote instanceof IDQuote)
             idQuote = (IDQuote)quote;
         

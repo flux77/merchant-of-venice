@@ -24,7 +24,31 @@ import java.util.List;
 import org.mov.parser.EvaluationException;
 import org.mov.util.TradingDate;
 
-// TODO: Doc
+/**
+ * When a task requires a mix of end-of-day and intra-day stock quotes, it should
+ * create an instance of this class which represents all the task's required
+ * quotes. This quote bundle is useful for displaying the latest value of stock quotes. If
+ * intra-day quotes are not available, then user of this package will transparently see
+ * just the end-of-day quotes. Even when intra-day quotes are available, the end-of-day
+ * quotes can be used for calculating quote change.
+ * <p>
+ * Example:
+ * <pre>
+ *      MixedQuoteBundle quoteBundle = new MixedQuoteBundle(symbols, firstDate, lastDate);
+ *      try {
+ *	    double = quoteBundle.getQuote("CBA", Quote.DAY_OPEN, 0);
+ *      }
+ *      catch(QuoteNotLoadedException e) {
+ *          //...
+ *      }
+ * </pre>
+ *
+ * @author Andrew Leppard
+ * @see EODQuote
+ * @see IDQuote
+ * @see Quote
+ * @see Symbol
+ */
 public class MixedQuoteBundle implements QuoteBundle {
 
     // Contains the end of day quotes

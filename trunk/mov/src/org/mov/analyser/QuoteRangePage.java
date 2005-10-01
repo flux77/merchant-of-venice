@@ -56,20 +56,66 @@ import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
 
+/**
+ * An analysis tool page that lets the user enter data about which quotes
+ * to work with (a quote range). This page is used by both the
+ * {@link PaperTradeModule} and {@link GPModule}. The page contains the
+ * following fields:
+ *
+ * <ul><li>Date Range
+ *     <ul><li>Start Date</li>
+ *         <li>End Date</li></ul></li>
+ * <li>Period (Optional)</li>
+ * <li>Symbols</li>
+ * <li>Order</li></ul>
+ *
+ * The date range denotes the date range of the quotes to work with.
+ * The optional period parameter allows this page to let the user
+ * specify multiple date ranges, the date ranges aren't specified
+ * explicitly here but are created from the given period option.
+ * The symbols denotes the symbols to work with. The order denotes
+ * the preferred order in working with the symbols.
+ *
+ * @author Andrew Leppard
+ */
 public class QuoteRangePage extends JPanel implements AnalyserPage {
 
     // Period types
+
+    /** No period. */
     public final static int NO_PERIOD = 0;
+
+    /** One week period. */
     public final static int ONE_WEEK = 1;
+    
+    /** Two week period. */
     public final static int TWO_WEEKS = 2;
+
+    /** One month period. */
     public final static int ONE_MONTH = 3;
+
+    /** Two month period. */
     public final static int TWO_MONTHS = 4;
+
+    /** Three month period. */
     public final static int THREE_MONTHS = 5;
+
+    /** Four month period. */
     public final static int FOUR_MONTHS = 6;
+
+    /** Six month period. */
     public final static int SIX_MONTHS = 7;
+
+    /** One year period. */
     public final static int ONE_YEAR = 8;
+
+    /** Two year period. */
     public final static int TWO_YEARS = 9;
+
+    /** Three year period. */
     public final static int THREE_YEARS = 10;
+
+    /** Four year period. */
     public final static int FOUR_YEARS = 11;
 
     private JDesktopPane desktop;
@@ -93,10 +139,21 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     private TradingDate endDate;
     private int dateRangePeriod;
 
+    /**
+     * Construct a new quote range page. The period setting will not be shown.
+     *
+     * @param desktop the desktop.
+     */
     public QuoteRangePage(JDesktopPane desktop) {
-	this(desktop, false);
+        this(desktop, false);
     }
 
+    /**
+     * Construct a new quote range page.
+     *
+     * @param desktop the desktop.
+     * @param allowMultipleDateRanges if set the period setting will be available.
+     */
     public QuoteRangePage(JDesktopPane desktop, boolean allowMultipleDateRanges) {
         this.desktop = desktop;
 	this.allowMultipleDateRanges = allowMultipleDateRanges;
@@ -279,24 +336,52 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
         return Locale.getString("QUOTE_RANGE_PAGE_TITLE");
     }
 
+    /**
+     * Return the quote range representation of the user's selection.
+     *
+     * @return the quote range representation.
+     */
     public EODQuoteRange getQuoteRange() {
         return quoteRange;
     }
 
+    /**
+     * Return the selected start date.
+     *
+     * @return the start date.
+     */
     public TradingDate getStartDate() {
         return startDate;
     }
 
+    /**
+     * Return the seelected end date.
+     *
+     * @return the end date.
+     */
     public TradingDate getEndDate() {
         return endDate;
     }
 
+    /**
+     * Return the period. Only call this function if you selected multiple
+     * date ranges.
+     *
+     * @return the period.
+     */
     public int getDateRangePeriod() {
 	assert allowMultipleDateRanges;
 
 	return dateRangePeriod;
     }
 
+    /**
+     * Create a new order comparator to order the stocks in the given quote bundle
+     * according to the user's selected symbol order.
+     *
+     * @param quoteBundle the quote bundle
+     * @return a new order comparator.
+     */
     public OrderComparator getOrderComparator(EODQuoteBundle quoteBundle) {
         if(orderByKeyButton.isSelected()) {
             // Set order (e.g. by volume).

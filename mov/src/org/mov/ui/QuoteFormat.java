@@ -20,12 +20,27 @@ package org.mov.ui;
 
 import java.text.NumberFormat;
 
+/**
+ * Representation of a quote value for display in a table. This class is
+ * used by the {@link AbstractTable} class to identify the value type so that
+ * it can render the value correctly. A quote value might be the day open,
+ * day close, day high etc of the quote.
+ *
+ * @author Andrew Leppard
+ */
 public class QuoteFormat implements Comparable {
 
+    // The quote value.
     private double quote;
 
-    private static NumberFormat format = null;
+    // Use NumberFormat to format the value.
+    private static NumberFormat format;
 
+    /**
+     * Create a new quote value format object.
+     *
+     * @param quote the quote value.
+     */
     public QuoteFormat(double quote) {
         this.quote = quote;
     }
@@ -40,14 +55,34 @@ public class QuoteFormat implements Comparable {
         return getNumberFormat().format(quote);
     }
 
+    /**
+     * Create a string representation of the quote value.
+     *
+     * @return string representation of the quote value.
+     */
     public String toString() {
         return quoteToString(getQuote());
     }
 
+    /**
+     * Return the quote value.
+     *
+     * @return the quote value.
+     */
     public double getQuote() {
         return quote;
     }
 
+    /**
+     * Compare two quote values.
+     *
+     * @param object object to compare to
+     * @return	the value <code>0</code> if the objects are equal;
+     * <code>1</code> if this object is after the specified
+     * object or
+     * <code>-1</code> if this object is before the specified
+     * object
+     */
     public int compareTo(Object object) {
         QuoteFormat format = (QuoteFormat)object;
 
@@ -59,6 +94,11 @@ public class QuoteFormat implements Comparable {
             return 0;
     }
 
+    /**
+     * Get number format object for this class.
+     *
+     * @return the number format.
+     */
     private static NumberFormat getNumberFormat() {
         // Synchronisation cannot cause issues here. So this code
         // isn't synchronised.

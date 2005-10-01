@@ -25,11 +25,10 @@ import java.util.List;
 import org.mov.prefs.PreferencesManager;
 
 /**
- * @author Pontus Strömdahl
- *
  * Contains static methods for creating File-, Sample- and DatabaseQuoteSources based 
  * on the user preference. 
  * 
+ * @author Pontus Strömdahl
  * @see FileQuoteSource
  * @see DatabaseQuoteSource
  * @see org.mov.prefs.PreferencesManager
@@ -116,15 +115,16 @@ public class QuoteSourceFactory {
      * @return	the database quote source 
      */
     public static DatabaseQuoteSource createDatabaseQuoteSource() {
-        PreferencesManager.DatabasePreferences prefs = PreferencesManager.loadDatabaseSettings();
+        PreferencesManager.DatabasePreferences prefs = 
+           PreferencesManager.loadDatabaseSettings();
         
         return new DatabaseQuoteSource(prefs.software, 
-                prefs.driver,
-                prefs.host, 
-                prefs.port, 
-                prefs.database, 
-                prefs.username, 
-                prefs.password);
+                                       prefs.driver,
+                                       prefs.host, 
+                                       prefs.port, 
+                                       prefs.database, 
+                                       prefs.username, 
+                                       prefs.password);
     }
 }
     

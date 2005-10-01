@@ -27,6 +27,14 @@ import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
 import org.mov.util.Locale;
 
+/**
+ * A JComboBox which allows the user to choose from a selection of symbol lists.
+ * The supported symbol lists include all ordinaries (i.e. all symbols of all
+ * ordinary listed companies), all symbols or marked indices. When Venice supports
+ * user stock groups or indices they can be added here.
+ *
+ * @author Andrew Leppard
+ */
 public class SymbolListComboBox extends JComboBox {
 
     // Drop down menu choices 
@@ -34,22 +42,31 @@ public class SymbolListComboBox extends JComboBox {
     private final static String ALL_SYMBOLS    = Locale.getString("ALL_SYMBOLS");
     private final static String MARKET_INDICES = Locale.getString("MARKET_INDICES");
 
+    /**
+     * Create a new symbol list combo box.
+     */
     public SymbolListComboBox() {
 	this(new String(""));
     }
 
+    /**
+     * Createa  new symbol list combo box.
+     *
+     * @param equationText the default selection.
+     */
     public SymbolListComboBox(String equationText) {
 	super();
 
         setEditable(true);
         updateItems();
         setSelectedItem(equationText);
-
-        // The combo box must be big enough to hold this text. This makes it
-        // as wide as the equation combo box. Yes but on 1.4.1 it makes them short!
-	//setPrototypeDisplayValue("avg(close, 15, 15) > 121");
     }
     
+    /**
+     * Return the symbol list selection in terms of a {@link EODQuoteRange} object.
+     *
+     * @return quote range with selected symbol list.
+     */
     public EODQuoteRange getQuoteRange()
         throws SymbolFormatException {
         
@@ -76,10 +93,20 @@ public class SymbolListComboBox extends JComboBox {
         }
     }
 
+    /**
+     * Return the current combo box selection as a text string.
+     *
+     * @return text string of current selection.
+     */
     public String getText() {
         return (String)getSelectedItem();
     }
 
+    /**
+     * Set the current combo box selection as a text string.
+     *
+     * @param text the new text string of the current selection.
+     */
     public void setText(String text) {
         setSelectedItem(text);
     }

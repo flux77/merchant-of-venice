@@ -34,7 +34,12 @@ import org.mov.portfolio.Portfolio;
 import org.mov.quote.*;
 import org.mov.ui.*;
 
-
+/**
+ * Venice module for displaying a portfolio in a table.
+ *
+ * @author Andrew Leppard
+ * @see PortfolioModel
+ */
 public class PortfolioTableModule extends AbstractTable
     implements Module, ActionListener {
 
@@ -50,6 +55,12 @@ public class PortfolioTableModule extends AbstractTable
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
 
+    /**
+     * Creat a new portfolio table module.
+     *
+     * @param portfolio   the portfolio to table.
+     * @param quoteBundle quote bundle.
+     */
     public PortfolioTableModule(Portfolio portfolio, EODQuoteBundle quoteBundle) {
 	
 	this.quoteBundle = quoteBundle;

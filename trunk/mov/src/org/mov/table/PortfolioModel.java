@@ -34,38 +34,83 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
+/**
+ * Table model to display a portfolio to the user. The model tells a
+ * table how to display the portfolio by describing the columns and how to populate
+ * the table.
+ *
+ * @author Andrew Leppard
+ * @see Column
+ */
 public class PortfolioModel extends AbstractTableModel {
     private EODQuoteBundle quoteBundle;
     private Portfolio portfolio;
     private List values;
 
     // Column ennumeration
+
+    /** Date column number. */
     public static final int DATE_COLUMN                = 0;
+
+    /** Stocks held column number. */
     public static final int STOCKS_HELD_COLUMN         = 1;
+
+    /** Portfolio cash value column number. */
     public static final int CASH_VALUE_COLUMN          = 2;
+
+    /** Portfolio share value column number. */
     public static final int SHARE_VALUE_COLUMN         = 3;
+
+    /** Portfolio value column number. */
     public static final int MARKET_VALUE_COLUMN        = 4;
+
+    /** Portfolio return column number. */
     public static final int RETURN_VALUE_COLUMN        = 5;
+
+    /** Portfolio value change column number. */
     public static final int MARKET_VALUE_CHANGE_COLUMN = 6;
+
+    /** Portfolio percent change column number. */
     public static final int PERCENT_CHANGE_COLUMN      = 7;
 
+    /**
+     * Structure containing information that will appear in the table.
+     */
     private class PortfolioValue {
+
+        /** Current date. */
         public TradingDate date;
+
+        /** Portfolio market value on that date. */
         public Money marketValue;
+
+        /** Portfolio cash value on that date. */
         public Money cashValue;
+
+        /** Portfolio share value on that date. */
         public Money shareValue;
+
+        /** Portfolio's return on that date. */
         public Money returnValue;
+
+        /** Number of stocks held in the portfolio on that date. */
         public String stocksHeld;
     }
 
+    /**
+     * Create a new portfolio model.
+     *
+     * @param portfolio   The Portfolio to table
+     * @param quoteBundle Quote Bundle. The quote bundle may be null, but only if the
+     *                    portfolio has never performed any trades.
+     */
     public PortfolioModel(Portfolio portfolio,
                           EODQuoteBundle quoteBundle) {
         super();
 
         // It's valid to pass in a null quote bundle, but only if the portfolio has
         // never traded any stocks.
-        assert(portfolio.getSymbolsTraded().size() == 0 ||
-               quoteBundle != null);
+        assert(portfolio.getSymbolsTraded().size() == 0 || quoteBundle != null);
 
         this.portfolio = portfolio;
         this.quoteBundle = quoteBundle;
@@ -108,10 +153,22 @@ public class PortfolioModel extends AbstractTableModel {
         setColumns(columns);
     }
 
+    /**
+     * Return the number of rows in the table.
+     *
+     * @return Number of rows in table.
+     */
     public int getRowCount() {
         return values.size();
     }
 
+    /**
+     * Return the value at the given table cell.
+     *
+     * @param row    Row number.
+     * @param column Column number.
+     * @return Value to display in cell.
+     */
     public Object getValueAt(int row, int column) {
         if(row >= getRowCount())
             return "";
@@ -237,6 +294,12 @@ public class PortfolioModel extends AbstractTableModel {
         return dateRange;
     }
 
+    /**
+     * Return the number of stocks currently held in the portfolio.
+     *
+     * @param portfolio The portfolio
+     * @return number of stocks held.
+     */
     private String getStocksHeld(Portfolio portfolio) {
         String string = new String();
 

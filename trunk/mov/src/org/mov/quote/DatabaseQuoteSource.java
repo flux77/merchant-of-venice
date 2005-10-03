@@ -781,6 +781,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * @return the number of quotes imported
      */
     public int importQuotes(List quotes) {
+        // TODO: This function should probably update the cached firstDate and lastDate.
         int quotesImported = 0;
 
         if(quotes.size() > 0 && checkConnection()) {

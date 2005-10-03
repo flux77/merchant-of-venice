@@ -544,42 +544,39 @@ public class ImportQuoteModule extends JPanel implements Module {
      * @param quotesImported the number of quotes imported
      */
     private void displayReport(final Report report, final int quotesImported) {
-        // TODO: Hmm!
-        //        try {
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        String message = Locale.getString("IMPORTED_QUOTES", quotesImported);
-                        
-                        if((report.getErrorCount() + report.getWarningCount()) > 0)
-                            message = message.concat("\n" +
-                                                     Locale.getString("IMPORTED_WARNINGS", 
-                                                                      report.getErrorCount(),
-                                                                      report.getWarningCount()));
-                        
-                        // Give the user the option of viewing the import report
-                        Object[] options = {Locale.getString("OK"), Locale.getString("VIEW_REPORT")};
-                        
-                        int option =
-                            JOptionPane.showInternalOptionDialog(desktop, 
-                                                                 message, 
-                                                                 Locale.getString("IMPORT_COMPLETE_TITLE"),
-                                                                 JOptionPane.DEFAULT_OPTION,
-                                                                 JOptionPane.INFORMATION_MESSAGE,
-                                                                 null,
-                                                                 options,
-                                                                 options[0]);
-                        if(option == 1)
-                            TextViewDialog.showTextDialog(report.getText(), Locale.getString("IMPORT_REPORT"));
-                        
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    String message = Locale.getString("IMPORTED_QUOTES", quotesImported);
+                    
+                    if((report.getErrorCount() + report.getWarningCount()) > 0)
+                        message = message.concat("\n" +
+                                                 Locale.getString("IMPORTED_WARNINGS", 
+                                                                  report.getErrorCount(),
+                                                                  report.getWarningCount()));
+                    
+                    // Give the user the option of viewing the import report
+                    Object[] options = {Locale.getString("OK"), Locale.getString("VIEW_REPORT")};
+                    int option =
+                        JOptionPane.showInternalOptionDialog(desktop, 
+                                                             message, 
+                                                             Locale.getString("IMPORT_COMPLETE_TITLE"),
+                                                             JOptionPane.DEFAULT_OPTION,
+                                                             JOptionPane.INFORMATION_MESSAGE,
+                                                             null,
+                                                             options,
+                                                             options[0]);
+                    
+                    if(option == 1) {
+                        Thread thread = new Thread(new Runnable() {
+                                public void run() {
+                                    TextViewDialog.showTextDialog(report.getText(),
+                                                                  Locale.getString("IMPORT_REPORT"));
+                                }});
+                        thread.start();
                     }
-                });
-            //        }
-    //        catch(InterruptedException e) {
-            // don't care
-    //   }
-    //    catch(InvocationTargetException e) {
-            // don't care
-    //    }
+                    
+                }
+            });
     }
 
     /**

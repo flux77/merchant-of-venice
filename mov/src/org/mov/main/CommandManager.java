@@ -50,6 +50,7 @@ import org.mov.quote.ExportQuoteModule;
 import org.mov.quote.Quote;
 import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.EODQuoteRange;
+import org.mov.quote.MixedQuoteBundle;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.Symbol;
 import org.mov.quote.IDQuoteSyncModule;
@@ -457,17 +458,14 @@ public class CommandManager {
 
                 progress.show(Locale.getString("OPEN_WATCH_SCREEN", watchScreen.getName()));
 
-                EODQuoteBundle quoteBundle = null;
+                MixedQuoteBundle quoteBundle = null;
                 TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
 
                 if(lastDate != null) {
-                    if(!thread.isInterrupted()) {
-                        EODQuoteRange quoteRange =
-                            new EODQuoteRange(watchScreen.getSymbols(), lastDate.previous(1),
-                                              lastDate);
-
-                        quoteBundle = new EODQuoteBundle(quoteRange);
-                    }
+                    if(!thread.isInterrupted())
+                        quoteBundle = new MixedQuoteBundle(watchScreen.getSymbols(),
+                                                           lastDate.previous(1),
+                                                           lastDate);
 
                     if(!thread.isInterrupted())
                         desktopManager.newFrame(new WatchScreenModule(watchScreen,

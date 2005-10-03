@@ -101,6 +101,16 @@ public class EODQuoteCache {
             }
         }
 
+        public EODQuote toQuote(Symbol symbol, TradingDate date) {
+            return new EODQuote(symbol,
+                                date,
+                                day_volume,
+                                (double)day_low,
+                                (double)day_high,
+                                (double)day_open,
+                                (double)day_close);
+        }
+
         public boolean equals(int day_volume, float day_low, float day_high,
                               float day_open, float day_close) {
             return (day_volume == this.day_volume &&
@@ -166,6 +176,27 @@ public class EODQuoteCache {
 
 	if(quote != null)
             return quote.getQuote(quoteType);
+        else
+	    throw QuoteNotLoadedException.getInstance();
+    }
+
+
+    /**
+     * Get a quote from the cache.
+     *
+     * @param symbol     the symbol to load
+     * @param dateOffset fast access date offset
+     * @return the quote
+     * @exception QuoteNotLoadedException if the quote was not in the cache
+     */
+    public EODQuote getQuote(Symbol symbol, int dateOffset)
+	throws QuoteNotLoadedException {
+
+	// Get the quote cache quote for the given symbol + date
+	EODQuoteCacheQuote quote = getQuoteCacheQuote(symbol, dateOffset);
+
+	if(quote != null)
+            return quote.toQuote(symbol, offsetToDate(dateOffset));
         else
 	    throw QuoteNotLoadedException.getInstance();
     }

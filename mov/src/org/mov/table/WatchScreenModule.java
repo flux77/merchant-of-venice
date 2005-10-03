@@ -42,22 +42,27 @@ import javax.swing.event.ListSelectionListener;
 import org.mov.main.CommandManager;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.quote.EODQuote;
-import org.mov.quote.EODQuoteBundle;
 import org.mov.prefs.PreferencesManager;
+import org.mov.quote.IDQuote;
+import org.mov.quote.IDQuoteCache;
+import org.mov.quote.IDQuoteSync;
 import org.mov.quote.MissingQuoteException;
+import org.mov.quote.MixedQuoteBundle;
 import org.mov.quote.Quote;
+import org.mov.quote.QuoteEvent;
+import org.mov.quote.QuoteListener;
 import org.mov.quote.Symbol;
 import org.mov.ui.AbstractTable;
 import org.mov.ui.Column;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
 import org.mov.ui.MenuHelper;
-import org.mov.ui.EODQuoteModel;
+import org.mov.ui.MixedQuoteModel;
 import org.mov.ui.SymbolListDialog;
 import org.mov.ui.TextDialog;
+import org.mov.util.Locale;
+import org.mov.util.TradingDate;
+import org.mov.util.TradingTime;
 
 /**
  * Venice module for displaying a watch screen to the user. This module allows a
@@ -67,7 +72,6 @@ import org.mov.ui.TextDialog;
  * @author Andrew Leppard
  * @see WatchScreen
  */
-
 public class WatchScreenModule extends AbstractTable implements Module, ActionListener {
 
     // Main menu items
@@ -88,10 +92,10 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     private JMenuItem popupTableSymbols = null;
 
     private PropertyChangeSupport propertySupport;
-    private EODQuoteBundle quoteBundle;
+    private MixedQuoteBundle quoteBundle;
 
     private WatchScreen watchScreen;
-    private EODQuoteModel model;
+    private MixedQuoteModel model;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
@@ -107,14 +111,14 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
      * @param quoteBundle watch screen quotes
      */
     public WatchScreenModule(WatchScreen watchScreen,
-                             EODQuoteBundle quoteBundle) {
+                             MixedQuoteBundle quoteBundle) {
 
         this.watchScreen = watchScreen;
 	this.quoteBundle = quoteBundle;
 	propertySupport = new PropertyChangeSupport(this);
 
-        model = new EODQuoteModel(quoteBundle, getQuotes(), Column.HIDDEN, Column.VISIBLE);
-	setModel(model, EODQuoteModel.SYMBOL_COLUMN, SORT_UP);
+        model = new MixedQuoteModel(quoteBundle, getQuotes(), Column.HIDDEN, Column.VISIBLE);
+	setModel(model, MixedQuoteModel.SYMBOL_COLUMN, SORT_UP);
 	showColumns(model);
 	addMenu();
 	model.addTableModelListener(this);
@@ -126,8 +130,14 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
                     handleMouseClicked(evt);
                 }
 	    });
-    }
 
+        // Update the table on new intra-day quotes
+        IDQuoteCache.getInstance().addQuoteListener(new QuoteListener() {
+                public void newQuotes(QuoteEvent event) {
+                    updateTable();
+                }
+            });
+    }
 
     // Graph menu item is only enabled when items are selected in the table.
     private void checkMenuDisabledStatus() {
@@ -178,7 +188,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             for(int i = 0; i < selectedRows.length; i++) {
                 Symbol symbol
                     = (Symbol)model.getValueAt(selectedRows[i],
-                                               EODQuoteModel.SYMBOL_COLUMN);
+                                               MixedQuoteModel.SYMBOL_COLUMN);
                 symbols.add(symbol);
             }
             // Graph the highlighted symbols
@@ -349,7 +359,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
             for(int i = 0; i < selectedRows.length; i++) {
                 Symbol symbol = (Symbol)model.getValueAt(selectedRows[i],
-                                                         EODQuoteModel.SYMBOL_COLUMN);
+                                                         MixedQuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
             }
@@ -375,7 +385,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             // function won't work properly.
             for(int i = 0; i < selectedRows.length; i++) {
                 Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
-                                                         EODQuoteModel.SYMBOL_COLUMN);
+                                                         MixedQuoteModel.SYMBOL_COLUMN);
                 symbols.add(symbol);
             }
 
@@ -411,7 +421,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
             for(int i = 0; i < selectedRows.length; i++) {
                 Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
-                                                         EODQuoteModel.SYMBOL_COLUMN);
+                                                         MixedQuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
             }
@@ -455,9 +465,9 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
                     String oldWatchScreenName = watchScreen.getName();
                     
                     // Get new name for watch screen
-                        TextDialog dialog = new TextDialog(DesktopManager.getDesktop(),
-							   Locale.getString("ENTER_NEW_WATCH_SCREEN_NAME"),
-							   Locale.getString("RENAME_WATCH_SCREEN"),
+                    TextDialog dialog = new TextDialog(DesktopManager.getDesktop(),
+                                                       Locale.getString("ENTER_NEW_WATCH_SCREEN_NAME"),
+                                                       Locale.getString("RENAME_WATCH_SCREEN"),
                                                        oldWatchScreenName);
                     String newWatchScreenName = dialog.showDialog();
                     
@@ -486,14 +496,15 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 	// Handle all action in a separate thread so we dont
 	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
 	Thread thread = new Thread() {
-
 		public void run() {
                     Set symbols = SymbolListDialog.getSymbols(DesktopManager.getDesktop(),
                                                               Locale.getString("ADD_SYMBOLS"));
                     if(symbols != null) {
-                        for(Iterator iterator = symbols.iterator(); iterator.hasNext();)
-                            watchScreen.addSymbol((Symbol)iterator.next());
+                        // Add symbols to watch screen, quote sync and table
+                        List symbolList = new ArrayList(symbols);
 
+                        watchScreen.addSymbols(symbolList);
+                        IDQuoteSync.getInstance().addSymbols(symbolList);
                         model.setQuotes(getQuotes());
                     }
                 }};
@@ -505,30 +516,33 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     // we should display from the quote bundle
     private List getQuotes() {
         List quotes = new ArrayList();
-        TradingDate lastDate = quoteBundle.getLastDate();        
+        int dateOffset = quoteBundle.getLastOffset();        
 
         for(Iterator iterator = watchScreen.getSymbols().iterator();
             iterator.hasNext();) {
             Symbol symbol = (Symbol)iterator.next();
-            EODQuote quote;
+            Quote quote;
 
             try {
-                quote =
-                    new EODQuote(symbol,
-                                 lastDate,
-                                 (int)quoteBundle.getQuote(symbol, Quote.DAY_VOLUME, lastDate),
-                                 quoteBundle.getQuote(symbol, Quote.DAY_LOW, lastDate),
-                                 quoteBundle.getQuote(symbol, Quote.DAY_HIGH, lastDate),
-                                 quoteBundle.getQuote(symbol, Quote.DAY_OPEN, lastDate),
-                                 quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, lastDate));
+                quote = quoteBundle.getQuote(symbol, dateOffset);
             }
             catch(MissingQuoteException e) {
-                quote = new EODQuote(symbol, lastDate, 0, 0.0D, 0.0D, 0.0D, 0.0D);
+                quote = new IDQuote(symbol, new TradingDate(), new TradingTime(),
+                                    0, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
             }
 
             quotes.add(quote);
         }
         
         return quotes;
+    }
+
+    /**
+     * This function is called when new intra-day quotes have been downloaded
+     * and we should update the table.
+     */
+    private void updateTable() {
+        model.setQuotes(getQuotes());
+        model.fireTableDataChanged();
     }
 }

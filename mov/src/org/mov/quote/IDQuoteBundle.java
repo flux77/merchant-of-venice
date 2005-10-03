@@ -56,8 +56,9 @@ public class IDQuoteBundle implements QuoteBundle {
     // List of symbols in quote bundle
     private List symbols;
 
-    // Reference to global intra-day quote cache
-    private IDQuoteCache quoteCache;
+    // Quick references to remove need to getInstance() calls
+    private static IDQuoteCache quoteCache = IDQuoteCache.getInstance();
+    private static IDQuoteSync quoteSync = IDQuoteSync.getInstance();
 
     /**
      * Create a new intra-day quote bundle containing all today's quotes for
@@ -67,9 +68,12 @@ public class IDQuoteBundle implements QuoteBundle {
      */
     public IDQuoteBundle(List symbols) {
         this.symbols = symbols;
+
+        // TODO: This isn't correct. Our latest quotes might be yesterday's.
+        this.date = new TradingDate();
         
         // Tell the quote sync to download intra-day quotes for these symbols
-        IDQuoteSync.getInstance().addSymbols(symbols);
+        quoteSync.addSymbols(symbols);
     }
 
     public double getQuote(Symbol symbol, int quoteType, int now, int timeOffset)
@@ -87,15 +91,36 @@ public class IDQuoteBundle implements QuoteBundle {
             quote = quoteCache.getQuote(symbol, quoteType, timeOffset);
         }
         catch(QuoteNotLoadedException e) {
-
             // Expand the quote range to include the symbol if we don't already have it
             if(!symbols.contains(symbol)) {
                 symbols.add(symbol);
-                IDQuoteSync.getInstance().addSymbols(symbols);
+                quoteSync.addSymbols(symbols);
             }
 
             // The symbol won't be available until next polling period
             throw MissingQuoteException.getInstance();
+        }
+
+        return quote;
+    }
+
+    public Quote getQuote(Symbol symbol, int timeOffset)
+        throws MissingQuoteException {
+
+        Quote quote;
+
+        try {
+            quote = quoteCache.getQuote(symbol, timeOffset);
+        }
+        catch(QuoteNotLoadedException e) {
+            // Expand the quote range to include the symbol if we don't already have it
+            if(!symbols.contains(symbol)) {
+                symbols.add(symbol);
+                quoteSync.addSymbols(symbols);
+            }
+
+            // The symbol won't be available until next polling period
+            throw MissingQuoteException.getInstance();            
         }
 
         return quote;
@@ -114,5 +139,23 @@ public class IDQuoteBundle implements QuoteBundle {
      */
     public int getOffset(Quote quote) {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Return the fast access offset for the earliest quote in the bundle.
+     *
+     * @return fast access offset
+     */
+    public int getFirstOffset() {
+        return quoteCache.getFirstTimeOffset();
+    }
+
+    /**
+     * Return the fast access offset for the latest quote in the bundle.
+     *
+     * @return fast access offset
+     */
+    public int getLastOffset() {
+        return quoteCache.getLastTimeOffset();
     }
 }

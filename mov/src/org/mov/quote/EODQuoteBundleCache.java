@@ -173,8 +173,8 @@ public class EODQuoteBundleCache {
     private void free(EODQuoteBundle quoteBundle) {
 	// Now traverse each quote in bundle, check to see if its used by any other
 	// bundle. If not, then free.
-	int firstDateOffset = quoteBundle.getFirstDateOffset();
-	int lastDateOffset = quoteBundle.getLastDateOffset();
+	int firstDateOffset = quoteBundle.getFirstOffset();
+	int lastDateOffset = quoteBundle.getLastOffset();
 
 	for(int dateOffset = firstDateOffset; dateOffset <= lastDateOffset; dateOffset++) {
 

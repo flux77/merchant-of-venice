@@ -52,6 +52,7 @@ public class DesktopManager
 
     private static JDesktopPane desktop_instance = null;
     private static EventListenerList moduleListeners = new EventListenerList();
+    private static int messagesDisplayed = 0;
 
     /**
      * Set the desktop we are managing.
@@ -175,19 +176,18 @@ public class DesktopManager
      * @param	message	the warning message to display
      */
     public static void showWarningMessage(final String message) {
-        // Now show the dialog in a new thread. This way our dialog isn't
-        // hidden behind the progress dialog.
-        Thread thread = new Thread(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 String multiLineMessage = breakUpMessage(message);
 
+                incrementMessagesDisplayed();
                 JOptionPane.showInternalMessageDialog(desktop_instance,
                                                       multiLineMessage,
                                                       Locale.getString("VENICE_PROBLEM_TITLE"),
                                                       JOptionPane.WARNING_MESSAGE);
+                decrementMessagesDisplayed();
             }
         });
-        thread.start();
     }
 
     /**
@@ -206,19 +206,44 @@ public class DesktopManager
         if(ProgressDialogManager.isProgressDialogUp())
             Thread.currentThread().interrupt();
 
-        // Now show the dialog in a new thread. This way our dialog isn't
-        // hidden behind the progress dialog.
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
+        SwingUtilities.invokeLater(new Runnable() {
+           public void run() {
                 String multiLineMessage = breakUpMessage(message);
 
+                incrementMessagesDisplayed();
                 JOptionPane.showInternalMessageDialog(desktop_instance,
                                                       multiLineMessage,
                                                       Locale.getString("VENICE_PROBLEM_TITLE"),
                                                       JOptionPane.ERROR_MESSAGE);
+                decrementMessagesDisplayed();
             }
         });
-        thread.start();
+    }
+
+    /**
+     * Return whether we are currently displaying any warning or error messages.
+     *
+     * @return <code>true</code> if we are displaying a message,
+     *         <code>false</code> otherwise.
+     */
+    public static boolean isDisplayingMessage() {
+        synchronized(desktop_instance) {
+            return messagesDisplayed > 0;
+        }
+    }
+
+    // Increment the displayed message number counter.
+    private static void incrementMessagesDisplayed() {
+        synchronized(desktop_instance) {
+            messagesDisplayed++;
+        }
+    }
+
+    // Decrement the displayed message number counter.
+    private static void decrementMessagesDisplayed() {
+        synchronized(desktop_instance) {
+            messagesDisplayed--;
+        }
     }
 
     // Break up a single line message into multiple line messages ready

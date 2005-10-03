@@ -122,10 +122,16 @@ public class AbstractTable extends SortedTable {
 	    	String text = date.toString("d?/m?/yyyy");
 	    	textLabel.setText(text);
 	    	add(textLabel);
-	    } else {
+	    }
+            else if(value != null) {
 		textLabel.setText(value.toString());
 		add(textLabel);
 	    }
+            else {
+                textLabel.setText("");
+                add(textLabel);
+            }
+
 	    return this;
 	}
 

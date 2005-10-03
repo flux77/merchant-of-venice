@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.mov.parser.EvaluationException;
 import org.mov.util.TradingDate;
+import org.mov.util.TradingTime;
 
 /**
  * When a task requires a mix of end-of-day and intra-day stock quotes, it should
@@ -82,36 +83,53 @@ public class MixedQuoteBundle implements QuoteBundle {
     public double getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException {
 
-        if(dateOffset > eodQuoteBundle.getLastDateOffset())
-            return idQuoteBundle.getQuote(symbol, quoteType, dateOffset);
+        if(dateOffset > eodQuoteBundle.getLastOffset())
+            // Retrieve most recent intra-day quote
+            return idQuoteBundle.getQuote(symbol, quoteType, idQuoteBundle.getLastOffset());
         else
             return eodQuoteBundle.getQuote(symbol, quoteType, dateOffset);
     }
 
+    public Quote getQuote(Symbol symbol, int offset)
+        throws MissingQuoteException {
+
+        Quote quote = null;
+
+        if(useIDQuotes())
+            // Retrieve most recent intra-day quotes
+            quote = idQuoteBundle.getQuote(symbol, idQuoteBundle.getLastOffset());
+        else
+            quote = eodQuoteBundle.getQuote(symbol, offset);
+
+        return quote;
+    }
+
     public TradingDate offsetToDate(int dateOffset) {
-        if(dateOffset > eodQuoteBundle.getLastDateOffset())
+        if(dateOffset > eodQuoteBundle.getLastOffset())
             return idQuoteBundle.offsetToDate(0);
         else
             return eodQuoteBundle.offsetToDate(dateOffset);
     }
 
-    // TODO
-    // Add these to QuoteBundle.java
-    // And EODQuoteCache
-    // And IDQuoteCache?
-    // apparently EODQuoteBundle already has getLastDateOffset(). So just rename it?
-
-    // gets a getOffset(Quote quote) method?? but what about ID quotes?
-
+    /**
+     * Return the fast access offset for the earliest quote in the bundle.
+     *
+     * @return fast access offset
+     */
     public int getFirstOffset() {
-        return eodQuoteBundle.getFirstDateOffset();
+        return eodQuoteBundle.getFirstOffset();
     }
 
+    /**
+     * Return the fast access offset for the latest quote in the bundle.
+     *
+     * @return fast access offset
+     */
     public int getLastOffset() {
         if(useIDQuotes())
-            return eodQuoteBundle.getLastDateOffset() + 1;
+            return eodQuoteBundle.getLastOffset() + 1;
         else
-            return eodQuoteBundle.getLastDateOffset();
+            return eodQuoteBundle.getLastOffset();
     }
 
     /**
@@ -134,8 +152,10 @@ public class MixedQuoteBundle implements QuoteBundle {
      * @exception WeekendDateException if the date falls on a weekend.
      */
     public int getOffset(Quote quote) throws WeekendDateException {
+        assert quote != null;
+
         if(quote.getDate().after(eodQuoteBundle.getLastDate()))
-            return eodQuoteBundle.getLastDateOffset() + 1;
+            return eodQuoteBundle.getLastOffset() + 1;
         else
             return eodQuoteBundle.getOffset(quote);
     }

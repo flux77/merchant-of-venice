@@ -117,35 +117,86 @@ public class EODQuoteBundle implements QuoteBundle {
      */
     public double getQuote(Symbol symbol, int quoteType, int dateOffset)
 	throws MissingQuoteException {
+        
+        boolean foundQuote = false;
+	double quote = 0.0D;
 
-	double quote;
-
+        // First try the quote cache.
         try {
             quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
+            foundQuote = true;
         }
         catch(QuoteNotLoadedException e) {
+            // Ignore
+        }
 
-            // If we couldn't load the quote - maybe the bundle isn't laoded?
+        // If the quote is not in the quote cache, perhaps the quote bundle is not loaded.
+        if(!foundQuote && tryReload()) {
             try {
-                quote = tryReload(symbol, quoteType, dateOffset);
+                quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
+                foundQuote = true;
             }
             catch(QuoteNotLoadedException e2) {
-
-                // If the quote is still null, maybe it's because it isn't in the quote range.
-                // Examine whether we can expand the quote range to include it.
-                if(tryExpand(symbol, dateOffset)) {
-                    try {
-                        quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
-                    }
-                    catch(QuoteNotLoadedException e3) {
-                        // We tried everyting - we just don't have it
-                        throw MissingQuoteException.getInstance();
-                    }
-                }
-                else
-                    throw MissingQuoteException.getInstance();
+                // Ignore
             }
         }
+
+        // If the quote is still not in the quote cache, perhaps the quote bundle
+        // does not contain the quote. Try expand the quote bundle.
+        if(!foundQuote && tryExpand(symbol, dateOffset)) {
+            try {
+                quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
+                foundQuote = true;
+            }
+            catch(QuoteNotLoadedException e3) {
+                // Ignore
+            }
+        }
+
+        // If we still don't have the quote. Give up.
+        if(!foundQuote)
+            throw MissingQuoteException.getInstance();
+
+        return quote;
+    }
+
+    public Quote getQuote(Symbol symbol, int dateOffset)
+	throws MissingQuoteException {
+        
+        Quote quote = null;
+
+        // First try the quote cache.
+        try {
+            quote = quoteCache.getQuote(symbol, dateOffset);
+        }
+        catch(QuoteNotLoadedException e) {
+            // Ignore
+        }
+
+        // If the quote is not in the quote cache, perhaps the quote bundle is not loaded.
+        if(quote == null && tryReload()) {
+            try {
+                quote = quoteCache.getQuote(symbol, dateOffset);
+            }
+            catch(QuoteNotLoadedException e2) {
+                // Ignore
+            }
+        }
+
+        // If the quote is still not in the quote cache, perhaps the quote bundle
+        // does not contain the quote. Try expand the quote bundle.
+        if(quote == null && tryExpand(symbol, dateOffset)) {
+            try {
+                quote = quoteCache.getQuote(symbol, dateOffset);
+            }
+            catch(QuoteNotLoadedException e3) {
+                // Ignore
+            }
+        }
+
+        // If we still don't have the quote. Give up.
+        if(quote == null)
+            throw MissingQuoteException.getInstance();
 
         return quote;
     }
@@ -207,8 +258,8 @@ public class EODQuoteBundle implements QuoteBundle {
     public boolean containsQuote(Symbol symbol, int dateOffset) {
 
 	if(getQuoteRange().containsSymbol(symbol) &&
-	   dateOffset >= getFirstDateOffset() &&
-	   dateOffset <= getLastDateOffset())
+	   dateOffset >= getFirstOffset() &&
+	   dateOffset <= getLastOffset())
 	    return true;
 	else
 	    return false;
@@ -271,10 +322,10 @@ public class EODQuoteBundle implements QuoteBundle {
      * @return the first symbol
      */
     public Symbol getFirstSymbol() {
-        int dateOffset = getFirstDateOffset();
+        int dateOffset = getFirstOffset();
 
         // Loop through each day looking for any symbols
-        while(dateOffset <= getLastDateOffset()) {
+        while(dateOffset <= getLastOffset()) {
             List symbols = getSymbols(dateOffset++);
 
             if(symbols.size() > 0)
@@ -358,7 +409,7 @@ public class EODQuoteBundle implements QuoteBundle {
      * @return all symbols
      */
     public List getAllSymbols() {
-        return getSymbols(getFirstDateOffset(), getLastDateOffset());
+        return getSymbols(getFirstOffset(), getLastOffset());
     }
 
     /**
@@ -411,11 +462,12 @@ public class EODQuoteBundle implements QuoteBundle {
     }
 
     /**
-     * Return the fast access date offset of the first date in this quote bundle
+     * Return the fast access date offset for the earliest quote in the bundle.
      *
-     * @return the first date offset, see {@link EODQuoteCache}
+     * @return fast access date offset
+     * @see EODQuoteCache
      */
-    public int getFirstDateOffset() {
+    public int getFirstOffset() {
 	if(firstDateOffset == 1) {
 	    try {
 		firstDateOffset = quoteCache.dateToOffset(getFirstDate());
@@ -445,11 +497,12 @@ public class EODQuoteBundle implements QuoteBundle {
     }
 
     /**
-     * Return the fast access date offset of the last date in this quote bundle
+     * Return the fast access date offset for the latest quote in the bundle.
      *
-     * @return the first date offset, see {@link EODQuoteCache}
+     * @return fast access date offset
+     * @see EODQuoteCache
      */
-    public int getLastDateOffset() {
+    public int getLastOffset() {
 	if(lastDateOffset == 1) {
 	    try {
 		lastDateOffset = quoteCache.dateToOffset(getLastDate());
@@ -519,27 +572,20 @@ public class EODQuoteBundle implements QuoteBundle {
 
     /**
      * If we know the given quote is not in the quote cache, this function will reload this
-     * quote bundle (if its not already loaded) and return the given quote. Or
-     * throw an exception if its still not in the quote cache.
+     * quote bundle.
      *
-     * @param symbol  the stock symbol
-     * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
-     *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
-     * @param dateOffset fast access date offset, see {@link EODQuoteCache}
-     * @return the quote
-     * @exception QuoteNotLoaded if the quote was not found
+     * @return <code>true</code> if the quote bundle was reloaded, <code>false</code> otherwise.
      */
-    private double tryReload(Symbol symbol, int quoteType, int dateOffset)
-        throws QuoteNotLoadedException {
+    private boolean tryReload() {
+        boolean success = false;
 
         // Perhaps our quote packet is not loaded - if so load
         if(!quoteBundleCache.isLoaded(this)) {
             quoteBundleCache.load(this);
-
-            return quoteCache.getQuote(symbol, quoteType, dateOffset);
+            success = true;
         }
 
-        throw QuoteNotLoadedException.getInstance();
+        return success;
     }
 
     /**
@@ -557,7 +603,7 @@ public class EODQuoteBundle implements QuoteBundle {
         EODQuoteRange expandedQuoteRange = (EODQuoteRange)getQuoteRange().clone();
         
         // We can expand a quote range by expanding it to cover an older date
-        if(getQuoteRange().getFirstDate() != null && dateOffset < getFirstDateOffset()) {
+        if(getQuoteRange().getFirstDate() != null && dateOffset < getFirstOffset()) {
 
             TradingDate date = quoteCache.offsetToDate(dateOffset);
             expandedQuoteRange.setFirstDate(date);

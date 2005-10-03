@@ -28,6 +28,7 @@ import org.mov.quote.Quote;
 import org.mov.quote.Symbol;
 import org.mov.quote.WeekendDateException;
 import org.mov.util.Locale;
+import org.mov.util.TradingTime;
 
 /**
  * Table model to display a mixture of end of day and intra-day quotes to the user.
@@ -112,7 +113,7 @@ public class MixedQuoteModel extends AbstractQuoteModel {
 			       Locale.getString("DATE"), 
 			       Locale.getString("DATE_COLUMN_HEADER"),
                                Symbol.class, displayDate));
-        columns.add(new Column(DATE_COLUMN, 
+        columns.add(new Column(TIME_COLUMN, 
 			       Locale.getString("TIME"), 
 			       Locale.getString("TIME_COLUMN_HEADER"),
                                Symbol.class, Column.HIDDEN));
@@ -132,7 +133,7 @@ public class MixedQuoteModel extends AbstractQuoteModel {
 			       Locale.getString("BID"), 
 			       Locale.getString("BID_COLUMN_HEADER"),
                                QuoteFormat.class, Column.HIDDEN));
-        columns.add(new Column(LAST_COLUMN, 
+        columns.add(new Column(ASK_COLUMN, 
 			       Locale.getString("ASK"), 
 			       Locale.getString("ASK_COLUMN_HEADER"),
                                QuoteFormat.class, Column.HIDDEN));
@@ -168,7 +169,7 @@ public class MixedQuoteModel extends AbstractQuoteModel {
      */
     public Object getValueAt(int row, int column) {
         if(row >= getRowCount())
-            return "";
+            return null;
 
         // Quotes in this table are a mixture of intra-day and end of day quotes.
         Quote quote = (Quote)getQuotes().get(row);

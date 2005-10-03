@@ -64,11 +64,29 @@ public interface QuoteBundle {
      * @param offset    fast access offset of current quote, for end-of-day quotes this
      *                  is the fast access date offset (see {@link EODQuoteCache}). For
      *                  intra-day quotes, it is the fast access time offset (see
+     *                  {@link IDQuoteCache}).
      * @return the quote
      * @exception MissingQuoteException if the quote was not found
      */
     public double getQuote(Symbol symbol, int quoteType, int offset)
 	throws MissingQuoteException;
+
+    /**
+     * Get a stock quote. If the stock is earlier than the first date in the bundle, the
+     * bundle will be expand to include the new date given. If the stock symbol is not
+     * included in the original symbol list, the quote bundle will be expanded to include
+     * it.
+     *
+     * @param symbol  the stock symbol
+     * @param offset  fast access offset of current quote, for end-of-day quotes this
+     *                is the fast access date offset (see {@link EODQuoteCache}). For
+     *                intra-day quotes, it is the fast access time offset (see
+     *                {@link IDQuoteCache}).
+     * @return the quote
+     * @exception MissingQuoteException if the quote was not found
+     */
+    public Quote getQuote(Symbol symbol, int offset)
+        throws MissingQuoteException;
 
     /**
      * Convert between a fast access offset to an actual date. Intra-day quotes
@@ -82,11 +100,28 @@ public interface QuoteBundle {
     public TradingDate offsetToDate(int offset);
 
     /**
-     * Retrieve the fast access offset from the given quote.
+     * Return the fast access offset from the given quote.
      *
      * @param quote quote
      * @return fast access offset
      */
     public int getOffset(Quote quote)
         throws WeekendDateException;
+
+    /**
+     * Return the fast access offset for the earliest quote in the bundle.
+     *
+     * @return fast access offset
+     */
+    public int getFirstOffset();
+
+    /**
+     * Return the fast access offset for the latest quote in the bundle.
+     *
+     * @return fast access offset
+     */
+    public int getLastOffset();
+
+
+
 }

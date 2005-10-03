@@ -75,11 +75,10 @@ public class IDQuoteCache {
      * This class contains a single intra-day quote in the quote cache. We use
      * this class over the {@link IDQuote} class because it uses less space.
      * This is because due to the way the cache is organised, we do not need to
-     * store the date and time of each individual quote.
+     * store the date and time of each individual quote. We can also further
+     * save space by storing the quotes as floats rather than doubles.
      */
     private class IDQuoteCacheQuote {
-        // Floats have more than enough precision to hold quotes. So we
-        // store them as floats rather than doubles to reduce memory.
         public int day_volume;
         public float day_low;
         public float day_high;
@@ -120,6 +119,19 @@ public class IDQuoteCache {
                 assert false;
                 return 0.0D;
             }
+        }
+
+        public IDQuote toQuote(Symbol symbol, TradingDate date, TradingTime time) {
+            return new IDQuote(symbol,
+                               date,
+                               time,
+                               day_volume,
+                               (double)day_low,
+                               (double)day_high,
+                               (double)day_open,
+                               (double)day_close,
+                               (double)bid,
+                               (double)ask);
         }
 
         public boolean equals(int day_volume, float day_low, float day_high,
@@ -172,8 +184,27 @@ public class IDQuoteCache {
         IDQuoteCacheQuote quote = getQuoteCacheQuote(symbol, timeOffset);
         if(quote != null)
             return quote.getQuote(quoteType);
-         else
-             throw QuoteNotLoadedException.getInstance();
+        else
+            throw QuoteNotLoadedException.getInstance();
+    }
+
+    /**
+     * Get a quote from the cache.
+     *
+     * @param symbol     the symbol to load
+     * @param timeOffset fast access time offset
+     * @return the quote
+     * @exception QuoteNotLoadedException if the quote was not in the cache
+     */
+    public IDQuote getQuote(Symbol symbol, int timeOffset)
+        throws QuoteNotLoadedException {
+        
+        // Get the quote cache quote for the given symbol + time
+        IDQuoteCacheQuote quote = getQuoteCacheQuote(symbol, timeOffset);
+        if(quote != null)
+            return quote.toQuote(symbol, date, offsetToTime(timeOffset));
+        else
+            throw QuoteNotLoadedException.getInstance();
     }
     
     // Returns the quote cache object for the given time
@@ -281,12 +312,25 @@ public class IDQuoteCache {
     }
 
     /**
-      * Get the fast access time offset of the newest time in the cache.
-      *
-      * @return the fast access offset of newest time in cache or -1 if there
-      *         are no times in the cache.
-      */
+     * Return the fast access time offset of the oldest time in the cache.
+     *
+     * @return the fast access time offset of the oldest time in cache or -1 if there
+     *         are no times in the cache.
+     */
     public int getFirstTimeOffset() {
+        if(times.size() == 0)
+            return -1;
+        else
+            return 0;
+    }
+
+    /**
+     * Return the fast access time offset of the newest time in the cache.
+     *
+     * @return the fast access time offset of the oldest time in cache or -1 if there
+     *         are no times in the cache.
+     */
+    public int getLastTimeOffset() {
         return times.size() - 1;
     }
     

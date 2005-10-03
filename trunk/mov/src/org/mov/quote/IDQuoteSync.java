@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.mov.ui.DesktopManager;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingTime;
 
@@ -66,23 +67,22 @@ public class IDQuoteSync {
          * Download the current intra-day quotes.
          */
         public void run() {
-            // TODO: Fix this up
-            /*
-            System.out.println("IDQuoteSync: PING!");
-
             try {
                 List quotes = YahooIDQuoteImport.importSymbols(symbols);
+
                 quoteCache.load(quotes);
                 
-                System.out.println("---------");
-                for(Iterator iterator = quotes.iterator(); iterator.hasNext();) 
-                    System.out.println(iterator.next());
+                //System.out.println("---------");
+                //for(Iterator iterator = quotes.iterator(); iterator.hasNext();) 
+                //    System.out.println(iterator.next());
             }
             catch(ImportExportException e) {
-                // deal with this
-                assert false;
+                // If an error message is already up, then don't display the error.
+                // This prevents us spamming the user with error messages every
+                // sync period.
+                if (!DesktopManager.isDisplayingMessage())
+                    DesktopManager.showErrorMessage(e.getMessage());
             }
-            */
         }
     }
 
@@ -91,7 +91,7 @@ public class IDQuoteSync {
      */
     private class StartSync extends TimerTask {
         
-        // Quote sync
+        // Quote sync to start
         private IDQuoteSync idQuoteSync;
 
         /**
@@ -116,7 +116,7 @@ public class IDQuoteSync {
      */
     private class StopSync extends TimerTask {
         
-        // Quote sync
+        // Quote sync to stop
         private IDQuoteSync idQuoteSync;
         
         /**
@@ -188,7 +188,6 @@ public class IDQuoteSync {
         stopTime = DEFAULT_STOP_TIME;
         startTimer = null;
         stopTimer = null;
-
     }
 
     /**
@@ -258,16 +257,20 @@ public class IDQuoteSync {
      * @param symbols new symbols to download
      */
     public void addSymbols(List symbols) {
+        boolean isNewSymbol = false;
 
         // Add the new unique symbols
         for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
             Symbol symbol = (Symbol)iterator.next();
-            if(!this.symbols.contains(symbol))
+            if(!this.symbols.contains(symbol)) {
                 this.symbols.add(symbol);
+                isNewSymbol = true;
+            }
         }
 
         // Restart sync task so that it has the updated symbol list
-        restartSyncTimer();
+        if(isNewSymbol)
+            restartSyncTimer();
     }
 
     /**
@@ -321,7 +324,7 @@ public class IDQuoteSync {
            symbols.size() > 0 &&
            (!now.before(startTime) && !now.after(stopTime)) &&
            !today.isWeekend()) {
-            
+
             syncTimer = new Timer();
             syncTimer.scheduleAtFixedRate(new Sync(symbols),
                                           0,

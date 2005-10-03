@@ -19,6 +19,7 @@
 package org.mov.table;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.mov.quote.Symbol;
@@ -28,6 +29,7 @@ import org.mov.quote.Symbol;
  * stock symbols that the user has grouped together to monitor. Each watch
  * screen also has its own name.
  *
+ * @author Andrew Leppard
  * @see Symbol
  */
 public class WatchScreen {
@@ -74,13 +76,23 @@ public class WatchScreen {
     }
 
     /**
-     * Add a symbol to this watcch screen.
+     * Add a symbol to this watch screen.
      *
      * @param symbol the symbol to add.
      */
     public void addSymbol(Symbol symbol) {
         if(!symbols.contains(symbol))
             symbols.add(symbol);
+    }
+
+    /**
+     * Add a list of symbols to this watch screen.
+     *
+     * @param symbols the list of symbols to add.
+     */
+    public void addSymbols(List symbols) {
+        for(Iterator iterator = symbols.iterator(); iterator.hasNext();)
+            addSymbol((Symbol)iterator.next());
     }
 
     /**

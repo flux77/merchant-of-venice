@@ -317,6 +317,9 @@
         <pathelement path="${java.class.path}"/>
         <pathelement path="${src}"/>
         <pathelement path="${test}"/>
+        <pathelement path="${lib.hsql}"/>
+        <pathelement path="${lib.mysql}"/>
+        <pathelement path="${lib.jython}"/>
       </classpath>
     </javac>
 
@@ -328,6 +331,9 @@
         <pathelement path="${java.class.path}"/>
         <pathelement path="${src}"/>
         <pathelement path="${test}"/>
+        <pathelement path="${lib.hsql}"/>
+        <pathelement path="${lib.mysql}"/>
+        <pathelement path="${lib.jython}"/>
       </classpath>
       <formatter type="plain"/>
       <batchtest todir="${report}">

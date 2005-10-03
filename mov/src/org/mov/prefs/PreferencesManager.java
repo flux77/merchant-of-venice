@@ -948,7 +948,7 @@ public class PreferencesManager {
 
         try {
             File defaultFile = new File(System.getProperty("user.home"),
-                                            DEFAULT_INTERNAL_FILE_NAME);
+                                        DEFAULT_INTERNAL_FILE_NAME);
             defaultFileName = defaultFile.getCanonicalPath();
         }
         catch(IOException e) {

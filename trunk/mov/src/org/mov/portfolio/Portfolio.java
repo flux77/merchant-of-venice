@@ -234,7 +234,7 @@ public class Portfolio implements Cloneable {
 		(Transaction)transactionIterator.next();
 	    Transaction clonedTransaction = (Transaction)transaction.clone();
 
-	    // Adjust share/cash account so it referes to the cloned
+	    // Adjust share/cash account so it refers to the cloned
 	    // portfolio accounts - not the old ones.
 	    if(clonedTransaction.getShareAccount() != null) {
 
@@ -573,10 +573,12 @@ public class Portfolio implements Cloneable {
             return this;
 
         // Otherwise we will need to rebuild the portfolio up to the
-        // given date.
+        // given date. Clone the portfolio, remove all the transactions
+        // and then add them back again.
         else {
             Portfolio portfolio = (Portfolio)clone();
             List transactions = new ArrayList(portfolio.getTransactions());
+            portfolio.removeAllTransactions();
 
             for(Iterator iterator = transactions.iterator(); iterator.hasNext();) {
                 Transaction transaction = (Transaction)iterator.next();
@@ -587,13 +589,10 @@ public class Portfolio implements Cloneable {
 
                 // Otherwise we've added all the transactions and can return.
                 else
-                    return portfolio;
+                    break;
             }
 
-            // If there is no more transactions, the given date must be before the
-            // last transaction...
-            assert false;
-            return this;
+            return portfolio;
         }
     }
 
@@ -645,7 +644,7 @@ public class Portfolio implements Cloneable {
                 }
                 
                 // Convert the cash/share accounts to a string - if
-                // we don't have the account in the portfolio, create it
+                // we don't have the account in the portfolio, create it.
                 CashAccount cashAccount = null;
                 CashAccount cashAccount2 = null;
                 ShareAccount shareAccount = null;
@@ -653,7 +652,7 @@ public class Portfolio implements Cloneable {
                 if(!cashAccountName.equals("")) {
                     cashAccount = (CashAccount)findAccountByName(cashAccountName);
                     
-                    // If its not found then create it
+                    // If it's not found then create it.
                     if(cashAccount == null) {
                         cashAccount = new CashAccount(cashAccountName);
                         addAccount(cashAccount);
@@ -664,7 +663,7 @@ public class Portfolio implements Cloneable {
                 if(!cashAccountName2.equals("")) {
                     cashAccount2 = (CashAccount)findAccountByName(cashAccountName2);
                     
-                    // If its not found then create it
+                    // If it's not found then create it.
                     if(cashAccount2 == null) {
                         cashAccount2 = new CashAccount(cashAccountName2);
                         addAccount(cashAccount2);
@@ -674,7 +673,7 @@ public class Portfolio implements Cloneable {
                 if(!shareAccountName.equals("")) {
                     shareAccount = (ShareAccount)findAccountByName(shareAccountName);
                     
-                    // If its not found then create it
+                    // If it's not found then create it.
                     if(shareAccount == null) {
                         shareAccount = new ShareAccount(shareAccountName);
                         addAccount(shareAccount);
@@ -716,7 +715,7 @@ public class Portfolio implements Cloneable {
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
         PrintWriter printWriter = new PrintWriter(bufferedWriter);
 		
-        // Iterate through transactions printing one each on every line
+        // Iterate through transactions printing one on every line
         for(Iterator iterator = getTransactions().iterator(); iterator.hasNext();) {
             Transaction transaction = (Transaction)iterator.next();
             printWriter.println(transaction);
@@ -776,7 +775,7 @@ public class Portfolio implements Cloneable {
                 (Portfolio)referencePortfolio.clone();
 
             // Extract the transactions and get the iterator pointing to the
-            // first transaction. The transaction list will be in order.
+            // first transaction. The transaction list will be in date order.
             List transactions =
                 new ArrayList(iteratorPortfolio.getTransactions());
             iteratorPortfolio.removeAllTransactions();
@@ -816,7 +815,7 @@ public class Portfolio implements Cloneable {
                 if(transaction.getDate().compareTo(currentDate) <= 0)
                     iteratorPortfolio.addTransaction(transaction);
 
-                // If it's happened after, we've gone too far! Put it back
+                // If it's happened after, we've gone too far! Put it back.
                 else {
                     transactionIterator.previous();
                     break;

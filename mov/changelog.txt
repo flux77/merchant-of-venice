@@ -30,6 +30,8 @@ Changes for Venice, 0.6 beta 1/Sep/2005
     then re-added.
   - Fixed an introduced bug in 0.5 where you needed to reload Venice
     after importing new quotes.
+  - Fixed a bug where the portfolio's percent change could be widly
+    inaccurate.
 
 Changes for Venice, 0.51 alpha 13/Apr/2005
 ==========================================

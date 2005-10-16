@@ -27,6 +27,7 @@ public final class LocaleConstants {
         java.util.Locale.ITALIAN,
         java.util.Locale.SIMPLIFIED_CHINESE,
 	new java.util.Locale("SV"), // Swedish
+	new java.util.Locale("PL"), // Polish
     };
 
     final public static int localeCount = locales.length;

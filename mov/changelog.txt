@@ -1,6 +1,8 @@
 Changes for Venice, 0.6 beta 1/Sep/2005
 =======================================
 
+* Added basic intra-day quote support.
+
 * Updates to Gondola Language:
   - Performance improvements due to stronger internal typing
     (Alberto Nacher).
@@ -12,6 +14,9 @@ Changes for Venice, 0.6 beta 1/Sep/2005
 * Updates to Paper Trade:
   - The current capital, number of transactions and start of paper trade
     now available to paper trade (Alberto Nacher).
+
+* Internationalisation:
+  - Polish translation added (Benedict P. Barszcz).
 
 * Tuning:
   - Portfolio and Watch Screens now only load the quotes they use,

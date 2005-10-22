@@ -245,7 +245,6 @@ public class IDQuoteCache {
      */
     public void load(List quotes) {
         if(quotes.size() > 0) {
-
             // Get the most recent time of any of the quotes. All the quotes will be
             // assigned this time.
             TradingTime time = getNewestTime(quotes);
@@ -254,8 +253,6 @@ public class IDQuoteCache {
             IDQuote firstQuote = (IDQuote)quotes.get(0);
             TradingDate date = firstQuote.getDate();
 
-            // Make sure the date matches the date of the current quote in the cache
-            assert this.date == null || this.date.equals(date);
             if(this.date == null)
                 this.date = date;
 

@@ -115,13 +115,13 @@ web     Packages the web files ready for deployment
 Thanks to the following people for providing additional code, patches or
 bugfixes:
 
-Daniel Makovec, Quentin Bossard, Peter Fradley, Bryan Lin, Alberto Nacher &
-Matthias Stöckel.
+Daniel Makovec, Quentin Bossard, Peter Fradley, Bryan Lin, Alberto Nacher,
+Matthias Stöckel and Dennis van den Berg.
 
 And the following for providing translations:
 
-Quentin Bossard (French), Bryan Lin (Chinese), Alberto Nacher (Italian) &
-Pontus Strömdahl (Swedish)
+Benedict P. Barszcz (Polish), Quentin Bossard (French), Bryan Lin (Chinese),
+Alberto Nacher (Italian) & Pontus Strömdahl (Swedish) 
 
 The winged lion image is:
 

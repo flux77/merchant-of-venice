@@ -95,6 +95,7 @@ public class CommandManager {
     // Locales for about box translation credits
     private java.util.Locale french = new java.util.Locale("FR");
     private java.util.Locale italian = new java.util.Locale("IT");
+    private java.util.Locale polish = new java.util.Locale("PL");
     private java.util.Locale swedish = new java.util.Locale("SV");
     private java.util.Locale simplifiedChinese = new java.util.Locale("ZH");    
 
@@ -923,16 +924,18 @@ public class CommandManager {
                                                     Main.COPYRIGHT_DATE_RANGE) + ", " +
 				   "Andrew Leppard\n\n" +
 
-                                   "Andrew Leppard (aleppard@picknow.com.au)\n\n" +
+                                   "Andrew Leppard (aleppard@picknowl.com.au)\n\n" +
 				
 				   Locale.getString("ADDITIONAL_CODE") + "\n" +
                                    "Daniel Makovec, Quentin Bossard, Peter Fradley, Mark Hummel,\n" +
-                                   "Bryan Lin, Alberto Nacher & Matthias St\366ckel.\n\n" +
+                                   "Bryan Lin, Alberto Nacher, Matthias St\366ckel &\n" +
+                                   "Dennis van den Berg.\n\n" +
 
                                    Locale.getString("TRANSLATORS") + "\n" +
-                                   "Quentin Bossard (" + french.getDisplayName() + "), " +
-                                   "Bryan Lin (" + simplifiedChinese.getDisplayName() + ")\n" +
-                                   "Alberto Nacher (" + italian.getDisplayName() + "), " +
+                                   "Benedict P. Barszcz (" + polish.getDisplayName() + "), " +
+                                   "Quentin Bossard (" + french.getDisplayName() + ")\n" +
+                                   "Bryan Lin (" + simplifiedChinese.getDisplayName() + "), " +
+                                   "Alberto Nacher (" + italian.getDisplayName() + ")\n" +
 				   "Pontus Str\366mdahl (" + swedish.getDisplayName() + ")"
 				   );
 

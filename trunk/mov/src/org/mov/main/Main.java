@@ -54,13 +54,13 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.5a";
+    public static String SHORT_VERSION = "0.6b";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION = "0.5 alpha";
+    public static String LONG_VERSION = "0.6 beta";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "13/" + Locale.getString("AUG") + "/2005";
+    public static String RELEASE_DATE = "23/" + Locale.getString("OCT") + "/2005";
 
     /** Copyright date range, e.g. "2003-5" */
     public static String COPYRIGHT_DATE_RANGE = "2003-5";

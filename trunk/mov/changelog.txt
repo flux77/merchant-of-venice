@@ -1,5 +1,5 @@
-Changes for Venice, 0.6 beta 1/Sep/2005
-=======================================
+Changes for Venice, 0.6 beta 23/Oct/2005
+========================================
 
 * Added basic intra-day quote support.
 

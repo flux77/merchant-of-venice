@@ -1,5 +1,5 @@
-Merchant of Venice, 0.5 alpha 13/Mar/2005
-=========================================
+Merchant of Venice, 0.6 beta 23/Oct/2005
+========================================
 
 Copyright (C) 2003-5, Andrew Leppard (aleppard picknowl com au)
 See COPYING.txt for license terms.

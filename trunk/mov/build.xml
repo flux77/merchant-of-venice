@@ -12,6 +12,7 @@
   <property name="report" value="${basedir}/report"/>
   <property name="src" value="${basedir}/src"/>
   <property name="lib" value="${basedir}/lib"/>
+  <property name="temp" value="${basedir}/temp"/>
   <property name="test" value="${basedir}/test"/>
   <property name="web" value="${basedir}/web"/>
 
@@ -79,6 +80,7 @@
     <delete file="${doc}/manual.html"/>
     <delete file="${doc}/manual.txt"/>
     <delete dir="${release}"/>
+    <delete dir="${temp}"/>
     <delete>
       <fileset dir="${help}" includes="*.html"/>
     </delete>
@@ -139,22 +141,44 @@
   <!-- Generate a jar -->
   <target name="jar" depends="build, doc">
 
-    <!-- First expand the MySQL driver so we can include it              
-    <unjar src="${src}/mysql-connector-java-3.0.16-ga-bin.jar"
-           dest="${src}">
+    <mkdir dir="${temp}"/>
+
+    <!-- First expand libraries so we can place them in the jar -->
+    <unjar src="${lib.hsql}" dest="${temp}">
+      <patternset>
+        <include name="org/**"/>
+      </patternset>
+    </unjar>
+
+    <unjar src="${lib.jython}" dest="${temp}">
+      <patternset>
+        <include name="org/**"/>
+        <include name="com/**"/>
+        <include name="jxxload_help/**"/>
+      </patternset>
+    </unjar>
+
+    <unjar src="${lib.mysql}" dest="${temp}">
       <patternset>
         <include name="com/**"/>
       </patternset>
-    </unjar> -->
+    </unjar>
+
+    <copy todir="${temp}">
+      <fileset dir="${src}"
+               includes="**/*.class, **/*.gif, **/*.png,
+                         org/mov/help/doc/*.html,
+                         **/*.properties,
+                         org/mov/help/doc/index.xml,
+                         org/mov/quote/samples/*.txt"
+               excludes="org/mov/tools/*"/>
+    </copy>
 
     <jar jarfile="venice.jar"
-         includes="**/*.class, **/*.gif, **/*.png, org/mov/help/doc/*.html,
-                   org/mov/util/locale/*.properties,
-                   org/mov/help/doc/index.xml, org/mov/quote/samples/*.txt,
-                   com/*"
-         excludes="org/mov/tools/*"
-         basedir="${src}"
+         basedir="${temp}"
 	 manifest="${src}/MANIFEST.MF"/>
+
+    <delete dir="${temp}"/>
   </target>
 
   <target name="app" depends="jar">

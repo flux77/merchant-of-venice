@@ -264,18 +264,14 @@
   <!-- Package venice up ready for release -->
   <target name="release" depends="doc, jar, test">
 
+    <!-- Binary Release -->
+
     <!-- Layout files ready for release -->
     <mkdir dir="${release}"/>
     <mkdir dir="${release}/venice-${VERSION}"/>
-    <mkdir dir="${release}/venice-${VERSION}/build"/>
-    <mkdir dir="${release}/venice-${VERSION}/build/src/"/>
     <mkdir dir="${release}/venice-${VERSION}/doc/"/>
     <copy file="${doc}/manual.txt" todir="${release}/venice-${VERSION}/doc"/>
     <copy file="${doc}/manual.html" todir="${release}/venice-${VERSION}/doc"/>
-    <copy todir="${release}/venice-${VERSION}/build/src/">
-      <fileset dir="${src}" includes="**/*.java, **/*.png, **/*.gif, **/*.properties"/>
-    </copy>
-    <copy file="build.xml" todir="${release}/venice-${VERSION}/build/"/>
     <copy file="COPYING.txt" todir="${release}/venice-${VERSION}/"/>
     <copy file="changelog.txt" todir="${release}/venice-${VERSION}/"/>
     <copy file="readme.txt" todir="${release}/venice-${VERSION}/"/>
@@ -290,6 +286,7 @@
       src="${release}/venice-${VERSION}.tar"/>
     <bzip2 zipfile="${release}/venice-${VERSION}.tar.bz2"
       src="${release}/venice-${VERSION}.tar"/>
+    <delete file="${release}/venice-${VERSION}.tar"/>
 
     <!-- Fix CRLF issues on text files for windows -->
     <fixcrlf srcdir="${release}/venice-${VERSION}/"
@@ -298,9 +295,6 @@
     <fixcrlf srcdir="${release}/venice-${VERSION}/doc"
              eol="crlf"
              includes="*.txt"/>
-    <fixcrlf srcdir="${release}/venice-${VERSION}/build/src/"
-             eol="crlf"
-             includes="**/*.java"/>
 
     <!-- The Windows version doesn't need the venice shell script -->
     <delete file="${release}/venice-${VERSION}/venice"/>
@@ -309,6 +303,49 @@
     <zip zipfile="${release}/venice-${VERSION}.zip">
       <fileset dir="${release}/" includes="venice-${VERSION}/**"/>
     </zip>
+
+    <!-- Source Release -->
+    <mkdir dir="${release}/venice-${VERSION}-src"/>
+    <mkdir dir="${release}/venice-${VERSION}-src/doc/"/>
+    <mkdir dir="${release}/venice-${VERSION}-src/lib/"/>
+    <mkdir dir="${release}/venice-${VERSION}-src/src/"/>
+    <mkdir dir="${release}/venice-${VERSION}-src/test/"/>
+
+    <copy todir="${release}/venice-${VERSION}-src/doc/">
+      <fileset dir="${doc}"
+                includes="document.dtd,
+                          manual.xml,
+                          manual*xsl"/>
+    </copy>
+    <copy file="build.xml" todir="${release}/venice-${VERSION}-src/"/>
+    <copy file="Info.plist" todir="${release}/venice-${VERSION}-src/"/>
+    <copy file="${lib.hsql}" todir="${release}/venice-${VERSION}-src/lib/"/>
+    <copy file="${lib.jython}" todir="${release}/venice-${VERSION}-src/lib/"/>
+    <copy file="${lib.mysql}" todir="${release}/venice-${VERSION}-src/lib/"/>
+    <copy todir="${release}/venice-${VERSION}-src/src/">
+      <fileset dir="${src}"
+                includes="**/*.java, **/*.gif, **/*.png,
+                          org/mov/help/doc/*.html,
+                          **/*.properties,
+                          org/mov/help/doc/index.xml,
+                          org/mov/quote/samples/*.txt,
+                          MANIFEST.MF"/>
+    </copy>
+    <copy todir="${release}/venice-${VERSION}-src/test/">
+      <fileset dir="${test}"
+                includes="**/*.java"/>
+    </copy>
+    <copy file="COPYING.txt" todir="${release}/venice-${VERSION}-src/"/>
+    <copy file="changelog.txt" todir="${release}/venice-${VERSION}-src/"/>
+    <copy file="readme.txt" todir="${release}/venice-${VERSION}-src/"/>
+    <copy file="venice" todir="${release}/venice-${VERSION}-src/"/>
+    <tar tarfile="${release}/venice-${VERSION}-src.tar">
+      <tarfileset dir="${release}/" includes="venice-${VERSION}-src/**"/>
+    </tar>
+    <gzip zipfile="${release}/venice-${VERSION}-src.tar.gz"
+      src="${release}/venice-${VERSION}-src.tar"/>
+    <delete file="${release}/venice-${VERSION}-src.tar"/>
+
   </target>
 
   <!-- Run Venice -->

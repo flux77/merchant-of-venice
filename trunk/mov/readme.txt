@@ -73,6 +73,14 @@ Andrew Leppard, at (aleppard picknowl com au).
 
 5 Building
 
+To build Venice you will need to download a copy of the source. The
+source is no longer included in the binary distribution. You can
+download the source release which contains the source from the latest
+release. Alternatively, you can download the current development
+version from CVS by running the following command:
+
+cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/mov co -P venice
+
 To build Venice you will need the programmes listed in the "Running"
 section and the following:
 
@@ -107,7 +115,8 @@ jar     Create a java archive file for Venice
 locale  Check locale files for consistency
 release Packages Venice into a file ready for release
 test    Runs the automated test suite
-web     Packages the web files ready for deployment
+web     Packages the web files ready for deployment (Not included in
+        the source release).
 
 6 Licenses
 
@@ -125,8 +134,8 @@ Matthias Stöckel and Dennis van den Berg.
 
 And the following for providing translations:
 
-Benedict P. Barszcz (Polish), Quentin Bossard (French), Bryan Lin (Chinese),
-Alberto Nacher (Italian) & Pontus Strömdahl (Swedish) 
+Benedict P. Barszcz (Polish), Quentin Bossard (French),
+Bryan Lin (Chinese), Alberto Nacher (Italian) & Pontus Strömdahl (Swedish) 
 
 The winged lion image is:
 

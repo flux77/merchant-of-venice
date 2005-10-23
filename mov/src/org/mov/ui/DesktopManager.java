@@ -476,6 +476,13 @@ public class DesktopManager
 				boolean honourSize, boolean resizable) {
 
         ModuleFrame frame = new ModuleFrame(this, module, centre, honourSize, resizable);
+
+        // Make sure that the module added signal is sent before the module
+        // is displayed. Otherwise it's possible for the user to quickly close the
+        // module causing the module added signal to be sent after the module removed
+        // signal! This happened and caused a mysterious exception to be thrown.
+	fireModuleAdded(module);
+
 	desktop_instance.add(frame);
 	
 	try {
@@ -486,8 +493,6 @@ public class DesktopManager
 	}
 	
 	frame.moveToFront();		
-
-	fireModuleAdded(module);
 
 	return frame;
     }

@@ -37,6 +37,8 @@ Changes for Venice, 0.6 beta 1/Sep/2005
     after importing new quotes.
   - Fixed a bug where the portfolio's percent change could be widly
     inaccurate.
+  - Fixed a bug where sometimes an exception was thrown when removing
+    a module frame.
 
 * Library updates:
   - HSQLDB V1.8.0.2 from 1.7.3.3.

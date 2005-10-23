@@ -364,7 +364,9 @@ wish to import.</para>
 <para>This dialog lets you instruct Venice to periodically download the current
 intra-day quotes from the internet. Once enabled, Venice will periodically poll
 an Internet site every few seconds or minutes and download the latest quote
-values. You'll need to fill in the following
+values. Currently intra-day quotes are only used in the Watch Screens.</para>
+
+<para>To enable intra-day quote synchronisation, you'll need to fill in the following
 fields:</para>
 <list><item><highlight>Enabled</highlight> - Select this to enable intra-day quote synchronisation.
 </item>

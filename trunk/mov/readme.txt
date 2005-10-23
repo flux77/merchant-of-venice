@@ -52,9 +52,9 @@ Or in Mac OS X by clicking on the "Venice.app" file.
 
 Venice contains the following technologies
 
-   hsqldb V1.7.3.3           from http://hsqldb.sourceforge.net
+   HSQLDB V1.8.0.2           from http://hsqldb.sourceforge.net
    Jython V2.1               from http://www.jython.org
-   MySQL Connector/J V3.1.7  from http://www.mysql.com
+   MySQL Connector/J V3.1.11 from http://www.mysql.com
    One-Jar V0.95             from http://one-jar.sourceforge.net/
 
 4 Bug Reports and Enhancements
@@ -110,7 +110,13 @@ release Packages Venice into a file ready for release
 test    Runs the automated test suite
 web     Packages the web files ready for deployment
 
-6 Thanks
+6 Licenses
+
+Venice is Copyright (C) 2003-2005, Andrew Leppard.
+HSQLDB is Copyright (C) 1995-2000, The Hypersonic SQL Group.
+Jython is Copyright (C) 2000, Jython Developers
+
+7 Thanks
 
 Thanks to the following people for providing additional code, patches or
 bugfixes:

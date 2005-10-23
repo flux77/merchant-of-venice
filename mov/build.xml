@@ -18,7 +18,7 @@
   <!-- Libraries -->
   <property name="lib.hsql" value="${lib}/hsqldb.jar"/>
   <property name="lib.jython" value="${lib}/jython.jar"/>
-  <property name="lib.mysql" value="${lib}/mysql-connector-java-3.1.7-bin.jar"/>
+  <property name="lib.mysql" value="${lib}/mysql-connector-java-3.1.11-bin.jar"/>
 
   <!-- Online help -->
   <property name="help" value="${src}/org/mov/help/doc"/>

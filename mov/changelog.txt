@@ -38,6 +38,10 @@ Changes for Venice, 0.6 beta 1/Sep/2005
   - Fixed a bug where the portfolio's percent change could be widly
     inaccurate.
 
+* Library updates:
+  - HSQLDB V1.8.0.2 from 1.7.3.3.
+  - MySQL Connector/J V3.1.11 from 3.1.7.
+
 Changes for Venice, 0.51 alpha 13/Apr/2005
 ==========================================
 

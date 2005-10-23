@@ -24,10 +24,6 @@ Section "Venice"
   WriteUninstaller "uninstall.exe"
 SectionEnd
 
-Section "Source Code"
-  File /r "build"
-SectionEnd
-
 Section "Start Menu Shortcuts"
   CreateDirectory "$SMPROGRAMS\Venice"
   CreateShortCut "$SMPROGRAMS\Venice\Manual.lnk" "$INSTDIR\doc\manual.html" "" "$INSTDIR\doc\manual.html" 0
@@ -54,6 +50,5 @@ Section "Uninstall"
   ; remove directories used
   RMDir "$SMPROGRAMS\Venice"
   RMDir "$INSTDIR\doc"
-  RMDir /r "$INSTDIR\build"
   RMDir "$INSTDIR"
 SectionEnd

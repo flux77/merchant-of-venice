@@ -55,7 +55,6 @@ Venice contains the following technologies
    HSQLDB V1.8.0.2           from http://hsqldb.sourceforge.net
    Jython V2.1               from http://www.jython.org
    MySQL Connector/J V3.1.11 from http://www.mysql.com
-   One-Jar V0.95             from http://one-jar.sourceforge.net/
 
 4 Bug Reports and Enhancements
 

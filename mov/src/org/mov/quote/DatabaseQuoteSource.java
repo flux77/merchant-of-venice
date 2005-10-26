@@ -79,6 +79,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
     /** Any generic SQL Database. */
     public final static int OTHER       = 3;
+
     // Mode
 
     /** Internal database. */
@@ -98,13 +99,24 @@ public class DatabaseQuoteSource implements QuoteSource
 
     // Shares table
     private final static String SHARE_TABLE_NAME  = "shares";
-    private final static String SYMBOL_FIELD      = "symbol";
+
+    // Column names
     private final static String DATE_FIELD        = "date";
+    private final static String SYMBOL_FIELD      = "symbol";
     private final static String DAY_OPEN_FIELD    = "open";
     private final static String DAY_CLOSE_FIELD   = "close";
     private final static String DAY_HIGH_FIELD    = "high";
     private final static String DAY_LOW_FIELD     = "low";
     private final static String DAY_VOLUME_FIELD  = "volume";
+
+    // Column numbers
+    private final static int DATE_COLUMN       = 1;
+    private final static int SYMBOL_COLUMN     = 2;
+    private final static int DAY_OPEN_COLUMN   = 3;
+    private final static int DAY_CLOSE_COLUMN  = 4;
+    private final static int DAY_HIGH_COLUMN   = 5;
+    private final static int DAY_LOW_COLUMN    = 6;
+    private final static int DAY_VOLUME_COLUMN = 7;
 
     // Shares indices
     private final static String DATE_INDEX_NAME   = "date_index";
@@ -497,13 +509,13 @@ public class DatabaseQuoteSource implements QuoteSource
                     EODQuoteCache quoteCache = EODQuoteCache.getInstance();
 
                     while (RS.next()) {
-                        quoteCache.load(Symbol.find(RS.getString(SYMBOL_FIELD)),
-                                        new TradingDate(RS.getDate(DATE_FIELD)),
-                                        RS.getInt(DAY_VOLUME_FIELD),
-                                        RS.getFloat(DAY_LOW_FIELD),
-                                        RS.getFloat(DAY_HIGH_FIELD),
-                                        RS.getFloat(DAY_OPEN_FIELD),
-                                        RS.getFloat(DAY_CLOSE_FIELD));
+                        quoteCache.load(Symbol.find(RS.getString(SYMBOL_COLUMN)),
+                                        new TradingDate(RS.getDate(DATE_COLUMN)),
+                                        RS.getInt(DAY_VOLUME_COLUMN),
+                                        RS.getFloat(DAY_LOW_COLUMN),
+                                        RS.getFloat(DAY_HIGH_COLUMN),
+                                        RS.getFloat(DAY_OPEN_COLUMN),
+                                        RS.getFloat(DAY_CLOSE_COLUMN));
                     }
                 }                    
 

@@ -116,13 +116,6 @@ public class AbstractTable extends SortedTable {
 	    if(value instanceof ChangeFormat)
 		renderChangeComponent(table, value, isSelected,
 				      hasFocus, row, column);
-	    else if(value instanceof TradingDate) {
-	    	TradingDate date = (TradingDate)value;
-
-	    	String text = date.toString("d?/m?/yyyy");
-	    	textLabel.setText(text);
-	    	add(textLabel);
-	    }
             else if(value != null) {
 		textLabel.setText(value.toString());
 		add(textLabel);

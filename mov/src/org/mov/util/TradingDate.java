@@ -18,6 +18,7 @@
 
 package org.mov.util;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -476,12 +477,12 @@ public class TradingDate implements Cloneable, Comparable {
     }
 
     /**
-     * Outputs the date in a format SQL can understand - 2001-12-30.
+     * Outputs the date in the following format 1/12/2005 or 31/12/2005. 
      *
-     * @return	SQL friendly date string
+     * @return String representation of date.
      */
-    public String toString() {	
-    	return getYear() + "-" + getMonth() + "-" + getDay();
+    public String toString() {
+        return getDay() + "/" + getMonth() + "/" + Converter.toFixedString(getYear(), 4);
     }
 
     /**

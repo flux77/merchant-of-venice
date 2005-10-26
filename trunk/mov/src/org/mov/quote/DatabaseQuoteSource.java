@@ -648,7 +648,8 @@ public class DatabaseQuoteSource implements QuoteSource
             if(filterString.length() > 0)
                 filterString = filterString.concat("AND ");
             
-            filterString = filterString.concat(DATE_FIELD + " = '" + quoteRange.getFirstDate() + "' ");
+            filterString = filterString.concat(DATE_FIELD + " = '" +
+                                               toSQLDateString(quoteRange.getFirstDate()) + "' ");
         }
 	
         // Otherwise check within a range of dates
@@ -656,8 +657,12 @@ public class DatabaseQuoteSource implements QuoteSource
             if(filterString.length() > 0)
                 filterString = filterString.concat("AND ");
             
-            filterString = filterString.concat(DATE_FIELD + " >= '" + quoteRange.getFirstDate() + "' AND " +
-                                               DATE_FIELD + " <= '" + quoteRange.getLastDate() + "' ");
+            filterString = filterString.concat(DATE_FIELD + " >= '" +
+                                               toSQLDateString(quoteRange.getFirstDate()) +
+                                               "' AND " +
+                                               DATE_FIELD + " <= '" +
+                                               toSQLDateString(quoteRange.getLastDate()) +
+                                               "' ");
         }
 	
         return queryString.concat(filterString);
@@ -861,13 +866,13 @@ public class DatabaseQuoteSource implements QuoteSource
                 
                 String insertQuery = new String("INSERT INTO " + SHARE_TABLE_NAME +
                                                 " VALUES (" +
-                                                "'" + quote.getDate()      + "', " +
-                                                "'" + quote.getSymbol()    + "', " +
-                                                "'" + quote.getDayOpen()   + "', " +
-                                                "'" + quote.getDayClose()  + "', " +
-                                                "'" + quote.getDayHigh()   + "', " +
-                                                "'" + quote.getDayLow()    + "', " +
-                                                "'" + quote.getDayVolume() + 
+                                                "'" + toSQLDateString(quote.getDate()) + "', " +
+                                                "'" + quote.getSymbol()                + "', " +
+                                                "'" + quote.getDayOpen()               + "', " +
+                                                "'" + quote.getDayClose()              + "', " +
+                                                "'" + quote.getDayHigh()               + "', " +
+                                                "'" + quote.getDayLow()                + "', " +
+                                                "'" + quote.getDayVolume()             + 
                                                 "')");
                 
                 // Now insert the quote into database
@@ -910,13 +915,13 @@ public class DatabaseQuoteSource implements QuoteSource
                 insertString.append(", (");
             
             // Add new quote
-            insertString.append("'" + quote.getDate()      + "', " +
-                                "'" + quote.getSymbol()    + "', " +
-                                "'" + quote.getDayOpen()   + "', " +
-                                "'" + quote.getDayClose()  + "', " +
-                                "'" + quote.getDayHigh()   + "', " +
-                                "'" + quote.getDayLow()    + "', " +
-                                "'" + quote.getDayVolume() + "')");
+            insertString.append("'" + toSQLDateString(quote.getDate()) + "', " +
+                                "'" + quote.getSymbol()                + "', " +
+                                "'" + quote.getDayOpen()               + "', " +
+                                "'" + quote.getDayClose()              + "', " +
+                                "'" + quote.getDayHigh()               + "', " +
+                                "'" + quote.getDayLow()                + "', " +
+                                "'" + quote.getDayVolume()             + "')");
         }
         
         try {
@@ -1030,7 +1035,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
             String query =
                 new String("SELECT COUNT(*) FROM " + SHARE_TABLE_NAME +
-                           " WHERE " + DATE_FIELD + " = '" + date + "' AND " +
+                           " WHERE " + DATE_FIELD + " = '" + toSQLDateString(date) + "' AND " +
                            DAY_CLOSE_FIELD + " > " + DAY_OPEN_FIELD + " AND " +
                            "LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
                            left(SYMBOL_FIELD ,1)  + " != 'X' ");
@@ -1062,7 +1067,7 @@ public class DatabaseQuoteSource implements QuoteSource
 
             query =
                 new String("SELECT COUNT(*) FROM " + SHARE_TABLE_NAME +
-                           " WHERE " + DATE_FIELD + " = '" + date + "' AND " +
+                           " WHERE " + DATE_FIELD + " = '" + toSQLDateString(date) + "' AND " +
                            DAY_CLOSE_FIELD + " < " + DAY_OPEN_FIELD + " AND " +
                            "LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
                            left(SYMBOL_FIELD, 1) + " != 'X' ");
@@ -1175,12 +1180,12 @@ public class DatabaseQuoteSource implements QuoteSource
         // 1. All quotes have the same symbol.
         if(sameSymbol)
             buffer.append(SYMBOL_FIELD + " = '" + symbol.toString() + "' AND " +
-                          DATE_FIELD + " >= '" + startDate + "' AND " +
-                          DATE_FIELD + " <= '" + endDate + "' ");
+                          DATE_FIELD + " >= '" + toSQLDateString(startDate) + "' AND " +
+                          DATE_FIELD + " <= '" + toSQLDateString(endDate) + "' ");
 
         // 2. All quotes are on the same date.
         else if(sameDate)
-            buffer.append(DATE_FIELD + " = '" + date.toString() + "'");
+            buffer.append(DATE_FIELD + " = '" + toSQLDateString(date) + "'");
 
         // 3. The quotes contain a mixture of symbols and dates. Bite the bullet
         // and do a slow SQL query which checks each one individually.
@@ -1188,7 +1193,7 @@ public class DatabaseQuoteSource implements QuoteSource
             for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
                 EODQuote quote = (EODQuote)iterator.next();
                 buffer.append("(" + SYMBOL_FIELD + " = '" + quote.getSymbol() + "' AND " +
-                              DATE_FIELD + " = '" + quote.getDate() + "')");
+                              DATE_FIELD + " = '" + toSQLDateString(quote.getDate()) + "')");
                 if(iterator.hasNext())
                     buffer.append(" OR ");
             }
@@ -1286,11 +1291,11 @@ public class DatabaseQuoteSource implements QuoteSource
         if(software == HSQLDB_SOFTWARE)
             return new String("SELECT TOP 1 " + DATE_FIELD + " FROM " +
                               SHARE_TABLE_NAME + " WHERE " + DATE_FIELD + " = '"
-                              + date + "' ");
+                              + toSQLDateString(date) + "' ");
         else
             return new String("SELECT " + DATE_FIELD + " FROM " +
                               SHARE_TABLE_NAME + " WHERE " + DATE_FIELD + " = '"
-                              + date + "' LIMIT 1");
+                              + toSQLDateString(date) + "' LIMIT 1");
     }
 
     /**
@@ -1309,6 +1314,17 @@ public class DatabaseQuoteSource implements QuoteSource
             return new String("SELECT " + SYMBOL_FIELD + " FROM " +
                               SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
                               + symbol + "' LIMIT 1");
+    }
+
+    /**
+     * Return a date string that can be used as part of an SQL query.
+     * E.g. 2000-12-03.
+     *
+     * @param date Date.
+     * @return Date string ready for SQL query.
+     */
+    private String toSQLDateString(TradingDate date) {
+    	return date.getYear() + "-" + date.getMonth() + "-" + date.getDay();
     }
 }
 

@@ -100,12 +100,30 @@ public class ProgressDialogManager {
      * @see SecondaryProgressDialog
      */
     public static ProgressDialog getProgressDialog() {
+        return getProgressDialog(true);
+    }
+
+    /**
+     * Create a new {@link PrimaryProgressDialog} if one is not already being displayed for 
+     * the current thread. If one is displayed, return a proxy to the current dialog, i.e.
+     * a {@link SecondaryProgressDialog}.
+     * The secondary progress dialog may or may not have full control over the real dialog. 
+     *
+     * @param isCancelButtonToBePainted true if we need to paint a cancel button
+     *
+     * @return progress dialog
+     * @see PrimaryProgressDialog
+     * @see SecondaryProgressDialog
+     */
+    public static ProgressDialog getProgressDialog(
+            boolean isCancelButtonToBePainted) {
         PrimaryProgressDialog primaryProgressDialog = 
             (PrimaryProgressDialog)cachedPrimaryProgressDialogs.get(Thread.currentThread());
 
         // If there isn't a primary progress window up, then create one
         if (primaryProgressDialog == null) {
-            primaryProgressDialog = new PrimaryProgressDialog(DesktopManager.getDesktop());
+            primaryProgressDialog = new PrimaryProgressDialog(DesktopManager.getDesktop(),
+                    isCancelButtonToBePainted);
             cachedPrimaryProgressDialogs.put(Thread.currentThread(), primaryProgressDialog);
             return primaryProgressDialog;
         }            

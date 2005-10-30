@@ -860,6 +860,62 @@ public class PreferencesManager {
     }
 
     /**
+     * Load user interface setting.
+     *
+     * @return the minimum decimal digits to be displayed
+     */
+    public static int loadMinDecimalDigits() {
+        // 3 is the default, if anything goes wrong
+        int retValue = 3;
+        Preferences prefs = getUserNode("/min_user_interface");
+        String str = prefs.get("min_decimal_digits", "3");
+        try {
+            retValue = Integer.parseInt(str);
+        } catch(Exception ex) {
+            retValue = 3;
+        }
+        return retValue;
+    }
+
+    /**
+     * Save user interface setting.
+     *
+     * @param the minimum decimal digits to be displayed
+     */
+    public static void saveMinDecimalDigits(String minDecimalDigits) {
+        Preferences prefs = getUserNode("/min_user_interface");
+	prefs.put("min_decimal_digits", minDecimalDigits);
+    }
+
+    /**
+     * Load user interface setting.
+     *
+     * @return the maximum decimal digits to be displayed
+     */
+    public static int loadMaxDecimalDigits() {
+        // 3 is the default, if anything goes wrong
+        int retValue = 3;
+        Preferences prefs = getUserNode("/max_user_interface");
+        String str = prefs.get("max_decimal_digits", "3");
+        try {
+            retValue = Integer.parseInt(str);
+        } catch(Exception ex) {
+            retValue = 3;
+        }
+        return retValue;
+    }
+
+    /**
+     * Save user interface setting.
+     *
+     * @param decimalDigits the maximum decimal digits to be displayed
+     */
+    public static void saveMaxDecimalDigits(String maxDecimalDigits) {
+        Preferences prefs = getUserNode("/max_user_interface");
+	prefs.put("max_decimal_digits", maxDecimalDigits);
+    }
+
+    /**
      * Get quote source setting.
      *
      * @return quote source, one of {@link #DATABASE}, {@link #FILES} or {@link #SAMPLES}.

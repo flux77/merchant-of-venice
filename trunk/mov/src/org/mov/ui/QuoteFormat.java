@@ -20,6 +20,8 @@ package org.mov.ui;
 
 import java.text.NumberFormat;
 
+import org.mov.prefs.PreferencesManager;
+
 /**
  * Representation of a quote value for display in a table. This class is
  * used by the {@link AbstractTable} class to identify the value type so that
@@ -34,7 +36,7 @@ public class QuoteFormat implements Comparable {
     private double quote;
 
     // Use NumberFormat to format the value.
-    private static NumberFormat format;
+    private static NumberFormat format = null;
 
     /**
      * Create a new quote value format object.
@@ -105,8 +107,10 @@ public class QuoteFormat implements Comparable {
         if(format == null) {
             format = NumberFormat.getInstance();
             format.setMinimumIntegerDigits(1);
-            format.setMinimumFractionDigits(5);
-            format.setMaximumFractionDigits(5);
+            int minDecimalDigits = PreferencesManager.loadMinDecimalDigits();
+            int maxDecimalDigits = PreferencesManager.loadMaxDecimalDigits();
+            format.setMinimumFractionDigits(minDecimalDigits);
+            format.setMaximumFractionDigits(maxDecimalDigits);
         }
 
         return format;

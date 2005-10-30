@@ -67,19 +67,41 @@ public class PrimaryProgressDialog implements ProgressDialog {
         setIndeterminate(true);
     }
 
-    // Creates a new instance of the contained dialog
+    /** 
+     * Create a new Progress Dialog. The dialog will not be displayed until {@link #show}
+     * is called. The Primary Progress Dialog is the actual dialog being displayed, it
+     * is returned by the first call to {@link ProgressDialogManager#getProgressDialog}.
+     *
+     * @param parent the parent desktop pane
+     * @param isCancelButtonToBePainted true if we need to paint a cancel button
+     */
+    public PrimaryProgressDialog(JDesktopPane parent,
+            boolean isCancelButtonToBePainted) {
+        newDialog(parent, isCancelButtonToBePainted);
+        setIndeterminate(true);
+    }
+
+    // Creates a new instance of the contained dialog with cancel button
     private void newDialog(JDesktopPane parent) {
+        newDialog(parent, true);
+    }
+    
+    // Creates a new instance of the contained dialog
+    private void newDialog(JDesktopPane parent, boolean isCancelButtonToBePainted) {
         final Thread thread = Thread.currentThread();
 
-        // If the cancel button is hit, close the dialog and send an
-        // interrupt to the current thread
-	cancelButton = new JButton(Locale.getString("CANCEL"));
-        cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    hide();
-                    thread.interrupt();
-                }
-            });
+        // Check if we want to paint the cancel button
+        if (isCancelButtonToBePainted) {
+            // If the cancel button is hit, close the dialog and send an
+            // interrupt to the current thread
+            cancelButton = new JButton(Locale.getString("CANCEL"));
+            cancelButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        hide();
+                        thread.interrupt();
+                    }
+                });
+        }
 
 	progressBar = new JProgressBar();
 
@@ -102,17 +124,24 @@ public class PrimaryProgressDialog implements ProgressDialog {
         panel.add(progressBar, BorderLayout.CENTER);
         panel.add(progressLabel, BorderLayout.SOUTH);
 
-	Object options[] = {cancelButton};
-	JOptionPane optionPane = 
+        Object[] options = {};
+        // Check if we have the cancel button
+        if (isCancelButtonToBePainted) {
+            options = new Object[] {cancelButton};
+        }
+        JOptionPane optionPane = 
             new JOptionPane(panel,
                             JOptionPane.INFORMATION_MESSAGE,
                             JOptionPane.OK_CANCEL_OPTION,
                             null, options, null);
 
-	dialog = optionPane.createDialog(parent, Locale.getString("PROGRESS"));
+        dialog = optionPane.createDialog(parent, Locale.getString("PROGRESS"));
         dialog.setModal(false);
 
-	optionPane.getRootPane().setDefaultButton(cancelButton);
+        // Check if we have the cancel button
+        if (isCancelButtonToBePainted) {
+            optionPane.getRootPane().setDefaultButton(cancelButton);
+        }
     }
 
     /**

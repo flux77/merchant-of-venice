@@ -72,6 +72,9 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
     /** Refers to the language preferences page */
     public final static int LANGUAGE_PAGE = 5;
 
+    /** Refers to the user interface page */
+    public final static int USER_INTERFACE = 6;
+
     private Vector pages;
     private DefaultListModel pageListModel;
     private JDesktopPane desktop;
@@ -117,6 +120,7 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
         addPage(new ProxyPage(desktop));
 	addPage(new QuoteSourcePage(desktop));	
 	addPage(new TuningPage(desktop));
+	addPage(new UserInterfacePage(desktop));
 
 	pageList = new JList(pageListModel);
 

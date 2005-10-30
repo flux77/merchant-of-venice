@@ -72,6 +72,7 @@ public class MainMenu implements ActionListener, ModuleListener
     private JMenuItem analysisPaperTradeMenuItem;
     private JMenuItem analysisGPMenuItem;
     private JMenuItem analysisGAMenuItem;
+    private JMenuItem analysisANNMenuItem;
     
     private JMenuItem windowTileHorizontalMenuItem;
     private JMenuItem windowTileVerticalMenuItem;
@@ -316,6 +317,10 @@ public class MainMenu implements ActionListener, ModuleListener
             MenuHelper.addMenuItem(this, analysisMenu,
                     Locale.getString("GA"));
         
+        analysisANNMenuItem =
+            MenuHelper.addMenuItem(this, analysisMenu,
+                    Locale.getString("ANN"));
+        
         /**********************************************
          * Window
          **********************************************/
@@ -531,6 +536,8 @@ public class MainMenu implements ActionListener, ModuleListener
                     CommandManager.getInstance().gp();
                 else if (menu == analysisGAMenuItem)
                     CommandManager.getInstance().ga();
+                else if (menu == analysisANNMenuItem)
+                    CommandManager.getInstance().ann();
                 
                 // Window Menu
                 else if (menu == windowTileHorizontalMenuItem)

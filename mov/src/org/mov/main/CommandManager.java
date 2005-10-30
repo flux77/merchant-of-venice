@@ -28,6 +28,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
+import org.mov.analyser.ANNModule;
+import org.mov.analyser.ANNResultModule;
 import org.mov.analyser.GAModule;
 import org.mov.analyser.GAResultModule;
 import org.mov.analyser.GPPageInitialPopulation;
@@ -380,6 +382,14 @@ public class CommandManager {
     }
 
     /**
+     * Open up a new artificial neural network module.
+     */
+    public void ann() {
+	ANNModule module = new ANNModule(desktop);
+	desktopManager.newFrame(module, true, true, true);
+    }
+
+    /**
      * Open up a result table that will display a summary of results
      * from paper trading.
      *
@@ -409,6 +419,17 @@ public class CommandManager {
      */
     public ModuleFrame newGAResultTable() {
 	GAResultModule results = new GAResultModule();
+	return desktopManager.newFrame(results);
+    }
+
+    /**
+     * Open up a result table that will display a summary of results
+     * from artificial neural network.
+     *
+     * @return	frame containing artificial neural network results
+     */
+    public ModuleFrame newANNResultTable() {
+	ANNResultModule results = new ANNResultModule();
 	return desktopManager.newFrame(results);
     }
 

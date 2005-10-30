@@ -18,7 +18,7 @@
 
 package org.mov.analyser;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +36,7 @@ import org.mov.portfolio.Portfolio;
 import org.mov.portfolio.ShareAccount;
 import org.mov.portfolio.StockHolding;
 import org.mov.portfolio.Transaction;
+import org.mov.prefs.PreferencesManager;
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.Quote;
 import org.mov.quote.EODQuoteCache;
@@ -58,26 +59,24 @@ import org.mov.quote.WeekendDateException;
 public class PaperTrade {
 
     // Generic name to call all the cash accounts in all generated portfolios
-    private final static String CASH_ACCOUNT_NAME = Locale.getString("CASH_ACCOUNT");
+    protected final static String CASH_ACCOUNT_NAME = Locale.getString("CASH_ACCOUNT");
 
     // Generic name to call all the share accounts in all generated portfolios
-    private final static String SHARE_ACCOUNT_NAME = Locale.getString("SHARE_ACCOUNT");
+    protected final static String SHARE_ACCOUNT_NAME = Locale.getString("SHARE_ACCOUNT");
     
-    // tip() format for output numbers
-    public final static String format = "0.00000#";
-    public final static DecimalFormat decimalFormat = new DecimalFormat(format);
+    // Stocks per line for the tip()
     public final static int STOCKS_PER_LINES = 1;
     
     // Information to get the next day trading prices
-    private static String[] symbolStock;
-    private static boolean[] buyRule;
-    private static boolean[] sellRule;
-    private static double[] buyValue;
-    private static double[] sellValue;
+    protected static String[] symbolStock;
+    protected static boolean[] buyRule;
+    protected static boolean[] sellRule;
+    protected static double[] buyValue;
+    protected static double[] sellValue;
 
     // Since this process uses so many temporary variables, it makes sense
     // grouping them all together.
-    private class Environment {
+    protected class Environment {
 
         // Direct access to quote cache to avoid calling getInstance() method
         public EODQuoteCache quoteCache;
@@ -101,10 +100,10 @@ public class PaperTrade {
         public int endDateOffset;
         
         // The rule getting the buy price
-        private String tradeValueBuy;
+        protected String tradeValueBuy;
         
         // The rule getting the sell price
-        private String tradeValueSell;
+        protected String tradeValueSell;
 
         /**
          * Create a new environment for paper trading.
@@ -159,7 +158,7 @@ public class PaperTrade {
     }
 
     // Users shouldn't instantiate this class
-    private PaperTrade() {
+    protected PaperTrade() {
         // nothing to do
     }
 
@@ -172,7 +171,7 @@ public class PaperTrade {
      * @param tradeCost the cost of a trade
      * @param day date of trade
      */
-    private static void sell(Environment environment,
+    protected static void sell(Environment environment,
                              Variables variables,
                              StockHolding stockHolding,
                              Money tradeCost,
@@ -220,7 +219,7 @@ public class PaperTrade {
      * @param day date of trade
      * @return <code>true</code> if we had enough money to acquire the stock.
      */
-    private static boolean buy(Environment environment,
+    protected static boolean buy(Environment environment,
                                Variables variables,
                                Symbol symbol,
                                Money amount,				
@@ -317,7 +316,7 @@ public class PaperTrade {
                         // If trade value expression is 'open', then
                         // set tradeValueWanted = 0 and sell at open price.
                         double tradeValueWanted = 0;
-                        if(environment.tradeValueSell.compareTo("open")!=0) {
+                        if(!environment.tradeValueSell.equals("open")) {
                             Expression tradeValueSellExpression = ExpressionFactory.newExpression(environment.tradeValueSell);
                             tradeValueWanted = tradeValueSellExpression.evaluate(variables, environment.quoteBundle, symbol, dateOffset);
                         }
@@ -392,7 +391,7 @@ public class PaperTrade {
                             // If trade value expression is 'open', then
                             // set tradeValueWanted = 0 and buy at open price.
                             double tradeValueWanted = 0;
-                            if(environment.tradeValueBuy.compareTo("open")!=0) {
+                            if(!environment.tradeValueBuy.equals("open")) {
                                 Expression tradeValueBuyExpression = ExpressionFactory.newExpression(environment.tradeValueBuy);
                                 tradeValueWanted = tradeValueBuyExpression.evaluate(variables, environment.quoteBundle, symbol, dateOffset);
                             }
@@ -432,7 +431,7 @@ public class PaperTrade {
      * @param dateOffset current date
      * @return the holding time
      */
-    private static int getHoldingTime(Environment environment, StockHolding stockHolding,
+    protected static int getHoldingTime(Environment environment, StockHolding stockHolding,
                                       int dateOffset) {
         try {
             return (1 - (EODQuoteCache.getInstance().dateToOffset(stockHolding.getDate()) -
@@ -455,7 +454,7 @@ public class PaperTrade {
      * @param symbol the stock of whom you want to know the capital owned
      * @return the actual capital of the given stock
      */
-    private static double getStockCapital(Environment environment, StockHolding stockHolding,
+    protected static double getStockCapital(Environment environment, StockHolding stockHolding,
                                       Symbol symbol, int dateOffset) {
         double retValue = 0.0D;
         try {
@@ -476,14 +475,15 @@ public class PaperTrade {
     /**
      * Return the actual capital of the portfolio.
      *
-     * @param environment the paper trade environment
+     * @param portfolio the paper trade portfolio
+     * @param quoteBundle historical quote data
      * @param dateOffset current date
      * @return the actual capital of the portfolio
      */
-    private static double getCapital(Environment environment, int dateOffset) {
+    protected static double getCapital(Portfolio portfolio, EODQuoteBundle quoteBundle, int dateOffset) {
         double retValue = 0.0D;
         try {
-            retValue = environment.portfolio.getValue(environment.quoteBundle, dateOffset).doubleValue();
+            retValue = portfolio.getValue(quoteBundle, dateOffset).doubleValue();
         }
         catch(MissingQuoteException e) {
             // Ignore and move on
@@ -537,6 +537,7 @@ public class PaperTrade {
                                                              tradeValueSell);
         int dateOffset = environment.startDateOffset;
 
+        // Paper Trading variables
         if(orderCache.isOrdered() && !variables.contains("order"))
             variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
         if(!variables.contains("held"))
@@ -565,7 +566,8 @@ public class PaperTrade {
             variables.setValue("transactions", environment.portfolio.countTransactions());
             
             // Set the value of actual capital
-            variables.setValue("capital", getCapital(environment, dateOffset));
+            variables.setValue("capital", getCapital(environment.portfolio,
+                    environment.quoteBundle, dateOffset));
             
             // Get all the (ordered) symbols that we can trade for today and
             // that we have quotes for.
@@ -579,6 +581,7 @@ public class PaperTrade {
             dateOffset++;
         }
 
+        // Set the tip for the next day
         setTip(environment, quoteBundle, variables, buy, sell, dateOffset, tradeCost,
                   orderCache.getTodaySymbols(dateOffset), orderCache);
         
@@ -629,6 +632,7 @@ public class PaperTrade {
                                                              tradeValueSell);
         int dateOffset = environment.startDateOffset;
 
+        // Paper Trading variables
         if(orderCache.isOrdered() && !variables.contains("order"))
             variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
         if(!variables.contains("held"))
@@ -657,7 +661,8 @@ public class PaperTrade {
             variables.setValue("transactions", environment.portfolio.countTransactions());
             
             // Set the value of actual capital
-            variables.setValue("capital", getCapital(environment, dateOffset));
+            variables.setValue("capital", getCapital(environment.portfolio,
+                    environment.quoteBundle, dateOffset));
             
             // Get all the (ordered) symbols that we can trade for today and
             // that we have quotes for.
@@ -680,6 +685,7 @@ public class PaperTrade {
             dateOffset++;
         }
 
+        // Set the tip for the next day
         setTip(environment, quoteBundle, variables, buy, sell, dateOffset, tradeCost,
                   orderCache.getTodaySymbols(dateOffset), orderCache);
         
@@ -748,7 +754,7 @@ public class PaperTrade {
             for(Iterator iteratorHolding = stockHoldings.iterator(); iteratorHolding.hasNext();) {
                 StockHolding stockHolding = (StockHolding)iteratorHolding.next();
                 Symbol symbolHolding = stockHolding.getSymbol();
-                if (symbolHolding.toString().compareTo(symbol.toString())==0) {
+                if (symbolHolding.toString().equals(symbol.toString())) {
                     variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
                     variables.setValue("stockcapital", getStockCapital(environment, stockHolding, symbol, dateOffset));
                     break;
@@ -767,7 +773,7 @@ public class PaperTrade {
                 // If trade value expression is 'open', then
                 // set the price to zero (sell at open price).
                 sellValue[index] = 0;
-                if(environment.tradeValueSell.compareTo("open")!=0) {
+                if(!environment.tradeValueSell.equals("open")) {
                     Expression tradeValueSellExpression = ExpressionFactory.newExpression(environment.tradeValueSell);
                     sellValue[index] = tradeValueSellExpression.evaluate(variables, environment.quoteBundle, symbol, dateOffset);
                 }
@@ -827,7 +833,7 @@ public class PaperTrade {
                 // If trade value expression is 'open', then
                 // set this price to zero (buy at open price).
                 buyValue[index] = 0;
-                if(environment.tradeValueBuy.compareTo("open")!=0) {
+                if(!environment.tradeValueBuy.equals("open")) {
                     Expression tradeValueBuyExpression = ExpressionFactory.newExpression(environment.tradeValueBuy);
                     buyValue[index] = tradeValueBuyExpression.evaluate(variables, environment.quoteBundle, symbol, dateOffset);
                 }
@@ -852,6 +858,16 @@ public class PaperTrade {
      * @return the string representing the tip.
      */
     public static String getTip() {
+        // tip() format for output numbers
+        NumberFormat format;
+        
+        format = NumberFormat.getInstance();
+        format.setMinimumIntegerDigits(1);
+        int minDecimalDigits = PreferencesManager.loadMinDecimalDigits();
+        int maxDecimalDigits = PreferencesManager.loadMaxDecimalDigits();
+        format.setMinimumFractionDigits(minDecimalDigits);
+        format.setMaximumFractionDigits(maxDecimalDigits);
+
         StringBuffer retValue = new StringBuffer();
         int found = 0;
         
@@ -869,7 +885,7 @@ public class PaperTrade {
                 retValue.append(symbolStock[i]);
                 
                 if (buyValue[i]!=0)
-                    retValue.append(" (@ " + decimalFormat.format(buyValue[i]) + ")");
+                    retValue.append(" (@ " + format.format(buyValue[i]) + ")");
                 
                 found++;
             }
@@ -893,7 +909,7 @@ public class PaperTrade {
                 retValue.append(symbolStock[i]);
                 
                 if (sellValue[i]!=0)
-                    retValue.append(" (@ " + decimalFormat.format(sellValue[i]) + ")");
+                    retValue.append(" (@ " + format.format(sellValue[i]) + ")");
                 
                 found++;
            }

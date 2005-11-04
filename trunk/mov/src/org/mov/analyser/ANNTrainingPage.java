@@ -43,14 +43,16 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
     private JTextField preLearningTextRow;
     private JTextField totCyclesTextRow;
     
-    private JTextField earningPercentageTextRow;
+    private JTextField minEarningPercentageTextRow;
+    private JTextField windowForecastTextRow;
     
     private double learningRate = 0.7D;
     private double momentum = 0.5D;
     private int preLearning = 0;
-    private int totCycles = 50;
+    private int totCycles = 150;
     
-    private double earningPercentage = 1.0D;
+    private double minEarningPercentage = 2.0D;
+    private int windowForecast = 7;
     
     /**
      * Construct a new ANN training parameters page.
@@ -82,7 +84,8 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
         settingsInitPop.put("pre_learning", preLearningTextRow.getText());
         settingsInitPop.put("tot_cycles", totCyclesTextRow.getText());
         
-        settingsInitPop.put("earning_percentage", earningPercentageTextRow.getText());
+        settingsInitPop.put("min_earning_percentage", minEarningPercentageTextRow.getText());
+        settingsInitPop.put("window_forecast", windowForecastTextRow.getText());
 
         PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
                                                     settingsInitPop);
@@ -125,8 +128,11 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
             totCyclesTextRow.setText(value);
         }
 
-        if(setting.equals("earning_percentage") && !value.equals("")) {
-            earningPercentageTextRow.setText(value);
+        if(setting.equals("min_earning_percentage") && !value.equals("")) {
+            minEarningPercentageTextRow.setText(value);
+        }
+        if(setting.equals("window_forecast") && !value.equals("")) {
+            windowForecastTextRow.setText(value);
         }
     }
     
@@ -155,10 +161,15 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
                         totCyclesTextRow.getText());
             }
 
-            if(!earningPercentageTextRow.getText().equals("")) {
-                earningPercentage = Double.parseDouble(
-                        earningPercentageTextRow.getText());
+            if(!minEarningPercentageTextRow.getText().equals("")) {
+                minEarningPercentage = Double.parseDouble(
+                        minEarningPercentageTextRow.getText());
             }
+            if(!windowForecastTextRow.getText().equals("")) {
+                windowForecast = Integer.parseInt(
+                        windowForecastTextRow.getText());
+            }
+
         } catch(NumberFormatException e) {
             JOptionPane.showInternalMessageDialog(desktop,
                 Locale.getString("ERROR_PARSING_NUMBER",
@@ -201,6 +212,16 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
         if(totCycles<=0) {
             JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("ANN_TOT_CYCLES_RANGE_ERROR"),
+                                                  Locale.getString("INVALID_ANN_ERROR"),
+                                                  JOptionPane.ERROR_MESSAGE);
+	    returnValue = false;
+        }
+        
+        // Check the range for windowForecast
+        // It must be a number equal or greater then one
+        if(windowForecast<1) {
+            JOptionPane.showInternalMessageDialog(desktop,
+                                                  Locale.getString("ANN_WINDOW_FORECAST_RANGE_ERROR"),
                                                   Locale.getString("INVALID_ANN_ERROR"),
                                                   JOptionPane.ERROR_MESSAGE);
 	    returnValue = false;
@@ -257,15 +278,24 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
     
     /** 
      * Get the earning percentage of ANN.
-     * Earning percentage is the percentage we want to gain each day trade,
-     * for example if we have a capital of 100, and we set earning percentage
-     * to 1, we'll train the neural network so that ANN will try to get a capital of 101
-     * in the first day trade, 102 in the second and so on... 
+     * Earning percentage is the percentage we want to gain,
+     * That's what we want to gain in a number of days equal or less
+     * than window forecast parameter. 
      *
      * @return earning percentage
      */
-    public double getEarningPercentage() {
-        return earningPercentage;
+    public double getMinEarningPercentage() {
+        return minEarningPercentage;
+    }
+    
+    /** 
+     * Get the window forecast. The window forecast is the number of days in future
+     * before which we gain the wished percentage.
+     *
+     * @return window forecast
+     */
+    public int getWindowForecast() {
+        return windowForecast;
     }
     
     /*
@@ -331,9 +361,14 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
         
-        earningPercentageTextRow =
+        minEarningPercentageTextRow =
         GridBagHelper.addTextRow(innerPanelTwo,
         Locale.getString("EARNING_PERCENTAGE"), "",
+        gridbag, c,
+        12);
+        windowForecastTextRow =
+        GridBagHelper.addTextRow(innerPanelTwo,
+        Locale.getString("WINDOW_FORECAST"), "",
         gridbag, c,
         12);
         
@@ -356,7 +391,8 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
         preLearningTextRow.setText(Integer.toString(preLearning));
         totCyclesTextRow.setText(Integer.toString(totCycles));
         
-        earningPercentageTextRow.setText(Double.toString(earningPercentage));
+        minEarningPercentageTextRow.setText(Double.toString(minEarningPercentage));
+        windowForecastTextRow.setText(Integer.toString(windowForecast));
     }
 
 }

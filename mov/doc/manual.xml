@@ -1564,7 +1564,7 @@ y11 .. y64 (24 parameters), z11 .. z16 (6 parameters). I put them ranging from -
 
 
 <chapter name="Artificial Neural Network">
-<para>Venice permits to use Artificial Neural Network (ANN) for technical analysis.
+<para>Venice is able to use Artificial Neural Network (ANN) for technical analysis.
 Venice can be used standalone, but the best performance can be achieved using it together with Joone,
 you can download Joone from http://www.jooneworld.com/.
 You can use the ANN in two ways. You can use the default ANN, that is to say you use Venice standalone;
@@ -1572,7 +1572,7 @@ a default ANN will be created with a Linear Layer as input, and a Sigmoid Layer 
 Sigmoid Layer as output.
 You can use a custom ANN, that is to say you use Venice together with Joone; the custom ANN can be imported from
 file system, all accepted files are .snet and .xml formats, which can be obtained exporting any ANN from Joone.
-Exporting an ANN from Joone, you have to take care to make the ANN with the right number of input and
+When you export an ANN from Joone, you have to take care to make the ANN with the right number of input and
 output neurons. The number of input neurons must be equal to the input expressions defined in ANN I/O Params section,
 the number of output neurons must be equal to two (buy and sell signals). If you import an ANN
 which have a different number of input/output neurons, before running or training it, the system will ask
@@ -1586,18 +1586,15 @@ in the preferences. Anyway if ANN has not been saved, the system will ask you to
 The theory (Cross Target technique) that resolves this problem can be seen at the following internet site:
 http://web.econ.unito.it/terna/ct-era/ct-era.html
 You must think to the above technique used in the following way: the actions are buy and sell signals,
-the effect of the actions is the capital at the end of day trade.
+the effect of the actions is the capital.
 For the sake of simplicity we have not put the capital as output of ANN, so the ANN have only two
 outputs: the actions (buy and sell signals, one buy and one sell used for all stocks, as usually in Venice).
-To train the buy and sell signals we consider four cases each day.
-We guess the capital according to four possible states:
-<list><item>1) We don't buy and don't sell having the stock in portfolio</item>
-<item>2) We don't buy and don't sell not having the stock in portfolio</item>
-<item>3) We buy but don't sell</item>
-<item>4) We don't buy but sell</item>
-</list>
-We choose the best of the four above, that is to say we choose the actions, which get an earn the nearest
-to earning percentage, defined in Cross Target parameters sub-section in ANN Training section.</para>
+We train the buy and sell signals according to cross target parameters.
+We train a buy signal if in one of the days from the trading day to the last window forecast day
+we can gain an amount equal to or higher than earning percentage.
+For example if we have window forecast = 7 and earning percentage = 2.0, we look for the next 7 days trading,
+if in at least one of them you can get a gain equal to or greater than 2%, then the ANN will be trained
+with a buy signal, if you cannot gain so much, the ANN will be trained with a sell signal.</para>
 
 <section name="The Range Page">
 <para>This is the same as the range page in the <link to="Paper Trade">Paper Trade Module</link>.</para>
@@ -1645,11 +1642,8 @@ while training: for example if we train the ANN with 10 stocks for 20 days (so 1
 if you want to skip 3 days of training, it is enough setting pre learning to 3 days x 10 stocks = 30;
 the default pre learning is zero, so all the period selected in the Venice GUI is taken into consideration.
 The tot cycles are the number of training cycles, many training cycles slow the training session, but
-the ANN will have better performance once trained. The earning percentage is the gain of the ANN each day of trade;
-if you set it to 5, the ANN will try to gain 5 percent each day, if you set it to 1,
-it will try to gain only 1 percent; That can be useful if you want the ANN not considering too high
-gains, these gains can be not common and so it could be preferable avoid considering them. Another funny thing
-you can do is trying a negative earning percentage!</para>
+the ANN will have better performance once trained. The earning percentage and the window forecast are
+the Cross Target parameters, as described above in the Artificial Neural Network introduction.</para>
 
 <para>Some example values:</para>
 <list><item>Learning Rate: 0.7
@@ -1658,15 +1652,37 @@ you can do is trying a negative earning percentage!</para>
 </item>
 <item>Pre Learning: 0
 </item>
-<item>Total Cycles: 50
+<item>Total Cycles: 150
 </item>
-<item>Earning Percentage: 5
+<item>Earning Percentage: 2.0
+</item>
+<item>Window Forecast: 7
 </item></list>
 </section>
 
 <section name="ANN Type">
 <para>Here you can load/save ANN from/to file system. You can also decide if using a default ANN or a custom one.
 If you decide to use a custom ANN, you have to load it from file system.</para>
+</section>
+
+<section name="ANN Example">
+<para>Almost all the parameters have default values, so I give you just an example of input values for the input
+expressions of the ANN. Another important thing is to consider the stocks one by one, because the trend
+can vary a lot from one stock to another one. Training one neural network for one stock only, is the best
+way to achieve the best performance. If you want to train and run the ANN with more than one stock in the stock
+text box, take care to choose carefully the bundle of stocks, because the system manage always only one
+neural network with two output signals for all the stocks in the bundle.</para>
+<para>Example of input values of input expressions of the ANN:</para>
+<list><item><code>(1000*(close-lag(close,-1)))/close</code>
+</item>
+<item><code>(1000*(lag(close,-1)-lag(close,-2)))/close</code>
+</item>
+<item><code>(1000*(lag(close,-2)-lag(close,-3)))/close</code>
+</item>
+<item><code>...</code>
+</item>
+<item><code>(1000*(lag(close,-(n-1))-lag(close,-n)))/close</code>
+</item></list>
 </section>
 </chapter>
 

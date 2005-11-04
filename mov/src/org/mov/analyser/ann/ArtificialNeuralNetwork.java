@@ -179,7 +179,7 @@ public class ArtificialNeuralNetwork implements NeuralNetListener {
             //boolean supervisioned,
             int newTotCicles,
             int newTrainingPatterns) {
-            
+
         if (nnet != null) {
         
             /* We get the first layer of the net (the input layer),
@@ -200,7 +200,7 @@ public class ArtificialNeuralNetwork implements NeuralNetListener {
             MemoryInputSynapse memOut = new MemoryInputSynapse();
             memOut.setFirstRow(0);
             memOut.setLastRow(outputDesiredArray.length);
-            memOut.setAdvancedColumnSelector("1-2");
+            memOut.setAdvancedColumnSelector("1-" + this.OUTPUT_NEURONS);
             memOut.setInputArray(outputDesiredArray);
             
             /* Set the monitor and teacher for the ANN training */
@@ -604,7 +604,7 @@ public class ArtificialNeuralNetwork implements NeuralNetListener {
             
     public void netStopped(NeuralNetEvent e) {
         // Close the progress bar
-        ProgressDialogManager.closeProgressDialog(progress);
+        progress.hide();
         // Stop the ANN
         nnet.stop();
         // Detach Monitor
@@ -619,7 +619,7 @@ public class ArtificialNeuralNetwork implements NeuralNetListener {
             
     public void netStoppedError(NeuralNetEvent e, java.lang.String error) {
         // Close the progress bar
-        ProgressDialogManager.closeProgressDialog(progress);
+        progress.hide();
         // Stop the ANN
         nnet.stop();
         // Detach Monitor

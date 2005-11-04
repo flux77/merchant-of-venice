@@ -49,7 +49,8 @@ import org.mov.ui.ProgressDialog;
  * ANNs need to be trained, and the training session needs to know how the things would
  * be happened, if different choices have been taken day by day.
  * For further information about the techniques used, you should find out the Cross Target
- * technique. That is the technique used here to get the buy/sell signals.
+ * technique (@author Prof. Pietro Terna).
+ * That is the technique used here to get the buy/sell signals.
  * {@link http://web.econ.unito.it/terna/ct-era/ct-era.html}
  *
  * <p>The final portfolio will contain a single cash and a single share account.
@@ -69,11 +70,11 @@ import org.mov.ui.ProgressDialog;
  * of CT technique.
  * We do not use the capital as output of ANN, but we use only two outputs (the buy
  * and sell signals).
- * We guess the capital according to four possible states:
- * 1) We don't buy and don't sell having the stock in portfolio
- * 2) We don't buy and don't sell not having the stock in portfolio
- * 3) We buy but don't sell
- * 4) We don't buy but sell
+ * We pilot the buy and sell signals according to what happens in the future:
+ * we calculate if we gain enough in one of the next days
+ * (one from the next day trading until the window forecast day trading).
+ * We gain enough if and only if the earning percentage is higher than the user defined one,
+ * in one of the window forecast days.
  *
  * The core of the CT method has done in the setANNTrainingParameters method in this class.
  *
@@ -142,8 +143,11 @@ public class ANNPaperTrade extends PaperTrade {
 
             try {
                 // Generate the input array of doubles according to the input expressions
-                double[] inputDoubles = getANNInput(inputExpressions,
-                        variables, quoteBundle, symbol, dateOffset);
+                double[] inputDoubles = new double[inputExpressions.length];
+                for (int ii=0; ii<inputDoubles.length; ii++) {
+                    inputDoubles[ii] = inputExpressions[ii].evaluate(variables,
+                    quoteBundle, symbol, dateOffset);
+                }
                 
                 // calculate the price wanted by user trade value expression
                 // to sell the stock (tradeValueWanted).
@@ -173,9 +177,9 @@ public class ANNPaperTrade extends PaperTrade {
             catch(MissingQuoteException e) {
                 // ignore and move on
             }
-            //catch(EvaluationException e) {
+            catch(EvaluationException e) {
                 // Ignore and move on
-            //}
+            }
         }
     }
 
@@ -242,8 +246,11 @@ public class ANNPaperTrade extends PaperTrade {
                             
                     try {
                         // Generate the input array of doubles according to the input expressions
-                        double[] inputDoubles = getANNInput(inputExpressions,
-                                variables, quoteBundle, symbol, dateOffset);
+                        double[] inputDoubles = new double[inputExpressions.length];
+                        for (int ii=0; ii<inputDoubles.length; ii++) {
+                            inputDoubles[ii] = inputExpressions[ii].evaluate(variables,
+                            quoteBundle, symbol, dateOffset);
+                        }
                 
                         boolean[] buy = artificialNeuralNetwork.run(inputDoubles);
                         if(buy[artificialNeuralNetwork.OUTPUT_BUY]) {
@@ -274,31 +281,6 @@ public class ANNPaperTrade extends PaperTrade {
                 order++;
             }
         }
-    }
-
-    /**
-     * Return the input for the ANN.
-     *
-     * @param inputExpressions expressions in input for the ANN
-     * @param variables any Gondola variables set
-     * @param quoteBundle historical quote data
-     * @param symbol current stock symbol to be processed
-     * @param dateOffset current date
-     *
-     * @return the input for the ANN
-     */
-    private static double[] getANNInput(Expression[] inputExpressions, Variables variables,
-            EODQuoteBundle quoteBundle, Symbol symbol, int dateOffset)
-        throws EvaluationException {
-        
-        // Generate the input array of doubles according to the input expressions
-        double[] inputDoubles = new double[inputExpressions.length];
-        for (int ii=0; ii<inputDoubles.length; ii++) {
-            inputDoubles[ii] = inputExpressions[ii].evaluate(variables,
-                    quoteBundle, symbol, dateOffset);
-        }
-        
-        return inputDoubles;
     }
 
     /**
@@ -516,10 +498,7 @@ public class ANNPaperTrade extends PaperTrade {
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);
 
-            // Calculate the input for ANN training
             // Iterate through stocks available today - should we buy or sell any of it?
-            Hashtable hashtable = new Hashtable();
-            
             for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
                 Symbol symbol = (Symbol)iterator.next();
                 /* 
@@ -528,21 +507,14 @@ public class ANNPaperTrade extends PaperTrade {
                  * Each call to setANNTrainingParameters method makes
                  * an assignment to a single row.
                  */
-                boolean stockHeld = false;
-                stockHeld =
-                        (hashtable.get(symbol.get()) == null) ?
-                            false :
-                            (new Boolean((Boolean)hashtable.get(symbol.get()))).booleanValue();
-                boolean newStockValue =
-                        setANNTrainingParameters(ANNInputArray[ANNArrayPointer],
+                setANNTrainingParameters(ANNInputArray[ANNArrayPointer],
                         ANNOutputDesiredArray[ANNArrayPointer],
-                        stockHeld,
-                        environment, quoteBundle, variables, dateOffset, tradeCost,
-                        symbol, orderCache, stockValue,
+                        environment, quoteBundle, variables,
+                        dateOffset, symbol,
                         inputExpressions, artificialNeuralNetwork,
-                        ANNTrainingPage.getEarningPercentage());
-                hashtable.put(symbol.get(),
-                        (Boolean)new Boolean(newStockValue));
+                        ANNTrainingPage.getMinEarningPercentage(),
+                        ANNTrainingPage.getWindowForecast());
+
                 ANNArrayPointer++;
             }
 
@@ -671,9 +643,8 @@ public class ANNPaperTrade extends PaperTrade {
             catch(MissingQuoteException e) {
                 // Ignore and move on
             }
-            // Iterate through stocks available today - should we buy or sell any of it?
-            Hashtable hashtable = new Hashtable();
             
+            // Iterate through stocks available today - should we buy or sell any of it?
             for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
                 Symbol symbol = (Symbol)iterator.next();
                 /* 
@@ -682,21 +653,14 @@ public class ANNPaperTrade extends PaperTrade {
                  * Each call to setANNTrainingParameters method makes an assignment to
                  * a single row.
                  */
-                boolean stockHeld = false;
-                stockHeld =
-                        (hashtable.get(symbol.get()) == null) ?
-                            false :
-                            (new Boolean((Boolean)hashtable.get(symbol.get()))).booleanValue();
-                boolean newStockValue =
-                        setANNTrainingParameters(ANNInputArray[ANNArrayPointer],
+                setANNTrainingParameters(ANNInputArray[ANNArrayPointer],
                         ANNOutputDesiredArray[ANNArrayPointer],
-                        stockHeld,
-                        environment, quoteBundle, variables, dateOffset, tradeCost,
-                        symbol, orderCache, stockValue,
+                        environment, quoteBundle, variables,
+                        dateOffset, symbol,
                         inputExpressions, artificialNeuralNetwork,
-                        ANNTrainingPage.getEarningPercentage());
-                hashtable.put(symbol.get(),
-                        (Boolean)new Boolean(newStockValue));
+                        ANNTrainingPage.getMinEarningPercentage(),
+                        ANNTrainingPage.getWindowForecast());
+                
                 ANNArrayPointer++;
             }
 
@@ -907,8 +871,11 @@ public class ANNPaperTrade extends PaperTrade {
 
             try {
                 // Generate the input array of doubles according to the input expressions
-                double[] inputDoubles = getANNInput(inputExpressions,
-                        variables, quoteBundle, symbol, dateOffset);
+                double[] inputDoubles = new double[inputExpressions.length];
+                for (int ii=0; ii<inputDoubles.length; ii++) {
+                    inputDoubles[ii] = inputExpressions[ii].evaluate(variables,
+                    quoteBundle, symbol, dateOffset);
+                }
                 
                 // Get if the stock must be sold
                 boolean[] sell = artificialNeuralNetwork.run(inputDoubles);
@@ -967,8 +934,11 @@ public class ANNPaperTrade extends PaperTrade {
 
             try {
                 // Generate the input array of doubles according to the input expressions
-                double[] inputDoubles = getANNInput(inputExpressions,
-                        variables, quoteBundle, symbol, dateOffset);
+                double[] inputDoubles = new double[inputExpressions.length];
+                for (int ii=0; ii<inputDoubles.length; ii++) {
+                    inputDoubles[ii] = inputExpressions[ii].evaluate(variables,
+                    quoteBundle, symbol, dateOffset);
+                }
                 
                 // Get if the stock must be bought
                 boolean[] buy = artificialNeuralNetwork.run(inputDoubles);
@@ -1011,229 +981,76 @@ public class ANNPaperTrade extends PaperTrade {
      * This is the core method which manages the Cross Target technique.
      * All the CT method is described at the beginning of this class.
      */
-    private static boolean setANNTrainingParameters(double[] ANNInputArrayRow,
+    private static void setANNTrainingParameters(double[] ANNInputArrayRow,
             double[] ANNOutputDesiredArrayRow,
-            boolean stockHeld,
             Environment environment,
             EODQuoteBundle quoteBundle,
             Variables variables,
             int dateOffset,
-            Money tradeCost,
             Symbol symbol,
-            OrderCache orderCache,
-            Money stockValue,
             Expression[] inputExpressions,
             ArtificialNeuralNetwork artificialNeuralNetwork,
-            double earningPercentage) {
-        
-        // The return value that says if a stock is held at the end of this trading day
-        boolean retValue = false;
+            double minEarningPercentage,
+            int windowForecast) {
         
         /* Input parameters for the ANN */
-        double[] inputDoubles = new double[inputExpressions.length];
         try {
-            inputDoubles = getANNInput(inputExpressions,
-                    variables, quoteBundle, symbol, dateOffset);
-            for (int ii=0; ii<inputDoubles.length; ii++) {
-                ANNInputArrayRow[ii] = inputDoubles[ii];
+            for (int ii=0; ii<inputExpressions.length; ii++) {
+                ANNInputArrayRow[ii] = inputExpressions[ii].evaluate(variables,
+                quoteBundle, symbol, dateOffset);
             }
+        } catch (EvaluationException ex) {
+            // Do nothing if we cannot get any of the inputs
         }
-        catch(EvaluationException e) {
-            // Ignore and move on
-        }
-        
+
         
         /* Output parameters for the ANN */
         
-        /* 
-         * Inizialize the hypothetic capitals according to all possible buy/sell signal.
-         * The only signal that has not been taken into consideration is the buy and sell,
-         * because if we want to buy, it is a nonsense selling it at the same time.
-         */
-        double capitalOld = 0.0D;
-        double capitalNotBuyNotSell = 0.0D;
-        double capitalNotBuyYesSell = 0.0D;
-        double capitalYesBuyNotSell = 0.0D;
-        
-        /* Calculate the capitals */
-        // Capital got from previous day trade
-        capitalOld = getCapital(environment.portfolio, quoteBundle, dateOffset);
-        
         /*
-         * Maximum number of stocks in portfolio
+         * open and close prices of the next trading days
+         * (the next trading days are equal to window forecast parameter).
+         * buySignal is activated if there is at least one day among the window
+         * forecast days, when we gain a percentage equal to or higher than earning percentage.
          */
-        int maxStocks = (int)Math.floor(capitalOld / stockValue.doubleValue());
-        
-        // NOT BUY AND NOT SELL
-        double capitalDoNothing = 0;
-        
+        double openPrice = 0;
+        boolean buySignal = false;
+        double closePrice = 0;
         try {
-            double openPrice = environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN,
-                            dateOffset + 1);
-            double closePrice = environment.quoteBundle.getQuote(symbol, Quote.DAY_CLOSE,
-                            dateOffset + 1);
-            int shares =
-                    (int)Math.floor(stockValue.doubleValue() / Math.max(openPrice, closePrice));
-            if (stockHeld) {
-                // not buy and not sell having the stock in portfolio (stockHeld == true)
-                capitalDoNothing = shares * (closePrice - openPrice);
-            } else {
-                // not buy and not sell not having the stock in portfolio (stockHeld == false)
-                capitalDoNothing = 0;
-            }
-        }
-        catch(MissingQuoteException e) {
-            // Ignore and move on
-        }
-                
-        // Capital got after this day trade, as if we have neither bought neither sold
-        capitalNotBuyNotSell = capitalOld + capitalDoNothing;
-        
-        // BUY AND NOT SELL
-        double capitalPortfolioBuy = 0;
-        try {
-            // calculate the price wanted by user trade value expression
-            // to buy the stock (tradeValueWanted).
-            // If trade value expression is 'open', then
-            // set tradeValueWanted at open price.
-            double tradeValueWanted = 0;
-            if(!environment.tradeValueBuy.equals("open")) {
-                Expression tradeValueBuyExpression = ExpressionFactory.newExpression(
-                        environment.tradeValueBuy);
-                tradeValueWanted = tradeValueBuyExpression.evaluate(variables,
-                        environment.quoteBundle, symbol, dateOffset);
-            } else {
-                tradeValueWanted = environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN,
-                        dateOffset + 1);
-            }
-            // If the wished price is greater than the minimum of the day,
-            // your stocks will be bought.
-            // It simulates an order of buying at fixed price (tradeValueWanted).
-            if (tradeValueWanted>=environment.quoteBundle.getQuote(symbol, Quote.DAY_LOW,
-                    dateOffset + 1)) {
-                // Calculate maximum number of shares we can buy with the given amount
-                double sharePrice = tradeValueWanted;
-                int shares = (int)Math.floor(stockValue.doubleValue() / sharePrice);
-
-                if(shares > 0) {
-                    // Now calculate the change of capital.
-                    // Buying we have to add what we earn from the close of dateOffset + 1
-                    // and the buy time (@ tradeValueWanted price).
-                    // We have also to subtract the tradeCost.
-                    capitalPortfolioBuy =
-                            shares * (
-                            quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, dateOffset + 1)
-                            - tradeValueWanted) -
-                            tradeCost.doubleValue();
+            // Get the open price
+            openPrice = environment.quoteBundle.getQuote(symbol,
+                    Quote.DAY_OPEN, dateOffset + 1);
+            // Loop for all the days in the window forecast
+            for (int ii = 1; ii < windowForecast + 1; ii++) {
+                if ((dateOffset + ii) <= environment.endDateOffset) {
+                    // Get the close price, ii days after the trading day.
+                    closePrice = environment.quoteBundle.getQuote(symbol,
+                            Quote.DAY_CLOSE, dateOffset + ii);
+                    double earn = (100.0D * (closePrice - openPrice) / openPrice);
+                    // if we earn in the ii trading day,
+                    // then set the buy signal to true.
+                    if (earn > minEarningPercentage) {
+                        buySignal = true;
+                    }
                 }
             }
         }
         catch(MissingQuoteException e) {
             // Ignore and move on
         }
-        catch(EvaluationException e) {
-            // Ignore and move on
-        }
-        
-        // Capital got after this day trade, as if we have bought but not sold
-        capitalYesBuyNotSell = capitalOld + capitalPortfolioBuy;
-        
-        // NOT BUY AND SELL
-        double capitalPortfolioSell = 0;
-        try {
-            // calculate the price wanted by user trade value expression
-            // to buy the stock (tradeValueWanted).
-            // If trade value expression is 'open', then
-            // set tradeValueWanted at open price.
-            double tradeValueWanted = 0;
-            if(!environment.tradeValueSell.equals("open")) {
-                Expression tradeValueSellExpression = ExpressionFactory.newExpression(
-                        environment.tradeValueSell);
-                tradeValueWanted = tradeValueSellExpression.evaluate(variables,
-                        environment.quoteBundle, symbol, dateOffset);
-            } else {
-                tradeValueWanted = environment.quoteBundle.getQuote(symbol, Quote.DAY_OPEN,
-                        dateOffset + 1);
-            }
-            // If the wished price is lower than the maximum of the day,
-            // your stocks will be sold.
-            // It simulates an order of selling at fixed price (tradeValueWanted).
-            if (tradeValueWanted<=environment.quoteBundle.getQuote(symbol, Quote.DAY_HIGH,
-                    dateOffset + 1)) {
-                int shares = (int)Math.floor(stockValue.doubleValue() / tradeValueWanted);
-
-                // Now calculate the change of capital.
-                // Selling we have to add what we earn from the close of dateOffset
-                // and the sell time (@ tradeValueWanted price).
-                // We have also to subtract the tradeCost.
-                capitalPortfolioSell =
-                        shares * (
-                        tradeValueWanted -
-                        quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, dateOffset)) -
-                        tradeCost.doubleValue();
-            }
-        }
-        catch(MissingQuoteException e) {
-            // Ignore and move on
-        }
-        catch(EvaluationException e) {
-            // Ignore and move on
-        }
-        
-        // Capital got after this day trade, as if we haven't bought but sold
-        capitalNotBuyYesSell = capitalOld + capitalPortfolioSell;
-        
-        
-        /* 
-         * Calculate the desired output according to Cross Target method.
-         * We choose the best performance according to Cross Target parameters
-         * among capital values calculated above.
-         * The best is used to train the ANN.
-         * The best is the nearest value to the earningPercentage,
-         * recalculated according to the number of maximum stocks
-         */
-        // Generate the input array of doubles according to the input expressions
-        double earningPercentageAll = earningPercentage / maxStocks;
-        double maxEarn = Math.min(
-                Math.abs((100.0D * (capitalNotBuyNotSell - capitalOld) / capitalOld) -
-                earningPercentageAll),
-                Math.abs((100.0D * (capitalNotBuyYesSell - capitalOld) / capitalOld) -
-                earningPercentageAll));
-        maxEarn = Math.min(maxEarn,
-                Math.abs((100.0D * (capitalYesBuyNotSell - capitalOld) / capitalOld) -
-                earningPercentageAll));
-        
-        
-        // Set the desired outputs
-        if (maxEarn == Math.abs((100.0D * (capitalNotBuyNotSell - capitalOld) / capitalOld) -
-                earningPercentageAll)) {
-            // NOT BUY AND NOT SELL
-            ANNOutputDesiredArrayRow[artificialNeuralNetwork.OUTPUT_BUY] =
-                    artificialNeuralNetwork.LOW_BOOL;
-            ANNOutputDesiredArrayRow[artificialNeuralNetwork.OUTPUT_SELL] =
-                    artificialNeuralNetwork.LOW_BOOL;
-            // We countinue to have/not have the stock according to the previous day trade
-            retValue = stockHeld;
-        } else if (maxEarn == Math.abs((100.0D * (capitalNotBuyYesSell - capitalOld) / capitalOld) -
-                earningPercentageAll)) {
-            // NOT BUY AND SELL
-            ANNOutputDesiredArrayRow[artificialNeuralNetwork.OUTPUT_BUY] =
-                    artificialNeuralNetwork.LOW_BOOL;
-            ANNOutputDesiredArrayRow[artificialNeuralNetwork.OUTPUT_SELL] =
-                    artificialNeuralNetwork.HIGH_BOOL;
-            // We sell, so we don't have the stock anymore.
-            retValue = false;
-        } else {
+                
+        // Set the wanted buy and sell signals
+        if (buySignal) {
             // BUY AND NOT SELL
             ANNOutputDesiredArrayRow[artificialNeuralNetwork.OUTPUT_BUY] =
                     artificialNeuralNetwork.HIGH_BOOL;
             ANNOutputDesiredArrayRow[artificialNeuralNetwork.OUTPUT_SELL] =
                     artificialNeuralNetwork.LOW_BOOL;
-            // We buy, so we have the stock
-            retValue = true;
+        } else {
+            // NOT BUY AND SELL
+            ANNOutputDesiredArrayRow[artificialNeuralNetwork.OUTPUT_BUY] =
+                    artificialNeuralNetwork.LOW_BOOL;
+            ANNOutputDesiredArrayRow[artificialNeuralNetwork.OUTPUT_SELL] =
+                    artificialNeuralNetwork.HIGH_BOOL;
         }
-        
-        // return if stock has held this day trade
-        return retValue;
     }
 }

@@ -467,7 +467,6 @@ public class ANNModule extends JPanel implements Module {
         ArtificialNeuralNetwork artificialNeuralNetwork = ANNNetworkTypePage.getANN();
         artificialNeuralNetwork.setBuyThreshold(ANNPage.getBuyThreshold());
         artificialNeuralNetwork.setSellThreshold(ANNPage.getSellThreshold());
-        double earningPercentage = ANNTrainingPage.getEarningPercentage();
 
         // We set the progress bar, it will be incremented one by one for each trading date
         progress.setIndeterminate(false);
@@ -553,7 +552,6 @@ public class ANNModule extends JPanel implements Module {
         ArtificialNeuralNetwork artificialNeuralNetwork = ANNNetworkTypePage.getANN();
         artificialNeuralNetwork.setBuyThreshold(ANNPage.getBuyThreshold());
         artificialNeuralNetwork.setSellThreshold(ANNPage.getSellThreshold());
-        double earningPercentage = ANNTrainingPage.getEarningPercentage();
 
         // Initialize the progress bar
         progress.setIndeterminate(false);

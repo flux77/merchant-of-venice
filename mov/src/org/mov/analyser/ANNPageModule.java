@@ -362,12 +362,14 @@ public class ANNPageModule extends AbstractTable implements Module {
                 // calculateOrderColumn method will do instead.
                 newExpressionArray[ORDER_COLUMN] = 
                         (new Integer(model.getRowCount())).toString();
-                newExpressionArray[EXPRESSION_COLUMN] = newExpression;
-                List newExpressionList = new ArrayList();
-                newExpressionList.add(newExpressionArray);
-                model.addResult(newExpressionList);
-                model.fireTableDataChanged();
-                repaint();
+                if ((newExpression != null) && (!newExpression.equals(""))) {
+                    newExpressionArray[EXPRESSION_COLUMN] = newExpression;
+                    List newExpressionList = new ArrayList();
+                    newExpressionList.add(newExpressionArray);
+                    model.addResult(newExpressionList);
+                    model.fireTableDataChanged();
+                    repaint();
+                }
             }});
 
             thread.start();

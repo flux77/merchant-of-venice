@@ -66,7 +66,7 @@ public class MacroManager {
      */
     
     public static void executeStartupMacros() {
-        List macros = PreferencesManager.loadStoredMacros();
+        List macros = PreferencesManager.getStoredMacros();
         Object array_list = Array.newInstance(StoredMacro.class, macros.size());
 
         // Set up the start sequence

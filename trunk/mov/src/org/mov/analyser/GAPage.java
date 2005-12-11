@@ -16,11 +16,6 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/**
- *
- * @author  Alberto Nacher
- */
-
 package org.mov.analyser;
 
 import java.awt.BorderLayout;
@@ -100,7 +95,7 @@ public class GAPage extends JPanel implements AnalyserPage {
     public void load(String key) {
         // Load last GUI settings from preferences
 	HashMap settings =
-            PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
+            PreferencesManager.getAnalyserPageSettings(key + getClass().getName());
 
 	Iterator iterator = settings.keySet().iterator();
 
@@ -130,8 +125,8 @@ public class GAPage extends JPanel implements AnalyserPage {
 	settings.put("display_population", displayPopulationTextField.getText());
 	settings.put("random_percentage", randomPercentageTextField.getText());
 
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settings);
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(),
+                                                   settings);
     }
 
     public boolean parse() {

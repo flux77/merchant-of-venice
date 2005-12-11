@@ -92,7 +92,7 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
      * @param desktop the parent desktop
      */
     public PreferencesModule(JDesktopPane desktop) {
-	this(desktop, PreferencesManager.loadLastPreferencesPage());
+	this(desktop, PreferencesManager.getLastPreferencesPage());
     }
 
     /**
@@ -269,6 +269,6 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
      * the window is being closed.
      */
     public void save() {
-	PreferencesManager.saveLastPreferencesPage(pageList.getSelectedIndex());
+	PreferencesManager.putLastPreferencesPage(pageList.getSelectedIndex());
     }
 }

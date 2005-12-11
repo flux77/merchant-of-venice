@@ -272,7 +272,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     public void save() {
         // Don't save the watch screen if it was just deleted.
 	if(!isDeleted)
-            PreferencesManager.saveWatchScreen(watchScreen);
+            PreferencesManager.putWatchScreen(watchScreen);
     }
 
     /**
@@ -476,7 +476,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
                         
                         // Save the watch screen under the new name
                         watchScreen.setName(newWatchScreenName);
-                        PreferencesManager.saveWatchScreen(watchScreen);
+                        PreferencesManager.putWatchScreen(watchScreen);
                         
                         // Delete the old watch screen
                         PreferencesManager.deleteWatchScreen(oldWatchScreenName);

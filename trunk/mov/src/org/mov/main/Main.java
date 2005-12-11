@@ -89,7 +89,7 @@ public class Main extends JFrame {
 			   "Andrew Leppard (aleppard@picknowl.com.au)");
         System.out.println(Locale.getString("SEE_LICENSE"));
 
-	displayPreferences = PreferencesManager.loadDisplaySettings();
+	displayPreferences = PreferencesManager.getDisplaySettings();
 	setSize(displayPreferences.width, displayPreferences.height);
 	setLocation(displayPreferences.x, displayPreferences.y);
 
@@ -129,7 +129,7 @@ public class Main extends JFrame {
 	displayPreferences.y = getY();
 	displayPreferences.width = getWidth();
 	displayPreferences.height = getHeight();
-	PreferencesManager.saveDisplaySettings(displayPreferences);
+	PreferencesManager.putDisplaySettings(displayPreferences);
 
 	// Call save() on each module so they can save their
 	// preferences data
@@ -157,14 +157,14 @@ public class Main extends JFrame {
         venice = new Main();
 
         // Temporarily disable functionality if the user has not accepted the license.
-        if(PreferencesManager.requireGPLAcceptance())
+        if(PreferencesManager.getHasGPLAcceptance())
             MainMenu.getInstance().disableMenus();
 
         venice.setVisible(true);
 
         // First make sure user has agreed to GPL. If they do not agree to
         // the license, then quit the application immediately.
-        if (PreferencesManager.requireGPLAcceptance()) {
+        if (PreferencesManager.getHasGPLAcceptance()) {
             if(!GPLViewDialog.showGPLAcceptanceDialog()) {
                 venice.dispose();
                 System.exit(0);
@@ -172,7 +172,7 @@ public class Main extends JFrame {
 
             // Record user's acceptance and re-enable functionality.
             else {
-                PreferencesManager.setGPLAcceptance();
+                PreferencesManager.putHasGPLAcceptance();
                 MainMenu.getInstance().enableMenus();
             }
         }
@@ -186,7 +186,7 @@ public class Main extends JFrame {
 
         // Start up intra-day quote sync
         PreferencesManager.IDQuoteSyncPreferences idQuoteSyncPreferences =
-            PreferencesManager.loadIDQuoteSyncPreferences();
+            PreferencesManager.getIDQuoteSyncPreferences();
         IDQuoteSync.getInstance().setPeriod(idQuoteSyncPreferences.period);
 
         try {

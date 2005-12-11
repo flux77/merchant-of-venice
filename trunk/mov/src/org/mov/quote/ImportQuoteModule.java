@@ -382,7 +382,7 @@ public class ImportQuoteModule extends JPanel implements Module {
     private boolean parseFileFields() {
         // Get files user wants to import
         JFileChooser chooser;
-        String lastDirectory = PreferencesManager.loadDirectoryLocation("importer");
+        String lastDirectory = PreferencesManager.getDirectoryLocation("importer");
             
         if(lastDirectory != null)
             chooser = new JFileChooser(lastDirectory);
@@ -395,7 +395,7 @@ public class ImportQuoteModule extends JPanel implements Module {
         if(action == JFileChooser.APPROVE_OPTION) {
             // Remember directory
             lastDirectory = chooser.getCurrentDirectory().getAbsolutePath();
-            PreferencesManager.saveDirectoryLocation("importer",lastDirectory);
+            PreferencesManager.putDirectoryLocation("importer",lastDirectory);
             
             files = chooser.getSelectedFiles();
             
@@ -592,7 +592,7 @@ public class ImportQuoteModule extends JPanel implements Module {
         // "Internal Database".
         int quoteSource = PreferencesManager.getQuoteSource();                    
         if(quoteSource == PreferencesManager.SAMPLES) {
-            PreferencesManager.setQuoteSource(PreferencesManager.INTERNAL);
+            PreferencesManager.putQuoteSource(PreferencesManager.INTERNAL);
             QuoteSourceManager.flush();
         }
 

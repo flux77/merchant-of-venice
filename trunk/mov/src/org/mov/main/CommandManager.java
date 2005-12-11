@@ -301,8 +301,7 @@ public class CommandManager {
 
         // We don't run this in a new thread because we call openPortfolio(portfolio)
         // which will open a new thread for us.
-        Portfolio portfolio =
-            PreferencesManager.loadPortfolio(portfolioName);
+        Portfolio portfolio = PreferencesManager.getPortfolio(portfolioName);
 
         openPortfolio(portfolio);
     }
@@ -447,7 +446,7 @@ public class CommandManager {
             WatchScreen watchScreen = new WatchScreen(watchScreenName);
 
 	    // Save watch screen so we can update the menu
-	    PreferencesManager.saveWatchScreen(watchScreen);
+	    PreferencesManager.putWatchScreen(watchScreen);
 	    MainMenu.getInstance().updateWatchScreenMenu();
 	
 	    // Open as normal
@@ -461,8 +460,7 @@ public class CommandManager {
      * @param watchScreenName the name of the watch screen
      */
     public void openWatchScreen(String watchScreenName) {
-        WatchScreen watchScreen =
-            PreferencesManager.loadWatchScreen(watchScreenName);
+        WatchScreen watchScreen = PreferencesManager.getWatchScreen(watchScreenName);
         openWatchScreen(watchScreen);
     }
 
@@ -547,7 +545,7 @@ public class CommandManager {
 	    Portfolio portfolio = new Portfolio(portfolioName);
 	
 	    // Save portfolio so we can update the menu
-	    PreferencesManager.savePortfolio(portfolio);
+	    PreferencesManager.putPortfolio(portfolio);
 	    MainMenu.getInstance().updatePortfolioMenu();
 	
 	    // Open as normal

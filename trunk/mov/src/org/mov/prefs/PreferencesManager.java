@@ -194,7 +194,7 @@ public class PreferencesManager {
      *
      * @return <code>true</code> if the user needs to explicitly accept the GPL
      */
-    public static boolean requireGPLAcceptance() {
+    public static boolean getHasGPLAcceptance() {
         Preferences node = getUserNode("/license");
         String acceptedVersion = node.get("accepted_version", "not_accepted");
         return !acceptedVersion.equals(Main.SHORT_VERSION);
@@ -204,7 +204,7 @@ public class PreferencesManager {
      * Set that the user has been shown the GPL and has accepted it. The user
      * will not be bothered again until the next version.
      */
-    public static void setGPLAcceptance() {
+    public static void putHasGPLAcceptance() {
         Preferences node = getUserNode("/license");
         node.put("accepted_version", Main.SHORT_VERSION);
     }
@@ -215,7 +215,7 @@ public class PreferencesManager {
      * @param  dirtype the directory type (e.g. macros, importer, etc)
      * @return the directory.
      */
-    public static String loadDirectoryLocation(String dirtype) {
+    public static String getDirectoryLocation(String dirtype) {
         Preferences prefs = getUserNode("/"+dirtype);
         String directory = prefs.get("directory", "");
 
@@ -231,7 +231,7 @@ public class PreferencesManager {
      * @param dirtype the directory type (e.g. macros, importer, etc)
      * @param directory the directory.
      */
-    public static void saveDirectoryLocation(String dirtype, String directory) {
+    public static void putDirectoryLocation(String dirtype, String directory) {
         Preferences prefs = getUserNode("/"+dirtype);
         prefs.put("directory", directory);
     }
@@ -242,7 +242,7 @@ public class PreferencesManager {
      * @return the list of stored expressions.
      * @see StoredExpression
      */
-    public static synchronized List loadStoredExpressions() {
+    public static synchronized List getStoredExpressions() {
 	List storedExpressions = new ArrayList();
 	Preferences prefs = getUserNode("/equations");
 
@@ -264,7 +264,7 @@ public class PreferencesManager {
      * @param storedExpressions the stored expressions.
      * @see StoredExpression
      */
-    public static synchronized void saveStoredExpressions(List storedExpressions) {
+    public static synchronized void putStoredExpressions(List storedExpressions) {
 	try {
 	    // Remove old expressions
 	    Preferences prefs = getUserNode("/equations");
@@ -287,11 +287,11 @@ public class PreferencesManager {
      * @return the list of registered macros
      * @see StoredMacro
      */
-    public static synchronized List loadStoredMacros() {
+    public static synchronized List getStoredMacros() {
         List stored_macros = new ArrayList();
         Preferences prefs = getUserNode("/macros/info");
 
-	    String dirname = PreferencesManager.loadDirectoryLocation("macros");
+	    String dirname = PreferencesManager.getDirectoryLocation("macros");
 	    if (dirname == null) return stored_macros;
 	    File directory = new File(dirname);
 	    if (!directory.isDirectory())
@@ -299,7 +299,7 @@ public class PreferencesManager {
 
 	    String[] list = directory.list(new FilenameFilter() {
 	        public boolean accept(File dir, String filename) {
-	            return (dir.getAbsolutePath().equals(PreferencesManager.loadDirectoryLocation("macros")) &&
+	            return (dir.getAbsolutePath().equals(PreferencesManager.getDirectoryLocation("macros")) &&
 	                    filename.indexOf(".py") == filename.length()-3);
 	        }
 	    });
@@ -322,7 +322,7 @@ public class PreferencesManager {
      * @param stored_macros the registered macros.
      * @see StoredMacro
      */
-    public static synchronized void saveStoredMacros(List stored_macros) {
+    public static synchronized void putStoredMacros(List stored_macros) {
         try {
             // Remove old macro definitions
             Preferences prefs = getUserNode("/macros_info");
@@ -344,7 +344,7 @@ public class PreferencesManager {
     }
     
     //Store the users text made for this symbol     
-    public static void saveUserNotes(String symbol, String text) {
+    public static void putUserNotes(String symbol, String text) {
         String xpath = "/userNotes/" + symbol;
         Preferences prefs = getUserNode("/userNotes");
 	
@@ -353,7 +353,7 @@ public class PreferencesManager {
     }
 
     // Retrieve the notes made for this symbol.
-    public static String loadUserNotes(String symbol) {
+    public static String getUserNotes(String symbol) {
 	String text, xpath;
 	Preferences prefs;
 
@@ -376,7 +376,7 @@ public class PreferencesManager {
      * @return mapping of settings.
      * @see org.mov.analyser.AnalyserPage
      */
-    public static HashMap loadAnalyserPageSettings(String key) {
+    public static HashMap getAnalyserPageSettings(String key) {
 
 	HashMap settings = new HashMap();
 	Preferences p = getUserNode("/analyser/" + key);
@@ -406,9 +406,8 @@ public class PreferencesManager {
      * @param settings the settings to save.
      * @see org.mov.analyser.AnalyserPage
      */
-    public static void saveAnalyserPageSettings(String key, HashMap settings) {
+    public static void putAnalyserPageSettings(String key, HashMap settings) {
 	Preferences p = getUserNode("/analyser/" + key);
-
 	Iterator iterator = settings.keySet().iterator();
 
 	while(iterator.hasNext()) {
@@ -424,7 +423,7 @@ public class PreferencesManager {
      *
      * @return index of the last preferences page visited.
      */
-    public static int loadLastPreferencesPage() {
+    public static int getLastPreferencesPage() {
 	Preferences prefs = getUserNode("/prefs");
 	return prefs.getInt("page", 0);
     }
@@ -434,7 +433,7 @@ public class PreferencesManager {
      *
      * @param page index of the last preferences page visited.
      */
-    public static void saveLastPreferencesPage(int page) {
+    public static void putLastPreferencesPage(int page) {
 	Preferences prefs = getUserNode("/prefs");
 	prefs.putInt("page", page);
     }
@@ -444,7 +443,7 @@ public class PreferencesManager {
      *
      * @return the maximum number of quotes.
      */
-    public static int loadMaximumCachedQuotes() {
+    public static int getMaximumCachedQuotes() {
 	Preferences prefs = getUserNode("/cache");
         return prefs.getInt("maximumQuotes", 100000);
     }
@@ -454,7 +453,7 @@ public class PreferencesManager {
      *
      * @param maximumCachedQuotes the maximum number of quotes.
      */
-    public static void saveMaximumCachedQuotes(int maximumCachedQuotes) {
+    public static void putMaximumCachedQuotes(int maximumCachedQuotes) {
         Preferences prefs = getUserNode("/cache");
         prefs.putInt("maximumQuotes", maximumCachedQuotes);
     }
@@ -484,7 +483,7 @@ public class PreferencesManager {
      * @param name the name of the watch screen to load.
      * @return the watch screen.
      */
-    public static synchronized WatchScreen loadWatchScreen(String name) {
+    public static synchronized WatchScreen getWatchScreen(String name) {
         WatchScreen watchScreen = new WatchScreen(name);
 
         Preferences p = getUserNode("/watchscreens/" + name);
@@ -512,7 +511,7 @@ public class PreferencesManager {
      *
      * @param watchScreen the watch screen.
      */
-    public static synchronized void saveWatchScreen(WatchScreen watchScreen) {
+    public static synchronized void putWatchScreen(WatchScreen watchScreen) {
         Preferences p = getUserNode("/watchscreens/" + watchScreen.getName());
 	p.put("name", watchScreen.getName());
 
@@ -595,7 +594,7 @@ public class PreferencesManager {
      * @param name the name of the portfolio to load.
      * @return the portfolio.
      */
-    public static synchronized Portfolio loadPortfolio(String name) {
+    public static synchronized Portfolio getPortfolio(String name) {
 	Portfolio portfolio = new Portfolio(name);
 	
 	Preferences p = getUserNode("/portfolio/" + name);
@@ -733,7 +732,7 @@ public class PreferencesManager {
      *
      * @param portfolio the portfolio.
      */
-    public static synchronized void savePortfolio(Portfolio portfolio) {
+    public static synchronized void putPortfolio(Portfolio portfolio) {
 	Preferences p = getUserNode("/portfolio/" + portfolio.getName());
 	p.put("name", portfolio.getName());
 
@@ -807,7 +806,7 @@ public class PreferencesManager {
      *
      * @return proxy preferences.
      */
-    public static ProxyPreferences loadProxySettings() {
+    public static ProxyPreferences getProxySettings() {
         Preferences prefs = getUserNode("/proxy");
         PreferencesManager preferencesManager = new PreferencesManager();
         ProxyPreferences proxyPreferences = preferencesManager.new ProxyPreferences();
@@ -827,7 +826,7 @@ public class PreferencesManager {
      *
      * @param proxyPreferences the new proxy preferences.
      */
-    public static void saveProxySettings(ProxyPreferences proxyPreferences) {
+    public static void putProxySettings(ProxyPreferences proxyPreferences) {
 	Preferences prefs = getUserNode("/proxy");
 	prefs.put("host", proxyPreferences.host);
 	prefs.put("port", proxyPreferences.port);
@@ -844,7 +843,7 @@ public class PreferencesManager {
      *
      * @return ISO Language Code
      */
-    public static String loadLanguageCode() {
+    public static String getLanguageCode() {
         Preferences prefs = getUserNode("/language");
         return prefs.get("locale", null);
     }
@@ -854,7 +853,7 @@ public class PreferencesManager {
      *
      * @param languageCode ISO Language Code
      */
-    public static void saveLanguageCode(String languageCode) {
+    public static void putLanguageCode(String languageCode) {
         Preferences prefs = getUserNode("/language");
 	prefs.put("locale", languageCode);
     }
@@ -864,7 +863,7 @@ public class PreferencesManager {
      *
      * @return the minimum decimal digits to be displayed
      */
-    public static int loadMinDecimalDigits() {
+    public static int getMinDecimalDigits() {
         // 3 is the default, if anything goes wrong
         int retValue = 3;
         Preferences prefs = getUserNode("/min_user_interface");
@@ -882,7 +881,7 @@ public class PreferencesManager {
      *
      * @param minDecimalDigits the minimum decimal digits to be displayed
      */
-    public static void saveMinDecimalDigits(String minDecimalDigits) {
+    public static void putMinDecimalDigits(String minDecimalDigits) {
         Preferences prefs = getUserNode("/min_user_interface");
 	prefs.put("min_decimal_digits", minDecimalDigits);
     }
@@ -892,7 +891,7 @@ public class PreferencesManager {
      *
      * @return the maximum decimal digits to be displayed
      */
-    public static int loadMaxDecimalDigits() {
+    public static int getMaxDecimalDigits() {
         // 3 is the default, if anything goes wrong
         int retValue = 3;
         Preferences prefs = getUserNode("/max_user_interface");
@@ -910,7 +909,7 @@ public class PreferencesManager {
      *
      * @param maxDecimalDigits the maximum decimal digits to be displayed
      */
-    public static void saveMaxDecimalDigits(String maxDecimalDigits) {
+    public static void putMaxDecimalDigits(String maxDecimalDigits) {
         Preferences prefs = getUserNode("/max_user_interface");
 	prefs.put("max_decimal_digits", maxDecimalDigits);
     }
@@ -941,7 +940,7 @@ public class PreferencesManager {
      * @param quoteSource the quote source, one of {@link #DATABASE}, {@link #INTERNAL} or 
      *                    {@link #SAMPLES}.
      */
-    public static void setQuoteSource(int quoteSource) {
+    public static void putQuoteSource(int quoteSource) {
         assert(quoteSource == DATABASE || quoteSource == SAMPLES || quoteSource == INTERNAL);
 
 	    Preferences prefs = getUserNode("/quote_source");
@@ -962,7 +961,7 @@ public class PreferencesManager {
      *
      * @return database preferences.
      */
-    public static DatabasePreferences loadDatabaseSettings() {
+    public static DatabasePreferences getDatabaseSettings() {
         Preferences prefs = getUserNode("/quote_source/database");
         PreferencesManager preferencesManager = new PreferencesManager();
         DatabasePreferences databasePreferences =
@@ -982,7 +981,7 @@ public class PreferencesManager {
      *
      * @param databasePreferences the new database preferences.
      */
-    public static void saveDatabaseSettings(DatabasePreferences databasePreferences) {
+    public static void putDatabaseSettings(DatabasePreferences databasePreferences) {
 	Preferences prefs = getUserNode("/quote_source/database");
 	prefs.put("software", databasePreferences.software);
 	prefs.put("driver", databasePreferences.driver);
@@ -998,7 +997,7 @@ public class PreferencesManager {
      *
      * @return internal database file name
      */
-    public static String loadInternalFileName() {
+    public static String getInternalFileName() {
         Preferences prefs = getUserNode("/quote_source/internal");
         String defaultFileName = DEFAULT_INTERNAL_FILE_NAME;
 
@@ -1022,7 +1021,7 @@ public class PreferencesManager {
      *
      * @param fileName the file name
      */
-    public static void saveInternalFileName(String fileName) {
+    public static void putInternalFileName(String fileName) {
         Preferences prefs = getUserNode("/quote_source/internal");
         prefs.put("file_name", fileName);
     }
@@ -1032,7 +1031,7 @@ public class PreferencesManager {
      *
      * @return display preferences.
      */
-    public static DisplayPreferences loadDisplaySettings() {
+    public static DisplayPreferences getDisplaySettings() {
         Preferences prefs = getUserNode("/display");
         PreferencesManager preferencesManager = new PreferencesManager();
         DisplayPreferences displayPreferences =
@@ -1049,7 +1048,7 @@ public class PreferencesManager {
      *
      * @param displayPreferences the new display preferences.
      */
-    public static void saveDisplaySettings(DisplayPreferences displayPreferences) {
+    public static void putDisplaySettings(DisplayPreferences displayPreferences) {
 	Preferences prefs = getUserNode("/display");
 	prefs.putInt("default_x", displayPreferences.x);
 	prefs.putInt("default_y", displayPreferences.y);
@@ -1063,7 +1062,7 @@ public class PreferencesManager {
      * @return the preferences.
      * @see org.mov.quote.IDQuoteSyncModule
      */
-    public static IDQuoteSyncPreferences loadIDQuoteSyncPreferences() {
+    public static IDQuoteSyncPreferences getIDQuoteSyncPreferences() {
         Preferences prefs = getUserNode("/id_quote_sync");
         PreferencesManager preferencesManager = new PreferencesManager();
         IDQuoteSyncPreferences idQuoteSyncPreferences =
@@ -1092,7 +1091,7 @@ public class PreferencesManager {
      * @param idQuoteSyncPreferences the preferences.
      * @see org.mov.quote.IDQuoteSyncModule
      */
-    public static void saveIDQuoteSyncPreferences(IDQuoteSyncPreferences idQuoteSyncPreferences) {
+    public static void putIDQuoteSyncPreferences(IDQuoteSyncPreferences idQuoteSyncPreferences) {
         Preferences prefs = getUserNode("/id_quote_sync");
         prefs.putBoolean("isEnabled", idQuoteSyncPreferences.isEnabled);
         prefs.put("symbols", idQuoteSyncPreferences.symbols);

@@ -302,7 +302,7 @@ public class PortfolioModule extends JPanel implements Module,
         // Don't save if the portfolio is transient or the user just
         // deleted it.
 	if(!portfolio.isTransient() && !isDeleted) {
-	    PreferencesManager.savePortfolio(portfolio);
+	    PreferencesManager.putPortfolio(portfolio);
 	    MainMenu.getInstance().updatePortfolioMenu();
 	}
     }
@@ -523,7 +523,7 @@ public class PortfolioModule extends JPanel implements Module,
 
             // Save the portfolio under the new name
             portfolio.setName(newPortfolioName);
-	    PreferencesManager.savePortfolio(portfolio);
+	    PreferencesManager.putPortfolio(portfolio);
 
             // Delete the old portfolio
             PreferencesManager.deletePortfolio(oldPortfolioName);

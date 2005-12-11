@@ -41,7 +41,7 @@ public class QuoteSourceFactory {
      * @return the database quote source
      */
     public static DatabaseQuoteSource createInternalQuoteSource() {
-        String fileName = PreferencesManager.loadInternalFileName();
+        String fileName = PreferencesManager.getInternalFileName();
         return new DatabaseQuoteSource(fileName);
     }
 
@@ -116,7 +116,7 @@ public class QuoteSourceFactory {
      */
     public static DatabaseQuoteSource createDatabaseQuoteSource() {
         PreferencesManager.DatabasePreferences prefs = 
-           PreferencesManager.loadDatabaseSettings();
+           PreferencesManager.getDatabaseSettings();
         
         return new DatabaseQuoteSource(prefs.software, 
                                        prefs.driver,

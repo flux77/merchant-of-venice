@@ -82,7 +82,7 @@ public class EquationTable extends AbstractTable {
 			       Locale.getString("FULL_EQUATION_COLUMN_HEADER"), 
 			       String.class, Column.VISIBLE));
 
-	storedExpressions = PreferencesManager.loadStoredExpressions();
+	storedExpressions = PreferencesManager.getStoredExpressions();
 
 	model = new Model(columns, storedExpressions);
 	setModel(model);
@@ -158,7 +158,7 @@ public class EquationTable extends AbstractTable {
      * this table. Make sure everything is in-sync with the new expressions.
      */
     public void save() {
-	PreferencesManager.saveStoredExpressions(storedExpressions);
+	PreferencesManager.putStoredExpressions(storedExpressions);
 	ExpressionComboBox.updateExpressions();
     }
 }

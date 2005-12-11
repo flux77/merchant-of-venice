@@ -67,8 +67,8 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
 
-        int minDecimalDigits = PreferencesManager.loadMinDecimalDigits();
-        int maxDecimalDigits = PreferencesManager.loadMaxDecimalDigits();
+        int minDecimalDigits = PreferencesManager.getMinDecimalDigits();
+        int maxDecimalDigits = PreferencesManager.getMaxDecimalDigits();
         minDecimalDigitsTextField = 
             GridBagHelper.addTextRow(borderPanel, 
                                      Locale.getString("MIN_DECIMAL_DIGITS"), 
@@ -105,10 +105,10 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
         }
 
         if(minDecimalDigits > 0) {
-            PreferencesManager.saveMinDecimalDigits(minDecimalDigitsTextField.getText());
+            PreferencesManager.putMinDecimalDigits(minDecimalDigitsTextField.getText());
         }
         if(maxDecimalDigits > 0) {
-            PreferencesManager.saveMaxDecimalDigits(maxDecimalDigitsTextField.getText());
+            PreferencesManager.putMaxDecimalDigits(maxDecimalDigitsTextField.getText());
         }
     }
 }

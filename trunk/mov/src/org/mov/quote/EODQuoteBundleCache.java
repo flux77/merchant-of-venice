@@ -141,7 +141,7 @@ public class EODQuoteBundleCache {
             // If the quote cache has too many quotes then keep
             // freeing the oldest bundle - but don't free the
             // newest bundle, since that is the one we are loading.
-            int maximumCachedQuotes = PreferencesManager.loadMaximumCachedQuotes();
+            int maximumCachedQuotes = PreferencesManager.getMaximumCachedQuotes();
 
             synchronized(loadedQuoteBundles) {
                 while(quoteCache.size() > maximumCachedQuotes &&

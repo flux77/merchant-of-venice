@@ -304,7 +304,7 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
     public void load(String key) {
         // Load last GUI settings from preferences
 	HashMap settings =
-            PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
+            PreferencesManager.getAnalyserPageSettings(key + getClass().getName());
 
 	Iterator iterator = settings.keySet().iterator();
 
@@ -338,8 +338,8 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
 	GPGondolaSelectionPanel[7].save(settings, "gp_pos_integer_expression");
 	GPGondolaSelectionPanel[8].save(settings, "gp_neg_integer_expression");
 
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settings);
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(),
+                                                   settings);
     }
 
     public boolean parse() {

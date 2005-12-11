@@ -107,8 +107,8 @@ public class QuoteFormat implements Comparable {
         if(format == null) {
             format = NumberFormat.getInstance();
             format.setMinimumIntegerDigits(1);
-            int minDecimalDigits = PreferencesManager.loadMinDecimalDigits();
-            int maxDecimalDigits = PreferencesManager.loadMaxDecimalDigits();
+            int minDecimalDigits = PreferencesManager.getMinDecimalDigits();
+            int maxDecimalDigits = PreferencesManager.getMaxDecimalDigits();
             format.setMinimumFractionDigits(minDecimalDigits);
             format.setMaximumFractionDigits(maxDecimalDigits);
         }

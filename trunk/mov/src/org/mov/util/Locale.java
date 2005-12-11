@@ -116,7 +116,7 @@ public class Locale {
         locale = java.util.Locale.getDefault();
 
         // Override if there is a preference setting for another language
-        String languageCode = PreferencesManager.loadLanguageCode();
+        String languageCode = PreferencesManager.getLanguageCode();
 
         if(languageCode != null) {
             java.util.Locale[] locales = LocaleConstants.locales;

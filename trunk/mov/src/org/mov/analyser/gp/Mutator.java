@@ -67,19 +67,17 @@ public class Mutator {
     // (i.e. we modify the expression tree at the mutation point).
     private final static int MODIFICATION_MUTATION_PERCENT = 70;
 
-    /** SUBTYPE
-     * The subtype concept is introduced in Mutator class to pilot the GP process,
-     * so that less time is wasted to find the best fitting expressions.
-     * The type concept is present in Expression class and it is widely used in Gondola,
-     * the subtype concept is a weaker tool, that only suggests the GP what to find
-     * for the best fit in an expression.
-     * For example in lag(close,xxx), we would like xxx be a INTEGER_TYPE expression,
-     * by the point of view of the type, but an integer is not enough,
-     * we also need that this integer be small and negative,
-     * because xxx is the number of days of delay.
-     * So we pilot the GP to find a small negative integer using
-     * the subtype NEGATIVE_SHORT_INTEGER_SUBTYPE.
-     */
+    // The subtype concept is introduced in Mutator class to pilot the GP process,
+    // so that less time is wasted to find the best fitting expressions.
+    // The type concept is present in Expression class and it is widely used in Gondola,
+    // the subtype concept is a weaker tool, that only suggests the GP what to find
+    // for the best fit in an expression.
+    // For example in lag(close,xxx), we would like xxx be a INTEGER_TYPE expression,
+    // by the point of view of the type, but an integer is not enough,
+    // we also need that this integer be small and negative,
+    // because xxx is the number of days of delay.
+    // So we pilot the GP to find a small negative integer using
+    // the subtype NEGATIVE_SHORT_INTEGER_SUBTYPE.
     private final static int NO_SUBTYPE = 0;
     private final static int POSITIVE_SHORT_INTEGER_SUBTYPE = 1;
     private final static int NEGATIVE_SHORT_INTEGER_SUBTYPE = 2;
@@ -131,7 +129,7 @@ public class Mutator {
      * Create a new random expression of the given type and subType.
      *
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
-     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @param subType the subType of the expression.
      * @return a randomly generated expression
      */
     public Expression createRandom(int type, int subType) {
@@ -146,7 +144,7 @@ public class Mutator {
      * expression decreases.
      *
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
-     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @param subType the subType of the expression.
      * @param level the level in the tree
      * @return a randomly generated expression
      */
@@ -161,7 +159,7 @@ public class Mutator {
      *
      * @param model initial expression to work with
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
-     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @param subType the subType of the expression.
      * @param level the level in the tree
      * @return a randomly generated expression
      * @see #createRandom(int type, int subType, int level)
@@ -212,7 +210,7 @@ public class Mutator {
      * 1 and 1).
      *
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
-     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @param subType the subType of the expression.
      * @return a randomly generated non-terminal expression
      */
     public Expression createRandomNonTerminal(int type, int subType) {
@@ -224,7 +222,7 @@ public class Mutator {
      * at the given level.
      *
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
-     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @param subType the subType of the expression.
      * @param level the level in the tree
      * @return a randomly generated non-terminal expression
      */
@@ -237,7 +235,7 @@ public class Mutator {
      *
      * @param model initial expression to work with
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
-     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @param subType the subType of the expression.
      * @param level the level in the tree
      * @return a randomly generated non-terminal expression
      * @see #createRandom(int type, int subType, int level)
@@ -280,7 +278,7 @@ public class Mutator {
      * or a variable expression.
      *
      * @param type the type of the expression, e.g. {@link Expression#BOOLEAN_TYPE}
-     * @param subType the subType of the expression, e.g. {@link Mutator#NO_SUBTYPE}
+     * @param subType the subType of the expression.
      * @return a randomly generated terminal expression
      */
     public Expression createRandomTerminal(int type, int subType) {

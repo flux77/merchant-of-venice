@@ -34,9 +34,18 @@
              destdir="${api}"
              additionalparam="-breakiterator"
 	     windowtitle="Venice ${VERSION}">
-    <header><![CDATA[<b>Venice ${VERSION}</b>]]></header>
-    <footer><![CDATA[<b>Venice ${VERSION}</b>]]></footer>
-    <doctitle>Venice ${VERSION}</doctitle>
+      <header><![CDATA[<b>Venice ${VERSION}</b>]]></header>
+      <footer><![CDATA[<b>Venice ${VERSION}</b>]]></footer>
+      <doctitle>Venice ${VERSION}</doctitle>
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+        <pathelement path="${lib.hsql}"/>
+        <pathelement path="${lib.mysql}"/>
+        <pathelement path="${lib.joone}"/>
+        <pathelement path="${lib.jython}"/>
+        <pathelement path="${lib.xml}"/>
+      </classpath>
   </javadoc>
   </target>
 

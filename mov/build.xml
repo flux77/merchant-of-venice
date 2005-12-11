@@ -18,8 +18,10 @@
 
   <!-- Libraries -->
   <property name="lib.hsql" value="${lib}/hsqldb.jar"/>
+  <property name="lib.joone" value="${lib}/joone-engine.jar"/>
   <property name="lib.jython" value="${lib}/jython.jar"/>
   <property name="lib.mysql" value="${lib}/mysql-connector-java-3.1.11-bin.jar"/>
+  <property name="lib.xml" value="${lib}/xstream-1.1.2.jar"/>
 
   <!-- Online help -->
   <property name="help" value="${src}/org/mov/help/doc"/>
@@ -62,7 +64,9 @@
         <pathelement path="${src}"/>
         <pathelement path="${lib.hsql}"/>
         <pathelement path="${lib.mysql}"/>
+        <pathelement path="${lib.joone}"/>
         <pathelement path="${lib.jython}"/>
+        <pathelement path="${lib.xml}"/>
       </classpath>
     </javac>
   </target>
@@ -150,6 +154,12 @@
       </patternset>
     </unjar>
 
+    <unjar src="${lib.joone}" dest="${temp}">
+      <patternset>
+        <include name="org/**"/>
+      </patternset>
+    </unjar>
+
     <unjar src="${lib.jython}" dest="${temp}">
       <patternset>
         <include name="org/**"/>
@@ -159,6 +169,12 @@
     </unjar>
 
     <unjar src="${lib.mysql}" dest="${temp}">
+      <patternset>
+        <include name="com/**"/>
+      </patternset>
+    </unjar>
+
+    <unjar src="${lib.xml}" dest="${temp}">
       <patternset>
         <include name="com/**"/>
       </patternset>
@@ -320,8 +336,10 @@
     <copy file="build.xml" todir="${release}/venice-${VERSION}-src/"/>
     <copy file="Info.plist" todir="${release}/venice-${VERSION}-src/"/>
     <copy file="${lib.hsql}" todir="${release}/venice-${VERSION}-src/lib/"/>
+    <copy file="${lib.joone}" todir="${release}/venice-${VERSION}-src/lib/"/>
     <copy file="${lib.jython}" todir="${release}/venice-${VERSION}-src/lib/"/>
     <copy file="${lib.mysql}" todir="${release}/venice-${VERSION}-src/lib/"/>
+    <copy file="${lib.xml}" todir="${release}/venice-${VERSION}-src/lib/"/>
     <copy todir="${release}/venice-${VERSION}-src/src/">
       <fileset dir="${src}"
                 includes="**/*.java, **/*.gif, **/*.png,
@@ -358,8 +376,10 @@
         <pathelement path="${java.class.path}"/>
         <pathelement path="${src}"/>
         <pathelement path="${lib.hsql}"/>
+        <pathelement path="${lib.joone}"/>
         <pathelement path="${lib.mysql}"/>
         <pathelement path="${lib.jython}"/>
+        <pathelement path="${lib.xml}"/>
       </classpath>
     </java>
   </target>
@@ -379,8 +399,10 @@
         <pathelement path="${src}"/>
         <pathelement path="${test}"/>
         <pathelement path="${lib.hsql}"/>
+        <pathelement path="${lib.joone}"/>
         <pathelement path="${lib.mysql}"/>
         <pathelement path="${lib.jython}"/>
+        <pathelement path="${lib.xml}"/>
       </classpath>
     </javac>
 
@@ -393,8 +415,10 @@
         <pathelement path="${src}"/>
         <pathelement path="${test}"/>
         <pathelement path="${lib.hsql}"/>
+        <pathelement path="${lib.joone}"/>
         <pathelement path="${lib.mysql}"/>
         <pathelement path="${lib.jython}"/>
+        <pathelement path="${lib.xml}"/>
       </classpath>
       <formatter type="plain"/>
       <batchtest todir="${report}">

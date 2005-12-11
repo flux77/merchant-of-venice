@@ -51,7 +51,7 @@ import org.mov.ui.ProgressDialog;
  * For further information about the techniques used, you should find out the Cross Target
  * technique (@author Prof. Pietro Terna).
  * That is the technique used here to get the buy/sell signals.
- * {@link http://web.econ.unito.it/terna/ct-era/ct-era.html}
+ * See http://web.econ.unito.it/terna/ct-era/ct-era.html.
  *
  * <p>The final portfolio will contain a single cash and a single share account.
  *

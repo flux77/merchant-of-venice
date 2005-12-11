@@ -880,7 +880,7 @@ public class PreferencesManager {
     /**
      * Save user interface setting.
      *
-     * @param the minimum decimal digits to be displayed
+     * @param minDecimalDigits the minimum decimal digits to be displayed
      */
     public static void saveMinDecimalDigits(String minDecimalDigits) {
         Preferences prefs = getUserNode("/min_user_interface");
@@ -908,7 +908,7 @@ public class PreferencesManager {
     /**
      * Save user interface setting.
      *
-     * @param decimalDigits the maximum decimal digits to be displayed
+     * @param maxDecimalDigits the maximum decimal digits to be displayed
      */
     public static void saveMaxDecimalDigits(String maxDecimalDigits) {
         Preferences prefs = getUserNode("/max_user_interface");

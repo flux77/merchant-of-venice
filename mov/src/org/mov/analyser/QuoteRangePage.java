@@ -165,7 +165,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 
         // Load last GUI settings from preferences
 	HashMap settings =
-            PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
+            PreferencesManager.getAnalyserPageSettings(key + getClass().getName());
 
 	Iterator iterator = settings.keySet().iterator();
 
@@ -219,8 +219,8 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	    settings.put("period", dateRangePeriodComboBox.getSelectedItem());
 	}
 
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settings);
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(),
+                                                   settings);
     }
 
     public boolean parse() {

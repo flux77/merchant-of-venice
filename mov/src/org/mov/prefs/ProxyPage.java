@@ -83,8 +83,7 @@ public class ProxyPage extends JPanel implements PreferencesPage {
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 
-	proxyPreferences = 
-	    PreferencesManager.loadProxySettings();
+	proxyPreferences = PreferencesManager.getProxySettings();
 
 	useProxyCheckBox = 
 	    GridBagHelper.addCheckBoxRow(borderPanel, 
@@ -146,7 +145,7 @@ public class ProxyPage extends JPanel implements PreferencesPage {
 	proxyPreferences.password = new String(passwordTextField.getPassword());
 	proxyPreferences.authEnabled = useAuthCheckBox.isSelected();
 	
-	PreferencesManager.saveProxySettings(proxyPreferences);
+	PreferencesManager.putProxySettings(proxyPreferences);
     }
     
     public JComponent getComponent() {
@@ -170,8 +169,7 @@ public class ProxyPage extends JPanel implements PreferencesPage {
      * proxies correctly
      */
     public static void setupNetworking() {
-        PreferencesManager.ProxyPreferences proxyPreferences = PreferencesManager
-                .loadProxySettings();
+        PreferencesManager.ProxyPreferences proxyPreferences = PreferencesManager.getProxySettings();
         if (proxyPreferences.isEnabled) {
             System.getProperties().put("http.proxyHost", proxyPreferences.host);
             System.getProperties().put("http.proxyPort", proxyPreferences.port);

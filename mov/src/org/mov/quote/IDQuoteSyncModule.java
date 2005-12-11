@@ -98,7 +98,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
      * Layout the GUI.
      */
     private void buildGUI() {
-        prefs = PreferencesManager.loadIDQuoteSyncPreferences();
+        prefs = PreferencesManager.getIDQuoteSyncPreferences();
 
         isEnabledCheckBox = new JCheckBox(Locale.getString("ENABLED"));
         isEnabledCheckBox.setSelected(prefs.isEnabled);
@@ -283,7 +283,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
         prefs.openTime = openTime;
         prefs.closeTime = closeTime;
         prefs.period = period;
-        PreferencesManager.saveIDQuoteSyncPreferences(prefs);
+        PreferencesManager.putIDQuoteSyncPreferences(prefs);
     }
 
     /**

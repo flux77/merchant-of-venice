@@ -63,7 +63,7 @@ public class UserNotes extends JInternalFrame {
 	
 	notes = new JTextArea(10,15);
 
-	prevText = PreferencesManager.loadUserNotes(symbol);
+	prevText = PreferencesManager.getUserNotes(symbol);
 	if (prevText != "") {
 	    notes.setText(prevText);
 	}
@@ -77,7 +77,7 @@ public class UserNotes extends JInternalFrame {
 	save.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    try {
-			PreferencesManager.saveUserNotes(symbol, notes.getText());
+			PreferencesManager.putUserNotes(symbol, notes.getText());
 			setClosed(true);
 		    } 
 		    catch (PropertyVetoException pve) {
@@ -97,9 +97,8 @@ public class UserNotes extends JInternalFrame {
 
 	revert.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    String foo = PreferencesManager.loadUserNotes(symbol);
+		    String foo = PreferencesManager.getUserNotes(symbol);
 		    notes.setText(foo);
-		    
 		}
 	    });
 	

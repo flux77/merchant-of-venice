@@ -260,7 +260,7 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 	    } else if (e.getSource() == edit_button) {
 	    } else if (e.getSource() == import_button) {
 	        JFileChooser chooser;
-	        String lastDirectory = PreferencesManager.loadDirectoryLocation("macros");
+	        String lastDirectory = PreferencesManager.getDirectoryLocation("macros");
 	        
 	        if(lastDirectory != null)
 	            chooser = new JFileChooser(lastDirectory);
@@ -272,7 +272,7 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 	        if(action == JFileChooser.APPROVE_OPTION) {
 	            // Remember directory
 	            lastDirectory = chooser.getCurrentDirectory().getAbsolutePath();
-	            PreferencesManager.saveDirectoryLocation("importer",lastDirectory);
+	            PreferencesManager.putDirectoryLocation("importer",lastDirectory);
 	            
 	            File file = chooser.getSelectedFile();
 	            if (file != null) {

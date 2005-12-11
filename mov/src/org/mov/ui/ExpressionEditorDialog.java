@@ -271,14 +271,14 @@ public class ExpressionEditorDialog {
      *         the dialog.
      */
     public static StoredExpression showAddDialog(String title, String expression) {
-	List storedExpressions = PreferencesManager.loadStoredExpressions();
+	List storedExpressions = PreferencesManager.getStoredExpressions();
 	StoredExpression storedExpression = showAddDialog(storedExpressions, title, expression);
 
 	// If the user added an expression, save it to the preferences and make
 	// sure all the combo boxes are updated.
 	if(storedExpression != null) {
 	    storedExpressions.add(storedExpression);
-	    PreferencesManager.saveStoredExpressions(storedExpressions);
+	    PreferencesManager.putStoredExpressions(storedExpressions);
 	    ExpressionComboBox.updateExpressions();
 	}
 

@@ -112,9 +112,8 @@ public class MacrosPage extends JPanel implements PreferencesPage {
      * @see org.mov.prefs.PreferencesPage#save()
      */
     public void save() {
-        PreferencesManager.saveDirectoryLocation("macros", directory_text
-                .getText());
-        PreferencesManager.saveStoredMacros(stored_macros);
+        PreferencesManager.putDirectoryLocation("macros", directory_text.getText());
+        PreferencesManager.putStoredMacros(stored_macros);
         MainMenu.getInstance().buildMacroMenu();
     }
 
@@ -175,8 +174,7 @@ public class MacrosPage extends JPanel implements PreferencesPage {
     private JTextField getDirectory_text() {
         if (directory_text == null) {
             directory_text = new JTextField();
-            directory_text.setText(PreferencesManager
-                    .loadDirectoryLocation("macros"));
+            directory_text.setText(PreferencesManager.getDirectoryLocation("macros"));
         }
         return directory_text;
     }
@@ -193,9 +191,8 @@ public class MacrosPage extends JPanel implements PreferencesPage {
             public void actionPerformed(ActionEvent e) {
                 // Get directory
                 JFileChooser chooser;
-                String lastDirectory = PreferencesManager
-                        .loadDirectoryLocation("macros");
-
+                String lastDirectory = PreferencesManager.getDirectoryLocation("macros");
+                
                 if (lastDirectory != null)
                     chooser = new JFileChooser(lastDirectory);
                 else
@@ -210,9 +207,9 @@ public class MacrosPage extends JPanel implements PreferencesPage {
                     File file = chooser.getSelectedFile();
                     String directory = file.getPath();
                     directory_text.setText(directory);
-                    PreferencesManager.saveDirectoryLocation("macros",
+                    PreferencesManager.putDirectoryLocation("macros",
                             directory);
-                    stored_macros = PreferencesManager.loadStoredMacros();
+                    stored_macros = PreferencesManager.getStoredMacros();
                     table_model.fireTableDataChanged();
 
                 }
@@ -253,7 +250,7 @@ public class MacrosPage extends JPanel implements PreferencesPage {
         if (macros_table == null) {
 
             // Set up the data
-            stored_macros = PreferencesManager.loadStoredMacros();
+            stored_macros = PreferencesManager.getStoredMacros();
             // Define the table model
             table_model = new AbstractTableModel() {
                 public int getColumnCount() {
@@ -582,8 +579,7 @@ public class MacrosPage extends JPanel implements PreferencesPage {
                     if (selected_row == -1) {return; }
                     StoredMacro macro = (StoredMacro) stored_macros
                             .get(selected_row);
-                    String filepath = PreferencesManager
-                            .loadDirectoryLocation("macros")
+                    String filepath = PreferencesManager.getDirectoryLocation("macros")
                             + File.separator + macro.getFilename();
                     int response = JOptionPane.showInternalConfirmDialog(delete_button,
                             Locale.getString("SURE_DELETE_MACRO", macro
@@ -593,7 +589,7 @@ public class MacrosPage extends JPanel implements PreferencesPage {
                     if (response == JOptionPane.YES_OPTION) {
                         if (macro.delete()) {
                             stored_macros.remove(selected_row);
-                            PreferencesManager.saveStoredMacros(stored_macros);
+                            PreferencesManager.putStoredMacros(stored_macros);
                             selected_row = -1;
                             table_model.fireTableDataChanged();
                         } else {
@@ -644,7 +640,7 @@ public class MacrosPage extends JPanel implements PreferencesPage {
                     } else {
                         stored_macros.set(edited_row, edited_macro);
                     }
-                    PreferencesManager.saveStoredMacros(stored_macros);
+                    PreferencesManager.putStoredMacros(stored_macros);
                 }
                 table_model.fireTableDataChanged();
                 macros_table.changeSelection(edited_row, 0, false, false);

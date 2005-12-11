@@ -72,7 +72,7 @@ public class YahooIDQuoteImport {
         IDQuoteFilter filter = new YahooIDQuoteFilter();
 
         PreferencesManager.ProxyPreferences proxyPreferences =
-            PreferencesManager.loadProxySettings();
+            PreferencesManager.getProxySettings();
 
         try {
 	    URL url = new URL(URLString);

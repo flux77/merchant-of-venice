@@ -172,7 +172,7 @@ public class ExpressionComboBox extends JComboBox implements PopupMenuListener {
      */
     public static void updateExpressions() {
 	// Load expressions from preferences
-	storedExpressions = PreferencesManager.loadStoredExpressions();
+	storedExpressions = PreferencesManager.getStoredExpressions();
     }
 
     // Searches through list of expressions for the one with the given name
@@ -259,7 +259,7 @@ public class ExpressionComboBox extends JComboBox implements PopupMenuListener {
 			if(storedExpression != null) {
 			    setExpressionText(storedExpression.name);
 			    storedExpressions.add(storedExpression);
-			    PreferencesManager.saveStoredExpressions(storedExpressions);
+			    PreferencesManager.putStoredExpressions(storedExpressions);
 			}
 
                         isDialogUp = false;
@@ -284,7 +284,7 @@ public class ExpressionComboBox extends JComboBox implements PopupMenuListener {
 							  JOptionPane.YES_NO_OPTION);
 		if(option == JOptionPane.YES_OPTION) {
 		    storedExpressions.remove(storedExpression);
-		    PreferencesManager.saveStoredExpressions(storedExpressions);
+		    PreferencesManager.putStoredExpressions(storedExpressions);
 		    setExpressionText("");
 		}       
 	    }		
@@ -310,7 +310,7 @@ public class ExpressionComboBox extends JComboBox implements PopupMenuListener {
 									  Locale.getString("EDIT_EQUATION"),
 									  storedExpression);
 				setExpressionText(storedExpression.expression);
-				PreferencesManager.saveStoredExpressions(storedExpressions);
+				PreferencesManager.putStoredExpressions(storedExpressions);
 			    }
 			}
 			else {

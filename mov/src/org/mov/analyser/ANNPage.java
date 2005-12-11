@@ -87,17 +87,17 @@ public class ANNPage extends JPanel implements AnalyserPage {
         String idStr = "ANNPage";
 
         HashMap settingsInitPop =
-                PreferencesManager.loadAnalyserPageSettings(key + idStr);
+                PreferencesManager.getAnalyserPageSettings(key + idStr);
         HashMap settingsInitPopCommon = new HashMap();
 
         ANNPageModule.save(settingsInitPop, idStr);
         settingsInitPopCommon.put("buy_threshold", buyThresholdTextRow.getText());
         settingsInitPopCommon.put("sell_threshold", sellThresholdTextRow.getText());
 
-        PreferencesManager.saveAnalyserPageSettings(key + idStr,
-                                                    settingsInitPop);
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settingsInitPopCommon);
+        PreferencesManager.putAnalyserPageSettings(key + idStr,
+                                                   settingsInitPop);
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(),
+                                                   settingsInitPopCommon);
     }
     
     /** 
@@ -108,7 +108,7 @@ public class ANNPage extends JPanel implements AnalyserPage {
         
         // Load last GUI settings from preferences
 	HashMap settings =
-            PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
+            PreferencesManager.getAnalyserPageSettings(key + getClass().getName());
 
 	Iterator iterator = settings.keySet().iterator();
 
@@ -122,7 +122,7 @@ public class ANNPage extends JPanel implements AnalyserPage {
         }
        
         HashMap settingsInitPop =
-                PreferencesManager.loadAnalyserPageSettings(key + idStr);
+                PreferencesManager.getAnalyserPageSettings(key + idStr);
 
         Iterator iteratorInitPop = settingsInitPop.keySet().iterator();
 

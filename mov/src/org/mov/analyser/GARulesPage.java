@@ -100,8 +100,8 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         String idStr = "Parameters";
         
         // Load last GUI settings from preferences
-        HashMap settings = PreferencesManager.loadAnalyserPageSettings(key
-                                                                       + getClass().getName());
+        HashMap settings = PreferencesManager.getAnalyserPageSettings(key
+                                                                      + getClass().getName());
         
         Iterator iterator = settings.keySet().iterator();
         
@@ -116,7 +116,7 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         }
         
         HashMap settingsParam =
-                PreferencesManager.loadAnalyserPageSettings(key + idStr);
+                PreferencesManager.getAnalyserPageSettings(key + idStr);
 
         Iterator iteratorParam = settingsParam.keySet().iterator();
 
@@ -133,17 +133,17 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         String idStr = "Parameters";
 
         HashMap settingsParam =
-                PreferencesManager.loadAnalyserPageSettings(key + idStr);
+                PreferencesManager.getAnalyserPageSettings(key + idStr);
         HashMap settings = new HashMap();
 
         GARulesPageModule.save(settingsParam, idStr);
         settings.put("buy_rule", buyRuleExpressionComboBox.getExpressionText());
         settings.put("sell_rule", sellRuleExpressionComboBox.getExpressionText());
 
-        PreferencesManager.saveAnalyserPageSettings(key + idStr,
-                                                    settingsParam);
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settings);
+        PreferencesManager.putAnalyserPageSettings(key + idStr,
+                                                   settingsParam);
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(),
+                                                   settings);
     }
     
     public boolean parse() {

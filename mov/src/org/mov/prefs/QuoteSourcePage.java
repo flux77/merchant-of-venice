@@ -143,7 +143,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     }
 
     private JPanel createInternalPanel(int quoteSource, ButtonGroup buttonGroup) {
-        String internalFileName = PreferencesManager.loadInternalFileName();
+        String internalFileName = PreferencesManager.getInternalFileName();
 
         useInternal = new JRadioButton(Locale.getString("USE_INTERNAL"), true);
 	buttonGroup.add(useInternal);
@@ -181,7 +181,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     }
 
     private JPanel createDatabasePanel(int quoteSource, ButtonGroup buttonGroup) {
-	databasePreferences = PreferencesManager.loadDatabaseSettings();
+	databasePreferences = PreferencesManager.getDatabaseSettings();
         useDatabase = new JRadioButton(Locale.getString("USE_DATABASE"), true);
 	buttonGroup.add(useDatabase);
 
@@ -375,11 +375,11 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    quoteSource = PreferencesManager.DATABASE;
 	else
 	    quoteSource = PreferencesManager.SAMPLES;
-	PreferencesManager.setQuoteSource(quoteSource);
+	PreferencesManager.putQuoteSource(quoteSource);
 
         // Save internal preferences
         {
-            PreferencesManager.saveInternalFileName(internalFileNameTextField.getText());
+            PreferencesManager.putInternalFileName(internalFileNameTextField.getText());
         }
 
 	// Save database preferences
@@ -388,9 +388,9 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    if(software.equals(Locale.getString("MYSQL")))
 	        databasePreferences.software = "mysql";
 	    else if(software.equals(Locale.getString("POSTGRESQL")))
-		    databasePreferences.software = "postgresql";
+                databasePreferences.software = "postgresql";
 	    else
-			databasePreferences.software = "hsql";
+                databasePreferences.software = "hsql";
 
 	    databasePreferences.driver = databaseDriver.getSelectedItem().toString();
 	    databasePreferences.host = databaseHost.getText();
@@ -399,7 +399,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    databasePreferences.password = new String(databasePassword.getPassword());
 	    databasePreferences.database = databaseName.getText();
 
-	    PreferencesManager.saveDatabaseSettings(databasePreferences);
+	    PreferencesManager.putDatabaseSettings(databasePreferences);
 	}
 
 	// This makes the next query use our new settings

@@ -85,7 +85,7 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         String idStr = "GPInitialPopulation";
 
         HashMap settingsInitPop =
-                PreferencesManager.loadAnalyserPageSettings(key + idStr);
+                PreferencesManager.getAnalyserPageSettings(key + idStr);
         HashMap settingsInitPopCommon = new HashMap();
 
         GPPageInitialPopulationModule.save(settingsInitPop, idStr);
@@ -93,10 +93,10 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         settingsInitPopCommon.put("generations_random", generateRandomPopTextRow.getText());
         settingsInitPopCommon.put("generations_init_pop", generateInitPopTextRow.getText());
 
-        PreferencesManager.saveAnalyserPageSettings(key + idStr,
-                                                    settingsInitPop);
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settingsInitPopCommon);
+        PreferencesManager.putAnalyserPageSettings(key + idStr,
+                                                   settingsInitPop);
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(),
+                                                   settingsInitPopCommon);
     }
     
     public void load(String key) {
@@ -104,7 +104,7 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         
         // Load last GUI settings from preferences
 	HashMap settings =
-            PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
+            PreferencesManager.getAnalyserPageSettings(key + getClass().getName());
 
 	Iterator iterator = settings.keySet().iterator();
 
@@ -116,7 +116,7 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         }
        
         HashMap settingsInitPop =
-                PreferencesManager.loadAnalyserPageSettings(key + idStr);
+                PreferencesManager.getAnalyserPageSettings(key + idStr);
 
         Iterator iteratorInitPop = settingsInitPop.keySet().iterator();
 

@@ -164,8 +164,7 @@ public class ANNNetworkTypePage extends JPanel implements AnalyserPage {
             }
         }
         
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(), settings);
-        
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(), settings);
     }
     
     /** 
@@ -175,7 +174,7 @@ public class ANNNetworkTypePage extends JPanel implements AnalyserPage {
         
         // Load last GUI settings from preferences
         HashMap settings =
-                PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
+                PreferencesManager.getAnalyserPageSettings(key + getClass().getName());
         
         Iterator iterator = settings.keySet().iterator();
         

@@ -140,7 +140,7 @@ public class YahooEODQuoteImport {
         EODQuoteFilter filter = new YahooEODQuoteFilter(symbol);
 
         PreferencesManager.ProxyPreferences proxyPreferences =
-            PreferencesManager.loadProxySettings();
+            PreferencesManager.getProxySettings();
 
         try {
 	    URL url = new URL(URLString);

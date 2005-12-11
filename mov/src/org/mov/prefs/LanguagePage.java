@@ -66,7 +66,7 @@ public class LanguagePage extends JPanel implements PreferencesPage {
 	JPanel borderPanel = new JPanel();
         borderPanel.setLayout(new BoxLayout(borderPanel, BoxLayout.PAGE_AXIS));
 	
-        languageCode = PreferencesManager.loadLanguageCode();
+        languageCode = PreferencesManager.getLanguageCode();
         
         if (languageCode == null)
             languageCode = Locale.getLocale().getISO3Language();
@@ -99,7 +99,7 @@ public class LanguagePage extends JPanel implements PreferencesPage {
     }
     
     public void save() {
-	PreferencesManager.saveLanguageCode(languageCode);
+	PreferencesManager.putLanguageCode(languageCode);
     }
     
     public JComponent getComponent() {

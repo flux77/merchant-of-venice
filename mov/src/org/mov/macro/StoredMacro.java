@@ -1,23 +1,20 @@
-/*
- * Created on 15-Aug-2004
- *
- * Merchant of Venice - technical analysis software for the stock market.
- * Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
- * This portion of code Copyright (C) 2004 Dan Makovec (venice@makovec.net)
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *  
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *  
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+/* Merchant of Venice - technical analysis software for the stock market.
+   Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
+   This portion of code Copyright (C) 2004 Dan Makovec (venice@makovec.net)
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
 package org.mov.macro;
@@ -150,7 +147,8 @@ public class StoredMacro {
     public boolean load() {
         if (getFilename() != null && getFilename().length() > 0) {
             try {
-                File file = new File(PreferencesManager.loadDirectoryLocation("macros")+ File.separator+ getFilename());
+                File file = new File(PreferencesManager.getDirectoryLocation("macros") +
+                                     File.separator+ getFilename());
                 URL url = file.toURL();
                 InputStreamReader isr = new InputStreamReader(url.openStream());
                 BufferedReader br = new BufferedReader(isr);
@@ -175,7 +173,8 @@ public class StoredMacro {
     public boolean save() {
         if (getFilename() != null) {
             try {
-                File file = new File(PreferencesManager.loadDirectoryLocation("macros")+ File.separator+ getFilename());
+                File file = new File(PreferencesManager.getDirectoryLocation("macros") +
+                                     File.separator+ getFilename());
                 URI uri = file.toURI();
 
                 FileOutputStream fos = new FileOutputStream(new File(uri));
@@ -196,7 +195,8 @@ public class StoredMacro {
     
     public boolean delete() {
         try {
-            File file = new File(PreferencesManager.loadDirectoryLocation("macros")+ File.separator+ getFilename());
+            File file = new File(PreferencesManager.getDirectoryLocation("macros") +
+                                 File.separator + getFilename());
             file.delete();
         } catch (Exception e) {
             return false;

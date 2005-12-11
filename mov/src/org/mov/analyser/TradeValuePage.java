@@ -70,7 +70,7 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
 
         // Load last GUI settings from preferences
 	HashMap settings =
-            PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
+            PreferencesManager.getAnalyserPageSettings(key + getClass().getName());
 
 	Iterator iterator = settings.keySet().iterator();
 
@@ -111,8 +111,8 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
         settings.put("trade_value_sell_combo", tradeValueSellComboBox.getSelectedItem());
         settings.put("trade_value_sell_text_field", tradeValueSellTextField.getText());
 
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settings);
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(),
+                                                   settings);
     }
 
     public boolean parse() {

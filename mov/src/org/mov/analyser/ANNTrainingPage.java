@@ -87,8 +87,8 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
         settingsInitPop.put("min_earning_percentage", minEarningPercentageTextRow.getText());
         settingsInitPop.put("window_forecast", windowForecastTextRow.getText());
 
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settingsInitPop);
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(),
+                                                   settingsInitPop);
     }
     
     /** 
@@ -97,7 +97,7 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
     public void load(String key) {
         // Load last GUI settings from preferences
 	HashMap settings =
-            PreferencesManager.loadAnalyserPageSettings(key + getClass().getName());
+            PreferencesManager.getAnalyserPageSettings(key + getClass().getName());
 
 	Iterator iterator = settings.keySet().iterator();
 

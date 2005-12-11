@@ -505,7 +505,7 @@ public class MainMenu implements ActionListener, ModuleListener
                         (String)portfolioTableHash.get(menu);
                     
                     Portfolio portfolio =
-                        PreferencesManager.loadPortfolio(portfolioName);
+                        PreferencesManager.getPortfolio(portfolioName);
                     
                     CommandManager.getInstance().tablePortfolio(portfolio);
                 }
@@ -524,7 +524,7 @@ public class MainMenu implements ActionListener, ModuleListener
                         (String)portfolioGraphHash.get(menu);
                     
                     Portfolio portfolio =
-                        PreferencesManager.loadPortfolio(portfolioName);
+                        PreferencesManager.getPortfolio(portfolioName);
                     
                     CommandManager.getInstance().graphPortfolio(portfolio);
                 }
@@ -707,7 +707,7 @@ public class MainMenu implements ActionListener, ModuleListener
      */
     public void buildMacroMenu()
     {
-        java.util.List stored_macros = PreferencesManager.loadStoredMacros();
+        java.util.List stored_macros = PreferencesManager.getStoredMacros();
         macroMenu.removeAll();
         menuItemToMacroHash.clear();
 

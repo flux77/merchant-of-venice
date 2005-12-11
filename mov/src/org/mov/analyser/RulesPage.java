@@ -114,10 +114,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
     }
     
     public void load(String key) {
-        
         // Load last GUI settings from preferences
-        HashMap settings = PreferencesManager.loadAnalyserPageSettings(key
-                                                                       + getClass().getName());
+        HashMap settings = PreferencesManager.getAnalyserPageSettings(key
+                                                                      + getClass().getName());
         
         Iterator iterator = settings.keySet().iterator();
         
@@ -155,8 +154,8 @@ public class RulesPage extends JPanel implements AnalyserPage {
         settings.put("brange", bRangeTextField.getText());
         settings.put("crange", cRangeTextField.getText());
         
-        PreferencesManager.saveAnalyserPageSettings(key + getClass().getName(),
-                                                    settings);
+        PreferencesManager.putAnalyserPageSettings(key + getClass().getName(),
+                                                   settings);
     }
     
     public boolean parse() {

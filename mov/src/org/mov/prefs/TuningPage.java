@@ -74,7 +74,7 @@ public class TuningPage extends JPanel implements PreferencesPage
                                   Integer.toString(currentCachedQuotes),
                                   gridbag, c);
 
-        int maximumCachedQuotes = PreferencesManager.loadMaximumCachedQuotes();
+        int maximumCachedQuotes = PreferencesManager.getMaximumCachedQuotes();
         maxCachedQuotesTextField = 
             GridBagHelper.addTextRow(borderPanel, 
                                      Locale.getString("MAXIMUM_CACHED_QUOTES"), 
@@ -104,6 +104,6 @@ public class TuningPage extends JPanel implements PreferencesPage
         }
 
         if(maximumCachedQuotes > 0)
-            PreferencesManager.saveMaximumCachedQuotes(maximumCachedQuotes);
+            PreferencesManager.putMaximumCachedQuotes(maximumCachedQuotes);
     }
 }

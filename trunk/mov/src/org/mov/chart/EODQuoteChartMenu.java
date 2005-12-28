@@ -169,7 +169,7 @@ public class EODQuoteChartMenu extends JMenu {
                 public void actionPerformed(ActionEvent e) { 
 
 		    UserNotes notes = new UserNotes(menuName);
-		    
+		    notes.moveToFront();
                 }});
 
 	JMenuItem exportMenu = new JMenuItem(Locale.getString("GRAPH_EXPORT"));

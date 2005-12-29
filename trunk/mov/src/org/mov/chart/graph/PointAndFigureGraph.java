@@ -206,7 +206,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 	col = (Comparable)iterator2.next();
 	
 	while(iterator.hasNext()) {
-	    Comparable x = (Comparable)iterator.next();
+	    Comparable date = (Comparable)iterator.next();
 
 	    diff = (i == 0)  ? 0 : (values[i] - prev);
 	    plot = (Math.abs(diff) >= boxPriceScale) ? true : false;
@@ -235,7 +235,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 		    // This places the marker on when the price changed
 		    // direction
 		    // Which seems to work ok for small datasets
-		    //col = x;	
+		    //col = date;	
 		    
 		    // This places it in the next column
 		    // This seems to work better for larger (more realistic)
@@ -275,9 +275,9 @@ public class PointAndFigureGraph extends AbstractGraph {
 		Double yTemp = new Double(values[i]);
 		yList.add(yTemp);
 		
-		pointAndFigure.putDate(col, x);
-		pointAndFigure.putYList(col, yList);
-		pointAndFigure.putString(col, marker);
+		/*Needs more data than just price and column for tooltips,
+		  because in vanilla P&F, no passage of time is indicated. */
+		pointAndFigure.putData(col, date, yList, marker);
 		
 	    }
 	    //The price meeting the box value is defined by the last 

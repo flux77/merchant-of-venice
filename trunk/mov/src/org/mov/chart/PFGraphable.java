@@ -107,6 +107,26 @@ public class PFGraphable extends Graphable {
 	return (TradingDate)dateMap.get(x);
     }
 
+    
+    /**
+     * Associate the given X value with the given data. This
+     * function is used to "load" up the graphable with data.
+     *
+     * @param	x	the x value
+     * @param	date	a date representing the point at which data changed  
+     * @param	list	a list of price values within a move. 
+     * @param	marker	a string denoting a price value as an upmove or downmove.   
+     
+     */
+    public void putData(Comparable x, Comparable date, Vector list, String marker) {
+        startX = endX = null;
+
+	putDate(x, date);
+	putYList(x, list);
+	putString(x, marker); 
+    }
+
+
     /**
      * Associate the given X value with the given Y value. This
      * function is used to "load" up the graphable with data.

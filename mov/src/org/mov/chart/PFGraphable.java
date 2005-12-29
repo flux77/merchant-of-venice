@@ -20,6 +20,8 @@ package org.mov.chart;
 
 import java.util.*;
 
+import org.mov.util.TradingDate;
+
 /**
  * Represents a graphable set of X points and their associated list of Y points.
  *
@@ -31,6 +33,7 @@ public class PFGraphable extends Graphable {
     private Comparable endX = null;
     private LinkedHashMap map;
     private LinkedHashMap charMap;
+    private LinkedHashMap dateMap; 
 
     /**
      * Create an empty PFgraphable.
@@ -38,8 +41,9 @@ public class PFGraphable extends Graphable {
     public PFGraphable() {
 	super();
 	
-	map = getMap();
-	charMap = getCharMap();
+	map = getMap();	
+	charMap = new LinkedHashMap();
+	dateMap = new LinkedHashMap();
     }
 
     /**
@@ -94,6 +98,30 @@ public class PFGraphable extends Graphable {
     }
 
     /**
+     * Get the date value for the given X value.
+     *
+     * @param	x	the x value
+     * @return	y	the associated character value
+     */
+    public TradingDate getDate(Comparable x) {
+	return (TradingDate)dateMap.get(x);
+    }
+
+    /**
+     * Associate the given X value with the given Y value. This
+     * function is used to "load" up the graphable with data.
+     *
+     * @param	x	the x value
+     * @param	y	the y value
+     */
+    public void putDate(Comparable x, Comparable y) {
+        startX = endX = null;
+
+	 dateMap.put(x, (Object)y);	
+	
+    }
+
+    /**
      * Associate the given X value with the given Y value. This
      * function is used to "load" up the graphable with data.
      *
@@ -106,6 +134,8 @@ public class PFGraphable extends Graphable {
 	 map.put(x, (Object)y);	
 	
     }
+
+    
 
     /**
      * Associate the given x value with the given character. This

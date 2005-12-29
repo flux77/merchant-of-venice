@@ -32,6 +32,8 @@ import org.mov.chart.GraphTools;
 import org.mov.chart.source.GraphSource;
 import org.mov.quote.QuoteFunctions;
 import org.mov.util.Locale;
+import org.mov.ui.QuoteFormat;
+import org.mov.util.TradingDate;
 
 /**
  * Point and Figure graph. This graph draws a series of characters (X/O)
@@ -66,6 +68,80 @@ public class PointAndFigureGraph extends AbstractGraph {
 			      horizontalScale,
 			      verticalScale, bottomLineValue, xRange);
     }
+
+
+    /**
+     * Get the tool tip text for the given X value and y coordinate.
+     *
+     * @param	x	the X value
+     * @param	y	the y coordinate
+     * @param	yoffset	y offset from top of graph
+     * @param	verticalScale	vertical scale factor
+     * @param	bottomLineValue	the Y value of the lowest line in the graph
+     * @return	the tool tip text for the default <code>GraphSource</code>
+     */
+
+    /*
+      We currently return the price value of the top of an upmove
+      and the bottom of a downmove rather than returning all points
+      and dates in between.      
+      
+    */
+    public String getToolTipText(Comparable x, int y, int yoffset,
+				 double verticalScale,
+				 double bottomLineValue) {
+
+	Vector list = null;
+	Double value = null;
+	String text = "";
+	int index;
+	boolean upmove = true;
+	
+	if (pointAndFigure == null || x == null) {
+	    return null;
+	}
+
+	String tmp = pointAndFigure.getString(x);
+	if (tmp == null) {
+	    return null;
+	}
+	
+	if (tmp.compareTo("X") == 0) {
+	    upmove = true;
+	} else {
+	    upmove = false;
+	}
+	
+	list = pointAndFigure.getYList(x);
+	if (list == null) {
+	    return null;
+	}
+
+	index = (upmove) ? 
+	    getLargestElement(list) : 
+	    getSmallestElement(list);
+	    
+	if (index < list.size()) {
+	    value = (Double)(list.elementAt(index));
+	    TradingDate date = pointAndFigure.getDate(x);
+	    
+	    if (value == null) {
+		return null;
+	    }
+	    
+	    text = "<html>" + 
+		getSource().getName() + 
+		"," +
+		date.toLongString() +
+		"<p>";
+	    
+	    text += QuoteFormat.quoteToString(value.doubleValue()) + "</p></html>";
+	    
+	}
+
+	return text;
+    }
+    
 
     // Highest Y value is in the moving average graph
     public double getHighestY(List x) {
@@ -120,13 +196,13 @@ public class PointAndFigureGraph extends AbstractGraph {
 	boolean plot; // Indicate whether this point gets plotted
 	boolean upmove = true, changeDirection = false;	
 	String marker;
-	Comparable col;	
+	Comparable col;		
 
 	int i = 0;	
 	double average;
 		
 	upmove = getFirstDirection(source, boxPriceScale);
-
+	
 	col = (Comparable)iterator2.next();
 	
 	while(iterator.hasNext()) {
@@ -199,6 +275,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 		Double yTemp = new Double(values[i]);
 		yList.add(yTemp);
 		
+		pointAndFigure.putDate(col, x);
 		pointAndFigure.putYList(col, yList);
 		pointAndFigure.putString(col, marker);
 		
@@ -314,6 +391,40 @@ public class PointAndFigureGraph extends AbstractGraph {
 	return true;
     }
 
+
+    // Wheel reinvention.
+    // Surely these functions exist in the Java API?  
+    private int getSmallestElement(Vector v) {
+	int i = 0;
+	int rv = 0;
+	double min = Double.MAX_VALUE, e = 0.0;
+	
+	for (i = 0; i < v.size(); i++) {
+	    e = ((Double)(v.elementAt(i))).doubleValue();
+	    if (e < min) {
+		min = e;
+		rv = i;
+	    }
+	}	       
+	return rv;
+    }
+
+    private int getLargestElement(Vector v) {	
+	int i = 0;
+	int rv = 0;
+	double max = Double.MIN_VALUE, e = 0.0;
+
+	for (i = 0; i < v.size(); i++) {
+	    e = ((Double)(v.elementAt(i))).doubleValue();
+	    if (e > max) {
+		max = e;
+		rv = i;
+	    }
+	}
+	return rv;
+    }
+
 }
+
 
 

@@ -121,6 +121,7 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
 	addPage(new QuoteSourcePage(desktop));	
 	addPage(new TuningPage(desktop));
 	addPage(new UserInterfacePage(desktop));
+	addPage(new ChartPreferencesPage(desktop));
 
 	pageList = new JList(pageListModel);
 

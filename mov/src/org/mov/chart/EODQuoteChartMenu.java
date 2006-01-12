@@ -41,6 +41,7 @@ import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.Symbol;
 import org.mov.util.ImageFilter;
 import org.mov.util.BMPFile;
+import org.mov.prefs.PreferencesManager;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.
@@ -122,16 +123,39 @@ public class EODQuoteChartMenu extends JMenu {
         // Graph main menus
 	JMenu graphMenu = new JMenu(Locale.getString("GRAPH"));
 
+
+	/* Determine which chart type to be selected based
+	   on the default chart chosen in the preferences */
+	String defaultChart = PreferencesManager.getDefaultChart();
+	boolean lineSel = false, barSel = false, candleSel = false, 
+	    highLowSel = false, pfSel = false;
+
+	if (defaultChart.compareTo("LINE_CHART") == 0) {
+	    lineSel = true;	    
+	}
+	if (defaultChart.compareTo("BAR_CHART") == 0) {
+	    barSel = true;	    
+	}
+	if (defaultChart.compareTo("HIGH_LOW_BAAR") == 0) {
+	    highLowSel = true;	    
+	}
+	if (defaultChart.compareTo("CANDLE_STICK") == 0) {
+	    candleSel = true;	    
+	}
+	if (defaultChart.compareTo("POINT_AND_FIGURE") == 0) {
+	    pfSel = true;	    
+	}
+
         // Add the view menu items. Usually the user will only want to display
         // one of these at a time. So if they do, unselect the other members of
         // the group.
         ButtonGroup group = new ButtonGroup();
         currentViewMenuItem =
-            addViewMenuItem(graphMenu, group, Locale.getString("LINE_CHART"), true); // selected
-        addViewMenuItem(graphMenu, group, Locale.getString("BAR_CHART"), false);
-	addViewMenuItem(graphMenu, group, Locale.getString("CANDLE_STICK"), false);
-	addViewMenuItem(graphMenu, group, Locale.getString("HIGH_LOW_BAR"), false);
-        addViewMenuItem(graphMenu, group, Locale.getString("POINT_AND_FIGURE"), false);
+            addViewMenuItem(graphMenu, group, Locale.getString("LINE_CHART"), lineSel); 
+        addViewMenuItem(graphMenu, group, Locale.getString("BAR_CHART"), barSel);
+	addViewMenuItem(graphMenu, group, Locale.getString("CANDLE_STICK"), candleSel);
+	addViewMenuItem(graphMenu, group, Locale.getString("HIGH_LOW_BAR"), highLowSel);
+        addViewMenuItem(graphMenu, group, Locale.getString("POINT_AND_FIGURE"), pfSel);
 
         graphMenu.addSeparator();
 
@@ -453,9 +477,10 @@ public class EODQuoteChartMenu extends JMenu {
     private Graph newGraph(String text) {
         Graph graph;
 
-        if(text == Locale.getString("BAR_CHART"))
+        if(text == Locale.getString("BAR_CHART")) {
+	    
             graph = new BarChartGraph(getDayOpen(), getDayLow(), getDayHigh(), getDayClose());
-
+	}
         else if(text == Locale.getString("BOLLINGER_BANDS"))
             graph = new BollingerBandsGraph(getDayClose());
 

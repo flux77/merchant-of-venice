@@ -915,6 +915,30 @@ public class PreferencesManager {
     }
 
     /**
+     * Load default chart setting.
+     *
+     * @return the default chart to be displayed
+     */
+    public static String getDefaultChart() {        
+        Preferences prefs = getUserNode("/default_chart_defaults");
+        String str = prefs.get("default_chart", "Line Graph");        
+        return str;
+    }
+
+    /**
+     * Save default chart setting.
+     *
+     * @param default the chart to be displayed
+     */
+    public static void putDefaultChart(String defaultChart) {
+
+        Preferences prefs = getUserNode("/default_chart_defaults");
+	prefs.put("default_chart", defaultChart);
+    }
+
+    
+
+    /**
      * Get quote source setting.
      *
      * @return quote source, one of {@link #DATABASE}, {@link #FILES} or {@link #SAMPLES}.

@@ -629,9 +629,10 @@ public class CommandManager {
             portfolioGraphSource =
                 new PortfolioGraphSource(portfolio, quoteBundle,
                                          PortfolioGraphSource.MARKET_VALUE);
-            graph = new LineGraph(portfolioGraphSource,
+	    graph = new LineGraph(portfolioGraphSource,
                                   Locale.getString("MARKET_VALUE"),
                                   true);
+	    
             chart.add(graph, portfolio, quoteBundle, 0);
             chart.redraw();
             desktopManager.newFrame(chart);
@@ -827,7 +828,8 @@ public class CommandManager {
 
             Iterator iterator = symbols.iterator();
             EODQuoteBundle quoteBundle = null;
-            GraphSource dayClose = null;
+            
+	    
             Graph graph = null;
 
             String title = symbols.toString();
@@ -853,9 +855,8 @@ public class CommandManager {
                 if(thread.isInterrupted())
                     break;
 
-                dayClose =
-                    new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
-                graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
+		graph = getNewGraph(quoteBundle, false);
+		
                 chart.add(graph, symbol, quoteBundle, 0);
                 chart.redraw();
 
@@ -903,11 +904,8 @@ public class CommandManager {
 
 	    quoteBundle = new EODQuoteBundle(new EODQuoteRange(symbols));
 
-	    dayClose =
-		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+	    graph = getNewGraph(quoteBundle, true);
 
-	    graph = new LineGraph(dayClose, Locale.getString("GRAPH_INDEX"), true);
-	    
 	    /* Has data is aggregate of all symbols, the actual
 	       symbol used to mark the chart is irrelevant. 
 	    */
@@ -1078,4 +1076,53 @@ public class CommandManager {
 
 	return false;
     }
+
+    /*
+      Return a new graph according to the default. 
+    */
+    private Graph getNewGraph(EODQuoteBundle quoteBundle, boolean index) {
+	GraphSource dayOpen = null, dayClose = null, dayHigh = null, dayLow = null;
+	
+	String defaultChart = PreferencesManager.getDefaultChart();
+	Graph graph;	
+	
+
+	// This would be nicer as a set of Ternary ops	   	 
+	if (index) {	
+	    dayOpen =
+		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
+	    dayClose =
+		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+	    dayHigh =
+		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_HIGH);
+	    dayLow =
+		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_LOW);
+	} else {
+	    dayOpen =
+		new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
+	    dayClose =
+		new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+	    dayHigh =
+		new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_HIGH);
+	    dayLow =
+		new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_LOW);
+	}
+	
+
+	if (defaultChart.compareTo("BAR_CHART") == 0) {		    
+	    graph = new BarChartGraph(dayOpen, dayLow, 
+				      dayHigh, dayClose);	    
+	} else if (defaultChart.compareTo("CANDLE_STICK") == 0) {
+	    graph = new CandleStickGraph(dayOpen, dayLow,
+					 dayHigh, dayClose);
+	} else if (defaultChart.compareTo("HIGH_LOW_BAR") == 0) {
+	    graph = new HighLowBarGraph(dayLow, dayHigh, dayClose);
+	} else if (defaultChart.compareTo("POINT_AND_FIGURE") == 0) {
+	    graph = new PointAndFigureGraph(dayClose);
+	} else {
+	    graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
+	}
+	return graph;
+    }        
+    
 }

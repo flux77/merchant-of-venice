@@ -148,6 +148,7 @@ public class ChartModule extends JPanel implements Module,
     // Function Toolbar
     private JButton defaultZoom = null;
     private JButton zoomIn = null;
+    private JButton cloneChart = null;
     private JButton paintOnChart = null;
     private JButton eraseOnChart = null;
     private JButton moveOnChart = null;
@@ -190,6 +191,7 @@ public class ChartModule extends JPanel implements Module,
     private String moveInImage = "toolbarButtonGraphics/general/Move24.gif";
     private String scribbleInImage = "toolbarButtonGraphics/general/Scribble24.gif";
     private String editInImage = "toolbarButtonGraphics/general/Text24.gif";
+    private String cloneChartImage = "toolbarButtonGraphics/general/Copy24.gif";
     
     //Index chart indicator - Index charts have aggregate graph sources
     private boolean indexChart = false;
@@ -290,6 +292,7 @@ public class ChartModule extends JPanel implements Module,
 	URL eraseInImageURL = ClassLoader.getSystemResource(eraseInImage);
 	URL moveInImageURL = ClassLoader.getSystemResource(moveInImage);
 	URL scribbleInImageURL = ClassLoader.getSystemResource(scribbleInImage);	URL editInImageURL = ClassLoader.getSystemResource(editInImage);
+	URL cloneChartURL = ClassLoader.getSystemResource(cloneChartImage);
 
         // If either image is not available, then do not create the
         // toolbar
@@ -309,6 +312,13 @@ public class ChartModule extends JPanel implements Module,
             zoomIn.addActionListener(this);
             zoomIn.setEnabled(zoomInEnabled);
             toolBar.add(zoomIn);
+
+	    // Create image on toolbar to clone the graph
+	    ImageIcon cloneChartIcon = new ImageIcon(cloneChartURL);
+	    cloneChart = new JButton(cloneChartIcon);
+	    cloneChart.addActionListener(this);
+	    cloneChart.setEnabled(true);
+	    toolBar.add(cloneChart);
 
 	    // Create image on toolbar to paint lines on graph
 	    ImageIcon paintOnChartIcon = new ImageIcon(paintInImageURL);
@@ -344,6 +354,9 @@ public class ChartModule extends JPanel implements Module,
 	    eraseOnChart.addActionListener(this);
 	    eraseOnChart.setEnabled(true);
 	    toolBar.add(eraseOnChart);
+	    
+
+	    
 	    
             add(toolBar, BorderLayout.WEST);
         }
@@ -863,6 +876,25 @@ public class ChartModule extends JPanel implements Module,
 		activateButton(null);
 		viewMode = SELECTING;
 	    }
+	} 
+
+	else if (cloneChart != null && e.getSource() == cloneChart) {
+	    Vector symbols = chart.getSymbols(); 
+	    Vector outputList = new Vector();
+
+	    Iterator i = symbols.iterator();
+	    while (i.hasNext()) {
+		try {
+		    Symbol s = Symbol.find( (String)i.next());
+		    outputList.add(s);
+		} catch (SymbolFormatException sfe) {
+		    //Shouldn't happen because the chart
+		    //has been instantiated which implies
+		    //a valid symbol has been found.
+		}		
+	    }
+
+	    CommandManager.getInstance().graphStockBySymbol(outputList);
 	}
 
 	else if(e.getSource() == closeMenuItem) {

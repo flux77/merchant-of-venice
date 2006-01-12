@@ -781,6 +781,37 @@ public class Chart extends JComponent implements MouseListener {
      */
     public String getTitle() {
 
+	Vector symbols = getSymbols();
+	String symbolListString = "";
+	boolean firstSymbol = true;
+
+	// Sort array of chart symbols
+	TreeSet sortedSet = new TreeSet(Collator.getInstance());
+	sortedSet.addAll(symbols);
+
+	Iterator symbolIterator = sortedSet.iterator();
+
+	while (symbolIterator.hasNext()) {
+	    String symbol = (String)symbolIterator.next();
+	    if (firstSymbol) {
+		symbolListString.concat(" " + symbol);
+		firstSymbol = false;
+	    } else {
+		symbolListString.concat(", " + symbol);
+	    }
+	}
+
+	// Now construct the title "Graph of XXX, BBB, YYY"
+	return Locale.getString("CHART_TITLE", symbolListString);	
+    }
+
+    /**
+     * Return the window symbols.
+     *
+     * @return	the window symbols
+     */
+
+    public Vector getSymbols() {
 	Iterator levelIterator = levels.iterator();
 
 	// First create a vector of all the chart symbols
@@ -797,30 +828,10 @@ public class Chart extends JComponent implements MouseListener {
 	    }
 	}
 
-	// Sort array of chart symbols
-	TreeSet sortedSet = new TreeSet(Collator.getInstance());
-	sortedSet.addAll(symbols);
 
-	String symbolListString = "";
-	boolean firstSymbol = true;
-	Iterator symbolIterator = sortedSet.iterator();
-
-	while(symbolIterator.hasNext()) {
-	    String symbol = (String)symbolIterator.next();
-
-	    if(firstSymbol) {
-		symbolListString = symbolListString.concat(" " + symbol);
-		firstSymbol = false;
-	    }
-	    else {
-		symbolListString = symbolListString.concat(", " + symbol);
-	    }
-	}
-
-	// Now construct the title "Graph of XXX, BBB, YYY"
-	return Locale.getString("CHART_TITLE", symbolListString);	
+	return symbols;
     }
-
+    
     public void mouseClicked(MouseEvent e) {}
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {

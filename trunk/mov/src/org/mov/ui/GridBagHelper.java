@@ -26,6 +26,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import java.util.Vector;
 
 /**
  * GridBagHelper is a class that makes it easier to create form user interfaces. Using
@@ -217,6 +219,38 @@ public class GridBagHelper {
 	panel.add(label);
 
         SymbolListComboBox comboBox = new SymbolListComboBox(symbolList);
+        if(c.gridx != -1)
+            c.gridx++;
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(comboBox, c);
+	panel.add(comboBox);
+
+	return comboBox;
+
+    }
+
+/**
+     * Append a new list combo box to the form.
+     *
+     * @param panel form panel
+     * @param field text to display next to the combo box
+     * @param initial list
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @return the symbol list combo box
+     */
+    public static JComboBox addComboBox(JPanel panel, 
+					String field, 
+					Vector list,
+					GridBagLayout gridbag,
+					GridBagConstraints c) {
+
+	JLabel label = new JLabel(field);
+	c.gridwidth = 1;
+	gridbag.setConstraints(label, c);
+	panel.add(label);
+
+        JComboBox comboBox = new JComboBox(list);
         if(c.gridx != -1)
             c.gridx++;
 	c.gridwidth = GridBagConstraints.REMAINDER;

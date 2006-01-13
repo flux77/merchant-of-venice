@@ -233,8 +233,7 @@ public class GridBagHelper {
      * Append a new list combo box to the form.
      *
      * @param panel form panel
-     * @param field text to display next to the combo box
-     * @param initial list
+     * @param field text to display next to the combo box     
      * @param gridbag the form's gridbag
      * @param c the form's constraints
      * @return the symbol list combo box

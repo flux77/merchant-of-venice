@@ -928,7 +928,7 @@ public class PreferencesManager {
     /**
      * Save default chart setting.
      *
-     * @param default the chart to be displayed
+     * @param defaultChart the chart to be displayed
      */
     public static void putDefaultChart(String defaultChart) {
 

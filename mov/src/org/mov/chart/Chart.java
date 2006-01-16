@@ -792,12 +792,13 @@ public class Chart extends JComponent implements MouseListener {
 	Iterator symbolIterator = sortedSet.iterator();
 
 	while (symbolIterator.hasNext()) {
+
 	    String symbol = (String)symbolIterator.next();
 	    if (firstSymbol) {
-		symbolListString.concat(" " + symbol);
+		symbolListString = symbolListString.concat(" " + symbol);
 		firstSymbol = false;
 	    } else {
-		symbolListString.concat(", " + symbol);
+		symbolListString = symbolListString.concat(", " + symbol);
 	    }
 	}
 

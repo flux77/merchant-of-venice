@@ -1,3 +1,11 @@
+Changes for Venice, 0.7 beta 24/Jan/2006
+========================================
+
+* Tuning:
+  - HSQLDB databases are now stored in binary format and are no
+    longer fully cached in memory. This should improve performance
+    and reduce memory usage.
+
 Changes for Venice, 0.6 beta 23/Oct/2005
 ========================================
 

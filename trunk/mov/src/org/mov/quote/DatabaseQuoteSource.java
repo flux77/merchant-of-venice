@@ -675,7 +675,7 @@ public class DatabaseQuoteSource implements QuoteSource
         try {
             // 1. Create the shares table
             Statement statement = connection.createStatement();
-            statement.executeUpdate("CREATE TABLE " + SHARE_TABLE_NAME + " (" +
+            statement.executeUpdate("CREATE " + getTableType() + " TABLE " + SHARE_TABLE_NAME + " (" +
                                     DATE_FIELD +	" DATE NOT NULL, " +
                                     SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
                                     ") NOT NULL, " +
@@ -693,7 +693,7 @@ public class DatabaseQuoteSource implements QuoteSource
                                     SHARE_TABLE_NAME + " (" + SYMBOL_FIELD + ")");
             
             // 3. Create the lookup table
-            statement.executeUpdate("CREATE TABLE " + LOOKUP_TABLE_NAME + " (" +
+            statement.executeUpdate("CREATE " + getTableType() + " TABLE " + LOOKUP_TABLE_NAME + " (" +
                                     SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
                                     ") NOT NULL, " +
                                     NAME_FIELD +	" VARCHAR(100), " +
@@ -1278,6 +1278,23 @@ public class DatabaseQuoteSource implements QuoteSource
             // This is probably more portable than the above
             return new String("SUBSTR(" + field + ", 1, " + length + ")");
         }        
+    }
+
+    /**
+     * Return SQL modify that comes after <code>CREATE</code> and before <code>TABLE</code>.
+     * Currently this is only used for HSQLDB.
+     *
+     * @return the SQL modify for <code>CREATE</code> calls.
+     */
+    private String getTableType() {
+        // We need to supply the table type "CACHED" when creating a HSQLDB
+        // table. This tells the database to store the table on disk and cache
+        // part of it in memory. If we do not specify this, it will load and
+        // work with the entire table in memory.
+        if(software.equals(HSQLDB_SOFTWARE))
+            return new String("CACHED");
+        else
+            return "";
     }
 
     /**

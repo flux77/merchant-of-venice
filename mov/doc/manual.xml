@@ -1583,7 +1583,8 @@ When you close the ANN window, be sure to have saved the ANN, because the ANN is
 in the preferences. Anyway if ANN has not been saved, the system will ask you to save it.</para>
 
 <para>Another interesting point to be explained is how we can get the output buy and sell signals from the ANN.
-The theory (Cross Target technique) that resolves this problem can be seen at the following internet site:
+The theory (Cross Target technique, by prof. Pietro Terna) that resolves this problem can be seen 
+at the following internet site:
 http://web.econ.unito.it/terna/ct-era/ct-era.html
 You must think to the above technique used in the following way: the actions are buy and sell signals,
 the effect of the actions is the capital.
@@ -1683,6 +1684,10 @@ neural network with two output signals for all the stocks in the bundle.</para>
 </item>
 <item><code>(1000*(lag(close,-(n-1))-lag(close,-n)))/close</code>
 </item></list>
+</section>
+
+<section name="Versioning">
+<para>Merchant of Venice 0.7 is based on Joone 1.2.1</para>
 </section>
 </chapter>
 

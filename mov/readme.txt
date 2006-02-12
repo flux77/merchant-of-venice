@@ -1,7 +1,7 @@
-Merchant of Venice, 0.6 beta 23/Oct/2005
+Merchant of Venice, 0.7 beta 23/Oct/2006
 ========================================
 
-Copyright (C) 2003-5, Andrew Leppard (aleppard picknowl com au)
+Copyright (C) 2003-6, Andrew Leppard (aleppard picknowl com au)
 See COPYING.txt for license terms.
 
 1 Introduction
@@ -120,7 +120,7 @@ web     Packages the web files ready for deployment (Not included in
 
 6 Licenses
 
-Venice is Copyright (C) 2003-2005, Andrew Leppard.
+Venice is Copyright (C) 2003-2006, Andrew Leppard.
 HSQLDB is Copyright (C) 1995-2000, The Hypersonic SQL Group.
 Jython is Copyright (C) 2000, Jython Developers
 
@@ -134,8 +134,8 @@ Matthias Stöckel and Dennis van den Berg.
 
 And the following for providing translations:
 
-Benedict P. Barszcz (Polish), Quentin Bossard (French),
-Bryan Lin (Chinese), Alberto Nacher (Italian) & Pontus Strömdahl (Swedish) 
+Benedict P. Barszcz (Polish), Quentin Bossard (French), Bryan Lin (Chinese),
+Alberto Nacher (Italian), Jordi Pujol (Catalan) & Pontus Strömdahl (Swedish) 
 
 The winged lion image is:
 

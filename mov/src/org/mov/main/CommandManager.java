@@ -95,6 +95,7 @@ public class CommandManager {
     private JInternalFrame preferencesModuleFrame = null;
 
     // Locales for about box translation credits
+    private java.util.Locale catalan = new java.util.Locale("CA");
     private java.util.Locale french = new java.util.Locale("FR");
     private java.util.Locale italian = new java.util.Locale("IT");
     private java.util.Locale polish = new java.util.Locale("PL");
@@ -950,9 +951,10 @@ public class CommandManager {
 
                                    Locale.getString("TRANSLATORS") + "\n" +
                                    "Benedict P. Barszcz (" + polish.getDisplayName() + "), " +
-                                   "Quentin Bossard (" + french.getDisplayName() + ")\n" +
+                                   "Quentin Bossard (" + french.getDisplayName() + "),\n" +
                                    "Bryan Lin (" + simplifiedChinese.getDisplayName() + "), " +
-                                   "Alberto Nacher (" + italian.getDisplayName() + ")\n" +
+                                   "Alberto Nacher (" + italian.getDisplayName() + "),\n" +
+                                   "Jordi Pujol (" + catalan.getDisplayName() + ") & " +
 				   "Pontus Str\366mdahl (" + swedish.getDisplayName() + ")"
 				   );
 

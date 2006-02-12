@@ -57,13 +57,13 @@ public class Main extends JFrame {
     public static String SHORT_VERSION = "0.6b";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION = "0.6 beta";
+    public static String LONG_VERSION = "0.7 beta";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "23/" + Locale.getString("OCT") + "/2005";
+    public static String RELEASE_DATE = "24/" + Locale.getString("JAN") + "/2006";
 
     /** Copyright date range, e.g. "2003-5" */
-    public static String COPYRIGHT_DATE_RANGE = "2003-5";
+    public static String COPYRIGHT_DATE_RANGE = "2003-6";
 
     /**
      * Get the main frame for the current application

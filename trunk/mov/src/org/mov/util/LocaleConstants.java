@@ -22,6 +22,7 @@ public final class LocaleConstants {
     
     // To be modified if another localization is added. Just add the supported languages here.
     final public static java.util.Locale[] locales =  {
+	new java.util.Locale("CA"), // Catalan
         java.util.Locale.ENGLISH,
         java.util.Locale.FRENCH,
         java.util.Locale.ITALIAN,

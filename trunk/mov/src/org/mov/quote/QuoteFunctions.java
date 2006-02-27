@@ -68,7 +68,7 @@ public class QuoteFunctions {
             }
         }
 
-        if(actualPeriod > 2)
+	if(actualPeriod > 2)
             deviationSum /= (actualPeriod - 1);
 
         return Math.sqrt(deviationSum);
@@ -494,5 +494,103 @@ public class QuoteFunctions {
     public static final double roundDouble(double d, int places) {
         return Math.round(d * Math.pow(10, (double) places)) / Math.pow(10,
             (double) places);
+    }
+    
+    /**
+     * Calculate the line of best fit of the data given by source. 
+     * 
+     * using the formula:
+     * slope = period * Sum(xy) - Sum(x)Sum(y) / period * Sum(x^2) - (Sum(x))^2
+     * intercept = ( Sum(y) - slope * Sum(x) ) / period
+     * @param source the source of quotes
+     * @param period the number of days to analyse
+     * @return the value of the trend at the end of period     
+
+    */
+
+    static public double bestFit(QuoteFunctionSource source, int period) 
+	throws EvaluationException
+    {
+	
+	double value;
+	int i;
+	double slope = 0.0;
+	double intercept = 0.0;
+	double sumXY, sumX , sumY, sumXSq, sqSumX;
+
+	sumXY = sumX = sumY = sumXSq = sqSumX = 0.0;
+	
+	for(i = 1; i <= period; i++) {
+	    value = source.getValue(i-1);
+
+	    if(!Double.isNaN(value)) {
+		//slope
+		sumXY += (i * value);
+		sumX += i;
+		sumY += value;		
+				
+		sumXSq += (i * i);
+	    }
+	}
+
+	sqSumX = sumX * sumX;
+
+	slope = ( (period * sumXY) - (sumX * sumY)) / ( (period * sumXSq) - sqSumX);		
+	intercept = (sumY - slope * sumX) / period;
+
+	double rv = (slope * (period+1) + intercept);
+	return (slope * (period+1) + intercept);
+	
+    }
+    
+    /**
+     * Return the equation of the line of best fit of the data given by source. 
+     * Uses the same formula as bestFit, but returns slope and intercept
+     * so that it can be used on charts.
+     * 
+     * 
+     * @param source the source of quotes
+     * @param period the number of days to analyse
+     * @return the value of the trend at the end of period     
+
+    */
+
+    static public double[] bestFitFunction(QuoteFunctionSource source, int start, int period) 
+	throws EvaluationException
+    {
+	
+	double value;
+	int i;
+	double slope = 0.0;
+	double intercept = 0.0;
+	double sumXY, sumX , sumY, sumXSq, sqSumX;
+	double rv[] = new double[2];
+	int end;
+
+	sumXY = sumX = sumY = sumXSq = sqSumX = 0.0;
+	
+	for(i = 1; i <= period; i++) {
+	    value = source.getValue(i-1);
+
+	    if(!Double.isNaN(value)) {
+		//slope
+		sumXY += (i * value);
+		sumX += i;
+		sumY += value;		
+				
+		sumXSq += (i * i);
+	    }
+	}
+
+	sqSumX = sumX * sumX;
+	
+	slope = ( (period * sumXY) - (sumX * sumY)) / ( (period * sumXSq) - sqSumX);		
+	intercept = (sumY - slope * sumX) / period;
+	
+	rv[0] = slope;
+	rv[1] = intercept;
+	
+	return rv;
+	
     }
 }

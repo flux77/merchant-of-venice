@@ -180,16 +180,16 @@ public class ExpressionFactory {
 	    expression = new NotEqualExpression(arg1, arg2);
 	    break;
         case(Token.TRUE_TOKEN):
-            expression = new NumberExpression(Expression.TRUE, Expression.BOOLEAN_TYPE);
+	    expression = new NumberExpression(Expression.TRUE, Expression.BOOLEAN_TYPE);
             break;
         case(Token.FALSE_TOKEN):
-            expression = new NumberExpression(Expression.FALSE, Expression.BOOLEAN_TYPE);
+	    expression = new NumberExpression(Expression.FALSE, Expression.BOOLEAN_TYPE);
             break;
 	case(Token.NUMBER_TOKEN):
 	    expression = new NumberExpression(token.getValue(), token.getValueType());
 	    break;
         case(Token.STRING_TOKEN):
-            expression = new StringExpression(token.getStringValue());
+	    expression = new StringExpression(token.getStringValue());
             break;
 	case(Token.DAY_OF_WEEK_TOKEN):
 	    expression = new DayOfWeekExpression();
@@ -210,19 +210,19 @@ public class ExpressionFactory {
 	    expression = new SumExpression(arg1, arg2, arg3);
 	    break;
         case(Token.SQRT_TOKEN):
-            expression = new SqrtExpression(arg1);
+	    expression = new SqrtExpression(arg1);
             break;
         case(Token.ABS_TOKEN):
-            expression = new AbsExpression(arg1);
+	    expression = new AbsExpression(arg1);
             break;
         case(Token.FOR_TOKEN):
-            expression = new ForExpression(arg1, arg2, arg3, arg4);
+	    expression = new ForExpression(arg1, arg2, arg3, arg4);
             break;
         case(Token.WHILE_TOKEN):
-            expression = new WhileExpression(arg1, arg2);
+	    expression = new WhileExpression(arg1, arg2);
             break;
         case(Token.CORR_TOKEN):
-            expression = new CorrExpression(arg1, arg2, arg3, arg4);
+	    expression = new CorrExpression(arg1, arg2, arg3, arg4);
             break;
         case(Token.EMA_TOKEN):
             expression = new EMAExpression(arg1, arg2, arg3, arg4);
@@ -257,9 +257,12 @@ public class ExpressionFactory {
         case(Token.EXP_TOKEN):
             expression = new ExponentialExpression(arg1);
             break;
+	case (Token.TREND_TOKEN):
+	    expression = new TrendExpression(arg1, arg2, arg3);
+	    break;
         default:
             // No such token
-            assert false;
+	    assert false;
 	}
 
 	return expression;

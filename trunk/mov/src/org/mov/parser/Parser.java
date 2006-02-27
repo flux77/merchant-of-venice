@@ -86,6 +86,7 @@ import org.mov.util.Locale;
  *                     "dayfromstart" "(" ")" |
  *                     "capital" "(" ")" |
  *                     "stockcapital" "(" ")" |
+ *                     "trend" (" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")"
  * FLOW_CONTROL      = "if"  "(" SUB_EXPR ")" EXPR "else" EXPR |
  *                     "for" "(" SUB_EXPR ";" SUB_EXPR ";" SUB_EXPR ")" EXPR |
  *                     "while" "(" SUB_EXPR ")" EXPR
@@ -330,7 +331,8 @@ public class Parser {
                 tokens.match(Token.SIN_TOKEN) ||
                 tokens.match(Token.COS_TOKEN) ||
                 tokens.match(Token.LOG_TOKEN) ||
-                tokens.match(Token.EXP_TOKEN))
+                tokens.match(Token.EXP_TOKEN) ||
+	        tokens.match(Token.TREND_TOKEN))
 	    expression = parseFunction(variables, tokens);
 
         // ABBREVIATION QUOTE FUNCTIONS
@@ -630,6 +632,21 @@ public class Parser {
 		arg4 = new NumberExpression(0.1D);
             }
 
+	    break;
+
+	case(Token.TREND_TOKEN):
+	    arg1 = parseQuote(variables, tokens);
+	    parseComma(variables, tokens);
+	    arg2 = parseSubExpression(variables, tokens);
+
+	    // Parse optional offset argument
+            if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+                parseComma(variables, tokens);
+                arg3 = parseSubExpression(variables, tokens);
+            }
+            else
+                arg3 = new NumberExpression(0);
+	    
 	    break;
 
 	case(Token.OBV_TOKEN):

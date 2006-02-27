@@ -217,8 +217,11 @@ public class Token {
     /** Represents "<code>exp()</code>" symbol */
     public static final int EXP_TOKEN = 61;
     
+    /** Represents "<code>trend()</code>" symbol */
+    public static final int TREND_TOKEN = 62;
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 62;
+    private static final int FIXED_LENGTH_TOKENS = 63;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -317,6 +320,7 @@ public class Token {
         tokenStrings[COS_TOKEN]                = "cos";
         tokenStrings[LOG_TOKEN]                = "log";
         tokenStrings[EXP_TOKEN]                = "exp";
+	tokenStrings[TREND_TOKEN]              = "trend";
         
         return tokenStrings;
     }

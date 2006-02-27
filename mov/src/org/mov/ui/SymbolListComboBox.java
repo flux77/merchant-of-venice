@@ -18,14 +18,18 @@
 
 package org.mov.ui;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.SortedSet;
+import java.util.Iterator;
 import javax.swing.JComboBox;
 
 import org.mov.quote.EODQuoteRange;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
 import org.mov.util.Locale;
+import org.mov.prefs.PreferencesManager;
+import org.mov.table.WatchScreen;
 
 /**
  * A JComboBox which allows the user to choose from a selection of symbol lists.
@@ -69,7 +73,8 @@ public class SymbolListComboBox extends JComboBox {
      */
     public EODQuoteRange getQuoteRange()
         throws SymbolFormatException {
-        
+
+
         String text = getText();
         
         if(text.equals(ALL_ORDINARIES))
@@ -81,16 +86,32 @@ public class SymbolListComboBox extends JComboBox {
         else if(text == null)
             return new EODQuoteRange(EODQuoteRange.ALL_ORDINARIES);
         else {
-            // Convert the text string to a sorted set of symbol
-            // strings and also check to see if they exist
-            SortedSet symbolSet = Symbol.toSortedSet(text, true);
-
-            // If it returned empty there was an error...
-            if(symbolSet.isEmpty())
-                throw new SymbolFormatException(Locale.getString("MISSING_SYMBOLS"));
-            else
-                return new EODQuoteRange(new ArrayList(symbolSet));
-        }
+	    // Compare text against watch screen names first
+	    // and generate symbolSet from watchscreen if watchscreen
+	    // name matches.
+	    WatchScreen w = getWatchScreen(text);	    
+	    SortedSet symbolSet = null;
+	    if (w != null) {
+		List symbolList = w.getSymbols();
+		Iterator i = symbolList.iterator();
+		String list = "";
+		while (i.hasNext()) {
+		    list += i.next() + " ";
+		}
+		symbolSet = Symbol.toSortedSet(list, true);
+	    } else {
+		// Otherwise,
+		// Convert the text string to a sorted set of symbol
+		// strings and also check to see if they exist
+		symbolSet = Symbol.toSortedSet(text, true);
+	    }
+	    
+	    // If it returned empty there was an error...
+	    if(symbolSet.isEmpty())
+		throw new SymbolFormatException(Locale.getString("MISSING_SYMBOLS"));
+	    else
+		return new EODQuoteRange(new ArrayList(symbolSet));
+	}	
     }
 
     /**
@@ -113,9 +134,32 @@ public class SymbolListComboBox extends JComboBox {
 
     // Rebuild option items in this combo box
     private void updateItems() {
+
         removeAllItems();
         addItem(ALL_ORDINARIES);
         addItem(ALL_SYMBOLS);
         addItem(MARKET_INDICES);
+	addWatchScreens();
+    }
+        
+    private void addWatchScreens() {
+	String[] names = PreferencesManager.getWatchScreenNames();
+	
+	for (int i = 0; i < names.length; i++) {	    
+	    addItem(names[i]);
+	}
+    }
+
+    // Return the watchscreen denoted by name
+    private WatchScreen getWatchScreen(String name) {
+	String[] names = PreferencesManager.getWatchScreenNames();
+	
+	for (int i = 0; i < names.length; i++) {
+	    if (names[i].compareTo(name) == 0) {
+		WatchScreen w = PreferencesManager.getWatchScreen(names[i]);
+		return w;
+	    }
+	}
+	return null;	    
     }
 }

@@ -25,26 +25,45 @@
 
 package org.mov.chart;
 
-public class Coordinate
+public class Coordinate 
 {
 
     protected static final int BREAK = -1; //End of coordinates/Out of bounds marker 
 
-    private Integer x;
-    private Integer y;
+    private Comparable dataX;
+    private Double dataY;    
+    private Integer yCoord;    
+
+    /* 
+
+    */
+    public Coordinate(Comparable x, Double y, Integer yCoord) {
+	dataX = x;
+	dataY = y;
+	this.yCoord = yCoord;;	
+    }
+
 
     public Coordinate(Integer x, Integer y) {
-	this.x = x;
-	this.y = y;
+	
     }
 
-
-    public Integer getX() {
-	return x;
+    public Coordinate() {
+	dataX = null;
+	dataY = null;
+	yCoord = new Integer(BREAK);
     }
+	
 
-    public Integer getY() {
-	return y;
+    public Comparable getXData() {
+	return dataX;
+    }
+    public Double getYData() {
+	return dataY;
+    }
+    
+    public Integer getYCoord() {
+	return yCoord;
     }
 
 }

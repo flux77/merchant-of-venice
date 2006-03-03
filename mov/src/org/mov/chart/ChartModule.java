@@ -688,27 +688,28 @@ public class ChartModule extends JPanel implements Module,
     public void mouseExited(MouseEvent e) {}
     public void mousePressed(MouseEvent e) {
 	Comparable x = chart.getXAtPoint(e.getX());
-	Integer y = new Integer(e.getY());
+	Double y = chart.getYAtPoint(e.getY());
+	Integer mouseX = new Integer(e.getX());
+	Integer mouseY = new Integer(e.getY());
 	
 	if(x != null &&
 	   viewMode == SELECTING) {
 	    chart.setHighlightedStart(x);
 	}
 
-	/* FIXME: These coordinates won't work at all
-	   zoom levels - so when user zooms the lines stay fixed.
-	*/
-
 	if (x != null && viewMode == DRAWING) {
-	    chart.setDrawnLineStart(new Integer(e.getX()),y);
+	    chart.setDrawnLineStart(x, y, mouseY);
 	    newLine = true;
 	}
 
 	if (x != null && viewMode == MOVING) {
-	    Integer[] start;
+	    Coordinate start;
  	    
-	    if ( (start = chart.move(new Integer(e.getX()),y)) != null) {
-		chart.setDrawnLineStart(start[0], start[1]);
+	    if ( (start = chart.move(mouseX,mouseY)) != null) {
+		
+		chart.setDrawnLineStart(start.getXData(), 
+					start.getYData(),
+					start.getYCoord());
 		newLine = true;
 	    }
 	}
@@ -716,10 +717,11 @@ public class ChartModule extends JPanel implements Module,
     }
     public void mouseReleased(MouseEvent e) { 
  	Comparable x = chart.getXAtPoint(e.getX());
-	Integer y = new Integer(e.getY());
+	Double y = chart.getYAtPoint(e.getY());
+	Integer mouseY = new Integer(e.getY());
 
 	if (x != null && (viewMode == DRAWING || viewMode == MOVING)) {
-	    chart.setDrawnLineEnd(new Integer(e.getX()),y, newLine);
+	    chart.setDrawnLineEnd(x, y, mouseY, newLine);
 	    if (newLine) {
 		newLine = false;
 	    }
@@ -729,19 +731,22 @@ public class ChartModule extends JPanel implements Module,
 	    String val = JOptionPane.showInputDialog(this,"Enter text", "Text", JOptionPane.OK_CANCEL_OPTION);
 	   
 	    if (val != null) {
-		chart.setText(val,new Integer(e.getX()), y);
+		chart.setText(val,x, y, mouseY);
 	    }
 	}
 
 	if (x != null && viewMode == SCRIBBLING) {
-	    chart.setPoint(new Integer(Coordinate.BREAK), new Integer(Coordinate.BREAK));
+	    Coordinate c = new Coordinate();
+	    chart.setPoint(c);
+
 	}
 
     }
     public void mouseDragged(MouseEvent e) {
 
 	Comparable x = chart.getXAtPoint(e.getX());
-	Integer y = new Integer(e.getY());
+	Double y = chart.getYAtPoint(e.getY());
+	Integer mouseY = new Integer(e.getY());
 
 	// can now zoom in!
 	// As long as we're not in an editing mode.
@@ -753,7 +758,7 @@ public class ChartModule extends JPanel implements Module,
 	    chart.setHighlightedEnd(x);
 	
 	if (x != null && (viewMode == DRAWING || viewMode == MOVING)) {
-	    chart.setDrawnLineEnd(new Integer(e.getX()),y, newLine);
+	    chart.setDrawnLineEnd(x, y, mouseY, newLine);
 	    
 	    if (newLine) {
 		newLine = false;
@@ -761,11 +766,11 @@ public class ChartModule extends JPanel implements Module,
 	}
        	
 	if (x != null && viewMode == ERASING) {
-	    chart.setErase(new Integer(e.getX()),y);
+	    chart.setErase(x, y, mouseY);
 	}
 
 	if (x != null && viewMode == SCRIBBLING) {
-	    chart.setPoint(new Integer(e.getX()), y);
+	    chart.setPoint(x, y, mouseY);
 	}
 
     }

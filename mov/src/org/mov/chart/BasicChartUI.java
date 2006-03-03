@@ -147,6 +147,36 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     }
 
     /**
+     * Return the Y value at the given x coordinate.
+     *
+     * @param	chart	the chart component
+     * @param	yCoordinate	an y coordinate on the screen
+     * @return	the Y value at the y coordinate
+     */
+    public Double getYAtPoint(Chart chart, int yCoordinate) {
+
+	/* calculate the verticalScale for the level at this point */
+
+	// Get graph level at this point
+	int level = getLevelAtPoint(yCoordinate);
+	// Get vertical axis of graph level
+	VerticalAxis verticalAxis =
+	    (VerticalAxis)verticalAxes.elementAt(level);
+	int yoffset = getStartOfLevel(level) + firstHorizontalLine;
+	double verticalScale = verticalAxis.getScale();
+	double height = verticalAxis.getHeightOfGraph();
+	double bottomLineValue = verticalAxis.getBottomLineValue();
+
+
+	double dataValue = GraphTools.getPointFromScale(yCoordinate, 
+						 bottomLineValue,
+						 verticalScale);
+       	
+
+	return new Double(dataValue);
+    }
+
+    /**
      * Return which graph level contains the given y coordinate.
      *
      * @param	yCoordinate	the y coordinate to query
@@ -374,7 +404,11 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	if (chart.getDrawnPoints() != null) {
 	    
 	    Vector points;
-		
+	    int x1, y1;
+	    int x2, y2;
+	    Comparable dataX;
+	    Double dataY;
+	    int absY1, absY2;
 	    
 	    points = chart.getDrawnPoints();
 		
@@ -382,60 +416,93 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    g.setColor(Color.MAGENTA);
 	    
 	    if (points.size() == 1) {
-		int x1 = ((Coordinate)points.elementAt(0)).getX().intValue();
-		int y1 = ((Coordinate)points.elementAt(0)).getY().intValue();
+		absY1 = ((Coordinate)points.elementAt(0)).getYCoord().intValue();
+		dataX = ((Coordinate)points.elementAt(0)).getXData();
+		dataY = ((Coordinate)points.elementAt(0)).getYData();
 
-		g.drawLine(x1,y1,x1+1,y1+1);
+		if (absY1 != Coordinate.BREAK) {
+		    x1 = getXCoordinate(chart, dataX);
+		    y1 = getYCoordinate(chart, dataY, absY1);		
+		    g.drawLine(x1,y1,x1+1,y1+1);
+		}
 	    } else {
 		for (int i = 0; i < points.size()-1; i++) {
-		    int x1 = ((Coordinate)points.elementAt(i)).getX().intValue();
-		    int y1 = ((Coordinate)points.elementAt(i)).getY().intValue();
-		    int x2 = ((Coordinate)points.elementAt(i+1)).getX().intValue();
-		    int y2 = ((Coordinate)points.elementAt(i+1)).getY().intValue();
+		    x1 = x2 = y1 = y2 = 0;
 		    
-		    if (x1 == Coordinate.BREAK || y1 == Coordinate.BREAK) {
+		    absY1 = ((Coordinate)points.elementAt(i)).getYCoord().intValue();
+		    dataX = ((Coordinate)points.elementAt(i)).getXData();
+		    dataY = ((Coordinate)points.elementAt(i)).getYData();
+
+		    if (absY1 != Coordinate.BREAK) {		    
+			x1 = getXCoordinate(chart, dataX);
+			y1 = getYCoordinate(chart, dataY, absY1);
+		    }
+
+		    dataX = ((Coordinate)points.elementAt(i+1)).getXData();
+		    dataY = ((Coordinate)points.elementAt(i+1)).getYData();
+		    absY2 = ((Coordinate)points.elementAt(i+1)).getYCoord().intValue();		    
+		    
+		    if (absY2 != Coordinate.BREAK) {
+			x2 = getXCoordinate(chart, dataX);
+			y2 = getYCoordinate(chart, dataY, absY2);
+		    }
+		    
+		    if (absY1 == Coordinate.BREAK) {
 			g.drawLine(x2,y2,x2+1,y2+1);
-		    } else if (x2 == Coordinate.BREAK || x2 == Coordinate.BREAK) {
+		    } else if (absY2 == Coordinate.BREAK) {
 			g.drawLine(x1,y1,x1+1,y1+1);
 		    } else {
+			//otherwise connect the dots
 			g.drawLine(x1,y1,x2,y2);
 		    }
+		    
 		}
 	    }
-
 	    g.setColor(prev);
 	    g.setPaintMode();
 	}
 	
     }
     
-
     //Paint any lines which have been drawn on the chart. 
     private void drawLines(Graphics g, Chart chart, int height) {
 	
 	if (chart.getDrawnLineStart() != null) {
 	    int i;
-
 	    Vector start, end;
+	    Color prev;
 
 	    start = chart.getDrawnLineStart();
 	    end = chart.getDrawnLineEnd();
 
 	    for (i = 0; i < end.size(); i++) {
-		int startX = ((Coordinate)start.elementAt(i)).getX().intValue();
-		int startY = ((Coordinate)start.elementAt(i)).getY().intValue();
-		int endX = ((Coordinate)end.elementAt(i)).getX().intValue();
-		int endY = ((Coordinate)end.elementAt(i)).getY().intValue();
+		int startX, endX;
+		int startY, endY;
+		int absY;
+		Comparable startDataX, endDataX;
+		Double startDataY, endDataY;
 
-		Color prev = g.getColor();
+		startDataX = ((Coordinate)start.elementAt(i)).getXData();
+		startDataY = ((Coordinate)start.elementAt(i)).getYData();
+				
+		absY = ((Coordinate)start.elementAt(i)).getYCoord().intValue();
+		startX = getXCoordinate(chart, startDataX);
+		startY = getYCoordinate(chart, startDataY, absY);
+		
+		endDataX = ((Coordinate)end.elementAt(i)).getXData();
+		endDataY = ((Coordinate)end.elementAt(i)).getYData();
+		
+		endX = getXCoordinate(chart, endDataX);
+		absY = ((Coordinate)end.elementAt(i)).getYCoord().intValue();
+		endY = getYCoordinate(chart, endDataY, absY);
 
+		prev = g.getColor();
+		
 		g.setColor(Color.MAGENTA);
 		g.drawLine(startX,startY, endX, endY);
 		g.setColor(prev);
 	    }
-
-	    g.setPaintMode();
-	    
+	    g.setPaintMode();	    
 	}
     }
 
@@ -445,8 +512,12 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
     private void drawText(Graphics g, Chart chart, int height) {
 	Color prev = g.getColor();
+	int x,y, absY;
+	Comparable dataX;
+	Double dataY;
 
 	g.setColor(Color.BLACK);
+	//TODO: Set font size based on zoom level
 
 	HashMap map = chart.getText();
 	Iterator it = map.values().iterator();
@@ -455,10 +526,14 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    String val = (String)it.next();
 	    if (it2.hasNext()) {
 		Coordinate key = (Coordinate)it2.next();
-		g.drawString(val, key.getX().intValue(), key.getY().intValue());
+		dataX = key.getXData();
+		dataY = key.getYData();
+		absY = key.getYCoord().intValue();
+		x = getXCoordinate(chart, dataX);
+		y = getYCoordinate(chart, dataY, absY);
+		g.drawString(val, x, y);
 	    }
-	}
-       
+	}       
 	g.setColor(prev);
 	g.setPaintMode();
     }
@@ -482,6 +557,220 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    }
 	}
 	return (int)(i * horizontalScale);
+    }
+
+    // For the given Y value, return the Y coordinate
+    private int getYCoordinate(Chart chart, Double y, int yIndex) {
+
+	double dataValue;
+	
+	// Get graph level at this point
+	int level = getLevelAtPoint(yIndex);
+	// Get vertical axis of graph level
+	VerticalAxis verticalAxis =
+	    (VerticalAxis)verticalAxes.elementAt(level);
+	double verticalScale = verticalAxis.getScale();
+	double height = verticalAxis.getHeightOfGraph();
+	double bottomLineValue = verticalAxis.getBottomLineValue();
+       	
+	//The absolute position for the data point 
+	int absY = GraphTools.scaleAndFitPoint( y.doubleValue(), 
+						(double)bottomLineValue, 
+						verticalScale);
+	return absY;
+	
+    }
+
+    //Return the difference between point (x,y) and the closest point
+    //generated by the equation of the line given by start and end. 
+    public double getDifference(Chart chart, Integer x, Integer y, 
+				Coordinate start, Coordinate end) {
+
+	double slope = 1.0;
+	double intersect;
+	double diff = 10.0;
+	Comparable dataX;
+	Double dataY;
+	int absY;
+	int x1, y1, x2, y2;
+	double candX, candY;
+
+	dataX = start.getXData();
+	dataY = start.getYData();
+	absY = start.getYCoord().intValue();
+	
+	x1 = getXCoordinate(chart, dataX);
+	y1 = getYCoordinate(chart, dataY, absY);
+	
+	dataX = end.getXData();
+	dataY = end.getYData();
+	absY = end.getYCoord().intValue();
+	
+	x2 = getXCoordinate(chart, dataX);
+	y2 = getYCoordinate(chart, dataY, absY);
+	
+	if (x2 == x1) {
+	    slope = 0;		
+	} else {
+	    slope = ( (double)(y1) - (double)(y2)) / ((double)(x1) - (double)(x2));
+	}
+	
+	if (x2 != x1) {
+	    intersect = (double)(y2) - slope * (double)(x2);
+	} else {
+	    intersect = (double)(x2);
+	}
+	
+	candX = (double)(x.intValue());
+	candY = (double)(y.intValue());
+	
+	if (x2 != x1) {
+	    diff = candY - (slope * candX + intersect);
+	} else {
+	    diff = candY - intersect;
+	}
+	
+	return diff;
+    }
+
+    //Return the difference between point (x,y) and the closest point
+    //generated by the equation of the line given by start and end.     
+    public double getDifference(Chart chart,  Coordinate c, Coordinate start, Coordinate end) {
+
+	double slope = 1.0;
+	double intersect;
+	double diff = 10.0;
+	Comparable dataX;
+	Double dataY;
+	int absY;
+	int x1, y1, x2, y2;
+	int candX, candY;	
+
+	dataX = start.getXData();
+	dataY = start.getYData();
+	absY = start.getYCoord().intValue();
+	
+	x1 = getXCoordinate(chart, dataX);
+	y1 = getYCoordinate(chart, dataY, absY);
+	
+	dataX = end.getXData();
+	dataY = end.getYData();
+	absY = end.getYCoord().intValue();
+	
+	x2 = getXCoordinate(chart, dataX);
+	y2 = getYCoordinate(chart, dataY, absY);
+	
+	if (x2 == x1) {
+	    slope = 0;		
+	} else {
+	    slope = ( (double)(y1) - (double)(y2)) / ((double)(x1) - (double)(x2));
+	}
+	
+	if (x2 != x1) {
+	    intersect = (double)(y2) - slope * (double)(x2);
+	} else {
+	    intersect = (double)(x2);
+	}
+	
+	dataX = c.getXData();
+	dataY = c.getYData();
+	absY = c.getYCoord().intValue();
+	
+	candX = getXCoordinate(chart, dataX);
+	candY = getYCoordinate(chart, dataY, absY);
+
+	if (x2 != x1) {
+	    diff = candY - (slope * candX + intersect);
+	} else {
+	    diff = candY - intersect;
+	}	
+	return diff;
+    }
+
+    //Return which end of the line has moved 
+    public Coordinate getMoved(Chart chart, Integer x, Integer y, 
+			       Coordinate start, Coordinate end) {
+	Comparable dataX;
+	Double dataY;
+	int absY;
+	int x1, y1, x2, y2;
+	double dist1, dist2;
+	Coordinate rv = null;
+
+	dataX = start.getXData();
+	dataY = start.getYData();
+	absY = start.getYCoord().intValue();
+
+	x1 = getXCoordinate(chart, dataX);
+	y1 = getYCoordinate(chart, dataY, absY);
+				
+	dataX = end.getXData();
+	dataY = end.getYData();
+	absY = end.getYCoord().intValue();
+		
+	x2 = getXCoordinate(chart, dataX);
+	y2 = getYCoordinate(chart, dataY, absY);
+
+	/* Determine which end of the line the user has
+	   chosen to move. */		
+	dist1 = Math.sqrt(
+			  ((x1 - x.intValue()) * 
+			   (x1 - x.intValue())) + 
+			  ((y1 - y.intValue()) * 
+			   (y1 - y.intValue())));
+	
+	dist2 = Math.sqrt(
+			  ((x2 - x.intValue()) * 
+			   (x2 - x.intValue())) + 
+			  ((y2 - y.intValue()) * 
+			   (y2 - y.intValue())));
+	
+	if (dist1 < dist2) {
+	    return start;
+	} else {		
+	    return end;
+	}	
+    }
+
+    /* Return true if coordinates c1 and c2 are "within" delta of each
+       other. True distance would be pythagorean. 
+    */
+    public boolean intersect(Chart chart, Coordinate c1, Coordinate c2,
+			     int delta) {
+
+	Comparable dataX;
+	Double dataY;
+	int absY;
+	int x1, y1, x2, y2;
+
+	dataX = c1.getXData();
+	dataY = c1.getYData();
+	absY = c1.getYCoord().intValue();
+
+	if (absY == Coordinate.BREAK) {
+	    return false;
+	}
+	
+	x1 = getXCoordinate(chart, dataX);
+	y1 = getYCoordinate(chart, dataY, absY);
+
+	dataX = c2.getXData();
+	dataY = c2.getYData();
+	absY = c2.getYCoord().intValue();	
+
+	if (absY == Coordinate.BREAK) {
+	    return false;
+	}
+
+	x2 = getXCoordinate(chart, dataX);	
+	y2 = getYCoordinate(chart, dataY, absY);
+
+	if (Math.abs(x1 - x2) < delta &&
+	    Math.abs(y1 - y2) < delta) {
+	    return true;
+	}
+	return false;
+
     }
 
     /**

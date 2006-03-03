@@ -149,6 +149,16 @@ public class GraphTools {
 	return (int)((point - offset) * scale);
     }
 
+
+    // Given the double y value of a point, the vertical offset and the
+    // vertical scale, return the double y value of a point. 
+    // The opposite of scaleAndFitPoint 
+    public static double getPointFromScale(int point,
+				       double offset, double scale) {
+	
+	return ( (point / scale) + offset);
+    }
+
     // chars is character to draw - in synch with list xRange
     public static void renderChar(Graphics g, PFGraphable source,
 				 int xoffset, int yoffset,

@@ -210,7 +210,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	}
 	
 	supportAndResistence[0] = support;
-	supportAndResistence[0] = resistence;
+	supportAndResistence[1] = resistence;
 
 	return supportAndResistence;
     }

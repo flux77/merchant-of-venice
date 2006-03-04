@@ -511,13 +511,15 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     */
 
     private void drawText(Graphics g, Chart chart, int height) {
-	Color prev = g.getColor();
+	Color prevColour = g.getColor();
 	int x,y, absY;
 	Comparable dataX;
 	Double dataY;
+	Font prevFont = g.getFont();
+	int fontSize;
+	String fontFamily = "Courier";
 
-	g.setColor(Color.BLACK);
-	//TODO: Set font size based on zoom level
+	g.setColor(Color.BLACK);	
 
 	HashMap map = chart.getText();
 	Iterator it = map.values().iterator();
@@ -530,11 +532,30 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		dataY = key.getYData();
 		absY = key.getYCoord().intValue();
 		x = getXCoordinate(chart, dataX);
-		y = getYCoordinate(chart, dataY, absY);
+ 		y = getYCoordinate(chart, dataY, absY);
+
+		double verticalScale = getVerticalScale(chart, absY);
+		
+		fontSize = 12;	
+		/* Is verticalScale monitor/resolution indedendant?
+		 */
+		if (verticalScale >= 2000.0) {		    
+		    fontSize += 4;
+		}
+		if (verticalScale >= 3000.0) {		    
+		    fontSize += 4;
+		}
+		if (verticalScale >= 4000.0) {		    
+		    fontSize += 4;
+		}
+
+		Font f = new Font(fontFamily, Font.PLAIN, fontSize);
+		g.setFont(f);
 		g.drawString(val, x, y);
 	    }
 	}       
-	g.setColor(prev);
+	g.setColor(prevColour);
+	g.setFont(prevFont);
 	g.setPaintMode();
     }
 
@@ -577,8 +598,20 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	int absY = GraphTools.scaleAndFitPoint( y.doubleValue(), 
 						(double)bottomLineValue, 
 						verticalScale);
+
 	return absY;
 	
+    }
+
+    private double getVerticalScale(Chart chart, int yIndex) {
+	// Get graph level at this point
+	int level = getLevelAtPoint(yIndex);
+	// Get vertical axis of graph level
+	VerticalAxis verticalAxis =
+	    (VerticalAxis)verticalAxes.elementAt(level);
+	double verticalScale = verticalAxis.getScale();
+
+	return verticalScale;
     }
 
     //Return the difference between point (x,y) and the closest point

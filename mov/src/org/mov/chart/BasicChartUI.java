@@ -162,16 +162,17 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	// Get vertical axis of graph level
 	VerticalAxis verticalAxis =
 	    (VerticalAxis)verticalAxes.elementAt(level);
-	int yoffset = getStartOfLevel(level) + firstHorizontalLine;
+	int yoffset = getStartOfLevel(level) + firstHorizontalLine + 
+	    ((Integer)levelHeights.elementAt(level)).intValue();
 	double verticalScale = verticalAxis.getScale();
 	double height = verticalAxis.getHeightOfGraph();
 	double bottomLineValue = verticalAxis.getBottomLineValue();
-
-
+		
 	double dataValue = GraphTools.getPointFromScale(yCoordinate, 
-						 bottomLineValue,
-						 verticalScale);
-       	
+							 bottomLineValue,
+							 yoffset,
+							 verticalScale);
+	
 
 	return new Double(dataValue);
     }
@@ -593,12 +594,15 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	double verticalScale = verticalAxis.getScale();
 	double height = verticalAxis.getHeightOfGraph();
 	double bottomLineValue = verticalAxis.getBottomLineValue();
-       	
+	int yoffset = getStartOfLevel(level) + firstHorizontalLine + ((Integer)levelHeights.elementAt(level)).intValue();
+	
 	//The absolute position for the data point 
-	int absY = GraphTools.scaleAndFitPoint( y.doubleValue(), 
+	int scaledPoint =  GraphTools.scaleAndFitPoint( y.doubleValue(), 
 						(double)bottomLineValue, 
 						verticalScale);
 
+	int absY = yoffset - scaledPoint;
+	
 	return absY;
 	
     }
@@ -868,6 +872,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     // Draw a single graph level onto the chart
     private void drawLevel(Graphics g, Vector graphs, Chart chart, int yoffset,
 			   int width, int height, int level) {
+
 
 	VerticalAxis verticalAxis = calculateVerticalAxis(chart, graphs,
 							  height, level);

@@ -34,36 +34,82 @@ public class Coordinate
     private Double dataY;    
     private Integer yCoord;    
 
-    /* 
-
-    */
+    /**
+     * Construct a new coordinate defined in the chart space  
+     * 
+     * @param x      The X value of the coordinate (a data value)
+     * @param y      The Y value of the coordinate (a data value)
+     * @param yCoord The screen value of the yCoordinate
+     */
     public Coordinate(Comparable x, Double y, Integer yCoord) {
 	dataX = x;
 	dataY = y;
 	this.yCoord = yCoord;;	
     }
-
-
-    public Coordinate(Integer x, Integer y) {
-	
-    }
-
+    
+    /** 
+     * Constrcut a Coordinate, as a null coordinate initially
+     *
+     */
     public Coordinate() {
 	dataX = null;
 	dataY = null;
 	yCoord = new Integer(BREAK);
     }
 	
-
+    /** 
+     * 
+     * Return the X value of this coordinate
+     * 
+     * @return the X Data value
+    */
     public Comparable getXData() {
 	return dataX;
     }
+
+    /** 
+     * 
+     * Return the Y value of this coordinate
+     * 
+     * @return the Y Data value
+    */
     public Double getYData() {
 	return dataY;
     }
     
+    /** 
+     * 
+     * Return the absolute y coordinate of this coordinate
+     * 
+     * @return the Y coordinate
+    */
     public Integer getYCoord() {
 	return yCoord;
+    }
+    
+    /**
+     * 
+     * Direct comparison between this coordinate and a specified one
+     *
+     * @param The line to compare this one to
+     * @return True if the coordinate has the same x,y values,
+     *         false otherwise
+       
+    */
+    public boolean compareTo(Coordinate c) {
+	if (dataX.compareTo(c.getXData()) == 0 &&
+	    dataY.compareTo(c.getYData()) == 0) {
+	    
+	    return true;
+	}
+	return false;
+    }
+    
+    //Debugging
+    public String toString() {
+	String rv = "(" + dataX + "," + dataY + "," + yCoord + ")";
+	
+	return rv;
     }
 
 }

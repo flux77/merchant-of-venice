@@ -173,8 +173,7 @@ public class ChartModule extends JPanel implements Module,
     private boolean zoomInEnabled = false;
 
     private int viewMode = SELECTING;
-    private boolean newLine = false;    
-    
+        
     private JDesktopPane desktop;
 
     // Frame Icon
@@ -507,8 +506,7 @@ public class ChartModule extends JPanel implements Module,
      * @param	quoteBundle  the quote bundle
      * @param	level	     specified level
      */
-    public void add(Graph graph, Portfolio portfolio, EODQuoteBundle quoteBundle,
-		    int level) {
+    public void add(Graph graph, Portfolio portfolio, EODQuoteBundle quoteBundle, int level) {
 
 	// Add graph to chart
 	chart.add(graph, level);
@@ -699,7 +697,6 @@ public class ChartModule extends JPanel implements Module,
 
 	if (x != null && viewMode == DRAWING) {
 	    chart.setDrawnLineStart(x, y, mouseY);
-	    newLine = true;
 	}
 
 	if (x != null && viewMode == MOVING) {
@@ -710,7 +707,6 @@ public class ChartModule extends JPanel implements Module,
 		chart.setDrawnLineStart(start.getXData(), 
 					start.getYData(),
 					start.getYCoord());
-		newLine = true;
 	    }
 	}
 	
@@ -721,10 +717,7 @@ public class ChartModule extends JPanel implements Module,
 	Integer mouseY = new Integer(e.getY());
 
 	if (x != null && (viewMode == DRAWING || viewMode == MOVING)) {
-	    chart.setDrawnLineEnd(x, y, mouseY, newLine);
-	    if (newLine) {
-		newLine = false;
-	    }
+	    chart.setDrawnLineEnd(x, y, mouseY);
 	}
 
 	if (x != null && viewMode == EDITING) {
@@ -758,11 +751,8 @@ public class ChartModule extends JPanel implements Module,
 	    chart.setHighlightedEnd(x);
 	
 	if (x != null && (viewMode == DRAWING || viewMode == MOVING)) {
-	    chart.setDrawnLineEnd(x, y, mouseY, newLine);
+	    chart.setDrawnLineEnd(x, y, mouseY);
 	    
-	    if (newLine) {
-		newLine = false;
-	    }
 	}
        	
 	if (x != null && viewMode == ERASING) {

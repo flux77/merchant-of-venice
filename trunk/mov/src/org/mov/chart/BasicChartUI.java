@@ -168,12 +168,11 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	double height = verticalAxis.getHeightOfGraph();
 	double bottomLineValue = verticalAxis.getBottomLineValue();
 		
+
 	double dataValue = GraphTools.getPointFromScale(yCoordinate, 
 							 bottomLineValue,
 							 yoffset,
 							 verticalScale);
-	
-
 	return new Double(dataValue);
     }
 
@@ -184,7 +183,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
      * @return	the level which contains the y coordinate or <code>0</code>
      *		if none do
      */
-    private int getLevelAtPoint(int yCoordinate) {
+    protected int getLevelAtPoint(int yCoordinate) {
 	
 	Iterator iterator = levelHeights.iterator();
 	int level = 0;
@@ -281,7 +280,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
 	int width = c.getWidth() - insets.left - insets.right;
 	int height = c.getHeight() - insets.top - insets.bottom;
-	
+
 	// Do we need to allocate a new image buffer? We do if:
 	// 1) There isnt one
 	// 2) Its not big enough to fit the image
@@ -299,11 +298,14 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	}
 	
 	// Draw it iff the size has changed
-	if(width != bufferWidth || height != bufferHeight) {
+	if(width != bufferWidth || 
+	   height != bufferHeight) {
 	    bufferedPaint(image.getGraphics(), (Chart)c, width, height);
 	
 	    bufferWidth = width;
 	    bufferHeight = height;
+	    
+	    
 	}
 	
 	// Copy buffer to screen
@@ -312,7 +314,6 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	// Finally highlight region
 	highlightRegion(g, (Chart)c, height);
 
-	//or draw any lines
 	drawLines(g, (Chart)c, height);
 	drawPoints(g, (Chart)c, height);
 	drawText(g, (Chart)c, height);
@@ -334,6 +335,8 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	drawLevels(g, chart, width, height);
 	drawHorizontalLabels(g, height);
 	drawAnnotations(g, chart);
+
+	
     }
 
     // Create a new horizontal axis which is sized for the component
@@ -402,50 +405,49 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     */
 
     private void drawPoints(Graphics g, Chart chart, int height) {
-	if (chart.getDrawnPoints() != null) {
+
+	ChartDrawingModel elements = chart.getChartDrawingModel();
+	Vector points = elements.getDrawnPoints();
+
+	if (points.size() > 0) {
 	    
-	    Vector points;
 	    int x1, y1;
 	    int x2, y2;
-	    Comparable dataX;
-	    Double dataY;
 	    int absY1, absY2;
+	    Coordinate coord1, coord2;
 	    
-	    points = chart.getDrawnPoints();
-		
 	    Color prev = g.getColor();
 	    g.setColor(Color.MAGENTA);
 	    
 	    if (points.size() == 1) {
-		absY1 = ((Coordinate)points.elementAt(0)).getYCoord().intValue();
-		dataX = ((Coordinate)points.elementAt(0)).getXData();
-		dataY = ((Coordinate)points.elementAt(0)).getYData();
-
+		
+		coord1 = (Coordinate)points.elementAt(0);
+		absY1 = coord1.getYCoord().intValue();
+		
 		if (absY1 != Coordinate.BREAK) {
-		    x1 = getXCoordinate(chart, dataX);
-		    y1 = getYCoordinate(chart, dataY, absY1);		
+		    x1 = getXCoordinate(chart, coord1);
+		    y1 = getYCoordinate(chart, coord1);		
 		    g.drawLine(x1,y1,x1+1,y1+1);
 		}
 	    } else {
 		for (int i = 0; i < points.size()-1; i++) {
 		    x1 = x2 = y1 = y2 = 0;
-		    
-		    absY1 = ((Coordinate)points.elementAt(i)).getYCoord().intValue();
-		    dataX = ((Coordinate)points.elementAt(i)).getXData();
-		    dataY = ((Coordinate)points.elementAt(i)).getYData();
 
+		    coord1 = (Coordinate)points.elementAt(i);
+		    
+		    absY1 = coord1.getYCoord().intValue();
+		    
 		    if (absY1 != Coordinate.BREAK) {		    
-			x1 = getXCoordinate(chart, dataX);
-			y1 = getYCoordinate(chart, dataY, absY1);
+			x1 = getXCoordinate(chart, coord1);
+			y1 = getYCoordinate(chart, coord1);
 		    }
 
-		    dataX = ((Coordinate)points.elementAt(i+1)).getXData();
-		    dataY = ((Coordinate)points.elementAt(i+1)).getYData();
-		    absY2 = ((Coordinate)points.elementAt(i+1)).getYCoord().intValue();		    
+		    coord2 = (Coordinate)points.elementAt(i+1);
+		    absY2 = coord2.getYCoord().intValue();		    
 		    
 		    if (absY2 != Coordinate.BREAK) {
-			x2 = getXCoordinate(chart, dataX);
-			y2 = getYCoordinate(chart, dataY, absY2);
+			x2 = getXCoordinate(chart, coord2);
+			y2 = getYCoordinate(chart, coord2);
 		    }
 		    
 		    if (absY1 == Coordinate.BREAK) {
@@ -468,34 +470,28 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     //Paint any lines which have been drawn on the chart. 
     private void drawLines(Graphics g, Chart chart, int height) {
 	
-	if (chart.getDrawnLineStart() != null) {
-	    int i;
-	    Vector start, end;
-	    Color prev;
+	Color prev;
+	ChartDrawingModel elements; 
+	Vector lines;
+	Iterator iterator;
 
-	    start = chart.getDrawnLineStart();
-	    end = chart.getDrawnLineEnd();
+	elements = chart.getChartDrawingModel();
+	lines = elements.getDrawnLines();
+	
+	if (lines.size() > 0) {
+	    iterator = lines.iterator();
 
-	    for (i = 0; i < end.size(); i++) {
+	    while (iterator.hasNext())  {
 		int startX, endX;
 		int startY, endY;
-		int absY;
-		Comparable startDataX, endDataX;
-		Double startDataY, endDataY;
-
-		startDataX = ((Coordinate)start.elementAt(i)).getXData();
-		startDataY = ((Coordinate)start.elementAt(i)).getYData();
-				
-		absY = ((Coordinate)start.elementAt(i)).getYCoord().intValue();
-		startX = getXCoordinate(chart, startDataX);
-		startY = getYCoordinate(chart, startDataY, absY);
+		DrawnLine line;
 		
-		endDataX = ((Coordinate)end.elementAt(i)).getXData();
-		endDataY = ((Coordinate)end.elementAt(i)).getYData();
+		line = (DrawnLine)iterator.next();
+		startX = getXCoordinate(chart, line.getStart());
+		startY = getYCoordinate(chart, line.getStart());
 		
-		endX = getXCoordinate(chart, endDataX);
-		absY = ((Coordinate)end.elementAt(i)).getYCoord().intValue();
-		endY = getYCoordinate(chart, endDataY, absY);
+		endX = getXCoordinate(chart, line.getEnd());
+		endY = getYCoordinate(chart, line.getEnd());
 
 		prev = g.getColor();
 		
@@ -513,32 +509,31 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
     private void drawText(Graphics g, Chart chart, int height) {
 	Color prevColour = g.getColor();
-	int x,y, absY;
-	Comparable dataX;
-	Double dataY;
+	int x,y,absY;
 	Font prevFont = g.getFont();
 	int fontSize;
 	String fontFamily = "Courier";
+	ChartDrawingModel elements = chart.getChartDrawingModel();
 
 	g.setColor(Color.BLACK);	
 
-	HashMap map = chart.getText();
+	HashMap map = elements.getText();
 	Iterator it = map.values().iterator();
 	Iterator it2 = map.keySet().iterator();
 	while (it.hasNext()) {
 	    String val = (String)it.next();
 	    if (it2.hasNext()) {
 		Coordinate key = (Coordinate)it2.next();
-		dataX = key.getXData();
-		dataY = key.getYData();
 		absY = key.getYCoord().intValue();
-		x = getXCoordinate(chart, dataX);
- 		y = getYCoordinate(chart, dataY, absY);
+		x = getXCoordinate(chart, key);
+ 		y = getYCoordinate(chart, key);
 
 		double verticalScale = getVerticalScale(chart, absY);
 		
 		fontSize = 12;	
 		/* Is verticalScale monitor/resolution indedendant?
+		   In any case, these fudge factors should be replaced/
+		   calculated
 		 */
 		if (verticalScale >= 2000.0) {		    
 		    fontSize += 4;
@@ -558,6 +553,11 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	g.setColor(prevColour);
 	g.setFont(prevFont);
 	g.setPaintMode();
+    }
+
+    // For the given point, return the X coordinate
+    private int getXCoordinate(Chart chart, Coordinate point) {
+	return getXCoordinate(chart, point.getXData());
     }
 
     // For the given X value, return the X coordinate
@@ -581,6 +581,13 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	return (int)(i * horizontalScale);
     }
 
+    // For the given point, return the Y coordinate
+    private int getYCoordinate(Chart chart, Coordinate point) {
+	return getYCoordinate(chart, 
+			      point.getYData(), 
+			      point.getYCoord().intValue());
+    }
+
     // For the given Y value, return the Y coordinate
     private int getYCoordinate(Chart chart, Double y, int yIndex) {
 
@@ -596,6 +603,39 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	double bottomLineValue = verticalAxis.getBottomLineValue();
 	int yoffset = getStartOfLevel(level) + firstHorizontalLine + ((Integer)levelHeights.elementAt(level)).intValue();
 	
+	//The absolute position for the data point 
+	int scaledPoint =  GraphTools.scaleAndFitPoint( y.doubleValue(), 
+						(double)bottomLineValue, 
+						verticalScale);
+
+	int absY = yoffset - scaledPoint;
+	
+	return absY;
+	
+    }
+
+    // For the given Y value, return the Y coordinate
+    private int getYCoordinate(Chart chart, Double y, int yIndex, int height2) {
+
+	double dataValue;
+	
+	// Get graph level at this point
+	int level = getLevelAtPoint(yIndex);
+	// Get vertical axis of graph level
+	VerticalAxis verticalAxis =
+	    (VerticalAxis)verticalAxes.elementAt(level);
+	double verticalScale = verticalAxis.getScale();
+	double height = verticalAxis.getHeightOfGraph();
+	double bottomLineValue = verticalAxis.getBottomLineValue();
+	int yoffset = getStartOfLevel(level) + firstHorizontalLine + ((Integer)levelHeights.elementAt(level)).intValue();
+	
+
+	int yOffset = verticalAxis.getHeightOfGraph() +
+	    (height2-verticalAxis.getHeightOfGraph())/2;
+	
+
+	yoffset = yOffset;
+
 	//The absolute position for the data point 
 	int scaledPoint =  GraphTools.scaleAndFitPoint( y.doubleValue(), 
 						(double)bottomLineValue, 
@@ -763,10 +803,11 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 			   (y2 - y.intValue())));
 	
 	if (dist1 < dist2) {
-	    return start;
-	} else {		
 	    return end;
+	} else {      	
+	    return start;
 	}	
+
     }
 
     /* Return true if coordinates c1 and c2 are "within" delta of each

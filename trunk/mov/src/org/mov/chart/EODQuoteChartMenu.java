@@ -172,6 +172,7 @@ public class EODQuoteChartMenu extends JMenu {
 	addMenuItem(graphMenu, Locale.getString("MACD"));
 	addMenuItem(graphMenu, Locale.getString("SIMPLE_MOVING_AVERAGE"));
 	addMenuItem(graphMenu, Locale.getString("EXP_MOVING_AVERAGE"));
+	addMenuItem(graphMenu, Locale.getString("MULT_MOVING_AVERAGE"));
 	addMenuItem(graphMenu, Locale.getString("OBV"));
         addMenuItem(graphMenu, Locale.getString("RSI"));
 	addMenuItem(graphMenu, Locale.getString("STANDARD_DEVIATION"));
@@ -513,6 +514,9 @@ public class EODQuoteChartMenu extends JMenu {
 	
         else if(text == Locale.getString("MOMENTUM"))
             graph = new MomentumGraph(getDayClose());
+
+	else if(text == Locale.getString("MULT_MOVING_AVERAGE"))
+	    graph = new MultipleMovingAverageGraph(getDayClose());
 	
         else if(text == Locale.getString("OBV"))
             graph = new OBVGraph(getDayOpen(), getDayClose(), getDayVolume());

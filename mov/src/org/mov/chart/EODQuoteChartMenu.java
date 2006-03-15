@@ -176,8 +176,9 @@ public class EODQuoteChartMenu extends JMenu {
 	addMenuItem(graphMenu, Locale.getString("OBV"));
         addMenuItem(graphMenu, Locale.getString("RSI"));
 	addMenuItem(graphMenu, Locale.getString("STANDARD_DEVIATION"));
-	addMenuItem(graphMenu, Locale.getString("SUPPORT_AND_RESISTENCE"));
 	addMenuItem(graphMenu, Locale.getString("COUNTBACK_LINE"));
+	addMenuItem(graphMenu, Locale.getString("SUPPORT_AND_RESISTENCE"));
+	
 
 	// Add all static menus
 	JMenuItem removeMenu = new JMenuItem(Locale.getString("REMOVE"));

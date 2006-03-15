@@ -177,6 +177,7 @@ public class EODQuoteChartMenu extends JMenu {
         addMenuItem(graphMenu, Locale.getString("RSI"));
 	addMenuItem(graphMenu, Locale.getString("STANDARD_DEVIATION"));
 	addMenuItem(graphMenu, Locale.getString("SUPPORT_AND_RESISTENCE"));
+	addMenuItem(graphMenu, Locale.getString("COUNTBACK_LINE"));
 
 	// Add all static menus
 	JMenuItem removeMenu = new JMenuItem(Locale.getString("REMOVE"));
@@ -488,6 +489,11 @@ public class EODQuoteChartMenu extends JMenu {
         else if(text == Locale.getString("CANDLE_STICK"))
             graph = new CandleStickGraph(getDayOpen(), getDayLow(), getDayHigh(), getDayClose());
         
+	else if(text == Locale.getString("COUNTBACK_LINE"))
+	    graph = new CountbackLineGraph(getDayLow(), 
+					   getDayHigh(),
+					   getDayClose());
+
         else if(text == Locale.getString("CUSTOM"))
             graph = new CustomGraph(getDayClose(), symbol, quoteBundle);
 

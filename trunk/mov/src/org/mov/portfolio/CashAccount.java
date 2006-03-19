@@ -18,6 +18,7 @@
 
 package org.mov.portfolio;
 
+import org.mov.util.Currency;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
@@ -32,41 +33,64 @@ public class CashAccount extends AbstractAccount implements Cloneable {
 
     // Amount of cash available
     private Money capital;
+
+    // Currency of the cash account.
+    private Currency currency;
+
+    // Name of cash account
     private String name;
 
     /**
-     * Create a new cash account.
+     * Create a new cash account with the given currency.
      *
-     * @param	name	the name of the new cash account
+     * @param	name	 the name of the new cash account
+     * @param   currency the currency of the cash account
+     */
+    public CashAccount(String name, Currency currency) {
+	this.name = name;
+        this.currency = currency;
+	this.capital = new Money(currency, 0.0D);
+    }
+
+    /**
+     * Create a new cash account with the default currency.
+     *
+     * @param	name	 the name of the new cash account
      */
     public CashAccount(String name) {
-	this.name = name;
-	this.capital = Money.ZERO;
+        this(name, Currency.getDefaultCurrency());
     }
 
     public void transaction(Transaction transaction) {
-
 	int type = transaction.getType();
 
 	// Update value of account
 	if(type == Transaction.WITHDRAWAL ||
 	   type == Transaction.FEE) {
+            assert transaction.getAmount().getCurrency().equals(currency);
 	    capital = capital.subtract(transaction.getAmount());
 	}
 	else if(type == Transaction.DEPOSIT ||
 		type == Transaction.INTEREST ||
 		type == Transaction.DIVIDEND) {
+            assert transaction.getAmount().getCurrency().equals(currency);
 	    capital = capital.add(transaction.getAmount());
 	}
 	else if(type == Transaction.ACCUMULATE) {
+            assert transaction.getAmount().getCurrency().equals(currency);
+            assert transaction.getTradeCost().getCurrency().equals(currency);
 	    capital = capital.subtract(transaction.getAmount());
             capital = capital.subtract(transaction.getTradeCost());
 	}
 	else if(type == Transaction.REDUCE) {
+            assert transaction.getAmount().getCurrency().equals(currency);
+            assert transaction.getTradeCost().getCurrency().equals(currency);
 	    capital = capital.add(transaction.getAmount());
             capital = capital.subtract(transaction.getTradeCost());
 	}
 	else if(type == Transaction.TRANSFER) {
+            assert transaction.getAmount().getCurrency().equals(currency);
+
 	    // Are we transfering to or from this account?
 	    if(transaction.getCashAccount() == this) {
 		capital = capital.subtract(transaction.getAmount()); // from
@@ -83,7 +107,7 @@ public class CashAccount extends AbstractAccount implements Cloneable {
      * @return the clone
      */
     public Object clone() {
-	CashAccount clonedCashAccount = new CashAccount(getName());
+	CashAccount clonedCashAccount = new CashAccount(getName(), getCurrency());
 
 	return clonedCashAccount;
     }
@@ -99,6 +123,7 @@ public class CashAccount extends AbstractAccount implements Cloneable {
             CashAccount account = (CashAccount)object;
 
             return(account.getName().equals(getName()) &&
+                   account.getCurrency().equals(getCurrency()) &&
                    account.getValue().equals(getValue()));
         }
         else
@@ -126,8 +151,12 @@ public class CashAccount extends AbstractAccount implements Cloneable {
 	return capital;
     }
 
+    public Currency getCurrency() {
+        return currency;
+    }
+
     public void removeAllTransactions() {
-	capital = Money.ZERO;
+	capital = new Money(currency, 0.0D);
     }
 
     public int getType() {

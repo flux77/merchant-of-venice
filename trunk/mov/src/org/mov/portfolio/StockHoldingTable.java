@@ -36,6 +36,7 @@ import org.mov.ui.Column;
 import org.mov.ui.ChangeFormat;
 import org.mov.ui.PointChangeFormat;
 import org.mov.ui.QuoteFormat;
+import org.mov.util.Currency;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
@@ -50,6 +51,8 @@ import org.mov.quote.Symbol;
  * will display a row for each stock held, givings its symbol, number of
  * shares held, current day close value, current market value and its
  * change in today's trading.
+ *
+ * @author Andrew Leppard
  * @see ShareAccount
  */
 public class StockHoldingTable extends AbstractTable {
@@ -67,14 +70,16 @@ public class StockHoldingTable extends AbstractTable {
 
     class Model extends AbstractTableModel {
 	private EODQuoteBundle quoteBundle;
+        private Currency currency;
 	private HashMap stockHoldings;
 	private Object[] symbols;
 	private TradingDate date;
 
-	public Model(List columns, HashMap stockHoldings, EODQuoteBundle quoteBundle) {
+	public Model(List columns, ShareAccount shareAccount, EODQuoteBundle quoteBundle) {
             super(columns);
 
-	    this.stockHoldings = stockHoldings;
+	    this.stockHoldings = shareAccount.getStockHoldings();
+            this.currency = shareAccount.getCurrency();
 	    this.quoteBundle = quoteBundle;
 
 	    symbols = stockHoldings.keySet().toArray();
@@ -124,11 +129,12 @@ public class StockHoldingTable extends AbstractTable {
 
             case(MARKET_VALUE_COLUMN):
                 try {
-                    return new Money(quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date) *
+                    return new Money(currency,
+                                     quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, date) *
                                      stockHolding.getShares());
                 }
                 catch(MissingQuoteException e) {
-                    return Money.ZERO;
+                    return new Money(currency, 0.0D);
                 }
 
             case(PERCENT_RETURN_COLUMN):
@@ -196,17 +202,17 @@ public class StockHoldingTable extends AbstractTable {
 
             }
             assert false;
-	    return "";
+	    return null;
 	}
     }
 
     /**
      * Create a new stock holding table.
      *
-     * @param	stockHoldings	stock holdings for ShareAccount
+     * @param	shareAccount	the share account to table
      * @param	quoteBundle	the quote bundle
      */
-    public StockHoldingTable(HashMap stockHoldings, EODQuoteBundle quoteBundle) {
+    public StockHoldingTable(ShareAccount shareAccount, EODQuoteBundle quoteBundle) {
         List columns = new ArrayList();
         columns.add(new Column(SYMBOL_COLUMN,
 			       Locale.getString("SYMBOL"),
@@ -241,7 +247,7 @@ public class StockHoldingTable extends AbstractTable {
 			       Locale.getString("PERCENT_RETURN_COLUMN_HEADER"),
                                ChangeFormat.class, Column.HIDDEN));
 
-        model = new Model(columns, stockHoldings, quoteBundle);
+        model = new Model(columns, shareAccount, quoteBundle);
 	setModel(model);
 
 	// If the user double clicks on a row then graph the stock

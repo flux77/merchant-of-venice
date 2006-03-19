@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.mov.util.Currency;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.quote.MissingQuoteException;
@@ -44,13 +45,27 @@ public class ShareAccount extends AbstractAccount implements Cloneable {
     // Name of share portfolio
     private String name;
 
+    // Currency of the share account.
+    private Currency currency;
+
     /**
-     * Create a new share account.
+     * Create a new share account with the given currency.
      *
-     * @param	name	the name of the new share account
+     * @param	name	 the name of the new share account
+     * @param   currency the currency of the share account
+     */
+    public ShareAccount(String name, Currency currency) {
+	this.name = name;
+        this.currency = currency;
+    }
+
+    /**
+     * Create a new share account width the default currency.
+     *
+     * @param	name	 the name of the new share account
      */
     public ShareAccount(String name) {
-	this.name = name;
+        this(name, Currency.getDefaultCurrency());
     }
 
     /**
@@ -59,7 +74,7 @@ public class ShareAccount extends AbstractAccount implements Cloneable {
      * @return the clone
      */
     public Object clone() {
-	ShareAccount clonedShareAccount = new ShareAccount(getName());
+	ShareAccount clonedShareAccount = new ShareAccount(getName(), getCurrency());
 
 	return clonedShareAccount;
     }
@@ -74,6 +89,7 @@ public class ShareAccount extends AbstractAccount implements Cloneable {
         if(object instanceof ShareAccount) {
             ShareAccount account = (ShareAccount)object;
             return(account.getName().equals(getName()) &&
+                   account.getCurrency().equals(getCurrency()) &&
                    account.getStockHoldings().equals(getStockHoldings()));
         }
         else
@@ -100,7 +116,7 @@ public class ShareAccount extends AbstractAccount implements Cloneable {
 
 	Set set = stockHoldings.keySet();
 	Iterator iterator = set.iterator();
-        Money value = Money.ZERO;
+        Money value = new Money(currency, 0.0D);
 
 	while(iterator.hasNext()) {
 	    Symbol symbol = (Symbol)iterator.next();
@@ -124,8 +140,7 @@ public class ShareAccount extends AbstractAccount implements Cloneable {
 	StockHolding holding =
 	    (StockHolding)stockHoldings.get(symbol);
 
-	if(type == Transaction.ACCUMULATE ||
-	   type == Transaction.DIVIDEND_DRP) {
+	if(type == Transaction.ACCUMULATE) {
             assert shares > 0;
 
             double averageCost = (transaction.getAmount().doubleValue() /
@@ -136,6 +151,16 @@ public class ShareAccount extends AbstractAccount implements Cloneable {
 		holding.accumulate(shares, averageCost);
 	    else // otherwise add new stock to portfolio
 		stockHoldings.put(symbol, new StockHolding(symbol, shares, averageCost,
+                                                           transaction.getDate()));
+	}
+	else if(type == Transaction.DIVIDEND_DRP) {
+            assert shares > 0;
+
+	    // Do we already own the stock? If so accumulate
+	    if(holding != null)
+		holding.accumulate(shares, 0.0D);
+	    else // otherwise add new stock to portfolio
+		stockHoldings.put(symbol, new StockHolding(symbol, shares, 0.0D,
                                                            transaction.getDate()));
 	}
 	else if(type == Transaction.REDUCE) {
@@ -184,6 +209,10 @@ public class ShareAccount extends AbstractAccount implements Cloneable {
 
     public int getType() {
 	return Account.SHARE_ACCOUNT;
+    }
+
+    public Currency getCurrency() {
+        return currency;
     }
 
     public void removeAllTransactions() {

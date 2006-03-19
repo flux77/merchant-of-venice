@@ -36,6 +36,8 @@ import org.mov.quote.EODQuoteBundle;
  * Display an account summary in a swing table for a portfolio. The table
  * will display a row for each account, giving its name and its current
  * value.
+ *
+ * @author Andrew Leppard
  * @see Portfolio
  */
 public class AccountTable extends AbstractTable {
@@ -80,7 +82,7 @@ public class AccountTable extends AbstractTable {
                     return todayAccount.getValue(quoteBundle, date);
                 }
                 catch(MissingQuoteException e) {
-                    return Money.ZERO;
+                    return new Money(todayAccount.getCurrency(), 0.0D);
                 }
 
             case(PERCENT_CHANGE_COLUMN):
@@ -98,7 +100,7 @@ public class AccountTable extends AbstractTable {
 
             default:
                 assert false;
-                return Money.ZERO;
+                return null;
             }
         }
 
@@ -112,7 +114,7 @@ public class AccountTable extends AbstractTable {
                     return todayPortfolio.getValue(quoteBundle, date);
                 }
                 catch(MissingQuoteException e) {
-                    return Money.ZERO;
+                    return new Money(todayPortfolio.getCurrency(), 0.0D);
                 }
 
             case(PERCENT_CHANGE_COLUMN):
@@ -129,7 +131,7 @@ public class AccountTable extends AbstractTable {
 
             default:
                 assert false;
-                return Money.ZERO;
+                return null;
             }
         }
 

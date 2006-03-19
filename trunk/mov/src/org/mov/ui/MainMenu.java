@@ -18,7 +18,7 @@
 
 package org.mov.ui;
 
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.*;
 import java.beans.*;
 import java.util.*;
@@ -503,11 +503,8 @@ public class MainMenu implements ActionListener, ModuleListener
                 else if(portfolioTableHash.get(menu) != null) {
                     String portfolioName =
                         (String)portfolioTableHash.get(menu);
-                    
-                    Portfolio portfolio =
-                        PreferencesManager.getPortfolio(portfolioName);
-                    
-                    CommandManager.getInstance().tablePortfolio(portfolio);
+                                        
+                    CommandManager.getInstance().tablePortfolio(portfolioName);
                 }
                 
                 // Graph Menu
@@ -522,11 +519,8 @@ public class MainMenu implements ActionListener, ModuleListener
                 else if(portfolioGraphHash.get(menu) != null) {
                     String portfolioName =
                         (String)portfolioGraphHash.get(menu);
-                    
-                    Portfolio portfolio =
-                        PreferencesManager.getPortfolio(portfolioName);
-                    
-                    CommandManager.getInstance().graphPortfolio(portfolio);
+                                        
+                    CommandManager.getInstance().graphPortfolio(portfolioName);
                 }
                 
                 // Analysis Menu
@@ -644,9 +638,9 @@ public class MainMenu implements ActionListener, ModuleListener
             MenuHelper.addMenuItem(this, filePortfolioMenu, Locale.getString("NEW_PORTFOLIO"));
         
         // Build both portfolio menus
-        String[] portfolioNames = PreferencesManager.getPortfolioNames();
+        List portfolioNames = PreferencesManager.getPortfolioNames();
         
-        if(portfolioNames.length > 0)
+        if(portfolioNames.size() > 0)
             filePortfolioMenu.addSeparator();
         else {
             JMenuItem noPortfoliosMenuItem = new JMenuItem(Locale.getString("NO_PORTFOLIOS"));
@@ -676,9 +670,9 @@ public class MainMenu implements ActionListener, ModuleListener
                     Locale.getString("NEW_WATCH_SCREEN"));
         
         // Build both portfolio menus
-        String[] watchScreenNames = PreferencesManager.getWatchScreenNames();
+        List watchScreenNames = PreferencesManager.getWatchScreenNames();
         
-        if(watchScreenNames.length > 0)
+        if(watchScreenNames.size() > 0)
             quoteWatchScreenMenu.addSeparator();
         
         watchScreenHash = buildMenu(quoteWatchScreenMenu, watchScreenNames);
@@ -687,15 +681,13 @@ public class MainMenu implements ActionListener, ModuleListener
     /** Take the list of menu item and add them to the given menu. Return
      *  a hashmap which maps each menu created with the given menu item.
      */
-    private HashMap buildMenu(JMenu menu, String[] items)
-    {
+    private HashMap buildMenu(JMenu menu, List items) {
         HashMap menuMap = new HashMap();
         
-        if(items.length > 0) {
-            for(int i = 0; i < items.length; i++) {
-                JMenuItem menuItem = MenuHelper.addMenuItem(this, menu, items[i]);
-                menuMap.put(menuItem, items[i]);
-            }
+        for(Iterator iterator = items.iterator(); iterator.hasNext();) {
+            String item = (String)iterator.next();
+            JMenuItem menuItem = MenuHelper.addMenuItem(this, menu, item);
+            menuMap.put(menuItem, item);
         }
         
         return menuMap;

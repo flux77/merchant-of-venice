@@ -135,7 +135,7 @@ public class PortfolioGraphSource implements GraphSource {
                         value = portfolio.getValue(quoteBundle, date);
 
                     else if(mode == CASH_VALUE)
-                        value = portfolio.getCashValue();
+                        value = portfolio.getCashValue(date);
 
                     else if(mode == SHARE_VALUE)
                         value = portfolio.getShareValue(quoteBundle, date);

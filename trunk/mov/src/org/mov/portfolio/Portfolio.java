@@ -24,18 +24,14 @@ import org.mov.quote.EODQuoteCache;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
 import org.mov.quote.WeekendDateException;
+import org.mov.util.Currency;
+import org.mov.util.ExchangeRateCache;
 import org.mov.util.Money;
 import org.mov.util.MoneyFormatException;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
+import org.mov.util.UnknownCurrencyCodeException;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -70,26 +66,51 @@ public class Portfolio implements Cloneable {
     // so we can calculate its profit/loss.
     private Money deposits;
 
+    // The base currency of the portfolio. This currency will be the
+    // default when creating new accounts, and will be used to display
+    // the total value of the portfolio.
+    private Currency currency;
+
+    // Local reference to the exchange rate cache
+    private ExchangeRateCache exchangeRateCache;
+
     /**
-     * Create a new empty portfolio.
+     * Create a new empty portfolio using the given currency.
      *
-     * @param	name	The name of the portfolio
+     * @param	name	 The name of the portfolio
+     * @param   currency The base currency of the portfolio
      */
-    public Portfolio(String name) {
-        this(name, false);
+    public Portfolio(String name, Currency currency) {
+        this(name, currency, false);
     }
 
     /**
-     * Create a new empty portfolio.
+     * Create a new empty portfolio using the default currency. The portfolio can be
+     * permanent or transient.
      *
-     * @param	name	The name of the portfolio
+     * @param	name	    The name of the portfolio
      * @param   isTransient Set to <code>true</code> if the portfolio displays
      *                      working information and shouldn't be saved.
      */
     public Portfolio(String name, boolean isTransient) {
+        this(name, Currency.getDefaultCurrency(), isTransient);
+    }
+
+    /**
+     * Create a new empty portfolio using the given currency. The portfolio can be
+     * permanent or transient.
+     *
+     * @param	name	    The name of the portfolio
+     * @param   currency    The base currency of the portfolio
+     * @param   isTransient Set to <code>true</code> if the portfolio displays
+     *                      working information and shouldn't be saved.
+     */
+    public Portfolio(String name, Currency currency, boolean isTransient) {
 	this.name = name;
+        this.currency = currency;
         this.isTransient = isTransient;
-        this.deposits = Money.ZERO;
+        this.deposits = new Money(currency, 0.0D);
+        this.exchangeRateCache = ExchangeRateCache.getInstance();
     }
 
     /**
@@ -108,6 +129,15 @@ public class Portfolio implements Cloneable {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Return the portfolio's default currency.
+     *
+     * @return the default currency
+     */
+    public Currency getCurrency() {
+        return currency;
     }
 
     /**
@@ -155,12 +185,10 @@ public class Portfolio implements Cloneable {
      * @param	transaction	a new transaction
      */
     public void addTransaction(Transaction transaction) {
-
 	// If the transaction is older than an existing transaction then remove all
 	// transactions. Put the new transaction with them, sort them all and then
 	// add all of the transactions. I.e. we must add the transactions in chronological
 	// order to prevent things like selling stock before we have bought it.
-
 	if(countTransactions() > 0 &&
 	   ((Transaction)transactions.get(transactions.size() - 1)).compareTo(transaction) > 0) {
 
@@ -189,11 +217,16 @@ public class Portfolio implements Cloneable {
 		}
             }
 
-            // Update our deposit figure for profit/loss calculation
+            // Update our deposit figure for profit/loss calculation. Convert the
+            // currency into the portfolo's default currency if necessary.
             if(transaction.getType() == Transaction.WITHDRAWAL)
-                deposits = deposits.subtract(transaction.getAmount());
+                deposits = exchangeRateCache.subtract(transaction.getDate(),
+                                                      deposits,
+                                                      transaction.getAmount());
             else if(transaction.getType() == Transaction.DEPOSIT)
-                deposits = deposits.add(transaction.getAmount());
+                deposits = exchangeRateCache.add(transaction.getDate(),
+                                                 deposits,
+                                                 transaction.getAmount());
 	}
     }
 
@@ -205,7 +238,7 @@ public class Portfolio implements Cloneable {
     public Object clone() {
 
 	// First clone portfolio object
-	Portfolio clonedPortfolio = new Portfolio(getName());
+	Portfolio clonedPortfolio = new Portfolio(getName(), getCurrency());
 
 	// Now clone accounts and insert the cloned accounts into
 	// the cloned portfolio
@@ -407,7 +440,7 @@ public class Portfolio implements Cloneable {
      */
     public void removeAllTransactions() {
 	transactions.clear();
-        deposits = Money.ZERO;
+        deposits = new Money(currency, 0.0D);
 
 	// A portfolio with no transactions has no value or stock so
 	// remove them from accounts
@@ -428,16 +461,20 @@ public class Portfolio implements Cloneable {
      * @return	the value
      */
     public Money getValue(EODQuoteBundle quoteBundle, TradingDate date)
-	throws MissingQuoteException {
+ 	throws MissingQuoteException {
+        
+        Money value = new Money(currency, 0.0D);
+        
+        for(Iterator iterator = accounts.iterator(); iterator.hasNext();) {
+ 	    Account account = (Account)iterator.next();
+            
+            // Convert the value into the portoflio's default currency if necessary
+ 	    value = exchangeRateCache.add(date, value, account.getValue(quoteBundle, date));
+        }
 
-        try {
-            return getValue(quoteBundle, EODQuoteCache.getInstance().dateToOffset(date));
-        }
-        catch(WeekendDateException e) {
-            throw MissingQuoteException.getInstance();
-        }
+        return value;
     }
-
+    
     /**
      * Get the value of the portfolio on the given day. Currently
      * this function should only be called for dates after the last
@@ -451,15 +488,17 @@ public class Portfolio implements Cloneable {
      public Money getValue(EODQuoteBundle quoteBundle, int dateOffset)
  	throws MissingQuoteException {
 
-         Money value = Money.ZERO;
+         TradingDate date = EODQuoteCache.getInstance().offsetToDate(dateOffset);
+         Money value = new Money(currency, 0.0D);
 
          for(Iterator iterator = accounts.iterator(); iterator.hasNext();) {
  	    Account account = (Account)iterator.next();
 
- 	    value = value.add(account.getValue(quoteBundle, dateOffset));
- 	}
+            // Convert the value into the default portoflio's currency if necessary
+ 	    value = exchangeRateCache.add(date, value, account.getValue(quoteBundle, dateOffset));
+         }
 	
- 	return value;
+         return value;
      }
 
     /**
@@ -484,23 +523,26 @@ public class Portfolio implements Cloneable {
     }
 
     /**
-     * Get the cash value of the Portfolio on the latest day.
+     * Get the cash value of the Portfolio on the current day.
      *
+     * @param   date the date.
      * @return	the value
      */
-    public Money getCashValue() {
-        Money value = Money.ZERO;
+    public Money getCashValue(TradingDate date) {
+        Money value = new Money(currency, 0.0D);
 
         for(Iterator iterator = accounts.iterator(); iterator.hasNext();) {
 	    Account account = (Account)iterator.next();
 
             if(account.getType() == Account.CASH_ACCOUNT) {
                 CashAccount cashAccount = (CashAccount)account;
-                value = value.add(cashAccount.getValue());
+
+                // Convert the cash value into the default portoflio's currency if necessary
+                value = exchangeRateCache.add(date, value, cashAccount.getValue());
             }
 	}
 	
-	return value;
+        return value;
     }
 
     /**
@@ -512,13 +554,14 @@ public class Portfolio implements Cloneable {
      */
     public Money getShareValue(EODQuoteBundle quoteBundle, TradingDate date)
 	throws MissingQuoteException {
-        Money value = Money.ZERO;
+        Money value = new Money(currency, 0.0D);
 
         for(Iterator iterator = accounts.iterator(); iterator.hasNext();) {
             Account account = (Account)iterator.next();
 
             if(account.getType() == Account.SHARE_ACCOUNT)
-                value = value.add(account.getValue(quoteBundle, date));
+                // Convert the share value into the default portoflio's currency if necessary
+                value = exchangeRateCache.add(date, value, account.getValue(quoteBundle, date));
         }
 
 	return value;
@@ -594,134 +637,6 @@ public class Portfolio implements Cloneable {
 
             return portfolio;
         }
-    }
-
-    /**
-     * Builds the portfolio by adding the list of transactions from the file.
-     * Any referenced accounts not contained in the portfolio will be created.
-     * No existing transactions in the portfolio will be removed.
-     *
-     * @param file the source file
-     * @exception IOException if there was an error
-     */
-    public void read(File file) throws IOException {
-
-        // Read file
-        try {
-            FileReader fileReader = new FileReader(file);
-            BufferedReader reader = new BufferedReader(fileReader);		
-            String line = reader.readLine();
-            
-            // ... one line at a time
-            while(line != null) {
-                // Separate around tabs
-                String[] parts = line.split("\t");
-                
-                int i = 0;
-                TradingDate date = new TradingDate(parts[i++],
-                                                   TradingDate.BRITISH);
-                
-                int type = Transaction.stringToType(parts[i++]);
-                Money amount = new Money(parts[i++]);
-                String symbolField = parts[i++];
-                Symbol symbol = symbolField.equals("-")? null : Symbol.find(symbolField);
-                
-                int shares = Integer.valueOf(parts[i++]).intValue();
-                Money tradeCost = new Money(parts[i++]);
-                String cashAccountName = parts[i++];
-                String cashAccountName2 = "";
-                String shareAccountName = "";
-                
-                // When the line ends in ",," the split doesn't take the
-                // last values. So be prepared for a ArrayIndexOutOfBounds
-                // which is OK.
-                try {
-                    cashAccountName2 = parts[i++];
-                    shareAccountName = parts[i++];
-                }
-                catch(ArrayIndexOutOfBoundsException e) {
-                    // OK
-                }
-                
-                // Convert the cash/share accounts to a string - if
-                // we don't have the account in the portfolio, create it.
-                CashAccount cashAccount = null;
-                CashAccount cashAccount2 = null;
-                ShareAccount shareAccount = null;
-                
-                if(!cashAccountName.equals("")) {
-                    cashAccount = (CashAccount)findAccountByName(cashAccountName);
-                    
-                    // If it's not found then create it.
-                    if(cashAccount == null) {
-                        cashAccount = new CashAccount(cashAccountName);
-                        addAccount(cashAccount);
-                    }
-                }
-                
-                
-                if(!cashAccountName2.equals("")) {
-                    cashAccount2 = (CashAccount)findAccountByName(cashAccountName2);
-                    
-                    // If it's not found then create it.
-                    if(cashAccount2 == null) {
-                        cashAccount2 = new CashAccount(cashAccountName2);
-                        addAccount(cashAccount2);
-                    }
-                }
-                
-                if(!shareAccountName.equals("")) {
-                    shareAccount = (ShareAccount)findAccountByName(shareAccountName);
-                    
-                    // If it's not found then create it.
-                    if(shareAccount == null) {
-                        shareAccount = new ShareAccount(shareAccountName);
-                        addAccount(shareAccount);
-                    }
-                }
-		
-                Transaction transaction =
-                    new Transaction(type, date, amount, symbol, shares,
-                                    tradeCost, cashAccount, cashAccount2, shareAccount);
-                addTransaction(transaction);
-                
-                line = reader.readLine();
-            }
-
-            reader.close();
-        }
-        catch(MoneyFormatException e) {
-            throw new IOException();
-        }
-        catch(NumberFormatException e) {
-            throw new IOException();
-        }
-        catch(SymbolFormatException e) {
-            throw new IOException();
-        }
-        catch(TradingDateFormatException e) {
-            throw new IOException();
-        }
-    }
-
-    /**
-     * Writes a list of all transactions in the Portfolio to the file.
-     *
-     * @param file the destination file
-     * @exception IOExpection if there was an error
-     */
-    public void write(File file) throws IOException {
-        FileWriter fileWriter = new FileWriter(file);
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        PrintWriter printWriter = new PrintWriter(bufferedWriter);
-		
-        // Iterate through transactions printing one on every line
-        for(Iterator iterator = getTransactions().iterator(); iterator.hasNext();) {
-            Transaction transaction = (Transaction)iterator.next();
-            printWriter.println(transaction);
-        }
-	
-        printWriter.close();
     }
 
     /**

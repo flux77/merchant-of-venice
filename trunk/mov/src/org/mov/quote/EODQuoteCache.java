@@ -51,7 +51,6 @@ import org.mov.util.TradingDateComparator;
  * @see EODQuoteBundleCache
  */
 public class EODQuoteCache {
-
     // Cache is organised by a list of hashmaps, each hashmap
     // corresponds to a trading day. The hashmap's keys are stock symbols.
     private List cache;
@@ -65,6 +64,15 @@ public class EODQuoteCache {
     // Singleton instance of this class
     private static EODQuoteCache instance = null;
 
+    /**
+     * This class is used to store quotes in the quote cache. We do not use
+     * {@link EODQuote} directly because it would take more space.
+     *
+     * This class provides a more compact representation because it does not
+     * store the {@link Symbol} or {@link TradingDate} as this information
+     * would be redundant here. It also further saves space by storing quote values
+     * as <code>float</code>s instead of <code>double</code>s.
+     */
     private class EODQuoteCacheQuote {
         // Floats have more than enough precision to hold quotes. So we
         // store them as floats rather than doubles to reduce memory.
@@ -328,7 +336,6 @@ public class EODQuoteCache {
      */
     public synchronized void load(Symbol symbol, TradingDate date, int day_volume, float day_low,
                                   float day_high, float day_open, float day_close) {
-
         // Find the fast date offset for the quote
         int dateOffset;
 
@@ -390,7 +397,6 @@ public class EODQuoteCache {
      * @param dateOffset the fast access date offset of the quote to remove
      */
     public synchronized void free(Symbol symbol, int dateOffset) {
-
 	try {
 	    HashMap quotesForDate = getQuotesForDate(dateOffset);
 	    Object quote = quotesForDate.remove(symbol);
@@ -461,7 +467,6 @@ public class EODQuoteCache {
      * @return the date
      */
     public TradingDate offsetToDate(int dateOffset) {
-
 	assert dateOffset <= 0;
 
 	// If the date isn't in the cache then expand it

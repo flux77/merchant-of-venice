@@ -398,7 +398,7 @@ public class TradingDate implements Cloneable, Comparable {
     }
 
     /**
-     * Compare the current date to the specified date.
+     * Compare this date to the specified date.
      *
      * @param	date	the date to compare
      * @return the value <code>0</code> if the dates are equal;

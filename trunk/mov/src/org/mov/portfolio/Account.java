@@ -20,6 +20,7 @@ package org.mov.portfolio;
 
 import org.mov.quote.MissingQuoteException;
 import org.mov.quote.EODQuoteBundle;
+import org.mov.util.Currency;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
@@ -71,6 +72,13 @@ public interface Account {
      */
     public Money getValue(EODQuoteBundle quoteBundle, TradingDate date)
 	throws MissingQuoteException;
+
+    /**
+     * Return the currency of the account.
+     *
+     * @return default currency.
+     */
+    public Currency getCurrency();
 
     /**
      * Perform a transaction on this account.

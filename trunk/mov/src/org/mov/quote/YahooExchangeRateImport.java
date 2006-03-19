@@ -68,7 +68,8 @@ public class YahooExchangeRateImport {
      * @return exchange rate
      * @exception ImportExportException if there was an error retrieving the exchange rate
      */
-    public static ExchangeRate importExchangeRate(Currency sourceCurrency, Currency destinationCurrency)
+    public static ExchangeRate importExchangeRate(Currency sourceCurrency,
+                                                  Currency destinationCurrency)
         throws ImportExportException {
 
         ExchangeRate rate = null;
@@ -88,6 +89,8 @@ public class YahooExchangeRateImport {
                 rate = filter.toExchangeRate(line);
             }
             catch(ExchangeRateFormatException e) {
+                System.out.println(e);
+                
                 throw new ImportExportException(Locale.getString("ERROR_DOWNLOADING_QUOTES"));
             }
 

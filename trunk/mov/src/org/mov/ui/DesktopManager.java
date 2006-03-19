@@ -194,9 +194,20 @@ public class DesktopManager
      * Show a simple error message to the user. This will also
      * cancel the current thread if the progress dialog is up.
      *
-     * @param	message	the error message to display
+     * @param message	the error message to display
      */
-    public static void showErrorMessage(final String message) {
+    public static void showErrorMessage(String message) {
+        showErrorMessage(Locale.getString("VENICE_PROBLEM_TITLE"), message);
+    }
+
+    /**
+     * Show a simple error message to the user. This will also
+     * cancel the current thread if the progress dialog is up.
+     *
+     * @param title   the title of the dialog to display
+     * @param message the error message to display
+     */
+    public static void showErrorMessage(final String title, final String message) {
         // If there is a progress dialog up send an interrupt to the current
         // thread. This is cool because tasks with progress dialogs only
         // need to monitor whether the thread is interrupted and it will
@@ -213,7 +224,7 @@ public class DesktopManager
                 incrementMessagesDisplayed();
                 JOptionPane.showInternalMessageDialog(desktop_instance,
                                                       multiLineMessage,
-                                                      Locale.getString("VENICE_PROBLEM_TITLE"),
+                                                      title,
                                                       JOptionPane.ERROR_MESSAGE);
                 decrementMessagesDisplayed();
             }

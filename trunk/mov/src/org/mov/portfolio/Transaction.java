@@ -30,6 +30,8 @@ import org.mov.util.TradingDate;
  * Transactions are used to build up a portfolio, the user does not
  * enter how many shares they own but rather their share transactions and
  * their current total is calculated from that.
+ *
+ * @author Andrew Leppard
  */
 public class Transaction implements Cloneable, Comparable {
 
@@ -117,7 +119,7 @@ public class Transaction implements Cloneable, Comparable {
 					    Money amount,
 					    CashAccount account) {
 	return new Transaction(WITHDRAWAL, date, amount, null, 0,
-			       Money.ZERO, account, null, null);
+			       null, account, null, null);
     }
 
     /**
@@ -132,7 +134,7 @@ public class Transaction implements Cloneable, Comparable {
 					 Money amount,
 					 CashAccount account) {
 	return new Transaction(DEPOSIT, date, amount, null, 0,
-			       Money.ZERO, account, null, null);
+			       null, account, null, null);
     }
 
     /**
@@ -147,7 +149,7 @@ public class Transaction implements Cloneable, Comparable {
 					  Money amount,
 					  CashAccount account) {
 	return new Transaction(INTEREST, date, amount, null, 0,
-			       Money.ZERO, account, null, null);
+			       null, account, null, null);
     }
 
     /**
@@ -162,7 +164,7 @@ public class Transaction implements Cloneable, Comparable {
 				     Money amount,
 				     CashAccount account) {
 	return new Transaction(FEE, date, amount, null, 0,
-			       Money.ZERO, account, null, null);
+			       null, account, null, null);
     }
 
     /**
@@ -226,7 +228,7 @@ public class Transaction implements Cloneable, Comparable {
 					  CashAccount cashAccount,
 					  ShareAccount shareAccount) {
 	return new Transaction(DIVIDEND, date, amount, symbol, 0,
-			       Money.ZERO, cashAccount, null, shareAccount);
+			       null, cashAccount, null, shareAccount);
     }
 
     /**
@@ -235,18 +237,16 @@ public class Transaction implements Cloneable, Comparable {
      * the holding by several shares.
      *
      * @param	date	date the transaction took place
-     * @param	amount	the value of the dividend
      * @param	symbol	the stock paying the dividend
      * @param	shares	the number of shares gained
      * @param	shareAccount	share account
      */
     public static Transaction newDividendDRP(TradingDate date,
-					     Money amount,
 					     Symbol symbol,
 					     int shares,
 					     ShareAccount shareAccount) {
-	return new Transaction(DIVIDEND_DRP, date, Money.ZERO, symbol, shares,
-			       Money.ZERO, null, null, shareAccount);
+	return new Transaction(DIVIDEND_DRP, date, null, symbol, shares,
+			       null, null, null, shareAccount);
     }
 
     /**
@@ -263,7 +263,7 @@ public class Transaction implements Cloneable, Comparable {
 					  CashAccount cashAccount,
 					  CashAccount cashAccount2) {
 	return new Transaction(TRANSFER, date, amount, null, 0,
-			       Money.ZERO, cashAccount, cashAccount2, null);
+			       null, cashAccount, cashAccount2, null);
     }
 
     /**

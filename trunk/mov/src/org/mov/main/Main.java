@@ -28,6 +28,7 @@ import java.util.List;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+
 import org.mov.macro.MacroManager;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.IDQuoteSync;
@@ -37,6 +38,7 @@ import org.mov.quote.SymbolFormatException;
 import org.mov.ui.GPLViewDialog;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
+import org.mov.util.ExchangeRateCache;
 import org.mov.util.Locale;
 
 /**
@@ -98,6 +100,7 @@ public class Main extends JFrame {
 	desktop = new JDesktopPane();
 	desktopManager = new org.mov.ui.DesktopManager(desktop);
 	desktop.setDesktopManager(desktopManager);
+        ExchangeRateCache.getInstance().setDesktopPane(desktop);
 
         // I didn't mind the blue colour background on the desktop pane
         // under the default steel l&f, but the Windows XP uses a very

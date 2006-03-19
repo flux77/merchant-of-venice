@@ -76,7 +76,7 @@ public class PrimaryProgressDialog implements ProgressDialog {
      * @param isCancelButtonToBePainted true if we need to paint a cancel button
      */
     public PrimaryProgressDialog(JDesktopPane parent,
-            boolean isCancelButtonToBePainted) {
+                                 boolean isCancelButtonToBePainted) {
         newDialog(parent, isCancelButtonToBePainted);
         setIndeterminate(true);
     }
@@ -105,7 +105,7 @@ public class PrimaryProgressDialog implements ProgressDialog {
 
 	progressBar = new JProgressBar();
 
-        // Most the Java implementations have very poor representations of
+        // Most Java implementations have very poor representations of
         // indeterminate progress, the exception being the Mac implementation.
         // So unless the user is running under Mac. Use our custom graphic.
         if(!isMacOSX())

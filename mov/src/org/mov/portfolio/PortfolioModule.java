@@ -42,6 +42,8 @@ import javax.swing.JTable;
 import javax.swing.border.*;
 
 import org.mov.main.*;
+import org.mov.util.Currency;
+import org.mov.util.ExchangeRateCache;
 import org.mov.util.Locale;
 import org.mov.prefs.*;
 import org.mov.quote.*;
@@ -68,8 +70,6 @@ public class PortfolioModule extends JPanel implements Module,
     private JMenuItem accountNewShareAccount;
     private JMenuItem portfolioGraph;
     private JMenuItem portfolioTable;
-    private JMenuItem portfolioExport;
-    private JMenuItem portfolioImport;
     private JMenuItem portfolioDelete;
     private JMenuItem portfolioRename;
     private JMenuItem portfolioClose;
@@ -103,6 +103,16 @@ public class PortfolioModule extends JPanel implements Module,
 
 	createMenu();
 	redraw();
+
+        // Calculate the value of the portfolio before we create and
+        // display the table. This way we don't pop up a dialog
+        // asking the user to enter an exchange rate half-way through
+        // rendering.
+        try {
+            portfolio.getValue(quoteBundle, portfolio.getLastDate());
+        } catch (MissingQuoteException e) {
+            // We don't actually care about the result
+        }
     }
 
     // create new menu for this module
@@ -116,16 +126,6 @@ public class PortfolioModule extends JPanel implements Module,
 	    portfolioTable =
 		MenuHelper.addMenuItem(this, portfolioMenu,
 				       Locale.getString("TABLE"));
-
-	    portfolioMenu.addSeparator();
-
-	    portfolioExport =
-		MenuHelper.addMenuItem(this, portfolioMenu,
-				       Locale.getString("EXPORT"));
-
-	    portfolioImport =
-		MenuHelper.addMenuItem(this, portfolioMenu,
-				       Locale.getString("IMPORT"));
 
             // If the portfolio is transient it won't be saved anyway - so
             // you can't delete or rename it.
@@ -197,7 +197,7 @@ public class PortfolioModule extends JPanel implements Module,
 	// If the portfolio is empty display a label saying "Empty"
 	// otherwise display the portfolio
 	if(accounts.size() == 0) {
-	    addLabel(Locale.getString("EMPTY"));
+	    addLabel(Locale.getString("EMPTY") + " (" + portfolio.getCurrency() + ")");
 	}
 	else {
             Iterator iterator = accounts.iterator();
@@ -206,14 +206,11 @@ public class PortfolioModule extends JPanel implements Module,
 	    while(iterator.hasNext()) {
 		Account account = (Account)iterator.next();
 		if(account instanceof ShareAccount) {
-				    addLabel(account.getName());
+                    addLabel(account.getName() + " (" + account.getCurrency() + ")");
 		
 		    // Add table of stock holdings for the portfolio
 		    ShareAccount shareAccount = (ShareAccount)account;
-		    table =
-			new StockHoldingTable(shareAccount.getStockHoldings(),
-					      quoteBundle);
-		
+		    table = new StockHoldingTable(shareAccount, quoteBundle);
 		    scrolledTable = new JScrollPane(table);
 		    add(scrolledTable);
 		
@@ -222,7 +219,7 @@ public class PortfolioModule extends JPanel implements Module,
 	    }
 	
 	    // Now add summary containing all accounts including total
-	    addLabel(Locale.getString("SUMMARY"));
+	    addLabel(Locale.getString("SUMMARY") + " (" + portfolio.getCurrency() + ")");
 	
 	    accountTable =
 		new AccountTable(portfolio, quoteBundle);
@@ -302,7 +299,14 @@ public class PortfolioModule extends JPanel implements Module,
         // Don't save if the portfolio is transient or the user just
         // deleted it.
 	if(!portfolio.isTransient() && !isDeleted) {
-	    PreferencesManager.putPortfolio(portfolio);
+            try {
+                PreferencesManager.putPortfolio(portfolio);
+            }
+            catch(PreferencesException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_SAVING_PORTFOLIO_TITLE"),
+                                                e.getMessage());
+            }
+
 	    MainMenu.getInstance().updatePortfolioMenu();
 	}
     }
@@ -393,12 +397,6 @@ public class PortfolioModule extends JPanel implements Module,
 		    }
 		    else if(e.getSource() == portfolioRename) {
 			renamePortfolio();
-		    }
-		    else if(e.getSource() == portfolioImport) {
-			importPortfolio();
-		    }
-		    else if(e.getSource() == portfolioExport) {
-			exportPortfolio();
 		    }
 		    else if(e.getSource() == accountNewCashAccount) {
 			newCashAccount();
@@ -523,10 +521,18 @@ public class PortfolioModule extends JPanel implements Module,
 
             // Save the portfolio under the new name
             portfolio.setName(newPortfolioName);
-	    PreferencesManager.putPortfolio(portfolio);
 
-            // Delete the old portfolio
-            PreferencesManager.deletePortfolio(oldPortfolioName);
+            try {
+                // Add new portfolio
+                PreferencesManager.putPortfolio(portfolio);
+
+                // Delete the old portfolio. Don't do this if the above failed!
+                PreferencesManager.deletePortfolio(oldPortfolioName);
+            }
+            catch(PreferencesException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_SAVING_PORTFOLIO_TITLE"),
+                                                e.getMessage());
+            }
 
             // Update GUI
 	    MainMenu.getInstance().updatePortfolioMenu();
@@ -534,76 +540,26 @@ public class PortfolioModule extends JPanel implements Module,
         }
     }
 
-    // Export this portfolio to a CSV file
-    private void exportPortfolio() {
-
-	// Select file to export to
-	JFileChooser chooser = new JFileChooser();
-	int action = chooser.showSaveDialog(desktop);
-
-	if(action == JFileChooser.APPROVE_OPTION) {
-	    File file = chooser.getSelectedFile();
-
-            try {
-                // Write the portfolio to the given file
-                portfolio.write(file);
-
-                // Let the user know the export has completed
-                JOptionPane.showInternalMessageDialog(desktop, 
-                                                      Locale.getString("EXPORT_COMPLETE"),
-                                                      Locale.getString("EXPORT_COMPLETE_TITLE"),
-                                                      JOptionPane.INFORMATION_MESSAGE);
-            }
-	    catch(java.io.IOException e) {
-		DesktopManager.showErrorMessage(Locale.getString("ERROR_WRITING_TO_FILE",
-								 file.getName()));
-	    }
-	}
-    }
-
-    // Import from a CSV file into this portfolio
-    private void importPortfolio() {
-
-	// Select file to import from
-	JFileChooser chooser = new JFileChooser();
-	chooser.setMultiSelectionEnabled(false);
-	int action = chooser.showOpenDialog(desktop);
-
-	if(action == JFileChooser.APPROVE_OPTION) {
-	    File file = chooser.getSelectedFile();
-
-	    try {
-                // Read the portfolio from the given file
-                portfolio.read(file);
-
-                // Let the user know the import has completed
-                JOptionPane.showInternalMessageDialog(desktop, 
-                                                      Locale.getString("IMPORT_COMPLETE"),
-                                                      Locale.getString("IMPORT_COMPLETE_TITLE"),
-                                                      JOptionPane.INFORMATION_MESSAGE);
-	    }
-            catch(IOException e) {
-		DesktopManager.showErrorMessage(Locale.getString("ERROR_READING_FROM_FILE",
-								 file.getName()));
-            }
-	}
-
-	redraw();
-	checkMenuDisabledStatus(); // enable transaction menu
-    }
-
     // Create a new cash account
     private void newCashAccount() {
-	TextDialog dialog =
-	    new TextDialog(desktop, Locale.getString("ENTER_ACCOUNT_NAME"),
-			   Locale.getString("NEW_CASH_ACCOUNT"));
+	AccountDialog dialog =
+	    new AccountDialog(desktop,
+                              Locale.getString("ENTER_ACCOUNT_NAME"),
+                              Locale.getString("NEW_CASH_ACCOUNT"),
+                              portfolio.getCurrency());
 
-	String accountName = dialog.showDialog();
+        if(dialog.showDialog()) {
+            String accountName = dialog.getAccountName();
+            Currency accountCurrency = dialog.getAccountCurrency();
+	    Account account = new CashAccount(accountName, accountCurrency);
 
-	if(accountName != null && accountName.length() > 0) {
-	    Account account = new CashAccount(accountName);
+            // Get exchange rate before we add it to the table. Otherwise the
+            // table will initiate the request during rendering which is ugly.
+            ExchangeRateCache.getInstance().getRate(portfolio.getLastDate(),
+                                                    accountCurrency,
+                                                    portfolio.getCurrency());
+
 	    portfolio.addAccount(account);
-
             redraw();
             checkMenuDisabledStatus(); // enable transaction menu
 	}
@@ -611,15 +567,24 @@ public class PortfolioModule extends JPanel implements Module,
 
     // Create a new share account
     private void newShareAccount() {
-	TextDialog dialog =
-	    new TextDialog(desktop, Locale.getString("ENTER_ACCOUNT_NAME"),
-			   Locale.getString("NEW_SHARE_ACCOUNT"));
-	String accountName = dialog.showDialog();
-	
-	if(accountName != null && accountName.length() > 0) {
-	    Account account = new ShareAccount(accountName);
-	    portfolio.addAccount(account);
+	AccountDialog dialog =
+	    new AccountDialog(desktop,
+                              Locale.getString("ENTER_ACCOUNT_NAME"),
+                              Locale.getString("NEW_SHARE_ACCOUNT"),
+                              portfolio.getCurrency());
+        
+        if(dialog.showDialog()) {
+            String accountName = dialog.getAccountName();
+            Currency accountCurrency = dialog.getAccountCurrency();
+	    Account account = new ShareAccount(accountName, accountCurrency);
+            
+            // Get exchange rate before we add it to the table. Otherwise the
+            // table will initiate the request during rendering which is ugly.
+            ExchangeRateCache.getInstance().getRate(portfolio.getLastDate(),
+                                                    accountCurrency,
+                                                    portfolio.getCurrency());
 
+	    portfolio.addAccount(account);
             redraw();
             checkMenuDisabledStatus(); // enable transaction menu
 	}

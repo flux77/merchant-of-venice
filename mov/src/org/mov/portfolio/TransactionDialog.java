@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
+
+import org.mov.util.Currency;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.MoneyFormatException;
@@ -43,6 +45,7 @@ import org.mov.ui.*;
  * </pre>
  *
  * @see Transaction
+ * @author Andrew Leppard
  */
 public class TransactionDialog extends JInternalFrame 
     implements ActionListener {
@@ -864,14 +867,15 @@ public class TransactionDialog extends JInternalFrame
 		(ShareAccount)portfolio.findAccountByName(accountName);
 	}
 
-	Money amount = Money.ZERO;
+	Money amount = new Money(cashAccount.getCurrency(), 0.0D);
 	int shares = 0;
-	Money tradeCost = Money.ZERO;
+	Money tradeCost = new Money(cashAccount.getCurrency(), 0.0D);
 
 	try {
 	    if(amountTextField != null) 
 		if(!amountTextField.getText().equals(""))
-		    amount = new Money(amountTextField.getText());
+		    amount = new Money(cashAccount.getCurrency(),
+                                       amountTextField.getText());
 
 	    if(sharesTextField != null) 
 		if(!sharesTextField.getText().equals(""))
@@ -879,7 +883,8 @@ public class TransactionDialog extends JInternalFrame
 	    
 	    if(tradeCostTextField != null) 
 		if(!tradeCostTextField.getText().equals(""))
-		    tradeCost = new Money(tradeCostTextField.getText());
+		    tradeCost = new Money(cashAccount.getCurrency(),
+                                          tradeCostTextField.getText());
 	}
 
 	//
@@ -888,7 +893,7 @@ public class TransactionDialog extends JInternalFrame
 
         // Can't parse money field?
         catch(MoneyFormatException e) {
-            String message = new String(Locale.getString("ERROR_PARSING_NUMBER",
+            String message = new String(Locale.getString("ERROR_PARSING_MONEY",
 							 e.getReason()));
 	    JOptionPane.showInternalMessageDialog(desktop, 
 						  message,
@@ -899,7 +904,7 @@ public class TransactionDialog extends JInternalFrame
 
 	// Can't parse numeric field?
 	catch(NumberFormatException e) {
-	    String message = new String(Locale.getString("CANT_PARSE_NUMBER",
+	    String message = new String(Locale.getString("ERROR_PARSING_NUMBER",
 							 e.getMessage()));
 
 	    JOptionPane.showInternalMessageDialog(desktop, 
@@ -980,7 +985,7 @@ public class TransactionDialog extends JInternalFrame
 						  shareAccount);
 	}
 	else if(type == Transaction.DIVIDEND_DRP) {
-	    transaction = Transaction.newDividendDRP(date, amount,
+	    transaction = Transaction.newDividendDRP(date,
 						     symbol, shares,
 						     shareAccount);
 	}

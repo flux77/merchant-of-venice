@@ -73,8 +73,6 @@ public class SymbolListComboBox extends JComboBox {
      */
     public EODQuoteRange getQuoteRange()
         throws SymbolFormatException {
-
-
         String text = getText();
         
         if(text.equals(ALL_ORDINARIES))
@@ -134,7 +132,6 @@ public class SymbolListComboBox extends JComboBox {
 
     // Rebuild option items in this combo box
     private void updateItems() {
-
         removeAllItems();
         addItem(ALL_ORDINARIES);
         addItem(ALL_SYMBOLS);
@@ -143,23 +140,26 @@ public class SymbolListComboBox extends JComboBox {
     }
         
     private void addWatchScreens() {
-	String[] names = PreferencesManager.getWatchScreenNames();
+	List names = PreferencesManager.getWatchScreenNames();
 	
-	for (int i = 0; i < names.length; i++) {	    
-	    addItem(names[i]);
-	}
+	for (Iterator iterator = names.iterator(); iterator.hasNext();)
+	    addItem(iterator.next());
     }
 
-    // Return the watchscreen denoted by name
+    /**
+     * Return the watch screen with the given name or <code>null</code>
+     * if there is no watch screen with the given name.
+     *
+     * @param name name of the watch screen.
+     * @return the watch screen or <code>null</code> if there is no
+     *         watch screen with that name.
+     */
     private WatchScreen getWatchScreen(String name) {
-	String[] names = PreferencesManager.getWatchScreenNames();
-	
-	for (int i = 0; i < names.length; i++) {
-	    if (names[i].compareTo(name) == 0) {
-		WatchScreen w = PreferencesManager.getWatchScreen(names[i]);
-		return w;
-	    }
-	}
-	return null;	    
+	List names = PreferencesManager.getWatchScreenNames();
+
+	if(names.contains(name))
+            return PreferencesManager.getWatchScreen(name);
+        else
+            return null;	    
     }
 }

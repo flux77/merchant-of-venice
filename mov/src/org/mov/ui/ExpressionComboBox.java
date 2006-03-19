@@ -52,6 +52,8 @@ import org.mov.util.Locale;
  *	ExpressionComboBox comboBox = new ExpressionComboBox();
  *	panel.add(comboBox);
  * </pre>
+ *
+ * @author Andrew Leppard
  */
 public class ExpressionComboBox extends JComboBox implements PopupMenuListener {
 

@@ -18,9 +18,8 @@
 
 package org.mov.util;
 
-import java.text.ParseException;
-
 import java.text.NumberFormat;
+import java.text.ParseException;
 
 /** 
  * An immutable representation of Money. This class was created to reference
@@ -29,20 +28,30 @@ import java.text.NumberFormat;
  * money should be represented by an integer type, which would require conversion
  * from the more natural floating point type. This class was created to handle
  * all this conversion work and provide a nice simple abstraction.
+ *
+ * @author Andrew Leppard
+ * @see Currency
  */
 public class Money implements Cloneable, Comparable {
+
+    /** Immutable representation of zero money in the default currency. */
+    public final static Money ZERO = new Money(0.0D);
 
     // WARNING: Do not convert doubles to long by:
     // amountLong = (long)(amountDouble * 100.0D)
     // because it performs a floor operation. Round by:
     // amountLong = Math.round(amountDouble * 100.0D)
 
-    // Converter to display currency. Create a single instance so we don't
-    // have to keep instantiating it.
-    private static NumberFormat format = NumberFormat.getCurrencyInstance();
+    // The currency of this money
+    private Currency currency;
 
-    /** A representation of no money, e.g. $0. */
-    public static Money ZERO = new Money();
+    // This number is the amount we need to multiply the double
+    // representation of money to store it as a long. We store
+    // and manipulate financial calculations using the long
+    // type to ensure that calculations are exact and we do not
+    // loose precision when rounding. For currencies containing
+    // 100 cents, the conversion rate will be 100.0.
+    private double conversion;
 
     // We use a long to store the money because float and doubles aren't
     // accurate enough. We do not use an int because it would only allow
@@ -50,23 +59,42 @@ public class Money implements Cloneable, Comparable {
     // it doesn't make much sense limiting the application in this way.
     private long amount;
 
-    // This is private because if the user wants to create an empty money
-    // value they should use the ZERO instance.
-    private Money() {
-        amount = 0;
-    }
-
-    private Money(long amount) {
+    /**
+     * Create a new <code>Money</code> instance from the given amount using
+     * the given currency and conversion value.
+     *
+     * @param currency   the currency of the money.
+     * @param conversion the number to multiply the money to convert
+     *                   from a double to a long representation.
+     * @param amount     the amount of money.
+     */
+    private Money(Currency currency, double conversion, long amount) {
+        this.currency = currency;
+        this.conversion = conversion;
         this.amount = amount;
     }
 
     /**
-     * Create a new <code>Money</code> instance from the given amount.
+     * Create a new <code>Money</code> instance from the given amount using the
+     * given currency.
+     * 
+     * @param currency the currency of the money.
+     * @param amount   the amount of money.
+     */
+    public Money(Currency currency, double amount) {
+        this.currency = currency;
+        this.conversion = calculateConversion(currency);
+        this.amount = toLong(amount, conversion);
+    }
+
+    /**
+     * Create a new <code>Money</code> instance from the given amount using the
+     * default currency.
      * 
      * @param amount the amount of money.
      */
     public Money(double amount) {
-        this.amount = Math.round(amount * 100.0D);
+        this(Currency.getDefaultCurrency(), amount);
     }
 
     /**
@@ -75,24 +103,37 @@ public class Money implements Cloneable, Comparable {
      * @param string the string to parse.
      * @exception MoneyFormatException if there was an error parsing the string.
      */
-    public Money(String string) 
+    public Money(Currency currency, String string) 
         throws MoneyFormatException {
 
+        this.currency = currency;
+        this.conversion = calculateConversion(currency);
+        
         try {
             // Try parsing currency format, e.g. $32.00
+            NumberFormat format = currency.getNumberFormat();
             Number number = format.parse(string);
-            this.amount = Math.round(number.doubleValue() * 100.0D);
+            this.amount = toLong(number.doubleValue(), conversion);
         }
         catch(ParseException e2) {
             // If that doesn't work try parsing it as a simple double
             try {
                 double doubleValue = Double.parseDouble(string);
-                this.amount = Math.round(doubleValue * 100.0D);
+                this.amount = toLong(doubleValue, conversion);
             }
             catch(NumberFormatException e) {
                 throw new MoneyFormatException(string);
             }
         }
+    }
+
+    /**
+     * Return the currency of this money.
+     *
+     * @return the currency
+     */
+    public Currency getCurrency() {
+        return currency;
     }
 
     /**
@@ -102,7 +143,9 @@ public class Money implements Cloneable, Comparable {
      * @return the resultant <code>Money</code>.
      */
     public Money add(Money money) {
-        return new Money(amount + money.longValue());
+        assert currency.equals(money.currency);
+
+        return new Money(currency, conversion, amount + money.amount);
     }
 
     /**
@@ -112,7 +155,7 @@ public class Money implements Cloneable, Comparable {
      * @return the resultant <code>Money</code>.
      */
     public Money add(double money) {
-        return new Money(amount + Math.round(money * 100.0D));
+        return new Money(currency, conversion, amount + toLong(money, conversion));
     }
 
     /**
@@ -122,7 +165,9 @@ public class Money implements Cloneable, Comparable {
      * @return the resultant <code>Money</code>.
      */
     public Money subtract(Money money) {
-        return new Money(amount - money.longValue());
+        assert currency.equals(money.currency);
+
+        return new Money(currency, conversion, amount - money.amount);
     }
 
     /**
@@ -132,7 +177,7 @@ public class Money implements Cloneable, Comparable {
      * @return the resultant <code>Money</code>.
      */
     public Money divide(int number) {
-        return new Money(amount / number);
+        return new Money(currency, conversion, amount / number);
     }
 
     /**
@@ -142,11 +187,17 @@ public class Money implements Cloneable, Comparable {
      * @return the resultant <code>Money</code>.
      */
     public Money multiply(int number) {
-        return new Money(amount * number);
+        return new Money(currency, conversion, amount * number);
     }
 
+    /**
+     * Return a clone of this object. Since <code>Money</code> is immutable,
+     * this function simply returns this object.
+     *
+     * @return this object
+     */
     public Object clone() {
-        return new Money(amount);
+        return this;
     }
 
     /**
@@ -156,7 +207,9 @@ public class Money implements Cloneable, Comparable {
      * @return <code>true</code> if this money is less than the given money.
      */
     public boolean isLessThan(Money money) {
-        return (amount < money.longValue());
+        assert currency.equals(money.currency);
+
+        return (amount < money.amount);
     }
 
     /**
@@ -166,7 +219,9 @@ public class Money implements Cloneable, Comparable {
      * @return <code>true</code> if this money is less than or equal to the given money.
      */
     public boolean isLessThanEqual(Money money) {
-        return (amount <= money.longValue());
+        assert currency.equals(money.currency);
+
+        return (amount <= money.amount);
     }
 
     /**
@@ -176,7 +231,9 @@ public class Money implements Cloneable, Comparable {
      * @return <code>true</code> if this money is greater than the given money.
      */
     public boolean isGreaterThan(Money money) {
-        return (amount > money.longValue());
+        assert currency.equals(money.currency);
+
+        return (amount > money.amount);
     }
 
     /**
@@ -186,37 +243,67 @@ public class Money implements Cloneable, Comparable {
      * @return <code>true</code> if this money is greater than or equal to the given money.
      */
     public boolean isGreaterThanEqual(Money money) {
-        return (amount >= money.longValue());
+        assert currency.equals(money.currency);
+
+        return (amount >= money.amount);
     }
 
+    /**
+     * Compare this money to the specified money.
+     *
+     * @param object the money to compare
+     * @return the value <code>0</code> if the monies are equal;
+     * <code>1</code> if this money is more than the specified money or
+     * <code>-1</code> if this money is less than the specified money.
+     */
     public int compareTo(Object object) {
         Money money = (Money)object;
 
-        if(amount < money.longValue())
+        assert currency.equals(money.currency);
+
+        if(amount < money.amount)
             return -1;
-        if(amount > money.longValue())
+        if(amount > money.amount)
             return 1;
         return 0;
     }
 
+    /**
+     * Compare this money for equality with the specified money.
+     *
+     * @param object the money to compare
+     * @return <code>true</code> iff the monies are equal.
+     */
     public boolean equals(Object object) {
         Money money = (Money)object;
 
-        return (amount == money.longValue());
+        assert currency.equals(money.currency);
+
+        return (amount == money.amount);
     }
 
+    /**
+     * Return a hash code representation of this money.
+     *
+     * @return hash code representation.
+     */
     public int hashCode() {
         return (int)amount;
     }
 
     /**
-     * Returns a <code>String</code> representation of the given money value.
+     * Exchange this money for another currency at the given exchange rate.
+     * This function returns a new money object which contains the exchanged
+     * money in the given currency.
      *
-     * @param amount the amount of money
-     * @return the string representation.
+     * @param currency     the currency to exchange this money for
+     * @param exchangeRate the exchange rate
+     * @return the new money in the given currency
      */
-    public static String toString(double amount) {
-        return format.format(amount);
+    public Money exchange(Currency currency, double exchangeRate) {
+        double newAmount = toDouble(amount, conversion) * exchangeRate;
+
+        return new Money(currency, newAmount);
     }
 
     /**
@@ -225,7 +312,22 @@ public class Money implements Cloneable, Comparable {
      * @return the string representation.
      */
     public String toString() {
+        NumberFormat format = currency.getNumberFormat();
+        
         return format.format(doubleValue());
+    }
+    
+    /**
+     * Return a <code>String</code> representation of the given amount of money
+     * in the default currency.
+     *
+     * @param value the value of the money
+     * @return the string representation.
+     */
+    public static String toString(double value) {
+        NumberFormat format = Currency.getDefaultCurrency().getNumberFormat();
+
+        return format.format(value);
     }
 
     /** 
@@ -235,20 +337,47 @@ public class Money implements Cloneable, Comparable {
      *         conversion to type <code>double</code>.
      */
     public double doubleValue() {
-        double cents = (double)amount;
-        return cents / 100.0D;
+        return toDouble(amount, conversion);
     }
 
     /**
-     * Return the value of this <code>Money</code> as a <code>long</code>.
-     * This conversion does not involve rounding as it represents the number
-     * of cents in the money rather than the dollar amount.
+     * Create the number we need to multiple the currency to convert it
+     * to a long. E.g. for Euro, with two decimal digits, if we
+     * multiply it by 100, we can convert it to a long. We store
+     * the value internally as an integer to avoid rounding issues.
      *
-     * @return the long representation.
+     * @param currency the currency
+     * @return the conversion value
      */
-    public long longValue() {
-        return amount;
+    private static double calculateConversion(Currency currency) {
+        return Math.pow(10.0D, (double)currency.getDefaultFractionDigits());
     }
 
+    /**
+     * Convert a <code>long</code> representation of money to a
+     * <code>double</code> representation of money. The former representation
+     * is used for calculations as it performs no rounding and so does not
+     * loose precision. The latter is displayed to the user.
+     *
+     * @param value      the <code>long</code> value to convert from
+     * @param conversion the conversion value
+     * @return the resultant <code>double</code> value
+     */
+    private static double toDouble(long value, double conversion) {
+        return ((double)value) / conversion;
+    }
 
+    /**
+     * Convert a <code>double</code> representation of money to a
+     * <code>long</code> representation of money. The latter representation
+     * is used for calculations as it performs no rounding and so does not
+     * loose precision. The former is displayed to the user.
+     *
+     * @param value      the <code>double</code> value to convert from
+     * @param conversion the conversion value
+     * @return the resultant <code>long</code> value
+     */
+    private static long toLong(double value, double conversion) {
+        return Math.round(value * conversion);
+    }
 }

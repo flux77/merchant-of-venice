@@ -201,7 +201,7 @@ public class PortfolioModel extends AbstractTableModel {
                 return today.marketValue.subtract(yesterday.marketValue);
             }
             else
-                return Money.ZERO;
+                return new Money(portfolio.getCurrency(), 0.0D);
 
         case(PERCENT_CHANGE_COLUMN):
             // The values are in date order. So the previous value is at row - 1.
@@ -245,7 +245,7 @@ public class PortfolioModel extends AbstractTableModel {
                 PortfolioValue value = new PortfolioValue();
 
                 value.date = date;
-                value.cashValue = portfolio.getCashValue();
+                value.cashValue = portfolio.getCashValue(date);
                 value.shareValue = portfolio.getShareValue(quoteBundle, date);
                 value.marketValue = portfolio.getValue(quoteBundle, date);
                 value.returnValue = portfolio.getReturnValue(quoteBundle, date);

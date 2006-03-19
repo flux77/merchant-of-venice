@@ -32,6 +32,7 @@ import org.mov.util.TradingDateFormatException;
 /**
  * Dialog for querying the user for a date.
  *
+ * @author Andrew Leppard
  * @see TradingDate
  */
 public class TradingDateDialog {

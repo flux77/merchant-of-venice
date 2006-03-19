@@ -92,9 +92,9 @@ public class Locale {
     // In the given source string replace all occurences of patternText with
     // text. This function appears elsewhere, it needs to be refactored.
     private static String replace(String source, String patternText, String text) {
-        // This function use to use Java's regex code, but this was unsatisfactory
+        // This function used to use Java's regex code, but this was unsatisfactory
         // for a simple find replace call because it did not treat the replacement
-        // text as simple text, but look for special symbols to do grouping,
+        // text as simple text, but it looked for special symbols to do grouping,
         // referencing etc. This caused exceptions to be thrown when we wanted
         // to replace '%' with $.
         int location = source.indexOf(patternText);

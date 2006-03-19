@@ -19,6 +19,8 @@
 package org.mov.quote;
 
 import org.mov.util.Currency;
+import org.mov.util.TradingDate;
+import org.mov.util.TradingDateFormatException;
 import org.mov.util.ExchangeRate;
 import org.mov.util.Locale;
 import org.mov.util.UnknownCurrencyCodeException;
@@ -36,7 +38,6 @@ import org.mov.util.UnknownCurrencyCodeException;
  *
  * @author Andrew Leppard
  */
-
 public class YahooExchangeRateFilter {
 
     /**
@@ -63,9 +64,9 @@ public class YahooExchangeRateFilter {
         
         // Parse to/from currencies.
         
-        // It's actually 6 but we ignore the other entries, so it makes sense to
+        // It's actually 6 but we ignore the other entries, as it makes sense to
         // try to be robust and not blow up if Yahoo adds or removes an entry.
-        if(parts.length < 2)
+        if(parts.length < 3)
             throw new ExchangeRateFormatException(Locale.getString("WRONG_FIELD_COUNT"));
         
         if(parts[i].length() != 10)
@@ -101,6 +102,19 @@ public class YahooExchangeRateFilter {
                                                                    parts[i]));
         }
         
-        return new ExchangeRate(sourceCurrency, destinationCurrency, value);
+        i++;
+
+        // Parse date
+        TradingDate date = null;
+        String dateString = parts[i].replaceAll("\"", "");
+
+        try {
+            date = new TradingDate(dateString, TradingDate.US);
+        }
+        catch(TradingDateFormatException e) {
+            throw new ExchangeRateFormatException(e.getMessage());
+        }
+
+        return new ExchangeRate(date, sourceCurrency, destinationCurrency, value);
     }
 }

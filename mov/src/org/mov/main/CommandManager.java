@@ -41,10 +41,13 @@ import org.mov.chart.*;
 import org.mov.chart.graph.*;
 import org.mov.chart.source.*;
 import org.mov.help.HelpModule;
+import org.mov.util.Currency;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
+import org.mov.portfolio.AccountDialog;
 import org.mov.portfolio.Portfolio;
 import org.mov.portfolio.PortfolioModule;
+import org.mov.prefs.PreferencesException;
 import org.mov.prefs.PreferencesModule;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.ImportQuoteModule;
@@ -299,12 +302,17 @@ public class CommandManager {
      * @param	portfolioName	name of portfolio to display
      */
     public void openPortfolio(String portfolioName) {
-
         // We don't run this in a new thread because we call openPortfolio(portfolio)
         // which will open a new thread for us.
-        Portfolio portfolio = PreferencesManager.getPortfolio(portfolioName);
+        try {
+            Portfolio portfolio = PreferencesManager.getPortfolio(portfolioName);
 
-        openPortfolio(portfolio);
+            openPortfolio(portfolio);
+        }
+        catch(PreferencesException e) {
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_LOADING_PORTFOLIO_TITLE"),
+                                            e.getMessage());
+        }
     }
 
     /**
@@ -537,21 +545,45 @@ public class CommandManager {
      */
     public void newPortfolio() {
 	// Get name for portfolio
-	TextDialog dialog = new TextDialog(desktop,
-					   Locale.getString("ENTER_PORTFOLIO_NAME"),
-					   Locale.getString("NEW_PORTFOLIO"));
-	String portfolioName = dialog.showDialog();
+	AccountDialog dialog = new AccountDialog(desktop,
+                                                 Locale.getString("ENTER_PORTFOLIO_NAME"),
+                                                 Locale.getString("NEW_PORTFOLIO"));
 
-	if(portfolioName != null && portfolioName.length() > 0) {
-	    Portfolio portfolio = new Portfolio(portfolioName);
+        if(dialog.showDialog()) {
+            String portfolioName = dialog.getAccountName();
+            Currency portfolioCurrency = dialog.getAccountCurrency();
+	    Portfolio portfolio = new Portfolio(portfolioName, portfolioCurrency);
 	
 	    // Save portfolio so we can update the menu
-	    PreferencesManager.putPortfolio(portfolio);
-	    MainMenu.getInstance().updatePortfolioMenu();
-	
-	    // Open as normal
-	    openPortfolio(portfolioName);
+            try {
+                PreferencesManager.putPortfolio(portfolio);
+                MainMenu.getInstance().updatePortfolioMenu();
+                openPortfolio(portfolio);
+            }
+            catch(PreferencesException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_SAVING_PORTFOLIO_TITLE"),
+                                                e.getMessage());
+            }
 	}
+    }
+
+    /**
+     * Graph the given portfolio.
+     *
+     * @param portfolioName the name of the portfolio to graph
+     */
+    public void graphPortfolio(String portfolioName) {
+
+        try {
+            Portfolio portfolio =
+                PreferencesManager.getPortfolio(portfolioName);
+
+            graphPortfolio(portfolio);
+        }
+        catch(PreferencesException e) {
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_LOADING_PORTFOLIO_TITLE"),
+                                            e.getMessage());
+        }
     }
 
     /**
@@ -640,6 +672,19 @@ public class CommandManager {
         }
 
         ProgressDialogManager.closeProgressDialog(progress);
+    }
+
+    public void tablePortfolio(String portfolioName) {
+        try {
+            Portfolio portfolio =
+                PreferencesManager.getPortfolio(portfolioName);
+
+            tablePortfolio(portfolio);
+        }
+        catch(PreferencesException e) {
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_LOADING_PORTFOLIO_TITLE"),
+                                            e.getMessage());
+        }
     }
 
     public void tablePortfolio(Portfolio portfolio) {

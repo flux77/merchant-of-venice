@@ -31,6 +31,8 @@ import java.util.List;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.ProgressDialog;
 import org.mov.ui.ProgressDialogManager;
+import org.mov.util.Currency;
+import org.mov.util.ExchangeRate;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 
@@ -125,6 +127,21 @@ public class DatabaseQuoteSource implements QuoteSource
     // Info table
     private final static String LOOKUP_TABLE_NAME = "lookup";
     private final static String NAME_FIELD        = "name";
+
+    // Exchange rate table
+    private final static String EXCHANGE_TABLE_NAME = "exchange";
+
+    // Column names
+    // DATE_FIELD
+    private final static String SOURCE_CURRENCY_FIELD      = "source_currency";
+    private final static String DESTINATION_CURRENCY_FIELD = "destination_currency";
+    private final static String EXCHANGE_RATE_FIELD        = "exchange_rate";
+
+    // Column numbers
+    // DATE_COLUMN
+    // SOURCE_CURRENCY_COLUMN
+    // DESTINATION_CURRENCY_COLUMN
+    private final static int EXCHANGE_RATE_COLUMN = 4;
 
     // Database details
     private int mode;
@@ -491,8 +508,13 @@ public class DatabaseQuoteSource implements QuoteSource
         return success;
     }
 
-    // Takes a string containing an SQL statement and then executes it. Returns
-    // a vector of quotes.
+    /**
+     * This function takes an SQL query statement that should return a list of
+     * quotes. This function executes the statement and stores the quotes into
+     * database. 
+     *
+     * @return <code>true</code> iff this function was successful.
+     */
     private boolean executeSQLString(ProgressDialog progress, String SQLString) {
 
 	if(checkConnection()) {
@@ -668,12 +690,16 @@ public class DatabaseQuoteSource implements QuoteSource
         return queryString.concat(filterString);
     }
     
-    // Creates database tables
-    private boolean createTables() {
+    /**
+     * Create the share table.
+     *
+     * @return <code>true</code> iff this function was successful.
+     */
+    private boolean createShareTable() {
         boolean success = false;
 	
         try {
-            // 1. Create the shares table
+            // Create the shares table.
             Statement statement = connection.createStatement();
             statement.executeUpdate("CREATE " + getTableType() + " TABLE " + SHARE_TABLE_NAME + " (" +
                                     DATE_FIELD +	" DATE NOT NULL, " +
@@ -683,22 +709,57 @@ public class DatabaseQuoteSource implements QuoteSource
                                     DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
                                     DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
                                     DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, " +
-                                    DAY_VOLUME_FIELD +	" INT DEFAULT 0, " +
+                                    DAY_VOLUME_FIELD +	" INT DEFAULT 0, " + // TODO: Use BIGINT
                                     "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
             
-            // 2. Create a couple of indices to speed things up
+            // Create a couple of indices to speed things up.
             statement.executeUpdate("CREATE INDEX " + DATE_INDEX_NAME + " ON " +
                                     SHARE_TABLE_NAME + " (" + DATE_FIELD + ")");
             statement.executeUpdate("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " +
                                     SHARE_TABLE_NAME + " (" + SYMBOL_FIELD + ")");
             
-            // 3. Create the lookup table
-            statement.executeUpdate("CREATE " + getTableType() + " TABLE " + LOOKUP_TABLE_NAME + " (" +
-                                    SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
-                                    ") NOT NULL, " +
-                                    NAME_FIELD +	" VARCHAR(100), " +
-                                    "PRIMARY KEY(" + SYMBOL_FIELD + "))");
-            
+            // Create the lookup table.
+            //statement.executeUpdate("CREATE " + getTableType() + " TABLE " + LOOKUP_TABLE_NAME + " (" +
+            //                        SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
+            //                         ") NOT NULL, " +
+            //                        NAME_FIELD +	" VARCHAR(100), " +
+            //                        "PRIMARY KEY(" + SYMBOL_FIELD + "))");
+            success = true;
+        }
+        catch (SQLException e) {
+            // Since hypersonic won't let us check if the table is already created,
+            // we need to ignore the inevitable error about the table already being present.
+            if(software != HSQLDB_SOFTWARE)
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                                 e.getMessage()));
+            else
+                success = true;
+        }
+	
+        return success;	
+    }
+    
+    /**
+     * Create the exchange table.
+     *
+     * @return <code>true</code> iff this function was successful.
+     */
+    private boolean createExchangeTable() {
+        boolean success = false;
+	
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("CREATE " + getTableType() + " TABLE " +
+                                    EXCHANGE_TABLE_NAME         + " (" +
+                                    DATE_FIELD                  + " DATE NOT NULL, " +
+
+                                    // ISO 4217 currency code is 3 characters.
+                                    SOURCE_CURRENCY_FIELD       + " CHAR(3) NOT NULL, " +
+                                    DESTINATION_CURRENCY_FIELD  + " CHAR(3) NOT NULL, " +
+                                    EXCHANGE_RATE_FIELD         + " FLOAT DEFAULT 1.0, " +
+                                    "PRIMARY KEY(" + DATE_FIELD + ", " +
+                                    SOURCE_CURRENCY_FIELD + ", " +
+                                    DESTINATION_CURRENCY_FIELD + "))");
             success = true;
         }
         catch (SQLException e) {
@@ -714,7 +775,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	
         return success;	
     }
-    
+
     private boolean checkDatabase() {
         boolean success = true;
 	
@@ -755,12 +816,13 @@ public class DatabaseQuoteSource implements QuoteSource
         // If we got here the database is available
         return success;
     }
-    
+
     private boolean checkTables() {
-        boolean success = false;
+        boolean success = true;
         
         try {
-            boolean foundTable = false;
+            boolean foundShareTable = false;
+            boolean foundExchangeTable = false;
 
             // Skip this check for hypersonic - it doesn't support it
             if(software != HSQLDB_SOFTWARE) {
@@ -771,21 +833,24 @@ public class DatabaseQuoteSource implements QuoteSource
                 while(RS.next()) {
                     traverseTables = RS.getString(3);
                     
-                    if(traverseTables.equals(SHARE_TABLE_NAME)) {
-                        foundTable = true;
-                        break;
-                    }
+                    if(traverseTables.equals(SHARE_TABLE_NAME))
+                        foundShareTable = true;
+
+                    if(traverseTables.equals(EXCHANGE_TABLE_NAME))
+                        foundExchangeTable = true;
                 }
             }
-            // No table? Well have to go create it
-            if(!foundTable)
-                success = createTables();
-            else
-                success = true;
+
+            // No table? Let's try and create them.
+            if(!foundShareTable)
+                success = createShareTable();
+            if(!foundExchangeTable && success)
+                success = createExchangeTable();
         }
         catch (SQLException e) {
             DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
-                    						e.getMessage()));
+                                                             e.getMessage()));
+            success = false;
         }
 
         return success;
@@ -1331,6 +1396,73 @@ public class DatabaseQuoteSource implements QuoteSource
             return new String("SELECT " + SYMBOL_FIELD + " FROM " +
                               SHARE_TABLE_NAME + " WHERE " + SYMBOL_FIELD + " = '"
                               + symbol + "' LIMIT 1");
+    }
+
+    /**
+     * Import currency exchange rates into the database.
+     *
+     * @param exchangeRates a list of exchange rates to import.
+     */
+    public void importExchangeRates(List exchangeRates) {
+        if (exchangeRates.size() > 0 && checkConnection()) {
+            // Iterate through the exchange rates and import them one-by-one.
+            Iterator iterator = exchangeRates.iterator();
+
+            try {
+                while(iterator.hasNext()) {
+                    ExchangeRate exchangeRate = (ExchangeRate)iterator.next();
+                    String sourceCurrencyCode = exchangeRate.getSourceCurrency().getCurrencyCode();
+                    String destinationCurrencyCode =
+                        exchangeRate.getDestinationCurrency().getCurrencyCode();
+
+                    String insertQuery =
+                        new String("INSERT INTO " + EXCHANGE_TABLE_NAME + " VALUES (" +
+                                   "'" + toSQLDateString(exchangeRate.getDate()) + "', " +
+                                   "'" + sourceCurrencyCode                      + "', " +
+                                   "'" + destinationCurrencyCode                 + "', " +
+                                   "'" + exchangeRate.getRate()                  + "')");
+
+                    // Now insert the exchange rate into the dataqbase
+                    Statement statement = connection.createStatement();
+                    statement.executeUpdate(insertQuery);
+                }
+            }
+            catch (SQLException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                                 e.getMessage()));
+            }
+        }
+    }
+
+    public List getExchangeRates(Currency sourceCurrency, Currency destinationCurrency) {
+        List list = new ArrayList();
+        
+	if(!checkConnection())
+            return list;
+
+        try {
+            Statement statement = connection.createStatement();
+            String query = new String("SELECT * FROM " + EXCHANGE_TABLE_NAME + " WHERE " +
+                                      SOURCE_CURRENCY_FIELD + " = '" +
+                                      sourceCurrency.getCurrencyCode() +
+                                      "' AND " +
+                                      DESTINATION_CURRENCY_FIELD + " ='" +
+                                      destinationCurrency.getCurrencyCode() + "'");
+
+            ResultSet RS = statement.executeQuery(query);
+
+            while (RS.next())
+                list.add(new ExchangeRate(new TradingDate(RS.getDate(DATE_COLUMN)),
+                                          sourceCurrency,
+                                          destinationCurrency,
+                                          RS.getDouble(EXCHANGE_RATE_COLUMN)));
+        }
+        catch(SQLException e) {
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+                                                             e.getMessage()));
+        }
+
+        return list;
     }
 
     /**

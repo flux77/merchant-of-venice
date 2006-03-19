@@ -20,9 +20,12 @@
 package org.mov.prefs;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,10 +38,15 @@ import org.mov.portfolio.Account;
 import org.mov.portfolio.CashAccount;
 import org.mov.portfolio.ShareAccount;
 import org.mov.portfolio.Portfolio;
+import org.mov.portfolio.PortfolioParserException;
+import org.mov.portfolio.PortfolioReader;
+import org.mov.portfolio.PortfolioWriter;
 import org.mov.portfolio.Transaction;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
 import org.mov.table.WatchScreen;
+import org.mov.util.Currency;
+import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingDateFormatException;
@@ -65,9 +73,6 @@ public class PreferencesManager {
 
     // The user root from Venice's point of view
     private static Preferences userRoot = Preferences.userRoot().node(base);
-
-    // Default name of internal database file
-    private static String DEFAULT_INTERNAL_FILE_NAME = "venice_quotes.bin";
 
     // This class cannot be instantiated
     private PreferencesManager() {
@@ -463,18 +468,26 @@ public class PreferencesManager {
      *
      * @return the list of watch screen names.
      */
-    public static String[] getWatchScreenNames() {
+    public static List getWatchScreenNames() {
 	Preferences p = getUserNode("/watchscreens");
-	String[] names = null;
+        List watchScreenNames = new ArrayList();
 
 	try {
-	    names = p.childrenNames();
+	    String preferenceWatchScreenNames[] = p.childrenNames();
+
+            for(int i = 0; i < preferenceWatchScreenNames.length; i++) {
+                String watchScreenName = preferenceWatchScreenNames[i];
+                watchScreenNames.add(watchScreenName);
+            }
 	}
 	catch(BackingStoreException e) {
 	    // don't care
 	}
 
-	return names;
+        // Make sure list is in alphabetical order
+        Collections.sort(watchScreenNames);
+
+	return watchScreenNames;
     }
 
     /**
@@ -558,16 +571,44 @@ public class PreferencesManager {
      *
      * @return the list of portfolio names.
      */
-    public static synchronized String[] getPortfolioNames() {
-	Preferences p = getUserNode("/portfolio");
-	String[] portfolioNames = null;
+    public static synchronized List getPortfolioNames() {
+        List portfolioNames = new ArrayList();
 
+        // First retrieve all the portfolios stored in ~/Venice/Portfolios/ (0.7b and up)
+        // Portfolios are now stored as files, as opposed to Java prefences, because this
+        // improves read and write times (especially on Mac OS X) and makes portfolio
+        // management easier for the user.
+        String[] portfolioFileNames = getPortfolioHome().list();
+        String suffix = ".xml";
+
+        for(int i = 0; i < portfolioFileNames.length; i++) {
+            String portfolioFileName = portfolioFileNames[i];
+
+            // Ignore files without trailing suffix
+            if(portfolioFileName.endsWith(suffix)) {
+                // Remove trailing suffix
+                String portfolioName =
+                    portfolioFileName.substring(0, portfolioFileName.length() - suffix.length()); 
+                portfolioNames.add(portfolioName);
+            }
+        }
+
+        // Now retrieve all the portfolios stored in Java preferences (up to 0.6b)
 	try {
-	    portfolioNames = p.childrenNames();
+            Preferences p = getUserNode("/portfolio");
+	    String[] preferencePortfolioNames = p.childrenNames();
+
+            for(int i = 0; i < preferencePortfolioNames.length; i++) {
+                String portfolioName = preferencePortfolioNames[i];
+                portfolioNames.add(portfolioName);
+            }
 	}
 	catch(BackingStoreException e) {
 	    // don't care
 	}
+
+        // Make sure list is in alphabetical order
+        Collections.sort(portfolioNames);
 
 	return portfolioNames;
     }
@@ -578,9 +619,13 @@ public class PreferencesManager {
      * @param name the portfolio name.
      */
     public static synchronized void deletePortfolio(String name) {
-	Preferences p = getUserNode("/portfolio/" + name);
+        // Delete the portfolio from ~/Venice/Portfolios/ (0.7b and up)
+        File portfolioFile = new File(getPortfolioHome(), name.concat(".xml"));
+        portfolioFile.delete();
 
+        // Delete the portfolio from Java preferences (up to 0.6b)
 	try {
+            Preferences p = getUserNode("/portfolio/" + name);
 	    p.removeNode();
 	}
 	catch(BackingStoreException e) {
@@ -589,13 +634,45 @@ public class PreferencesManager {
     }
 
     /**
-     * Load the portfolio with the given name.
+     * Read the portfolio contained the given file. Venice stores portfolios
+     * in files from 0.7b and up.
      *
-     * @param name the name of the portfolio to load.
-     * @return the portfolio.
+     * @param portfolioFile the file containing the portfolio.
+     * @return the Portfolio contained in the file.
+     * @exception PreferencesException if there was an error loading the portfolio.
      */
-    public static synchronized Portfolio getPortfolio(String name) {
-	Portfolio portfolio = new Portfolio(name);
+    private static Portfolio getPortfolioFromFile(File portfolioFile)
+        throws PreferencesException {
+        try {
+            FileInputStream inputStream = new FileInputStream(portfolioFile);
+            Portfolio portfolio = PortfolioReader.read(inputStream);
+            inputStream.close();
+            return portfolio;
+        }
+        catch(IOException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+        catch(PortfolioParserException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+        catch(SecurityException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+    }
+
+    /**
+     * Read the portfolio with the given name from the preferences. Venice stores
+     * portfolios in preferences up to 0.6b.
+     *
+     * @param name the name of the portfolio to retrieve.
+     * @return the Portfolio.
+     * @exception PreferencesException if there was an error loading the portfolio.
+     */
+    private static Portfolio getPortfolioFromPreferences(String name)
+        throws PreferencesException {
+        // Venice 0.6b did not support multiple currencies. So just default
+        // to the user's default currency.
+	Portfolio portfolio = new Portfolio(name, Currency.getDefaultCurrency());
 	
 	Preferences p = getUserNode("/portfolio/" + name);
 
@@ -610,10 +687,10 @@ public class PreferencesManager {
 
 		String accountType = accountPrefs.get("type", "share");
 		if(accountType.equals("share")) {
-		    account = new ShareAccount(accountNames[i]);
+		    account = new ShareAccount(accountNames[i], Currency.getDefaultCurrency());
 		}
 		else {
-		    account = new CashAccount(accountNames[i]);
+		    account = new CashAccount(accountNames[i], Currency.getDefaultCurrency());
 		}
 
 		portfolio.addAccount(account);
@@ -640,56 +717,98 @@ public class PreferencesManager {
                                         TradingDate.BRITISH);
                 }
                 catch(TradingDateFormatException e) {
-                    // Shouldnt happen unless portfolio gets corrupted
+                    throw new PreferencesException(e.getMessage());
                 }
 
-		Money amount = new Money(transactionPrefs.getDouble("amount", 0.0D));
+		Money amount = new Money(Currency.getDefaultCurrency(),
+                                         transactionPrefs.getDouble("amount", 0.0D));
 		Symbol symbol = null;
 		int shares = transactionPrefs.getInt("shares", 0);
-		Money tradeCost = new Money(transactionPrefs.getDouble("trade_cost", 0.0D));
+		Money tradeCost = new Money(Currency.getDefaultCurrency(),
+                                            transactionPrefs.getDouble("trade_cost", 0.0D));
 
                 try {
                     symbol = Symbol.find(transactionPrefs.get("symbol", ""));
                 }
                 catch(SymbolFormatException e) {
-                    // Shouldnt happen unless portfolio gets corrupted
+                    throw new PreferencesException(e.getMessage());
+                }
+
+                String cashAccountName = transactionPrefs.get("cash_account", "");
+                String cashAccountName2 = transactionPrefs.get("cash_account2", "");
+                String shareAccountName = transactionPrefs.get("share_account", "");
+                    
+                CashAccount cashAccount = null;
+                CashAccount cashAccount2 = null;
+                ShareAccount shareAccount = null;
+
+		try {
+		    cashAccount =
+			(CashAccount)portfolio.findAccountByName(cashAccountName);
+                }
+                catch(ClassCastException e) {
+                    throw new PreferencesException(Locale.getString("EXPECTING_CASH_ACCOUNT",
+                                                                    cashAccountName));
                 }
 
 		try {
-		    String cashAccountName = transactionPrefs.get("cash_account", "");
-		    CashAccount cashAccount =
-			(CashAccount)portfolio.findAccountByName(cashAccountName);
-
-		    String cashAccountName2 = transactionPrefs.get("cash_account2", "");
-		    CashAccount cashAccount2 =
+                    cashAccount2 =
 			(CashAccount)portfolio.findAccountByName(cashAccountName2);
-
-		    String shareAccountName = transactionPrefs.get("share_account", "");
-		    ShareAccount shareAccount =
+                }
+                catch(ClassCastException e) {
+                    throw new PreferencesException(Locale.getString("EXPECTING_CASH_ACCOUNT",
+                                                                    cashAccountName2));
+                }
+                
+                try {
+		    shareAccount =
 			(ShareAccount)portfolio.findAccountByName(shareAccountName);
+                }
+                catch(ClassCastException e) {
+                    throw new PreferencesException(Locale.getString("EXPECTING_SHARE_ACCOUNT",
+                                                                    shareAccountName));
+                }
 
-		    // Build transaction and add it to the portfolio
-		    Transaction transaction =
-			new Transaction(type, date, amount, symbol, shares,
-					tradeCost, cashAccount, cashAccount2,
+                // Skip transactions which have an account. There seems to have been
+                // an old bug which created duplication transactions with no account.
+                if(cashAccount != null || cashAccount2 != null || shareAccount != null) {
+                    // Build transaction and add it to the portfolio
+                    Transaction transaction =
+                        new Transaction(type, date, amount, symbol, shares,
+                                        tradeCost, cashAccount, cashAccount2,
                                         shareAccount);
-						
-		    transactions.add(transaction);
-		}
-		catch(ClassCastException e) {
-		    // Shouldnt happen unless portfolio gets corrupted
-		    assert false;
-		}
-	    }
+                    transactions.add(transaction);
+                }
+            }
 
 	    portfolio.addTransactions(transactions);
 	
 	}
 	catch(BackingStoreException e) {
-	    // don't care
+            throw new PreferencesException(e.getMessage());
 	}
 
 	return portfolio;
+    }
+
+    /**
+     * Load the portfolio with the given name.
+     *
+     * @param portoflioName the name of the portfolio to load.
+     * @return the portfolio.
+     * @exception PreferencesException if there was an error loading the portfolio.
+     */
+    public static synchronized Portfolio getPortfolio(String portfolioName)
+        throws PreferencesException {
+        File portfolioFile = new File(getPortfolioHome(), portfolioName.concat(".xml"));
+
+        // Load the portfolio from ~/Venice/Portfolios/ (0.7b and up)
+        if(portfolioFile.exists())
+            return getPortfolioFromFile(portfolioFile);
+
+        // Load the portfolio from Java preferences (up to 0.6b)
+        else
+            return getPortfolioFromPreferences(portfolioName);
     }
 
     // Venice 0.1 & 0.2 did not have i8ln support so they saved the
@@ -728,76 +847,73 @@ public class PreferencesManager {
     }
 
     /**
+     * Return the directroy which contains Venice's HSQLDB database.
+     *
+     * @return Database directroy.
+     */
+    private static File getDatabaseHome() {
+        File veniceHome = getVeniceHome();
+        File databaseHome = new File(veniceHome, "Database");
+        if (!databaseHome.exists())
+            databaseHome.mkdir();
+        return databaseHome;
+    }
+
+    /**
+     * Return the directory which contains Venice's portfolios.
+     *
+     * @return Portfolio directory.
+     */
+    private static File getPortfolioHome() {
+        File veniceHome = getVeniceHome();
+        File portfolioHome = new File(veniceHome, "Portfolio");
+        if (!portfolioHome.exists())
+            portfolioHome.mkdir();
+        return portfolioHome;
+    }
+
+    /**
+     * Return Venice's home directory. Venice uses this directory to store important
+     * files such as portfolios. If this directory does not exist it will be
+     * created.
+     *
+     * @return Home directory
+     */
+    private static File getVeniceHome() {
+        File veniceHome = new File(System.getProperty("user.home"), "Venice");
+        if (!veniceHome.exists())
+            veniceHome.mkdir();
+        return veniceHome;
+    }
+
+    /**
      * Save the portfolio.
      *
      * @param portfolio the portfolio.
+     * @exception PreferencesException if there was an error saving the portfolio.
      */
-    public static synchronized void putPortfolio(Portfolio portfolio) {
-	Preferences p = getUserNode("/portfolio/" + portfolio.getName());
-	p.put("name", portfolio.getName());
-
-	// Clear old accounts and transactions
+    public static synchronized void putPortfolio(Portfolio portfolio)
+        throws PreferencesException {
+        try {
+            File portfolioFile = new File(getPortfolioHome(), portfolio.getName() + ".xml");
+            FileOutputStream outputStream = new FileOutputStream(portfolioFile);
+            PortfolioWriter.write(portfolio, outputStream);
+            outputStream.close();
+        }
+        catch(IOException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+        catch(SecurityException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+        
+        // Clear old portfolio from preferences if present (up to 0.6b).
 	try {
-	    p.node("accounts").removeNode();
-	    p.node("transactions").removeNode();
+            Preferences p = getUserNode("/portfolio/" + portfolio.getName());
+	    p.removeNode();
 	}
 	catch(BackingStoreException e) {
-	    // don't care
-	}
-
-	// Save accounts
-	List accounts = portfolio.getAccounts();
-	Iterator iterator = accounts.iterator();
-
-	while(iterator.hasNext()) {
-	    Account account = (Account)iterator.next();
-	    Preferences accountPrefs =
-		p.node("accounts").node(account.getName());
-	
-	    if(account.getType() == Account.SHARE_ACCOUNT) {
-		accountPrefs.put("type", "share");
-	    }
-	    else {
-		accountPrefs.put("type", "cash");
-	    }
-	}
-
-	// Save transactions
-	List transactions = portfolio.getTransactions();
-	iterator = transactions.iterator();
-	int i = 0; // Store transactions as node 0, 1, 2 etc
-
-	while(iterator.hasNext()) {
-	    Transaction transaction = (Transaction)iterator.next();
-	    Preferences transactionPrefs = p.node("transactions/" +
-						  Integer.toString(i++));
-	
-	    transactionPrefs.put("type", Integer.toString(transaction.getType()));
-	    transactionPrefs.put("date",
-			     transaction.getDate().toString("dd/mm/yyyy"));
-	    transactionPrefs.putDouble("amount", transaction.getAmount().doubleValue());
-
-	    if(transaction.getSymbol() != null)
-		transactionPrefs.put("symbol", transaction.getSymbol().toString());
-
-	    transactionPrefs.putInt("shares", transaction.getShares());
-	    transactionPrefs.putDouble("trade_cost",
-				      transaction.getTradeCost().doubleValue());
-
-	    CashAccount cashAccount = transaction.getCashAccount();
-	    if(cashAccount != null)
-		transactionPrefs.put("cash_account",
-				     cashAccount.getName());
-
-	    CashAccount cashAccount2 = transaction.getCashAccount2();
-	    if(cashAccount2 != null)
-		transactionPrefs.put("cash_account2",
-				     cashAccount2.getName());
-
-	    ShareAccount shareAccount = transaction.getShareAccount();
-	    if(shareAccount != null)
-		transactionPrefs.put("share_account",
-				     shareAccount.getName());
+	    throw new PreferencesException(e.getMessage());
 	}
     }
 
@@ -936,8 +1052,6 @@ public class PreferencesManager {
 	prefs.put("default_chart", defaultChart);
     }
 
-    
-
     /**
      * Get quote source setting.
      *
@@ -1022,32 +1136,20 @@ public class PreferencesManager {
      * @return internal database file name
      */
     public static String getInternalFileName() {
-        Preferences prefs = getUserNode("/quote_source/internal");
-        String defaultFileName = DEFAULT_INTERNAL_FILE_NAME;
+        File databaseFile = new File(getDatabaseHome(), "Database");
+        String databaseFileName = "Database";
 
         try {
-            File defaultFile = new File(System.getProperty("user.home"),
-                                        DEFAULT_INTERNAL_FILE_NAME);
-            defaultFileName = defaultFile.getCanonicalPath();
+            databaseFileName = databaseFile.getCanonicalPath();
         }
         catch(IOException e) {
             // don't care
         }
         catch(SecurityException e) {
             // don't care
-        }
+        }        
 
-        return prefs.get("file_name", defaultFileName);
-    }
-
-    /**
-     * Save the file name to store the internal database.
-     *
-     * @param fileName the file name
-     */
-    public static void putInternalFileName(String fileName) {
-        Preferences prefs = getUserNode("/quote_source/internal");
-        prefs.put("file_name", fileName);
+        return databaseFileName;
     }
 
     /**
@@ -1100,7 +1202,7 @@ public class PreferencesManager {
             idQuoteSyncPreferences.closeTime = new TradingTime(prefs.get("closeTime", "16:00:00"));
         }
         catch(TradingTimeFormatException e) {
-            /* This should not happen - but deal with the possibility gracefully. */
+            // This should never happen - but deal with the possibility gracefully.
             idQuoteSyncPreferences.openTime = new TradingTime(9, 0, 0);
             idQuoteSyncPreferences.closeTime = new TradingTime(16, 0, 0);
         }

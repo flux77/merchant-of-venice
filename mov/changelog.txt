@@ -1,5 +1,11 @@
-Changes for Venice, 0.7 beta 24/Oct/2006
+Changes for Venice, 0.7 beta ??/???/2006
 ========================================
+
+* Added multi-currency portfolio support (Andrew Leppard, Quentin Bossard)
+
+* Portfolios are now saved as XML files in the user's home directory.
+  This should improve performance when loading and saving portfolios
+  and make them easier to manage (e.g. backup).
 
 * Internationalisation:
   - Catalan translation added (Jordi Pujol).

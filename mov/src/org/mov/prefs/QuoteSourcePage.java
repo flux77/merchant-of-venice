@@ -59,9 +59,8 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     private JComboBox databaseDriver;
     private JTextField databaseHost;
 
-    // Wigets from internal pane
+    // Widgets from internal pane
     private JRadioButton useInternal;
-    private JTextField internalFileNameTextField;
 
     // This field needs to be initialised as it may be referenced
     // before the widget is created.
@@ -150,32 +149,9 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 
 	useInternal.setSelected(quoteSource == PreferencesManager.INTERNAL);
         
-        TitledBorder titled = new TitledBorder(Locale.getString("INTERNAL_PREFERENCES"));
-        JPanel preferencesPanel = new JPanel();
-        preferencesPanel.setBorder(titled);
-        preferencesPanel.setLayout(new BorderLayout()); 
-        JPanel borderPanel = new JPanel();
-        
-        GridBagLayout gridbag = new GridBagLayout();
-        GridBagConstraints c = new GridBagConstraints();
-        borderPanel.setLayout(gridbag);
-        
-        c.weightx = 1.0;
-        c.ipadx = 5;
-        c.anchor = GridBagConstraints.WEST;
-        
-        // File to store database
-        internalFileNameTextField = GridBagHelper.addTextRow(borderPanel, 
-                                                             Locale.getString("FILE"), 
-                                                             internalFileName,
-                                                             gridbag, c, 15);
-        
-        preferencesPanel.add(borderPanel, BorderLayout.NORTH);
-        
         JPanel outerPanel = new JPanel();
         outerPanel.setLayout(new BorderLayout());
         outerPanel.add(useInternal, BorderLayout.NORTH);
-        outerPanel.add(preferencesPanel, BorderLayout.CENTER);
         
         return outerPanel;
     }
@@ -377,30 +353,23 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    quoteSource = PreferencesManager.SAMPLES;
 	PreferencesManager.putQuoteSource(quoteSource);
 
-        // Save internal preferences
-        {
-            PreferencesManager.putInternalFileName(internalFileNameTextField.getText());
-        }
-
 	// Save database preferences
-	{
-	    String software = (String)databaseSoftware.getSelectedItem();
-	    if(software.equals(Locale.getString("MYSQL")))
-	        databasePreferences.software = "mysql";
-	    else if(software.equals(Locale.getString("POSTGRESQL")))
-                databasePreferences.software = "postgresql";
-	    else
-                databasePreferences.software = "hsql";
-
-	    databasePreferences.driver = databaseDriver.getSelectedItem().toString();
-	    databasePreferences.host = databaseHost.getText();
-	    databasePreferences.port = databasePort.getText();
-	    databasePreferences.username = databaseUsername.getText();
-	    databasePreferences.password = new String(databasePassword.getPassword());
-	    databasePreferences.database = databaseName.getText();
-
-	    PreferencesManager.putDatabaseSettings(databasePreferences);
-	}
+        String software = (String)databaseSoftware.getSelectedItem();
+        if(software.equals(Locale.getString("MYSQL")))
+            databasePreferences.software = "mysql";
+        else if(software.equals(Locale.getString("POSTGRESQL")))
+            databasePreferences.software = "postgresql";
+        else
+            databasePreferences.software = "hsql";
+        
+        databasePreferences.driver = databaseDriver.getSelectedItem().toString();
+        databasePreferences.host = databaseHost.getText();
+        databasePreferences.port = databasePort.getText();
+        databasePreferences.username = databaseUsername.getText();
+        databasePreferences.password = new String(databasePassword.getPassword());
+        databasePreferences.database = databaseName.getText();
+        
+        PreferencesManager.putDatabaseSettings(databasePreferences);
 
 	// This makes the next query use our new settings
 	QuoteSourceManager.flush();

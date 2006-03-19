@@ -20,6 +20,7 @@ package org.mov.quote;
 
 import java.util.List;
 
+import org.mov.util.Currency;
 import org.mov.util.TradingDate;
 
 /**
@@ -111,6 +112,16 @@ public interface QuoteSource {
      */
     public int getAdvanceDecline(TradingDate date)
         throws MissingQuoteException;
+
+    /**
+     * Return all the stored exchange rates between the two currencies.
+     *
+     * @param sourceCurrency the currency to convert from
+     * @param destinationCurrency the currency to convert to
+     * @return the exchange rate being the number of destinationCurrency that you can buy per
+     *         sourceCurrency
+     */
+    public List getExchangeRates(Currency sourceCurrency, Currency destinationCurrency);
 
     /**
      * Shutdown the quote source.

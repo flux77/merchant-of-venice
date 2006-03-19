@@ -23,6 +23,8 @@ import org.mov.util.TradingDate;
 
 /**
  * Representation of a single stock holding in a share account. 
+ *
+ * @author Andrew Leppard
  * @see ShareAccount
  */
 public class StockHolding {

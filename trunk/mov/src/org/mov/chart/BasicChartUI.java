@@ -30,7 +30,7 @@ import org.mov.chart.graph.*;
  * Chart Implementation.
  */
 public class BasicChartUI extends ComponentUI implements ImageObserver  {
-
+    
     //
     // Constants that define the look and feel of the graph
     //
@@ -585,16 +585,15 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     private int getYCoordinate(Chart chart, Coordinate point) {
 	return getYCoordinate(chart, 
 			      point.getYData(), 
-			      point.getYCoord().intValue());
+			      point.getYCoord().intValue(),
+			      point.getLevel());
     }
 
     // For the given Y value, return the Y coordinate
-    private int getYCoordinate(Chart chart, Double y, int yIndex) {
+    private int getYCoordinate(Chart chart, Double y, int yIndex, int level) {
 
 	double dataValue;
-	
-	// Get graph level at this point
-	int level = getLevelAtPoint(yIndex);
+		
 	// Get vertical axis of graph level
 	VerticalAxis verticalAxis =
 	    (VerticalAxis)verticalAxes.elementAt(level);
@@ -615,12 +614,16 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     }
 
     // For the given Y value, return the Y coordinate
-    private int getYCoordinate(Chart chart, Double y, int yIndex, int height2) {
+    private int getYCoordinate(Chart chart, 
+			       Double y, 
+			       int yIndex, 
+			       int height2,
+			       int lvl) {	
 
 	double dataValue;
 	
 	// Get graph level at this point
-	int level = getLevelAtPoint(yIndex);
+	int level = getLevelAtPoint(lvl);
 	// Get vertical axis of graph level
 	VerticalAxis verticalAxis =
 	    (VerticalAxis)verticalAxes.elementAt(level);
@@ -671,20 +674,23 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	int absY;
 	int x1, y1, x2, y2;
 	double candX, candY;
+	int level;
 
 	dataX = start.getXData();
 	dataY = start.getYData();
 	absY = start.getYCoord().intValue();
+	level = start.getLevel();
 	
 	x1 = getXCoordinate(chart, dataX);
-	y1 = getYCoordinate(chart, dataY, absY);
+	y1 = getYCoordinate(chart, dataY, absY, level);
 	
 	dataX = end.getXData();
 	dataY = end.getYData();
 	absY = end.getYCoord().intValue();
+	level = end.getLevel();
 	
 	x2 = getXCoordinate(chart, dataX);
-	y2 = getYCoordinate(chart, dataY, absY);
+	y2 = getYCoordinate(chart, dataY, absY, level);
 	
 	if (x2 == x1) {
 	    slope = 0;		
@@ -721,21 +727,24 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	Double dataY;
 	int absY;
 	int x1, y1, x2, y2;
-	int candX, candY;	
+	int candX, candY; 
+	int level;
 
 	dataX = start.getXData();
 	dataY = start.getYData();
 	absY = start.getYCoord().intValue();
+	level = start.getLevel();	
 	
 	x1 = getXCoordinate(chart, dataX);
-	y1 = getYCoordinate(chart, dataY, absY);
+	y1 = getYCoordinate(chart, dataY, absY, level);
 	
 	dataX = end.getXData();
 	dataY = end.getYData();
 	absY = end.getYCoord().intValue();
+	level = end.getLevel();
 	
 	x2 = getXCoordinate(chart, dataX);
-	y2 = getYCoordinate(chart, dataY, absY);
+	y2 = getYCoordinate(chart, dataY, absY, level);
 	
 	if (x2 == x1) {
 	    slope = 0;		
@@ -752,9 +761,10 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	dataX = c.getXData();
 	dataY = c.getYData();
 	absY = c.getYCoord().intValue();
+	level = c.getLevel();
 	
 	candX = getXCoordinate(chart, dataX);
-	candY = getYCoordinate(chart, dataY, absY);
+	candY = getYCoordinate(chart, dataY, absY, level);
 
 	if (x2 != x1) {
 	    diff = candY - (slope * candX + intersect);
@@ -773,20 +783,23 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	int x1, y1, x2, y2;
 	double dist1, dist2;
 	Coordinate rv = null;
+	int level;
 
 	dataX = start.getXData();
 	dataY = start.getYData();
 	absY = start.getYCoord().intValue();
+	level = start.getLevel();
 
 	x1 = getXCoordinate(chart, dataX);
-	y1 = getYCoordinate(chart, dataY, absY);
+	y1 = getYCoordinate(chart, dataY, absY, level);
 				
 	dataX = end.getXData();
 	dataY = end.getYData();
 	absY = end.getYCoord().intValue();
+	level = end.getLevel();
 		
 	x2 = getXCoordinate(chart, dataX);
-	y2 = getYCoordinate(chart, dataY, absY);
+	y2 = getYCoordinate(chart, dataY, absY, level);
 
 	/* Determine which end of the line the user has
 	   chosen to move. */		
@@ -820,28 +833,31 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	Double dataY;
 	int absY;
 	int x1, y1, x2, y2;
+	int level;
 
 	dataX = c1.getXData();
 	dataY = c1.getYData();
 	absY = c1.getYCoord().intValue();
+	level = c1.getLevel();
 
 	if (absY == Coordinate.BREAK) {
 	    return false;
 	}
 	
 	x1 = getXCoordinate(chart, dataX);
-	y1 = getYCoordinate(chart, dataY, absY);
+	y1 = getYCoordinate(chart, dataY, absY, level);
 
 	dataX = c2.getXData();
 	dataY = c2.getYData();
 	absY = c2.getYCoord().intValue();	
+	level = c2.getLevel();
 
 	if (absY == Coordinate.BREAK) {
 	    return false;
 	}
 
 	x2 = getXCoordinate(chart, dataX);	
-	y2 = getYCoordinate(chart, dataY, absY);
+	y2 = getYCoordinate(chart, dataY, absY, level);
 
 	if (Math.abs(x1 - x2) < delta &&
 	    Math.abs(y1 - y2) < delta) {
@@ -1004,6 +1020,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    (VerticalAxis)verticalAxes.elementAt(level);
 
 	if(verticalAxis == null) {
+	    
 	    verticalAxis =
 		new VerticalAxis(getLowestY(chart.getXRange(), graphs),
 				 getHighestY(chart.getXRange(), graphs),
@@ -1192,7 +1209,6 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	double highestY = Double.NEGATIVE_INFINITY;
 
 	while(iterator.hasNext()) {
-
 	    y = ((Graph)iterator.next()).getHighestY(x);
 
 	    if(y > highestY)

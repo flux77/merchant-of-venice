@@ -32,7 +32,8 @@ public class Coordinate
 
     private Comparable dataX;
     private Double dataY;    
-    private Integer yCoord;    
+    private Integer yCoord; 
+    private int level;
 
     /**
      * Construct a new coordinate defined in the chart space  
@@ -44,7 +45,23 @@ public class Coordinate
     public Coordinate(Comparable x, Double y, Integer yCoord) {
 	dataX = x;
 	dataY = y;
-	this.yCoord = yCoord;;	
+	this.yCoord = yCoord;
+	level = 0;
+    }
+
+    /**
+     * Construct a new coordinate defined in the chart space  
+     * 
+     * @param x      The X value of the coordinate (a data value)
+     * @param y      The Y value of the coordinate (a data value)
+     * @param yCoord The screen value of the yCoordinate
+     * @param level  The chart level of the yCoordinate
+     */
+    public Coordinate(Comparable x, Double y, Integer yCoord, int level) {
+	dataX = x;
+	dataY = y;
+	this.yCoord = yCoord;
+	this.level = level;
     }
     
     /** 
@@ -55,6 +72,7 @@ public class Coordinate
 	dataX = null;
 	dataY = null;
 	yCoord = new Integer(BREAK);
+	level = 0;
     }
 	
     /** 
@@ -86,7 +104,19 @@ public class Coordinate
     public Integer getYCoord() {
 	return yCoord;
     }
+
+    /** 
+     * 
+     * Return the graph level the y coordinate
+     * 
+     * @return the level 
+    */
+    public int getLevel() {
+	return level;
+    }
     
+    
+
     /**
      * 
      * Direct comparison between this coordinate and a specified one

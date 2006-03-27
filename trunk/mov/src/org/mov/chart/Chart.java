@@ -497,7 +497,8 @@ public class Chart extends JComponent implements MouseListener {
 		
 	drawnElements.createNewLine(new Coordinate(dataX, 
 						   dataY, 
-						   absY));   
+						   absY,
+						   level));   
 	repaint();
     }
 
@@ -521,8 +522,9 @@ public class Chart extends JComponent implements MouseListener {
 
 	lines = drawnElements.getDrawnLines();
 	line = drawnElements.getLastLine();
+	level = gui.getLevelAtPoint(absY.intValue());
 	
-	line.setEnd(new Coordinate(dataX, dataY, absY));
+	line.setEnd(new Coordinate(dataX, dataY, absY,level));
 
 	repaint();
     }
@@ -547,8 +549,9 @@ public class Chart extends JComponent implements MouseListener {
      */
     
     public void setPoint(Comparable dataX, Double dataY, Integer absY) {
-		
-	drawnElements.setPoint(new Coordinate(dataX, dataY, absY));
+	
+	int level = gui.getLevelAtPoint(absY.intValue());
+	drawnElements.setPoint(new Coordinate(dataX, dataY, absY, level));
 	repaint();
     }
 
@@ -667,7 +670,8 @@ public class Chart extends JComponent implements MouseListener {
 
     public void setText(String text, Comparable dataX, Double dataY, Integer absY) {
 	
-	drawnElements.setText( new Coordinate(dataX, dataY, absY), text);
+	int level = gui.getLevelAtPoint(absY.intValue());
+	drawnElements.setText( new Coordinate(dataX, dataY, absY, level), text);
 	
 	repaint();
     }

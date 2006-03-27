@@ -721,7 +721,11 @@ public class ChartModule extends JPanel implements Module,
 	}
 
 	if (x != null && viewMode == EDITING) {
-	    String val = JOptionPane.showInputDialog(this,"Enter text", "Text", JOptionPane.OK_CANCEL_OPTION);
+	    String val = 
+		JOptionPane.showInputDialog(this,
+					    Locale.getString("ENTER_TEXT"), 
+					    "Text", 
+					    JOptionPane.OK_CANCEL_OPTION);
 	   
 	    if (val != null) {
 		chart.setText(val,x, y, mouseY);

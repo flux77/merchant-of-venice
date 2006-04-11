@@ -214,5 +214,90 @@ public class GraphTools {
 	}
 	
     }
+
+        // chars is character to draw - in synch with list xRange
+    public static void renderMarker(Graphics g, PFGraphable source,
+				    int xoffset, int yoffset,
+				    double horizontalScale, double verticalScale,
+				    double bottomLineValue, List xRange) {
+
+	int xCoordinate, yCoordinate;
+	int xCoordinate2, yCoordinate2;
+	int deltaX, deltaY;	
+	int lastXCoordinate = -1 , lastYCoordinate = -1;
+	Vector yList;
+	Double y;
+	Comparable x;
+	Iterator iterator = xRange.iterator();
+	int i = 0;
+	double boxPrice = source.getBoxPrice();	
+	int columnSpan = source.getColumnSpan();
+
+	while(iterator.hasNext()) {
+
+	    x = (Comparable)iterator.next();
+
+	    // Skip until our start X
+	    if(x.compareTo(source.getStartX()) < 0) {
+		i++;
+		continue;
+	    }
+
+	    // If our graph is finished exit this loop
+	    if(x.compareTo(source.getEndX()) > 0)
+		break;
+	    
+	    // Otherwise draw point
+	    yList = source.getYList(x);
+	    
+	    
+	    for (int j = 0; yList != null && j < yList.size(); j++) {
+		y = (Double)yList.elementAt(j);
+		
+		// The graph is allowed to skip points
+		if(y != null) {
+		
+		    xCoordinate = (int)(xoffset + horizontalScale * i);
+		    yCoordinate = yoffset - scaleAndFitPoint(y.doubleValue(),
+							     bottomLineValue,
+							     verticalScale);
+		    
+		    xCoordinate2 = (int)(xoffset + horizontalScale * (i + columnSpan));
+		    
+		    yCoordinate2 = yoffset - scaleAndFitPoint(y.doubleValue() - boxPrice,
+							      bottomLineValue,
+							      verticalScale);
+		    
+		    deltaX = xCoordinate2 - xCoordinate;
+		    deltaY = yCoordinate2 - yCoordinate;		    
+		    
+		    String marker = source.getString(x);
+		    if (marker.compareTo("O") == 0) {
+			//deltaY divided by two so 
+			//downmove markers don't meld 
+			g.drawOval(xCoordinate, yCoordinate, 
+				   deltaX,
+				   deltaY / 2);
+		    } else {
+			g.drawLine(xCoordinate, 
+				   yCoordinate,
+				   deltaX + xCoordinate,
+				   yCoordinate2);
+
+			g.drawLine(xCoordinate, 
+				   yCoordinate2,
+				   deltaX + xCoordinate,
+				   yCoordinate);
+			
+		    }
+		    
+		}				
+	    }
+	
+	    i++;
+	}
+	
+    }
+
 }
 

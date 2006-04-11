@@ -28,6 +28,7 @@ import java.util.Vector;
 
 import org.mov.chart.Graphable;
 import org.mov.chart.PFGraphable;
+import org.mov.chart.PFData;
 import org.mov.chart.GraphTools;
 import org.mov.chart.source.GraphSource;
 import org.mov.quote.QuoteFunctions;
@@ -64,9 +65,11 @@ public class PointAndFigureGraph extends AbstractGraph {
 
 	// We ignore the graph colours and use our own custom colours
 	g.setColor(Color.green.darker());
-	GraphTools.renderChar(g, pointAndFigure, xoffset, yoffset,
+	GraphTools.renderMarker(g, pointAndFigure, xoffset, yoffset,
 			      horizontalScale,
 			      verticalScale, bottomLineValue, xRange);
+
+	
     }
 
 
@@ -187,26 +190,30 @@ public class PointAndFigureGraph extends AbstractGraph {
 	// Date set and value array will be in sync
 	double[] values = source.toArray();
 	Vector yList = new Vector();
+	Vector pfData = new Vector();
 		
 	Set xRange = source.getXRange();
 	Set column = source.getXRange(); // Associate Column with date
+	int columnNumber = 0, columnSpan = 1; 
+	int dataLen = xRange.size();
 	Iterator iterator = xRange.iterator();
 	Iterator iterator2 = column.iterator();
+	Iterator tempIterator;
 	double diff, prev = 0.0;
 	boolean plot; // Indicate whether this point gets plotted
 	boolean upmove = true, changeDirection = false;	
 	String marker;
-	Comparable col;		
-
+	Comparable date, startDate;	
+	
 	int i = 0;	
-	double average;
+	double average;	
 		
 	upmove = getFirstDirection(source, boxPriceScale);
-	
-	col = (Comparable)iterator2.next();
+		
+	startDate = (Comparable)iterator2.next();	
 	
 	while(iterator.hasNext()) {
-	    Comparable date = (Comparable)iterator.next();
+	    date = (Comparable)iterator.next();
 
 	    diff = (i == 0)  ? 0 : (values[i] - prev);
 	    plot = (Math.abs(diff) >= boxPriceScale) ? true : false;
@@ -232,16 +239,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 		    yList = new Vector();
 
 		    upmove = (upmove) ? false: true;
-		    // This places the marker on when the price changed
-		    // direction
-		    // Which seems to work ok for small datasets
-		    //col = date;	
-		    
-		    // This places it in the next column
-		    // This seems to work better for larger (more realistic)
-		    // datasets, even though the user may have to zoom
-		    // a few times.
-		    col = (Comparable)iterator2.next();
+		    columnNumber++;
 		
 		}
 		
@@ -272,13 +270,15 @@ public class PointAndFigureGraph extends AbstractGraph {
 		    }
 		}
 
-		Double yTemp = new Double(values[i]);
-		yList.add(yTemp);
-		
 		/*Needs more data than just price and column for tooltips,
 		  because in vanilla P&F, no passage of time is indicated. */
-		pointAndFigure.putData(col, date, yList, marker);
+		PFData data = new PFData(date, yList, marker);		
 		
+		if (pfData.size() <= columnNumber) {
+		    pfData.add(data); 
+		} else {
+		    pfData.setElementAt(data, columnNumber);
+		}
 	    }
 	    //The price meeting the box value is defined by the last 
 	    //marker placed, which is not necessarily the previous value.
@@ -288,7 +288,33 @@ public class PointAndFigureGraph extends AbstractGraph {
 	    
 	    i++;
 	}
-	
+
+	/* 
+	   Column span is reduced to create a gap, which 
+	   makes graph look less cluttered.
+
+	   The point of spanning data across date "columns"
+	   is so that in the Graphable each date associates
+	   with a price point.
+	*/
+	columnSpan = (int)(dataLen / columnNumber);		
+	pointAndFigure.setColumnSpan(columnSpan - 2);
+
+	pointAndFigure.setBoxPrice(boxPriceScale);
+	tempIterator = column.iterator();
+	date = startDate;
+		
+	for (i = 0; i < columnNumber; i++) {
+	    PFData data = (PFData)pfData.elementAt(i);
+	    
+	    pointAndFigure.putData(date,
+				   data.getDate(),
+				   data.getList(),
+				   data.getMarker());
+ 
+	    date = dateIncrement(tempIterator, columnSpan);
+	}
+
 	return pointAndFigure;
     }
 
@@ -420,6 +446,16 @@ public class PointAndFigureGraph extends AbstractGraph {
 		max = e;
 		rv = i;
 	    }
+	}
+	return rv;
+    }
+
+    private static Comparable dateIncrement(Iterator iterator, int op) {
+	int i = 0;
+	Comparable rv = null;
+
+	for (i = 0;  i < op && iterator.hasNext(); i++) {
+	    rv = (Comparable)iterator.next();
 	}
 	return rv;
     }

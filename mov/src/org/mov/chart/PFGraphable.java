@@ -34,6 +34,8 @@ public class PFGraphable extends Graphable {
     private LinkedHashMap map;
     private LinkedHashMap charMap;
     private LinkedHashMap dateMap; 
+    private double boxPrice;
+    private int columnSpan;
 
     /**
      * Create an empty PFgraphable.
@@ -44,6 +46,9 @@ public class PFGraphable extends Graphable {
 	map = getMap();	
 	charMap = new LinkedHashMap();
 	dateMap = new LinkedHashMap();
+	
+	boxPrice = 0.01;
+	columnSpan = 1;
     }
 
     /**
@@ -107,6 +112,24 @@ public class PFGraphable extends Graphable {
 	return (TradingDate)dateMap.get(x);
     }
 
+
+    /**
+     * Return the box price for this graph  
+     * 
+     * @return box price The box price
+    */
+    public double getBoxPrice() {
+	return boxPrice;
+    }
+
+    /**
+     * Return the size of the column span.
+     *
+     * @return columnSpan The column span
+    */
+    public int getColumnSpan() {
+	return columnSpan;
+    }
     
     /**
      * Associate the given X value with the given data. This
@@ -126,6 +149,26 @@ public class PFGraphable extends Graphable {
 	putString(x, marker); 
     }
 
+    /**
+     * Set the box price at graph generation 
+     *
+     * @param  value   The box price which represents the smallest 
+     *                 plottable price point
+    */
+    public void setBoxPrice(double value) {
+	boxPrice = value;
+    }
+
+    /**
+     * Set the size of the date column span. A PF graph does not necessarily
+     * have price data for a particular date. 
+     * 
+     * @param value  The size of the column span
+     *
+    */
+    public void setColumnSpan(int value) {
+	columnSpan = value;
+    }
 
     /**
      * Associate the given X value with the given Y value. This

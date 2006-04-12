@@ -262,8 +262,27 @@ public class PointAndFigureGraph extends AbstractGraph {
 		if (prev != 0.0) {
 		    while (diff  >= 0.0) {		    
 			double tmp = (upmove) ? values[i] - (boxPriceScale * counter) : values[i] + (boxPriceScale * counter);
+
+			double tmp2 = 100 * boxPriceScale;
+			double tmp3 = tmp * 100;
 			
+			/* Round values to fit in box value
+			   operands multiplied by  by 100 and then
+			   result divided by 100 to avoid round off
+			   error.
+			 */		 
+			double rem = ( (tmp3) % tmp2) / 100.0;
+
+			if (upmove) {
+			    rem = boxPriceScale - rem;
+			} else {
+			    rem = -rem;
+			}
+
+			tmp += rem;
 			Double yTemp = new Double(tmp);
+
+
 			yList.add(yTemp);
 			diff = Math.abs(diff) - boxPriceScale;
 			counter++;		

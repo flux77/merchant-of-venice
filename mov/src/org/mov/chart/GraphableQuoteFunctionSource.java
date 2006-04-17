@@ -22,6 +22,11 @@ import org.mov.parser.EvaluationException;
 import org.mov.quote.QuoteFunctionSource;
 import org.mov.util.TradingDate;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Allow the {@link org.mov.quote.QuoteFunctions} package to use quotes directly 
  * from a {@link Graphable}. The following code, from
@@ -53,13 +58,20 @@ public class GraphableQuoteFunctionSource implements QuoteFunctionSource {
 
     // The graphable containing the quotes
     private Graphable graphable;
-
-    // The current date. The previous quotes for period number of days will
-    // be accessed
-    private TradingDate date;
  
     // Number of quote dates available to quote functions
     private int period;
+
+    // Quote functions need to access values by offset, while the
+    // Graphable contains values mapped to dates. So create a mapping
+    // that maps offsets to values.
+    private List values;
+
+    // Mapping between date and offset in values array
+    private Map dateOffsets;
+
+    // Offset of "current date" in values array.
+    private int currentDateOffset;
 
     /**
      * Create a new quote function source that uses quotes directly from a
@@ -72,8 +84,9 @@ public class GraphableQuoteFunctionSource implements QuoteFunctionSource {
      */
     public GraphableQuoteFunctionSource(Graphable graphable, TradingDate date, int period) {
         this.graphable = graphable;
-        this.date = date;
         this.period = period;
+        initialise();
+        setDate(date);
     }
 
     /**
@@ -85,21 +98,50 @@ public class GraphableQuoteFunctionSource implements QuoteFunctionSource {
      * @param date the current date
      */
     public void setDate(TradingDate date) {
-        this.date = date;
+        Integer currentDateOffsetObject = (Integer)dateOffsets.get(date);
+        assert currentDateOffsetObject != null;
+        currentDateOffset = currentDateOffsetObject.intValue();
     }
 
     public double getValue(int index)
         throws EvaluationException {
 
 	assert index >= 0 && index < period;
-        
-        TradingDate currentDate = date.previous(period - index - 1);
-        Double value = graphable.getY(currentDate);
 
-        /* Return the value on that date if we have one */
+        Double value = null;
+        int offset = currentDateOffset - period + index + 1;
+
+        // Return Double.NaN if the value isn't in the array
+        if(offset >= 0 && offset < values.size())
+            value = (Double)values.get(offset);
+
+        // Return the value on that date if we have one
         if(value != null)
             return value.doubleValue();
         else
             return Double.NaN;
+    }
+
+    /**
+     * Creates two objects to improve performance of getValue(). The first
+     * object contains an array of values so that the getValue() function
+     * can return values based on an index, rather than using date calculations
+     * to extract the date from the Graphable. The second object contains
+     * a mapping which maps the current date to an offset in the newly
+     * created array.
+     */
+    private void initialise() {
+        dateOffsets = new HashMap();
+        values = new ArrayList();
+    
+        TradingDate endDate = (TradingDate)graphable.getEndX();
+        int offset = 0;
+
+        for(TradingDate date = (TradingDate)graphable.getStartX();
+            !date.after(endDate);
+            date = date.next(1)) {
+            values.add(graphable.getY(date));
+            dateOffsets.put(date, new Integer(offset++));
+        }
     }
 }

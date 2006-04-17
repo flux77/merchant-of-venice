@@ -2,7 +2,7 @@
 <project name="Venice" default="run" basedir=".">
 
   <!-- Current version we are working towards -->
-  <property name="VERSION" value="0.6beta"/>
+  <property name="VERSION" value="0.7beta"/>
 
   <!-- Paths -->
   <property name="api" value="${basedir}/api"/>
@@ -20,7 +20,7 @@
   <property name="lib.hsql" value="${lib}/hsqldb.jar"/>
   <property name="lib.joone" value="${lib}/joone-engine.jar"/>
   <property name="lib.jython" value="${lib}/jython.jar"/>
-  <property name="lib.mysql" value="${lib}/mysql-connector-java-3.1.11-bin.jar"/>
+  <property name="lib.mysql" value="${lib}/mysql-connector-java-3.1.12-bin.jar"/>
   <property name="lib.xml" value="${lib}/xstream-1.1.2.jar"/>
 
   <!-- Online help -->

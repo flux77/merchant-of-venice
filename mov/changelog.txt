@@ -1,4 +1,4 @@
-Changes for Venice, 0.7 beta ??/???/2006
+Changes for Venice, 0.7 beta 17/Apr/2006
 ========================================
 
 * Added multi-currency portfolio support (Andrew Leppard, Quentin Bossard)
@@ -14,7 +14,11 @@ Changes for Venice, 0.7 beta ??/???/2006
   - HSQLDB databases are now stored in binary format and are no
     longer fully cached in memory. This should improve performance
     and reduce memory usage.
-  - Charting indicators such as Bollinger Bands is now much faster.
+  - Charting indicators, such as Bollinger Bands, is now much faster.
+
+* Library updates:
+  - HSQLDB V1.8.0.4 from 1.8.0.2
+  - MySQL Connector/J V3.1.12 from 3.1.11.
 
 Changes for Venice, 0.6 beta 23/Oct/2005
 ========================================

@@ -356,7 +356,8 @@ public class QuoteFunctions {
 	int periodSlow = 26;
 	int periodFast = 12;
 
-        MACD = ema(sourceSlow, periodSlow, smoothingConstant) - ema(sourceFast, periodFast, smoothingConstant);
+        MACD = ema(sourceSlow, periodSlow, smoothingConstant) - ema(sourceFast, periodFast,
+                                                                    smoothingConstant);
         
 	return MACD;
     }
@@ -423,8 +424,10 @@ public class QuoteFunctions {
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
      *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
      */
-    static public int obv(QuoteFunctionSource sourceOpen, QuoteFunctionSource sourceClose, QuoteFunctionSource sourceVolume,
-                            int range, int initialValue)
+    static public int obv(QuoteFunctionSource sourceOpen,
+                          QuoteFunctionSource sourceClose,
+                          QuoteFunctionSource sourceVolume,
+                          int range, int initialValue)
         throws EvaluationException {
 
 	int OBV = initialValue;

@@ -124,7 +124,9 @@ web     Packages the web files ready for deployment (Not included in
 
 Venice is Copyright (C) 2003-2006, Andrew Leppard.
 HSQLDB is Copyright (C) 1995-2000, The Hypersonic SQL Group.
-Jython is Copyright (C) 2000, Jython Developers
+Joone is Copyright (C) 2004, Paolo Marrone and the Joone team.
+Jython is Copyright (C) 2000, Jython Developers.
+XStream is Copyright (C) 2003-2005, Joe Walnes.
 
 7 Thanks
 

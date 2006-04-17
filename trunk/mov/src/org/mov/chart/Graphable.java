@@ -97,8 +97,6 @@ public class Graphable {
 	return (Double)map.get(x);
     }
 
-
-
     /**
      * Associate the given X value with the given Y value. This
      * function is used to "load" up the graphable with data.

@@ -56,7 +56,7 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.6b";
+    public static String SHORT_VERSION = "0.7b";
 
     /** Longer version string, e.g. "0.1 alpha" */
     public static String LONG_VERSION = "0.7 beta";

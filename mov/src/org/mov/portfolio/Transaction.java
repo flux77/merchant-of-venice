@@ -348,9 +348,7 @@ public class Transaction implements Cloneable, Comparable {
         // Test the fields that are always present
         if(!transaction.getDate().equals(getDate()) ||
            transaction.getType() != getType() &&
-           !transaction.getAmount().equals(getAmount()) ||
-           transaction.getShares() != getShares() ||
-           !transaction.getTradeCost().equals(getTradeCost()))
+           transaction.getShares() != getShares())
             return false;
 
         // The following fields might be null, so check they are either both null or not
@@ -363,6 +361,14 @@ public class Transaction implements Cloneable, Comparable {
         // Now check if the fields contain the same value
         if(transaction.getSymbol() != null &&
            !transaction.getSymbol().equals(getSymbol()))
+            return false;
+
+        if(transaction.getAmount() != null &&
+           !transaction.getAmount().equals(getAmount()))
+            return false;
+
+        if(transaction.getTradeCost() != null &&
+           !transaction.getTradeCost().equals(getTradeCost()))
             return false;
 
         if(transaction.getCashAccount() != null &&

@@ -301,18 +301,43 @@ public class CommandManager {
      *
      * @param	portfolioName	name of portfolio to display
      */
-    public void openPortfolio(String portfolioName) {
-        // We don't run this in a new thread because we call openPortfolio(portfolio)
-        // which will open a new thread for us.
-        try {
-            Portfolio portfolio = PreferencesManager.getPortfolio(portfolioName);
+    public void openPortfolio(final String portfolioName) {
+        final Thread thread = new Thread(new Runnable() {
 
-            openPortfolio(portfolio);
-        }
-        catch(PreferencesException e) {
-            DesktopManager.showErrorMessage(Locale.getString("ERROR_LOADING_PORTFOLIO_TITLE"),
-                                            e.getMessage());
-        }
+            public void run() {
+                Thread thread = Thread.currentThread();
+                ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+
+                progress.show(Locale.getString("OPEN_PORTFOLIO", portfolioName));
+
+                try {
+                    Portfolio portfolio = PreferencesManager.getPortfolio(portfolioName);
+                    EODQuoteBundle quoteBundle = null;
+                    TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
+                    
+                    if(lastDate != null) {
+                        if(!thread.isInterrupted()) {
+                            EODQuoteRange quoteRange =
+                                new EODQuoteRange(portfolio.getStocksHeld(), lastDate.previous(1),
+                                                  lastDate);
+                            
+                            quoteBundle = new EODQuoteBundle(quoteRange);
+                        }
+                        
+                        if(!thread.isInterrupted())
+                            openPortfolio(portfolio, quoteBundle);
+                    }
+                }
+                catch(PreferencesException e) {
+                    DesktopManager.showErrorMessage(Locale.getString("ERROR_LOADING_PORTFOLIO_TITLE"),
+                                                    e.getMessage());
+                }
+
+                ProgressDialogManager.closeProgressDialog(progress);
+            }
+            });
+
+        thread.start();
     }
 
     /**
@@ -321,7 +346,6 @@ public class CommandManager {
      * @param portfolio the portfolio
      */
     public void openPortfolio(final Portfolio portfolio) {
-
         final Thread thread = new Thread(new Runnable() {
 
             public void run() {

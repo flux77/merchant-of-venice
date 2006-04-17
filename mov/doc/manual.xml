@@ -44,10 +44,10 @@ in Venice. For charting see <link to="Graphs">Graphs</link>.
 </para>
 </help>
 
-<text>Merchant of Venice, 0.5 alpha / 13/Mar/2005
+<text>Merchant of Venice, 0.7 beta / 17/Apr/2006
 ===========================================
 
-Copyright (C) 2003-5, Andrew Leppard (aleppard picknowl com au)
+Copyright (C) 2003-6, Andrew Leppard (aleppard picknowl com au)
 See COPYING.txt for license terms.
 
 </text>
@@ -636,16 +636,6 @@ will need at least one of each.</para>
 <para>A portfolio is made up of several accounts and also transactions. A
 transaction is any financial transaction that involves one or more of the
 accounts. See transactions for more details.</para>
-<section name="Import/Export">
-<para>You can import and export portfolios to CSV files (comma separated values)
-these files can then be read by an Excel spreadsheet and other tools. This
-can be useful for backup purposes. Venice is alpha after all! The format of
-the output files is:</para>
-<para><code>dd/mm/yyyy,transaction name,value,symbol,share number,trade cost,cash
-account1,cash account2,share account</code></para>
-<para>Not all of these fields will be present, an example exported line is:</para>
-<para><code>02/01/2003,Accumulate,4000.00,XYZ,100,20.50,Bank,,Broker</code></para>
-</section>
 
 <section name="Graph">
 <para>You can graph the value of a portfolio over time. See <link to="Graphs">Graphs</link>

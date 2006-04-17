@@ -1,4 +1,4 @@
-Merchant of Venice, 0.7 beta 23/Oct/2006
+Merchant of Venice, 0.7 beta 17/Apr/2006
 ========================================
 
 Copyright (C) 2003-6, Andrew Leppard (aleppard picknowl com au)
@@ -52,9 +52,11 @@ Or in Mac OS X by clicking on the "Venice.app" file.
 
 Venice contains the following technologies
 
-   HSQLDB V1.8.0.2           from http://hsqldb.sourceforge.net
+   HSQLDB V1.8.0.4           from http://hsqldb.sourceforge.net
    Jython V2.1               from http://www.jython.org
-   MySQL Connector/J V3.1.11 from http://www.mysql.com
+   MySQL Connector/J V3.1.12 from http://www.mysql.com
+   Joone V1.2.1              from http://www.jooneworld.com
+   XStream V1.1.2            from http://xstream.codehaus.org
 
 4 Bug Reports and Enhancements
 

@@ -23,10 +23,13 @@ import junit.framework.TestCase;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
 
+import org.mov.util.Currency;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -61,7 +64,8 @@ public class PortfolioTest extends TestCase {
             fail(e.getMessage());
         }
 
-        Portfolio portfolio = new Portfolio(PORTFOLIO_NAME);
+        Portfolio portfolio = new Portfolio(PORTFOLIO_NAME,
+                                            Currency.getDefaultCurrency());
         assertEquals(portfolio.getName(), PORTFOLIO_NAME);
         assertFalse(portfolio.isTransient());
 
@@ -129,7 +133,6 @@ public class PortfolioTest extends TestCase {
         portfolio.addTransaction(transaction);
 
         transaction = Transaction.newDividendDRP(today,
-                                                 new Money(100),
                                                  CBA,
                                                  100,
                                                  shareAccount);
@@ -147,19 +150,35 @@ public class PortfolioTest extends TestCase {
         assertEquals(portfolio.countTransactions(), 9);
         assertEquals(portfolio.countTransactions(Transaction.WITHDRAWAL), 1);
         assertEquals(portfolio.getTransactions().size(), 9);
-        assertEquals(new Money(9575), portfolio.getCashValue());
+        assertEquals(new Money(9575),
+                     portfolio.getCashValue(portfolio.getLastDate()));
 
         //
         // Test exporting and then importing the portfolio.
         //
 
-        Portfolio importedPortfolio = new Portfolio(PORTFOLIO_NAME);
+        Portfolio importedPortfolio = new Portfolio(PORTFOLIO_NAME,
+                                                    Currency.getDefaultCurrency());
         try {
             File tempFile = File.createTempFile("venice_test",  null);
-            portfolio.write(tempFile);
-            importedPortfolio.read(tempFile);
+
+            // Write Portfolio...
+            FileOutputStream outputStream = new FileOutputStream(tempFile);
+            PortfolioWriter.write(portfolio, outputStream);
+            outputStream.close();
+
+            // ... and read it back in again.
+            FileInputStream inputStream = new FileInputStream(tempFile);
+            importedPortfolio = PortfolioReader.read(inputStream);
+            inputStream.close();
         }
         catch(IOException e) {
+            fail(e.getMessage());
+        }
+        catch(PortfolioParserException e) {
+            fail(e.getMessage());
+        }
+        catch(SecurityException e) {
             fail(e.getMessage());
         }
 

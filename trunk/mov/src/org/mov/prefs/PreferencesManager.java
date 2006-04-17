@@ -728,7 +728,10 @@ public class PreferencesManager {
                                             transactionPrefs.getDouble("trade_cost", 0.0D));
 
                 try {
-                    symbol = Symbol.find(transactionPrefs.get("symbol", ""));
+                    String symbolString = transactionPrefs.get("symbol", "");
+
+                    if(symbolString.length() > 0)
+                        symbol = Symbol.find(transactionPrefs.get("symbol", ""));
                 }
                 catch(SymbolFormatException e) {
                     throw new PreferencesException(e.getMessage());
@@ -777,6 +780,7 @@ public class PreferencesManager {
                         new Transaction(type, date, amount, symbol, shares,
                                         tradeCost, cashAccount, cashAccount2,
                                         shareAccount);
+
                     transactions.add(transaction);
                 }
             }

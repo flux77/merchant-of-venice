@@ -3,6 +3,9 @@ Changes for Venice, 0.7 beta 17/Apr/2006
 
 * Added multi-currency portfolio support (Andrew Leppard, Quentin Bossard)
 
+* Added support for currencies with greater than 100 subdivisions, e.g.
+  Kuwaiti dinar which has 1,000 fils per dinar.
+
 * Portfolios are now saved as XML files in the user's home directory.
   This should improve performance when loading and saving portfolios
   and make them easier to manage (e.g. backup).
@@ -19,6 +22,9 @@ Changes for Venice, 0.7 beta 17/Apr/2006
 * Library updates:
   - HSQLDB V1.8.0.4 from 1.8.0.2
   - MySQL Connector/J V3.1.12 from 3.1.11.
+
+* Bug Fixes:
+   - User drawn lines now scale properly when graph is resized (Mark Hummel).
 
 Changes for Venice, 0.6 beta 23/Oct/2005
 ========================================

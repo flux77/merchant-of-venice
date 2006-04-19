@@ -1,5 +1,5 @@
-Merchant of Venice, 0.7 beta 17/Apr/2006
-========================================
+Merchant of Venice, 0.8 alpha ??/???/2006
+=========================================
 
 Copyright (C) 2003-6, Andrew Leppard (aleppard picknowl com au)
 See COPYING.txt for license terms.
@@ -133,8 +133,8 @@ XStream is Copyright (C) 2003-2005, Joe Walnes.
 Thanks to the following people for providing additional code, patches or
 bugfixes:
 
-Daniel Makovec, Quentin Bossard, Peter Fradley, Bryan Lin, Alberto Nacher,
-Matthias Stöckel and Dennis van den Berg.
+Daniel Makovec, Quentin Bossard, Peter Fradley, Mark Hummel, Bryan Lin,
+Alberto Nacher, Matthias Stöckel and Dennis van den Berg.
 
 And the following for providing translations:
 

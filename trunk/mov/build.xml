@@ -89,6 +89,7 @@
       <fileset dir="${test}" includes="**/*.class"/>
     </delete>
     <delete file="venice.jar"/>
+    <delete dir="Venice.app"/>
     <delete dir="${api}"/>
     <delete file="${doc}/manual.html"/>
     <delete file="${doc}/manual.txt"/>

@@ -406,6 +406,11 @@ public class PointAndFigureGraph extends AbstractGraph {
 	
 	
 	defaultBoxPriceScale = QuoteFunctions.roundDouble(defaultBoxPriceScale, 2);
+
+	if (defaultBoxPriceScale <= 0.0) {
+	    defaultBoxPriceScale = 0.01;
+	}
+
         return defaultBoxPriceScale;
     }
 

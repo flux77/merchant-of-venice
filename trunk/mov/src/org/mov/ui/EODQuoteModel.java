@@ -105,7 +105,7 @@ public class EODQuoteModel extends AbstractQuoteModel {
         columns.add(new Column(VOLUME_COLUMN, 
 			       Locale.getString("VOLUME"), 
 			       Locale.getString("VOLUME_COLUMN_HEADER"),
-                               Integer.class, Column.VISIBLE));
+                               Long.class, Column.VISIBLE));
         columns.add(new Column(DAY_LOW_COLUMN, 
 			       Locale.getString("DAY_LOW"), 
 			       Locale.getString("DAY_LOW_COLUMN_HEADER"),
@@ -158,8 +158,8 @@ public class EODQuoteModel extends AbstractQuoteModel {
             return quote.getDate();
             
         case(VOLUME_COLUMN):
-            return new Integer(quote.getDayVolume());
-            
+            return new Long(quote.getDayVolume());
+
         case(DAY_LOW_COLUMN):
             return new QuoteFormat(quote.getDayLow());
             

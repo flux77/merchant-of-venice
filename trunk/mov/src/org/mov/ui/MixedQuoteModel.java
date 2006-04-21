@@ -152,7 +152,7 @@ public class MixedQuoteModel extends AbstractQuoteModel {
         columns.add(new Column(VOLUME_COLUMN, 
 			       Locale.getString("VOLUME"), 
 			       Locale.getString("VOLUME_COLUMN_HEADER"),
-                               Integer.class, Column.VISIBLE));
+                               Long.class, Column.VISIBLE));
 	columns.add(new Column(ACTIVITY_COLUMN, 
 			       Locale.getString("ACTIVITY"), 
 			       Locale.getString("ACTIVITY_COLUMN_HEADER"),
@@ -252,7 +252,7 @@ public class MixedQuoteModel extends AbstractQuoteModel {
                 return new QuoteFormat(0.0D);            
             
         case(VOLUME_COLUMN):
-            return new Integer(quote.getDayVolume());
+            return new Long(quote.getDayVolume());
             
         case(DAY_LOW_COLUMN):
             return new QuoteFormat(quote.getDayLow());

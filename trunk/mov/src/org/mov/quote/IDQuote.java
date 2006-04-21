@@ -40,7 +40,7 @@ public class IDQuote implements Quote {
     private TradingTime time;
 
     // Current volume
-    private int currentVolume;
+    private long currentVolume;
 
     // Current low
     private double currentLow;
@@ -75,7 +75,7 @@ public class IDQuote implements Quote {
      * @param   ask            the last ask price
      */
     public IDQuote(Symbol symbol, TradingDate date, TradingTime time,
-                   int currentVolume, double currentLow, double currentHigh,
+                   long currentVolume, double currentLow, double currentHigh,
                    double dayOpen, double last, double bid, double ask) {
         setSymbol(symbol);
         setDate(date);
@@ -158,7 +158,7 @@ public class IDQuote implements Quote {
      *
      * @return	the current day volume
      */
-    public int getDayVolume() {
+    public long getDayVolume() {
 	return currentVolume;
     }
 

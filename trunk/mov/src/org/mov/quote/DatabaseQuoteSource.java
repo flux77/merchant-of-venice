@@ -533,7 +533,7 @@ public class DatabaseQuoteSource implements QuoteSource
                     while (RS.next()) {
                         quoteCache.load(Symbol.find(RS.getString(SYMBOL_COLUMN)),
                                         new TradingDate(RS.getDate(DATE_COLUMN)),
-                                        RS.getInt(DAY_VOLUME_COLUMN),
+                                        RS.getLong(DAY_VOLUME_COLUMN),
                                         RS.getFloat(DAY_LOW_COLUMN),
                                         RS.getFloat(DAY_HIGH_COLUMN),
                                         RS.getFloat(DAY_OPEN_COLUMN),
@@ -709,7 +709,7 @@ public class DatabaseQuoteSource implements QuoteSource
                                     DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
                                     DAY_HIGH_FIELD +	" FLOAT DEFAULT 0.0, " +
                                     DAY_LOW_FIELD +	" FLOAT DEFAULT 0.0, " +
-                                    DAY_VOLUME_FIELD +	" INT DEFAULT 0, " + // TODO: Use BIGINT
+                                    DAY_VOLUME_FIELD +	" BIGINT DEFAULT 0, "  +
                                     "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
             
             // Create a couple of indices to speed things up.

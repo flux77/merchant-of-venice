@@ -82,7 +82,7 @@ public interface Quote {
      *
      * @return	the volume
      */
-    public int getDayVolume();
+    public long getDayVolume();
 
     /**
      * Return the day low for end-of-day quotes or the

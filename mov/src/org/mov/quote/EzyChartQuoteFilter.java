@@ -88,11 +88,11 @@ public class EzyChartQuoteFilter implements EODQuoteFilter {
 
 		// Convert all prices from cents to dollars
                 try {
-                    float day_open = Float.parseFloat(quoteParts[i++]) / 100;
-                    float day_high = Float.parseFloat(quoteParts[i++]) / 100;
-                    float day_low = Float.parseFloat(quoteParts[i++]) / 100;
-                    float day_close = Float.parseFloat(quoteParts[i++]) / 100;
-                    int day_volume = Integer.parseInt(quoteParts[i++]);
+                    double day_open = Double.parseDouble(quoteParts[i++]) / 100.0;
+                    double day_high = Double.parseDouble(quoteParts[i++]) / 100.0;
+                    double day_low = Double.parseDouble(quoteParts[i++]) / 100.0;
+                    double day_close = Double.parseDouble(quoteParts[i++]) / 100.0;
+                    long day_volume = Long.parseLong(quoteParts[i++]);
                     quote = new EODQuote(symbol, date, day_volume, day_low, day_high,
                                          day_open, day_close);
                 } 
@@ -116,10 +116,10 @@ public class EzyChartQuoteFilter implements EODQuoteFilter {
     public String toString(EODQuote quote) {
 	return new String(quote.getSymbol() + "," + 
 			  quote.getDate().toString("yymmdd") + "," +
-			  Math.round(quote.getDayOpen()*100) + "," +
-			  Math.round(quote.getDayHigh()*100) + "," +
-			  Math.round(quote.getDayLow()*100) + "," +
-			  Math.round(quote.getDayClose()*100) + "," +
+			  Math.round(quote.getDayOpen()*100.0) + "," +
+			  Math.round(quote.getDayHigh()*100.0) + "," +
+			  Math.round(quote.getDayLow()*100.0) + "," +
+			  Math.round(quote.getDayClose()*100.0) + "," +
 			  quote.getDayVolume());
     }
 }

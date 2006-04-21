@@ -91,11 +91,11 @@ public class MetaStockQuoteFilter implements EODQuoteFilter {
                 }
 
                 try {
-                    float day_open = Float.parseFloat(quoteParts[i++]);
-                    float day_high = Float.parseFloat(quoteParts[i++]);
-                    float day_low = Float.parseFloat(quoteParts[i++]);
-                    float day_close = Float.parseFloat(quoteParts[i++]);
-                    int day_volume = Integer.parseInt(quoteParts[i++]);
+                    double day_open = Double.parseDouble(quoteParts[i++]);
+                    double day_high = Double.parseDouble(quoteParts[i++]);
+                    double day_low = Double.parseDouble(quoteParts[i++]);
+                    double day_close = Double.parseDouble(quoteParts[i++]);
+                    long day_volume = Long.parseLong(quoteParts[i++]);
                     quote = new EODQuote(symbol, date, day_volume, day_low, day_high,
                                          day_open, day_close);
                 } 

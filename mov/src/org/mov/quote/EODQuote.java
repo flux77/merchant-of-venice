@@ -33,7 +33,7 @@ import org.mov.util.TradingDate;
 public class EODQuote implements Quote {
     private Symbol symbol;
     private TradingDate date;
-    private int day_volume;
+    private long day_volume;
     private double day_low;
     private double day_high;
     private double day_open;
@@ -58,7 +58,7 @@ public class EODQuote implements Quote {
      * @param	day_close	the closing quote on this date
      */
     public EODQuote(Symbol symbol, TradingDate date,
-                    int day_volume, double day_low, double day_high,
+                    long day_volume, double day_low, double day_high,
                     double day_open, double day_close) {
 	setSymbol(symbol);
 	setDate(date);
@@ -149,7 +149,7 @@ public class EODQuote implements Quote {
      *
      * @return	the volume
      */
-    public int getDayVolume() {
+    public long getDayVolume() {
 	return day_volume;
     }
 

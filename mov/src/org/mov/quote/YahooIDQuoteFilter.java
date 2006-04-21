@@ -82,7 +82,7 @@ public class YahooIDQuoteFilter implements IDQuoteFilter {
 	    if(quoteParts.length == 9) {
                 try {
                     Symbol symbol = Symbol.find(quoteParts[i++]);
-                    float last = Float.parseFloat(quoteParts[i++]);
+                    double last = Double.parseDouble(quoteParts[i++]);
                     TradingDate date = new TradingDate(quoteParts[i++],
                                                        TradingDate.US);
                     TradingTime time = new TradingTime(quoteParts[i++]);
@@ -90,10 +90,10 @@ public class YahooIDQuoteFilter implements IDQuoteFilter {
                     // Skip current change
                     i++;
                     
-                    float day_open = Float.parseFloat(quoteParts[i++]);
-                    float current_high = Float.parseFloat(quoteParts[i++]);
-                    float current_low = Float.parseFloat(quoteParts[i++]);
-                    int current_volume = Integer.parseInt(quoteParts[i++]);
+                    double day_open = Double.parseDouble(quoteParts[i++]);
+                    double current_high = Double.parseDouble(quoteParts[i++]);
+                    double current_low = Double.parseDouble(quoteParts[i++]);
+                    long current_volume = Long.parseLong(quoteParts[i++]);
 
                     // Yahoo unfortunately does not provide bid or ask prices
                     // in its downloadable format.

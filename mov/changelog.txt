@@ -1,6 +1,8 @@
 Changes for Venice, 0.8 alpha ??/???/2006
 =========================================
 
+* Bug Fixes:
+  - Can now work with volumes greater than 2147483647.
 
 Changes for Venice, 0.7 beta 17/Apr/2006
 ========================================

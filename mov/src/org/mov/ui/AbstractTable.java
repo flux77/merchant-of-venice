@@ -177,6 +177,7 @@ public class AbstractTable extends SortedTable {
 	setDefaultRenderer(Double.class, new StockQuoteRenderer());
 	setDefaultRenderer(Float.class, new StockQuoteRenderer());
 	setDefaultRenderer(Integer.class, new StockQuoteRenderer());
+	setDefaultRenderer(Long.class, new StockQuoteRenderer());
 	setDefaultRenderer(Money.class, new StockQuoteRenderer());
 	setDefaultRenderer(QuoteFormat.class, new StockQuoteRenderer());
 	setDefaultRenderer(String.class, new StockQuoteRenderer());

@@ -79,7 +79,7 @@ public class IDQuoteCache {
      * save space by storing the quotes as floats rather than doubles.
      */
     private class IDQuoteCacheQuote {
-        public int day_volume;
+        public long day_volume;
         public float day_low;
         public float day_high;
         public float day_open;
@@ -87,7 +87,7 @@ public class IDQuoteCache {
         public float bid;
         public float ask;
 
-        public IDQuoteCacheQuote(int day_volume, 
+        public IDQuoteCacheQuote(long day_volume, 
                                  float day_low, float day_high, float day_open, float day_close,
                                  float bid, float ask) {
             this.day_volume = day_volume;
@@ -134,7 +134,7 @@ public class IDQuoteCache {
                                (double)ask);
         }
 
-        public boolean equals(int day_volume, float day_low, float day_high,
+        public boolean equals(long day_volume, float day_low, float day_high,
                               float day_open, float day_close, float bid,
                               float ask) {
             return (day_volume == this.day_volume &&

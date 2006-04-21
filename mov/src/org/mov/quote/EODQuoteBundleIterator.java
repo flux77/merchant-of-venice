@@ -130,15 +130,7 @@ public class EODQuoteBundleIterator implements Iterator {
             }
 
             try {
-                EODQuote quote =
-                    new EODQuote(nextSymbol,
-                              nextDate,
-                              (int)quoteBundle.getQuote(nextSymbol, Quote.DAY_VOLUME,
-                                                        dateOffset),
-                              quoteBundle.getQuote(nextSymbol, Quote.DAY_LOW, dateOffset),
-                              quoteBundle.getQuote(nextSymbol, Quote.DAY_HIGH, dateOffset),
-                              quoteBundle.getQuote(nextSymbol, Quote.DAY_OPEN, dateOffset),
-                              quoteBundle.getQuote(nextSymbol, Quote.DAY_CLOSE, dateOffset));
+                Quote quote = quoteBundle.getQuote(nextSymbol, dateOffset);
                 findNext();
 
                 return (Object)quote;

@@ -76,13 +76,13 @@ public class EODQuoteCache {
     private class EODQuoteCacheQuote {
         // Floats have more than enough precision to hold quotes. So we
         // store them as floats rather than doubles to reduce memory.
-        public int day_volume;
+        public long day_volume;
         public float day_low;
         public float day_high;
         public float day_open;
         public float day_close;
 
-        public EODQuoteCacheQuote(int day_volume, float day_low, float day_high,
+        public EODQuoteCacheQuote(long day_volume, float day_low, float day_high,
                                   float day_open, float day_close) {
             this.day_volume = day_volume;
             this.day_low = day_low;
@@ -119,7 +119,7 @@ public class EODQuoteCache {
                                 (double)day_close);
         }
 
-        public boolean equals(int day_volume, float day_low, float day_high,
+        public boolean equals(long day_volume, float day_low, float day_high,
                               float day_open, float day_close) {
             return (day_volume == this.day_volume &&
                     day_low == this.day_low &&
@@ -334,7 +334,7 @@ public class EODQuoteCache {
      * @param day_open day open
      * @param day_close day close
      */
-    public synchronized void load(Symbol symbol, TradingDate date, int day_volume, float day_low,
+    public synchronized void load(Symbol symbol, TradingDate date, long day_volume, float day_low,
                                   float day_high, float day_open, float day_close) {
         // Find the fast date offset for the quote
         int dateOffset;

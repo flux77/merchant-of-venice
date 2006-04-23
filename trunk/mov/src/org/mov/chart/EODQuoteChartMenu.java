@@ -208,6 +208,7 @@ public class EODQuoteChartMenu extends JMenu {
 		    Thread thread = new Thread() {
 			    public void run() {
 
+				boolean okToWrite = true;
 				File f;
 				String filename = "";
 				String userDir = System.getProperty("user.home");
@@ -216,6 +217,7 @@ public class EODQuoteChartMenu extends JMenu {
 				
 				ImageFilter filter = new ImageFilter();
 				chooser.setFileFilter(filter);
+				
 				
 				int rv = chooser.showSaveDialog(DesktopManager.getDesktop());
 				
@@ -234,15 +236,19 @@ public class EODQuoteChartMenu extends JMenu {
 						
 					
 					boolean choice = confirmDialog.showDialog();
-					if (choice) {
-					    BMPFile bmpwrite = new BMPFile(true);
-					    bmpwrite.saveBitmap(
-								filename, 
-								bi, 
-								bi.getWidth(), 
-								bi.getHeight());
+					if (!choice) {
+					    okToWrite = false;
 					}
-				    }				
+				    }
+
+				    if (okToWrite) {
+					BMPFile bmpwrite = new BMPFile(true);
+					bmpwrite.saveBitmap(
+							    filename, 
+							    bi, 
+							    bi.getWidth(), 
+							    bi.getHeight());				
+				    }
 				}
 			    }
 			};

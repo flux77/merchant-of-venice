@@ -365,10 +365,10 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             }
 
             // Graph the highlighted symbols
-	    if (e.getSource() == graphSymbols) {
+	    if (e.getSource() == graphSymbols || e.getSource() == popupGraphSymbols) {
 		CommandManager.getInstance().graphStockBySymbol(symbols);
 	    }
-	    if (e.getSource() == graphIndexSymbols) {
+	    else if (e.getSource() == graphIndexSymbols) {
 		CommandManager.getInstance().graphIndexBySymbol(symbols);
 	    }
         }

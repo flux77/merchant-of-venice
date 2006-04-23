@@ -35,6 +35,7 @@ import org.mov.chart.source.GraphSource;
 import org.mov.chart.source.OHLCVQuoteGraphSource;
 import org.mov.chart.source.OHLCVIndexQuoteGraphSource;
 import org.mov.ui.DesktopManager;
+import org.mov.ui.ConfirmDialog;
 import org.mov.util.Locale;
 import org.mov.quote.Quote;
 import org.mov.quote.EODQuoteBundle;
@@ -203,29 +204,50 @@ public class EODQuoteChartMenu extends JMenu {
 
 	exportMenu.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    File f;
-		    String filename = "";
-		    String userDir = System.getProperty("user.home");
-		    JFileChooser chooser = new JFileChooser();
-                    chooser.setMultiSelectionEnabled(false);
 
-		    ImageFilter filter = new ImageFilter();
-		    chooser.setFileFilter(filter);
+		    Thread thread = new Thread() {
+			    public void run() {
 
-		    int rv = chooser.showSaveDialog(DesktopManager.getDesktop());
+				File f;
+				String filename = "";
+				String userDir = System.getProperty("user.home");
+				JFileChooser chooser = new JFileChooser();
+				chooser.setMultiSelectionEnabled(false);
+				
+				ImageFilter filter = new ImageFilter();
+				chooser.setFileFilter(filter);
+				
+				int rv = chooser.showSaveDialog(DesktopManager.getDesktop());
+				
+				if (rv == JFileChooser.APPROVE_OPTION) {
+				    
+				    BufferedImage bi = listener.getImage();
+				    f = chooser.getSelectedFile();		
+				    filename = f.getAbsolutePath();
 
-		    if (rv == JFileChooser.APPROVE_OPTION) {
-			
-			BufferedImage bi = listener.getImage();
-			f = chooser.getSelectedFile();		
-			filename = f.getAbsolutePath();
-
-			BMPFile bmpwrite = new BMPFile(true);
-			bmpwrite.saveBitmap(filename, bi, bi.getWidth(), bi.getHeight());
-
-		    }
-		}
-	    });
+				    //Check existence, confirm overwrite
+				    if (f.exists()) {
+					ConfirmDialog confirmDialog = 
+					    new ConfirmDialog(DesktopManager.getDesktop(), 
+							      Locale.getString("GRAPH_SURE_OVERWRITE"), 
+							      Locale.getString("GRAPH_OVERWRITE"));
+						
+					
+					boolean choice = confirmDialog.showDialog();
+					if (choice) {
+					    BMPFile bmpwrite = new BMPFile(true);
+					    bmpwrite.saveBitmap(
+								filename, 
+								bi, 
+								bi.getWidth(), 
+								bi.getHeight());
+					}
+				    }				
+				}
+			    }
+			};
+		    thread.start();
+		}});
 
         // Build menu items
 	this.add(graphMenu);

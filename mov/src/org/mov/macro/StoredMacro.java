@@ -173,7 +173,7 @@ public class StoredMacro {
     public boolean save() {
         if (getFilename() != null) {
             try {
-                File file = new File(PreferencesManager.getDirectoryLocation("macros") +
+                File file = new File(PreferencesManager.getMacroHome() +
                                      File.separator+ getFilename());
                 URI uri = file.toURI();
 
@@ -195,7 +195,7 @@ public class StoredMacro {
     
     public boolean delete() {
         try {
-            File file = new File(PreferencesManager.getDirectoryLocation("macros") +
+            File file = new File(PreferencesManager.getMacroHome() +
                                  File.separator + getFilename());
             file.delete();
         } catch (Exception e) {

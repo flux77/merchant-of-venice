@@ -864,6 +864,19 @@ public class PreferencesManager {
     }
 
     /**
+     * Return the directroy which contains Venice's macros.
+     *
+     * @return Macro directroy.
+     */
+    public static File getMacroHome() {
+        File veniceHome = getVeniceHome();
+        File macroHome = new File(veniceHome, "Macro");
+        if (!macroHome.exists())
+            macroHome.mkdir();
+        return macroHome;
+    }
+
+    /**
      * Return the directory which contains Venice's portfolios.
      *
      * @return Portfolio directory.

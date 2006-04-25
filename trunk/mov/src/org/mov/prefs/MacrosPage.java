@@ -57,8 +57,6 @@ import org.mov.util.Locale;
 public class MacrosPage extends JPanel implements PreferencesPage {
     private JDesktopPane desktop;
 
-    private JTextField directory_text = null;
-
     private JTable macros_table = null;
 
     private AbstractTableModel table_model = null;
@@ -112,7 +110,6 @@ public class MacrosPage extends JPanel implements PreferencesPage {
      * @see org.mov.prefs.PreferencesPage#save()
      */
     public void save() {
-        PreferencesManager.putDirectoryLocation("macros", directory_text.getText());
         PreferencesManager.putStoredMacros(stored_macros);
         MainMenu.getInstance().buildMacroMenu();
     }
@@ -143,80 +140,8 @@ public class MacrosPage extends JPanel implements PreferencesPage {
     private void initialize() {
         this.setLayout(new BorderLayout());
         this.setSize(300, 200);
-        this.add(getDir_panel(), java.awt.BorderLayout.NORTH);
         this.add(getTable_panel(), java.awt.BorderLayout.CENTER);
         this.add(getButton_panel(), java.awt.BorderLayout.SOUTH);
-    }
-
-    /**
-     * This method initializes jPanel
-     * 
-     * @return javax.swing.JPanel
-     */
-    private JPanel getDir_panel() {
-        JButton browse_button = null;
-
-        JPanel dir_panel = new JPanel();
-        dir_panel.setLayout(new BorderLayout());
-        javax.swing.JLabel label = new JLabel();
-        label.setText(Locale.getString("MACROS_DIRECTORY"));
-        dir_panel.add(label, java.awt.BorderLayout.WEST);
-        dir_panel.add(getDirectory_text(), java.awt.BorderLayout.CENTER);
-        dir_panel.add(getBrowse_button(), java.awt.BorderLayout.EAST);
-        return dir_panel;
-    }
-
-    /**
-     * This method initializes jTextField
-     * 
-     * @return javax.swing.JTextField
-     */
-    private JTextField getDirectory_text() {
-        if (directory_text == null) {
-            directory_text = new JTextField();
-            directory_text.setText(PreferencesManager.getDirectoryLocation("macros"));
-        }
-        return directory_text;
-    }
-
-    /**
-     * This method initializes jButton
-     * 
-     * @return javax.swing.JButton
-     */
-    private JButton getBrowse_button() {
-        JButton browse_button = new JButton();
-        browse_button.setText(Locale.getString("BROWSE"));
-        browse_button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Get directory
-                JFileChooser chooser;
-                String lastDirectory = PreferencesManager.getDirectoryLocation("macros");
-                
-                if (lastDirectory != null)
-                    chooser = new JFileChooser(lastDirectory);
-                else
-                    chooser = new JFileChooser();
-
-                chooser.setMultiSelectionEnabled(false);
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int action = chooser.showOpenDialog(desktop);
-
-                if (action == JFileChooser.APPROVE_OPTION) {
-                    // Set the new macro directory
-                    File file = chooser.getSelectedFile();
-                    String directory = file.getPath();
-                    directory_text.setText(directory);
-                    PreferencesManager.putDirectoryLocation("macros",
-                            directory);
-                    stored_macros = PreferencesManager.getStoredMacros();
-                    table_model.fireTableDataChanged();
-
-                }
-            }
-        });
-
-        return browse_button;
     }
 
     /**
@@ -579,7 +504,7 @@ public class MacrosPage extends JPanel implements PreferencesPage {
                     if (selected_row == -1) {return; }
                     StoredMacro macro = (StoredMacro) stored_macros
                             .get(selected_row);
-                    String filepath = PreferencesManager.getDirectoryLocation("macros")
+                    String filepath = PreferencesManager.getMacroHome()
                             + File.separator + macro.getFilename();
                     int response = JOptionPane.showInternalConfirmDialog(delete_button,
                             Locale.getString("SURE_DELETE_MACRO", macro
@@ -633,7 +558,6 @@ public class MacrosPage extends JPanel implements PreferencesPage {
                 up_button.setEnabled(true);	
                 if (editor.isOk_clicked()) {
                     if (edited_row == -1) {
-                        System.out.println("clicked ok");
                         stored_macros.add(edited_macro);
                         edited_row = stored_macros.size() - 1;
                         selected_row = edited_row;

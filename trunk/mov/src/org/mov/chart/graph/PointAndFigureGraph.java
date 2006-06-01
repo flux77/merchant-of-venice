@@ -317,8 +317,9 @@ public class PointAndFigureGraph extends AbstractGraph {
 	   with a price point.
 	*/
 
-
-
+	if (columnNumber == 0) {
+	    columnNumber = 1;
+	}
 	columnSpan = (int)(dataLen / columnNumber);		
 	pointAndFigure.setColumnSpan(columnSpan - 2);
 

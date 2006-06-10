@@ -27,6 +27,8 @@ import javax.swing.JPanel;
 import javax.swing.JInternalFrame;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
+import java.util.Date;
+import java.text.DateFormat;
 
 import org.mov.ui.DesktopManager;
 import org.mov.util.Locale;
@@ -77,7 +79,14 @@ public class UserNotes extends JInternalFrame {
 	save.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    try {
-			PreferencesManager.putUserNotes(symbol, notes.getText());
+			
+			String text = notes.getText();
+			Date now = new Date();
+			DateFormat df = DateFormat.getDateInstance();
+			
+			text += "\n --- " + df.format(now) + " ---\n ";
+
+			PreferencesManager.putUserNotes(symbol, text);
 			setClosed(true);
 		    } 
 		    catch (PropertyVetoException pve) {

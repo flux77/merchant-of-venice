@@ -21,6 +21,8 @@ package org.mov.chart.graph;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
+
 import org.mov.chart.source.GraphSource;
 
 /**
@@ -219,5 +221,22 @@ abstract public class AbstractGraph implements Graph {
         // null indicates no UI
         return null;
     }
+
+    /** Return true if there is data available for date X 
+     *
+     * @param Date - Comparable date 
+     * @return true 
+     *
+     * Trivially true for all graphs except for P&F
+     * 
+     *
+     */
+    
+    //Is it worth generalising the special case (P&F data mapping) in this
+    //manner?    
+    public boolean dataAvailable(Vector x) {
+	return true;
+    }
+    
 }
 

@@ -35,7 +35,7 @@ import org.mov.util.Locale;
  *
  * @see ChartModule
  */
-public class Chart extends JComponent implements MouseListener {
+public class Chart extends JComponent implements MouseListener {    
 
     // The first element of this vector contains a vector of the
     // graphs for the primary graph, the second for the secondary graph etc
@@ -710,7 +710,9 @@ public class Chart extends JComponent implements MouseListener {
     /**
      * Draw the graph zoomed into the given highlighted region.
      */
-    public void zoomToHighlightedRegion() {
+    public void zoomToHighlightedRegion() 
+	throws ChartOutOfBoundsException {
+	
 	// Order [startHighlightedX, endHighlightedX]
 	if(startHighlightedX.compareTo(endHighlightedX) > 0) {
 	    Comparable temp = startHighlightedX;
@@ -721,6 +723,12 @@ public class Chart extends JComponent implements MouseListener {
 	// Recalculate x range
 	setXRange(startHighlightedX, endHighlightedX);
 	clearHighlightedRegion();
+       	
+	if (!dataAvailable()) {
+	    zoomToDefaultRegion();
+	    throw new ChartOutOfBoundsException();	
+	}
+
 	zoomedIn = true;
 	resetBuffer();
     }
@@ -816,6 +824,33 @@ public class Chart extends JComponent implements MouseListener {
 
     public BufferedImage getImage() {
 	return gui.getImage();
+    }
+
+    public boolean dataAvailable(Graph g) {
+	if (g.dataAvailable(getXRange())) {
+	    return true;
+	} else {
+	    return false;
+	}
+    }
+
+    public boolean dataAvailable() {
+
+	Iterator levelIterator = levels.iterator();
+
+	while(levelIterator.hasNext()) {
+	    Vector graphs = (Vector)levelIterator.next();
+	    Iterator graphIterator = graphs.iterator();
+
+	    while(graphIterator.hasNext()) {
+		Graph graph = (Graph)graphIterator.next();
+
+		if (dataAvailable(graph)) {
+		    return true;
+		}
+	    }
+	}
+	return false;
     }
 
 }

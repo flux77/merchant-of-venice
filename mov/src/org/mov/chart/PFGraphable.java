@@ -286,5 +286,17 @@ public class PFGraphable extends Graphable {
 	return map.keySet();
     }
 
+    public boolean dataAvailable(Vector x) {
+	double val, lowest;
+
+	val = getHighestY(x);
+	lowest = getLowestY(x);
+
+	if (getHighestY(x) == Double.NEGATIVE_INFINITY) {
+	    return false;
+	}
+	return true;
+    }
+
 
 }

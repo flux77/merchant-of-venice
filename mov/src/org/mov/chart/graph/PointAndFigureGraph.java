@@ -398,6 +398,9 @@ public class PointAndFigureGraph extends AbstractGraph {
 					     defaultBoxPriceScale);
 
 	    columnSpan = temp.getColumnSpan(); 
+	    if (columnSpan == 0) {
+		columnSpan = 1;
+	    }
 	    numColumns = (int)(dataLen / columnSpan);
 
 	    if (numColumns < minColumns) {
@@ -516,6 +519,10 @@ public class PointAndFigureGraph extends AbstractGraph {
 	    rv = (Comparable)iterator.next();
 	}
 	return rv;
+    }
+
+    public boolean dataAvailable(Vector xRange) {	
+	return pointAndFigure.dataAvailable(xRange);
     }
 
 }

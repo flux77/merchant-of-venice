@@ -23,6 +23,7 @@ import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import org.mov.chart.source.GraphSource;
 
@@ -229,6 +230,18 @@ public interface Graph {
      * @return <code>true</code> if the graph is a primary graph
      */
     public boolean isPrimary();
+
+    /**
+     * Return whether the graph has a price for range xRange  
+     * Is trivially true for all graphs apart from the PointAndFigure graph 
+     * as P&F is the only graph type where price data does not map one to one  
+     * to date.
+     *
+     * @param   xRange Range of X values
+     * @return  True if data is available for range xRange.     
+    */
+
+    public boolean dataAvailable(Vector xRange);
 }
 
 

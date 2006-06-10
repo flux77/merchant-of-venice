@@ -33,6 +33,7 @@ import org.mov.util.Locale;
 import org.mov.portfolio.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
+import org.mov.ui.DesktopManager;
 
 /**
  * The charting module for venice. This class provides the user interface
@@ -778,13 +779,17 @@ public class ChartModule extends JPanel implements Module,
     public void actionPerformed(ActionEvent e) {
 
 	if(zoomIn != null && e.getSource() == zoomIn) {
-	    chart.zoomToHighlightedRegion();
-            zoomIn.setEnabled(zoomInEnabled = false);
-            defaultZoom.setEnabled(defaultZoomEnabled = true);
-	    // This tells the scrollpane to re-asses whether it needs
-	    // the horizontal scrollbar now
-	    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	    repaint();
+	    try {
+		chart.zoomToHighlightedRegion();
+		zoomIn.setEnabled(zoomInEnabled = false);
+		defaultZoom.setEnabled(defaultZoomEnabled = true);
+		// This tells the scrollpane to re-asses whether it needs
+		// the horizontal scrollbar now
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    } catch (ChartOutOfBoundsException cobe) {
+		DesktopManager.showWarningMessage(Locale.getString("CHART_NO_DATA_AVAILABLE_WARNING"));
+	    }
+	    repaint();	
 	}
 	else if(defaultZoom != null && e.getSource() == defaultZoom) {
 	    chart.zoomToDefaultRegion();
@@ -993,6 +998,10 @@ public class ChartModule extends JPanel implements Module,
 
     public BufferedImage getImage() { 
 	return chart.getImage();
+    }
+
+    public boolean isDataAvailable(Graph g) {
+	return chart.dataAvailable(g);
     }
 
 }

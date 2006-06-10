@@ -451,7 +451,11 @@ public class EODQuoteChartMenu extends JMenu {
      */
     private Graph getGraph(final String text) {
         Graph graph = newGraph(text);
-        GraphUI graphUI = graph.getUI(new HashMap());
+
+	GraphUI graphUI = null;
+	if (graph != null) {
+	    graphUI = graph.getUI(new HashMap());
+	}
 
         if(graphUI != null) {
             GraphSettingsDialog dialog =
@@ -459,11 +463,16 @@ public class EODQuoteChartMenu extends JMenu {
 
             int buttonPressed = dialog.showDialog();
 
-            if (buttonPressed == GraphSettingsDialog.ADD)
-                graph.setSettings(dialog.getSettings());
-            else
-                graph = null;
+            if (buttonPressed == GraphSettingsDialog.ADD) 
+                graph.setSettings(dialog.getSettings());	    	    
+            else 
+                graph = null;	    
         }
+	
+	if (graph != null && !listener.isDataAvailable(graph)) {
+	    DesktopManager.showWarningMessage(Locale.getString("CHART_NO_DATA_AVAILABLE_WARNING"));
+	    graph = null;
+	}
 
         return graph;
     }
@@ -558,7 +567,7 @@ public class EODQuoteChartMenu extends JMenu {
 
         else if(text == Locale.getString("POINT_AND_FIGURE")) 
             graph = new PointAndFigureGraph(getDayClose());
-
+	    	    
 	else if (text == Locale.getString("SUPPORT_AND_RESISTENCE"))
 	    graph = new SupportAndResistenceGraph(getDayClose());
 
@@ -577,7 +586,9 @@ public class EODQuoteChartMenu extends JMenu {
         }
 
         // Make sure we did the right text -> graph mapping.
-        assert text == graph.getName();
+	if (graph != null) {
+	    assert text == graph.getName();
+	}
 
         return graph;
     }

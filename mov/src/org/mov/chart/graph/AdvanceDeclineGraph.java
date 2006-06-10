@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import org.mov.chart.Graphable;
 import org.mov.chart.GraphTools;
@@ -278,6 +279,10 @@ public class AdvanceDeclineGraph implements Graph {
 
     public boolean isPrimary() {
         return true;
+    }
+
+    public boolean dataAvailable(Vector x) {
+	return true;
     }
 }
 

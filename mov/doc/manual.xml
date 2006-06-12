@@ -305,7 +305,12 @@ maximum values:</para>
 
 <para>When you change the above parameters, you should restart Venice,
 so that these parameters are effective.</para>
-</chapter></chapter>
+</chapter>
+
+<chapter name="Chart Defaults">
+<para>The Chart Defaults page currently only allows you to set which chart type will be displayed initially when you graph a stock. The default is set to Line Chart initially.</para>
+</chapter>
+</chapter>
 
 <chapter name="Importing and Exporting Preferences">
 <para>You can load from or save to an XML file the whole Venice preferences.</para>
@@ -614,6 +619,15 @@ equation to chart and to specify the chart as either primary or secondary.
 A primary chart is one that appears in the top graph. A secondary chart will
 appear in its own smaller graph below.</para>
 </section>
+
+<section name="Point And Figure">
+  <para>The Point and Figure graph attempts to highligh only significant price movement, independant of time. This means it differs from most of the other charts in that there is not necessarily any data shown for a particular date range. </para>
+
+<para>
+If you switch to the Point and Figure graph while zoomed in on an area which does not have any Point and Figure data or you attempt to zoom in on such an area, a warning dialogue is displayed and the operation will be cancelled.
+  </para>
+</section>
+
 </section>
 </chapter>
 

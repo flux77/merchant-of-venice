@@ -83,19 +83,23 @@ public class ImportQuoteModule extends JPanel implements Module {
     private JRadioButton fromFiles;
     private JComboBox formatComboBox;
     private JRadioButton fromInternet;
-    private JComboBox sourceComboBox;
+    private JComboBox webSiteComboBox;
     private JTextField symbolList;
     private JTextField startDateTextField;
     private JTextField endDateTextField;
     
     // Parsed fields for internet import
-    TradingDate startDate;
-    TradingDate endDate;
-    List symbols;
+    private TradingDate startDate;
+    private TradingDate endDate;
+    private List symbols;
 
     // Parsed fields for file import
-    EODQuoteFilter filter;
-    File files[];
+    private EODQuoteFilter filter;
+    private File files[];
+
+    // Web site combo box entry indeces.
+    private final static int YAHOO_SITE = 0; // finance.yahoo.com
+    private final static int FLOAT_SITE = 1; // float.com.au
 
     /**
      * Create a new import quote module.
@@ -134,12 +138,7 @@ public class ImportQuoteModule extends JPanel implements Module {
         // Import from files
         {
             fromFiles = new JRadioButton(Locale.getString("FILES"));
-            fromFiles.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        checkDisabledStatus();
-                    }
-                });
-            
+
             if(importFromSource.equals("files"))
                 fromFiles.setSelected(true);
             c.gridwidth = 1;
@@ -164,25 +163,27 @@ public class ImportQuoteModule extends JPanel implements Module {
 
         // Import from the internet
         {
-            fromInternet = new JRadioButton(Locale.getString("INTERNET"));
-            fromInternet.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        checkDisabledStatus();
-                    }
-                });
+            String webSite = p.get("webSite", "yahoo");
 
+            fromInternet = new JRadioButton(Locale.getString("INTERNET"));
             if(importFromSource.equals("internet"))
                 fromInternet.setSelected(true);
             c.gridwidth = 1;
             gridbag.setConstraints(fromInternet, c);
             titledPanel.add(fromInternet);
             
-            sourceComboBox = new JComboBox();
-            sourceComboBox.addItem(Locale.getString("YAHOO"));
+            webSiteComboBox = new JComboBox();
+            webSiteComboBox.addItem(Locale.getString("YAHOO_DISPLAY_URL"));
+            webSiteComboBox.addItem(Locale.getString("FLOAT_DISPLAY_URL"));
+
+            if(webSite.equals("yahoo"))
+                webSiteComboBox.setSelectedIndex(YAHOO_SITE);
+            else
+                webSiteComboBox.setSelectedIndex(FLOAT_SITE);
 
             c.gridwidth = GridBagConstraints.REMAINDER;
-            gridbag.setConstraints(sourceComboBox, c);
-            titledPanel.add(sourceComboBox);
+            gridbag.setConstraints(webSiteComboBox, c);
+            titledPanel.add(webSiteComboBox);
             
             c.gridx = 1;
             symbolList = GridBagHelper.addTextRow(titledPanel, Locale.getString("SYMBOLS"), 
@@ -237,7 +238,26 @@ public class ImportQuoteModule extends JPanel implements Module {
         add(buttonPanel, BorderLayout.SOUTH);
         
         // Make sure the appropriate buttons are enabled and the others
-        // are disabled
+        // are disabled. Set up the check disabled action listeners only
+        // after all the necessary GUI components have been created.
+        fromFiles.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    checkDisabledStatus();
+                }
+            });
+
+        fromInternet.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    checkDisabledStatus();
+                }
+            });
+
+        webSiteComboBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    checkDisabledStatus();
+                }
+            });
+
         checkDisabledStatus();
     }
 
@@ -249,12 +269,14 @@ public class ImportQuoteModule extends JPanel implements Module {
         // File format is only applicable if importing from files.
         formatComboBox.setEnabled(fromFiles.isSelected());
 
-        // Exchange, symbol list and dates are only applicable if importing
-        // from the internet
-        sourceComboBox.setEnabled(fromInternet.isSelected());
-        symbolList.setEnabled(fromInternet.isSelected());
+        // URL and dates are only applicable if importing from the internet
+        webSiteComboBox.setEnabled(fromInternet.isSelected());
         startDateTextField.setEnabled(fromInternet.isSelected());
         endDateTextField.setEnabled(fromInternet.isSelected());
+
+        // Symbols are only applicable if importing from Yahoo.
+        symbolList.setEnabled(fromInternet.isSelected() &&
+                              webSiteComboBox.getSelectedIndex() == YAHOO_SITE);
     }
 
     /**
@@ -295,6 +317,11 @@ public class ImportQuoteModule extends JPanel implements Module {
         p.put("internetStartDate", startDateTextField.getText());
         p.put("internetEndDate", endDateTextField.getText());
         p.put("fileFilter", (String)formatComboBox.getSelectedItem());
+
+        if(webSiteComboBox.getSelectedIndex() == YAHOO_SITE)
+            p.put("webSite", "yahoo");
+        else
+            p.put("webSite", "float");
     }
 
     /**
@@ -416,66 +443,137 @@ public class ImportQuoteModule extends JPanel implements Module {
      */
     private void importQuotesFromInternet() {
         if(parseInternetFields()) {
-            Report report = new Report();
-            int quotesImported = 0;
-
-            // Get database to import to
-            DatabaseQuoteSource database = getDatabaseSource();
-
-            // Tell frame we want to close
-            propertySupport.firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
-
-            // Set up proxy support
-            ProxyPage.setupNetworking();
-
-            // Now set up progress dialog to display the symbol by symbol progress
-            ProgressDialog progress = ProgressDialogManager.getProgressDialog();
-            progress.setIndeterminate(false);
-            progress.setMaximum(symbols.size());
-            progress.setProgress(0);
-            progress.setMaster(true);
-            progress.show(Locale.getString("IMPORTING"));
-
-            // Import a symbol at a time
-            try {
-                for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
-
-                    Symbol symbol = (Symbol)iterator.next();
-
-                    // Update progress dialog
-                    progress.setNote(Locale.getString("IMPORTING_SYMBOL", symbol.toString()));
-                    
-                    // Load quotes from internet
-                    List quotes =
-                       YahooEODQuoteImport.importSymbol(report, symbol, startDate, endDate);
-                    
-                    // Import into database
-                    if(quotes.size() > 0) {
-
-                        // remove the symbol argument
-                        int symbolQuotesImported = database.importQuotes(quotes);
-                        report.addMessage(Locale.getString("YAHOO") + ":" + symbol + ": " +
-                                          Locale.getString("IMPORTED_QUOTES", 
-                                                           symbolQuotesImported));
-                        quotesImported += symbolQuotesImported;
-                    }
-                 
-                    // Stop if the user hit cancel
-                    if(Thread.currentThread().isInterrupted())
-                        break;
-                    
-                    progress.increment();
-                }
-            }
-
-            catch(ImportExportException e) {
-                DesktopManager.showErrorMessage(e.getMessage());
-            }
-
-            QuoteSourceManager.flush();
-            ProgressDialogManager.closeProgressDialog(progress);
-            displayReport(report, quotesImported);
+            if(webSiteComboBox.getSelectedIndex() == YAHOO_SITE)
+                importQuotesFromYahoo();
+            else
+                importQuotesFromFloat();
         }
+    }
+
+    /**
+     * Import quotes from finance.yahoo.com.
+     */
+    private void importQuotesFromYahoo() {
+        Report report = new Report();
+        int quotesImported = 0;
+        
+        // Get database to import to
+        DatabaseQuoteSource database = getDatabaseSource();
+        
+        // Tell frame we want to close
+        propertySupport.firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
+        
+        // Set up proxy support
+        ProxyPage.setupNetworking();
+        
+        // Now set up progress dialog to display the symbol by symbol progress
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+        progress.setIndeterminate(false);
+        progress.setMaximum(symbols.size());
+        progress.setProgress(0);
+        progress.setMaster(true);
+        progress.show(Locale.getString("IMPORTING"));
+        
+        // Import a symbol at a time
+        try {
+            for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
+                
+                Symbol symbol = (Symbol)iterator.next();
+                
+                // Update progress dialog
+                progress.setNote(Locale.getString("IMPORTING_SYMBOL", symbol.toString()));
+                
+                // Load quotes from internet
+                List quotes =
+                    YahooEODQuoteImport.importSymbol(report, symbol, startDate, endDate);
+                
+                // Import into database
+                if(quotes.size() > 0) {
+                    
+                    // remove the symbol argument
+                    int symbolQuotesImported = database.importQuotes(quotes);
+                    report.addMessage(Locale.getString("YAHOO_DISPLAY_URL") + ":" + symbol + ": " +
+                                      Locale.getString("IMPORTED_QUOTES", 
+                                                       symbolQuotesImported));
+                    quotesImported += symbolQuotesImported;
+                }
+                
+                // Stop if the user hit cancel
+                if(Thread.currentThread().isInterrupted())
+                    break;
+                
+                progress.increment();
+            }
+        }
+        
+        catch(ImportExportException e) {
+            DesktopManager.showErrorMessage(e.getMessage());
+        }
+        
+        QuoteSourceManager.flush();
+        ProgressDialogManager.closeProgressDialog(progress);
+        displayReport(report, quotesImported);
+    }
+
+    /**
+     * Import quotes from float.com.au.
+     */
+    private void importQuotesFromFloat() {
+        Report report = new Report();
+        int quotesImported = 0;
+        
+        // Get database to import to
+        DatabaseQuoteSource database = getDatabaseSource();
+        List dates = TradingDate.dateRangeToList(startDate, endDate);
+        
+        // Tell frame we want to close
+        propertySupport.firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
+        
+        // Set up proxy support
+        ProxyPage.setupNetworking();
+        
+        // Now set up progress dialog to display the symbol by symbol progress
+        ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+        progress.setIndeterminate(false);
+        progress.setMaximum(dates.size());
+        progress.setProgress(0);
+        progress.setMaster(true);
+        progress.show(Locale.getString("IMPORTING"));
+        
+        // Import a date at a time
+        try {
+            for(Iterator iterator = dates.iterator(); iterator.hasNext();) {
+                
+                TradingDate date = (TradingDate)iterator.next();
+
+                // Update progress dialog
+                progress.setNote(Locale.getString("IMPORTING_DATE", date.toString()));
+                
+                // Load quotes from internet
+                List quotes = FloatEODQuoteImport.importDate(report, date);
+                
+                // Import into database
+                int dateQuotesImported = database.importQuotes(quotes);
+                report.addMessage(Locale.getString("FLOAT_DISPLAY_URL") + ":" + date + ": " +
+                                  Locale.getString("IMPORTED_QUOTES", 
+                                                   dateQuotesImported));
+                quotesImported += dateQuotesImported;
+                
+                // Stop if the user hit cancel
+                if(Thread.currentThread().isInterrupted())
+                    break;
+                
+                progress.increment();
+            }
+        }
+        
+        catch(ImportExportException e) {
+            DesktopManager.showErrorMessage(e.getMessage());
+        }
+        
+        QuoteSourceManager.flush();
+        ProgressDialogManager.closeProgressDialog(progress);
+        displayReport(report, quotesImported);
     }
 
     /**
@@ -485,28 +583,31 @@ public class ImportQuoteModule extends JPanel implements Module {
      *         otherwise
      */
     private boolean parseInternetFields() {
-        // Parse symbol list and validate
-        try {
-            // Don't check that the symbols exist before import. After all
-            // they won't at the first import.
-            symbols = new ArrayList(Symbol.toSortedSet(symbolList.getText(), false));
-        }
-        catch(SymbolFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  e.getMessage(),
-                                                  Locale.getString("INVALID_SYMBOL_LIST"),
-                                                  JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
+        // Parse symbol list and validate if we are downloading from Yahoo.
+        // If we are downloading from float.com.au then we ignore this field.
+        if(webSiteComboBox.getSelectedIndex() == YAHOO_SITE) {
+            try {
+                // Don't check that the symbols exist before import. After all
+                // they won't at the first import.
+                symbols = new ArrayList(Symbol.toSortedSet(symbolList.getText(), false));
+            }
+            catch(SymbolFormatException e) {
+                JOptionPane.showInternalMessageDialog(desktop, 
+                                                      e.getMessage(),
+                                                      Locale.getString("INVALID_SYMBOL_LIST"),
+                                                      JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
 
-        if(symbols.size() == 0) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("MISSING_SYMBOLS"),
-                                                  Locale.getString("INVALID_SYMBOL_LIST"),
-                                                  JOptionPane.ERROR_MESSAGE);
-            return false;
+            if(symbols.size() == 0) {
+                JOptionPane.showInternalMessageDialog(desktop, 
+                                                      Locale.getString("MISSING_SYMBOLS"),
+                                                      Locale.getString("INVALID_SYMBOL_LIST"),
+                                                      JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
         }
-        
+            
         // Parse dates and validate
         try {
             startDate = new TradingDate(startDateTextField.getText(), TradingDate.BRITISH);

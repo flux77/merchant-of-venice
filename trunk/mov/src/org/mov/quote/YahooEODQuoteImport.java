@@ -40,7 +40,7 @@ import org.mov.util.Report;
 import org.mov.util.TradingDate;
 
 /**
- * Import end-of-day quotes from Yahoo into Venice.
+ * Import end-of-day quotes from finance.yahoo.com into Venice.
  *
  * @author Andrew Leppard
  * @see FileEODQuoteImport
@@ -112,7 +112,7 @@ public class YahooEODQuoteImport {
         } while(!retrievalEndDate.before(startDate));
         
         if(result.size() == 0) {
-            report.addError(Locale.getString("YAHOO") + ":" + 
+            report.addError(Locale.getString("YAHOO_DISPLAY_URL") + ":" + 
                             symbol + ":" +
                             Locale.getString("ERROR") + ": " +
                             Locale.getString("NO_QUOTES_FOUND"));
@@ -161,7 +161,7 @@ public class YahooEODQuoteImport {
                         verify(report, quote);
                     }                    
                     catch(QuoteFormatException e) {
-                        report.addError(Locale.getString("YAHOO") + ":" + 
+                        report.addError(Locale.getString("YAHOO_DISPLAY_URL") + ":" + 
                                         symbol + ":" +
                                         Locale.getString("ERROR") + ": " +
                                         e.getMessage());
@@ -262,7 +262,7 @@ public class YahooEODQuoteImport {
             for(Iterator iterator = messages.iterator(); iterator.hasNext();) {
                 String message = (String)iterator.next();
 
-                report.addWarning(Locale.getString("YAHOO") + ":" + 
+                report.addWarning(Locale.getString("YAHOO_DISPLAY_URL") + ":" + 
                                   quote.getSymbol() + ":" + 
                                   quote.getDate() + ":" +
                                   Locale.getString("WARNING") + ": " +

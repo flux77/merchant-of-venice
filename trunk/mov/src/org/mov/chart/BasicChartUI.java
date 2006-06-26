@@ -296,30 +296,32 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 				  height + BUFFER_BUFFER_SIZE,
 				  BufferedImage.TYPE_3BYTE_BGR);	
 	}
+
+	ChartDrawingModel cdm = ((Chart)c).getChartDrawingModel();
+	
 	
 	// Draw it iff the size has changed
 	if(width != bufferWidth || 
-	   height != bufferHeight) {
+	   height != bufferHeight ||
+	   cdm.dataExists()) {	    
+
 	    bufferedPaint(image.getGraphics(), (Chart)c, width, height);
 	
 	    bufferWidth = width;
 	    bufferHeight = height;
-	    
-	    
-	}
-	
+	    	    
+	}	
+
 	// Copy buffer to screen
 	g.drawImage(image, 0, 0, this);
 	
 	// Finally highlight region
 	highlightRegion(g, (Chart)c, height);
 
-	drawLines(g, (Chart)c, height);
-	drawPoints(g, (Chart)c, height);
-	drawText(g, (Chart)c, height);
     }
 
-    public BufferedImage getImage() {
+    public BufferedImage getImage() {       	
+	
 	return image;
     }
 
@@ -335,6 +337,10 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	drawLevels(g, chart, width, height);
 	drawHorizontalLabels(g, height);
 	drawAnnotations(g, chart);
+
+	drawLines(g, chart);
+	drawPoints(g, chart);
+	drawText(g, chart);
 
 	
     }
@@ -404,7 +410,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
       Show free hand lines drawn on chart.
     */
 
-    private void drawPoints(Graphics g, Chart chart, int height) {
+    private void drawPoints(Graphics g, Chart chart) {
 
 	ChartDrawingModel elements = chart.getChartDrawingModel();
 	Vector points = elements.getDrawnPoints();
@@ -468,7 +474,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     }
     
     //Paint any lines which have been drawn on the chart. 
-    private void drawLines(Graphics g, Chart chart, int height) {
+    private void drawLines(Graphics g, Chart chart) {
 	
 	Color prev;
 	ChartDrawingModel elements; 
@@ -498,6 +504,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		g.setColor(Color.MAGENTA);
 		g.drawLine(startX,startY, endX, endY);
 		g.setColor(prev);
+
 	    }
 	    g.setPaintMode();	    
 	}
@@ -507,7 +514,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
        Show text added to chart by drawing.
     */
 
-    private void drawText(Graphics g, Chart chart, int height) {
+    private void drawText(Graphics g, Chart chart) {
 	Color prevColour = g.getColor();
 	int x,y,absY;
 	Font prevFont = g.getFont();

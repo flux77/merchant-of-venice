@@ -34,11 +34,15 @@ public class ChartDrawingModel
     Vector points;
     Vector lines;
     HashMap text;
+    boolean dataExists;
     
     public ChartDrawingModel() {
 	points = new Vector();
 	lines = new Vector();
 	text = new HashMap();
+
+	setDataExists();
+	
     }
     
     
@@ -54,6 +58,8 @@ public class ChartDrawingModel
 	//So there's some defined end
 	line.setEnd(start);
 	lines.add(line);
+
+	setDataExists();
     }
     
     /**
@@ -105,6 +111,8 @@ public class ChartDrawingModel
 	if (i != -1) {
 	    lines.remove(i);
 	}
+
+	setDataExists();
     }
 
     /**
@@ -158,6 +166,7 @@ public class ChartDrawingModel
     */
     public void setPoint(Coordinate point) {
 	points.add(point);
+	setDataExists();
     }
 
     /**
@@ -183,6 +192,7 @@ public class ChartDrawingModel
 	if (i != -1) {
 	    points.remove(i);
 	}
+	setDataExists();
     }
 
     /**
@@ -202,7 +212,8 @@ public class ChartDrawingModel
     */
     public void setText(Coordinate point, String str) {
 	
-	text.put(point, str);
+	text.put(point, str);	
+	setDataExists();
     }
 
     /**
@@ -212,6 +223,23 @@ public class ChartDrawingModel
     */
     public void removeText(Coordinate point) {
 	text.remove(point);
+	setDataExists();
+    }
+
+    public boolean dataExists() {
+	return dataExists;
+    }
+
+    /* Determine if there is any drawn elements left on the chart
+       after a delete */
+    private void setDataExists() {
+
+	dataExists = true;
+	if (lines.size() == 0 &&
+	    points.size() == 0 &&
+	    text.size() == 0) {
+	    dataExists = false;
+	}	    
     }
 
 }

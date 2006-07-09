@@ -27,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventListener;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -46,7 +47,7 @@ import javax.swing.table.TableModel;
  * Table that allows the user to sort by column by clicking on the column's
  * table header
  *
- * @version	0.1, 01/02/19	
+ * @version	0.1, 01/02/19
  * @author	Andrew Leppard
  */
 
@@ -83,7 +84,7 @@ public class SortedTable extends JTable
             setBackground(background);
             setForeground(foreground);
 	}
-	
+
 	public Component
 	    getTableCellRendererComponent(JTable table,
 					  Object value,
@@ -157,7 +158,7 @@ public class SortedTable extends JTable
 		this.key = key;
 		this.index = index;
 	    }
-	
+
 	    Object getKey() {
 		return key;
 	    }
@@ -170,12 +171,12 @@ public class SortedTable extends JTable
 	private class SortComparator implements Comparator
 	{
 	    private int sortDirection;
-	
+
 	    public SortComparator(int sortDirection)
 	    {
 		setDirection(sortDirection);
 	    }
-	
+
 	    public void setDirection(int sortDirection)
 	    {
 		this.sortDirection = sortDirection;
@@ -194,6 +195,7 @@ public class SortedTable extends JTable
                 // shoud always appear at the bottom.
                 try {
                     if(firstKey instanceof TwoWayComparable) {
+                        // TODO: remove twoway comparable and use Reverse thing in collections.
                         TwoWayComparable firstComparable = (TwoWayComparable)firstKey;
                         TwoWayComparable secondComparable = (TwoWayComparable)secondKey;
 
@@ -215,7 +217,7 @@ public class SortedTable extends JTable
                 // If we got here there was an error - so return equality.
                 return 0;
 	    }
-	
+
 	    private int applySortDirection(int comparision)
 	    {
 		// Changes direction of sort
@@ -228,21 +230,21 @@ public class SortedTable extends JTable
 			comparision = 1;
                     */
 		}
-		
+
 		return comparision; // no change
 	    }
 	}
-	
+
 	public SortModel(TableModel userModel, int sortColumn, int
 			 sortDirection)
 	{
 	    this.userModel = userModel;
 	    userModel.addTableModelListener(this);
-	
+
 	    hiddenColumns = new TreeSet();
 	    sortComparator = new SortComparator(sortDirection);
 	    sortIndex = null;
-	
+
 	    sort(sortColumn, sortDirection);
 	}
 
@@ -268,7 +270,7 @@ public class SortedTable extends JTable
 	}
 
 	public void showColumn(int columnNumber, boolean show) {
-	    if(show == false && isColumnVisible(columnNumber)) {	
+	    if(show == false && isColumnVisible(columnNumber)) {
 		hiddenColumns.add(new Integer(columnNumber));
 		fireTableStructureChanged();
 	    }
@@ -277,7 +279,7 @@ public class SortedTable extends JTable
 		fireTableStructureChanged();
 	    }
 	}
-	
+
 	// Convert from column index which includes hidden columns to
 	// one that doesn't. E.g. if column 3 is hidden and this function
 	// is given column number 4 it will return 5 as this is the column
@@ -290,7 +292,7 @@ public class SortedTable extends JTable
 
 	    while(iterator.hasNext()) {
 		int hiddenColumnNumber = ((Integer)iterator.next()).intValue();
-		
+
 		if(hiddenColumnNumber <= column)
 		    column++;
 	    }
@@ -307,7 +309,7 @@ public class SortedTable extends JTable
 
 	    while(iterator.hasNext()) {
 		int hiddenColumnNumber = ((Integer)iterator.next()).intValue();
-		
+
 		if(hiddenColumnNumber <= column) {
 		    numberHiddenColumns++;
                     column++;
@@ -334,17 +336,23 @@ public class SortedTable extends JTable
 				     i);
 		sortIndex.add(tableElement);
 	    }
-	
+
 	    // 2. Get comparator ready and then sort
 	    sortComparator.setDirection(sortDirection);
 	    Collections.sort(sortIndex, sortComparator);
 	}
 
+        public boolean isCellEditable(int row, int column)
+        {
+            return userModel.isCellEditable(getUnsortedRow(row),
+                                            convertToDisplayedColumn(column));
+        }
+
 	public int getRowCount()
 	{
 	    return userModel.getRowCount();
 	}
-	
+
 	public int getColumnCount()
 	{
 	    return userModel.getColumnCount() - hiddenColumns.size();
@@ -359,7 +367,7 @@ public class SortedTable extends JTable
 	{
 	    return userModel.getColumnName(convertToDisplayedColumn(column));
 	}
-	
+
 	public Object getValueAt(int row, int column)
 	{
 	    column = convertToDisplayedColumn(column);
@@ -379,7 +387,27 @@ public class SortedTable extends JTable
 	    }
 	    else
 		return (Object)"";
-	}
+        }
+
+        public void setValueAt(Object value, int row, int column)
+        {
+            // TODO: merge better with getValueAt
+	    column = convertToDisplayedColumn(column);
+
+	    // If the table size has changed then we need to
+	    // resort before we return the new value
+	    if(sortIndex.size() != getRowCount()) {
+		sort(currentSortColumn, currentSortDirection);
+	    }
+
+	    // The sortIndex.get(row) will translate the given row to the
+	    // sorted row
+	    if(sortIndex != null) {
+		TableElement index = (TableElement)sortIndex.get(row);
+
+		userModel.setValueAt(value, index.getIndex(), column);
+	    }
+        }
 
 	// Given the row of the sorted data, what row would it be in the
 	// original unsorted data?
@@ -406,7 +434,7 @@ public class SortedTable extends JTable
                     index = (TableElement)sortIndex.get(i);
 
                     if(index.getIndex() == unsortedRow)
-                        return i;		
+                        return i;
                 }
 
                 // No longer in table
@@ -426,7 +454,7 @@ public class SortedTable extends JTable
 	sortColumn = 0;
 	sortDirection = SORT_DOWN;
 	model = null;
-	
+
 	// Set custom renderer for the tables headers so we have the
 	// sort direction arrow
         setCustomHeaderRenderer();
@@ -470,7 +498,7 @@ public class SortedTable extends JTable
 
     public void setModel(TableModel model)
     {
-	setModel(model, sortColumn, sortDirection);
+        setModel(model, sortColumn, sortDirection);
     }
 
     public void setModel(TableModel model, int sortColumn, int sortDirection)
@@ -498,7 +526,7 @@ public class SortedTable extends JTable
 
 	    int[] selectedRows = getSelectedRows();
 	    int selectedRowCount = getSelectedRowCount();
-	
+
 	    // Resort data in table model
 	    model.sort(sortColumn, sortDirection);
 
@@ -514,8 +542,8 @@ public class SortedTable extends JTable
     // We use a custom renderer for the table header so that we can
     // insert the up/down sort arrows.
     private void setCustomHeaderRenderer() {
-	TableCellRenderer r = getTableHeader().getDefaultRenderer();	
-	
+	TableCellRenderer r = getTableHeader().getDefaultRenderer();
+
 	// Assume the header is rendered using swing components (it is) and
 	// get the component used to render the first cell of the header
 	JComponent header =
@@ -578,7 +606,7 @@ public class SortedTable extends JTable
     {
 	int[] unsortedSelectedRows = super.getSelectedRows();
 	int[] selectedRows = new int[getSelectedRowCount()];
-	
+
 	if(getSelectedRowCount() > 0) {
 	    for(int i = 0; i < getSelectedRowCount(); i++)
 		selectedRows[i] =

@@ -56,7 +56,7 @@ public class AbstractTable extends SortedTable {
 
     // Default values for rendering table rows
     private static final Color backgroundColor = Color.white;
-    private static final Color alternativeBackgroundColor = new Color(237, 237, 237);   
+    private static final Color alternativeBackgroundColor = new Color(237, 237, 237);
 
     // Images used for arrows representing when stock has gone up, down or is unchanged
     private String upImage = "org/mov/images/Up.png";
@@ -74,18 +74,53 @@ public class AbstractTable extends SortedTable {
     private List showExpressionColumnMenuItems;
 
     /**
-     * Class for rendering all cells in the table. Not just stock quotes.
+     * Class for rendering cells in the table.
      */
-    private class StockQuoteRenderer extends JPanel implements TableCellRenderer
-    {
+    private class PatternRenderer extends JPanel implements TableCellRenderer {
+	private TableCellRenderer defaultRenderer;
+
+        /**
+         * Create a new renderer for rendering a table cell.
+         */
+	public PatternRenderer(TableCellRenderer defaultRenderer) {
+	    this.defaultRenderer = defaultRenderer;
+	}
+
+	public Component getTableCellRendererComponent(JTable table,
+						       Object value,
+						       boolean isSelected,
+						       boolean hasFocus,
+						       int row, int column) {
+	    // Use Java's own default renderer to render the cell
+	    Component component =
+		defaultRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+							      row, column);
+
+	    // But make each alternate row a different colour
+            if(isSelected)
+		component.setBackground(table.getSelectionBackground());
+            else
+                component.setBackground(row % 2 != 0?
+                                        backgroundColor:
+                                        alternativeBackgroundColor);
+	    return component;
+	}
+    }
+
+    /**
+     * Class for rendering the {@link ChangeFormat} class in the table. This class
+     * is rendered by displaying the change as a percent and an array icon
+     * representing the direction of change.
+     */
+    private class ChangeFormatRenderer extends JPanel implements TableCellRenderer {
 	private JLabel textLabel = new JLabel();
 	private JLabel iconLabel = new JLabel();
 	private Component glue = Box.createHorizontalGlue();
 
         /**
-         * Create a new rendered for rendering a table cell.
+         * Create a new renderer for rendering a table cell.
          */
-	public StockQuoteRenderer() {
+	public ChangeFormatRenderer() {
 	    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 	}
 
@@ -94,8 +129,6 @@ public class AbstractTable extends SortedTable {
 						       boolean isSelected,
 						       boolean hasFocus,
 						       int row, int column) {
-	    AbstractTable t = (AbstractTable) table;
-
 	    // Set font to match default font
 	    textLabel.setFont(table.getFont());
 
@@ -112,55 +145,31 @@ public class AbstractTable extends SortedTable {
 			      alternativeBackgroundColor);
             }
 
-	    // The change column has specific rendering
-	    if(value instanceof ChangeFormat)
-		renderChangeComponent(table, value, isSelected,
-				      hasFocus, row, column);
-            else if(value != null) {
-		textLabel.setText(value.toString());
-		add(textLabel);
-	    }
-            else {
-                textLabel.setText("");
-                add(textLabel);
-            }
-
-	    return this;
-	}
-
-        /**
-         * Render the {@link ChangeFormat} change which displays a stock's change.
-         * This requires extra work because it will display an arrow showing the
-         * stock change direction.
-         */
-	private void renderChangeComponent(JTable table, Object value,
-					   boolean isSelected,
-					   boolean hasFocus,
-					   int row, int column) {
-
 	    ChangeFormat change = (ChangeFormat)value;
 	    double changePercent = change.getChange();
 	    String text = new String();
 
-	    if(changePercent > 0)
+	    if(changePercent > 0.0)
 		text = "+";
 
             text = text.concat(format.format(changePercent));
             text = text.concat("%");
 	    textLabel.setText(text);
 
-	    if(changePercent > 0 && upImageIcon != null)
+	    if(changePercent > 0.0 && upImageIcon != null)
 		iconLabel.setIcon(upImageIcon);
 
-	    else if(changePercent < 0 && downImageIcon != null)
+	    else if(changePercent < 0.0 && downImageIcon != null)
 		iconLabel.setIcon(downImageIcon);
 
-	    else if(changePercent == 0 && unchangedImageIcon != null)
+	    else if(changePercent == 0.0 && unchangedImageIcon != null)
 		iconLabel.setIcon(unchangedImageIcon);
 
 	    add(glue);
 	    add(textLabel);
 	    add(iconLabel);
+
+	    return this;
 	}
     }
 
@@ -168,24 +177,7 @@ public class AbstractTable extends SortedTable {
      * Create a new table.
      */
     public AbstractTable() {
-
 	setShowGrid(true);
-
-	// Our own stock quote renderer
-	setDefaultRenderer(AccountNameFormat.class, new StockQuoteRenderer());
-	setDefaultRenderer(ChangeFormat.class, new StockQuoteRenderer());
-	setDefaultRenderer(Double.class, new StockQuoteRenderer());
-	setDefaultRenderer(Float.class, new StockQuoteRenderer());
-	setDefaultRenderer(Integer.class, new StockQuoteRenderer());
-	setDefaultRenderer(Long.class, new StockQuoteRenderer());
-	setDefaultRenderer(Money.class, new StockQuoteRenderer());
-	setDefaultRenderer(QuoteFormat.class, new StockQuoteRenderer());
-	setDefaultRenderer(String.class, new StockQuoteRenderer());
-	setDefaultRenderer(TradingDate.class, new StockQuoteRenderer());
-	setDefaultRenderer(TradingTime.class, new StockQuoteRenderer());
-        setDefaultRenderer(ExpressionResult.class, new StockQuoteRenderer());
-        setDefaultRenderer(PointChangeFormat.class, new StockQuoteRenderer());
-        setDefaultRenderer(Symbol.class, new StockQuoteRenderer());
 
         // Set up number formatter for rendering ChangeFormat.java
         format = NumberFormat.getInstance();
@@ -193,7 +185,7 @@ public class AbstractTable extends SortedTable {
         format.setMinimumFractionDigits(2);
         format.setMaximumFractionDigits(2);
 
-        // Add create the image icons for the up, down & unchanged images
+        // Add the icons for the up, down & unchanged images
         URL upImageResource = ClassLoader.getSystemResource(upImage);
         upImageIcon = (upImageResource != null? new ImageIcon(upImageResource) : null);
 
@@ -203,6 +195,20 @@ public class AbstractTable extends SortedTable {
         URL unchangedImageResource = ClassLoader.getSystemResource(unchangedImage);
         unchangedImageIcon = (unchangedImageResource != null?
                               new ImageIcon(unchangedImageResource) : null);
+
+	// Set up a cell renderer to render each alternative row a different colur.
+	// JTable sets up specific renderers for these objects. So this is the minimum number
+	// of renderers we need to define to override the defaults.
+	setDefaultRenderer(Object.class,
+			   new PatternRenderer(getDefaultRenderer(Object.class)));
+	setDefaultRenderer(Number.class,
+			   new PatternRenderer(getDefaultRenderer(Number.class)));
+	setDefaultRenderer(Boolean.class,
+			   new PatternRenderer(getDefaultRenderer(Boolean.class)));
+
+	// Set up a specific renderer for displaying the ChangeFormat component.
+	// We display an arrow indicating whether the change is positive or negative.
+	setDefaultRenderer(ChangeFormat.class, new ChangeFormatRenderer());
     }
 
     /**
@@ -252,7 +258,7 @@ public class AbstractTable extends SortedTable {
                         }, showColumnsMenu, column.getFullName());
 
                 showMenuItem.setState(column.getVisible() == Column.VISIBLE);
-                
+
                 if(isExpressionColumn)
                     showExpressionColumnMenuItems.add(showMenuItem);
             }
@@ -293,7 +299,7 @@ public class AbstractTable extends SortedTable {
                                             expressionColumns[i].getExpressionText().length() > 0;
                                         JCheckBoxMenuItem menuItem =
                                             (JCheckBoxMenuItem)showExpressionColumnMenuItems.get(i);
-			
+
                                         showColumn(expressionColumns[i].getNumber(),
                                                    containsExpression);
                                         menuItem.setState(containsExpression);

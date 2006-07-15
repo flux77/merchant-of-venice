@@ -1,20 +1,20 @@
 /* Merchant of Venice - technical analysis software for the stock market.
    Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
    This portion of code Copyright (C) 2004 Dan Makovec (venice@makovec.net)
-  
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-    
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-    
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.prefs;
@@ -102,10 +102,10 @@ public class PreferencesManager {
 
         /** Whether we are using the web proxy. */
 	public boolean isEnabled;
-	
+
         /** Is authentication enabled? */
         public boolean authEnabled;
-        
+
         /** Authentication user name. */
         public String user;
 
@@ -155,7 +155,7 @@ public class PreferencesManager {
 
     /** Intra-day Quote Sync preferences fields. */
     public class IDQuoteSyncPreferences {
-        
+
         /** Is syncing enabled? */
         public boolean isEnabled;
 
@@ -288,7 +288,7 @@ public class PreferencesManager {
 
     /**
      * Load the list of all registered macros.
-     * 
+     *
      * @return the list of registered macros
      * @see StoredMacro
      */
@@ -296,27 +296,27 @@ public class PreferencesManager {
         List stored_macros = new ArrayList();
         Preferences prefs = getUserNode("/macros/info");
 
-	    String dirname = PreferencesManager.getDirectoryLocation("macros");
-	    if (dirname == null) return stored_macros;
-	    File directory = new File(dirname);
-	    if (!directory.isDirectory())
-	        return null;
+        String dirname = PreferencesManager.getDirectoryLocation("macros");
+        if (dirname == null) return stored_macros;
+        File directory = new File(dirname);
+        if (!directory.isDirectory())
+           return stored_macros;
 
-	    String[] list = directory.list(new FilenameFilter() {
-	        public boolean accept(File dir, String filename) {
-	            return (dir.getAbsolutePath().equals(PreferencesManager.getDirectoryLocation("macros")) &&
-	                    filename.indexOf(".py") == filename.length()-3);
-	        }
-	    });
-	    
+        String[] list = directory.list(new FilenameFilter() {
+          public boolean accept(File dir, String filename) {
+           return (dir.getAbsolutePath().equals(PreferencesManager.getDirectoryLocation("macros")) &&
+                   filename.indexOf(".py") == filename.length()-3);
+          }
+         });
+
         for(int i = 0; i < list.length; i++) {
-            String name = list[i].substring(0,list[i].length()-3);
-            Preferences macro_node = getUserNode("/macros/info/"+list[i]);
-            stored_macros.add(new StoredMacro(macro_node.get("name", name), 
-                    		  list[i],
-                 			  macro_node.getBoolean("on_startup",false),
-                       		  macro_node.getInt("start_sequence",0),
-                       		  macro_node.getBoolean("in_menu", false)));
+         String name = list[i].substring(0,list[i].length()-3);
+         Preferences macro_node = getUserNode("/macros/info/"+list[i]);
+         stored_macros.add(new StoredMacro(macro_node.get("name", name),
+                                           list[i],
+                                           macro_node.getBoolean("on_startup",false),
+                                           macro_node.getInt("start_sequence",0),
+                                           macro_node.getBoolean("in_menu", false)));
         }
         return stored_macros;
     }
@@ -333,7 +333,7 @@ public class PreferencesManager {
             Preferences prefs = getUserNode("/macros_info");
             prefs.removeNode();
             prefs = getUserNode("/macros_info");
-            
+
             for(Iterator iterator = stored_macros.iterator(); iterator.hasNext();) {
                 StoredMacro stored_macro = (StoredMacro)iterator.next();
                 Preferences macro_node = getUserNode("/macros/info/"+stored_macro.getFilename());
@@ -347,12 +347,12 @@ public class PreferencesManager {
             // ignore
         }
     }
-    
-    //Store the users text made for this symbol     
+
+    //Store the users text made for this symbol
     public static void putUserNotes(String symbol, String text) {
         String xpath = "/userNotes/" + symbol;
         Preferences prefs = getUserNode("/userNotes");
-	
+
         prefs = getUserNode("/userNotes");
         prefs.put(symbol, text);
     }
@@ -369,7 +369,7 @@ public class PreferencesManager {
 	if (prefs != null) {
 	    text = prefs.get(symbol, "");
 	}
-	    
+
 	return text;
 
     }
@@ -462,7 +462,7 @@ public class PreferencesManager {
         Preferences prefs = getUserNode("/cache");
         prefs.putInt("maximumQuotes", maximumCachedQuotes);
     }
-    
+
     /**
      * Return a list of the names of all the watch screens.
      *
@@ -588,7 +588,7 @@ public class PreferencesManager {
             if(portfolioFileName.endsWith(suffix)) {
                 // Remove trailing suffix
                 String portfolioName =
-                    portfolioFileName.substring(0, portfolioFileName.length() - suffix.length()); 
+                    portfolioFileName.substring(0, portfolioFileName.length() - suffix.length());
                 portfolioNames.add(portfolioName);
             }
         }
@@ -673,7 +673,7 @@ public class PreferencesManager {
         // Venice 0.6b did not support multiple currencies. So just default
         // to the user's default currency.
 	Portfolio portfolio = new Portfolio(name, Currency.getDefaultCurrency());
-	
+
 	Preferences p = getUserNode("/portfolio/" + name);
 
 	try {
@@ -701,7 +701,7 @@ public class PreferencesManager {
 
 	    String[] transactionNumbers =
 		p.node("transactions").childrenNames();
-	
+
 	    for(int i = 0; i < transactionNumbers.length; i++) {
 		Preferences transactionPrefs =
 		    p.node("transactions").node(transactionNumbers[i]);
@@ -740,7 +740,7 @@ public class PreferencesManager {
                 String cashAccountName = transactionPrefs.get("cash_account", "");
                 String cashAccountName2 = transactionPrefs.get("cash_account2", "");
                 String shareAccountName = transactionPrefs.get("share_account", "");
-                    
+
                 CashAccount cashAccount = null;
                 CashAccount cashAccount2 = null;
                 ShareAccount shareAccount = null;
@@ -762,7 +762,7 @@ public class PreferencesManager {
                     throw new PreferencesException(Locale.getString("EXPECTING_CASH_ACCOUNT",
                                                                     cashAccountName2));
                 }
-                
+
                 try {
 		    shareAccount =
 			(ShareAccount)portfolio.findAccountByName(shareAccountName);
@@ -786,7 +786,7 @@ public class PreferencesManager {
             }
 
 	    portfolio.addTransactions(transactions);
-	
+
 	}
 	catch(BackingStoreException e) {
             throw new PreferencesException(e.getMessage());
@@ -923,7 +923,7 @@ public class PreferencesManager {
         catch(SecurityException e) {
             throw new PreferencesException(e.getMessage());
         }
-        
+
         // Clear old portfolio from preferences if present (up to 0.6b).
 	try {
             Preferences p = getUserNode("/portfolio/" + portfolio.getName());
@@ -946,7 +946,7 @@ public class PreferencesManager {
         proxyPreferences.host = prefs.get("host", "proxy");
         proxyPreferences.port = prefs.get("port", "8080");
         proxyPreferences.isEnabled = prefs.getBoolean("enabled", false);
-        
+
     	proxyPreferences.user= prefs.get("user", "");
     	proxyPreferences.password = prefs.get("password", "");
     	proxyPreferences.authEnabled = prefs.getBoolean("authEnabled", false);
@@ -964,7 +964,7 @@ public class PreferencesManager {
 	prefs.put("host", proxyPreferences.host);
 	prefs.put("port", proxyPreferences.port);
 	prefs.putBoolean("enabled", proxyPreferences.isEnabled);
-	
+
 	prefs.put("user", proxyPreferences.user);
 	prefs.put("password", proxyPreferences.password);
 	prefs.putBoolean("authEnabled", proxyPreferences.authEnabled);
@@ -1052,9 +1052,9 @@ public class PreferencesManager {
      *
      * @return the default chart to be displayed
      */
-    public static String getDefaultChart() {        
+    public static String getDefaultChart() {
         Preferences prefs = getUserNode("/default_chart_defaults");
-        String str = prefs.get("default_chart", "Line Graph");        
+        String str = prefs.get("default_chart", "Line Graph");
         return str;
     }
 
@@ -1077,7 +1077,7 @@ public class PreferencesManager {
     public static int getQuoteSource() {
 	Preferences prefs = getUserNode("/quote_source");
 	String quoteSource = prefs.get("source", "samples");
-	
+
 	if(quoteSource.equals("samples"))
 	    return SAMPLES;
 	else if(quoteSource.equals("files"))
@@ -1085,14 +1085,14 @@ public class PreferencesManager {
 	    return INTERNAL;
 	else if(quoteSource.equals("database"))
 	    return DATABASE;
-	else 
+	else
         return INTERNAL;
     }
 
     /**
      * Set quote source setting.
      *
-     * @param quoteSource the quote source, one of {@link #DATABASE}, {@link #INTERNAL} or 
+     * @param quoteSource the quote source, one of {@link #DATABASE}, {@link #INTERNAL} or
      *                    {@link #SAMPLES}.
      */
     public static void putQuoteSource(int quoteSource) {
@@ -1164,7 +1164,7 @@ public class PreferencesManager {
         }
         catch(SecurityException e) {
             // don't care
-        }        
+        }
 
         return databaseFileName;
     }

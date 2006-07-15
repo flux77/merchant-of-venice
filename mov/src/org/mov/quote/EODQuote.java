@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.quote;
@@ -86,6 +86,9 @@ public class EODQuote implements Quote {
 
         if(date.after(new TradingDate()))
             messages.add(Locale.getString("FUTURE_DATE"));
+
+        if(date.isWeekend())
+           messages.add(Locale.getString("WEEKEND_QUOTE"));
 
         if(day_low > day_open || day_low > day_close || day_low > day_high) {
             messages.add(Locale.getString("DAY_LOW_NOT_LOWEST"));
@@ -194,7 +197,7 @@ public class EODQuote implements Quote {
      *
      * @param	symbol	the stock symbol
      */
-    public void setSymbol(Symbol symbol) {	
+    public void setSymbol(Symbol symbol) {
         this.symbol = symbol;
     }
 
@@ -236,7 +239,7 @@ public class EODQuote implements Quote {
 
     public double getQuote(int quote)
         throws UnsupportedOperationException {
-        
+
 	switch(quote) {
 	case(DAY_OPEN):
 	    return getDayOpen();
@@ -259,13 +262,13 @@ public class EODQuote implements Quote {
      * @return	a string representation of the stock quote.
      */
     public String toString() {
-	return new String(getSymbol() + ", " + 
+	return new String(getSymbol() + ", " +
                           getDate() + ", " +
-			  QuoteFormat.quoteToString(getDayOpen()) + ", " + 
-                          QuoteFormat.quoteToString(getDayHigh()) + ", " + 
-			  QuoteFormat.quoteToString(getDayLow()) + ", " + 
-                          QuoteFormat.quoteToString(getDayClose()) + ", " + 
+			  QuoteFormat.quoteToString(getDayOpen()) + ", " +
+                          QuoteFormat.quoteToString(getDayHigh()) + ", " +
+			  QuoteFormat.quoteToString(getDayLow()) + ", " +
+                          QuoteFormat.quoteToString(getDayClose()) + ", " +
 			  getDayVolume());
-			   
+
     }
 }

@@ -3,6 +3,10 @@ Changes for Venice, 0.8 alpha ??/???/2006
 
 * Added support for downloading ASX quotes from float.com.au.
 
+* Updates to Usability:
+  - Now warns if you try to import wekeend stock quotes.
+    Stock quotes on weekends are not yet supported.
+
 * Bug Fixes:
   - Can now work with volumes greater than 2147483647.
   - Graphing from context menu in watch screen now works (bug #1328197).

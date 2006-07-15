@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.quote;
@@ -36,8 +36,8 @@ import org.mov.util.Locale;
  * become "invisible".
  *
  * <p>By creating a single class we reduce the amount of <code>toUpperCase()</code> and
- * <code>toLowerCase()</code> calls required, and have a single place to store symbol 
- * parsing code. 
+ * <code>toLowerCase()</code> calls required, and have a single place to store symbol
+ * parsing code.
  *
  * <p>To reduce memory, symbols are stored canonically. That is there is a single
  * object for each symbol. For example the string symbol "CBA" would be represented by
@@ -49,13 +49,13 @@ import org.mov.util.Locale;
 public class Symbol implements Cloneable, Comparable {
 
     private String symbol;
-    
+
     /** The minimum valid length for a symbol */
     public final static int MINIMUM_SYMBOL_LENGTH = 1;
 
     /** The maximum valid length for a symbol. */
     public final static int MAXIMUM_SYMBOL_LENGTH = 12;
-    
+
     // Hashmap of linking strings to their canonical symbol instance
     private static HashMap registry = new HashMap();
 
@@ -65,7 +65,7 @@ public class Symbol implements Cloneable, Comparable {
      * @param string a string containing a single symbol
      * @exception SymbolFormatException if the string doesn't contain a valid quote
      */
-    private Symbol(String string) 
+    private Symbol(String string)
         throws SymbolFormatException {
 
         if(string.length() > MAXIMUM_SYMBOL_LENGTH)
@@ -75,13 +75,12 @@ public class Symbol implements Cloneable, Comparable {
             throw new SymbolFormatException(Locale.getString("SYMBOL_TOO_SHORT",
 							     string));
 
-        // A symbol can only contain numbers & letters. Yahoo finance adds in
-        // full stops and carots. So support them.
+        // A symbol can only contain numbers, letters and certain other characters.
         for(int i = 0; i < string.length(); i++) {
             char letter = string.charAt(i);
 
-            if(!Character.isLetter(letter) && !Character.isDigit(letter) &&
-               letter != '.' && letter != '^' && letter != '-' )
+            if(!Character.isLetterOrDigit(letter) &&
+               letter != '.' && letter != '^' && letter != '-' && letter != '&')
                 throw new SymbolFormatException(Locale.getString("INVALID_SYMBOL",
 								 string));
         }
@@ -95,14 +94,14 @@ public class Symbol implements Cloneable, Comparable {
      * @param string a string containing a single symbol
      * @exception SymbolFormatException if the string doesn't contain a valid quote
      */
-    public static Symbol find(String string) 
+    public static Symbol find(String string)
         throws SymbolFormatException {
 
         String upperCaseString = string.toUpperCase();
         Symbol symbol = (Symbol)registry.get(upperCaseString);
 
         if(symbol == null) {
-            // To prevent two simultaneous threads adding the same symbol twice, 
+            // To prevent two simultaneous threads adding the same symbol twice,
             // we run the add code in a synchronized block. Since
             // sychronisation is slow, it is only invoked if we encounter a
             // new symbol.
@@ -120,7 +119,7 @@ public class Symbol implements Cloneable, Comparable {
 
         return symbol;
     }
-   
+
     /**
      * Return the symbol string.
      *
@@ -161,7 +160,7 @@ public class Symbol implements Cloneable, Comparable {
      * @param   checkExists set this flag to <code>TRUE</code> to make sure
      *                      that the symbols are in the current quote source
      * @return	a sorted set of symbols
-     * @exception SymbolFormatException if the string doesn't contain a 
+     * @exception SymbolFormatException if the string doesn't contain a
      *            list of valid quotes
      */
     public static SortedSet toSortedSet(String string, boolean checkExists)
@@ -175,13 +174,13 @@ public class Symbol implements Cloneable, Comparable {
         for(int i = 0; i < symbols.length; i++) {
             if(symbols[i].length() > 0) {
                 Symbol symbol = find(symbols[i]);
-                
+
                 if(checkExists && !QuoteSourceManager.getSource().symbolExists(symbol))
-                    throw new SymbolFormatException(Locale.getString("NO_QUOTES_SYMBOL", 
+                    throw new SymbolFormatException(Locale.getString("NO_QUOTES_SYMBOL",
                                                                      symbols[i]));
                 sortedSet.add(symbol);
             }
-        }	
+        }
 
 	return sortedSet;
     }
@@ -190,13 +189,13 @@ public class Symbol implements Cloneable, Comparable {
      * Convert a string containing a single symbol into a quote symbol.
      * This differs from {@link Symbol#find} as it performs better
      * error checking and checks that the symbol exists.
-     * 
+     *
      * @param string a string containing a single symbol
      * @exception SymbolFormatException if the string doesn't contain a valid quote
      */
     public static Symbol toSymbol(String string)
         throws SymbolFormatException {
-        
+
         SortedSet symbols = toSortedSet(string, true);
         Object[] symbolsArray = symbols.toArray();
 
@@ -217,7 +216,7 @@ public class Symbol implements Cloneable, Comparable {
         // Since Symbols are canonical the clone is this class.
         return this;
     }
-    
+
     /**
      * Compare this symbol to the given symbol.
      *
@@ -229,7 +228,7 @@ public class Symbol implements Cloneable, Comparable {
     public int compareTo(Object object) {
 	return toString().compareTo(object.toString());
     }
-    
+
     /**
      * Compare this symbol to the given symbol.
      *
@@ -240,7 +239,7 @@ public class Symbol implements Cloneable, Comparable {
         // We can compare directly since the objects are canonical
 	return this == object;
     }
-    
+
     /**
      * Calculate the hash code for this symbol.
      *
@@ -249,7 +248,7 @@ public class Symbol implements Cloneable, Comparable {
     public int hashCode() {
         return symbol.hashCode();
     }
-    
+
     /**
      * Convert the symbol to a string. This is identical to the
      * {@link Symbol#get} method.

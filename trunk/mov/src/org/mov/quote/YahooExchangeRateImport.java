@@ -5,15 +5,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package org.mov.quote;
@@ -31,12 +31,11 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.util.Currency;
 import org.mov.util.ExchangeRate;
+import org.mov.util.Find;
 import org.mov.util.Locale;
 
 /**
@@ -84,13 +83,13 @@ public class YahooExchangeRateImport {
             InputStreamReader input = new InputStreamReader(url.openStream());
             BufferedReader bufferedInput = new BufferedReader(input);
             String line = bufferedInput.readLine();
-            
+
             try {
                 rate = filter.toExchangeRate(line);
             }
             catch(ExchangeRateFormatException e) {
                 System.out.println(e);
-                
+
                 throw new ImportExportException(Locale.getString("ERROR_DOWNLOADING_QUOTES"));
             }
 
@@ -128,32 +127,18 @@ public class YahooExchangeRateImport {
 
         catch(IOException e) {
             throw new ImportExportException(Locale.getString("ERROR_DOWNLOADING_QUOTES"));
-        } 
-        
-        return rate;       
+        }
+
+        return rate;
     }
 
     private static String constructURL(Currency sourceCurrency,
                                        Currency destinationCurrency) {
         String URLString = YAHOO_URL_PATTERN;
-        URLString = replace(URLString, SOURCE_CURRENCY,
-                            sourceCurrency.getCurrencyCode());
-        URLString = replace(URLString, DESTINATION_CURRENCY,
-                            destinationCurrency.getCurrencyCode());
+        URLString = Find.replace(URLString, SOURCE_CURRENCY,
+                                 sourceCurrency.getCurrencyCode());
+        URLString = Find.replace(URLString, DESTINATION_CURRENCY,
+                                 destinationCurrency.getCurrencyCode());
         return URLString;
-    }
-
-    /**
-     * Perform a find replace on a string.
-     *
-     * @param string the source string
-     * @param oldSubString the text which to replace
-     * @param newSubString the text to replace with
-     * @return the new string
-     */
-    private static String replace(String string, String oldSubString, String newSubString) {
-        Pattern pattern = Pattern.compile(oldSubString);
-        Matcher matcher = pattern.matcher(string);
-        return matcher.replaceAll(newSubString);
     }
 }

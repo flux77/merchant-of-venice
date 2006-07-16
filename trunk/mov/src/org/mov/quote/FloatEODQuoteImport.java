@@ -32,10 +32,9 @@ import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.mov.prefs.PreferencesManager;
+import org.mov.util.Find;
 import org.mov.util.Locale;
 import org.mov.util.Report;
 import org.mov.util.TradingDate;
@@ -77,18 +76,18 @@ public class FloatEODQuoteImport {
             InputStreamReader input = new InputStreamReader(url.openStream());
             BufferedReader bufferedInput = new BufferedReader(input);
             String line = null;
- 
+
             do {
                 line = bufferedInput.readLine();
-                
+
                 if(line != null) {
                     try {
-                        EODQuote quote = filter.toEODQuote(line);     
+                        EODQuote quote = filter.toEODQuote(line);
                         quotes.add(quote);
                         verify(report, quote);
-                    }                    
+                    }
                     catch(QuoteFormatException e) {
-                        report.addError(Locale.getString("DFLOAT_DISPLAY_URL") + ":" + 
+                        report.addError(Locale.getString("DFLOAT_DISPLAY_URL") + ":" +
                                         date + ":" +
                                         Locale.getString("ERROR") + ": " +
                                         e.getMessage());
@@ -124,9 +123,9 @@ public class FloatEODQuoteImport {
                                                              proxyPreferences.host,
                                                              proxyPreferences.port));
 	}
-        
+
         catch(FileNotFoundException e) {
-            report.addError(Locale.getString("FLOAT_DISPLAY_URL") + ":" + 
+            report.addError(Locale.getString("FLOAT_DISPLAY_URL") + ":" +
                             date + ":" +
                             Locale.getString("ERROR") + ": " +
                             Locale.getString("NO_QUOTES_FOUND"));
@@ -134,9 +133,9 @@ public class FloatEODQuoteImport {
 
         catch(IOException e) {
             throw new ImportExportException(Locale.getString("ERROR_DOWNLOADING_QUOTES"));
-        } 
-        
-        return quotes;       
+        }
+
+        return quotes;
     }
 
     /**
@@ -152,27 +151,13 @@ public class FloatEODQuoteImport {
         format.setMinimumIntegerDigits(2);
 
         String urlString = URL_PATTERN;
-        urlString = replace(urlString, DAY, format.format(date.getDay()));
-        urlString = replace(urlString, MONTH, format.format(date.getMonth() - 1));
+        urlString = Find.replace(urlString, DAY, format.format(date.getDay()));
+        urlString = Find.replace(urlString, MONTH, format.format(date.getMonth() - 1));
 
         format.setMinimumIntegerDigits(4);
-        urlString = replace(urlString, YEAR, format.format(date.getYear()));
+        urlString = Find.replace(urlString, YEAR, format.format(date.getYear()));
 
         return urlString;
-    }
-
-    /**
-     * Perform a find replace on a string.
-     *
-     * @param string the source string
-     * @param oldSubString the text which to replace
-     * @param newSubString the text to replace with
-     * @return the new string
-     */
-    private static String replace(String string, String oldSubString, String newSubString) {
-        Pattern pattern = Pattern.compile(oldSubString);
-        Matcher matcher = pattern.matcher(string);
-        return matcher.replaceAll(newSubString);
     }
 
     /**
@@ -192,8 +177,8 @@ public class FloatEODQuoteImport {
             for(Iterator iterator = messages.iterator(); iterator.hasNext();) {
                 String message = (String)iterator.next();
 
-                report.addWarning(Locale.getString("FLOAT_DISPLAY_URL") + ":" + 
-                                  quote.getSymbol() + ":" + 
+                report.addWarning(Locale.getString("FLOAT_DISPLAY_URL") + ":" +
+                                  quote.getSymbol() + ":" +
                                   quote.getDate() + ":" +
                                   Locale.getString("WARNING") + ": " +
                                   message);

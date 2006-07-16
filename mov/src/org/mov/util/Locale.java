@@ -41,7 +41,7 @@ import org.mov.prefs.PreferencesManager;
  */
 public class Locale {
     private static java.util.Locale locale = null;
-    
+
     // This is the string we use if we can't find a matching entry in
     // any of the resource bundles.
     private final static String UNKNOWN = "???";
@@ -87,24 +87,6 @@ public class Locale {
 
 	    resourceBundlesLoaded = true;
 	}
-    }
-
-    // In the given source string replace all occurences of patternText with
-    // text. This function appears elsewhere, it needs to be refactored.
-    private static String replace(String source, String patternText, String text) {
-        // This function used to use Java's regex code, but this was unsatisfactory
-        // for a simple find replace call because it did not treat the replacement
-        // text as simple text, but it looked for special symbols to do grouping,
-        // referencing etc. This caused exceptions to be thrown when we wanted
-        // to replace '%' with $.
-        int location = source.indexOf(patternText);
-        if(location != -1) {
-            return(source.substring(0, location) + 
-                   text +
-                   source.substring(location + patternText.length()));
-        }
-
-        return source;
     }
 
     /**
@@ -192,8 +174,8 @@ public class Locale {
      */
     public static String getString(String key, String arg1) {
 	String string = getString(key);
-	
-	return replace(string, "%1", arg1);	
+
+	return Find.replace(string, "%1", arg1);
     }
 
     /**
@@ -214,9 +196,9 @@ public class Locale {
      */
     public static String getString(String key, String arg1, String arg2) {
 	String string = getString(key);
-	
-	string = replace(string, "%1", arg1);	
-	return replace(string, "%2", arg2);
+
+	string = Find.replace(string, "%1", arg1);
+	return Find.replace(string, "%2", arg2);
     }
 
     /**
@@ -239,10 +221,10 @@ public class Locale {
      */
     public static String getString(String key, String arg1, String arg2, String arg3) {
 	String string = getString(key);
-	
-	string = replace(string, "%1", arg1);	
-	string = replace(string, "%2", arg2);	
-	return replace(string, "%3", arg3);	
+
+	string = Find.replace(string, "%1", arg1);
+	string = Find.replace(string, "%2", arg2);
+	return Find.replace(string, "%3", arg3);
     }
 
     /**

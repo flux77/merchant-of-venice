@@ -24,8 +24,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.mov.util.Locale;
 
@@ -44,11 +42,11 @@ public class TradingDate implements Cloneable, Comparable {
 
     /** Date format will be in US format, e.g. <code>mm/dd/yy</code>, <code>mm/dd/yyyy</code>
         etc. */
-    public final static int US = 0;		
+    public final static int US = 0;
 
     /** Date format will be in britsh format, e.g. <code>dd/mm/yy</code>, <code>dd/mm/yyyy</code>
         etc. */
-    public final static int BRITISH = 1;	
+    public final static int BRITISH = 1;
 
     private int year;
     private int month;
@@ -137,9 +135,9 @@ public class TradingDate implements Cloneable, Comparable {
             else
                 isSeparator = false;
 
-	    // DD/MM/YY, DD/MM/YYYY, DD-MM-YY, DD-MM-YYYY		
+	    // DD/MM/YY, DD/MM/YYYY, DD-MM-YY, DD-MM-YYYY
             // DD/MONTH/YY, DD/MONTH/YYYY, DD-MONTH-YY, DD-MONTH-YYYY
-	    if(isSeparator) {	
+	    if(isSeparator) {
 		int i = 0;
 
 		// DAY
@@ -182,9 +180,9 @@ public class TradingDate implements Cloneable, Comparable {
 		if(type == US && isMonthNumeric) {
 		    int temp;
 		    temp = day; day = month; month = temp;
-		}	
+		}
 	    }
-    	
+
 	    // These formats are not localised...
 
 	    // YYMMDD
@@ -192,10 +190,10 @@ public class TradingDate implements Cloneable, Comparable {
 		year = Integer.parseInt(date.substring(0, 2));
 		month = Integer.parseInt(date.substring(2, 4));
 		day = Integer.parseInt(date.substring(4, 6));
-		
+
 		year = twoToFourDigitYear(year);
 	    }
-	
+
 	    // YYYYMMDD
 	    else if(date.length() == 8) {
 		year = Integer.parseInt(date.substring(0, 4));
@@ -213,7 +211,7 @@ public class TradingDate implements Cloneable, Comparable {
         catch(StringIndexOutOfBoundsException e) {
             throw new TradingDateFormatException(date);
         }
-        
+
         // Simple range checking.
         if(month == 0 || month > 12 || day == 0 || day > 31)
             throw new TradingDateFormatException(date);
@@ -446,38 +444,30 @@ public class TradingDate implements Cloneable, Comparable {
      * @return	the text string
      */
     public String toString(String format) {
-	format = replace(format, "d\\?", Integer.toString(getDay()));
-	format = replace(format, "dd", Converter.toFixedString(getDay(), 2));
-	format = replace(format, "m\\?", Integer.toString(getMonth()));
-	format = replace(format, "mm",
-			 Converter.toFixedString(getMonth(), 2));
+	format = Find.replaceAll(format, "d\\?", Integer.toString(getDay()));
+	format = Find.replaceAll(format, "dd", Converter.toFixedString(getDay(), 2));
+	format = Find.replaceAll(format, "m\\?", Integer.toString(getMonth()));
+	format = Find.replaceAll(format, "mm",
+                                 Converter.toFixedString(getMonth(), 2));
 
-	format = replace(format, "MMM", monthToText(getMonth()));
-	format = replace(format, "yyyy",
-			 Converter.toFixedString(getYear(), 4));	
+	format = Find.replaceAll(format, "MMM", monthToText(getMonth()));
+	format = Find.replaceAll(format, "yyyy",
+                                 Converter.toFixedString(getYear(), 4));
 
 	if(getYear() > 99) {
-	    format = replace(format, "yy",
-			     Integer.toString(getYear()).substring(2));
+	    format = Find.replaceAll(format, "yy",
+                                     Integer.toString(getYear()).substring(2));
 	}
 	else {
-	    format = replace(format, "yy",
-			     Integer.toString(getYear()));
+	    format = Find.replaceAll(format, "yy",
+                                     Integer.toString(getYear()));
 	}
 
 	return format;
     }
 
-    // In the given source string replace all occurences of patternText with
-    // text.
-    private String replace(String source, String patternText, String text) {
-	Pattern pattern = Pattern.compile(patternText);
-	Matcher matcher = pattern.matcher(source);
-	return matcher.replaceAll(text);
-    }
-
     /**
-     * Outputs the date in the following format 1/12/2005 or 31/12/2005. 
+     * Outputs the date in the following format 1/12/2005 or 31/12/2005.
      *
      * @return String representation of date.
      */
@@ -523,7 +513,7 @@ public class TradingDate implements Cloneable, Comparable {
 			   Locale.getString("OCT"),
 			   Locale.getString("NOV"),
 			   Locale.getString("DEC")};
-	
+
 	month--;
 
 	if(month < months.length && month >= 0)
@@ -591,7 +581,7 @@ public class TradingDate implements Cloneable, Comparable {
         calendar.set(Calendar.HOUR_OF_DAY, time.getHour());
         calendar.set(Calendar.MINUTE, time.getMinute());
         calendar.set(Calendar.SECOND, time.getSecond());
-        
+
         return calendar.getTime();
     }
 

@@ -45,6 +45,9 @@ import org.mov.portfolio.Transaction;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
 import org.mov.table.WatchScreen;
+import org.mov.table.WatchScreenParserException;
+import org.mov.table.WatchScreenReader;
+import org.mov.table.WatchScreenWriter;
 import org.mov.util.Currency;
 import org.mov.util.Locale;
 import org.mov.util.Money;
@@ -469,10 +472,30 @@ public class PreferencesManager {
      * @return the list of watch screen names.
      */
     public static List getWatchScreenNames() {
-	Preferences p = getUserNode("/watchscreens");
         List watchScreenNames = new ArrayList();
 
+        // First retrieve all the watch screens stored in ~/Venice/WatchScreen/ (0.8 and up)
+        // Watch screens are now stored as files, as opposed to Java prefences, because this
+        // improves read and write times (especially on Mac OS X) and makes watch screen
+        // management easier for the user.
+        String[] watchScreenFileNames = getWatchScreenHome().list();
+        String suffix = ".xml";
+
+        for(int i = 0; i < watchScreenFileNames.length; i++) {
+            String watchScreenFileName = watchScreenFileNames[i];
+
+            // Ignore files without trailing suffix
+            if(watchScreenFileName.endsWith(suffix)) {
+                // Remove trailing suffix
+                String watchScreenName =
+                    watchScreenFileName.substring(0, watchScreenFileName.length() - suffix.length());
+                watchScreenNames.add(watchScreenName);
+            }
+        }
+
+        // Now retrieve all the watch screens stored in Java preferences (up to 0.7b)
 	try {
+            Preferences p = getUserNode("/watchscreens");
 	    String preferenceWatchScreenNames[] = p.childrenNames();
 
             for(int i = 0; i < preferenceWatchScreenNames.length; i++) {
@@ -491,12 +514,16 @@ public class PreferencesManager {
     }
 
     /**
-     * Load the watch screen with the given name.
+     * Read the watch screen with the given name from the preferences. Venice stores
+     * watch screens in preferences up to 0.7.
      *
-     * @param name the name of the watch screen to load.
+     * @param name the name of the watch screen to retrieve.
      * @return the watch screen.
+     * @exception PreferencesException if there was an error loading the watch screen.
      */
-    public static synchronized WatchScreen getWatchScreen(String name) {
+    private static WatchScreen getWatchScreenFromPreferences(String name)
+        throws PreferencesException {
+
         WatchScreen watchScreen = new WatchScreen(name);
 
         Preferences p = getUserNode("/watchscreens/" + name);
@@ -513,41 +540,89 @@ public class PreferencesManager {
                 }
         }
 	catch(BackingStoreException e) {
-	    // don't care
+            throw new PreferencesException(e.getMessage());
 	}
 
         return watchScreen;
     }
 
     /**
+     * Read the watch screen contained the given file. Venice stores watch screens
+     * in files from 0.8 and up.
+     *
+     * @param watchScreenFile the file containing the watch screen.
+     * @return the watch screen contained in the file.
+     * @exception PreferencesException if there was an error loading the watch screen.
+     */
+    private static WatchScreen getWatchScreenFromFile(File watchScreenFile)
+        throws PreferencesException {
+        try {
+            FileInputStream inputStream = new FileInputStream(watchScreenFile);
+            WatchScreen watchScreen = WatchScreenReader.read(inputStream);
+            inputStream.close();
+            return watchScreen;
+        }
+        catch(IOException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+        catch(WatchScreenParserException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+        catch(SecurityException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+    }
+
+    /**
+     * Load the watch screen with the given name.
+     *
+     * @param watchScreenName the name of the watch screen to load.
+     * @return the watch screen.
+     * @exception PreferencesException if there was an error loading the watch screen.
+     */
+    public static synchronized WatchScreen getWatchScreen(String watchScreenName)
+        throws PreferencesException {
+        File watchScreenFile = new File(getWatchScreenHome(), watchScreenName.concat(".xml"));
+
+        // Load the watchScreen from ~/Venice/WatchScreen/ (0.8 and up)
+        if(watchScreenFile.exists())
+            return getWatchScreenFromFile(watchScreenFile);
+
+        // Load the watchScreen from Java preferences (up to 0.7)
+        else
+            return getWatchScreenFromPreferences(watchScreenName);
+    }
+
+    /**
      * Save the watch screen.
      *
      * @param watchScreen the watch screen.
+     * @exception PreferencesException if there was an error saving the watch screen.
      */
-    public static synchronized void putWatchScreen(WatchScreen watchScreen) {
-        Preferences p = getUserNode("/watchscreens/" + watchScreen.getName());
-	p.put("name", watchScreen.getName());
+    public static synchronized void putWatchScreen(WatchScreen watchScreen)
+        throws PreferencesException {
 
-        // Clear old symbols
         try {
-            p.node("symbols").removeNode();
+            File watchScreenFile = new File(getWatchScreenHome(), watchScreen.getName() + ".xml");
+            FileOutputStream outputStream = new FileOutputStream(watchScreenFile);
+            WatchScreenWriter.write(watchScreen, outputStream);
+            outputStream.close();
         }
-        catch(BackingStoreException e) {
-            // don't care
+        catch(IOException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+        catch(SecurityException e) {
+            throw new PreferencesException(e.getMessage());
         }
 
-        // Save watched symbols
-        List symbols = watchScreen.getSymbols();
-
-        for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
-            Symbol symbol = (Symbol)iterator.next();
-
-            // Later on we will associate things like alerts and stops
-            // for each symbol. But at the moment we only keep the list
-            // of symbols
-            Preferences symbolPrefs = p.node("symbols").node(symbol.toString());
-            symbolPrefs.put("present", "1");
-        }
+        // Clear old watch screen from preferences if present (up to 0.7).
+	try {
+            Preferences p = getUserNode("/watchscreens/" + watchScreen.getName());
+	    p.removeNode();
+	}
+	catch(BackingStoreException e) {
+	    throw new PreferencesException(e.getMessage());
+	}
     }
 
     /**
@@ -556,9 +631,13 @@ public class PreferencesManager {
      * @param name the watch screen name.
      */
     public static synchronized void deleteWatchScreen(String name) {
-	Preferences p = getUserNode("/watchscreens/" + name);
+        // Delete the watch screen from ~/Venice/WatchScreen/ (0.8 and up)
+        File watchScreenFile = new File(getWatchScreenHome(), name.concat(".xml"));
+        watchScreenFile.delete();
 
+        // Delete the watch screen from Java preferences (up to 0.7)
 	try {
+            Preferences p = getUserNode("/watchscreens/" + name);
 	    p.removeNode();
 	}
 	catch(BackingStoreException e) {
@@ -574,7 +653,7 @@ public class PreferencesManager {
     public static synchronized List getPortfolioNames() {
         List portfolioNames = new ArrayList();
 
-        // First retrieve all the portfolios stored in ~/Venice/Portfolios/ (0.7b and up)
+        // First retrieve all the portfolios stored in ~/Venice/Portfolio/ (0.7b and up)
         // Portfolios are now stored as files, as opposed to Java prefences, because this
         // improves read and write times (especially on Mac OS X) and makes portfolio
         // management easier for the user.
@@ -619,7 +698,7 @@ public class PreferencesManager {
      * @param name the portfolio name.
      */
     public static synchronized void deletePortfolio(String name) {
-        // Delete the portfolio from ~/Venice/Portfolios/ (0.7b and up)
+        // Delete the portfolio from ~/Venice/Portfolio/ (0.7b and up)
         File portfolioFile = new File(getPortfolioHome(), name.concat(".xml"));
         portfolioFile.delete();
 
@@ -806,7 +885,7 @@ public class PreferencesManager {
         throws PreferencesException {
         File portfolioFile = new File(getPortfolioHome(), portfolioName.concat(".xml"));
 
-        // Load the portfolio from ~/Venice/Portfolios/ (0.7b and up)
+        // Load the portfolio from ~/Venice/Portfolio/ (0.7b and up)
         if(portfolioFile.exists())
             return getPortfolioFromFile(portfolioFile);
 
@@ -887,6 +966,19 @@ public class PreferencesManager {
         if (!portfolioHome.exists())
             portfolioHome.mkdir();
         return portfolioHome;
+    }
+
+    /**
+     * Return the directory which contains Venice's watch screens.
+     *
+     * @return Watch screen directory.
+     */
+    private static File getWatchScreenHome() {
+        File veniceHome = getVeniceHome();
+        File watchScreenHome = new File(veniceHome, "WatchScreen");
+        if (!watchScreenHome.exists())
+            watchScreenHome.mkdir();
+        return watchScreenHome;
     }
 
     /**

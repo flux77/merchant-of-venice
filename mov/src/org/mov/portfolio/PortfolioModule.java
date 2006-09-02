@@ -201,26 +201,26 @@ public class PortfolioModule extends JPanel implements Module,
 	}
 	else {
             Iterator iterator = accounts.iterator();
-	
+
 	    // First list share accounts
 	    while(iterator.hasNext()) {
 		Account account = (Account)iterator.next();
 		if(account instanceof ShareAccount) {
                     addLabel(account.getName() + " (" + account.getCurrency() + ")");
-		
+
 		    // Add table of stock holdings for the portfolio
 		    ShareAccount shareAccount = (ShareAccount)account;
 		    table = new StockHoldingTable(shareAccount, quoteBundle);
 		    scrolledTable = new JScrollPane(table);
 		    add(scrolledTable);
-		
+
 		    restrictTableHeight(scrolledTable, table);
 		}
 	    }
-	
+
 	    // Now add summary containing all accounts including total
 	    addLabel(Locale.getString("SUMMARY") + " (" + portfolio.getCurrency() + ")");
-	
+
 	    accountTable =
 		new AccountTable(portfolio, quoteBundle);
 
@@ -228,7 +228,7 @@ public class PortfolioModule extends JPanel implements Module,
 	    add(scrolledTable);
 
 	    restrictTableHeight(scrolledTable, accountTable);
-	}	
+	}
 
 	add(Box.createVerticalGlue());
 
@@ -253,19 +253,19 @@ public class PortfolioModule extends JPanel implements Module,
 	    table.getTableHeader().getPreferredSize().getHeight() +
 	    table.getRowHeight() * rows + 4;
 	// +3 for swing metal, +4 for XP, Aqua themes
-	
+
 	Dimension maximumSize = new Dimension();
 	maximumSize.setSize(table.getMaximumSize().getWidth(),
 			    maximumHeight);
-	
+
 	Dimension preferredSize = new Dimension();
 	preferredSize.setSize(table.getPreferredSize().getWidth(),
 			      maximumHeight);
-	
+
 	Dimension minimumSize = new Dimension();
 	minimumSize.setSize(table.getMinimumSize().getWidth(),
 			    maximumHeight);
-	
+
 	scrollPane.setPreferredSize(preferredSize);
 	scrollPane.setMaximumSize(maximumSize);
 	scrollPane.setMinimumSize(minimumSize);
@@ -572,12 +572,12 @@ public class PortfolioModule extends JPanel implements Module,
                               Locale.getString("ENTER_ACCOUNT_NAME"),
                               Locale.getString("NEW_SHARE_ACCOUNT"),
                               portfolio.getCurrency());
-        
+
         if(dialog.showDialog()) {
             String accountName = dialog.getAccountName();
             Currency accountCurrency = dialog.getAccountCurrency();
 	    Account account = new ShareAccount(accountName, accountCurrency);
-            
+
             // Get exchange rate before we add it to the table. Otherwise the
             // table will initiate the request during rendering which is ugly.
             ExchangeRateCache.getInstance().getRate(portfolio.getLastDate(),

@@ -42,6 +42,7 @@ import javax.swing.event.ListSelectionListener;
 import org.mov.main.CommandManager;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
+import org.mov.prefs.PreferencesException;
 import org.mov.prefs.PreferencesManager;
 import org.mov.quote.IDQuote;
 import org.mov.quote.IDQuoteCache;
@@ -142,7 +143,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     // Graph menu item is only enabled when items are selected in the table.
     private void checkMenuDisabledStatus() {
 	int numberOfSelectedRows = getSelectedRowCount();
-       
+
         removeSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
         graphSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
 	graphIndexSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
@@ -158,7 +159,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
         // Right click on the table - raise menu
         if(event.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu menu = new JPopupMenu();
-	    
+
             popupGraphSymbols =
                 MenuHelper.addMenuItem(this, menu,
                                        Locale.getString("GRAPH"));
@@ -203,27 +204,27 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
         // Watch Screen Menu
         {
             JMenu tableMenu = MenuHelper.addMenu(menuBar, Locale.getString("WATCH_SCREEN"));
-            
+
             // Show columns menu
             tableMenu.add(createShowColumnMenu(model));
-            
+
             tableMenu.addSeparator();
 
             applyExpressionsMenuItem = MenuHelper.addMenuItem(this, tableMenu,
                                                               Locale.getString("APPLY_EQUATIONS"));
 
             tableMenu.addSeparator();
-            
+
             deleteWatchScreen = MenuHelper.addMenuItem(this, tableMenu,
                                                        Locale.getString("DELETE"));
-            
+
             renameWatchScreen = MenuHelper.addMenuItem(this, tableMenu,
                                                        Locale.getString("RENAME"));
-            
+
             tableMenu.addSeparator();
-            
+
             tableClose = MenuHelper.addMenuItem(this, tableMenu,
-						Locale.getString("CLOSE"));	
+						Locale.getString("CLOSE"));
         }
 
         // Symbol Menu
@@ -238,7 +239,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
                                        Locale.getString("REMOVE"));
 
             symbolsMenu.addSeparator();
-            
+
             graphSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
                                        Locale.getString("GRAPH"));
@@ -254,12 +255,12 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
         }
 
         // Listen for changes in selection so we can update the menus
-        getSelectionModel().addListSelectionListener(new ListSelectionListener() {		
-                
+        getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
                 public void valueChanged(ListSelectionEvent e) {
                     checkMenuDisabledStatus();
                 }
-                
+
             });
 
 	checkMenuDisabledStatus();
@@ -271,8 +272,15 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
      */
     public void save() {
         // Don't save the watch screen if it was just deleted.
-	if(!isDeleted)
-            PreferencesManager.putWatchScreen(watchScreen);
+	if(!isDeleted) {
+            try {
+                PreferencesManager.putWatchScreen(watchScreen);
+            }
+            catch(PreferencesException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_SAVING_WATCH_SCREEN_TITLE"),
+                                                e.getMessage());
+            }
+        }
     }
 
     /**
@@ -384,7 +392,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             // because if we start to remove them in this loop the getValueAt()
             // function won't work properly.
             for(int i = 0; i < selectedRows.length; i++) {
-                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i],
                                                          MixedQuoteModel.SYMBOL_COLUMN);
                 symbols.add(symbol);
             }
@@ -403,7 +411,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
         // Apply expressions to watch screen
         else if(e.getSource() == applyExpressionsMenuItem)
             applyExpressions(model);
-        
+
         // Delete watch screen
         else if(e.getSource() == deleteWatchScreen)
             deleteWatchScreen();
@@ -420,7 +428,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
-                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i],
                                                          MixedQuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
@@ -463,28 +471,34 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
 		public void run() {
                     String oldWatchScreenName = watchScreen.getName();
-                    
+
                     // Get new name for watch screen
                     TextDialog dialog = new TextDialog(DesktopManager.getDesktop(),
                                                        Locale.getString("ENTER_NEW_WATCH_SCREEN_NAME"),
                                                        Locale.getString("RENAME_WATCH_SCREEN"),
                                                        oldWatchScreenName);
                     String newWatchScreenName = dialog.showDialog();
-                    
+
                     if(newWatchScreenName != null && newWatchScreenName.length() > 0 &&
                        !newWatchScreenName.equals(oldWatchScreenName)) {
-                        
+
                         // Save the watch screen under the new name
                         watchScreen.setName(newWatchScreenName);
-                        PreferencesManager.putWatchScreen(watchScreen);
-                        
+                        try {
+                            PreferencesManager.putWatchScreen(watchScreen);
+                        }
+                        catch(PreferencesException e) {
+                            DesktopManager.showErrorMessage(Locale.getString("ERROR_SAVING_WATCH_SCREEN_TITLE"),
+                                                            e.getMessage());
+                        }
+
                         // Delete the old watch screen
                         PreferencesManager.deleteWatchScreen(oldWatchScreenName);
-                        
+
                         // Update GUI
                         MainMenu.getInstance().updateWatchScreenMenu();
-                        propertySupport.firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY, 
-                                                           0, 1); 
+                        propertySupport.firePropertyChange(ModuleFrame.TITLEBAR_CHANGED_PROPERTY,
+                                                           0, 1);
                     }
                 }};
 
@@ -516,7 +530,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     // we should display from the quote bundle
     private List getQuotes() {
         List quotes = new ArrayList();
-        int dateOffset = quoteBundle.getLastOffset();        
+        int dateOffset = quoteBundle.getLastOffset();
 
         for(Iterator iterator = watchScreen.getSymbols().iterator();
             iterator.hasNext();) {
@@ -533,7 +547,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
             quotes.add(quote);
         }
-        
+
         return quotes;
     }
 

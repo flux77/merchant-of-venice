@@ -7,6 +7,9 @@ Changes for Venice, 0.8 alpha ??/???/2006
   - Now warns if you try to import wekeend stock quotes.
     Stock quotes on weekends are not yet supported.
 
+* Watch screens are now saved as XML files in the user's home directory.
+  This should make them easier to manage (e.g. backup).
+
 * Bug Fixes:
   - Can now work with volumes greater than 2147483647.
   - Graphing from context menu in watch screen now works (bug #1328197).

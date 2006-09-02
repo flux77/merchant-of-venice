@@ -103,7 +103,7 @@ public class CommandManager {
     private java.util.Locale italian = new java.util.Locale("IT");
     private java.util.Locale polish = new java.util.Locale("PL");
     private java.util.Locale swedish = new java.util.Locale("SV");
-    private java.util.Locale simplifiedChinese = new java.util.Locale("ZH");    
+    private java.util.Locale simplifiedChinese = new java.util.Locale("ZH");
 
     // Class should only be constructed once by this class
     private CommandManager() {
@@ -220,7 +220,7 @@ public class CommandManager {
     public void tableStocksByDate(final int type) {
         Thread thread = new Thread(new Runnable() {
                 public void run() {
-		
+
                     String title = new String(Locale.getString("LIST_IT_BY_DATE",
 							       EODQuoteRange.getDescription(type)));
                     TradingDate date = TradingDateDialog.getDate(desktop,
@@ -314,16 +314,16 @@ public class CommandManager {
                     Portfolio portfolio = PreferencesManager.getPortfolio(portfolioName);
                     EODQuoteBundle quoteBundle = null;
                     TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
-                    
+
                     if(lastDate != null) {
                         if(!thread.isInterrupted()) {
                             EODQuoteRange quoteRange =
                                 new EODQuoteRange(portfolio.getStocksHeld(), lastDate.previous(1),
                                                   lastDate);
-                            
+
                             quoteBundle = new EODQuoteBundle(quoteRange);
                         }
-                        
+
                         if(!thread.isInterrupted())
                             openPortfolio(portfolio, quoteBundle);
                     }
@@ -356,7 +356,7 @@ public class CommandManager {
 
                 EODQuoteBundle quoteBundle = null;
                 TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
-                
+
                 if(lastDate != null) {
                     if(!thread.isInterrupted()) {
                         EODQuoteRange quoteRange =
@@ -427,9 +427,9 @@ public class CommandManager {
      *
      * @return	frame containing paper trade result module
      */
-    public ModuleFrame newPaperTradeResultTable() {	
+    public ModuleFrame newPaperTradeResultTable() {
 	PaperTradeResultModule results = new PaperTradeResultModule();
-	return desktopManager.newFrame(results);	
+	return desktopManager.newFrame(results);
     }
 
     /**
@@ -474,16 +474,20 @@ public class CommandManager {
 					   Locale.getString("ENTER_WATCH_SCREEN_NAME"),
 					   Locale.getString("NEW_WATCH_SCREEN"));
 	String watchScreenName = dialog.showDialog();
-	
+
         if(watchScreenName != null && watchScreenName.length() > 0) {
             WatchScreen watchScreen = new WatchScreen(watchScreenName);
 
 	    // Save watch screen so we can update the menu
-	    PreferencesManager.putWatchScreen(watchScreen);
-	    MainMenu.getInstance().updateWatchScreenMenu();
-	
-	    // Open as normal
-            openWatchScreen(watchScreen);
+            try {
+                PreferencesManager.putWatchScreen(watchScreen);
+                MainMenu.getInstance().updateWatchScreenMenu();
+                openWatchScreen(watchScreen);
+            }
+            catch(PreferencesException e) {
+                DesktopManager.showErrorMessage(Locale.getString("ERROR_SAVING_WATCH_SCREEN_TITLE"),
+                                                e.getMessage());
+            }
 	}
     }
 
@@ -493,8 +497,14 @@ public class CommandManager {
      * @param watchScreenName the name of the watch screen
      */
     public void openWatchScreen(String watchScreenName) {
-        WatchScreen watchScreen = PreferencesManager.getWatchScreen(watchScreenName);
-        openWatchScreen(watchScreen);
+        try {
+            WatchScreen watchScreen = PreferencesManager.getWatchScreen(watchScreenName);
+            openWatchScreen(watchScreen);
+        }
+        catch(PreferencesException e) {
+            DesktopManager.showErrorMessage(Locale.getString("ERROR_LOADING_WATCH_SCREEN_TITLE"),
+                                            e.getMessage());
+        }
     }
 
     /**
@@ -577,7 +587,7 @@ public class CommandManager {
             String portfolioName = dialog.getAccountName();
             Currency portfolioCurrency = dialog.getAccountCurrency();
 	    Portfolio portfolio = new Portfolio(portfolioName, portfolioCurrency);
-	
+
 	    // Save portfolio so we can update the menu
             try {
                 PreferencesManager.putPortfolio(portfolio);
@@ -665,7 +675,7 @@ public class CommandManager {
                 startDate = portfolio.getStartDate();
 
             if(endDate == null) {
-                endDate = QuoteSourceManager.getSource().getLastDate();		
+                endDate = QuoteSourceManager.getSource().getLastDate();
 
                 // Make sure the end date is after the start date! Otherwise the code
                 // will assert later.
@@ -689,7 +699,7 @@ public class CommandManager {
 	    graph = new LineGraph(portfolioGraphSource,
                                   Locale.getString("MARKET_VALUE"),
                                   true);
-	    
+
             chart.add(graph, portfolio, quoteBundle, 0);
             chart.redraw();
             desktopManager.newFrame(chart);
@@ -739,7 +749,7 @@ public class CommandManager {
                 startDate = portfolio.getStartDate();
 
             if(endDate == null) {
-                endDate = QuoteSourceManager.getSource().getLastDate();		
+                endDate = QuoteSourceManager.getSource().getLastDate();
 
                 // Make sure the end date is after the start date! Otherwise the code
                 // will assert later.
@@ -898,8 +908,8 @@ public class CommandManager {
 
             Iterator iterator = symbols.iterator();
             EODQuoteBundle quoteBundle = null;
-            
-	    
+
+
             Graph graph = null;
 
             String title = symbols.toString();
@@ -926,7 +936,7 @@ public class CommandManager {
                     break;
 
 		graph = getNewGraph(quoteBundle, false);
-		
+
                 chart.add(graph, symbol, quoteBundle, 0);
                 chart.redraw();
 
@@ -977,21 +987,21 @@ public class CommandManager {
 	    graph = getNewGraph(quoteBundle, true);
 
 	    /* Has data is aggregate of all symbols, the actual
-	       symbol used to mark the chart is irrelevant. 
+	       symbol used to mark the chart is irrelevant.
 	    */
 	    Symbol symbol = (Symbol)iterator.next();
 	    chart.add(graph, symbol, quoteBundle, 0);
-	    
+
 	    chart.redraw();
-	
+
 	    if(symbols.size() > 1)
 		progress.increment();
-	
+
 
 	    if (!thread.isInterrupted())
 		desktopManager.newFrame(chart);
-	
-	
+
+
 	    ProgressDialogManager.closeProgressDialog(progress);
 	}
 
@@ -1012,7 +1022,7 @@ public class CommandManager {
 				   "Andrew Leppard\n\n" +
 
                                    "Andrew Leppard (aleppard@picknowl.com.au)\n\n" +
-				
+
 				   Locale.getString("ADDITIONAL_CODE") + "\n" +
                                    "Daniel Makovec, Quentin Bossard, Peter Fradley, Mark Hummel,\n" +
                                    "Bryan Lin, Alberto Nacher, Matthias St\366ckel &\n" +
@@ -1089,7 +1099,7 @@ public class CommandManager {
 	    }
 	}
     }
-		
+
     /**
      * Displays the intra-day quote quote sync module that allows the user
      * to automatically download new intra-day quotes into the application.
@@ -1143,23 +1153,23 @@ public class CommandManager {
 	    }
 
 	    return true;
-	}	
+	}
 
 	return false;
     }
 
     /*
-      Return a new graph according to the default. 
+      Return a new graph according to the default.
     */
     private Graph getNewGraph(EODQuoteBundle quoteBundle, boolean index) {
 	GraphSource dayOpen = null, dayClose = null, dayHigh = null, dayLow = null;
-	
-	String defaultChart = PreferencesManager.getDefaultChart();
-	Graph graph;	
-	
 
-	// This would be nicer as a set of Ternary ops	   	 
-	if (index) {	
+	String defaultChart = PreferencesManager.getDefaultChart();
+	Graph graph;
+
+
+	// This would be nicer as a set of Ternary ops
+	if (index) {
 	    dayOpen =
 		new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
 	    dayClose =
@@ -1178,11 +1188,11 @@ public class CommandManager {
 	    dayLow =
 		new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_LOW);
 	}
-	
 
-	if (defaultChart.compareTo("BAR_CHART") == 0) {		    
-	    graph = new BarChartGraph(dayOpen, dayLow, 
-				      dayHigh, dayClose);	    
+
+	if (defaultChart.compareTo("BAR_CHART") == 0) {
+	    graph = new BarChartGraph(dayOpen, dayLow,
+				      dayHigh, dayClose);
 	} else if (defaultChart.compareTo("CANDLE_STICK") == 0) {
 	    graph = new CandleStickGraph(dayOpen, dayLow,
 					 dayHigh, dayClose);
@@ -1194,6 +1204,6 @@ public class CommandManager {
 	    graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
 	}
 	return graph;
-    }        
-    
+    }
+
 }

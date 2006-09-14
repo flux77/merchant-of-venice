@@ -509,8 +509,7 @@ public class Chart extends JComponent implements MouseListener {
      * @param	dataX	the x data point corresponding to the end of the line
      * @param   dataY   the y data point corresponding to the end of the line.
      * @param   absY    the absolute y coordinate of the end of the line     
-     * @param   newline a flag indicating if the line drawn is new, or being
-                continued.
+
      */
     
     public void setDrawnLineEnd(Comparable dataX, Double dataY, 
@@ -545,7 +544,9 @@ public class Chart extends JComponent implements MouseListener {
     /**
      * Puts a point on a chart.
      *
-     * @param	coord the coordinate 
+     * @param	dataX the x coordinate 
+     * @param	dataY the relative y coordinate 
+     * @param	absY  the absolute y coordinate 
      */
     
     public void setPoint(Comparable dataX, Double dataY, Integer absY) {
@@ -561,7 +562,7 @@ public class Chart extends JComponent implements MouseListener {
      * index, and return the difference between those points and x,y
      *
      * @param x        the x coordinate
-     * @param dataY    the y coordinate
+     * @param y        the y coordinate
      * @param index    the index a drawn line 
      */
 
@@ -664,8 +665,10 @@ public class Chart extends JComponent implements MouseListener {
     /** 
      * Put text at x,y.
      *
-     * @param x        the x coordinate of the selected point
-     * @param y        the y coordinate of the selected point 
+     * @param text     The text to place on the chart
+     * @param dataX    The relative X coordinate of the selected point 
+      * @param dataY   The relative Y coordinate of the selected point
+     * @param absY     The absolute y coordinate of the selected point 
      */
 
     public void setText(String text, Comparable dataX, Double dataY, Integer absY) {

@@ -39,7 +39,6 @@ public class TrendExpression extends TernaryExpression {
      * for the given number of <code>days</code>, starting with <code>lag</code> days away, and the given value.
      *
      * @param	quote	the quote kind to average
-     * @param	value	the quote kind to compare to
      * @param	days	the number of days to average over
      * @param	lag	the offset from the current day
      */

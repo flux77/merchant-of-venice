@@ -121,7 +121,7 @@ public class Coordinate
      * 
      * Direct comparison between this coordinate and a specified one
      *
-     * @param The line to compare this one to
+     * @param c The coordinate to be compared against this one
      * @return True if the coordinate has the same x,y values,
      *         false otherwise
        

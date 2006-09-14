@@ -94,7 +94,7 @@ public class DrawnLine
      * 
      * Direct comparison between this line and a specified one
      *
-     * @param The line to compare this one to
+     * @param l The line to compare against this one
      * @return True if the line has the same start and end point
      *         false otherwise
        
@@ -116,8 +116,9 @@ public class DrawnLine
     /**
      * 
      * Direct comparison between this line and a specified one
-     *
-     * @param The line to compare this one to
+     
+     * @param start The start point of the line to compare 
+     * @param end The end point of the line to compare 
      * @return True if the line has the same start and end point
      *         false otherwise
        

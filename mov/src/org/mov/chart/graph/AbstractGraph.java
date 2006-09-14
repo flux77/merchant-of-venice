@@ -224,7 +224,7 @@ abstract public class AbstractGraph implements Graph {
 
     /** Return true if there is data available for date X 
      *
-     * @param Date - Comparable date 
+     * @param date - Comparable date 
      * @return true 
      *
      * Trivially true for all graphs except for P&F
@@ -234,7 +234,7 @@ abstract public class AbstractGraph implements Graph {
     
     //Is it worth generalising the special case (P&F data mapping) in this
     //manner?    
-    public boolean dataAvailable(Vector x) {
+    public boolean dataAvailable(Vector date) {
 	return true;
     }
     

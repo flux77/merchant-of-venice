@@ -55,7 +55,9 @@ public class CountbackLineGraph extends AbstractGraph {
     /**
      * Create a new countback line.
      *
-     * @param	source	the source to create a moving average from
+     * @param	low	the source to create a moving average from
+     * @param	high	the source to create a moving average from
+     * @param	close	the source to create a moving average from
      */
     public CountbackLineGraph(GraphSource low, 
 			      GraphSource high,

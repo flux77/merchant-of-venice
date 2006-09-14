@@ -45,7 +45,7 @@ import org.mov.util.Locale;
  * BOOLEAN_EXPR      = ADD_EXPR [ RELATION ADD_EXPR ]
  * RELATION          = "==" | "<=" | ">=" | "<" | ">" | "!="
  * ADD_EXPR          = MULTIPLY_EXPR [ ADD_OPERATOR MULTIPLY_EXPR ]
- * ADD_OPERATION     = "-" | "+"
+ * ADD_OPERATOR      = "-" | "+"
  * MULTIPLY_EXPR     = FACTOR [ MULTIPLY_OPERATOR FACTOR ]
  * MULTIPLY_OPERATOR = "*" | "/"
  * FACTOR            = STRING | VARIABLE | NUMBER | FUNCTION | FLOW_CONTROL | QUOTE | "(" SUB_EXPR ")"

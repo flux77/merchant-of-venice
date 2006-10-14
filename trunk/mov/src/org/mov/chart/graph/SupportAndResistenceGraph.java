@@ -62,6 +62,12 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 
     private static final double delta = 0.02;
     private static final int overlapTolerance = 20;
+    private static final int overlapBonus = 80;
+    private static final int separationPenalty = -10;
+    private static final int verticalSeparationBonus = 50;
+    private static final int verticalSeparationBonus2 = 60;
+    private static final int trendLength = 4;
+
     
 
     /**
@@ -211,7 +217,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	    diff = values[i] - prev;
 
 	    // previous price was end of downmove, hence trough
-	    if (diff > delta && !upmove && directionCount > 4) {		
+	    if (diff > delta && !upmove && directionCount > trendLength) {		
 		if (startTroughsPosn.get( new Double(prev)) == null) {
 		    startTroughsPosn.put(new Double(prev), new Integer(i));
 		}
@@ -222,7 +228,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 		directionCount = 0;
 	    }
 	    // previous price was end of upmove, hence peak		
-	    else if (diff < -delta && upmove && directionCount > 4) {
+	    else if (diff < -delta && upmove && directionCount > trendLength) {
 		
 		if (startPeaksPosn.get(new Double(prev)) == null) {
 		    startPeaksPosn.put(new Double(prev), new Integer(i));			
@@ -278,10 +284,10 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	    
 	    if (start1 - overlapTolerance > end2 ||
 		end1 < start2 - overlapTolerance) {
-		score += 80;
+		score += overlapBonus;
 		
 	    } else {
-		score -= 10;
+		score += separationPenalty;
 	    }	    
 	    
 	    score += (end1 - start1);
@@ -289,11 +295,11 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	    diff = Math.abs(troughsPriceData[0] - peaksPriceData[0]);
 	    
 	    if (diff > Math.sqrt(variance)) {
-		score += 50;
+		score += verticalSeparationBonus;
 	    }
 
 	    if (diff > (2 * Math.sqrt(variance))) {
-		score += 60;
+		score += verticalSeparationBonus2;
 	    }
 
 	    score += (int)diff;

@@ -97,6 +97,8 @@ public class TradingDate implements Cloneable, Comparable {
      * <table>
      * <tr><td><pre>YYMMDD</pre></td><td>e.g. "010203"</td></tr>
      * <tr><td><pre>YYYYMMDD</pre></td><td>e.g. "20010203"</td></tr>
+     * <tr><td><pre>YYYY-MM-DD</pre></td><td>e.g. "2001-02-03"</td></tr>
+     * <tr><td><pre>YYYY/MM/DD</pre></td><td>e.g. "2001/02/03"</td></tr>
      * <tr><td><pre>DD/MM/YY</pre></td><td>e.g. "3/2/01"</td></tr>
      * <tr><td><pre>DD/MM/YYYY</pre></td><td>e.g. "3/2/2001"</td></tr>
      * <tr><td><pre>MM/DD/YY</pre></td><td>e.g. "2/3/01"</td></tr>
@@ -105,8 +107,8 @@ public class TradingDate implements Cloneable, Comparable {
      * <tr><td><pre>DD-MM-YYYY</pre></td><td>e.g. "3-2-2001"</td></tr>
      * <tr><td><pre>MM-DD-YY</pre></td><td>e.g. "2-3-01"</td></tr>
      * <tr><td><pre>MM-DD-YYYY</pre></td><td>e.g. "2-3-2001"</td></tr>
-     * <tr><td><pre>DD/MONTH/YY</pre></td><td>e.g. "3/Feb/01"</td></tr>
-     * <tr><td><pre>DD/MONTH/YYYY</pre></td><td>e.g. "3/Feb/2001"</td></tr>
+     * <tr><td><pre>DD/MON/YY</pre></td><td>e.g. "3/Feb/01"</td></tr>
+     * <tr><td><pre>DD/MON/YYYY</pre></td><td>e.g. "3/Feb/2001"</td></tr>
      * <tr><td><pre>DD-MONTH-YY</pre></td><td>e.g. "3-February-01"</td></tr>
      * <tr><td><pre>DD-MONTH-YYYY</pre></td><td>e.g. "3-February-2001"</td></tr>
      * </table>
@@ -135,9 +137,19 @@ public class TradingDate implements Cloneable, Comparable {
             else
                 isSeparator = false;
 
+	    // YYYY-MM-DD, YYYY/MM/DD
+	    if(isSeparator &&
+               date.length() == 10 &&
+               date.charAt(4) == separator &&
+               date.charAt(7) == separator) {
+		year = Integer.parseInt(date.substring(0, 4));
+		month = Integer.parseInt(date.substring(5, 7));
+		day = Integer.parseInt(date.substring(8, 10));
+	    }
+
 	    // DD/MM/YY, DD/MM/YYYY, DD-MM-YY, DD-MM-YYYY
             // DD/MONTH/YY, DD/MONTH/YYYY, DD-MONTH-YY, DD-MONTH-YYYY
-	    if(isSeparator) {
+	    else if(isSeparator) {
 		int i = 0;
 
 		// DAY

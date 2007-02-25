@@ -1,4 +1,4 @@
-Changes for Venice, 0.8 alpha ??/???/2006
+Changes for Venice, 0.71 beta 25/Feb/2007
 =========================================
 
 * Added support for downloading ASX quotes from float.com.au.
@@ -13,6 +13,8 @@ Changes for Venice, 0.8 alpha ??/???/2006
 * Bug Fixes:
   - Can now work with volumes greater than 2147483647.
   - Graphing from context menu in watch screen now works (bug #1328197).
+  - Importing quotes from Yahoo now works again. They changed the
+    date format to one Venice couldn't parse.
 
 Changes for Venice, 0.7 beta 17/Apr/2006
 ========================================

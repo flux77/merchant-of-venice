@@ -56,16 +56,16 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.8a";
+    public static String SHORT_VERSION = "0.71b";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION = "0.8 alpha";
+    public static String LONG_VERSION = "0.71 beta";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "17/" + Locale.getString("APR") + "/2006";
+    public static String RELEASE_DATE = "25/" + Locale.getString("FEB") + "/2007";
 
     /** Copyright date range, e.g. "2003-5" */
-    public static String COPYRIGHT_DATE_RANGE = "2003-6";
+    public static String COPYRIGHT_DATE_RANGE = "2003-7";
 
     /**
      * Get the main frame for the current application
@@ -141,7 +141,7 @@ public class Main extends JFrame {
         // Shutdown the database if necessary
         QuoteSourceManager.shutdown();
 
-	dispose();	
+	dispose();
 	System.exit(0);
     }
 
@@ -195,7 +195,7 @@ public class Main extends JFrame {
         try {
             List symbols = new ArrayList(Symbol.toSortedSet(idQuoteSyncPreferences.symbols,
                                                             false));
-            
+
             IDQuoteSync.getInstance().addSymbols(symbols);
         } catch(SymbolFormatException e) {
             // Ignore error in preferences

@@ -1,7 +1,7 @@
-Merchant of Venice, 0.8 alpha ??/???/2006
+Merchant of Venice, 0.71 beta 25/Feb/2007
 =========================================
 
-Copyright (C) 2003-6, Andrew Leppard (aleppard picknowl com au)
+Copyright (C) 2003-7, Andrew Leppard (aleppard picknowl com au)
 See COPYING.txt for license terms.
 
 1 Introduction
@@ -81,7 +81,7 @@ download the source release which contains the source from the latest
 release. Alternatively, you can download the current development
 version from CVS by running the following command:
 
-cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/mov co -P venice
+cvs -z3 -d:pserver:anonymous@mov.cvs.sourceforge.net:/cvsroot/mov co -P venice
 
 To build Venice you will need the programmes listed in the "Running"
 section and the following:

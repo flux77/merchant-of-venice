@@ -327,7 +327,7 @@ public class PointAndFigureGraph extends AbstractGraph {
 	tempIterator = column.iterator();
 	date = startDate;
 		
-	for (i = 0; i < columnNumber; i++) {
+	for (i = 0; i <= columnNumber; i++) {
 	    PFData data = (PFData)pfData.elementAt(i);
 	    
 	    pointAndFigure.putData(date,

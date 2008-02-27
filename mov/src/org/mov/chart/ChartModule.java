@@ -34,6 +34,8 @@ import org.mov.portfolio.*;
 import org.mov.quote.*;
 import org.mov.ui.*;
 import org.mov.ui.DesktopManager;
+import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.PreferencesException;
 
 /**
  * The charting module for venice. This class provides the user interface
@@ -994,7 +996,20 @@ public class ChartModule extends JPanel implements Module,
      * Tell module to save any current state data / preferences data because
      * the window is being closed.
      */
-    public void save() { }
+    public void save() { 
+	Vector symbolList = chart.getSymbols();
+
+	String type = String.valueOf(getClass().getName());
+	String key = String.valueOf(hashCode());
+
+	try {
+	    PreferencesManager.putModuleSettings(getTitle(), 
+					      type, key, 
+					      symbolList);	    
+	} catch (PreferencesException pfe) {
+
+	}
+    }
 
     public BufferedImage getImage() { 
 	return chart.getImage();

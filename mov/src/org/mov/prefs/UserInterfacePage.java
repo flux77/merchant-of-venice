@@ -26,6 +26,7 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JCheckBox;
 
 import org.mov.quote.EODQuoteCache;
 import org.mov.ui.GridBagHelper;
@@ -40,6 +41,8 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
     private JDesktopPane desktop;
     private JTextField minDecimalDigitsTextField;
     private JTextField maxDecimalDigitsTextField;
+    private JCheckBox restoreWindowsCheckBox;
+    
    
     /**
      * Create a new user interface preferences page.
@@ -50,7 +53,7 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
 	this.desktop = desktop;
 
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
+	
         add(createQuotesPanel());
     }
     
@@ -80,7 +83,17 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
                                      Integer.toString(maxDecimalDigits),
                                      gridbag, c, 10);
 
+	
+	
+	restoreWindowsCheckBox = 
+	    GridBagHelper.addCheckBoxRow(borderPanel,
+					 Locale.getString("RESTORE_SAVED_WINDOWS"),
+					 PreferencesManager.getRestoreSavedWindowsSetting(),
+					 gridbag, c);
+	
+	
         quotesPanel.add(borderPanel, BorderLayout.NORTH);
+	
         return quotesPanel;
     }
 
@@ -95,6 +108,7 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
     public void save() {
         int minDecimalDigits = 0;
         int maxDecimalDigits = 0;
+	boolean restoreSavedWindows;
 
         try {
             minDecimalDigits = Integer.parseInt(minDecimalDigitsTextField.getText());
@@ -110,5 +124,9 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
         if(maxDecimalDigits > 0) {
             PreferencesManager.putMaxDecimalDigits(maxDecimalDigitsTextField.getText());
         }
+
+	restoreSavedWindows = restoreWindowsCheckBox.isSelected();
+	PreferencesManager.putRestoreSavedWindowsSetting(restoreSavedWindows);
+
     }
 }

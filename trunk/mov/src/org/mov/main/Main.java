@@ -24,6 +24,9 @@ import java.awt.event.WindowEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
+import java.util.Iterator;
+import java.io.*;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -31,6 +34,12 @@ import javax.swing.UIManager;
 
 import org.mov.macro.MacroManager;
 import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.ModuleFrameSettings;
+import org.mov.prefs.ModuleSettings;
+import org.mov.prefs.ModuleFrameSettingsReader;
+import org.mov.prefs.ModuleSettingsReader;
+import org.mov.prefs.ModuleSettingsParserException;
+import org.mov.ui.FrameRegister;
 import org.mov.quote.IDQuoteSync;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.quote.Symbol;
@@ -38,6 +47,8 @@ import org.mov.quote.SymbolFormatException;
 import org.mov.ui.GPLViewDialog;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.MainMenu;
+import org.mov.ui.ProgressDialog;
+import org.mov.ui.ProgressDialogManager;
 import org.mov.util.ExchangeRateCache;
 import org.mov.util.Locale;
 
@@ -113,6 +124,8 @@ public class Main extends JFrame {
         MainMenu.getInstance(this, desktopManager);
 
 	setContentPane(desktop);
+	
+	       
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    // User closed window by hitting "X" button
@@ -123,6 +136,13 @@ public class Main extends JFrame {
 		    saveSettingsAndExit();
 		}
 	    });
+
+	//Restore saved windows + state
+	//Need to make the frame visible before adding new frames
+	setVisible(true);	
+	restoreSavedFrames();
+	
+
     }
 
     // Save settings and exit!
@@ -205,6 +225,119 @@ public class Main extends JFrame {
                                                idQuoteSyncPreferences.closeTime);
         IDQuoteSync.getInstance().setEnabled(idQuoteSyncPreferences.isEnabled);
     }
+
+
+    /**
+     * Restore saved internal frames and their modules, reconstructing their 
+     position and geometry.
+
+     **/
+
+    private void restoreSavedFrames() {
+
+	Vector savedFrameFiles, dataList;
+	Iterator iterator;
+	int savedFrames;
+	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
+	int progressValue = 0;
+	FrameRegister frameRegister;
+	int count = 0;
+	
+
+	if (!PreferencesManager.getRestoreSavedWindowsSetting()) 
+	    return;
+		
+	savedFrameFiles = PreferencesManager.getSavedFrames();
+	iterator = savedFrameFiles.iterator();
+	savedFrames  = savedFrameFiles.size();
+	frameRegister = desktopManager.getFrameRegister();
+
+	if (savedFrames <= 0) {
+	    return;
+	}
+
+	Thread thread = Thread.currentThread();
+
+	progress.show(Locale.getString("RESTORE_SAVED_WINDOWS_PROGRESS"));
+	progress.setIndeterminate(false);
+	progress.setMaximum(savedFrames);
+	progress.setMaster(true);
+	
+
+	/* Make sure the initial desktop has displayed first */
+	while (iterator.hasNext()) {	    
+	    if (thread.isInterrupted()) {
+		break;
+	    }
+
+	    progress.increment();
+	    try {
+	    
+		File savedFrameFile = (File)iterator.next();
+		FileInputStream inputStream = new FileInputStream(savedFrameFile);
+	
+		try {
+		    ModuleFrameSettings newFrameSettings = ModuleFrameSettingsReader.read(inputStream);
+
+		    String moduleKey = newFrameSettings.getModuleKey();
+		    File  savedModuleFile = PreferencesManager.getSavedModule(moduleKey);
+				    
+		    FileInputStream moduleInputStream = new FileInputStream(savedModuleFile);
+		    ModuleSettings newModuleSettings = ModuleSettingsReader.read(moduleInputStream);
+		    		    
+		    int type = newModuleSettings.getType();
+		    switch (type) {
+		    case ModuleSettings.CHARTMODULE: 
+			dataList = newModuleSettings.getDataList();
+			Vector symbolList = new Vector();
+			Iterator symbolIterator = dataList.iterator();
+			while (symbolIterator.hasNext()) {
+			    try {			    
+				String symbolString = (String)symbolIterator.next();
+				Symbol symbol = Symbol.find(symbolString);
+				symbolList.add(symbol);
+			    } catch (SymbolFormatException sfe) {
+			    }
+			}						
+									
+			CommandManager.getInstance().graphStockBySymbol(symbolList);
+			ModuleFrame newFrame = frameRegister.get(String.valueOf(count));
+
+			newFrame.setSizeAndLocation(newFrame, desktop, false, true);
+			newFrame.setBounds(newFrameSettings.getGeometry());
+			newFrame.setPreferredSize(newFrameSettings.getGeometry().getSize());
+
+			
+			
+			break;
+		    case ModuleSettings.TABLEMODULE:
+		    case ModuleSettings.ANALYSERMODULE:
+		    case ModuleSettings.PORTFOLIOMODULE:
+		    case ModuleSettings.PREFERENCESMODULE:
+			break;
+		    default:
+			
+		    }
+		    count++;
+
+		} catch (ModuleSettingsParserException wpe) {
+		    
+		}
+		
+	    } catch (FileNotFoundException fnf) {
+
+	    } catch (IOException ioe) {
+
+	    } 	    	    	    
+	}
+	ProgressDialogManager.closeProgressDialog(progress);
+	if (!thread.isInterrupted()) {
+	    PreferencesManager.removeSavedFrames();
+	    PreferencesManager.removeSavedModules();
+	}
+    }
+	
+
 }
 
 

@@ -29,10 +29,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
 
 import org.mov.main.Main;
+import org.mov.main.ModuleFrame;
+import org.mov.prefs.ModuleFrameSettingsWriter;
+import org.mov.prefs.ModuleSettingsWriter;
 import org.mov.macro.StoredMacro;
 import org.mov.portfolio.Account;
 import org.mov.portfolio.CashAccount;
@@ -1150,6 +1154,35 @@ public class PreferencesManager {
         return str;
     }
 
+
+    /** 
+     * Save wether to restore windows on restart 
+     *
+     * @param state a boolean flag which when true causes Venice to reconstruct
+     * previously open windows.
+     **/
+
+    public static void putRestoreSavedWindowsSetting(boolean state) {
+	Preferences prefs = getUserNode("/restore_windows_user_interface");
+	prefs.put("state", String.valueOf(state));
+    }
+
+    /** 
+     * Return wether to restore windows on restart 
+     *
+     * @ Return wether Venice should to reconstruct
+     * previously open windows.
+     **/
+
+    public static boolean getRestoreSavedWindowsSetting() {
+	Preferences prefs = getUserNode("/restore_windows_user_interface");
+	String state = prefs.get("state", "false");
+
+	return state.equals("true") ? true : false;
+    }
+    
+    
+
     /**
      * Save default chart setting.
      *
@@ -1335,4 +1368,206 @@ public class PreferencesManager {
         prefs.putInt("period", idQuoteSyncPreferences.period);
 
     }
+    /**
+     * Return the location of the saved window data.
+     * The directory is created if it does not exist.
+
+     */
+
+    private static File getFrameSettingsHome() {
+	File veniceHome = getVeniceHome();
+	File frameSettingsHome = new File(veniceHome, "SavedWindows");
+	if (!frameSettingsHome.exists()) 
+	    frameSettingsHome.mkdir();
+	
+	return frameSettingsHome;
+    }
+
+    /**
+     * Save open frame settings.
+     *
+     * @param frame A ModuleFrame representing an open window on the Venice desktop.
+     * @see ModuleFrame     
+     */
+
+    /**
+     * Return a list of frames saved on the filesystem.
+     *
+     * @return A vector where the elements are File objects containing saved 
+     * ModuleFrame data.
+     * 
+     * The location of the saved frames is ~/Venice/SavedWindows.
+     * As the restore saved windows feature is new, there is no
+     * old preferences mechanism.
+     */
+    public static Vector getSavedFrames() {
+	String[] savedFrameFileNames = PreferencesManager.getFrameSettingsHome().list();
+
+	Vector savedFrames = new Vector();
+	String suffix = ".xml";
+	
+	for (int i = 0; i < savedFrameFileNames.length; i++) {
+	    String savedFrameFileName = savedFrameFileNames[i];
+	    //Ignore files which are not XML 
+	    if (!savedFrameFileName.endsWith(suffix)) {
+		continue;
+	    }
+	    //Interested in the ModuleFrames, not the modules at this stage
+	    if (!savedFrameFileName.startsWith("FrameData")) {
+		continue;
+	    }
+
+	    File savedFrameFile = new File(PreferencesManager.getFrameSettingsHome(), savedFrameFileName);
+	    
+	    savedFrames.add(savedFrameFile);	    
+	}
+	return savedFrames;
+    }
+
+    
+    public static void putModuleFrameSettings(ModuleFrame frame) throws PreferencesException {
+	
+	try {
+	    File frameSettingsFile = new File(getFrameSettingsHome(), 
+					      ("FrameDataFor" + frame.getTitle()).replaceAll(" ", "") + "_" + frame.hashCode() + ".xml");
+
+	    FileOutputStream outputStream = new FileOutputStream(frameSettingsFile);
+
+	    ModuleFrameSettingsWriter.write(frame, outputStream);
+	    outputStream.close();
+	} catch (IOException e) {
+	    throw new PreferencesException(e.getMessage());
+	} catch (SecurityException e) {
+	    throw new PreferencesException(e.getMessage());
+	}
+    }
+
+    /**
+     * Save the module state.
+     *
+     * @param name The name of the chart
+     * @param type The implementing class of the Module
+     * @param key An identifier for the module
+     */
+
+    public static void putModuleSettings(String name, 
+				 String type, 
+				 String key,
+				 Vector list) throws PreferencesException {
+    
+	Iterator iterator = list.iterator();
+	
+	try {
+	    File moduleSettingsFile = new File(getFrameSettingsHome(), 
+					      name.replaceAll(" ","") + "_" + key + ".xml");
+
+	    FileOutputStream outputStream = new FileOutputStream(moduleSettingsFile);
+	    ModuleSettingsWriter.write(name, type, key, list, outputStream);	
+	} catch (IOException e) {
+	       throw new PreferencesException(e.getMessage());
+        }
+        catch(SecurityException e) {
+            throw new PreferencesException(e.getMessage());        
+	}
+    }
+
+    /**
+     *
+     * Return the saved module settings from the file system
+     *
+     * @return A list of File objects containing the saved module data.
+     */
+    public static Vector getSavedModules() {
+	String[] savedModuleFileNames = PreferencesManager.getFrameSettingsHome().list();
+	Vector savedModules = new Vector();
+	File savedModuleFile = null;
+
+	// Retrieve all the saved frames stored in ~/Venice/SavedWindows/ (0.8 and up)
+	
+        String suffix = ".xml";
+
+        for(int i = 0; i < savedModuleFileNames.length; i++) {	    
+	    String savedModuleFileName = savedModuleFileNames[i];
+
+	    if (!savedModuleFileName.endsWith(suffix)) {
+		    continue;
+		}
+
+	    //Interested in the modules, not the ModuleFrames at this stage
+	    if (savedModuleFileName.startsWith("FrameData")) {
+		continue;
+	    }
+	    
+	    savedModuleFile = new File(PreferencesManager.getFrameSettingsHome(), savedModuleFileName);
+	    
+	    savedModules.add(savedModuleFile);
+
+	}
+	return savedModules;
+    }
+
+    /**
+     *
+     * Return the saved module settings from the file system
+     *
+     * @param key A string which identifies the module 
+     * @return A File object containing the saved module data.
+     */
+    public static File getSavedModule(String key) {
+	String[] savedModuleFileNames = PreferencesManager.getFrameSettingsHome().list();
+	File savedModuleFile = null;
+
+	// Retrieve all the saved frames stored in ~/Venice/SavedWindows/ (0.8 and up)
+	
+        String suffix = ".xml";
+
+        for(int i = 0; i < savedModuleFileNames.length; i++) {	    
+	    String savedModuleFileName = savedModuleFileNames[i];
+
+	    if (!savedModuleFileName.endsWith(suffix)) {
+		    continue;
+		}
+
+	    //Interested in the modules, not the ModuleFrames at this stage
+	    if (savedModuleFileName.startsWith("FrameData")) {
+		continue;
+	    }
+
+	    if (!savedModuleFileName.endsWith(key + suffix)) {
+		continue;
+	    }
+
+	    savedModuleFile = new File(PreferencesManager.getFrameSettingsHome(), savedModuleFileName);
+	}
+	return savedModuleFile;    
+    }
+
+    /**
+     *
+     * Remove all the saved frames.
+     */
+    public static void removeSavedFrames() {
+	Vector list = getSavedFrames();
+	Iterator iterator = list.iterator();
+
+	while (iterator.hasNext()) {
+	    File f = (File)iterator.next();
+	    f.delete();
+	}
+    }
+    
+    /**
+     *
+     * Remove all the saved modules.
+     */
+    public static void removeSavedModules() {
+	Vector list = getSavedModules();
+	Iterator iterator = list.iterator();
+
+	while (iterator.hasNext()) {
+	    File f = (File)iterator.next();
+	    f.delete();
+	}
+    }
+
 }

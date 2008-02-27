@@ -26,7 +26,10 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import org.mov.main.*;
+import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.PreferencesException;
 import org.mov.util.Locale;
+import org.mov.ui.FrameRegister;
 
 /**
  * This class manages activities to do with internal frames on the desktop
@@ -54,6 +57,8 @@ public class DesktopManager
     private static EventListenerList moduleListeners = new EventListenerList();
     private static int messagesDisplayed = 0;
 
+    private FrameRegister frameRegister;
+
     /**
      * Set the desktop we are managing.
      *
@@ -79,7 +84,8 @@ public class DesktopManager
      */
     public DesktopManager(JDesktopPane desktop) {
 	super();
-	setDesktop(desktop);
+	frameRegister = new FrameRegister();
+	setDesktop(desktop);	
     }
 
     /**
@@ -487,6 +493,7 @@ public class DesktopManager
 				boolean honourSize, boolean resizable) {
 
         ModuleFrame frame = new ModuleFrame(this, module, centre, honourSize, resizable);
+	frameRegister.add(frame);
 
         // Make sure that the module added signal is sent before the module
         // is displayed. Otherwise it's possible for the user to quickly close the
@@ -508,6 +515,14 @@ public class DesktopManager
 	return frame;
     }
 
+
+    /**
+     *
+     */
+    public FrameRegister getFrameRegister() {
+	return frameRegister;
+    }
+
     /**
      * Call save() on every open module. This will save all the modules'
      * preferences data.
@@ -524,7 +539,15 @@ public class DesktopManager
 	    if(frame instanceof ModuleFrame) {
 		ModuleFrame moduleFrame = (ModuleFrame)frame;
 		moduleFrame.getModule().save();
-	    }
+
+		//Save the geometry of the frame so that it can be reconconstructed
+		//when Venice is restarted.
+		try {
+		    PreferencesManager.putModuleFrameSettings(moduleFrame);
+		} catch (PreferencesException pfe) {
+		    //Not sure what to do about this yet.
+		}		
+	    }	    
 	}
     }
 }

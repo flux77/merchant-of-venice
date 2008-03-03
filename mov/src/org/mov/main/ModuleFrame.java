@@ -180,10 +180,17 @@ public class ModuleFrame extends JInternalFrame
     /* Make sure the internal modules saves its information before destroying it
      */
     public void internalFrameClosed(InternalFrameEvent e) {
-	module.save();
 
+	//Need to remove the frame from the register before
+	//saving the module (for the moment)
+	if (desktopManager.getFrameRegister().find(String.valueOf(hashCode()))) {
+	    desktopManager.getFrameRegister().delete(this);
+	}
+	    
+	module.save();	
 	// Update menu containing list of windows
 	desktopManager.fireModuleRemoved(module);
+
     }
     /**
      * Standard InternalFrame functions

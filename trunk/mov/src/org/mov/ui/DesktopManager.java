@@ -493,7 +493,9 @@ public class DesktopManager
 				boolean honourSize, boolean resizable) {
 
         ModuleFrame frame = new ModuleFrame(this, module, centre, honourSize, resizable);
-	frameRegister.add(frame);
+	
+	frameRegister.add(frame);	
+	frameRegister.put(String.valueOf(frame.hashCode()), frame);
 
         // Make sure that the module added signal is sent before the module
         // is displayed. Otherwise it's possible for the user to quickly close the
@@ -538,8 +540,8 @@ public class DesktopManager
 
 	    if(frame instanceof ModuleFrame) {
 		ModuleFrame moduleFrame = (ModuleFrame)frame;
-		moduleFrame.getModule().save();
-
+		Module module = moduleFrame.getModule();
+		module.save();
 		//Save the geometry of the frame so that it can be reconconstructed
 		//when Venice is restarted.
 		try {

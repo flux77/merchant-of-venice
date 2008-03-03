@@ -303,6 +303,10 @@ public class Main extends JFrame {
 			CommandManager.getInstance().graphStockBySymbol(symbolList);
 			ModuleFrame newFrame = frameRegister.get(String.valueOf(count));
 
+			//Augment the key index with the hashcode so that
+			//the frame can remove itself from the register
+			frameRegister.put(String.valueOf(newFrame.hashCode()), newFrame);
+
 			newFrame.setSizeAndLocation(newFrame, desktop, false, true);
 			newFrame.setBounds(newFrameSettings.getGeometry());
 			newFrame.setPreferredSize(newFrameSettings.getGeometry().getSize());

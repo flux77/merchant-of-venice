@@ -21,6 +21,8 @@ package org.mov.ui;
 
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.Set;
+import java.util.Iterator;
 import org.mov.main.ModuleFrame;
 
 
@@ -45,7 +47,8 @@ import org.mov.main.ModuleFrame;
   Main.restoreSavedWindows() creates and access frames serially via an index,
   that's not sufficient reason to apply that restriction for other uses.
 
-  
+  Further, a general key is necessary for the frame to remove itself from
+  the register.
  */
 
 public class FrameRegister extends HashMap {
@@ -103,6 +106,59 @@ public class FrameRegister extends HashMap {
 	}
 	notifyAll();
 	return frame;    
+    }
+
+    /**
+     *
+     * Return true if there is a mapping to 
+     */
+
+    public synchronized boolean find(String key) {
+	ModuleFrame frame = (ModuleFrame)super.get(key);
+	return (frame == null) ? false : true;
+    }
+    
+    /**
+     * Return true if there is a moduleframe which has a module of key
+     childkey
+     * 
+     * @param childKey The identifier of a module
+    */
+    public synchronized boolean findChild(String childKey) {
+	Set set = keySet();
+	Iterator iterator = set.iterator();
+	boolean  rv = false;
+
+	while (iterator.hasNext()) {
+	    String parentKey = (String)iterator.next();
+	    ModuleFrame f = (ModuleFrame)super.get(parentKey);
+	    if (String.valueOf(f.getModule().hashCode()).equals(childKey)) {
+		rv = true;
+	    }
+	}
+	return rv;
+    }
+
+    /**
+     *
+     * Remove all references to the ModuleFrame
+     * 
+     * @param frame The ModuleFrame to delete 
+     */
+
+    public void delete(ModuleFrame frame) {
+	
+	if (containsValue(frame)) {
+	    Set set = keySet();
+	    Iterator iterator = set.iterator();
+	    while (iterator.hasNext()) {
+		String key = (String)iterator.next();
+		ModuleFrame f = (ModuleFrame)super.get(key);
+		if (f != null) {
+		    super.remove(key);
+		}
+	    }
+	}	        	
     }
 
 }

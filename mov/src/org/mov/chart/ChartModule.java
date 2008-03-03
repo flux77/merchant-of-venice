@@ -1002,12 +1002,18 @@ public class ChartModule extends JPanel implements Module,
 	String type = String.valueOf(getClass().getName());
 	String key = String.valueOf(hashCode());
 
-	try {
-	    PreferencesManager.putModuleSettings(getTitle(), 
-					      type, key, 
-					      symbolList);	    
-	} catch (PreferencesException pfe) {
+	//Don't save the module settings to the filesystem if it's parent
+	//frame has been closed.
+	DesktopManager manager = (DesktopManager)desktop.getDesktopManager();
 
+	if (manager.getFrameRegister().findChild(key)) {
+	    try {
+		PreferencesManager.putModuleSettings(getTitle(), 
+						     type, key, 
+						     symbolList);	    
+	    } catch (PreferencesException pfe) {
+		
+	    }
 	}
     }
 

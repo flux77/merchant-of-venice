@@ -34,9 +34,11 @@ import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
 
 import org.mov.main.Main;
+import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
 import org.mov.prefs.ModuleFrameSettingsWriter;
 import org.mov.prefs.ModuleSettingsWriter;
+import org.mov.ui.DesktopManager;
 import org.mov.macro.StoredMacro;
 import org.mov.portfolio.Account;
 import org.mov.portfolio.CashAccount;
@@ -1454,21 +1456,20 @@ public class PreferencesManager {
 				 String type, 
 				 String key,
 				 Vector list) throws PreferencesException {
-    
-	Iterator iterator = list.iterator();
-	
+
 	try {
 	    File moduleSettingsFile = new File(getFrameSettingsHome(), 
-					      name.replaceAll(" ","") + "_" + key + ".xml");
-
+					       name.replaceAll(" ","") + "_" + key + ".xml");
+	    
 	    FileOutputStream outputStream = new FileOutputStream(moduleSettingsFile);
 	    ModuleSettingsWriter.write(name, type, key, list, outputStream);	
 	} catch (IOException e) {
-	       throw new PreferencesException(e.getMessage());
-        }
-        catch(SecurityException e) {
-            throw new PreferencesException(e.getMessage());        
+	    throw new PreferencesException(e.getMessage());
 	}
+	catch(SecurityException e) {
+	    throw new PreferencesException(e.getMessage());        
+	}
+	
     }
 
     /**
@@ -1505,7 +1506,7 @@ public class PreferencesManager {
 	}
 	return savedModules;
     }
-
+    
     /**
      *
      * Return the saved module settings from the file system
@@ -1542,6 +1543,8 @@ public class PreferencesManager {
 	return savedModuleFile;    
     }
 
+
+
     /**
      *
      * Remove all the saved frames.
@@ -1569,5 +1572,7 @@ public class PreferencesManager {
 	    f.delete();
 	}
     }
+
+    
 
 }

@@ -148,17 +148,27 @@ public class FrameRegister extends HashMap {
 
     public void delete(ModuleFrame frame) {
 	
+	Vector deleteList = new Vector(); //A list of the frame references to remove
+	
 	if (containsValue(frame)) {
 	    Set set = keySet();
 	    Iterator iterator = set.iterator();
 	    while (iterator.hasNext()) {
 		String key = (String)iterator.next();
-		ModuleFrame f = (ModuleFrame)super.get(key);
+		ModuleFrame f = (ModuleFrame)super.get(key);		
 		if (f != null) {
-		    super.remove(key);
+		    //The deletion is postponed to avoid a concurrent modification exception
+		    deleteList.add(key);
 		}
 	    }
-	}	        	
+	}
+
+	//Now remove all the references in the delete list
+	Iterator iterator = deleteList.iterator();
+	while (iterator.hasNext()) {
+	    String key = (String)iterator.next();
+	    super.remove(key);
+	}
     }
 
 }

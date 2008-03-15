@@ -242,6 +242,7 @@ public class Main extends JFrame {
 	int progressValue = 0;
 	FrameRegister frameRegister;
 	int count = 0;
+	int index;
 	
 
 	if (!PreferencesManager.getRestoreSavedWindowsSetting()) 
@@ -301,12 +302,17 @@ public class Main extends JFrame {
 			}						
 									
 			CommandManager.getInstance().graphStockBySymbol(symbolList);
-			ModuleFrame newFrame = frameRegister.get(String.valueOf(count));
+			
+			//The creation of a frame creates
+			//two mappings for a frame.			
+			index = (count == 0) ? 0 : count + 1;
+
+			ModuleFrame newFrame = frameRegister.get(String.valueOf(index));
 
 			//Augment the key index with the hashcode so that
 			//the frame can remove itself from the register
+						
 			frameRegister.put(String.valueOf(newFrame.hashCode()), newFrame);
-
 			newFrame.setSizeAndLocation(newFrame, desktop, false, true);
 			newFrame.setBounds(newFrameSettings.getGeometry());
 			newFrame.setPreferredSize(newFrameSettings.getGeometry().getSize());

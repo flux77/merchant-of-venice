@@ -57,22 +57,27 @@ public class RSIGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange) {
+		       double bottomLineValue, List xRange, 
+		       boolean vertOrientation) {
 
         int overSold = RSIGraphUI.getOverSold(getSettings());
         int overBought = RSIGraphUI.getOverBought(getSettings());
 
         g.setColor(Color.BLACK);
         GraphTools.renderHorizontalLine(g, overSold, xoffset, yoffset, horizontalScale,
-                                        verticalScale, bottomLineValue, xRange);
+                                        verticalScale, bottomLineValue, xRange, 
+					vertOrientation);
+	    
         GraphTools.renderHorizontalLine(g, overBought, xoffset, yoffset, horizontalScale,
-                                        verticalScale, bottomLineValue, xRange);
+                                        verticalScale, bottomLineValue, xRange, 
+					vertOrientation);
 
 
 	g.setColor(colour);
 	GraphTools.renderLine(g, RSI, xoffset, yoffset,
 			      horizontalScale,
-			      verticalScale, bottomLineValue, xRange);
+			      verticalScale, bottomLineValue, xRange, 
+			      vertOrientation);
     }
 
     public String getToolTipText(Comparable x, int y, int yoffset,

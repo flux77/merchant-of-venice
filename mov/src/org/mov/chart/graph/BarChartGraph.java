@@ -49,7 +49,7 @@ public class BarChartGraph extends AbstractGraph {
      * @param	dayHigh	source containing the day high values
      * @param	dayClose source containing the day close values
      */
-    public BarChartGraph(GraphSource dayOpen, GraphSource dayLow, GraphSource dayHigh, GraphSource dayClose) {
+      public BarChartGraph(GraphSource dayOpen, GraphSource dayLow, GraphSource dayHigh, GraphSource dayClose) {
 	super(dayClose);
 
 	this.dayOpen = dayOpen.getGraphable(); // a changer !!!
@@ -58,10 +58,19 @@ public class BarChartGraph extends AbstractGraph {
 	this.dayClose = dayClose.getGraphable();
     }
 
-    // See Graph.java
     public void render(Graphics g, Color c, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
 		       double bottomLineValue, List xRange) {
+	render(g, c, xoffset, yoffset, horizontalScale, verticalScale,
+	       bottomLineValue, xRange, true);
+    }
+		       
+
+    // See Graph.java
+    public void render(Graphics g, Color c, int xoffset, int yoffset,
+		       double horizontalScale, double verticalScale,
+		       double bottomLineValue, List xRange, 
+		       boolean vertOrientation) {
 
 	g.setColor(Color.RED);
 
@@ -71,6 +80,9 @@ public class BarChartGraph extends AbstractGraph {
 	int i = 0;
     int halfbarWidth=(int)(0.309 * horizontalScale);//bryan
     int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
+
+    int vertDirection = vertOrientation ? 1 : -1;
+    int horizDirection = 1; //Not yet used
 
 	while(iterator.hasNext()) {
 
@@ -98,23 +110,24 @@ public class BarChartGraph extends AbstractGraph {
 
 		xCoordinate = (int)(xoffset + horizontalScale * i);
 		
-                openY = yoffset -
-		    GraphTools.scaleAndFitPoint(dayOpenY.doubleValue(),
-						bottomLineValue,
-						verticalScale);
-		lowY = yoffset -
-		    GraphTools.scaleAndFitPoint(dayLowY.doubleValue(),
-						bottomLineValue,
-						verticalScale);
-		highY = yoffset -
-		    GraphTools.scaleAndFitPoint(dayHighY.doubleValue(),
-						bottomLineValue,
-						verticalScale);
-		closeY = yoffset -
-		    GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(),
-						bottomLineValue,
-						verticalScale);
-		
+		openY = GraphTools.calcYCoord(yoffset, dayOpenY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
+
+		lowY = GraphTools.calcYCoord(yoffset, dayLowY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
+
+		highY = GraphTools.calcYCoord(yoffset, dayHighY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
+
+		closeY = GraphTools.calcYCoord(yoffset, dayCloseY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
+	       		
+								
+
 		// Draw bar
 //		g.drawLine(xCoordinate, lowY, xCoordinate, highY);
 		g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, lowY, xCoordinate+halfbarWidth+1 +halfBlankWidth, highY);

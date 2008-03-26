@@ -60,7 +60,7 @@ public class CandleStickGraph extends AbstractGraph {
 	// See Graph.java
     public void render(Graphics g, Color c, int xoffset, int yoffset,
         double horizontalScale, double verticalScale, double bottomLineValue,
-        List xRange) {
+		       List xRange, boolean vertOrientation) {
 
         int xCoordinate, lowY, highY, closeY, openY;
         Double dayLowY, dayHighY, dayCloseY, dayOpenY;
@@ -68,6 +68,7 @@ public class CandleStickGraph extends AbstractGraph {
         int i = 0;
         int halfbarWidth=(int)(0.309 * horizontalScale);//bryan
         int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
+	int vertDirection = (vertOrientation) ? 1 : -1;
 
         while (iterator.hasNext()) {
 
@@ -95,18 +96,21 @@ public class CandleStickGraph extends AbstractGraph {
 
                 xCoordinate = (int) (xoffset + horizontalScale * i);
 
-                openY = yoffset
-                    - GraphTools.scaleAndFitPoint(dayOpenY.doubleValue(),
-                        bottomLineValue, verticalScale);
-                lowY = yoffset
-                    - GraphTools.scaleAndFitPoint(dayLowY.doubleValue(),
-                        bottomLineValue, verticalScale);
-                highY = yoffset
-                    - GraphTools.scaleAndFitPoint(dayHighY.doubleValue(),
-                        bottomLineValue, verticalScale);
-                closeY = yoffset
-                    - GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(),
-                        bottomLineValue, verticalScale);
+		openY = GraphTools.calcYCoord(yoffset, dayOpenY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
+
+		lowY = GraphTools.calcYCoord(yoffset, dayLowY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
+
+		highY = GraphTools.calcYCoord(yoffset, dayHighY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
+
+		closeY = GraphTools.calcYCoord(yoffset, dayCloseY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
 
                 // Draw bar
                 if (closeY > openY) { // red candle : open higher than close

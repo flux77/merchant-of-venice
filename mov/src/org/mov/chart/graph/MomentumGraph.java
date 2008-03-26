@@ -55,12 +55,14 @@ public class MomentumGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange) {
+		       double bottomLineValue, List xRange, 
+		       boolean vertOrientation) {
 
 	g.setColor(colour);
 	GraphTools.renderBar(g, momentum, xoffset, yoffset,
 			     horizontalScale,
-			     verticalScale, bottomLineValue, xRange);
+			     verticalScale, bottomLineValue, xRange, 
+			     vertOrientation);
     }
 
     public String getToolTipText(Comparable x, int y, int yoffset,

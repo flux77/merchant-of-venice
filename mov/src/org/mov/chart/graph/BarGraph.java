@@ -53,12 +53,14 @@ public class BarGraph extends AbstractGraph {
     // See Graph.java
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange) {
+		       double bottomLineValue, List xRange, 
+		       boolean vertOrientation) {
 
 	g.setColor(colour);
 	GraphTools.renderBar(g, getSource().getGraphable(),
 			     xoffset, yoffset, horizontalScale,
-			     verticalScale, bottomLineValue, xRange);
+			     verticalScale, bottomLineValue, xRange, 
+			     vertOrientation);
     }
 
     /**

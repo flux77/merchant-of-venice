@@ -157,6 +157,7 @@ public class ChartModule extends JPanel implements Module,
     private JButton moveOnChart = null;
     private JButton scribbleOnChart = null;    
     private JButton editOnChart = null;
+    private JButton flipChart = null;
 
     // Modes
     private static final int SELECTING = 0;
@@ -169,6 +170,7 @@ public class ChartModule extends JPanel implements Module,
     // Menus
     private JMenuItem addMenuItem = null;
     private JMenuItem closeMenuItem = null;
+    private JMenuItem flipMenuItem = null;
 
     // Enabled?
     private boolean defaultZoomEnabled = false;
@@ -194,7 +196,8 @@ public class ChartModule extends JPanel implements Module,
     private String scribbleInImage = "toolbarButtonGraphics/general/Scribble24.gif";
     private String editInImage = "toolbarButtonGraphics/general/Text24.gif";
     private String cloneChartImage = "toolbarButtonGraphics/general/Copy24.gif";
-    
+    private String flipChartImage = "toolbarButtonGraphics/general/Refresh24.gif";
+
     //Index chart indicator - Index charts have aggregate graph sources
     private boolean indexChart = false;
 
@@ -269,11 +272,19 @@ public class ChartModule extends JPanel implements Module,
 	menu.add(addMenuItem);
 	menu.addSeparator();
 
+	flipMenuItem = new JMenuItem(Locale.getString("GRAPH_FLIP"));
+	flipMenuItem.addActionListener(this);
+	menu.add(flipMenuItem);
+	menu.addSeparator();
+
 	closeMenuItem = new JMenuItem(Locale.getString("CLOSE"));
 	closeMenuItem.setAccelerator(KeyStroke.getKeyStroke('C',
 		  		     java.awt.Event.CTRL_MASK, false));
 	closeMenuItem.addActionListener(this);
 	menu.add(closeMenuItem);
+
+
+	
 
 	menuBar.add(menu);
 
@@ -295,6 +306,7 @@ public class ChartModule extends JPanel implements Module,
 	URL moveInImageURL = ClassLoader.getSystemResource(moveInImage);
 	URL scribbleInImageURL = ClassLoader.getSystemResource(scribbleInImage);	URL editInImageURL = ClassLoader.getSystemResource(editInImage);
 	URL cloneChartURL = ClassLoader.getSystemResource(cloneChartImage);
+	URL flipChartURL = ClassLoader.getSystemResource(flipChartImage);
 
         // If either image is not available, then do not create the
         // toolbar
@@ -356,6 +368,13 @@ public class ChartModule extends JPanel implements Module,
 	    eraseOnChart.addActionListener(this);
 	    eraseOnChart.setEnabled(true);
 	    toolBar.add(eraseOnChart);
+
+	    // Create image on toolbar to toggle chart orientation
+	    ImageIcon flipChartIcon = new ImageIcon(flipChartURL);
+	    flipChart = new JButton(flipChartIcon);
+	    flipChart.addActionListener(this);
+	    flipChart.setEnabled(true);
+	    toolBar.add(flipChart);
 	    
 
 	    
@@ -903,6 +922,11 @@ public class ChartModule extends JPanel implements Module,
 	    CommandManager.getInstance().graphStockBySymbol(outputList);
 	}
 
+	else if (flipChart != null && e.getSource() == flipChart) {
+	    chart.setOrientation( chart.getOrientation() ? false : true);
+	    chart.repaint();
+	}
+	
 	else if(e.getSource() == closeMenuItem) {
 	    propertySupport.
 		firePropertyChange(ModuleFrame.WINDOW_CLOSE_PROPERTY, 0, 1);
@@ -948,7 +972,7 @@ public class ChartModule extends JPanel implements Module,
      *
     */
 
-    public void activateButton(JButton b) {
+	public void activateButton(JButton b) {
 	
 	paintOnChart.setSelected(false);
 	eraseOnChart.setSelected(false);

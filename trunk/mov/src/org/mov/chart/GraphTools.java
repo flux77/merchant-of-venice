@@ -32,11 +32,15 @@ public class GraphTools {
                                             double horizontalScale,
                                             double verticalScale,
                                             double bottomLineValue,
-                                            List xRange) {
+                                            List xRange, 
+					    boolean vertOrientation) {
 
+	int vertDirection = (vertOrientation) ? 1 : -1;
         int startX = xoffset;
         int endX = (int)(xoffset + (xRange.size() - 1) * horizontalScale);
-        int y = yoffset - scaleAndFitPoint(yValue, bottomLineValue, verticalScale);
+	
+	int y = calcYCoord(yoffset, yValue, bottomLineValue, 
+			   verticalScale, vertDirection);
 
         g.drawLine(startX, y, endX, y);
     }
@@ -45,6 +49,16 @@ public class GraphTools {
 				  int xoffset, int yoffset,
 				  double horizontalScale, double verticalScale,
 				  double bottomLineValue, List xRange) {
+	renderLine(g, source, xoffset, yoffset, 
+		   horizontalScale, verticalScale,
+		   bottomLineValue, xRange, 
+		   true);
+    }
+
+    public static void renderLine(Graphics g, Graphable source,
+				  int xoffset, int yoffset,
+				  double horizontalScale, double verticalScale,
+				  double bottomLineValue, List xRange, boolean vertOrientation) {
 	
 	int xCoordinate, yCoordinate;
 	int lastXCoordinate = -1 , lastYCoordinate = -1;
@@ -52,6 +66,7 @@ public class GraphTools {
 	Comparable x;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
+	int vertDirection = (vertOrientation) ? 1 : -1;
     int halfbarWidth=(int)(0.309 * horizontalScale);//bryan    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
 	while(iterator.hasNext()) {
 
@@ -73,9 +88,11 @@ public class GraphTools {
 	    // The graph is allowed to skip points
 	    if(y != null) {
 		xCoordinate = (int)(xoffset + horizontalScale * i);
-		yCoordinate = yoffset - scaleAndFitPoint(y.doubleValue(),
-							 bottomLineValue,
-							 verticalScale);
+		yCoordinate = calcYCoord(yoffset, y.doubleValue(), 
+					 bottomLineValue, verticalScale,
+					 vertDirection);
+		
+		
 		
 		if(lastXCoordinate != -1)
 //		    g.drawLine(xCoordinate, yCoordinate,//
@@ -91,10 +108,21 @@ public class GraphTools {
 	}
     }
 
-    public static void renderBar(Graphics g, Graphable source,
+        public static void renderBar(Graphics g, Graphable source,
 				 int xoffset, int yoffset,
 				 double horizontalScale, double verticalScale,
 				 double bottomLineValue, List xRange) {
+	    renderBar(g, source, xoffset, yoffset, 
+		      horizontalScale, verticalScale, bottomLineValue, xRange,
+		      true);
+	}
+
+
+    public static void renderBar(Graphics g, Graphable source,
+				 int xoffset, int yoffset,
+				 double horizontalScale, double verticalScale,
+				 double bottomLineValue, List xRange, 
+				 boolean vertOrientation) {
 	int x2, y1, y2;
 //	int x1 = -1;    int halfbarWidth=(int)(0.309 * horizontalScale);//bryan    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
 	Double y;
@@ -102,8 +130,12 @@ public class GraphTools {
 	Comparable x;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
-
-	y2 = yoffset - scaleAndFitPoint(0, bottomLineValue, verticalScale);
+	int vertDirection = (vertOrientation) ? 1 : -1;
+	
+	y2 = calcYCoord(yoffset, 0, bottomLineValue, verticalScale, 
+			vertDirection);
+	
+	//y2 = yoffset - scaleAndFitPoint(0, bottomLineValue, verticalScale);
 
 	while(iterator.hasNext()) {
 
@@ -129,8 +161,13 @@ public class GraphTools {
 		doubleValue = y.doubleValue();
 
 	    x2 = (int)(xoffset + horizontalScale * i);
-	    y1 = yoffset - scaleAndFitPoint(doubleValue,
-	    				    bottomLineValue, verticalScale);
+	    
+	    //y1 = yoffset - scaleAndFitPoint(doubleValue,
+	    //			    bottomLineValue, verticalScale);
+
+	    y1 = calcYCoord(yoffset, doubleValue, bottomLineValue, 
+			    verticalScale, vertDirection);
+
 		g.fillRect( x2 +halfBlankWidth, Math.min(y1, y2),	    				halfbarWidth*2+1, Math.abs(y2-y1));
 //	    if(x1 != -1)//
 //		g.fillRect(Math.min(x1, x2), Math.min(y1, y2),//
@@ -164,11 +201,25 @@ public class GraphTools {
 	return ( (height - point) / scale  + offset);
     }
 
+
     // chars is character to draw - in synch with list xRange
     public static void renderChar(Graphics g, PFGraphable source,
 				 int xoffset, int yoffset,
 				 double horizontalScale, double verticalScale,
 				  double bottomLineValue, List xRange) {
+				  
+	renderChar(g, source, xoffset, yoffset, 
+		   horizontalScale, verticalScale, bottomLineValue, xRange,
+		   true);
+	
+    }
+
+    // chars is character to draw - in synch with list xRange
+    public static void renderChar(Graphics g, PFGraphable source,
+				 int xoffset, int yoffset,
+				 double horizontalScale, double verticalScale,
+				  double bottomLineValue, List xRange, 
+				  boolean vertOrientation) {
 
 	int xCoordinate, yCoordinate;
 	int lastXCoordinate = -1 , lastYCoordinate = -1;
@@ -177,6 +228,7 @@ public class GraphTools {
 	Comparable x;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
+	int vertDirection = (vertOrientation ) ? 1 : -1;
 
 	while(iterator.hasNext()) {
 
@@ -205,6 +257,10 @@ public class GraphTools {
 		    yCoordinate = yoffset - scaleAndFitPoint(y.doubleValue(),
 							     bottomLineValue,
 							     verticalScale);
+		    
+		    yCoordinate = calcYCoord(yoffset, y.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
 		    g.drawString(source.getString(x),xCoordinate, yCoordinate);
 		
 		}				
@@ -215,11 +271,24 @@ public class GraphTools {
 	
     }
 
-        // chars is character to draw - in synch with list xRange
+
+            // chars is character to draw - in synch with list xRange
     public static void renderMarker(Graphics g, PFGraphable source,
 				    int xoffset, int yoffset,
 				    double horizontalScale, double verticalScale,
 				    double bottomLineValue, List xRange) {
+	
+	renderMarker(g, source, xoffset, yoffset,
+		     horizontalScale, verticalScale, bottomLineValue,xRange,
+		     true);
+
+    }
+
+        // chars is character to draw - in synch with list xRange
+    public static void renderMarker(Graphics g, PFGraphable source,
+				    int xoffset, int yoffset,
+				    double horizontalScale, double verticalScale,
+				    double bottomLineValue, List xRange, boolean vertOrientation) {
 
 	int xCoordinate, yCoordinate;
 	int xCoordinate2, yCoordinate2;
@@ -230,6 +299,7 @@ public class GraphTools {
 	Comparable x;
 	Iterator iterator = xRange.iterator();
 	int i = 0;
+	int vertDirection = (vertOrientation) ? 1 : -1;
 	double boxPrice = source.getBoxPrice();	
 	int columnSpan = source.getColumnSpan();
 
@@ -258,15 +328,16 @@ public class GraphTools {
 		if(y != null) {
 		
 		    xCoordinate = (int)(xoffset + horizontalScale * i);
-		    yCoordinate = yoffset - scaleAndFitPoint(y.doubleValue(),
-							     bottomLineValue,
-							     verticalScale);
+
+		    yCoordinate = calcYCoord(yoffset, y.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
 		    
 		    xCoordinate2 = (int)(xoffset + horizontalScale * (i + columnSpan));
-		    
-		    yCoordinate2 = yoffset - scaleAndFitPoint(y.doubleValue() - boxPrice,
-							      bottomLineValue,
-							      verticalScale);
+		    		    
+		    yCoordinate2 = calcYCoord(yoffset, y.doubleValue() - boxPrice,
+					     bottomLineValue, verticalScale,
+					     vertDirection);
 		    
 		    deltaX = xCoordinate2 - xCoordinate;
 		    deltaY = yCoordinate2 - yCoordinate;		    
@@ -298,6 +369,36 @@ public class GraphTools {
 	}
 	
     }
+
+    /**
+     * 
+     * Utility method for calculating screen points given a data value, scale and direction.
+     *
+     * @param   yoffset The yoffset in the graphics object where the graph 
+     *                  starts 
+     * @param   yValue  The data point (Y value)
+     * @param   bottomLineValue The Y value of the lowest line in the graph
+     * @param   verticalScale  The verticalScale used to convert between
+     *                         Y value and cartesian coordinate y.
+     * @param   vertDirection  A flag indicating the vertical direction of the
+     *                         graph: 1 = Graph is drawn from top to bottom
+     *                               -1 = Graph is drawn from bottom to top
+     * 
+     */
+
+    public static int calcYCoord(int yoffset, double yValue, 
+				double bottomLineValue, 
+				double verticalScale,
+				 int vertDirection) {
+				
+	
+	int vertOffset = (vertDirection == 1) ? yoffset : 0;
+	
+	return vertOffset - scaleAndFitPoint(vertDirection * yValue, 
+					 vertDirection * bottomLineValue,
+					 verticalScale);
+    }
+				
 
 }
 

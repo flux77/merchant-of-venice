@@ -66,11 +66,13 @@ public interface Graph {
      * @param	bottomLineValue	the Y value of the lowest line in the graph
      * @param	xRange	a <code>List</code> of <code>Comparable</code>
      *			that contain the X values to plot
+     * @param   vertOrientation true if increasing y values mean decreasing Y values 
      */
     public void render(Graphics g, Color colour,
 		       int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange);
+		       double bottomLineValue, List xRange, 
+		       boolean vertOrientation);
 
     /**
      * Get the tool tip text for the given X value and y coordinate.

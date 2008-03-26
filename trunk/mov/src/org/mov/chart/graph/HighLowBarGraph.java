@@ -60,13 +60,15 @@ public class HighLowBarGraph extends AbstractGraph {
     // See Graph.java
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange) {
+		       double bottomLineValue, List xRange, 
+		       boolean vertOrientation) {
 
 	g.setColor(colour);
 
 	int xCoordinate, lowY, highY, closeY;
 	Double dayLowY, dayHighY, dayCloseY;
 	Iterator iterator = xRange.iterator();
+	int vertDirection = (vertOrientation) ? -1 : 1;
 	int i = 0;    int halfbarWidth=(int)(0.309 * horizontalScale);//bryan    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
 
 	while(iterator.hasNext()) {
@@ -94,18 +96,17 @@ public class HighLowBarGraph extends AbstractGraph {
 
 		xCoordinate = (int)(xoffset + horizontalScale * i);
 
-		lowY = yoffset -
-		    GraphTools.scaleAndFitPoint(dayLowY.doubleValue(),
-						bottomLineValue,
-						verticalScale);
-		highY = yoffset -
-		    GraphTools.scaleAndFitPoint(dayHighY.doubleValue(),
-						bottomLineValue,
-						verticalScale);
-		closeY = yoffset -
-		    GraphTools.scaleAndFitPoint(dayCloseY.doubleValue(),
-						bottomLineValue,
-						verticalScale);
+		lowY = GraphTools.calcYCoord(yoffset, dayLowY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
+
+		highY = GraphTools.calcYCoord(yoffset, dayHighY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
+
+		closeY = GraphTools.calcYCoord(yoffset, dayCloseY.doubleValue(),
+					     bottomLineValue, verticalScale,
+					     vertDirection);
 		
 		// Draw bar
 //		g.drawLine(xCoordinate, lowY, xCoordinate, highY);		g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, lowY, xCoordinate+halfbarWidth+1 +halfBlankWidth, highY);//bryan

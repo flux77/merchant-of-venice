@@ -55,6 +55,7 @@ public class Chart extends JComponent implements MouseListener {
     private Comparable endHighlightedX;
 
     private ChartDrawingModel drawnElements;
+    private boolean normalOrientation; //Is the chart normally oriented? (origin in top left corner)
 
     // Are we in a zoomed in view?
     private boolean zoomedIn = false;
@@ -72,6 +73,7 @@ public class Chart extends JComponent implements MouseListener {
 	updateUI();
 
 	drawnElements = new ChartDrawingModel();
+	normalOrientation = true;
 	
     }
 
@@ -854,6 +856,31 @@ public class Chart extends JComponent implements MouseListener {
 	    }
 	}
 	return false;
+    }
+
+    /**
+     * 
+     * Set the viewing orientation of the chart. Normal orientation is
+     * top to bottom. 
+     * 
+     * @param orientation A boolean value. If true, chart is drawn from top to
+     *                    bottom, otherwise bottom up.
+     *     
+     
+     */
+    public void setOrientation(boolean orientation) {
+	normalOrientation = orientation;
+	resetBuffer();
+    }
+    
+    /**
+     *
+     * Return the viewing orientation
+     *
+     */
+    
+    public boolean getOrientation() {
+	return normalOrientation;
     }
 
 }

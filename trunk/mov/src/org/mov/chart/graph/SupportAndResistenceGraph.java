@@ -88,18 +88,20 @@ public class SupportAndResistenceGraph extends AbstractGraph {
     // See Graph.java
     public void render(Graphics g, Color c, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange) {
+		       double bottomLineValue, List xRange, boolean vertOrientation) {
 
 
 	g.setColor(Color.green.darker());
 	GraphTools.renderLine(g, support, xoffset, yoffset, 
-		     horizontalScale,
-		     verticalScale, bottomLineValue, xRange);
+			      horizontalScale,
+			      verticalScale, bottomLineValue, xRange, 
+			      vertOrientation);
 
 	g.setColor(Color.red.darker());
 	GraphTools.renderLine(g, resistence, xoffset, yoffset, 
-		     horizontalScale,
-		     verticalScale, bottomLineValue, xRange);
+			      horizontalScale,
+			      verticalScale, bottomLineValue, xRange, 
+			      vertOrientation);
 
     }
 

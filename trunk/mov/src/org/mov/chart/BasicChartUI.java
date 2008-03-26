@@ -1061,7 +1061,8 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 			 horizontalScale,
 			 verticalAxis.getScale(),
 			 verticalAxis.getBottomLineValue(),
-			 chart.getXRange());
+			 chart.getXRange(),
+			 chart.getOrientation());
 	}
     }
 

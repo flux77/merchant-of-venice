@@ -67,8 +67,9 @@ public class PointAndFigureGraph extends AbstractGraph {
 	// We ignore the graph colours and use our own custom colours
 	g.setColor(Color.green.darker());
 	GraphTools.renderMarker(g, pointAndFigure, xoffset, yoffset,
-			      horizontalScale,
-			      verticalScale, bottomLineValue, xRange);
+				horizontalScale,
+				verticalScale, bottomLineValue, xRange, 
+				vertOrientation);
 
 	
     }

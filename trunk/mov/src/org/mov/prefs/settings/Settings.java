@@ -30,8 +30,9 @@ package org.mov.prefs.settings;
  * @see ModuleSettingReader 
 */
 
-
+import javax.swing.JDesktopPane;
 import java.util.*;
+import org.mov.main.Module;
 
 import org.mov.prefs.settings.SettingsWriter;
 
@@ -69,7 +70,7 @@ public interface Settings {
      * 
      * @param  group  The module group
      */
-    public int setGroup(int group);
+    public void setGroup(int group);
 
     /**
      * Return the module type as defined by the Setting constants.
@@ -128,5 +129,10 @@ public interface Settings {
     public SettingsWriter getWriter();
 
     
+    /**
+     *
+     * Return a Module based on the settings.
+     */
+    public Module getModule(JDesktopPane desktop);
 
 }

@@ -53,12 +53,14 @@ import org.mov.ui.ProgressDialogManager;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
+import org.mov.prefs.settings.Settings;
 
 public class GAModule extends JPanel implements Module {
 
     private PropertyChangeSupport propertySupport;
     private JDesktopPane desktop;
     private EODQuoteBundle quoteBundle;
+    private Settings settings;
 
     // Single result table for entire application
     private static ModuleFrame resultsFrame = null;
@@ -439,5 +441,9 @@ public class GAModule extends JPanel implements Module {
                 
                 resultsModule.addResults(GAResults);
             }});
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

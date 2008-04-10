@@ -30,12 +30,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
-import javax.swing.JDesktopPane;
 
 import org.mov.main.Main;
-import org.mov.main.Module;
 import org.mov.macro.StoredMacro;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
@@ -44,88 +43,53 @@ import org.mov.table.WatchScreenParserException;
 import org.mov.table.WatchScreenReader;
 import org.mov.table.WatchScreenWriter;
 
+import org.mov.prefs.settings.GraphSettings;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 import org.mov.main.ModuleFrame;
 import java.util.Collection;
 import java.util.Vector;
 
 /**
- * This class can save the toplevel Module data which is common to all modules.
+ * This class represents Module data which can be saved for the purposes
+ *  of restoring the modules upon restart.
  * 
  * @author Mark Hummel
- * @see Settings
- * @see SettingsWriter
+ * @see PreferencesManager
+ * @see ModuleSettingsWriter
+ * @see ModuleSettingReader 
 */
 
-public abstract class AbstractSettings implements Settings {
-
-        
-    private int group;
-    private int type;
-    private String name;
-
-    private String key;
-    private String title;
-
-    public AbstractSettings(int group, int type) {
-	this.group = group;
-	this.type = type;
-
-	name = this.getClass().getName();
-    }
-
-    public AbstractSettings(int group, int type, String key) {
-	this.group = group;
-	this.type = type;
-	this.key = key;	
-
-	name = this.getClass().getName();
-	
-
-    }
-
-    public void setTitle(String title) {
-	this.title = title;
-    }
-
-    public String getTitle() {
-	return title;
-    }
-
-    public int getType() {
-	return type;
-    }
-
-    public int getGroup() {
-	return group;
-    }
-
-    public void setGroup(int group) {
-	this.group = group;
-    }
-
-    public void setType(int type) {
-	this.type = type;
-    }
-
-    public void setKey(String key) {
-	this.key = key;
-    }
-
-    public String getKey() {
-	return key;
-    }
+public class GraphSettingsWriter implements SettingsWriter {
     
-    public Module getModule(JDesktopPane desktop) {
-	return null;
+    public GraphSettingsWriter() {
+	
     }
 
-    public String toString() {
-	String rv = "Group: " + String.valueOf(group) + 
-	    "Type: " + String.valueOf(type) +
-	    "Title: " + title;
+    /**
+     * Write the Graph settings to the output stream in XML.
+     *
+     * @param settings   The Graph settings
+     * @param Document   The root document
+     * @param parent     The parent element to which data is appended.
+     */
 
-	return rv;
+    public void write(Settings  settings, Document document, Element parent) {
+	Element setElement = (Element)document.createElement("set");
+	HashMap map = ((GraphSettings)settings).get();
+	Set keySet = map.keySet();
+	Iterator iterator = keySet.iterator();
+
+	while (iterator.hasNext()) {
+	    Element entry = (Element)document.createElement("entry");
+	    String key = (String)iterator.next();
+	    entry.setAttribute("key", key);
+	    entry.setAttribute("value", (String)map.get(key));
+	    setElement.appendChild(entry);
+	}	
+	parent.appendChild(setElement);
     }
-
 }

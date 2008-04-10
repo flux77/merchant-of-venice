@@ -37,6 +37,7 @@ import org.mov.ui.AbstractTableModel;
 import org.mov.ui.Column;
 import org.mov.ui.MenuHelper;
 import org.mov.ui.*;
+import org.mov.prefs.settings.Settings;
 
 /** 
  * Venice module for displaying a portfolio's transaction history to
@@ -68,6 +69,7 @@ public class TransactionModule extends AbstractTable implements Module,
     private PortfolioModule portfolioModule;
     private Portfolio portfolio;
     private Model model;
+    private Settings settings;
 
     class Model extends AbstractTableModel {
 
@@ -520,5 +522,9 @@ public class TransactionModule extends AbstractTable implements Module,
 	    };
 
 	menuAction.start();
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

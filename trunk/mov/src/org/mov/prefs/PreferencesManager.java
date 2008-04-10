@@ -36,8 +36,8 @@ import java.util.prefs.BackingStoreException;
 import org.mov.main.Main;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
-import org.mov.prefs.ModuleFrameSettingsWriter;
-import org.mov.prefs.ModuleSettingsWriter;
+import org.mov.prefs.settings.ModuleFrameSettingsWriter;
+import org.mov.prefs.settings.TopLevelSettingsWriter;
 import org.mov.ui.DesktopManager;
 import org.mov.macro.StoredMacro;
 import org.mov.portfolio.Account;
@@ -1434,8 +1434,10 @@ public class PreferencesManager {
 					      ("FrameDataFor" + frame.getTitle()).replaceAll(" ", "") + "_" + frame.hashCode() + ".xml");
 
 	    FileOutputStream outputStream = new FileOutputStream(frameSettingsFile);
+	    
+	    TopLevelSettingsWriter settingsWriter = new TopLevelSettingsWriter();
 
-	    ModuleFrameSettingsWriter.write(frame, outputStream);
+	    settingsWriter.write(frame, outputStream);
 	    outputStream.close();
 	} catch (IOException e) {
 	    throw new PreferencesException(e.getMessage());
@@ -1443,106 +1445,6 @@ public class PreferencesManager {
 	    throw new PreferencesException(e.getMessage());
 	}
     }
-
-    /**
-     * Save the module state.
-     *
-     * @param name The name of the chart
-     * @param type The implementing class of the Module
-     * @param key An identifier for the module
-     */
-
-    public static void putModuleSettings(String name, 
-				 String type, 
-				 String key,
-				 Vector list) throws PreferencesException {
-
-	try {
-	    File moduleSettingsFile = new File(getFrameSettingsHome(), 
-					       name.replaceAll(" ","") + "_" + key + ".xml");
-	    
-	    FileOutputStream outputStream = new FileOutputStream(moduleSettingsFile);
-	    ModuleSettingsWriter.write(name, type, key, list, outputStream);	
-	} catch (IOException e) {
-	    throw new PreferencesException(e.getMessage());
-	}
-	catch(SecurityException e) {
-	    throw new PreferencesException(e.getMessage());        
-	}
-	
-    }
-
-    /**
-     *
-     * Return the saved module settings from the file system
-     *
-     * @return A list of File objects containing the saved module data.
-     */
-    public static Vector getSavedModules() {
-	String[] savedModuleFileNames = PreferencesManager.getFrameSettingsHome().list();
-	Vector savedModules = new Vector();
-	File savedModuleFile = null;
-
-	// Retrieve all the saved frames stored in ~/Venice/SavedWindows/ (0.8 and up)
-	
-        String suffix = ".xml";
-
-        for(int i = 0; i < savedModuleFileNames.length; i++) {	    
-	    String savedModuleFileName = savedModuleFileNames[i];
-
-	    if (!savedModuleFileName.endsWith(suffix)) {
-		    continue;
-		}
-
-	    //Interested in the modules, not the ModuleFrames at this stage
-	    if (savedModuleFileName.startsWith("FrameData")) {
-		continue;
-	    }
-	    
-	    savedModuleFile = new File(PreferencesManager.getFrameSettingsHome(), savedModuleFileName);
-	    
-	    savedModules.add(savedModuleFile);
-
-	}
-	return savedModules;
-    }
-    
-    /**
-     *
-     * Return the saved module settings from the file system
-     *
-     * @param key A string which identifies the module 
-     * @return A File object containing the saved module data.
-     */
-    public static File getSavedModule(String key) {
-	String[] savedModuleFileNames = PreferencesManager.getFrameSettingsHome().list();
-	File savedModuleFile = null;
-
-	// Retrieve all the saved frames stored in ~/Venice/SavedWindows/ (0.8 and up)
-	
-        String suffix = ".xml";
-
-        for(int i = 0; i < savedModuleFileNames.length; i++) {	    
-	    String savedModuleFileName = savedModuleFileNames[i];
-
-	    if (!savedModuleFileName.endsWith(suffix)) {
-		    continue;
-		}
-
-	    //Interested in the modules, not the ModuleFrames at this stage
-	    if (savedModuleFileName.startsWith("FrameData")) {
-		continue;
-	    }
-
-	    if (!savedModuleFileName.endsWith(key + suffix)) {
-		continue;
-	    }
-
-	    savedModuleFile = new File(PreferencesManager.getFrameSettingsHome(), savedModuleFileName);
-	}
-	return savedModuleFile;    
-    }
-
 
 
     /**
@@ -1558,21 +1460,5 @@ public class PreferencesManager {
 	    f.delete();
 	}
     }
-    
-    /**
-     *
-     * Remove all the saved modules.
-     */
-    public static void removeSavedModules() {
-	Vector list = getSavedModules();
-	Iterator iterator = list.iterator();
-
-	while (iterator.hasNext()) {
-	    File f = (File)iterator.next();
-	    f.delete();
-	}
-    }
-
-    
-
+        
 }

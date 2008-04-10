@@ -33,6 +33,7 @@ import org.mov.util.Locale;
 import org.mov.portfolio.Portfolio;
 import org.mov.quote.*;
 import org.mov.ui.*;
+import org.mov.prefs.settings.Settings;
 
 /**
  * Venice module for displaying a portfolio in a table.
@@ -51,6 +52,7 @@ public class PortfolioTableModule extends AbstractTable
     private EODQuoteBundle quoteBundle;
     private Portfolio portfolio;
     private PortfolioModel model;
+    private Settings settings;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
@@ -178,6 +180,10 @@ public class PortfolioTableModule extends AbstractTable
 	}
 	else
             assert false;
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 
 }

@@ -51,6 +51,7 @@ import org.mov.ui.Column;
 import org.mov.ui.MenuHelper;
 import org.mov.ui.TextsEditorDialog;
 import org.mov.util.Locale;
+import org.mov.prefs.settings.Settings;
 
 public class GARulesPageModule extends AbstractTable implements Module {
     
@@ -70,6 +71,7 @@ public class GARulesPageModule extends AbstractTable implements Module {
 
     private JDesktopPane desktop;
     private Model model;
+    private Settings settings;
     
     // Menus
     private JMenuBar menuBar;
@@ -444,4 +446,8 @@ public class GARulesPageModule extends AbstractTable implements Module {
         return true;
     }
     
+    public Settings getSettings() {
+	return settings;
+    }
+
 }

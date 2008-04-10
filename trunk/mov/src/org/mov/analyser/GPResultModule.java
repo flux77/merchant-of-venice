@@ -50,6 +50,7 @@ import org.mov.ui.MenuHelper;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
+import org.mov.prefs.settings.Settings;
 
 public class GPResultModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -68,6 +69,7 @@ public class GPResultModule extends AbstractTable implements Module {
 
     private Model model;
     private GPPageInitialPopulation GPPageInitialPopulation;
+    private Settings settings;
 
     // Menus
     private JMenuBar menuBar;
@@ -691,5 +693,9 @@ public class GPResultModule extends AbstractTable implements Module {
 
     public boolean encloseInScrollPane() {
 	return true;
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

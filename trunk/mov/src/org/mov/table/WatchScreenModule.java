@@ -44,6 +44,7 @@ import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
 import org.mov.prefs.PreferencesException;
 import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.settings.Settings;
 import org.mov.quote.IDQuote;
 import org.mov.quote.IDQuoteCache;
 import org.mov.quote.IDQuoteSync;
@@ -97,6 +98,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
     private WatchScreen watchScreen;
     private MixedQuoteModel model;
+    private Settings settings;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
@@ -558,5 +560,9 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     private void updateTable() {
         model.setQuotes(getQuotes());
         model.fireTableDataChanged();
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

@@ -55,6 +55,7 @@ import org.mov.ui.EODQuoteModel;
 import org.mov.ui.ExpressionQuery;
 import org.mov.ui.MenuHelper;
 import org.mov.ui.SymbolListDialog;
+import org.mov.prefs.settings.Settings;
 
 /**
  * Venice module for displaying a table of stock quotes. This module allows a user
@@ -82,6 +83,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     private EODQuoteBundle quoteBundle;
 
     private EODQuoteModel model;
+    private Settings settings;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
@@ -586,6 +588,10 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
 	else
             assert false;
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 
 }

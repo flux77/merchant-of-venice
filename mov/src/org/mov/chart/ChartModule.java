@@ -37,6 +37,10 @@ import org.mov.ui.DesktopManager;
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.PreferencesException;
 
+import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.ChartModuleSettings;
+import org.mov.prefs.settings.GraphSettings;
+
 /**
  * The charting module for venice. This class provides the user interface
  * used to draw any of the required charts.
@@ -180,6 +184,7 @@ public class ChartModule extends JPanel implements Module,
     private int viewMode = SELECTING;
         
     private JDesktopPane desktop;
+    private ChartModuleSettings settings;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
@@ -209,8 +214,74 @@ public class ChartModule extends JPanel implements Module,
     public ChartModule(JDesktopPane desktop) {
 
 	this.desktop = desktop;
-	indexChart = false;
+	initChart(false);
+    }
 
+    /**
+     * Create a new Chart.
+     *
+     * @param	desktop	the parent desktop.
+     */
+    public ChartModule(JDesktopPane desktop, boolean indexChart) {
+
+	this.desktop = desktop;
+
+	initChart(indexChart);
+    }   
+
+
+    /**
+     * Create a new Chart.
+     *
+     * @param	desktop	the parent desktop.
+     * @param   settings  The settings data for the chart. 
+     */
+
+    public ChartModule(JDesktopPane desktop, ChartModuleSettings settings) {
+	Vector levelSettingsList = (Vector)settings.getLevelSettingsList();
+	Vector symbolList = (Vector)settings.getSymbolList();
+	initChart(false);
+
+	Iterator levelsIterator = levelSettingsList.iterator();
+	int symbolIndex = 0;
+	
+	while (levelsIterator.hasNext()) {
+	    Vector graphList = (Vector)levelsIterator.next();
+	    Iterator graphIterator = graphList.iterator();
+	    
+	    while (graphIterator.hasNext()) {
+		Vector graphSettingsList = (Vector)graphIterator.next();
+		Iterator graphSettingsIterator = graphSettingsList.iterator();
+		
+		while (graphSettingsIterator.hasNext()) {
+		    GraphSettings graphSettings = 
+			(GraphSettings)graphSettingsIterator.next();
+		    
+		    //Try to recreate the level from the data 
+		    try {
+			Symbol s = Symbol.find((String)symbolList.
+					       get(symbolIndex));
+
+			EODQuoteBundle bundle = new 
+			    EODQuoteBundle(new EODQuoteRange(s));
+			
+			Graph newGraph = graphSettings.getGraph(bundle);
+			if (newGraph != null) 
+			    add(newGraph, s, bundle, 0);			
+		    } catch (SymbolFormatException sfe) {
+
+		    }		    
+		} 
+		symbolIndex++;
+	    }
+	}
+	
+	
+	
+    }
+
+    private void initChart(boolean indexChart) {
+	this.indexChart = indexChart;
 	propertySupport = new PropertyChangeSupport(this);
 
 	chart = new Chart();
@@ -242,56 +313,6 @@ public class ChartModule extends JPanel implements Module,
 	
 	add(scrollPane, BorderLayout.CENTER);
     }
-
-    /**
-     * Create a new Chart.
-     *
-     * @param	desktop	the parent desktop.
-     */
-    public ChartModule(JDesktopPane desktop, boolean indexChart) {
-
-	this.desktop = desktop;
-	this.indexChart = indexChart;
-
-	propertySupport = new PropertyChangeSupport(this);
-
-	chart = new Chart();
-	chart.addMouseListener(this);
-	chart.addMouseMotionListener(this);
-
-	setLayout(new BorderLayout());
-
-	addFunctionToolBar();
-	
-	// Add non-company specific menu for graph
-	JMenu menu = new JMenu(Locale.getString("GRAPH"));
-	addMenuItem = new JMenuItem(Locale.getString("ADD"));
-	addMenuItem.setAccelerator(KeyStroke.getKeyStroke('A',
-				   java.awt.Event.CTRL_MASK, false));
-	addMenuItem.addActionListener(this);
-	menu.add(addMenuItem);
-	menu.addSeparator();
-
-	flipMenuItem = new JMenuItem(Locale.getString("GRAPH_FLIP"));
-	flipMenuItem.addActionListener(this);
-	menu.add(flipMenuItem);
-	menu.addSeparator();
-
-	closeMenuItem = new JMenuItem(Locale.getString("CLOSE"));
-	closeMenuItem.setAccelerator(KeyStroke.getKeyStroke('C',
-		  		     java.awt.Event.CTRL_MASK, false));
-	closeMenuItem.addActionListener(this);
-	menu.add(closeMenuItem);
-
-
-	
-
-	menuBar.add(menu);
-
-	scrollPane = new JScrollPane(chart);
-	
-	add(scrollPane, BorderLayout.CENTER);
-    }   
 
 
     // Adds the toolbar that gives the user the options to zoom in and out
@@ -1022,23 +1043,35 @@ public class ChartModule extends JPanel implements Module,
      */
     public void save() { 
 	Vector symbolList = chart.getSymbols();
-
 	String type = String.valueOf(getClass().getName());
 	String key = String.valueOf(hashCode());
 
-	//Don't save the module settings to the filesystem if it's parent
-	//frame has been closed.
-	DesktopManager manager = (DesktopManager)desktop.getDesktopManager();
+	Vector levelSettingsList = new Vector();
+	settings = new ChartModuleSettings(key);
+	settings.setTitle(getTitle());
+	
+	Iterator levelsIterator = chart.getLevels().iterator();
+	while (levelsIterator.hasNext()) {
+	    Vector graphSettingsList = new Vector();
+	    Vector graphList = (Vector)levelsIterator.next();
+	    Iterator graphIterator = graphList.iterator();
 
-	if (manager.getFrameRegister().findChild(key)) {
-	    try {
-		PreferencesManager.putModuleSettings(getTitle(), 
-						     type, key, 
-						     symbolList);	    
-	    } catch (PreferencesException pfe) {
-		
-	    }
+	    while (graphIterator.hasNext()) {
+		Graph graph = (Graph)graphIterator.next();
+		GraphSettings graphSettings = 
+		    new GraphSettings(String.valueOf(graph.hashCode()),
+				      String.valueOf(chart.hashCode()),
+				      graph.getName());
+
+		graphSettings.put(graph.getSettings());
+		graphSettingsList.add(graphSettings);
+	    }	    
+	    levelSettingsList.add(graphSettingsList);
 	}
+
+	settings.putLevelSettingsList(levelSettingsList);
+	settings.putSymbolList(symbolList);
+	
     }
 
     public BufferedImage getImage() { 
@@ -1047,6 +1080,10 @@ public class ChartModule extends JPanel implements Module,
 
     public boolean isDataAvailable(Graph g) {
 	return chart.dataAvailable(g);
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 
 }

@@ -52,6 +52,7 @@ import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
 import org.mov.prefs.ProxyPage;
 import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.settings.Settings;
 import org.mov.ui.DesktopManager;
 import org.mov.ui.GridBagHelper;
 import org.mov.ui.ProgressDialog;
@@ -92,6 +93,7 @@ public class ImportQuoteModule extends JPanel implements Module {
     private TradingDate startDate;
     private TradingDate endDate;
     private List symbols;
+    private Settings settings;
 
     // Parsed fields for file import
     private EODQuoteFilter filter;
@@ -771,5 +773,9 @@ public class ImportQuoteModule extends JPanel implements Module {
      */
     public void save() {
         // Same as hitting cancel - do not save anything
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

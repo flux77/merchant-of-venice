@@ -44,6 +44,7 @@ import javax.swing.border.TitledBorder;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
 import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.settings.Settings;
 import org.mov.ui.GridBagHelper;
 import org.mov.util.Locale;
 import org.mov.util.TradingTime;
@@ -79,6 +80,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
 
     // Preferences
     private PreferencesManager.IDQuoteSyncPreferences prefs = null;
+    private Settings settings;
     
     /**
      * Create a new Intra-day quote sync module.
@@ -367,5 +369,9 @@ public class IDQuoteSyncModule extends JPanel implements Module {
      */
     public void save() {
         // Same as hitting cancel - do not save anything
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

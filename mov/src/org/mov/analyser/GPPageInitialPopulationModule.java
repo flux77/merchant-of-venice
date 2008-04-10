@@ -53,6 +53,7 @@ import org.mov.ui.ExpressionEditorDialog;
 import org.mov.ui.TextsEditorDialog;
 import org.mov.ui.MenuHelper;
 import org.mov.util.Locale;
+import org.mov.prefs.settings.Settings;
 
 public class GPPageInitialPopulationModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -75,6 +76,7 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
     private Model model;
     private int[] perc = new int[0];
     private Random random = new Random(System.currentTimeMillis());
+    private Settings settings;
     
     // Menus
     private JMenuBar menuBar;
@@ -918,6 +920,10 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
     
     public boolean encloseInScrollPane() {
         return true;
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
     
 }

@@ -54,6 +54,32 @@ public class MovingAverageGraph extends AbstractGraph {
         setSettings(new HashMap());
     }
 
+    /**
+     * Create a new simple moving average graph.
+     *
+     * @param	source	the source to create a moving average from
+     */
+    public MovingAverageGraph(GraphSource source, HashMap settings) {
+	super(source);
+        super.setSettings(settings);
+
+	int period;
+	String periodString = (String)settings.get("period");
+
+	if(periodString != null) {
+            try {
+                period = Integer.parseInt(periodString);
+		movingAverage = createMovingAverage(source.getGraphable(), period);
+            }
+            catch(NumberFormatException e) {
+                // Value should already be checked
+                assert false;
+            }
+        }
+    }
+
+    
+
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
 		       double bottomLineValue, List xRange, 

@@ -51,6 +51,7 @@ import org.mov.ui.ProgressDialogManager;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
+import org.mov.prefs.settings.Settings;
 
 public class ANNModule extends JPanel implements Module {
 
@@ -71,6 +72,8 @@ public class ANNModule extends JPanel implements Module {
     private ANNTrainingPage ANNTrainingPage;
     private ANNNetworkTypePage ANNNetworkTypePage;
     
+    private Settings settings;
+
     /**
      * Create a new paper trade module.
      *
@@ -626,5 +629,9 @@ public class ANNModule extends JPanel implements Module {
                     resultsModule.setDesktop(desktop);
                     resultsModule.addResults(ANNResults);
 		}});
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

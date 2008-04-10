@@ -50,6 +50,7 @@ import org.mov.ui.Column;
 import org.mov.ui.ExpressionEditorDialog;
 import org.mov.ui.MenuHelper;
 import org.mov.util.Locale;
+import org.mov.prefs.settings.Settings;
 
 public class ANNPageModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -75,6 +76,7 @@ public class ANNPageModule extends AbstractTable implements Module {
 
     private JDesktopPane desktop;
     private Model model;
+    private Settings settings;
     
     // The input expressions of the ANN
     private Expression[] inputExpressions;
@@ -617,6 +619,10 @@ public class ANNPageModule extends AbstractTable implements Module {
     
     public boolean encloseInScrollPane() {
         return true;
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
     
 }

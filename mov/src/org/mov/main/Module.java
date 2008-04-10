@@ -21,6 +21,8 @@ package org.mov.main;
 import java.beans.*;
 import javax.swing.*;
 
+import org.mov.prefs.settings.Settings;
+
 /**
  * Provides a common interface that all modules must adhere to. This
  * interface is used to provide seamless intergration between the desktop
@@ -84,5 +86,12 @@ public interface Module
      * the window is being closed.
      */
     public void save();
+
+
+    /**
+       Return the Settings for the module.
+     */
+    public Settings getSettings();
+
 }
 

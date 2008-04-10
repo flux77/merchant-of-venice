@@ -51,6 +51,7 @@ import org.mov.ui.MenuHelper;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
+import org.mov.prefs.settings.Settings;
 
 public class ANNResultModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -65,6 +66,7 @@ public class ANNResultModule extends AbstractTable implements Module {
     private static final int PERCENT_RETURN_COLUMN = 7;
 
     private Model model;
+    private Settings settings;
 
     // Menus
     private JMenuBar menuBar;
@@ -520,5 +522,9 @@ public class ANNResultModule extends AbstractTable implements Module {
 
     public boolean encloseInScrollPane() {
 	return true;
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

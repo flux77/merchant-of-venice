@@ -39,6 +39,7 @@ import org.mov.ui.ProgressDialogManager;
 import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
+import org.mov.prefs.settings.Settings;
 
 public class GPModule extends JPanel implements Module {
     
@@ -57,6 +58,8 @@ public class GPModule extends JPanel implements Module {
     private GPGondolaSelection GPGondolaSelection;
     private TradeValuePage tradeValuePage;
     
+
+    private Settings settings;
    
     public GPModule(JDesktopPane desktop) {
         this.desktop = desktop;
@@ -408,5 +411,9 @@ public class GPModule extends JPanel implements Module {
                 
                 resultsModule.addResults(GPResults);
             }});
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

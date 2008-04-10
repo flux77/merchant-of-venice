@@ -34,11 +34,10 @@ import javax.swing.UIManager;
 
 import org.mov.macro.MacroManager;
 import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.ModuleFrameSettings;
-import org.mov.prefs.ModuleSettings;
-import org.mov.prefs.ModuleFrameSettingsReader;
-import org.mov.prefs.ModuleSettingsReader;
-import org.mov.prefs.ModuleSettingsParserException;
+import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.ModuleFrameSettings;
+import org.mov.prefs.settings.ModuleFrameSettingsReader;
+import org.mov.prefs.settings.ModuleSettingsParserException;
 import org.mov.ui.FrameRegister;
 import org.mov.quote.IDQuoteSync;
 import org.mov.quote.QuoteSourceManager;
@@ -231,8 +230,8 @@ public class Main extends JFrame {
      * Restore saved internal frames and their modules, reconstructing their 
      position and geometry.
 
-     **/
-
+    **/
+    
     private void restoreSavedFrames() {
 
 	Vector savedFrameFiles, dataList;
@@ -276,77 +275,45 @@ public class Main extends JFrame {
 	    
 		File savedFrameFile = (File)iterator.next();
 		FileInputStream inputStream = new FileInputStream(savedFrameFile);
-	
+		
 		try {
 		    ModuleFrameSettings newFrameSettings = ModuleFrameSettingsReader.read(inputStream);
-
-		    String moduleKey = newFrameSettings.getModuleKey();
-		    File  savedModuleFile = PreferencesManager.getSavedModule(moduleKey);
-				    
-		    FileInputStream moduleInputStream = new FileInputStream(savedModuleFile);
-		    ModuleSettings newModuleSettings = ModuleSettingsReader.read(moduleInputStream);
-		    		    
-		    int type = newModuleSettings.getType();
-		    switch (type) {
-		    case ModuleSettings.CHARTMODULE: 
-			dataList = newModuleSettings.getDataList();
-			Vector symbolList = new Vector();
-			Iterator symbolIterator = dataList.iterator();
-			while (symbolIterator.hasNext()) {
-			    try {			    
-				String symbolString = (String)symbolIterator.next();
-				Symbol symbol = Symbol.find(symbolString);
-				symbolList.add(symbol);
-			    } catch (SymbolFormatException sfe) {
-			    }
-			}						
-									
-			CommandManager.getInstance().graphStockBySymbol(symbolList);
+		    Settings moduleSettings = newFrameSettings.getModuleSettings();
+		    //Recreate the module from settings.
+		    Module newModule = moduleSettings.getModule(desktop);
+		    
+		    //Place it initially at 0,0
+		    desktopManager.newFrame(newModule);
+		    
+		    //The creation of a frame creates
+		    //two mappings for a frame.			
+		    index = (count == 0) ? 0 : count + 1;
+		    
+		    ModuleFrame newFrame = frameRegister.get(String.valueOf(index));
 			
-			//The creation of a frame creates
-			//two mappings for a frame.			
-			index = (count == 0) ? 0 : count + 1;
-
-			ModuleFrame newFrame = frameRegister.get(String.valueOf(index));
-
-			//Augment the key index with the hashcode so that
-			//the frame can remove itself from the register
-						
-			frameRegister.put(String.valueOf(newFrame.hashCode()), newFrame);
-			newFrame.setSizeAndLocation(newFrame, desktop, false, true);
-			newFrame.setBounds(newFrameSettings.getGeometry());
-			newFrame.setPreferredSize(newFrameSettings.getGeometry().getSize());
-
-			
-			
-			break;
-		    case ModuleSettings.TABLEMODULE:
-		    case ModuleSettings.ANALYSERMODULE:
-		    case ModuleSettings.PORTFOLIOMODULE:
-		    case ModuleSettings.PREFERENCESMODULE:
-			break;
-		    default:
-			
-		    }
+		    //Augment the key index with the hashcode so that
+		    //the frame can remove itself from the register
+		    
+		    frameRegister.put(String.valueOf(newFrame.hashCode()), newFrame);
+		    newFrame.setSizeAndLocation(newFrame, desktop, false, true);
+		    newFrame.setBounds(newFrameSettings.getBounds());
+		    newFrame.setPreferredSize(newFrameSettings.getBounds().getSize());			
 		    count++;
-
 		} catch (ModuleSettingsParserException wpe) {
 		    
-		}
-		
+		}		
 	    } catch (FileNotFoundException fnf) {
-
+	    
 	    } catch (IOException ioe) {
-
+		
 	    } 	    	    	    
 	}
 	ProgressDialogManager.closeProgressDialog(progress);
 	if (!thread.isInterrupted()) {
 	    PreferencesManager.removeSavedFrames();
-	    PreferencesManager.removeSavedModules();
 	}
     }
-	
+    
 
 }
 

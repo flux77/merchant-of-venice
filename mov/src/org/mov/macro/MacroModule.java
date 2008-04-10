@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 
 import org.mov.main.Module;
 import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.settings.Settings;
 import org.mov.util.Locale;
 
 import java.awt.BorderLayout;
@@ -64,6 +65,8 @@ public class MacroModule extends JPanel implements Module, ActionListener {
     private PropertyChangeSupport propertySupport;
 
     private String frameIcon = "org/mov/images/TableIcon.gif";
+
+    private Settings settings;
 
     /* (non-Javadoc)
      * @see org.mov.main.Module#getTitle()
@@ -281,4 +284,8 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 	    } else if (e.getSource() == delete_button) {
 	    }
 	}
+
+    public Settings getSettings() {
+	return settings;
+    }
 }

@@ -46,6 +46,7 @@ import org.mov.util.Currency;
 import org.mov.util.ExchangeRateCache;
 import org.mov.util.Locale;
 import org.mov.prefs.*;
+import org.mov.prefs.settings.Settings;
 import org.mov.quote.*;
 import org.mov.ui.*;
 
@@ -64,6 +65,7 @@ public class PortfolioModule extends JPanel implements Module,
     private JDesktopPane desktop;
     private Portfolio portfolio;
     private EODQuoteBundle quoteBundle;
+    private Settings settings;
 
     private JMenuBar menuBar;
     private JMenuItem accountNewCashAccount;
@@ -608,5 +610,9 @@ public class PortfolioModule extends JPanel implements Module,
             if(historyFrame != null && !historyFrame.isClosed())
                 historyModule.redraw();
         }
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 }

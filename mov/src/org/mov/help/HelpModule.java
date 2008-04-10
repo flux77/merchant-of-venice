@@ -30,6 +30,7 @@ import javax.swing.tree.*;
 
 import org.mov.main.*;
 import org.mov.util.Locale;
+import org.mov.prefs.settings.Settings;
 
 /**
  * This module provides a help browser for Venice. It allows traveresal of a tree
@@ -74,6 +75,8 @@ public class HelpModule extends JPanel implements Module {
     // Stack of pages we've visited
     private Stack visitedPages;
     private int positionInStack;
+
+    private Settings settings;
     
     /**
      * Create a new help browser loaded at the root page.
@@ -399,6 +402,10 @@ public class HelpModule extends JPanel implements Module {
      */
     public void save() { 
         // nothing to do
+    }
+
+    public Settings getSettings() {
+	return settings;
     }
 
 }

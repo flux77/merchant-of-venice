@@ -57,9 +57,9 @@ public class ChartModuleSettingsReader {
 	
 	int i = 0;
 	while (levelIterator.hasNext()) {
-	    NodeList list = (NodeList)levelIterator.next();
+	    Node list = (Node)levelIterator.next();
 
-	    Vector graphEntries = XMLHelper.readList((Element)list.item(i),
+	    Vector graphEntries = XMLHelper.readList((Element)list,
 						     "list",
 						     "graph",
 						     "graph");

@@ -68,6 +68,9 @@ public class ChartModuleSettingsReader {
 	    graphList = new Vector();
 
 	    while (graphEntriesIterator.hasNext()) {
+
+
+
 		Node graphNode = (Node)graphEntriesIterator.next();
 		
 		String graphTitle = XMLHelper.getAttribute((Element)graphNode,
@@ -82,22 +85,22 @@ public class ChartModuleSettingsReader {
 
 		graphSettingsList = new Vector();
 		Iterator chartSettingsIterator = chartSettings.iterator();
+
+		HashMap setSettings = new HashMap();
+		GraphSettings graphSettings = new 
+		    GraphSettings(graphSymbol, graphTitle, graphTitle);
 		
 		while (chartSettingsIterator.hasNext()) {
+
 		    Node hash = (Node)chartSettingsIterator.next();
 		    String key = XMLHelper.getAttribute((Element)hash, "key");
 		    String value = XMLHelper.getAttribute((Element)hash, 
-							  "value");
-
-		    GraphSettings graphSettings = new 
-			GraphSettings(graphSymbol, key, graphTitle);
-
-		    HashMap setSettings = new HashMap();
-		    setSettings.put(key, value);
-		    graphSettings.put(setSettings);
-		    graphSettingsList.add(graphSettings);		
-		    
+							  "value");	           		    
+		    setSettings.put(key, value);		    		    
 		}
+		graphSettings.put(setSettings);
+		graphSettingsList.add(graphSettings);
+
 		//Graph has no settings, but we want an entry for the
 		//graph anyway so ChartModule can recreate it.
 		if (graphSettingsList.size() == 0) {
@@ -108,6 +111,7 @@ public class ChartModuleSettingsReader {
 		    empty.put(emptyMap);
 		    graphSettingsList.add(empty);
 		}
+		
 		graphList.add(graphSettingsList);
 	    }
 	    levelSettingsList.add(graphList);	    

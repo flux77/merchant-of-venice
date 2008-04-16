@@ -59,6 +59,45 @@ public class PointAndFigureGraph extends AbstractGraph {
         setSettings(new HashMap());
     }
 
+    /**
+     * Create a new point and figure graph.
+     *
+     * @param	source	the source to create the point and figure from
+     * @param	settings  the settings for the graph
+     */
+    public PointAndFigureGraph(GraphSource source, HashMap settings) {	
+	super(source);
+        super.setSettings(settings);
+
+	double priceReversalScale = 0.0;
+	double boxPriceScale = 0.0;
+
+	// Retrieve values from hashmap
+        String priceReversalString = (String)settings.get(PointAndFigureGraphUI.PRICE_REVERSAL_SCALE);
+        String boxString = (String)settings.get(PointAndFigureGraphUI.BOX_PRICE_SCALE);
+	
+	if (priceReversalString != null &&
+	    boxString != null) {
+	    try {
+		priceReversalScale = Double.parseDouble(priceReversalString);
+		boxPriceScale = Double.parseDouble(boxString);
+
+		// Create point and figure graphable
+
+		pointAndFigure = 
+		    createPointAndFigureGraph(source.getGraphable(), 
+					      priceReversalScale, 
+					      boxPriceScale);
+	    } catch(NumberFormatException e) {
+		//Value should be already be checked
+		assert false;
+	    }
+	}
+
+
+    }
+
+
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
 		       double bottomLineValue, List xRange, 

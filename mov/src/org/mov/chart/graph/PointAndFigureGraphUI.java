@@ -41,8 +41,8 @@ public class PointAndFigureGraphUI implements GraphUI {
     private JTextField boxPriceTextField;
 
     // String name of settings
-    private final static String PRICE_REVERSAL_SCALE = "price_reversal_scale";
-    private final static String BOX_PRICE_SCALE = "box_price";
+    protected final static String PRICE_REVERSAL_SCALE = "price_reversal_scale";
+    protected final static String BOX_PRICE_SCALE = "box_price";
 
     // Limits
     private final static double MINIMUM_PRICE_SCALE = 0.0001D;

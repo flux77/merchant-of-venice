@@ -161,9 +161,6 @@ public class XMLHelper {
 
 	Element root = (Element)list.item(0);	
 	NodeList entries = root.getElementsByTagName(entryName);
-	if (!singleton(entries)) {
-	    return outputList;
-	}
 	
 	for (int i = 0; i < entries.getLength(); i++) {
 	    Node entry = entries.item(i);

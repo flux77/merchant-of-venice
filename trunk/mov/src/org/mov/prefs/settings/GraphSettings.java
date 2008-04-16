@@ -48,14 +48,16 @@ import org.mov.table.WatchScreenWriter;
 
 import org.mov.chart.graph.Graph;
 import org.mov.chart.source.GraphSource;
-import org.mov.chart.graph.BarChartGraph;
-import org.mov.chart.graph.MovingAverageGraph;
 import org.mov.main.Module;
 import org.mov.prefs.settings.GraphSettingsWriter;
 import org.mov.main.ModuleFrame;
 import java.util.Collection;
 import java.util.Vector;
 
+import org.mov.chart.graph.BarChartGraph;
+import org.mov.chart.graph.MovingAverageGraph;
+import org.mov.chart.graph.CandleStickGraph;
+import org.mov.chart.graph.PointAndFigureGraph;
 
 
 /**
@@ -121,7 +123,9 @@ public class GraphSettings extends AbstractSettings {
      */
 
     public void put(HashMap settings) {
+	
 	this.settings = settings;
+
     }
 
 
@@ -180,6 +184,20 @@ public class GraphSettings extends AbstractSettings {
 	    
 	}
 	
+	if (title.equals("Candle Stick")) {
+	    newGraph = new CandleStickGraph(getSource(bundle, Quote.DAY_OPEN),
+					    getSource(bundle, Quote.DAY_LOW),
+					    getSource(bundle, Quote.DAY_HIGH),
+					    getSource(bundle, Quote.DAY_CLOSE));
+					    	    
+	}
+
+	if (title.equals("Point and Figure")) {
+	    newGraph = new PointAndFigureGraph(getSource(bundle, Quote.DAY_CLOSE),
+					  settings);
+	}
+
+
 	if (title.equals("Line Chart")) {
 	    newGraph = null;
 	}
@@ -188,7 +206,7 @@ public class GraphSettings extends AbstractSettings {
 	    newGraph = new 
 		MovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE), settings);
 	}
-	    
+
 	return newGraph;
     }
     

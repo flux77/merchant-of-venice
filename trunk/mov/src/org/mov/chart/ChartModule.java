@@ -241,14 +241,18 @@ public class ChartModule extends JPanel implements Module,
 	Vector levelSettingsList = (Vector)settings.getLevelSettingsList();
 	Vector symbolList = (Vector)settings.getSymbolList();
 	initChart(false);
+	int levelCount = 0;
+	int graphCount = 0;
 
 	Iterator levelsIterator = levelSettingsList.iterator();
 	int symbolIndex = 0;
-	
+
 	while (levelsIterator.hasNext()) {
 	    Vector graphList = (Vector)levelsIterator.next();
 	    Iterator graphIterator = graphList.iterator();
 	    
+	    graphCount = 0;
+
 	    while (graphIterator.hasNext()) {
 		Vector graphSettingsList = (Vector)graphIterator.next();
 		Iterator graphSettingsIterator = graphSettingsList.iterator();
@@ -266,14 +270,23 @@ public class ChartModule extends JPanel implements Module,
 			    EODQuoteBundle(new EODQuoteRange(s));
 			
 			Graph newGraph = graphSettings.getGraph(bundle);
-			if (newGraph != null) 
-			    add(newGraph, s, bundle, 0);			
+			if (newGraph != null) {
+			    if (graphCount > 0) {
+				append(newGraph, levelCount);
+			    } else {
+				add(newGraph, s, bundle, levelCount);	
+			    }
+
+			}
+
 		    } catch (SymbolFormatException sfe) {
 
 		    }		    
-		} 
+		}
 		symbolIndex++;
+		graphCount++;				    
 	    }
+	    levelCount++;
 	}
 	
 	
@@ -578,6 +591,7 @@ public class ChartModule extends JPanel implements Module,
 	// Add graph to chart to given level, redraw chart but dont add it
 	// to menu as it is already there
 	chart.add(graph, level);
+
     }
 
     /**

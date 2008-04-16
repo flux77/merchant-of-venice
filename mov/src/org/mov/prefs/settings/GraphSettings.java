@@ -32,10 +32,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
+import java.util.Collection;
+import java.util.Vector;
 import javax.swing.JDesktopPane;
 
 import org.mov.main.Main;
 import org.mov.macro.StoredMacro;
+import org.mov.util.Locale;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
 import org.mov.quote.EODQuoteBundle;
@@ -51,13 +54,16 @@ import org.mov.chart.source.GraphSource;
 import org.mov.main.Module;
 import org.mov.prefs.settings.GraphSettingsWriter;
 import org.mov.main.ModuleFrame;
-import java.util.Collection;
-import java.util.Vector;
 
+
+import org.mov.chart.graph.LineGraph;
 import org.mov.chart.graph.BarChartGraph;
-import org.mov.chart.graph.MovingAverageGraph;
+import org.mov.chart.graph.HighLowBarGraph;
 import org.mov.chart.graph.CandleStickGraph;
 import org.mov.chart.graph.PointAndFigureGraph;
+import org.mov.chart.graph.BollingerBandsGraph;
+import org.mov.chart.graph.MovingAverageGraph;
+import org.mov.chart.graph.MomentumGraph;
 
 
 /**
@@ -197,17 +203,46 @@ public class GraphSettings extends AbstractSettings {
 					  settings);
 	}
 
+       
+	if (title.equals(Locale.getString("HIGH_LOW_BAR"))) {
+		newGraph = 
+		    new HighLowBarGraph(getSource(bundle, Quote.DAY_LOW),
+					getSource(bundle, Quote.DAY_HIGH),
+					getSource(bundle, Quote.DAY_CLOSE));
+						
+	    }
 
-	if (title.equals("Line Chart")) {
-	    newGraph = null;
+	if (title.equals("Line Chart") ||
+	    title.equals("Day Close")) {
+	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_CLOSE),
+				     title,
+				     true);
+					       
+	    
 	}
 
 	if (title.equals("Simple Moving Average")) {
 	    newGraph = new 
 		MovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE), settings);
 	}
+	
+
+	if (title.equals("Bollinger Bands")) {
+	    newGraph = new 
+		BollingerBandsGraph(getSource(bundle, Quote.DAY_CLOSE),
+				    settings);
+	}
+
+	if (title.equals(Locale.getString("MOMENTUM"))) {	    	    
+	    newGraph = new
+		MomentumGraph(getSource(bundle, Quote.DAY_CLOSE),
+			       settings);
+	    
+	}
 
 	return newGraph;
+
+
     }
     
     private GraphSource getSource(EODQuoteBundle bundle, int type) {

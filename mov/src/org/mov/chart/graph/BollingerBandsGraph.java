@@ -59,6 +59,31 @@ public class BollingerBandsGraph extends AbstractGraph {
         setSettings(new HashMap());
     }
 
+    /**
+     * Create a new bollinger bands graph.
+     *
+     * @param	source	the source to create a standard deviation from
+     */
+    public BollingerBandsGraph(GraphSource source, HashMap settings) {
+        super(source);
+	super.setSettings(settings);
+
+	int period;
+	String periodString = (String)settings.get("period");
+
+	if(periodString != null) {
+            try {
+                period = Integer.parseInt(periodString);
+		createBollingerBands(source.getGraphable(), period);
+            }
+            catch(NumberFormatException e) {
+                // Value should already be checked
+                assert false;
+            }
+        }
+        
+    }
+
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
 		       double bottomLineValue, List xRange, 
@@ -120,12 +145,16 @@ public class BollingerBandsGraph extends AbstractGraph {
     public void setSettings(HashMap settings) {
         super.setSettings(settings);
 
-        Graphable source = getSource().getGraphable();
-
         // Retrieve period from settings hashmap
         int period = PeriodGraphUI.getPeriod(settings);
 
-	// Create bollinger bands
+	createBollingerBands(getSource().getGraphable(), period);
+
+    }
+
+    
+    private void createBollingerBands(Graphable source, int period) {
+	
 	upperBand = new Graphable();
 	lowerBand = new Graphable();	
 
@@ -151,6 +180,7 @@ public class BollingerBandsGraph extends AbstractGraph {
             }
         }
     }
+    
 }
 
 

@@ -371,6 +371,7 @@ public class EODQuoteChartMenu extends JMenu {
      * @return graph souce
      */
     private GraphSource getDayOpen() {
+
         if(dayOpenGraphSource == null)
 	    if (indexChart) {
 		dayOpenGraphSource = new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_OPEN);
@@ -432,10 +433,12 @@ public class EODQuoteChartMenu extends JMenu {
      * @return graph souce
      */
     private GraphSource getDayVolume() {
-        if(dayVolumeGraphSource == null) {
-	    dayVolumeGraphSource = new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
-	} else {
-            dayVolumeGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
+	if(dayVolumeGraphSource == null) {
+	    if (indexChart) {
+		dayVolumeGraphSource = new OHLCVIndexQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
+	    } else {
+		dayVolumeGraphSource = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_VOLUME);
+	    }
 	}
         return dayVolumeGraphSource;
     }

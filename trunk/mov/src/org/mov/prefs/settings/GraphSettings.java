@@ -63,7 +63,10 @@ import org.mov.chart.graph.CandleStickGraph;
 import org.mov.chart.graph.PointAndFigureGraph;
 import org.mov.chart.graph.BollingerBandsGraph;
 import org.mov.chart.graph.MovingAverageGraph;
+import org.mov.chart.graph.MultipleMovingAverageGraph;
 import org.mov.chart.graph.MomentumGraph;
+import org.mov.chart.graph.OBVGraph;
+
 
 
 /**
@@ -221,6 +224,36 @@ public class GraphSettings extends AbstractSettings {
 	    
 	}
 
+	
+	if (title.equals("Day Open")) {
+	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_OPEN),
+				     title,
+				     true);
+					       	    
+	}
+	
+	if (title.equals("Day High")) {
+	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_HIGH),
+				     title,
+				     true);
+					       	    
+	}
+
+	if (title.equals("Day Low")) {
+	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_LOW),
+				     title,
+				     true);
+					       	    
+	}
+
+	if (title.equals("Volume")) {
+	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_VOLUME),
+				     title,
+				     true);
+					       	    
+	}
+
+		
 	if (title.equals("Simple Moving Average")) {
 	    newGraph = new 
 		MovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE), settings);
@@ -240,10 +273,27 @@ public class GraphSettings extends AbstractSettings {
 	    
 	}
 
+	if (title.equals("Multiple Moving Average")) {
+	    newGraph = new
+		MultipleMovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE));
+	}
+
+	
+	if (title.equals("OBV")) {
+	    
+	    newGraph = new
+		OBVGraph(getSource(bundle, Quote.DAY_OPEN),
+			 getSource(bundle, Quote.DAY_CLOSE),
+			 getSource(bundle, Quote.DAY_VOLUME));
+	    
+	}
+	
+
 	return newGraph;
 
-
     }
+
+    
     
     private GraphSource getSource(EODQuoteBundle bundle, int type) {
 

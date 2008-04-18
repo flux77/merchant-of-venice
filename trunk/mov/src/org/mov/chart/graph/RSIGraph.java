@@ -55,6 +55,30 @@ public class RSIGraph extends AbstractGraph {
         setSettings(new HashMap());
     }
 
+    /**
+     * Create a new RSI graph.
+     *
+     * @param	source	the source to create a standard deviation from
+     * @param   settings the settings for this graph
+     */
+    public RSIGraph(GraphSource source, HashMap settings) {
+        super(source);
+        super.setSettings(settings);
+
+	int period     = 0;	
+	String periodString = (String)settings.get("period");
+
+	if (periodString != null) {
+	    try {
+		period = Integer.parseInt(periodString);
+		RSI = createRSI(source.getGraphable(), period);
+	    } catch (NumberFormatException e) {
+		//value should already have been checked
+	    }
+	}
+    }
+
+
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
 		       double bottomLineValue, List xRange, 
@@ -171,11 +195,12 @@ public class RSIGraph extends AbstractGraph {
     public void setSettings(HashMap settings) {
         super.setSettings(settings);
 
-        // Retrieve values from hashmap
-        int period = RSIGraphUI.getPeriod(settings);
+        // Retrieve values from hashmap        
+	int period = RSIGraphUI.getPeriod(settings);
 
 	// create RSI
-	RSI = createRSI(getSource().getGraphable(), period);
+	RSI = createRSI(getSource().getGraphable(), period); 
+			
     }
 
     /**

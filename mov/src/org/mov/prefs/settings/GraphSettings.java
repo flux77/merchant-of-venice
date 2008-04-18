@@ -62,10 +62,13 @@ import org.mov.chart.graph.HighLowBarGraph;
 import org.mov.chart.graph.CandleStickGraph;
 import org.mov.chart.graph.PointAndFigureGraph;
 import org.mov.chart.graph.BollingerBandsGraph;
+import org.mov.chart.graph.MACDGraph;
 import org.mov.chart.graph.MovingAverageGraph;
+import org.mov.chart.graph.ExpMovingAverageGraph;
 import org.mov.chart.graph.MultipleMovingAverageGraph;
 import org.mov.chart.graph.MomentumGraph;
 import org.mov.chart.graph.OBVGraph;
+import org.mov.chart.graph.StandardDeviationGraph;
 
 
 
@@ -258,6 +261,14 @@ public class GraphSettings extends AbstractSettings {
 	    newGraph = new 
 		MovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE), settings);
 	}
+
+
+	if (title.equals("Exponential Moving Average")) {
+	    newGraph = new 
+		MovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE), settings);
+	}
+
+	
 	
 
 	if (title.equals("Bollinger Bands")) {
@@ -284,10 +295,22 @@ public class GraphSettings extends AbstractSettings {
 	    newGraph = new
 		OBVGraph(getSource(bundle, Quote.DAY_OPEN),
 			 getSource(bundle, Quote.DAY_CLOSE),
-			 getSource(bundle, Quote.DAY_VOLUME));
-	    
+			 getSource(bundle, Quote.DAY_VOLUME));	    
+	}
+
+	if (title.equals("Standard Deviation")) {
+	    newGraph = new 
+		StandardDeviationGraph(getSource(bundle, Quote.DAY_CLOSE),
+				       settings);
+		
 	}
 	
+	if (title.equals("MACD")) {
+	    newGraph = new
+		MACDGraph(getSource(bundle, Quote.DAY_CLOSE),
+			  settings);
+	}
+
 
 	return newGraph;
 

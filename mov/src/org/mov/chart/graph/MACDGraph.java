@@ -48,6 +48,76 @@ public class MACDGraph extends AbstractGraph {
     }
 
     /**
+     * Create a new MACD graph.
+     *
+     * @param	source	the source to create two moving averages from
+     * @param	settings the settings of the graph
+     */
+    public MACDGraph(GraphSource source, HashMap settings) {
+	super(source);
+        super.setSettings(settings);
+
+	String avgType = (String)settings.get("MACD average type");
+	String periodOneString = (String)settings.get("MACD period first");
+	String periodTwoString = (String)settings.get("MACD period second");
+
+	int periodOne = 0;
+	int periodTwo = 0;
+
+	if (avgType != null &&
+	    periodOneString != null &&
+	    periodTwoString != null) {	   
+
+	    
+	    try {
+		periodOne = Integer.parseInt(periodOneString);
+		periodTwo = Integer.parseInt(periodTwoString);
+	    } catch (NumberFormatException e) {
+		//Value should already have been checked
+	    }
+
+	    if (avgType.equals("SMA")) {		
+		createMACDGraph(source.getGraphable(),
+				periodOne,
+				periodTwo);
+
+	    }	    
+	    if (avgType.equals("EMA")) {
+		double smoothingConstantOne = 0.0;
+		double smoothingConstantTwo = 0.0;
+
+		String smoothingOneString = 
+		    (String)settings.get("MACD smooth first");
+
+		String smoothingTwoString = 
+		    (String)settings.get("MACD smooth second");
+
+
+		if (smoothingOneString != null &&
+		    smoothingTwoString != null) {
+		    
+		    try {
+			smoothingConstantOne = 
+			    Double.parseDouble(smoothingOneString);
+			smoothingConstantTwo = 
+			    Double.parseDouble(smoothingTwoString);
+
+			createMACDGraph(source.getGraphable(),
+					periodOne,
+					periodTwo,
+					smoothingConstantOne,
+					smoothingConstantTwo);
+			
+		    } catch (NumberFormatException e) {
+			//Value should already have been checked
+		    }
+		}
+	    }	    
+	}
+	
+    }
+
+    /**
      * Create a new MACD graph according to Exponential Moving Average.
      *
      * @param	source	the source to create two moving averages from

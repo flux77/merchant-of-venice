@@ -69,7 +69,7 @@ import org.mov.chart.graph.MultipleMovingAverageGraph;
 import org.mov.chart.graph.MomentumGraph;
 import org.mov.chart.graph.OBVGraph;
 import org.mov.chart.graph.StandardDeviationGraph;
-
+import org.mov.chart.graph.RSIGraph;
 
 
 /**
@@ -309,6 +309,12 @@ public class GraphSettings extends AbstractSettings {
 	    newGraph = new
 		MACDGraph(getSource(bundle, Quote.DAY_CLOSE),
 			  settings);
+	}
+
+	if (title.equals("RSI")) {
+	    newGraph = new
+		RSIGraph(getSource(bundle, Quote.DAY_CLOSE),
+			 settings);
 	}
 
 

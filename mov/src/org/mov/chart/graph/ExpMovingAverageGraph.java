@@ -63,30 +63,8 @@ public class ExpMovingAverageGraph extends AbstractGraph {
      */
     public ExpMovingAverageGraph(GraphSource source, HashMap settings) {
 	super(source);	
-        super.setSettings(settings);
-
-	int period;
-	double smoothingConstant;
-	String periodString = (String)settings.get("period");
-	String smoothingString = (String)settings.get("smoothing_constant");
-
-	if(periodString != null && smoothingString != null) {
-            try {
-                period = Integer.parseInt(periodString);
-		smoothingConstant = Double.parseDouble(smoothingString);
-
-		movingAverage = createMovingAverage(source.getGraphable(), 
-						    period, smoothingConstant);
-				
-
-		
-            }
-            catch(NumberFormatException e) {
-                // Value should already be checked
-                assert false;
-            }
-        }
-
+        setSettings(settings);
+	
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,

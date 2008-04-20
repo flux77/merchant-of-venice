@@ -70,6 +70,7 @@ import org.mov.chart.graph.MomentumGraph;
 import org.mov.chart.graph.OBVGraph;
 import org.mov.chart.graph.StandardDeviationGraph;
 import org.mov.chart.graph.RSIGraph;
+import org.mov.chart.graph.CustomGraph;
 
 
 /**
@@ -87,6 +88,7 @@ public class GraphSettings extends AbstractSettings {
     
     private HashMap settings;
     String title;
+    Symbol symbol;
 
     /**
      *
@@ -154,11 +156,47 @@ public class GraphSettings extends AbstractSettings {
      * 
      * Set the graph title
      * 
-     @ param   title The graph title  
+     * @param   title The graph title  
      */
 
     public void setTitle(String title) {
 	this.title = title;
+    }
+
+    /**
+     *
+     * Set the symbol of the graph
+     * 
+     * @param symbol  A symbol
+     */
+
+    public void setSymbol(Symbol symbol) {
+	this.symbol = symbol;
+    }
+
+    /**
+     *
+     * Return the symbol assigned to this graph
+     * @return The quote symbol
+     */
+
+    public Symbol getSymbol() {
+	return symbol;
+    }
+
+    /**
+     *
+     * Set the symbol of the graph
+     * 
+     * @param symbol  A string representing a Symbol
+     */
+
+    public void setSymbol(String s) {
+	try {
+	    symbol = Symbol.find(s);
+	} catch (SymbolFormatException sfe) {
+
+	}
     }
 
     /**
@@ -317,6 +355,14 @@ public class GraphSettings extends AbstractSettings {
 			 settings);
 	}
 
+
+	if (title.equals("Custom")) {
+	    newGraph = new
+		CustomGraph(getSource(bundle, Quote.DAY_CLOSE),
+			    symbol,
+			    bundle,
+			    settings);
+	}
 
 	return newGraph;
 

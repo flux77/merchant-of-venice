@@ -70,6 +70,45 @@ public class CustomGraph extends AbstractGraph {
         setSettings(new HashMap());
     }
 
+
+        /**
+     * Create a new custom graph. Currently this class requires both a graph source
+     * and a quote bundle. The quote bundle argument will soon become deprecated and
+     * the function will require five graph sources - one for day open, close, low
+     * high and volume. This change will enable us to run equations on arbitrary
+     * indeces (i.e. groups of stocks).
+     *
+     * @param	source	    the source containing the dates to work with
+     * @param   symbol      the symbol to apply the expression
+     * @param   quoteBundle the quote bundle containing the quotes
+     * @param   settings    the settings for the graph
+     */
+    public CustomGraph(GraphSource source, Symbol symbol, EODQuoteBundle quoteBundle, HashMap settings) {
+        super(source);
+        this.symbol = symbol;
+        this.quoteBundle = quoteBundle;
+        super.setSettings(settings);
+
+	// Retrieve expression from settings hashmap
+        try {
+            String indicatorText = CustomGraphUI.getIndicatorText(settings);
+
+            if(indicatorText.length() > 0) {
+                Expression indicator = Parser.parse(indicatorText);
+		
+                // Create indicator graphable
+                indicatorGraphable = createCustom(indicator, getSource().getGraphable(),
+                                                  quoteBundle, symbol);
+            }
+        }
+        catch(ExpressionException p) {
+            // Expression should already have been checked
+            assert false;
+        }
+
+    }
+
+
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
 		       double bottomLineValue, List xRange, 

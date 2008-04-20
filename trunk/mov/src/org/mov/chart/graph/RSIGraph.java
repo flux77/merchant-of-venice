@@ -63,19 +63,7 @@ public class RSIGraph extends AbstractGraph {
      */
     public RSIGraph(GraphSource source, HashMap settings) {
         super(source);
-        super.setSettings(settings);
-
-	int period     = 0;	
-	String periodString = (String)settings.get("period");
-
-	if (periodString != null) {
-	    try {
-		period = Integer.parseInt(periodString);
-		RSI = createRSI(source.getGraphable(), period);
-	    } catch (NumberFormatException e) {
-		//value should already have been checked
-	    }
-	}
+        setSettings(settings);
     }
 
 

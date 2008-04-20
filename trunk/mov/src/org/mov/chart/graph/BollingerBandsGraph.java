@@ -66,21 +66,8 @@ public class BollingerBandsGraph extends AbstractGraph {
      */
     public BollingerBandsGraph(GraphSource source, HashMap settings) {
         super(source);
+	setSettings(settings);
 	super.setSettings(settings);
-
-	int period;
-	String periodString = (String)settings.get("period");
-
-	if(periodString != null) {
-            try {
-                period = Integer.parseInt(periodString);
-		createBollingerBands(source.getGraphable(), period);
-            }
-            catch(NumberFormatException e) {
-                // Value should already be checked
-                assert false;
-            }
-        }
         
     }
 

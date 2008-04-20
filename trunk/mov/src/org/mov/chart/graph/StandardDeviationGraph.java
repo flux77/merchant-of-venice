@@ -64,20 +64,7 @@ public class StandardDeviationGraph extends AbstractGraph {
      */
     public StandardDeviationGraph(GraphSource source, HashMap settings) {
         super(source);
-        super.setSettings(settings);
-
-	int period = 0;
-	String periodString = (String)settings.get("period");
-
-	if (periodString != null) {
-	    try {
-		period = Integer.parseInt(periodString);
-	    } catch (NumberFormatException e) {
-		//Should already have been checked
-	    }
-	}
-	standardDeviation = createStandardDeviation(source.getGraphable(), period);
-
+        setSettings(settings);
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,

@@ -61,21 +61,7 @@ public class MomentumGraph extends AbstractGraph {
      */
     public MomentumGraph(GraphSource source, HashMap settings) {
 	super(source);
-	super.setSettings(settings);
-
-	int period;
-	String periodString = (String)settings.get("period");
-
-	if(periodString != null) {
-            try {
-                period = Integer.parseInt(periodString);
-		momentum = createMomentum(source.getGraphable(), period);
-            }
-            catch(NumberFormatException e) {
-                // Value should already be checked
-                assert false;
-            }
-        }
+	setSettings(settings);
     }
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,

@@ -190,6 +190,9 @@ public class ModuleFrameSettingsReader {
 	case Settings.CHARTMODULE:
 	    moduleSettings = ChartModuleSettingsReader.read(data);
 	    break;
+	case Settings.WATCHSCREENMODULE:
+	    moduleSettings = WatchScreenSettingsReader.read(data);
+	    break;
 	default:	   
 	    return false;
 	}

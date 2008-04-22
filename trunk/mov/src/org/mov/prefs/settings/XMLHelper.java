@@ -28,6 +28,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.mov.quote.Symbol;
+
 /**
    This class is for Java version 1.4 which doesn't have support for XPATH 
  */
@@ -112,7 +114,7 @@ public class XMLHelper {
 
 
 	Vector outputList = new Vector();
-	
+
 	//This call means a direct read - e is the head of the list 
 	//so we don't have to search the child elements for the head.	
 	if (e.getTagName().equals(listName) &&
@@ -234,6 +236,32 @@ public class XMLHelper {
 	    Node entry = (Node)iterator.next();
 	    Node textNode = entry.getFirstChild();
 	    outputList.add(textNode.getNodeValue());
+	}
+	return outputList;
+    }
+
+
+    /**
+     *
+     * Convert a list whose elements consist of strings representing symbols
+     * to elements representing Venice Symbols
+     * 
+     * @param List   A list of string elements
+     * @return  A list of Symbol elements
+     */
+
+    public static Vector stringToSymbolsList(List list) {
+	Vector outputList = new Vector();
+	Iterator iterator = list.iterator();
+
+	while (iterator.hasNext()) {
+	    String name = (String)iterator.next();
+	    try {
+		Symbol s = Symbol.find(name);
+		outputList.add(s);
+	    } catch (org.mov.quote.SymbolFormatException sfe) {
+		
+	    }
 	}
 	return outputList;
     }

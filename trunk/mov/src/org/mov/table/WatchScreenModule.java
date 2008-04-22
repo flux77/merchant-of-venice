@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -65,6 +66,7 @@ import org.mov.ui.TextDialog;
 import org.mov.util.Locale;
 import org.mov.util.TradingDate;
 import org.mov.util.TradingTime;
+import org.mov.prefs.settings.WatchScreenSettings;
 
 /**
  * Venice module for displaying a watch screen to the user. This module allows a
@@ -98,7 +100,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
     private WatchScreen watchScreen;
     private MixedQuoteModel model;
-    private Settings settings;
+    private WatchScreenSettings settings;
 
     // Frame Icon
     private String frameIcon = "org/mov/images/TableIcon.gif";
@@ -118,8 +120,9 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
         this.watchScreen = watchScreen;
 	this.quoteBundle = quoteBundle;
-	propertySupport = new PropertyChangeSupport(this);
 
+	propertySupport = new PropertyChangeSupport(this);
+	
         model = new MixedQuoteModel(quoteBundle, getQuotes(), Column.HIDDEN, Column.VISIBLE);
 	setModel(model, MixedQuoteModel.SYMBOL_COLUMN, SORT_UP);
 	showColumns(model);
@@ -282,6 +285,10 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
                 DesktopManager.showErrorMessage(Locale.getString("ERROR_SAVING_WATCH_SCREEN_TITLE"),
                                                 e.getMessage());
             }
+
+	    settings = new WatchScreenSettings();
+	    settings.putSymbolList(watchScreen.getSymbols());
+
         }
     }
 

@@ -95,7 +95,11 @@ public class GPQuoteBundle extends EODQuoteBundle {
      *
      * @param quoteRange        the new quote range
      */
-    public void setQuoteRange(EODQuoteRange quoteRange) {
-        assert false;
+    public void setQuoteRange(EODQuoteRange quoteRange) {	
+	//assert false;
+	//Is this method not meant to be called?
+	//It was being called and the assertion 
+	//triggering, stopping the GP process
+	super.setQuoteRange(quoteRange);
     }
 }

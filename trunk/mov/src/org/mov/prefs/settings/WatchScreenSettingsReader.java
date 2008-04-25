@@ -39,13 +39,10 @@ public class WatchScreenSettingsReader {
     }
 
     public static WatchScreenSettings read(Element root) {
-	WatchScreenSettings settings = new WatchScreenSettings();       
-	Vector symbolList = XMLHelper.readList(root, 
-					       "list", 
-					       "symbolList",
-					       "entry");
+	WatchScreenSettings settings = new WatchScreenSettings();      
+	String title = XMLHelper.getAttribute(root, "name");
 	
-	settings.putSymbolList(XMLHelper.nodeToStringList(symbolList));
+	settings.setTitle(title);
 
 	return settings;
     }

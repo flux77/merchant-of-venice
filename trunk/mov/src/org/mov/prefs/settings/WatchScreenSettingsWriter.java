@@ -44,21 +44,6 @@ public class WatchScreenSettingsWriter implements SettingsWriter {
     }
     
     public void write(Settings settings, Document document, Element parent) {
-	WatchScreenSettings mySettings = (WatchScreenSettings)settings;
-	
-	List symbolList = mySettings.getSymbolList();
-	Iterator iterator = symbolList.iterator();
-
-	Element symbolListElement = (Element)document.createElement("list");
-	symbolListElement.setAttribute("type","symbolList");
-	parent.appendChild(symbolListElement);
-
-	while (iterator.hasNext()) {
-	    Symbol s = (Symbol)iterator.next();
-	    Element entry = (Element)document.createElement("entry");
-	    Text itemText = document.createTextNode(s.toString());
-	    entry.appendChild(itemText);
-	    symbolListElement.appendChild(entry);
-	}
+	//Nothing do
     }
 }

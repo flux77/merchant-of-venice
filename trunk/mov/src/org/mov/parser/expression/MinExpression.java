@@ -94,6 +94,8 @@ public class MinExpression extends TernaryExpression {
         throws EvaluationException {
 
 	double min = Double.MAX_VALUE;
+	boolean setValue = false;
+	boolean missingQuotes = false;
 
 	for(int i = offset - days + 1; i <= offset; i++) {
             try {
@@ -101,10 +103,23 @@ public class MinExpression extends TernaryExpression {
 
                 if(value < min)
                     min = value;
+
+		setValue = true;
             }
             catch(MissingQuoteException e) {
+		missingQuotes = true;
                 // nothing to do
             }
+	}
+	
+	/* 
+	   Returning Double.MAX_VALUE here causes offset to overflow
+	   when the parent is a LagExpression. Consequently, offset becomes
+	   a positive value which triggers assertions which halt analyser 
+	   processes. 
+	 */	   
+	if (!setValue && missingQuotes) {
+	    throw EvaluationException.UNDEFINED_RESULT_EXCEPTION;
 	}
 
 	return min;

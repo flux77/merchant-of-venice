@@ -166,6 +166,10 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException LOGARITHM_NEGATIVE_EXCEPTION =
         new EvaluationException(Locale.getString("LOGARITHM_NEGATIVE_EXCEPTION"));
 
+    /** An exception which is thrown when the result of a calculation is undefined. e.g. Calculating the average of the empty set */
+    public static EvaluationException UNDEFINED_RESULT_EXCEPTION =
+        new EvaluationException(Locale.getString("UNDEFINED_RESULT_EXCEPTION"));
+
     /**
      * Create a new evaluation exception with the given error reason.
      * Make any exception without a run-time error message static so the

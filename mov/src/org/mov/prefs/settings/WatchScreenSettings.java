@@ -39,27 +39,20 @@ import org.mov.quote.QuoteSourceManager;
 import org.mov.table.WatchScreen;
 import org.mov.util.TradingDate;
 
+import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.PreferencesException;
 import org.mov.prefs.settings.SettingsWriter;
 import org.mov.prefs.settings.WatchScreenSettingsWriter;
 
 public class WatchScreenSettings extends AbstractSettings {
     
-    private List symbolList;
-
     public WatchScreenSettings() {
 	super(Settings.TABLE, Settings.WATCHSCREENMODULE);
     }
 
-    public WatchScreenSettings(String key) {
+    public WatchScreenSettings(String title) {
 	super(Settings.TABLE, Settings.WATCHSCREENMODULE);
-    }
-
-    public void putSymbolList(List symbolList) {
-	this.symbolList = symbolList;
-    }
-
-    public List getSymbolList() {
-	return symbolList;
+	super.setTitle(title);
     }
 
     public SettingsWriter getWriter() {
@@ -67,21 +60,21 @@ public class WatchScreenSettings extends AbstractSettings {
     }
 
     public Module getModule(JDesktopPane desktop) {
-	WatchScreen watchScreen = new WatchScreen(getTitle());
-	List realSymbolList = XMLHelper.stringToSymbolsList(symbolList);
-
-	watchScreen.addSymbols(realSymbolList);
 	
-	TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
-	
-	if (lastDate != null) {	
-	    MixedQuoteBundle quoteBundle = new MixedQuoteBundle(watchScreen.getSymbols(),
-					       lastDate.previous(1),
-					       lastDate);
-	
-	    return new WatchScreenModule(watchScreen, quoteBundle);
-	}
-	return null;
+	try {
+	    WatchScreen watchScreen = PreferencesManager.getWatchScreen(getTitle());
+	    
+	    TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
+	    
+	    if (lastDate != null) {	
+		MixedQuoteBundle quoteBundle = new MixedQuoteBundle(watchScreen.getSymbols(),
+								    lastDate.previous(1),
+								    lastDate);
+		
+		return new WatchScreenModule(watchScreen, quoteBundle);
+	    }	    	    
+	} catch (PreferencesException pfe) {
+	}	
+	return null;	    
     }
-    
 }

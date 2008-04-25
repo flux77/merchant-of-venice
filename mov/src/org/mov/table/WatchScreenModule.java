@@ -286,8 +286,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
                                                 e.getMessage());
             }
 
-	    settings = new WatchScreenSettings();
-	    settings.putSymbolList(watchScreen.getSymbols());
+	    settings = new WatchScreenSettings(watchScreen.getName());
 
         }
     }

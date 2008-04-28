@@ -81,7 +81,7 @@ download the source release which contains the source from the latest
 release. Alternatively, you can download the current development
 version from CVS by running the following command:
 
-cvs -z3 -d:pserver:anonymous@mov.cvs.sourceforge.net:/cvsroot/mov co -P venice
+cvs -z3 -d:pserver:anonymous@mov.cvs.sourceforge.net:/cvsroot/mov co -P mov
 
 To build Venice you will need the programmes listed in the "Running"
 section and the following:

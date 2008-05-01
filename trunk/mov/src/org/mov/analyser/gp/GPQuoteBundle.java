@@ -82,8 +82,13 @@ public class GPQuoteBundle extends EODQuoteBundle {
             throw EvaluationException.FUTURE_DATE_EXCEPTION;
 
         // Trying to access a date too far into the past?
-        else if(Math.abs(offset) > Math.abs(window))
+	// Math.abs(Integer.MIN_VALUE) returns Integer.MIN_VALUE which 
+	// is negative.
+        else if(Math.abs(offset) > Math.abs(window) ||
+		offset == Integer.MIN_VALUE) 
             throw EvaluationException.PAST_DATE_EXCEPTION;
+
+	
 
         // Date is within range
         else

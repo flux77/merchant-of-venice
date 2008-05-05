@@ -57,7 +57,7 @@ public interface Settings {
     
     public static final int QUOTEMODULE = 2;
     public static final int WATCHSCREENMODULE = 3;
-    
+    public static final int HELPMODULE = 4;    
     /**
      * Return the Module group as defined by the Settings constants
      * 

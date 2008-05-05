@@ -193,6 +193,9 @@ public class ModuleFrameSettingsReader {
 	case Settings.WATCHSCREENMODULE:
 	    moduleSettings = WatchScreenSettingsReader.read(data);
 	    break;
+	case Settings.HELPMODULE:
+	    moduleSettings = HelpSettingsReader.read(data);
+	    break;
 	default:	   
 	    return false;
 	}

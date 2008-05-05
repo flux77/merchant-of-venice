@@ -31,6 +31,7 @@ import javax.swing.tree.*;
 import org.mov.main.*;
 import org.mov.util.Locale;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.HelpModuleSettings;
 
 /**
  * This module provides a help browser for Venice. It allows traveresal of a tree
@@ -76,7 +77,7 @@ public class HelpModule extends JPanel implements Module {
     private Stack visitedPages;
     private int positionInStack;
 
-    private Settings settings;
+    private HelpModuleSettings settings;
     
     /**
      * Create a new help browser loaded at the root page.
@@ -84,7 +85,33 @@ public class HelpModule extends JPanel implements Module {
      * @param	desktop	the parent desktop.
      */
     public HelpModule(JDesktopPane desktop) {
-        this.desktop = desktop;
+	init();
+
+
+        // Update visisted page stack
+        visitedPages = new Stack();
+        positionInStack = 0;
+        visitedPages.push(root);
+        displayPage((HelpPage)root);
+    }
+
+    /**
+     * Create a new help browser loaded at the root page.
+     *
+     * @param	desktop	the parent desktop.
+     * @param	the parent desktop.
+     */
+    public HelpModule(JDesktopPane desktop, HelpModuleSettings settings) {
+	init();
+
+        // Update visisted page stack
+        visitedPages = settings.getVisitedPages();
+        positionInStack = settings.getPositionInStack();
+        displayPage((HelpPage)visitedPages.get(positionInStack));
+    }
+
+    private void init() {
+	this.desktop = desktop;
 
         propertySupport = new PropertyChangeSupport(this);       
 
@@ -105,13 +132,8 @@ public class HelpModule extends JPanel implements Module {
         splitPane.setRightComponent(new JScrollPane(editorPane));
 
         add(splitPane, BorderLayout.CENTER);        
-
-        // Update visisted page stack
-        visitedPages = new Stack();
-        positionInStack = 0;
-        visitedPages.push(root);
-        displayPage((HelpPage)root);
     }
+    
 
     // Adds the tool bar
     private void addFunctionToolBar() {
@@ -401,7 +423,12 @@ public class HelpModule extends JPanel implements Module {
      * the window is being closed.
      */
     public void save() { 
-        // nothing to do
+	settings = new HelpModuleSettings(String.valueOf(hashCode()));
+	settings.setTitle(getTitle());
+
+	settings.setPositionInStack(positionInStack);
+	settings.setVisitedPages(visitedPages);
+	
     }
 
     public Settings getSettings() {

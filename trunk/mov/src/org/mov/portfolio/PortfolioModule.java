@@ -47,6 +47,7 @@ import org.mov.util.ExchangeRateCache;
 import org.mov.util.Locale;
 import org.mov.prefs.*;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.PortfolioModuleSettings;
 import org.mov.quote.*;
 import org.mov.ui.*;
 
@@ -100,6 +101,36 @@ public class PortfolioModule extends JPanel implements Module,
 	this.desktop = desktop;
 	this.portfolio = portfolio;
 	this.quoteBundle = quoteBundle;
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	createMenu();
+	redraw();
+
+        // Calculate the value of the portfolio before we create and
+        // display the table. This way we don't pop up a dialog
+        // asking the user to enter an exchange rate half-way through
+        // rendering.
+        try {
+            portfolio.getValue(quoteBundle, portfolio.getLastDate());
+        } catch (MissingQuoteException e) {
+            // We don't actually care about the result
+        }
+    }
+
+    /**
+     * Create a new portfolio module.
+     *
+     * @param	desktop	the current desktop
+     * @param	settings	the portfolioModule settings to display
+     *
+     * A saved portfolio is non transient by definition.
+     */
+
+    public PortfolioModule(JDesktopPane desktop, PortfolioModuleSettings settings) {
+	this.desktop = desktop;
+	portfolio = settings.getPortfolio();
+	quoteBundle = settings.getQuoteBundle();
 
 	propertySupport = new PropertyChangeSupport(this);
 
@@ -310,6 +341,9 @@ public class PortfolioModule extends JPanel implements Module,
             }
 
 	    MainMenu.getInstance().updatePortfolioMenu();
+
+	    settings = new PortfolioModuleSettings(portfolio.getName());
+
 	}
     }
 
@@ -328,7 +362,7 @@ public class PortfolioModule extends JPanel implements Module,
 
     /**
      * Remove a property change listener for module change events.
-     *
+    *
      * @param	listener	listener
      */
     public void removeModuleChangeListener(PropertyChangeListener listener) {

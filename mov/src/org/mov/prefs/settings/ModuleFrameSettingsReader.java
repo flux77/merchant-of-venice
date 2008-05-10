@@ -196,6 +196,12 @@ public class ModuleFrameSettingsReader {
 	case Settings.HELPMODULE:
 	    moduleSettings = HelpSettingsReader.read(data);
 	    break;
+	case Settings.PORTFOLIOMODULE:
+	    moduleSettings = PortfolioSettingsReader.read(data);
+	    break;
+	case Settings.PREFERENCESMODULE:
+	    moduleSettings = PreferencesSettingsReader.read(data);
+	    break;
 	default:	   
 	    return false;
 	}

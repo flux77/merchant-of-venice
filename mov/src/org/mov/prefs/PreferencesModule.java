@@ -28,6 +28,7 @@ import javax.swing.event.*;
 
 import org.mov.main.*;
 import org.mov.prefs.PreferencesManager;
+import org.mov.prefs.settings.PreferencesModuleSettings;
 import org.mov.prefs.settings.Settings;
 import org.mov.util.Locale;
 
@@ -274,6 +275,7 @@ public class PreferencesModule extends JPanel implements Module, ActionListener 
      */
     public void save() {
 	PreferencesManager.putLastPreferencesPage(pageList.getSelectedIndex());
+	settings = new PreferencesModuleSettings();
     }
 
     public Settings getSettings() {

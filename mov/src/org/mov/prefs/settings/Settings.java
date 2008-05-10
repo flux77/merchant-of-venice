@@ -50,6 +50,7 @@ public interface Settings {
     public static final int PREFS    = 3;
     public static final int HELP     = 4;
     public static final int PORTFOLIO = 5;
+    public static final int PREFERENCES = 6;
 
     //Module Types
     public static final int MODULE = -1;
@@ -60,7 +61,7 @@ public interface Settings {
     public static final int WATCHSCREENMODULE = 3;
     public static final int HELPMODULE = 4; 
     public static final int PORTFOLIOMODULE = 5;
-
+    public static final int PREFERENCESMODULE = 6;
     /**
      * Return the Module group as defined by the Settings constants
      * 

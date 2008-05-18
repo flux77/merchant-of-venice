@@ -84,9 +84,17 @@ public abstract class AbstractSettings implements Settings {
 
     }
 
+    /**
+     * Set the title of the Module.
+     * 
+     * @param title The module title
+     */
+
     public void setTitle(String title) {
 	this.title = title;
     }
+
+
 
     public String getTitle() {
 	return title;

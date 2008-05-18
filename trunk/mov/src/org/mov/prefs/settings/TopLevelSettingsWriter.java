@@ -20,8 +20,11 @@ package org.mov.prefs.settings;
 
 import org.mov.quote.Symbol;
 import org.mov.main.ModuleFrame;
+import org.mov.main.Module;
 
 import java.io.OutputStream;
+import java.io.BufferedOutputStream;
+import java.beans.XMLEncoder;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.List;
@@ -44,6 +47,7 @@ import org.mov.chart.graph.Graph;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
+
 
 /**
  * This class writes settings in XML format.
@@ -69,54 +73,26 @@ public class TopLevelSettingsWriter implements SettingsWriter {
     public  void write(ModuleFrame frame, OutputStream stream) {
 
 	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+	
+	ModuleFrameSettings settings = new ModuleFrameSettings();
+	Settings moduleSettings = frame.getModule().getSettings();
+	settings.setModuleSettings(moduleSettings);
+	settings.setBounds(frame.getBounds());
 
-        try {
-            DocumentBuilder builder = builderFactory.newDocumentBuilder();
-            Document document = builder.newDocument();
-	    
-	    Element framesElement = (Element)document.createElement("frames");
-	    document.appendChild(framesElement);
+	BufferedOutputStream buffStream = new BufferedOutputStream(stream);
+	XMLEncoder xStream = new XMLEncoder(buffStream);
+	
+	try {
+	    xStream.writeObject(settings);
+	    xStream.close();
+	} catch (java.lang.Exception e) {
+	    System.out.println("Error writeing object; " + e);
+	}
 
-	    ModuleFrameSettings settings = new ModuleFrameSettings();
-	    Settings moduleSettings = frame.getModule().getSettings();
-	    settings.setModuleSettings(moduleSettings);
-	    settings.setBounds(frame.getBounds());
 
-	    write(settings, document, framesElement);		
-
-	    TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-	    
-            DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(stream);
-            transformer.transform(source, result);
-        }
-        catch(ParserConfigurationException e) {
-            // This should not occur
-            assert false;
-        }
-        catch(TransformerException e) {
-            // This should not occur
-            assert false;
-        }
-	    
     }
 
-    /**
-     * Write the module settings to the output stream in XML format.
-     *
-     * @param frame the module frame data to write
-     * @param stream      the output stream to write the window settings.
-     */
-
-    public  void write(Settings settings, Document document, Element parent) {
-
-	    Element frameElement = (Element)document.createElement("frame");
-	    parent.appendChild(frameElement);
-	    
-	    ModuleFrameSettingsWriter frameSettingsWriter = (ModuleFrameSettingsWriter)settings.getWriter();
-	    frameSettingsWriter.write(settings, document, frameElement);
-	    	   	    				                
+    public void write(Settings settings, Document document, Element parent) {
+	
     }
-   
 }

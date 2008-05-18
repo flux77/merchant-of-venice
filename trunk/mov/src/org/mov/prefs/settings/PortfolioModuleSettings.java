@@ -45,8 +45,6 @@ import org.mov.util.TradingDate;
 
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.PreferencesException;
-import org.mov.prefs.settings.SettingsWriter;
-import org.mov.prefs.settings.WatchScreenSettingsWriter;
 
 public class PortfolioModuleSettings extends AbstractSettings {
 
@@ -76,10 +74,6 @@ public class PortfolioModuleSettings extends AbstractSettings {
 
     public Portfolio getPortfolio() {
 	return portfolio;
-    }
-
-    public SettingsWriter getWriter() {
-	return new PortfolioSettingsWriter();
     }
 
     public Module getModule(JDesktopPane desktop) {

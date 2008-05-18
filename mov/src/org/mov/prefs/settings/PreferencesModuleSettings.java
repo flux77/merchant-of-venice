@@ -39,7 +39,6 @@ import org.mov.prefs.PreferencesModule;
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.PreferencesException;
 import org.mov.prefs.settings.SettingsWriter;
-import org.mov.prefs.settings.WatchScreenSettingsWriter;
 
 public class PreferencesModuleSettings extends AbstractSettings {
     
@@ -52,9 +51,6 @@ public class PreferencesModuleSettings extends AbstractSettings {
 	super.setTitle(title);
     }
 
-    public SettingsWriter getWriter() {
-	return new PreferencesSettingsWriter();
-    }
 
     public Module getModule(JDesktopPane desktop) {
 	return new PreferencesModule(desktop);	

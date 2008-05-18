@@ -36,7 +36,6 @@ import java.util.prefs.BackingStoreException;
 import org.mov.main.Main;
 import org.mov.main.Module;
 import org.mov.main.ModuleFrame;
-import org.mov.prefs.settings.ModuleFrameSettingsWriter;
 import org.mov.prefs.settings.TopLevelSettingsWriter;
 import org.mov.ui.DesktopManager;
 import org.mov.macro.StoredMacro;
@@ -1434,7 +1433,7 @@ public class PreferencesManager {
 					      ("FrameDataFor" + frame.getTitle()).replaceAll(" ", "") + "_" + frame.hashCode() + ".xml");
 
 	    FileOutputStream outputStream = new FileOutputStream(frameSettingsFile);
-	    
+
 	    TopLevelSettingsWriter settingsWriter = new TopLevelSettingsWriter();
 
 	    settingsWriter.write(frame, outputStream);

@@ -33,6 +33,7 @@ import java.util.prefs.BackingStoreException;
 
 import org.mov.util.Locale;
 import org.mov.main.Main;
+import org.mov.main.Module;
 import org.mov.macro.StoredMacro;
 import org.mov.quote.Symbol;
 import org.mov.quote.SymbolFormatException;
@@ -42,7 +43,6 @@ import org.mov.table.WatchScreenReader;
 import org.mov.table.WatchScreenWriter;
 
 import org.mov.main.ModuleFrame;
-import org.mov.prefs.settings.ModuleFrameSettingsWriter;
 import java.util.Collection;
 import java.util.Vector;
 import java.awt.Dimension;
@@ -148,8 +148,5 @@ public class ModuleFrameSettings extends AbstractSettings {
      *
      */
 
-    public SettingsWriter getWriter() {
-	return new ModuleFrameSettingsWriter();
-    }
 
 }

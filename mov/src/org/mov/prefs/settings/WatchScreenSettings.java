@@ -42,7 +42,6 @@ import org.mov.util.TradingDate;
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.PreferencesException;
 import org.mov.prefs.settings.SettingsWriter;
-import org.mov.prefs.settings.WatchScreenSettingsWriter;
 
 public class WatchScreenSettings extends AbstractSettings {
     
@@ -53,10 +52,6 @@ public class WatchScreenSettings extends AbstractSettings {
     public WatchScreenSettings(String title) {
 	super(Settings.TABLE, Settings.WATCHSCREENMODULE);
 	super.setTitle(title);
-    }
-
-    public SettingsWriter getWriter() {
-	return new WatchScreenSettingsWriter();
     }
 
     public Module getModule(JDesktopPane desktop) {

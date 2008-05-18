@@ -122,21 +122,12 @@ public interface Settings {
      */
    
     public void setKey(String key);
-
-
-    /**
-     * Return a writer which can write the settings (to the filesystem)
-     * 
-     * @return A SettingsWriter
-     */
-    
-    public SettingsWriter getWriter();
-
     
     /**
      *
      * Return a Module based on the settings.
      */
     public Module getModule(JDesktopPane desktop);
+
 
 }

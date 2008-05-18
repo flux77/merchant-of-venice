@@ -248,49 +248,41 @@ public class ChartModule extends JPanel implements Module,
 	int symbolIndex = 0;
 
 	while (levelsIterator.hasNext()) {
+
 	    Vector graphList = (Vector)levelsIterator.next();
-	    Iterator graphIterator = graphList.iterator();
+	    Iterator graphSettingsIterator = graphList.iterator();
 	    
 	    graphCount = 0;
 
-	    while (graphIterator.hasNext()) {
-		Vector graphSettingsList = (Vector)graphIterator.next();
-		Iterator graphSettingsIterator = graphSettingsList.iterator();
-		
-		while (graphSettingsIterator.hasNext()) {
-		    GraphSettings graphSettings = 
-			(GraphSettings)graphSettingsIterator.next();
+	    while (graphSettingsIterator.hasNext()) { 
+		GraphSettings graphSettings = (GraphSettings)graphSettingsIterator.next();
 		    
-		    //Try to recreate the level from the data 
-		    try {
-			Symbol s = Symbol.find((String)symbolList.
-					       get(symbolIndex));
-
-			EODQuoteBundle bundle = new 
-			    EODQuoteBundle(new EODQuoteRange(s));
-			
-			Graph newGraph = graphSettings.getGraph(bundle);
-			if (newGraph != null) {
-			    if (graphCount > 0) {
-				append(newGraph, levelCount);
-			    } else {
+		//Try to recreate the level from the data 
+		try {
+		    Symbol s = Symbol.find((String)symbolList.
+					   get(symbolIndex));
+		    
+		    EODQuoteBundle bundle = new 
+			EODQuoteBundle(new EODQuoteRange(s));
+		    
+		    Graph newGraph = graphSettings.getGraph(bundle);
+		    if (newGraph != null) {
+			if (graphCount > 0) {
+			    append(newGraph, levelCount);
+			} else {
 				add(newGraph, s, bundle, levelCount);	
-			    }
-
 			}
-
-		    } catch (SymbolFormatException sfe) {
-
+			
 		    }		    
-		}
+		} catch (SymbolFormatException sfe) {
+		    
+		}		    
+	    
 		symbolIndex++;
 		graphCount++;				    
 	    }
 	    levelCount++;
 	}
-	
-	
-	
     }
 
     private void initChart(boolean indexChart) {
@@ -1077,14 +1069,14 @@ public class ChartModule extends JPanel implements Module,
 				      String.valueOf(chart.hashCode()),
 				      graph.getName());
 
-		graphSettings.put(graph.getSettings());
+		graphSettings.setSettings(graph.getSettings());
 		graphSettingsList.add(graphSettings);
 	    }	    
 	    levelSettingsList.add(graphSettingsList);
 	}
 
-	settings.putLevelSettingsList(levelSettingsList);
-	settings.putSymbolList(symbolList);
+	settings.setLevelSettingsList(levelSettingsList);
+	settings.setSymbolList(symbolList);
 	
     }
 

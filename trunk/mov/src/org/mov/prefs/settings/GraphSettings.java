@@ -52,8 +52,6 @@ import org.mov.table.WatchScreenWriter;
 import org.mov.chart.graph.Graph;
 import org.mov.chart.source.GraphSource;
 import org.mov.main.Module;
-import org.mov.prefs.settings.GraphSettingsWriter;
-import org.mov.main.ModuleFrame;
 
 
 import org.mov.chart.graph.LineGraph;
@@ -124,7 +122,8 @@ public class GraphSettings extends AbstractSettings {
      * 
      * @return A hashMap representing a set of key-value pairs
      */
-    public HashMap get() {
+    
+    public HashMap getSettings() {
 	return settings;
     }
 
@@ -135,14 +134,11 @@ public class GraphSettings extends AbstractSettings {
      * @param settings A hashmap representing the settings data  
 
      */
-
-    public void put(HashMap settings) {
-	
+    public void setSettings(HashMap settings) {
 	this.settings = settings;
-
     }
 
-
+    
     /**
      * Return the graph title
      * 
@@ -198,17 +194,6 @@ public class GraphSettings extends AbstractSettings {
 
 	}
     }
-
-    /**
-     * 
-     * Return a writer object which can write this classes data
-     * 
-     * @return  A graphSettingsWriter 
-     */
-    public SettingsWriter getWriter() {
-	return new GraphSettingsWriter();
-    }
-
 
 
     //Graph settings are data of the chart module, so nothing is returned here

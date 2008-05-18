@@ -96,8 +96,7 @@ public class ChartModuleSettings extends AbstractSettings {
      * 
      * @param symbolList  A list of symbols
      */
-
-    public void putSymbolList(List symbolList) {
+    public void setSymbolList(List symbolList) {
 	this.symbolList = symbolList;
     }
 
@@ -129,7 +128,7 @@ public class ChartModuleSettings extends AbstractSettings {
      * @param levelSettingsList  A list of level settings
      */
     
-    public void putLevelSettingsList(List levelSettingsList) {
+    public void setLevelSettingsList(List levelSettingsList) {
 	this.levelSettingsList = levelSettingsList;
     }
 
@@ -144,17 +143,7 @@ public class ChartModuleSettings extends AbstractSettings {
 	super.setTitle(title);
     }
 
-        /**
-     * 
-     * Return a writer object which can write this classes data
-     * 
-     * @return  A graphSettingsWriter 
-     */
-    
-    public SettingsWriter getWriter() {
-	return new ChartModuleSettingsWriter();		
-    } 
-
+ 
     /**
      * 
      * Creates a ChartModule based on this ChartModuleSettings.

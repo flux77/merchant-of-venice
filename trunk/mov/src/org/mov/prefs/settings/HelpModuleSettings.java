@@ -37,8 +37,6 @@ import org.mov.main.Module;
 import org.mov.help.HelpModule;
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.PreferencesException;
-import org.mov.prefs.settings.SettingsWriter;
-import org.mov.prefs.settings.HelpSettingsWriter;
 
 public class HelpModuleSettings extends AbstractSettings {
     
@@ -69,10 +67,6 @@ public class HelpModuleSettings extends AbstractSettings {
 
     public void setPositionInStack(int positionInStack) {
 	this.positionInStack = positionInStack;
-    }
-
-    public SettingsWriter getWriter() {
-	return new HelpSettingsWriter();
     }
 
     public Module getModule(JDesktopPane desktop) {	

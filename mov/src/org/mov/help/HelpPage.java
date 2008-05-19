@@ -63,6 +63,31 @@ public class HelpPage extends DefaultMutableTreeNode {
     }
 
     /**
+     * Create a new root help page. The page will display
+     * the contents of the help file in the src/org/mov/help/doc/ directory which
+     * has the same name as name with a trailing "html".
+     *
+     * No parameters for constructor to fit Java Beans interface
+     */
+    public HelpPage() {
+	super(Locale.getString("VENICE_SHORT"));
+	name = Locale.getString("VENICE_SHORT");
+	link = nameToLink(name);	
+	isLoaded = false;
+    }
+
+
+    /**
+     * Set the name of the page.
+     * 
+     * @param name   The name of the page
+     */
+    public void setName(String name) {
+	this.name = name;
+    }
+
+
+    /**
      * Get the name of the chapter.
      *
      * @return the chapter name
@@ -79,6 +104,17 @@ public class HelpPage extends DefaultMutableTreeNode {
      */
     public String getLink() {
         return link;
+    }
+
+    /**
+     *
+     * Create a page link to this helppage
+     * 
+     * @param link  The name of the page linking to this page
+     */
+
+    public void setLink(String link) {
+	this.link = link;
     }
 
     /**

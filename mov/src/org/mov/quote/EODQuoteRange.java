@@ -555,6 +555,11 @@ public class EODQuoteRange implements Cloneable {
     // CONTAINED - this quote range is contained by the given quote range
     // NO_OVERLAP - the two quote ranges don't overlap
     // PARTIAL_OVERLAP - the two quotes overlap slightly
+    //
+    // If the two quotes have the same start date but different
+    // end date (and vice versa), are they contained?
+    // The code used to return PARTIAL_OVERLAP, but this was causing
+    // an assertion to be triggered later on. 
     private int getOverlapType(EODQuoteRange quoteRange) {
 	if(getFirstDate() == null)
 	    return CONTAINS;
@@ -570,8 +575,8 @@ public class EODQuoteRange implements Cloneable {
 		getLastDate().compareTo(quoteRange.getLastDate()) >= 0)
 	    return CONTAINS;
 
-	else if(getFirstDate().compareTo(quoteRange.getFirstDate()) > 0 &&
-		getLastDate().compareTo(quoteRange.getLastDate()) < 0)
+	else if(getFirstDate().compareTo(quoteRange.getFirstDate()) >= 0 &&
+		getLastDate().compareTo(quoteRange.getLastDate()) <= 0)
 	    return CONTAINED;
 	
 	return PARTIAL_OVERLAP;

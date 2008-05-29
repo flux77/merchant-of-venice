@@ -35,7 +35,6 @@ import javax.swing.JDesktopPane;
 import java.util.*;
 import org.mov.main.Module;
 import org.mov.table.QuoteModule;
-import org.mov.quote.SettingsEODQuoteBundle;
 import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.EODQuoteRange;
 import org.mov.quote.QuoteSourceManager;

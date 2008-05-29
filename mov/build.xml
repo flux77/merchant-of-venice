@@ -382,7 +382,6 @@
           dir="${src}"
           fork="yes">
       <jvmarg value="-ea"/>
-      <jvmarg value="-Xmx1024M"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
         <pathelement path="${src}"/>

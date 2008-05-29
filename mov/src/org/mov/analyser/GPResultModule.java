@@ -51,6 +51,7 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.AnalyserResultSettings;
 
 public class GPResultModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -69,7 +70,7 @@ public class GPResultModule extends AbstractTable implements Module {
 
     private Model model;
     private GPPageInitialPopulation GPPageInitialPopulation;
-    private Settings settings;
+    private AnalyserResultSettings settings;
 
     // Menus
     private JMenuBar menuBar;
@@ -175,7 +176,53 @@ public class GPResultModule extends AbstractTable implements Module {
         
         this.GPPageInitialPopulation=GPPageInitialPopulation;
         
-        List columns = new ArrayList();
+	model = new Model(createColumns());
+	setModel(model);
+
+	model.addTableModelListener(this);
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	addMenu();
+
+        // If the user clicks on the table trap it.
+	addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent evt) {
+                    handleMouseClicked(evt);
+                }
+	    });
+
+        showColumns(model);
+    }
+
+
+    public GPResultModule(AnalyserResultSettings settings) {
+	this.settings = settings;
+	this.GPPageInitialPopulation=GPPageInitialPopulation;
+        
+	model = new Model(createColumns());
+	model.setResults(settings.getResults());
+	setModel(model);
+
+	model.addTableModelListener(this);
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	addMenu();
+
+        // If the user clicks on the table trap it.
+	addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent evt) {
+                    handleMouseClicked(evt);
+                }
+	    });
+
+        showColumns(model);
+
+    }
+
+    private  List createColumns() {
+	List columns = new ArrayList();
         columns.add(new Column(START_DATE_COLUMN,
                                Locale.getString("START_DATE"),
                                Locale.getString("START_DATE_COLUMN_HEADER"),
@@ -231,23 +278,7 @@ public class GPResultModule extends AbstractTable implements Module {
                                ChangeFormat.class,
                                Column.VISIBLE));
 
-	model = new Model(columns);
-	setModel(model);
-
-	model.addTableModelListener(this);
-
-	propertySupport = new PropertyChangeSupport(this);
-
-	addMenu();
-
-        // If the user clicks on the table trap it.
-	addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent evt) {
-                    handleMouseClicked(evt);
-                }
-	    });
-
-        showColumns(model);
+	return columns;
     }
 
     // If the user double clicks on a result with the LMB, graph the portfolio.
@@ -576,7 +607,7 @@ public class GPResultModule extends AbstractTable implements Module {
                     viewBuyRule();
                 }});
         resultMenu.add(viewBuyRuleMenuItem);
-
+	
         viewSellRuleMenuItem = new JMenuItem(Locale.getString("VIEW_SELL_RULE"));
         viewSellRuleMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -663,6 +694,10 @@ public class GPResultModule extends AbstractTable implements Module {
     }
 
     public void save() {
+
+	settings = new AnalyserResultSettings(Settings.GPRESULTS);
+	settings.setResults(model.getResults());
+
         // Free up precious memory
         model.removeAllResults();
     }

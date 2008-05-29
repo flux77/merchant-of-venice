@@ -18,44 +18,21 @@
 
 package org.mov.prefs.settings;
 
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.util.Locale;
 
 import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.beans.XMLDecoder;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.Iterator;
-
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import org.mov.prefs.settings.ModuleSettingsParserException;
 import org.mov.main.ModuleFrame;
 import org.mov.prefs.settings.ModuleFrameSettings;
 import org.mov.prefs.settings.GraphSettings;
+import org.mov.quote.Symbol;
+import org.mov.quote.SymbolFormatException;
+import org.mov.util.Locale;
 
-
-
-import org.xml.sax.SAXException;
 
 /**
  * This class parses watch screens written in XML format.
@@ -92,10 +69,17 @@ public class ModuleFrameSettingsReader {
 	}
 	
 	BufferedInputStream buffStream = new BufferedInputStream(stream);
-	XMLDecoder xStream = new XMLDecoder(buffStream);
-	Object result = xStream.readObject();
-	xStream.close();
+	byte[] buf = new byte[stream.available()];
+	stream.read(buf);
+	String xml = new String(buf);
+			
+	XStream xStream = new XStream(new DomDriver());
+	ModuleFrameSettings result = (ModuleFrameSettings)xStream.fromXML(xml);
+	stream.close();
 
 	return (ModuleFrameSettings)result;
+
     }
+    
 }
+

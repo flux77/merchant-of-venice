@@ -54,13 +54,14 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.AnalyserModuleSettings;
 
 public class GAModule extends JPanel implements Module {
 
     private PropertyChangeSupport propertySupport;
     private JDesktopPane desktop;
     private EODQuoteBundle quoteBundle;
-    private Settings settings;
+    private AnalyserModuleSettings settings;
 
     // Single result table for entire application
     private static ModuleFrame resultsFrame = null;
@@ -155,6 +156,8 @@ public class GAModule extends JPanel implements Module {
         portfolioPage.save(getClass().getName());
         tradeValuePage.save(getClass().getName());
         GAPage.save(getClass().getName());
+
+	settings = new AnalyserModuleSettings(Settings.GAMODULE);
     }
 
     public String getTitle() {

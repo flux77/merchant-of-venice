@@ -40,6 +40,7 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.AnalyserModuleSettings;
 
 public class GPModule extends JPanel implements Module {
     
@@ -59,7 +60,7 @@ public class GPModule extends JPanel implements Module {
     private TradeValuePage tradeValuePage;
     
 
-    private Settings settings;
+    private AnalyserModuleSettings settings;
    
     public GPModule(JDesktopPane desktop) {
         this.desktop = desktop;
@@ -152,6 +153,9 @@ public class GPModule extends JPanel implements Module {
         GPPage.save(getClass().getName());
         GPPageInitialPopulation.save(getClass().getName());
         GPGondolaSelection.save(getClass().getName());
+
+	settings = new AnalyserModuleSettings(Settings.GPMODULE);
+	
     }
     
     public String getTitle() {

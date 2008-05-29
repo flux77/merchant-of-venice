@@ -21,7 +21,7 @@
   <property name="lib.joone" value="${lib}/joone-engine.jar"/>
   <property name="lib.jython" value="${lib}/jython.jar"/>
   <property name="lib.mysql" value="${lib}/mysql-connector-java-3.1.12-bin.jar"/>
-  <property name="lib.xml" value="${lib}/xstream-1.1.2.jar"/>
+  <property name="lib.xml" value="${lib}/xstream-1.3.jar"/>
 
   <!-- Online help -->
   <property name="help" value="${src}/org/mov/help/doc"/>
@@ -382,6 +382,7 @@
           dir="${src}"
           fork="yes">
       <jvmarg value="-ea"/>
+      <jvmarg value="-Xmx1024M"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
         <pathelement path="${src}"/>

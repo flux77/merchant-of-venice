@@ -38,6 +38,7 @@ import org.mov.ui.Column;
 import org.mov.ui.MenuHelper;
 import org.mov.ui.*;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.TransactionModuleSettings;
 
 /** 
  * Venice module for displaying a portfolio's transaction history to
@@ -69,7 +70,7 @@ public class TransactionModule extends AbstractTable implements Module,
     private PortfolioModule portfolioModule;
     private Portfolio portfolio;
     private Model model;
-    private Settings settings;
+    private TransactionModuleSettings settings;
 
     class Model extends AbstractTableModel {
 
@@ -87,6 +88,10 @@ public class TransactionModule extends AbstractTable implements Module,
 
 	public Transaction getTransactionAtRow(int row) {
 	    return (Transaction)transactions.get(row);
+	}
+
+	public List getTransactions() {
+	    return transactions;
 	}
 
 	public int getRowCount() {
@@ -315,7 +320,7 @@ public class TransactionModule extends AbstractTable implements Module,
 
 
     public void save() {
-	// nothing to save
+	settings = new TransactionModuleSettings(portfolio.getName());
     }
 
     public String getTitle() {
@@ -399,6 +404,9 @@ public class TransactionModule extends AbstractTable implements Module,
 
 				    // Update the table and the portfolio window
 				    redraw();
+
+				    
+
 				    portfolioModule.redraw();
 				}});
 		    }

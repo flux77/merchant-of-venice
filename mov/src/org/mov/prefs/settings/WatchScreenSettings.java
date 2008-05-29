@@ -22,12 +22,13 @@ package org.mov.prefs.settings;
 
 
 /**
- * This class  represents WatchScreen Module data  which can restore modules upon restart. 
+ * This class represents WatchScreen Module data  which can restore modules upon restart. 
  * 
  * @author Mark Hummel
  * @see PreferencesManager
- * @see ModuleSettingsWriter
- * @see ModuleSettingReader 
+ * @see SettingsWriter
+ * @see SettingsReader 
+ * @see Settings 
 */
 
 import javax.swing.JDesktopPane;
@@ -45,14 +46,34 @@ import org.mov.prefs.settings.SettingsWriter;
 
 public class WatchScreenSettings extends AbstractSettings {
     
+    /**
+     * 
+     * WatchScreenSettings default constructor
+     */
+
     public WatchScreenSettings() {
 	super(Settings.TABLE, Settings.WATCHSCREENMODULE);
     }
 
+
+    /**
+     * 
+     * Construct a WatchScreenSettings module with the title as key
+     *
+     * @param  title  The title of the WatchScreen
+     */
     public WatchScreenSettings(String title) {
 	super(Settings.TABLE, Settings.WATCHSCREENMODULE);
 	super.setTitle(title);
     }
+
+    /**
+     *
+     * Return a WatchScreenModule based on the WatchScreenSettings
+     * 
+     * @param  desktop  The Venice desktop
+     * @return  A WatchScreenModule     
+     */
 
     public Module getModule(JDesktopPane desktop) {
 	

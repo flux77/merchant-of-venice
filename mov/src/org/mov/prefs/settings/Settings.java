@@ -26,8 +26,8 @@ package org.mov.prefs.settings;
  * 
  * @author Mark Hummel
  * @see PreferencesManager
- * @see ModuleSettingsWriter
- * @see ModuleSettingReader 
+ * @see SettingsWriter
+ * @see SettingReader 
 */
 
 import javax.swing.JDesktopPane;
@@ -38,34 +38,43 @@ import org.mov.prefs.settings.SettingsWriter;
 
 public interface Settings {
     
-
     //Groups
-    public static final int FRAME    = -2;
-    public static final int ROOTMODULE = -1;
+    public static final int FRAME      = 0;
+    public static final int ROOTMODULE = 1;
 
     //Module Groups
-    public static final int CHART    = 0;
-    public static final int ANALYSER = 1;
-    public static final int TABLE    = 2;
-    public static final int PREFS    = 3;
-    public static final int HELP     = 4;
-    public static final int PORTFOLIO = 5;
-    public static final int PREFERENCES = 6;
+    public static final int CHART       = 2;
+    public static final int ANALYSER    = 3;
+    public static final int TABLE       = 4;
+    public static final int PREFS       = 5;
+    public static final int HELP        = 6;
+    public static final int PORTFOLIO   = 7;
+    public static final int PREFERENCES = 8;
 
     //Module Types
-    public static final int MODULE = -1;
-    public static final int CHARTMODULE = 0;
-    public static final int GRAPHS = 1;
+    public static final int MODULE      = 0;
+    public static final int CHARTMODULE = 1;
+    public static final int GRAPHS      = 2;
     
-    public static final int QUOTEMODULE = 2;
-    public static final int WATCHSCREENMODULE = 3;
-    public static final int HELPMODULE = 4; 
-    public static final int PORTFOLIOMODULE = 5;
-    public static final int PREFERENCESMODULE = 6;
+    public static final int QUOTEMODULE       = 3;
+    public static final int WATCHSCREENMODULE = 4;
+    public static final int HELPMODULE        = 5; 
+    public static final int PORTFOLIOMODULE   = 6;
+    public static final int PREFERENCESMODULE = 7;
+    public static final int TRANSACTIONMODULE = 8;    
+    public static final int PAPERTRADEMODULE  = 9;
+    public static final int PAPERTRADERESULTS = 10;
+    public static final int GPMODULE          = 11;
+    public static final int GAMODULE          = 12;
+    public static final int ANNMODULE         = 13;
+    public static final int GPRESULTS         = 14;
+    public static final int GARESULTS         = 15;
+    public static final int ANNRESULTS        = 16;
+
     /**
      * Return the Module group as defined by the Settings constants
      * 
-     * @return THe module group
+     * @return The module group
      */
     public int getGroup();
 

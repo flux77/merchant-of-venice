@@ -41,8 +41,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
 import org.mov.quote.Symbol;
 import org.mov.chart.graph.Graph;
+
+import org.mov.util.ExchangeRateCache;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,11 +60,11 @@ import org.w3c.dom.Text;
  * @author Mark Hummel
  * @see DesktopManager
  * @see PreferencesManager
- * @see WatchScreenWriter
+ * @see SettingsWriter
  */
-public class TopLevelSettingsWriter implements SettingsWriter {
+public class ModuleFrameSettingsWriter implements SettingsWriter {
 
-    public TopLevelSettingsWriter() {
+    public ModuleFrameSettingsWriter() {
         // Nothing to do
     }
 
@@ -79,17 +84,17 @@ public class TopLevelSettingsWriter implements SettingsWriter {
 	settings.setModuleSettings(moduleSettings);
 	settings.setBounds(frame.getBounds());
 
-	BufferedOutputStream buffStream = new BufferedOutputStream(stream);
-	XMLEncoder xStream = new XMLEncoder(buffStream);
+	BufferedOutputStream buffStream = new BufferedOutputStream(stream);	
+
+	XStream xStream = new XStream(new DomDriver());
+	xStream.omitField(ExchangeRateCache.class, "desktopPane");
 	
 	try {
-	    xStream.writeObject(settings);
-	    xStream.close();
-	} catch (java.lang.Exception e) {
-	    System.out.println("Error writeing object; " + e);
+	    String xml = xStream.toXML(settings);
+	    stream.write(xml.getBytes());
+	    stream.close();
+	} catch (Exception e) {
 	}
-
-
     }
 
     public void write(Settings settings, Document document, Element parent) {

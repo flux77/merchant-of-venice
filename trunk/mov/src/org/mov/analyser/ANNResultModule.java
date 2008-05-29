@@ -52,6 +52,7 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.AnalyserResultSettings;
 
 public class ANNResultModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -66,7 +67,7 @@ public class ANNResultModule extends AbstractTable implements Module {
     private static final int PERCENT_RETURN_COLUMN = 7;
 
     private Model model;
-    private Settings settings;
+    private AnalyserResultSettings settings;
 
     // Menus
     private JMenuBar menuBar;
@@ -158,8 +159,52 @@ public class ANNResultModule extends AbstractTable implements Module {
 	}
     }
 
-    public ANNResultModule() {
-        List columns = new ArrayList();
+    public ANNResultModule() {	
+	model = new Model(createColumns());
+	setModel(model);
+
+	model.addTableModelListener(this);
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	addMenu();
+
+        // If the user clicks on the table trap it.
+	addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent evt) {
+                    handleMouseClicked(evt);
+                }
+	    });
+
+        showColumns(model);
+    }
+    
+    public ANNResultModule(AnalyserResultSettings settings) {
+	this.settings = settings;
+
+	model = new Model(createColumns());
+	model.setResults(settings.getResults());
+	setModel(model);
+
+	model.addTableModelListener(this);
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	addMenu();
+
+        // If the user clicks on the table trap it.
+	addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent evt) {
+                    handleMouseClicked(evt);
+                }
+	    });
+
+        showColumns(model);
+    }
+
+    private List createColumns() {
+	
+	List columns = new ArrayList();
         columns.add(new Column(START_DATE_COLUMN,
                                Locale.getString("START_DATE"),
                                Locale.getString("START_DATE_COLUMN_HEADER"),
@@ -197,25 +242,9 @@ public class ANNResultModule extends AbstractTable implements Module {
                                Locale.getString("PERCENT_RETURN_COLUMN_HEADER"),
                                ChangeFormat.class, Column.VISIBLE));
 
-	model = new Model(columns);
-	setModel(model);
-
-	model.addTableModelListener(this);
-
-	propertySupport = new PropertyChangeSupport(this);
-
-	addMenu();
-
-        // If the user clicks on the table trap it.
-	addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent evt) {
-                    handleMouseClicked(evt);
-                }
-	    });
-
-        showColumns(model);
+	return columns;
     }
-    
+
     public void setDesktop(JDesktopPane desktop) {
         this.desktop = desktop;
     }

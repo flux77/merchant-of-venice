@@ -1,3 +1,4 @@
+
 /* Merchant of Venice - technical analysis software for the stock market.
    Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
 
@@ -52,6 +53,7 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.AnalyserModuleSettings;
 
 public class ANNModule extends JPanel implements Module {
 
@@ -72,7 +74,7 @@ public class ANNModule extends JPanel implements Module {
     private ANNTrainingPage ANNTrainingPage;
     private ANNNetworkTypePage ANNNetworkTypePage;
     
-    private Settings settings;
+    private AnalyserModuleSettings settings;
 
     /**
      * Create a new paper trade module.
@@ -174,6 +176,8 @@ public class ANNModule extends JPanel implements Module {
         ANNPage.save(getClass().getName());
         ANNTrainingPage.save(getClass().getName());
         ANNNetworkTypePage.save(getClass().getName());
+
+	settings = new AnalyserModuleSettings(Settings.ANNMODULE);
     }
 
     public String getTitle() {

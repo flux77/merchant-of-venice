@@ -171,4 +171,25 @@ public class FrameRegister extends HashMap {
 	}
     }
 
+    /**
+       Return true if there is a frame of a certain type in the register.
+     */
+
+    public ModuleFrame getFrameOfType(String type) {
+	Set keySet = keySet();
+	Iterator iterator = keySet.iterator();
+
+	while (iterator.hasNext()) {
+	    String key = (String)iterator.next();
+	    ModuleFrame frame = (ModuleFrame)super.get(key);
+	    	    	   
+	    System.out.println("type = " + frame.getModule().getClass().getName());
+
+	    if (frame.getClass().getName().equals(type)) {
+		return frame;
+	    }	    
+	}
+	return null;
+    }
+
 }

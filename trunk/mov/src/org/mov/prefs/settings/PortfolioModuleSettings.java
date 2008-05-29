@@ -22,12 +22,13 @@ package org.mov.prefs.settings;
 
 
 /**
- * This class  represents WatchScreen Module data  which can restore modules upon restart. 
+ * This class represents PortfolioModule data which can restore Portfolio modules upon restart. 
  * 
  * @author Mark Hummel
  * @see PreferencesManager
- * @see ModuleSettingsWriter
- * @see ModuleSettingReader 
+ * @see SettingsWriter
+ * @see SettingsReader 
+ * @see Settings
 */
 
 import javax.swing.JDesktopPane;
@@ -36,13 +37,11 @@ import java.util.*;
 import org.mov.main.Module;
 import org.mov.portfolio.PortfolioModule;
 import org.mov.portfolio.Portfolio;
-
 import org.mov.quote.QuoteBundle;
 import org.mov.quote.EODQuoteRange;
 import org.mov.quote.EODQuoteBundle;
 import org.mov.quote.QuoteSourceManager;
 import org.mov.util.TradingDate;
-
 import org.mov.prefs.PreferencesManager;
 import org.mov.prefs.PreferencesException;
 
@@ -51,30 +50,74 @@ public class PortfolioModuleSettings extends AbstractSettings {
     Portfolio portfolio;
     EODQuoteBundle quoteBundle;
     
+    /**
+     *
+     * PortfolioModuleSettings default constructor
+     */
+
     public PortfolioModuleSettings() {
 	super(Settings.PORTFOLIO, Settings.PORTFOLIOMODULE);
     }
 
+    /**
+     * Construct a PortfolioModuleSettings with title as key
+     * 
+     * @param title  The Title of the PortfolioModule
+     */
     public PortfolioModuleSettings(String title) {
 	super(Settings.PORTFOLIO, Settings.PORTFOLIOMODULE);
 	super.setTitle(title);
     }
 
+    /**
+     *
+     * Set the quoteBundle for the PortfolioModule Settings
+     * 
+     * @param quoteBundle  The quoteBundle of the PortfolioModule
+     */
     public void setQuoteBundle(EODQuoteBundle quoteBundle) {
 	this.quoteBundle = quoteBundle;
     }
 
+    /**
+     * 
+     * Get the quoteBundle from the PortfolioModuleSettings
+     * 
+     * @return the quoteBundle of a PortfolioModule
+     */
     public EODQuoteBundle getQuoteBundle() {
 	return quoteBundle;
     }
 
+    /**
+     * 
+     * Set the Portfolio for the PortfolioModuleSettings
+     * 
+     * @param Portfolio  The portfolio of the PortfolioModule 
+     */
     public void setPortfolio(Portfolio portfolio) {
 	this.portfolio = portfolio;
     }
 
+    /**
+     * 
+     * Get the Portfolio of a PortfolioModule
+     * 
+     * @return  portfolio  A portfolio   
+     */
+
     public Portfolio getPortfolio() {
 	return portfolio;
     }
+
+    /**
+     * 
+     * Return a PortfolioModule based on the PortfolioModuleSettings
+     * 
+     * @param desktop The Venice  desktop
+     * @return A PortfolioModule
+     * 
+     */
 
     public Module getModule(JDesktopPane desktop) {
 

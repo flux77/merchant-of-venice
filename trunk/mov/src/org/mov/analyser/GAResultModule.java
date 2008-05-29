@@ -55,6 +55,7 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.AnalyserResultSettings;
 
 public class GAResultModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -173,9 +174,51 @@ public class GAResultModule extends AbstractTable implements Module {
 	}
     }
 
-    public GAResultModule() {
-        
-        List columns = new ArrayList();
+    public GAResultModule() {        
+	model = new Model(createColumns());
+	setModel(model);
+
+	model.addTableModelListener(this);
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	addMenu();
+
+        // If the user clicks on the table trap it.
+	addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent evt) {
+                    handleMouseClicked(evt);
+                }
+	    });
+
+        showColumns(model);
+    }
+
+    public GAResultModule(AnalyserResultSettings settings) {        
+	this.settings = settings;
+	model = new Model(createColumns());
+	model.setResults(settings.getResults());
+	setModel(model);
+
+	model.addTableModelListener(this);
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	addMenu();
+
+        // If the user clicks on the table trap it.
+	addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent evt) {
+                    handleMouseClicked(evt);
+                }
+	    });
+
+        showColumns(model);
+    }
+
+    private List createColumns() {
+	
+	List columns = new ArrayList();
         columns.add(new Column(START_DATE_COLUMN,
                                Locale.getString("START_DATE"),
                                Locale.getString("START_DATE_COLUMN_HEADER"),
@@ -231,23 +274,7 @@ public class GAResultModule extends AbstractTable implements Module {
                                ChangeFormat.class,
                                Column.VISIBLE));
 
-	model = new Model(columns);
-	setModel(model);
-
-	model.addTableModelListener(this);
-
-	propertySupport = new PropertyChangeSupport(this);
-
-	addMenu();
-
-        // If the user clicks on the table trap it.
-	addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent evt) {
-                    handleMouseClicked(evt);
-                }
-	    });
-
-        showColumns(model);
+	return columns;
     }
 
     // If the user double clicks on a result with the LMB, graph the portfolio.

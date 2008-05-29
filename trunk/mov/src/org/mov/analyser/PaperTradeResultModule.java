@@ -53,6 +53,7 @@ import org.mov.util.Locale;
 import org.mov.util.Money;
 import org.mov.util.TradingDate;
 import org.mov.prefs.settings.Settings;
+import org.mov.prefs.settings.AnalyserResultSettings;
 
 public class PaperTradeResultModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -72,7 +73,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     private static final int PERCENT_RETURN_COLUMN = 12;
 
     private Model model;
-    private Settings settings;
+    private AnalyserResultSettings settings;
 
     // Menus
     private JMenuBar menuBar;
@@ -100,7 +101,7 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
 	public PaperTradeResult getResult(int row) {
 	    return (PaperTradeResult)results.get(row);
 	}
-
+	
         public void removeAllResults() {
             results.clear();
 
@@ -184,7 +185,53 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     }
 
     public PaperTradeResultModule() {
-        List columns = new ArrayList();
+        List columns = createColumns();	        
+	model = new Model(columns);
+	setModel(model);
+
+	model.addTableModelListener(this);
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	addMenu();
+
+        // If the user clicks on the table trap it.
+	addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent evt) {
+                    handleMouseClicked(evt);
+                }
+	    });
+
+        showColumns(model);
+    }
+
+    public PaperTradeResultModule(AnalyserResultSettings settings) {
+	this.settings = settings;
+	List columns = createColumns();
+	model = new Model(columns);
+	model.setResults(settings.getResults());
+		
+	setModel(model);
+
+	model.addTableModelListener(this);
+
+	propertySupport = new PropertyChangeSupport(this);
+
+	addMenu();
+
+        // If the user clicks on the table trap it.
+	addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent evt) {
+                    handleMouseClicked(evt);
+                }
+	    });
+
+        showColumns(model);
+
+    }
+
+    private List createColumns() {
+	List columns = new ArrayList();
         columns.add(new Column(START_DATE_COLUMN,
                                Locale.getString("START_DATE"),
                                Locale.getString("START_DATE_COLUMN_HEADER"),
@@ -247,24 +294,9 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
                                Locale.getString("PERCENT_RETURN_COLUMN_HEADER"),
                                ChangeFormat.class, Column.VISIBLE));
 
-	model = new Model(columns);
-	setModel(model);
+	return columns;
 
-	model.addTableModelListener(this);
-
-	propertySupport = new PropertyChangeSupport(this);
-
-	addMenu();
-
-        // If the user clicks on the table trap it.
-	addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent evt) {
-                    handleMouseClicked(evt);
-                }
-	    });
-
-        showColumns(model);
-    }
+    } 
     
     public void setDesktop(JDesktopPane desktop) {
         this.desktop = desktop;
@@ -690,8 +722,14 @@ public class PaperTradeResultModule extends AbstractTable implements Module {
     }
 
     public void save() {
+
+	settings = new AnalyserResultSettings(Settings.PAPERTRADERESULTS);
+	settings.setResults(model.getResults());
+
         // Free up precious memory
         model.removeAllResults();
+	
+
     }
 
     public String getTitle() {

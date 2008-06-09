@@ -46,15 +46,18 @@ import org.mov.main.ModuleFrame;
   FrameRegister is a HashMap rather than a Vector because although 
   Main.restoreSavedWindows() creates and access frames serially via an index,
   that's not sufficient reason to apply that restriction for other uses.
-
+.
   Further, a general key is necessary for the frame to remove itself from
   the register.
  */
 
 public class FrameRegister extends HashMap {
 
+    int frameCount; 
+
     public FrameRegister() {
 	super();
+	frameCount = 0;
     }
 
     /**
@@ -65,7 +68,9 @@ public class FrameRegister extends HashMap {
      */
     
     public synchronized void add(ModuleFrame frame) {
-	put(String.valueOf(size()),frame);
+
+	frameCount++;
+	put(String.valueOf(frameCount), frame);
     }
 
     /**
@@ -96,6 +101,7 @@ public class FrameRegister extends HashMap {
     public synchronized ModuleFrame get(String key) {
 
 	ModuleFrame frame = (ModuleFrame)super.get(key);
+
 	while (frame == null) {
 	    try {
 		wait();

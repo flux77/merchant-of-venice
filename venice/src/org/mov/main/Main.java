@@ -284,11 +284,11 @@ public class Main extends JFrame {
 		    
 		    //Place it initially at 0,0
 		    desktopManager.newFrame(newModule);
-		    
+
 		    //The creation of a frame creates
 		    //two mappings for a frame.			
-		    index = (count == 0) ? 0 : count + 1;
-		    
+		    index = count + 1;
+
 		    ModuleFrame newFrame = frameRegister.get(String.valueOf(index));
 			
 		    //Augment the key index with the hashcode so that

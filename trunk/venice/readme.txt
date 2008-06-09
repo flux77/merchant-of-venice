@@ -1,7 +1,7 @@
 Merchant of Venice, 0.71 beta 25/Feb/2007
 =========================================
 
-Copyright (C) 2003-7, Andrew Leppard (aleppard picknowl com au)
+Copyright (C) 2003-8, Andrew Leppard (andrew venice org nz)
 See COPYING.txt for license terms.
 
 1 Introduction
@@ -71,7 +71,7 @@ Sourceforge enhancement tracking system at:
    https://sourceforge.net/tracker/?func=add&group_id=53631&atid=471028
 
 Or if you have any comments, please don't hesitate to email me,
-Andrew Leppard, at (aleppard picknowl com au).
+Andrew Leppard (andrew venice org nz).
 
 5 Building
 
@@ -79,9 +79,9 @@ To build Venice you will need to download a copy of the source. The
 source is no longer included in the binary distribution. You can
 download the source release which contains the source from the latest
 release. Alternatively, you can download the current development
-version from CVS by running the following command:
+version from Subversion by running the following command:
 
-cvs -z3 -d:pserver:anonymous@mov.cvs.sourceforge.net:/cvsroot/mov co -P mov
+svn co https://mov.svn.sourceforge.net/svnroot/mov/trunk/ venice
 
 To build Venice you will need the programmes listed in the "Running"
 section and the following:
@@ -122,7 +122,7 @@ web     Packages the web files ready for deployment (Not included in
 
 6 Licenses
 
-Venice is Copyright (C) 2003-2006, Andrew Leppard.
+Venice is Copyright (C) 2003-2008, Andrew Leppard.
 HSQLDB is Copyright (C) 1995-2000, The Hypersonic SQL Group.
 Joone is Copyright (C) 2004, Paolo Marrone and the Joone team.
 Jython is Copyright (C) 2000, Jython Developers.

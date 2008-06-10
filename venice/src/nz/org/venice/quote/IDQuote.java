@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
-import org.mov.ui.QuoteFormat;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingTime;
+import nz.org.venice.ui.QuoteFormat;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingTime;
 
 /**
  * Representation of an intra-day stock quote for a given stock, on a given

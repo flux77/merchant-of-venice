@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.util.*;
 
-import org.mov.util.TradingDate;
+import nz.org.venice.util.TradingDate;
 
 /**
  * Represents a graphable set of X points and their associated list of Y points.

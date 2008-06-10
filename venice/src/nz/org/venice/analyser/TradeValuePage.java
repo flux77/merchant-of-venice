@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -34,13 +34,13 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.parser.Expression;
-import org.mov.parser.ExpressionException;
-import org.mov.parser.Parser;
-import org.mov.parser.Variable;
-import org.mov.parser.Variables;
-import org.mov.util.Locale;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.ExpressionException;
+import nz.org.venice.parser.Parser;
+import nz.org.venice.parser.Variable;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.util.Locale;
 
 public class TradeValuePage extends JPanel implements AnalyserPage {
 

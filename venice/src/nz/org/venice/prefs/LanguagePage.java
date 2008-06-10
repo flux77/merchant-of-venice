@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.prefs;
+package nz.org.venice.prefs;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -28,8 +28,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import org.mov.util.Locale;
-import org.mov.util.LocaleConstants;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.LocaleConstants;
 
 /**
  * Provides a preference page to let the user specify their language.

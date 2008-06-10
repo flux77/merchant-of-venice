@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
-import org.mov.parser.EvaluationException;
+import nz.org.venice.parser.EvaluationException;
 
 /**
  * This interface describes the quote source for the quote functions
@@ -42,7 +42,7 @@ public interface QuoteFunctionSource {
      * @param  offset the offset of the date in the quote source.
      * @return the quote value or <code>NaN</code> if the quote is missing / not available
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     public double getValue(int offset)
         throws EvaluationException;

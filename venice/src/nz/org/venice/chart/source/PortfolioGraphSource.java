@@ -16,16 +16,16 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.source;
+package nz.org.venice.chart.source;
 
-import org.mov.chart.Graphable;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.portfolio.Account;
-import org.mov.portfolio.Portfolio;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.EODQuoteBundle;
+import nz.org.venice.chart.Graphable;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.portfolio.Account;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.EODQuoteBundle;
 import java.util.Iterator;
 import java.util.List;
 

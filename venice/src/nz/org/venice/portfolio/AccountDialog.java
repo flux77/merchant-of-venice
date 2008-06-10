@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -33,9 +33,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.mov.ui.CurrencyComboBox;
-import org.mov.util.Currency;
-import org.mov.util.Locale;
+import nz.org.venice.ui.CurrencyComboBox;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Locale;
 
 /**
  * A dialog that allows the user to enter an account name and currency. The account

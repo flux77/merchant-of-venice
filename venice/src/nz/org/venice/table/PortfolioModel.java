@@ -16,23 +16,23 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.table;
+package nz.org.venice.table;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.portfolio.Portfolio;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.Symbol;
-import org.mov.ui.AbstractTableModel;
-import org.mov.ui.Column;
-import org.mov.ui.ChangeFormat;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.ui.AbstractTableModel;
+import nz.org.venice.ui.Column;
+import nz.org.venice.ui.ChangeFormat;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
 
 /**
  * Table model to display a portfolio to the user. The model tells a

@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.util.HashMap;
 import javax.swing.JPanel;
@@ -33,13 +33,13 @@ import javax.swing.JPanel;
  * graph. Therefore this interface has no set constructor as the constructor
  * can vary depending on the graph.
  *
- * <p>This user interface will be displayed by the {@link org.mov.chart.GraphSettingsDialog}.
+ * <p>This user interface will be displayed by the {@link nz.org.venice.chart.GraphSettingsDialog}.
  *
  * @author Andrew Leppard
  * @see AbstractGraph
  * @see Graph
- * @see org.mov.chart.GraphSettingsDialog
- * @see org.mov.chart.source.GraphSource
+ * @see nz.org.venice.chart.GraphSettingsDialog
+ * @see nz.org.venice.chart.source.GraphSource
  */
 public interface GraphUI {
 

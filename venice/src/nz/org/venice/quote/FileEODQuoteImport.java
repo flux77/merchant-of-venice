@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.util.Locale;
-import org.mov.util.Report;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Report;
 
 /**
  * Import quotes from files into Venice or export them to files.

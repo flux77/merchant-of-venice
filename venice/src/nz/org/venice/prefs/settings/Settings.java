@@ -18,7 +18,7 @@
 
 
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 
 /**
@@ -32,9 +32,9 @@ package org.mov.prefs.settings;
 
 import javax.swing.JDesktopPane;
 import java.util.*;
-import org.mov.main.Module;
+import nz.org.venice.main.Module;
 
-import org.mov.prefs.settings.SettingsWriter;
+import nz.org.venice.prefs.settings.SettingsWriter;
 
 public interface Settings {
     

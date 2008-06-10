@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
-import org.mov.parser.EvaluationException;
+import nz.org.venice.parser.EvaluationException;
 
-import org.mov.util.TradingDate;
+import nz.org.venice.util.TradingDate;
 
 /**
  * This class provides a generic interface which can be used to access a bundle

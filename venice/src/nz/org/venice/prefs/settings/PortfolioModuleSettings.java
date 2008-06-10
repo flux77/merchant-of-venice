@@ -18,7 +18,7 @@
 
 
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 
 /**
@@ -34,16 +34,16 @@ package org.mov.prefs.settings;
 import javax.swing.JDesktopPane;
 import java.util.*;
 
-import org.mov.main.Module;
-import org.mov.portfolio.PortfolioModule;
-import org.mov.portfolio.Portfolio;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.EODQuoteRange;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.util.TradingDate;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.PreferencesException;
+import nz.org.venice.main.Module;
+import nz.org.venice.portfolio.PortfolioModule;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.quote.QuoteBundle;
+import nz.org.venice.quote.EODQuoteRange;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesException;
 
 public class PortfolioModuleSettings extends AbstractSettings {
 

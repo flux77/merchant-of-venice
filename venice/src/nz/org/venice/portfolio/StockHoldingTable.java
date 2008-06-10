@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -30,21 +30,21 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.mov.ui.AbstractTable;
-import org.mov.ui.AbstractTableModel;
-import org.mov.ui.Column;
-import org.mov.ui.ChangeFormat;
-import org.mov.ui.PointChangeFormat;
-import org.mov.ui.QuoteFormat;
-import org.mov.util.Currency;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.main.CommandManager;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.Quote;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.Symbol;
+import nz.org.venice.ui.AbstractTable;
+import nz.org.venice.ui.AbstractTableModel;
+import nz.org.venice.ui.Column;
+import nz.org.venice.ui.ChangeFormat;
+import nz.org.venice.ui.PointChangeFormat;
+import nz.org.venice.ui.QuoteFormat;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.main.CommandManager;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Symbol;
 
 /**
  * Display stock holdings in a swing table for a ShareAccount. This table

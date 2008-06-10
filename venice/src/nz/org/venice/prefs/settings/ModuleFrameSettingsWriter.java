@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
-import org.mov.quote.Symbol;
-import org.mov.main.ModuleFrame;
-import org.mov.main.Module;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.main.Module;
 
 import java.io.OutputStream;
 import java.io.BufferedOutputStream;
@@ -44,10 +44,10 @@ import javax.xml.transform.stream.StreamResult;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-import org.mov.quote.Symbol;
-import org.mov.chart.graph.Graph;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.chart.graph.Graph;
 
-import org.mov.util.ExchangeRateCache;
+import nz.org.venice.util.ExchangeRateCache;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

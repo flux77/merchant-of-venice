@@ -23,7 +23,7 @@
  * 
  */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.util.Vector;
 import java.util.HashMap;

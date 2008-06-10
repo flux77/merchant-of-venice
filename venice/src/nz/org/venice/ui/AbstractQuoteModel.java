@@ -16,16 +16,16 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.mov.parser.EvaluationException;
-import org.mov.quote.QuoteBundle;
-import org.mov.util.Locale;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.quote.QuoteBundle;
+import nz.org.venice.util.Locale;
 
 /**
  * Helper for constructing quote table models. This abstract table model allows
@@ -56,7 +56,7 @@ public abstract class AbstractQuoteModel extends AbstractTableModel {
      * Create a new quote table model with no columns.
      *
      * @param quoteBundle           Quote bundle
-     * @param quotes                A list of {@link org.mov.quote.Quote}s which contain
+     * @param quotes                A list of {@link nz.org.venice.quote.Quote}s which contain
      *                              the quote symbols and dates to table.
      * @param firstExpressionColumn The column number of the first expression
      *                              column.

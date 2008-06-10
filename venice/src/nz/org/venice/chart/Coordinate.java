@@ -23,7 +23,7 @@
  * 
  */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 public class Coordinate 
 {

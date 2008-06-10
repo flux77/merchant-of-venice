@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.util.Currency;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
 
 /**
  * Generic interface for all financial account objects. This interface

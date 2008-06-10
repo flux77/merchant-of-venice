@@ -16,14 +16,14 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mov.ui.QuoteFormat;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
+import nz.org.venice.ui.QuoteFormat;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
 
 /**
  * Representation of an end-of-day stock quote for a given stock on a given date.

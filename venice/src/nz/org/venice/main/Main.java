@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.main;
+package nz.org.venice.main;
 
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
@@ -32,24 +32,24 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
-import org.mov.macro.MacroManager;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.ModuleFrameSettings;
-import org.mov.prefs.settings.ModuleFrameSettingsReader;
-import org.mov.prefs.settings.ModuleSettingsParserException;
-import org.mov.ui.FrameRegister;
-import org.mov.quote.IDQuoteSync;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.ui.GPLViewDialog;
-import org.mov.ui.DesktopManager;
-import org.mov.ui.MainMenu;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
-import org.mov.util.ExchangeRateCache;
-import org.mov.util.Locale;
+import nz.org.venice.macro.MacroManager;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.ModuleFrameSettings;
+import nz.org.venice.prefs.settings.ModuleFrameSettingsReader;
+import nz.org.venice.prefs.settings.ModuleSettingsParserException;
+import nz.org.venice.ui.FrameRegister;
+import nz.org.venice.quote.IDQuoteSync;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.ui.GPLViewDialog;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.ui.MainMenu;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
+import nz.org.venice.util.ExchangeRateCache;
+import nz.org.venice.util.Locale;
 
 /**
  * The top level class which contains the main() function. This class builds
@@ -98,7 +98,7 @@ public class Main extends JFrame {
             System.out.print("-");
         System.out.println("");
         System.out.println(Locale.getString("COPYRIGHT", COPYRIGHT_DATE_RANGE) + ", " +
-			   "Andrew Leppard (aleppard@picknowl.com.au)");
+			   "Andrew Leppard (andrew venice org nz)");
         System.out.println(Locale.getString("SEE_LICENSE"));
 
 	displayPreferences = PreferencesManager.getDisplaySettings();
@@ -108,7 +108,7 @@ public class Main extends JFrame {
 	setTitle(Locale.getString("VENICE_SHORT") + " " + SHORT_VERSION);
 
 	desktop = new JDesktopPane();
-	desktopManager = new org.mov.ui.DesktopManager(desktop);
+	desktopManager = new nz.org.venice.ui.DesktopManager(desktop);
 	desktop.setDesktopManager(desktopManager);
         ExchangeRateCache.getInstance().setDesktopPane(desktop);
 
@@ -123,8 +123,8 @@ public class Main extends JFrame {
         MainMenu.getInstance(this, desktopManager);
 
 	setContentPane(desktop);
-	
-	       
+
+
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    // User closed window by hitting "X" button
@@ -138,9 +138,9 @@ public class Main extends JFrame {
 
 	//Restore saved windows + state
 	//Need to make the frame visible before adding new frames
-	setVisible(true);	
+	setVisible(true);
 	restoreSavedFrames();
-	
+
 
     }
 
@@ -227,11 +227,11 @@ public class Main extends JFrame {
 
 
     /**
-     * Restore saved internal frames and their modules, reconstructing their 
+     * Restore saved internal frames and their modules, reconstructing their
      position and geometry.
 
     **/
-    
+
     private void restoreSavedFrames() {
 
 	Vector savedFrameFiles, dataList;
@@ -242,11 +242,11 @@ public class Main extends JFrame {
 	FrameRegister frameRegister;
 	int count = 0;
 	int index;
-	
 
-	if (!PreferencesManager.getRestoreSavedWindowsSetting()) 
+
+	if (!PreferencesManager.getRestoreSavedWindowsSetting())
 	    return;
-		
+
 	savedFrameFiles = PreferencesManager.getSavedFrames();
 	iterator = savedFrameFiles.iterator();
 	savedFrames  = savedFrameFiles.size();
@@ -262,58 +262,58 @@ public class Main extends JFrame {
 	progress.setIndeterminate(false);
 	progress.setMaximum(savedFrames);
 	progress.setMaster(true);
-	
+
 
 	/* Make sure the initial desktop has displayed first */
-	while (iterator.hasNext()) {	    
+	while (iterator.hasNext()) {
 	    if (thread.isInterrupted()) {
 		break;
 	    }
 
 	    progress.increment();
 	    try {
-	    
+
 		File savedFrameFile = (File)iterator.next();
 		FileInputStream inputStream = new FileInputStream(savedFrameFile);
-		
+
 		try {
 		    ModuleFrameSettings newFrameSettings = ModuleFrameSettingsReader.read(inputStream);
 		    Settings moduleSettings = newFrameSettings.getModuleSettings();
 		    //Recreate the module from settings.
 		    Module newModule = moduleSettings.getModule(desktop);
-		    
+
 		    //Place it initially at 0,0
 		    desktopManager.newFrame(newModule);
 
 		    //The creation of a frame creates
-		    //two mappings for a frame.			
+		    //two mappings for a frame.
 		    index = count + 1;
 
 		    ModuleFrame newFrame = frameRegister.get(String.valueOf(index));
-			
+
 		    //Augment the key index with the hashcode so that
 		    //the frame can remove itself from the register
-		    
+
 		    frameRegister.put(String.valueOf(newFrame.hashCode()), newFrame);
 		    newFrame.setSizeAndLocation(newFrame, desktop, false, true);
 		    newFrame.setBounds(newFrameSettings.getBounds());
-		    newFrame.setPreferredSize(newFrameSettings.getBounds().getSize());			
+		    newFrame.setPreferredSize(newFrameSettings.getBounds().getSize());
 		    count++;
 		} catch (ModuleSettingsParserException wpe) {
-		    
-		}		
+
+		}
 	    } catch (FileNotFoundException fnf) {
-	    
+
 	    } catch (IOException ioe) {
-		
-	    } 	    	    	    
+
+	    }
 	}
 	ProgressDialogManager.closeProgressDialog(progress);
 	if (!thread.isInterrupted()) {
 	    PreferencesManager.removeSavedFrames();
 	}
     }
-    
+
 
 }
 

@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 import java.util.List;
 import java.util.Vector;
@@ -28,7 +28,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.mov.quote.Symbol;
+import nz.org.venice.quote.Symbol;
 
 /**
    This class is for Java version 1.4 which doesn't have support for XPATH 
@@ -259,7 +259,7 @@ public class XMLHelper {
 	    try {
 		Symbol s = Symbol.find(name);
 		outputList.add(s);
-	    } catch (org.mov.quote.SymbolFormatException sfe) {
+	    } catch (nz.org.venice.quote.SymbolFormatException sfe) {
 		
 	    }
 	}

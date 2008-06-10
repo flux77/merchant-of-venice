@@ -16,17 +16,17 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.parser.expression;
+package nz.org.venice.parser.expression;
 
-import org.mov.parser.EvaluationException;
-import org.mov.parser.Expression;
-import org.mov.parser.TypeMismatchException;
-import org.mov.parser.Variables;
-import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.QuoteBundleFunctionSource;
-import org.mov.quote.QuoteFunctions;
-import org.mov.quote.Symbol;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.TypeMismatchException;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.QuoteBundle;
+import nz.org.venice.quote.QuoteBundleFunctionSource;
+import nz.org.venice.quote.QuoteFunctions;
+import nz.org.venice.quote.Symbol;
 
 /**
  * An expression which finds the OBV (On Balance Volume) over a given trading period.

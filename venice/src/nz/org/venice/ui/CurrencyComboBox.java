@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
-import org.mov.util.Currency;
+import nz.org.venice.util.Currency;
 
 import java.util.Iterator;
 import java.util.List;

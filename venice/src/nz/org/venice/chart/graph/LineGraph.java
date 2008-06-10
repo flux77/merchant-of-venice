@@ -16,12 +16,12 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.awt.*;
 import java.util.List;
-import org.mov.chart.*;
-import org.mov.chart.source.*;
+import nz.org.venice.chart.*;
+import nz.org.venice.chart.source.*;
 
 /**
  * Simple line graph. This graph is used to draw any kind of line such

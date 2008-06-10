@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 /**
  * An exception which is raised when the chart is zoomed in where there 

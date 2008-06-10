@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,18 +31,18 @@ import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
 
-import org.mov.util.Locale;
-import org.mov.main.Main;
-import org.mov.main.Module;
-import org.mov.macro.StoredMacro;
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.table.WatchScreen;
-import org.mov.table.WatchScreenParserException;
-import org.mov.table.WatchScreenReader;
-import org.mov.table.WatchScreenWriter;
+import nz.org.venice.util.Locale;
+import nz.org.venice.main.Main;
+import nz.org.venice.main.Module;
+import nz.org.venice.macro.StoredMacro;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.table.WatchScreen;
+import nz.org.venice.table.WatchScreenParserException;
+import nz.org.venice.table.WatchScreenReader;
+import nz.org.venice.table.WatchScreenWriter;
 
-import org.mov.main.ModuleFrame;
+import nz.org.venice.main.ModuleFrame;
 import java.util.Collection;
 import java.util.Vector;
 import java.awt.Dimension;

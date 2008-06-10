@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.parser.expression;
+package nz.org.venice.parser.expression;
 
-import org.mov.parser.*;
+import nz.org.venice.parser.*;
 
 /**
  * Abstract base class for the comparision expressions:

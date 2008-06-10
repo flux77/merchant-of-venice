@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.table;
+package nz.org.venice.table;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -43,20 +43,20 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.mov.main.*;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.parser.*;
-import org.mov.quote.*;
-import org.mov.ui.AbstractTable;
-import org.mov.ui.Column;
-import org.mov.ui.DesktopManager;
-import org.mov.ui.EODQuoteModel;
-import org.mov.ui.ExpressionQuery;
-import org.mov.ui.MenuHelper;
-import org.mov.ui.SymbolListDialog;
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.QuoteModuleSettings;
+import nz.org.venice.main.*;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.parser.*;
+import nz.org.venice.quote.*;
+import nz.org.venice.ui.AbstractTable;
+import nz.org.venice.ui.Column;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.ui.EODQuoteModel;
+import nz.org.venice.ui.ExpressionQuery;
+import nz.org.venice.ui.MenuHelper;
+import nz.org.venice.ui.SymbolListDialog;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.QuoteModuleSettings;
 
 /**
  * Venice module for displaying a table of stock quotes. This module allows a user
@@ -376,7 +376,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 		public void run() {
 
 		    JDesktopPane desktop =
-			org.mov.ui.DesktopManager.getDesktop();
+			nz.org.venice.ui.DesktopManager.getDesktop();
 
 		    String expressionString =
 			ExpressionQuery.getExpression(desktop,
@@ -411,7 +411,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
 		public void run() {
                     JDesktopPane desktop =
-                        org.mov.ui.DesktopManager.getDesktop();
+                        nz.org.venice.ui.DesktopManager.getDesktop();
         
                     Symbol symbol = SymbolListDialog.getSymbol(desktop, Locale.getString("FIND_SYMBOL"));
 

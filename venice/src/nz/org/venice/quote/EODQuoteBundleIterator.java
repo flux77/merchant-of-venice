@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.util.*;
 
-import org.mov.util.*;
+import nz.org.venice.util.*;
 
 /**
  * Iterator for traversing EODQuotes in an EODQuoteBundle. This iterator allows the user to

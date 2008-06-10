@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -33,9 +33,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import org.mov.parser.ExpressionException;
-import org.mov.parser.Parser;
-import org.mov.util.Locale;
+import nz.org.venice.parser.ExpressionException;
+import nz.org.venice.parser.Parser;
+import nz.org.venice.util.Locale;
 
 /**
  * A dialog which allows the user to set the user column expressions in a table.

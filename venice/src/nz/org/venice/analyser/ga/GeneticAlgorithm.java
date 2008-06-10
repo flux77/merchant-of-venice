@@ -20,24 +20,24 @@
  *
  * @author  Alberto Nacher
  */
-package org.mov.analyser.ga;
+package nz.org.venice.analyser.ga;
 
 import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.mov.analyser.OrderCache;
-import org.mov.analyser.PaperTrade;
+import nz.org.venice.analyser.OrderCache;
+import nz.org.venice.analyser.PaperTrade;
 
-import org.mov.parser.Expression;
-import org.mov.parser.EvaluationException;
-import org.mov.parser.Variables;
-import org.mov.portfolio.Portfolio;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
 
 /**
  * The Genetic Algorithm creates and breeds random paper trading individuals. This

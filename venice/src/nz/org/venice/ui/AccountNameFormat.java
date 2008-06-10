@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * This class describes how to display and sort the name of portfolio

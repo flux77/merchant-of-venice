@@ -18,7 +18,7 @@
 
 
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 
 /**
@@ -34,10 +34,10 @@ package org.mov.prefs.settings;
 import javax.swing.JDesktopPane;
 import java.util.*;
 
-import org.mov.main.Module;
-import org.mov.help.HelpModule;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.PreferencesException;
+import nz.org.venice.main.Module;
+import nz.org.venice.help.HelpModule;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesException;
 
 public class HelpModuleSettings extends AbstractSettings {
     

@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.parser;
+package nz.org.venice.parser;
 
 import junit.framework.TestCase;
 
-import org.mov.parser.Expression;
+import nz.org.venice.parser.Expression;
 
 public class ExpressionTest extends TestCase {
     public void testEquals() {

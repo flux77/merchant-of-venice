@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.util;
+package nz.org.venice.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,15 +28,15 @@ import java.util.Map;
 
 import javax.swing.JDesktopPane;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.quote.DatabaseQuoteSource;
-import org.mov.quote.ImportExportException;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.quote.YahooExchangeRateImport;
-import org.mov.ui.DesktopManager;
-import org.mov.ui.NumberDialog;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.quote.DatabaseQuoteSource;
+import nz.org.venice.quote.ImportExportException;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.quote.YahooExchangeRateImport;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.ui.NumberDialog;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
 
 /**
  * Cache of exchange rates. This class caches exchange rates in memory from the

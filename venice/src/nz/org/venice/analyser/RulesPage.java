@@ -17,7 +17,7 @@
  * Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -36,15 +36,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.mov.parser.Expression;
-import org.mov.parser.ExpressionException;
-import org.mov.parser.Parser;
-import org.mov.parser.Variable;
-import org.mov.parser.Variables;
-import org.mov.prefs.PreferencesManager;
-import org.mov.ui.ExpressionComboBox;
-import org.mov.ui.GridBagHelper;
-import org.mov.util.Locale;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.ExpressionException;
+import nz.org.venice.parser.Parser;
+import nz.org.venice.parser.Variable;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.ui.ExpressionComboBox;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.util.Locale;
 
 /**
 * An analysis tool page that lets the user enter a buy and sell rule, or

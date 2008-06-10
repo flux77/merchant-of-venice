@@ -16,14 +16,14 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JComboBox;
 
-import org.mov.util.TradingDate;
+import nz.org.venice.util.TradingDate;
 
 /**
  * A combo box which displays all the symbols traded in a portfolio. Currently

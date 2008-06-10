@@ -16,7 +16,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.awt.Component;
 import java.awt.event.*;
@@ -25,13 +25,13 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.mov.macro.MacroManager;
-import org.mov.macro.StoredMacro;
-import org.mov.main.*;
-import org.mov.util.Locale;
-import org.mov.portfolio.*;
-import org.mov.prefs.*;
-import org.mov.quote.*;
+import nz.org.venice.macro.MacroManager;
+import nz.org.venice.macro.StoredMacro;
+import nz.org.venice.main.*;
+import nz.org.venice.util.Locale;
+import nz.org.venice.portfolio.*;
+import nz.org.venice.prefs.*;
+import nz.org.venice.quote.*;
 
 /**
  * The main menu of the application.
@@ -96,7 +96,7 @@ public class MainMenu implements ActionListener, ModuleListener
     private JMenu quoteWatchScreenMenu;
     private JMenu macroMenu;
     
-    private org.mov.ui.DesktopManager desktopManager;
+    private nz.org.venice.ui.DesktopManager desktopManager;
     private JDesktopPane desktop;
     private JFrame frame;
     
@@ -123,7 +123,7 @@ public class MainMenu implements ActionListener, ModuleListener
      * @param	desktopManager	the desktop to lunch internal frames on
      */
     public static MainMenu getInstance(JFrame frame,
-            org.mov.ui.DesktopManager desktopManager) {
+            nz.org.venice.ui.DesktopManager desktopManager) {
         if(instance == null)
             instance = new MainMenu(frame, desktopManager);
         return instance;
@@ -140,7 +140,7 @@ public class MainMenu implements ActionListener, ModuleListener
     }
     
     private MainMenu(JFrame frame,
-            org.mov.ui.DesktopManager desktopManager) {
+            nz.org.venice.ui.DesktopManager desktopManager) {
         this.frame = frame;
         this.desktopManager = desktopManager;
         this.desktop = DesktopManager.getDesktop();

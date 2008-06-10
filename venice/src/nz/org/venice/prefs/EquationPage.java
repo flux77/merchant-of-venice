@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.prefs;
+package nz.org.venice.prefs;
 
 import java.awt.BorderLayout;
 import java.awt.Point;
@@ -32,7 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * Provides a preference page to let the user manage stored equations.

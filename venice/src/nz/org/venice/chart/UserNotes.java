@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.beans.PropertyVetoException;
 import java.awt.event.ActionEvent;
@@ -30,9 +30,9 @@ import java.awt.BorderLayout;
 import java.util.Date;
 import java.text.DateFormat;
 
-import org.mov.ui.DesktopManager;
-import org.mov.util.Locale;
-import org.mov.prefs.PreferencesManager;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.util.Locale;
+import nz.org.venice.prefs.PreferencesManager;
 
 /**
  * Provides a text area for which a user can make notes regarding thie stock symbol being graphed.

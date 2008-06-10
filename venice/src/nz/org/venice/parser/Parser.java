@@ -16,19 +16,19 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.parser;
+package nz.org.venice.parser;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mov.parser.expression.ClauseExpression;
-import org.mov.parser.expression.DefineVariableExpression;
-import org.mov.parser.expression.GetVariableExpression;
-import org.mov.parser.expression.LagExpression;
-import org.mov.parser.expression.NumberExpression;
-import org.mov.parser.expression.SetVariableExpression;
-import org.mov.quote.QuoteFunctions;
-import org.mov.util.Locale;
+import nz.org.venice.parser.expression.ClauseExpression;
+import nz.org.venice.parser.expression.DefineVariableExpression;
+import nz.org.venice.parser.expression.GetVariableExpression;
+import nz.org.venice.parser.expression.LagExpression;
+import nz.org.venice.parser.expression.NumberExpression;
+import nz.org.venice.parser.expression.SetVariableExpression;
+import nz.org.venice.quote.QuoteFunctions;
+import nz.org.venice.util.Locale;
 
 /**
  * Parse a string into an executable expression. This class acts as

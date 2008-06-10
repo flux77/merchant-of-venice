@@ -16,14 +16,14 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.mov.chart.source.GraphSource;
+import nz.org.venice.chart.source.GraphSource;
 
 /**
  * Set the default values for a graph based on a single

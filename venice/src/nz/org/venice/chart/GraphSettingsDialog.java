@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -29,9 +29,9 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.mov.chart.graph.GraphUI;
-import org.mov.ui.DesktopManager;
-import org.mov.util.Locale;
+import nz.org.venice.chart.graph.GraphUI;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.util.Locale;
 
 /**
  * Provides a dialog that enables the user to modify graph settings. Each
@@ -40,7 +40,7 @@ import org.mov.util.Locale;
  * standard way to the user.
  *
  * @author Andrew Leppard
- * @see org.mov.chart.graph.GraphUI
+ * @see nz.org.venice.chart.graph.GraphUI
  */
 public class GraphSettingsDialog extends JInternalFrame {
 

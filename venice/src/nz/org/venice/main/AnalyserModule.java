@@ -1,4 +1,4 @@
-package org.mov.main;
+package nz.org.venice.main;
 
 import java.beans.*;
 import javax.swing.*;

@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
@@ -39,10 +39,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneLayout;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.ui.ConfirmDialog;
-import org.mov.ui.GridBagHelper;
-import org.mov.util.Locale;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.ui.ConfirmDialog;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.util.Locale;
 
 public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
     

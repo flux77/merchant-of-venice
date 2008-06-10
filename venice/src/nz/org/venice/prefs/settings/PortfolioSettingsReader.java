@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 import java.util.Vector;
 import java.util.HashMap;
@@ -28,9 +28,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.PortfolioModuleSettings;
-import org.mov.prefs.settings.XMLHelper;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.PortfolioModuleSettings;
+import nz.org.venice.prefs.settings.XMLHelper;
 
 public class PortfolioSettingsReader {
 

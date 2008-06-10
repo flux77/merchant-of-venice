@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.table;
+package nz.org.venice.table;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,12 +28,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import org.mov.main.*;
-import org.mov.util.Locale;
-import org.mov.portfolio.Portfolio;
-import org.mov.quote.*;
-import org.mov.ui.*;
-import org.mov.prefs.settings.Settings;
+import nz.org.venice.main.*;
+import nz.org.venice.util.Locale;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.quote.*;
+import nz.org.venice.ui.*;
+import nz.org.venice.prefs.settings.Settings;
 
 /**
  * Venice module for displaying a portfolio in a table.

@@ -16,18 +16,18 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.prefs;
+package nz.org.venice.prefs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.mov.ui.AbstractTable;
-import org.mov.ui.AbstractTableModel;
-import org.mov.ui.Column;
-import org.mov.ui.ExpressionComboBox;
-import org.mov.ui.ExpressionEditorDialog;
-import org.mov.util.Locale;
+import nz.org.venice.ui.AbstractTable;
+import nz.org.venice.ui.AbstractTableModel;
+import nz.org.venice.ui.Column;
+import nz.org.venice.ui.ExpressionComboBox;
+import nz.org.venice.ui.ExpressionEditorDialog;
+import nz.org.venice.util.Locale;
 
 /**
  * The table in the Expression Preferences page that lists stored expressions.

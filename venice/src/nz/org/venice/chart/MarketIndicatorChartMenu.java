@@ -16,15 +16,15 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import org.mov.chart.graph.Graph;
-import org.mov.util.Locale;
+import nz.org.venice.chart.graph.Graph;
+import nz.org.venice.util.Locale;
 
 /**
  * Provides a menu which is associated with a market indicator being graphed.

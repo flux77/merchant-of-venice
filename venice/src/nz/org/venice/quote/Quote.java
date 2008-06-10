@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
-import org.mov.util.TradingDate;
+import nz.org.venice.util.TradingDate;
 
 /**
  * Representation of either an end-of-day or an intra-day stock quote. This

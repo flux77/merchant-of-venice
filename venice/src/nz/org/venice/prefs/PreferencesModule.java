@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.prefs;
+package nz.org.venice.prefs;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,11 +26,11 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 
-import org.mov.main.*;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.settings.PreferencesModuleSettings;
-import org.mov.prefs.settings.Settings;
-import org.mov.util.Locale;
+import nz.org.venice.main.*;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.settings.PreferencesModuleSettings;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.util.Locale;
 
 /**
  * The preferences module for venice. This class provides the user

@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.importer;
+package nz.org.venice.importer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -34,7 +34,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * Let the user loading or saving the preferences of MoV windows.
@@ -48,7 +48,7 @@ public class PreferencesXML {
     private String path = null;
     
     // The base in the prefs tree where all Venice settings are stored
-    private final static String base = "org.mov";
+    private final static String base = "nz.org.venice";
 
     // The user root from Venice's point of view
     private static Preferences userRoot = Preferences.userRoot().node(base);

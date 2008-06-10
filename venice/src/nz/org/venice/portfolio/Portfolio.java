@@ -16,21 +16,21 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.EODQuoteCache;
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.quote.WeekendDateException;
-import org.mov.util.Currency;
-import org.mov.util.ExchangeRateCache;
-import org.mov.util.Money;
-import org.mov.util.MoneyFormatException;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
-import org.mov.util.UnknownCurrencyCodeException;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.EODQuoteCache;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.quote.WeekendDateException;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.ExchangeRateCache;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.MoneyFormatException;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingDateFormatException;
+import nz.org.venice.util.UnknownCurrencyCodeException;
 
 import java.util.ArrayList;
 import java.util.Collections;

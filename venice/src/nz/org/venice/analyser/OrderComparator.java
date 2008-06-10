@@ -16,17 +16,17 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.util.Comparator;
 
-import org.mov.parser.EvaluationException;
-import org.mov.parser.Expression;
-import org.mov.parser.Variables;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.Quote;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.Symbol;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Symbol;
 
 /**
  * This comparator orders the stock quotes on a given date. The GP

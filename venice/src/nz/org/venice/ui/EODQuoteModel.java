@@ -16,17 +16,17 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.EODQuote;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.Quote;
-import org.mov.quote.Symbol;
-import org.mov.util.Locale;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.EODQuote;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.util.Locale;
 
 /**
  * Table model to display end of day quotes to the user. This model tells a table
@@ -37,7 +37,7 @@ import org.mov.util.Locale;
  * @see AbstractTable
  * @see Column
  * @see ExpressionColumn
- * @see org.mov.quote.QuoteBundle
+ * @see nz.org.venice.quote.QuoteBundle
  */
 public class EODQuoteModel extends AbstractQuoteModel {
 

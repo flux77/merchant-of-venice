@@ -16,16 +16,16 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
 import junit.framework.TestCase;
 
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
 
-import org.mov.util.Currency;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
 
 import java.io.File;
 import java.io.FileInputStream;

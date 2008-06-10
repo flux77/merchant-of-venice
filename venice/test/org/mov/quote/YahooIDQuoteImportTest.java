@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import junit.framework.TestCase;
 
@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.quote.ImportExportException;
-import org.mov.quote.SymbolFormatException;
-import org.mov.quote.YahooIDQuoteImport;
+import nz.org.venice.quote.ImportExportException;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.quote.YahooIDQuoteImport;
 
 /**
  * Test the YahooIDQuoteImport class by downloading some quotes.

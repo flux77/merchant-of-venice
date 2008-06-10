@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -24,14 +24,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.chart.Graphable;
-import org.mov.chart.GraphableQuoteFunctionSource;
-import org.mov.chart.GraphTools;
-import org.mov.chart.source.GraphSource;
-import org.mov.parser.EvaluationException;
-import org.mov.quote.QuoteFunctions;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
+import nz.org.venice.chart.Graphable;
+import nz.org.venice.chart.GraphableQuoteFunctionSource;
+import nz.org.venice.chart.GraphTools;
+import nz.org.venice.chart.source.GraphSource;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.quote.QuoteFunctions;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
 
 /**
  * Grpah of the RSI (Relative Strength Indicator). See {@link QuoteFunctions#rsi}

@@ -21,7 +21,7 @@
  * @author  Alberto Nacher
  */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -39,22 +39,22 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import org.mov.analyser.ga.*;
-import org.mov.main.CommandManager;
-import org.mov.main.Module;
-import org.mov.main.ModuleFrame;
-import org.mov.parser.Expression;
-import org.mov.parser.Variable;
-import org.mov.parser.Variables;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.AnalyserModuleSettings;
+import nz.org.venice.analyser.ga.*;
+import nz.org.venice.main.CommandManager;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.Variable;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.quote.QuoteBundle;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.AnalyserModuleSettings;
 
 public class GAModule extends JPanel implements Module {
 

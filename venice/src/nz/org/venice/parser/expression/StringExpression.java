@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.parser.expression;
+package nz.org.venice.parser.expression;
 
-import org.mov.parser.Variables;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.Symbol;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.quote.QuoteBundle;
+import nz.org.venice.quote.Symbol;
 
 /**
  * A representation of a value.

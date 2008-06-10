@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,19 +30,19 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFileChooser;
 import java.io.File;
 
-import org.mov.chart.graph.*;
-import org.mov.chart.source.GraphSource;
-import org.mov.chart.source.OHLCVQuoteGraphSource;
-import org.mov.chart.source.OHLCVIndexQuoteGraphSource;
-import org.mov.ui.DesktopManager;
-import org.mov.ui.ConfirmDialog;
-import org.mov.util.Locale;
-import org.mov.quote.Quote;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.Symbol;
-import org.mov.util.ImageFilter;
-import org.mov.util.BMPFile;
-import org.mov.prefs.PreferencesManager;
+import nz.org.venice.chart.graph.*;
+import nz.org.venice.chart.source.GraphSource;
+import nz.org.venice.chart.source.OHLCVQuoteGraphSource;
+import nz.org.venice.chart.source.OHLCVIndexQuoteGraphSource;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.ui.ConfirmDialog;
+import nz.org.venice.util.Locale;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.util.ImageFilter;
+import nz.org.venice.util.BMPFile;
+import nz.org.venice.prefs.PreferencesManager;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.

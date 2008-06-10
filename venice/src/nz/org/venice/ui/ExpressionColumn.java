@@ -16,21 +16,21 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.mov.parser.EvaluationException;
-import org.mov.parser.Expression;
-import org.mov.parser.Variables;
-import org.mov.quote.Quote;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.Symbol;
-import org.mov.quote.WeekendDateException;
-import org.mov.util.TradingDate;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.QuoteBundle;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.WeekendDateException;
+import nz.org.venice.util.TradingDate;
 
 /**
  * Representation of an expression column in a table. An expression column is a

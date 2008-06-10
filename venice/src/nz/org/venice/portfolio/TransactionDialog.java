@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,14 +26,14 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.mov.util.Currency;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.MoneyFormatException;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
-import org.mov.quote.*;
-import org.mov.ui.*;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.MoneyFormatException;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingDateFormatException;
+import nz.org.venice.quote.*;
+import nz.org.venice.ui.*;
 
 /**
  * A dialog for letting the user add a new Transaction.

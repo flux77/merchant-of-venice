@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.macro;
+package nz.org.venice.macro;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,9 +34,9 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.ui.DesktopManager;
-import org.mov.util.Locale;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.util.Locale;
 
 /**
  * @author Dan Makovec venice@makovec.net

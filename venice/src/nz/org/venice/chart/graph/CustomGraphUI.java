@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -26,19 +26,19 @@ import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 
-import org.mov.chart.Graphable;
-import org.mov.parser.EvaluationException;
-import org.mov.parser.Expression;
-import org.mov.parser.ExpressionException;
-import org.mov.parser.Parser;
-import org.mov.parser.Variables;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.Symbol;
-import org.mov.quote.WeekendDateException;
-import org.mov.ui.ExpressionComboBox;
-import org.mov.ui.GridBagHelper;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
+import nz.org.venice.chart.Graphable;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.ExpressionException;
+import nz.org.venice.parser.Parser;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.WeekendDateException;
+import nz.org.venice.ui.ExpressionComboBox;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
 
 /**
  * The custom graph user interface.

@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.prefs;
+package nz.org.venice.prefs;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -34,8 +34,8 @@ import java.net.PasswordAuthentication;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import org.mov.ui.GridBagHelper;
-import org.mov.util.Locale;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.util.Locale;
 
 /**
  * Provides a preference page to let the user specify their web proxy.

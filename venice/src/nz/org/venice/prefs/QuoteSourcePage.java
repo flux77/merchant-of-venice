@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.prefs;
+package nz.org.venice.prefs;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -36,11 +36,11 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.border.TitledBorder;
 
-import org.mov.ui.GridBagHelper;
-import org.mov.prefs.PreferencesManager;
-import org.mov.quote.DatabaseQuoteSource;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.util.Locale;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.quote.DatabaseQuoteSource;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.util.Locale;
 
 /** 
  * Provides a preferences page to let the user modify the quote source.

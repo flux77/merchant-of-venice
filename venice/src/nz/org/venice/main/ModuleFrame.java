@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.main;
+package nz.org.venice.main;
 
 import java.awt.Dimension;
 import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.mov.ui.DesktopManager;
+import nz.org.venice.ui.DesktopManager;
 
 /**
  * An internal frame designed specifically for holding Module objects.  Every visible Module should run within

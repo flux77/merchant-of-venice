@@ -16,22 +16,22 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.List;
 
-import org.mov.chart.Graphable;
-import org.mov.chart.GraphTools;
-import org.mov.chart.source.GraphSource;
-import org.mov.util.Locale;
-import org.mov.parser.Parser;
-import org.mov.parser.Expression;
-import org.mov.parser.ExpressionException;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.Symbol;
+import nz.org.venice.chart.Graphable;
+import nz.org.venice.chart.GraphTools;
+import nz.org.venice.chart.source.GraphSource;
+import nz.org.venice.util.Locale;
+import nz.org.venice.parser.Parser;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.ExpressionException;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Symbol;
 
 /**
  * Graph a Gondola expression. This graph allows the user to construct and graph
@@ -39,7 +39,7 @@ import org.mov.quote.Symbol;
  *
  * @author Andrew Leppard
  * @see CustomGraphUI
- * @see org.mov.parser.Expression
+ * @see nz.org.venice.parser.Expression
  */
 public class CustomGraph extends AbstractGraph {
 

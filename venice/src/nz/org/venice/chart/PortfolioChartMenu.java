@@ -16,17 +16,17 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
-import org.mov.chart.graph.*;
-import org.mov.chart.source.*;
-import org.mov.util.Locale;
-import org.mov.portfolio.*;
-import org.mov.quote.*;
+import nz.org.venice.chart.graph.*;
+import nz.org.venice.chart.source.*;
+import nz.org.venice.util.Locale;
+import nz.org.venice.portfolio.*;
+import nz.org.venice.quote.*;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.

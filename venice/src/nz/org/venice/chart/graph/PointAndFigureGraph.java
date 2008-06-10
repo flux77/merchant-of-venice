@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -26,15 +26,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.mov.chart.Graphable;
-import org.mov.chart.PFGraphable;
-import org.mov.chart.PFData;
-import org.mov.chart.GraphTools;
-import org.mov.chart.source.GraphSource;
-import org.mov.quote.QuoteFunctions;
-import org.mov.util.Locale;
-import org.mov.ui.QuoteFormat;
-import org.mov.util.TradingDate;
+import nz.org.venice.chart.Graphable;
+import nz.org.venice.chart.PFGraphable;
+import nz.org.venice.chart.PFData;
+import nz.org.venice.chart.GraphTools;
+import nz.org.venice.chart.source.GraphSource;
+import nz.org.venice.quote.QuoteFunctions;
+import nz.org.venice.util.Locale;
+import nz.org.venice.ui.QuoteFormat;
+import nz.org.venice.util.TradingDate;
 
 /**
  * Point and Figure graph. This graph draws a series of characters (X/O)

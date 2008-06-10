@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -27,14 +27,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.mov.chart.Graphable;
-import org.mov.chart.GraphTools;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
+import nz.org.venice.chart.Graphable;
+import nz.org.venice.chart.GraphTools;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
 
 /**
  * Advance/Decline graph. This graphs the Advance/Decline market indicator. This

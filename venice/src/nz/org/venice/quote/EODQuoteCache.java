@@ -16,15 +16,15 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateComparator;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingDateComparator;
 
 /**
  * This class contains all the end-of-day stock quotes currently in memory. Its purpose is to

@@ -18,7 +18,7 @@
 
 
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 
 /**
@@ -33,16 +33,16 @@ package org.mov.prefs.settings;
 
 import javax.swing.JDesktopPane;
 import java.util.*;
-import org.mov.main.Module;
-import org.mov.table.WatchScreenModule;
-import org.mov.quote.MixedQuoteBundle;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.table.WatchScreen;
-import org.mov.util.TradingDate;
+import nz.org.venice.main.Module;
+import nz.org.venice.table.WatchScreenModule;
+import nz.org.venice.quote.MixedQuoteBundle;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.table.WatchScreen;
+import nz.org.venice.util.TradingDate;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.PreferencesException;
-import org.mov.prefs.settings.SettingsWriter;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesException;
+import nz.org.venice.prefs.settings.SettingsWriter;
 
 public class WatchScreenSettings extends AbstractSettings {
     

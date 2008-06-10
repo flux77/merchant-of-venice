@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.text.NumberFormat;
 
-import org.mov.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesManager;
 
 /**
  * Representation of a quote value for display in a table. This class is

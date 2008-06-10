@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.HashMap;
 
-import org.mov.quote.EODQuoteBundle;
+import nz.org.venice.quote.EODQuoteBundle;
 
 /**
  * Caches the order of stock quotes in a quote bundle. The GP allows the user

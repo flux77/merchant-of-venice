@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.parser;
+package nz.org.venice.parser;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mov.util.Locale;
-import org.mov.parser.expression.AbstractExpression;
+import nz.org.venice.util.Locale;
+import nz.org.venice.parser.expression.AbstractExpression;
 
 /**
  * A representation of any token in the <i>Gondola</i> language.

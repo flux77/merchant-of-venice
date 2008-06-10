@@ -21,18 +21,18 @@
  * @author  Alberto Nacher
  */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.util.List;
 import java.util.Iterator;
 
-import org.mov.analyser.ga.GAIndividual;
-import org.mov.parser.Expression;
-import org.mov.portfolio.Transaction;
-import org.mov.portfolio.Portfolio;
-import org.mov.quote.*;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
+import nz.org.venice.analyser.ga.GAIndividual;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.portfolio.Transaction;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.quote.*;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
 
 public class GAResult {
     private GAIndividual individual;

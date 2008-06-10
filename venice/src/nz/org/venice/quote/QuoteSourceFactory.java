@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mov.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesManager;
 
 /**
  * Contains static methods for creating File-, Sample- and DatabaseQuoteSources based 
@@ -31,7 +31,7 @@ import org.mov.prefs.PreferencesManager;
  * @author Pontus Strömdahl
  * @see FileQuoteSource
  * @see DatabaseQuoteSource
- * @see org.mov.prefs.PreferencesManager
+ * @see nz.org.venice.prefs.PreferencesManager
  */
 public class QuoteSourceFactory {
     

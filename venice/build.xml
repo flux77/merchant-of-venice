@@ -49,15 +49,14 @@
   </javadoc>
   </target>
 
-  <!-- Get a backup of the CVS tree from sourceforge -->
+  <!-- Get a backup of the SVN tree from sourceforge -->
   <target name="backup">
-    <tstamp>
-      <format property="today" pattern="ddmmyyyy"/>
-    </tstamp>
     <mkdir dir="${backup}"/>
-    <get src="http://cvs.sourceforge.net/cvstarballs/mov-cvsroot.tar.bz2"
-         dest="${backup}/backup-${today}.tar.bz2"
-	 verbose="true"/>
+    <exec executable="rsync">
+      <arg value="-av"/>
+      <arg value="mov.svn.sourceforge.net::svn/mov/*"/>
+      <arg value="${backup}/"/>
+    </exec>
   </target>
 
   <!-- Build venice -->

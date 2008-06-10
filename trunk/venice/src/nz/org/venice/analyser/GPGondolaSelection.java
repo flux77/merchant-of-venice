@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.Dimension;
 import java.util.HashMap;
@@ -30,9 +30,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneLayout;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.ui.ConfirmDialog;
-import org.mov.util.Locale;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.ui.ConfirmDialog;
+import nz.org.venice.util.Locale;
 
 public class GPGondolaSelection extends JPanel implements AnalyserPage {
 

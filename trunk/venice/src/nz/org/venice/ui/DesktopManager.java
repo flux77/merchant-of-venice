@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -25,11 +25,11 @@ import java.beans.PropertyVetoException;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import org.mov.main.*;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.PreferencesException;
-import org.mov.util.Locale;
-import org.mov.ui.FrameRegister;
+import nz.org.venice.main.*;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesException;
+import nz.org.venice.util.Locale;
+import nz.org.venice.ui.FrameRegister;
 
 /**
  * This class manages activities to do with internal frames on the desktop

@@ -17,7 +17,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.prefs;
+package nz.org.venice.prefs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,33 +33,33 @@ import java.util.Vector;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
 
-import org.mov.main.Main;
-import org.mov.main.Module;
-import org.mov.main.ModuleFrame;
-import org.mov.prefs.settings.ModuleFrameSettingsWriter;
-import org.mov.ui.DesktopManager;
-import org.mov.macro.StoredMacro;
-import org.mov.portfolio.Account;
-import org.mov.portfolio.CashAccount;
-import org.mov.portfolio.ShareAccount;
-import org.mov.portfolio.Portfolio;
-import org.mov.portfolio.PortfolioParserException;
-import org.mov.portfolio.PortfolioReader;
-import org.mov.portfolio.PortfolioWriter;
-import org.mov.portfolio.Transaction;
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.table.WatchScreen;
-import org.mov.table.WatchScreenParserException;
-import org.mov.table.WatchScreenReader;
-import org.mov.table.WatchScreenWriter;
-import org.mov.util.Currency;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
-import org.mov.util.TradingTime;
-import org.mov.util.TradingTimeFormatException;
+import nz.org.venice.main.Main;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.prefs.settings.ModuleFrameSettingsWriter;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.macro.StoredMacro;
+import nz.org.venice.portfolio.Account;
+import nz.org.venice.portfolio.CashAccount;
+import nz.org.venice.portfolio.ShareAccount;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.portfolio.PortfolioParserException;
+import nz.org.venice.portfolio.PortfolioReader;
+import nz.org.venice.portfolio.PortfolioWriter;
+import nz.org.venice.portfolio.Transaction;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.table.WatchScreen;
+import nz.org.venice.table.WatchScreenParserException;
+import nz.org.venice.table.WatchScreenReader;
+import nz.org.venice.table.WatchScreenWriter;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingDateFormatException;
+import nz.org.venice.util.TradingTime;
+import nz.org.venice.util.TradingTimeFormatException;
 
 /**
  * The Preferences Manager contains a set of routines for loading and saving all
@@ -77,7 +77,7 @@ import org.mov.util.TradingTimeFormatException;
  */
 public class PreferencesManager {
     // The base in the prefs tree where all Venice settings are stored
-    private final static String base = "org.mov";
+    private final static String base = "nz.org.venice";
 
     // The user root from Venice's point of view
     private static Preferences userRoot = Preferences.userRoot().node(base);
@@ -387,7 +387,7 @@ public class PreferencesManager {
      *
      * @param key a key which identifies which page settings to load.
      * @return mapping of settings.
-     * @see org.mov.analyser.AnalyserPage
+     * @see nz.org.venice.analyser.AnalyserPage
      */
     public static HashMap getAnalyserPageSettings(String key) {
 
@@ -417,7 +417,7 @@ public class PreferencesManager {
      *
      * @param key a key which identifies which page settings to save.
      * @param settings the settings to save.
-     * @see org.mov.analyser.AnalyserPage
+     * @see nz.org.venice.analyser.AnalyserPage
      */
     public static void putAnalyserPageSettings(String key, HashMap settings) {
 	Preferences p = getUserNode("/analyser/" + key);
@@ -1329,7 +1329,7 @@ public class PreferencesManager {
      * Load intra-day quote sync module preferences.
      *
      * @return the preferences.
-     * @see org.mov.quote.IDQuoteSyncModule
+     * @see nz.org.venice.quote.IDQuoteSyncModule
      */
     public static IDQuoteSyncPreferences getIDQuoteSyncPreferences() {
         Preferences prefs = getUserNode("/id_quote_sync");
@@ -1358,7 +1358,7 @@ public class PreferencesManager {
      * Save intra-day quote sync module preferences.
      *
      * @param idQuoteSyncPreferences the preferences.
-     * @see org.mov.quote.IDQuoteSyncModule
+     * @see nz.org.venice.quote.IDQuoteSyncModule
      */
     public static void putIDQuoteSyncPreferences(IDQuoteSyncPreferences idQuoteSyncPreferences) {
         Preferences prefs = getUserNode("/id_quote_sync");

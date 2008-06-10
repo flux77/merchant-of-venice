@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.macro;
+package nz.org.venice.macro;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -33,10 +33,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
-import org.mov.main.Module;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.settings.Settings;
-import org.mov.util.Locale;
+import nz.org.venice.main.Module;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.util.Locale;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -69,14 +69,14 @@ public class MacroModule extends JPanel implements Module, ActionListener {
     private Settings settings;
 
     /* (non-Javadoc)
-     * @see org.mov.main.Module#getTitle()
+     * @see nz.org.venice.main.Module#getTitle()
      */
     public String getTitle() {
         return Locale.getString("MACRO_MANAGER");
     }
 
     /* (non-Javadoc)
-     * @see org.mov.main.Module#addModuleChangeListener(java.beans.PropertyChangeListener)
+     * @see nz.org.venice.main.Module#addModuleChangeListener(java.beans.PropertyChangeListener)
      */
     public void addModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
@@ -84,7 +84,7 @@ public class MacroModule extends JPanel implements Module, ActionListener {
     }
 
     /* (non-Javadoc)
-     * @see org.mov.main.Module#removeModuleChangeListener(java.beans.PropertyChangeListener)
+     * @see nz.org.venice.main.Module#removeModuleChangeListener(java.beans.PropertyChangeListener)
      */
     public void removeModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
@@ -92,35 +92,35 @@ public class MacroModule extends JPanel implements Module, ActionListener {
     }
 
     /* (non-Javadoc)
-     * @see org.mov.main.Module#getFrameIcon()
+     * @see nz.org.venice.main.Module#getFrameIcon()
      */
     public ImageIcon getFrameIcon() {
     	return new ImageIcon(ClassLoader.getSystemClassLoader().getResource(frameIcon));
     }
 
     /* (non-Javadoc)
-     * @see org.mov.main.Module#getComponent()
+     * @see nz.org.venice.main.Module#getComponent()
      */
     public JComponent getComponent() {
         return this;
     }
 
     /* (non-Javadoc)
-     * @see org.mov.main.Module#getJMenuBar()
+     * @see nz.org.venice.main.Module#getJMenuBar()
      */
     public JMenuBar getJMenuBar() {
         return null;
     }
 
     /* (non-Javadoc)
-     * @see org.mov.main.Module#encloseInScrollPane()
+     * @see nz.org.venice.main.Module#encloseInScrollPane()
      */
     public boolean encloseInScrollPane() {
         return false;
     }
 
     /* (non-Javadoc)
-     * @see org.mov.main.Module#save()
+     * @see nz.org.venice.main.Module#save()
      */
     public void save() {
         // TODO Auto-generated method stub

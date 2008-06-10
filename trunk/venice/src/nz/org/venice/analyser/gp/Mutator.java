@@ -16,15 +16,15 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser.gp;
+package nz.org.venice.analyser.gp;
 
 import java.util.Iterator;
 import java.util.Random;
 
-import org.mov.analyser.GPGondolaSelection;
-import org.mov.parser.Expression;
-import org.mov.parser.expression.*;
-import org.mov.quote.Quote;
+import nz.org.venice.analyser.GPGondolaSelection;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.expression.*;
+import nz.org.venice.quote.Quote;
 
 /**
  * The mutator can build random expressions and randomly mutate existing

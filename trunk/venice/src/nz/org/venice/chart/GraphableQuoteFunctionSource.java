@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
-import org.mov.parser.EvaluationException;
-import org.mov.quote.QuoteFunctionSource;
-import org.mov.util.TradingDate;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.quote.QuoteFunctionSource;
+import nz.org.venice.util.TradingDate;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Allow the {@link org.mov.quote.QuoteFunctions} package to use quotes directly 
+ * Allow the {@link nz.org.venice.quote.QuoteFunctions} package to use quotes directly 
  * from a {@link Graphable}. The following code, from
- * {@link org.mov.chart.graph.MovingAverageGraph} shows an example of how to call
+ * {@link nz.org.venice.chart.graph.MovingAverageGraph} shows an example of how to call
  * a quote function from a graph:
  *
  * <pre>
@@ -52,7 +52,7 @@ import java.util.HashMap;
  *      }
  * </pre>
  * @author Andrew Leppard
- * @see org.mov.quote.QuoteFunctions
+ * @see nz.org.venice.quote.QuoteFunctions
  */
 public class GraphableQuoteFunctionSource implements QuoteFunctionSource {
 

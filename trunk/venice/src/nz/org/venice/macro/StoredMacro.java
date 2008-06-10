@@ -17,7 +17,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.macro;
+package nz.org.venice.macro;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,7 +28,7 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URL;
 
-import org.mov.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesManager;
 
 /**
  * @author Dan Makovec venice@makovec.net

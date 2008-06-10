@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,21 +26,21 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
-import org.mov.analyser.gp.GeneticProgramme;
-import org.mov.analyser.gp.Individual;
-import org.mov.analyser.gp.GPQuoteBundle;
-import org.mov.main.CommandManager;
-import org.mov.main.Module;
-import org.mov.main.ModuleFrame;
-import org.mov.parser.ExpressionFactory;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.AnalyserModuleSettings;
+import nz.org.venice.analyser.gp.GeneticProgramme;
+import nz.org.venice.analyser.gp.Individual;
+import nz.org.venice.analyser.gp.GPQuoteBundle;
+import nz.org.venice.main.CommandManager;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.parser.ExpressionFactory;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.AnalyserModuleSettings;
 
 public class GPModule extends JPanel implements Module {
     

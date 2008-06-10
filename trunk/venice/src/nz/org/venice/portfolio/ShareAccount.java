@@ -16,21 +16,21 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.mov.util.Currency;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.EODQuoteCache;
-import org.mov.quote.Quote;
-import org.mov.quote.Symbol;
-import org.mov.quote.WeekendDateException;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.EODQuoteCache;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.WeekendDateException;
 
 /**
  * Representation of a share account in a portfolio.

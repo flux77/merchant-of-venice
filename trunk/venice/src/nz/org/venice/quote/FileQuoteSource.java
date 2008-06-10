@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -28,12 +28,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.util.Currency;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.ui.DesktopManager;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
 
 /**
  * Provides functionality to obtain stock quotes from files. This class

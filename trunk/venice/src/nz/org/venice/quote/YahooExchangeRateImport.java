@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -32,11 +32,11 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.util.Currency;
-import org.mov.util.ExchangeRate;
-import org.mov.util.Find;
-import org.mov.util.Locale;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.ExchangeRate;
+import nz.org.venice.util.Find;
+import nz.org.venice.util.Locale;
 
 /**
  * Import exchange rate quotes from Yahoo into Venice.

@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.parser.expression;
+package nz.org.venice.parser.expression;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.mov.parser.Expression;
+import nz.org.venice.parser.Expression;
 
 /**
  * The abstract base class for all expressions in the <i>Gondola</i> language. This

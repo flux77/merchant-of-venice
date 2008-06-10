@@ -16,12 +16,12 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.parser;
+package nz.org.venice.parser;
 
 import java.util.Iterator;
 
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.Symbol;
+import nz.org.venice.quote.QuoteBundle;
+import nz.org.venice.quote.Symbol;
 
 /** 
  * Representation of a composite executable parse tree. Any expression

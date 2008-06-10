@@ -16,14 +16,14 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
-import org.mov.util.Currency;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
-import org.mov.util.ExchangeRate;
-import org.mov.util.Locale;
-import org.mov.util.UnknownCurrencyCodeException;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingDateFormatException;
+import nz.org.venice.util.ExchangeRate;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.UnknownCurrencyCodeException;
 
 /**
  * Provides a filter to parse currency exchange rates supplied from Yahoo.

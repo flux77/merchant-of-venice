@@ -16,29 +16,29 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.analyser.ann.ArtificialNeuralNetwork;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.parser.EvaluationException;
-import org.mov.parser.Expression;
-import org.mov.parser.ExpressionFactory;
-import org.mov.parser.Variable;
-import org.mov.parser.Variables;
-import org.mov.portfolio.Portfolio;
-import org.mov.portfolio.StockHolding;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.Quote;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.Symbol;
-import org.mov.ui.ProgressDialog;
+import nz.org.venice.analyser.ann.ArtificialNeuralNetwork;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.ExpressionFactory;
+import nz.org.venice.parser.Variable;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.portfolio.StockHolding;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.ui.ProgressDialog;
 
 
 /**

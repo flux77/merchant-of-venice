@@ -16,7 +16,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.mov.analyser.ann;
+package nz.org.venice.analyser.ann;
 
 /* In this class we manage all the Joone relations.
  * Here you can find all the import of the Joone classes,
@@ -27,9 +27,9 @@ import java.io.*;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
-import org.mov.util.Locale;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
+import nz.org.venice.util.Locale;
 
 /* Joone import */
 import org.joone.engine.*;

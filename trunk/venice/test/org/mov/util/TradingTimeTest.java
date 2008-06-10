@@ -16,12 +16,12 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.util;
+package nz.org.venice.util;
 
 import junit.framework.TestCase;
 
-import org.mov.util.TradingTime;
-import org.mov.util.TradingTimeFormatException;
+import nz.org.venice.util.TradingTime;
+import nz.org.venice.util.TradingTimeFormatException;
 
 public class TradingTimeTest extends TestCase {
     public void testParser() {

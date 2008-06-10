@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.main;
+package nz.org.venice.main;
 
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
@@ -28,51 +28,51 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
-import org.mov.analyser.ANNModule;
-import org.mov.analyser.ANNResultModule;
-import org.mov.analyser.GAModule;
-import org.mov.analyser.GAResultModule;
-import org.mov.analyser.GPPageInitialPopulation;
-import org.mov.analyser.GPModule;
-import org.mov.analyser.GPResultModule;
-import org.mov.analyser.PaperTradeModule;
-import org.mov.analyser.PaperTradeResultModule;
-import org.mov.chart.*;
-import org.mov.chart.graph.*;
-import org.mov.chart.source.*;
-import org.mov.help.HelpModule;
-import org.mov.util.Currency;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.portfolio.AccountDialog;
-import org.mov.portfolio.Portfolio;
-import org.mov.portfolio.PortfolioModule;
-import org.mov.prefs.PreferencesException;
-import org.mov.prefs.PreferencesModule;
-import org.mov.prefs.PreferencesManager;
-import org.mov.quote.ImportQuoteModule;
-import org.mov.quote.ExportQuoteModule;
-import org.mov.quote.Quote;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.EODQuoteRange;
-import org.mov.quote.MixedQuoteBundle;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.quote.Symbol;
-import org.mov.quote.IDQuoteSyncModule;
-import org.mov.table.PortfolioTableModule;
-import org.mov.table.QuoteModule;
-import org.mov.table.WatchScreen;
-import org.mov.table.WatchScreenModule;
-import org.mov.importer.PreferencesXML;
-import org.mov.ui.DesktopManager;
-import org.mov.ui.ExpressionQuery;
-import org.mov.ui.GPLViewDialog;
-import org.mov.ui.MainMenu;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
-import org.mov.ui.SymbolListDialog;
-import org.mov.ui.TextDialog;
-import org.mov.ui.TradingDateDialog;
+import nz.org.venice.analyser.ANNModule;
+import nz.org.venice.analyser.ANNResultModule;
+import nz.org.venice.analyser.GAModule;
+import nz.org.venice.analyser.GAResultModule;
+import nz.org.venice.analyser.GPPageInitialPopulation;
+import nz.org.venice.analyser.GPModule;
+import nz.org.venice.analyser.GPResultModule;
+import nz.org.venice.analyser.PaperTradeModule;
+import nz.org.venice.analyser.PaperTradeResultModule;
+import nz.org.venice.chart.*;
+import nz.org.venice.chart.graph.*;
+import nz.org.venice.chart.source.*;
+import nz.org.venice.help.HelpModule;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.portfolio.AccountDialog;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.portfolio.PortfolioModule;
+import nz.org.venice.prefs.PreferencesException;
+import nz.org.venice.prefs.PreferencesModule;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.quote.ImportQuoteModule;
+import nz.org.venice.quote.ExportQuoteModule;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.EODQuoteRange;
+import nz.org.venice.quote.MixedQuoteBundle;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.IDQuoteSyncModule;
+import nz.org.venice.table.PortfolioTableModule;
+import nz.org.venice.table.QuoteModule;
+import nz.org.venice.table.WatchScreen;
+import nz.org.venice.table.WatchScreenModule;
+import nz.org.venice.importer.PreferencesXML;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.ui.ExpressionQuery;
+import nz.org.venice.ui.GPLViewDialog;
+import nz.org.venice.ui.MainMenu;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
+import nz.org.venice.ui.SymbolListDialog;
+import nz.org.venice.ui.TextDialog;
+import nz.org.venice.ui.TradingDateDialog;
 
 /**
  * This class manages the tasks that can be initiated from menus and toolbars. Each
@@ -1021,7 +1021,7 @@ public class CommandManager {
                                                     Main.COPYRIGHT_DATE_RANGE) + ", " +
 				   "Andrew Leppard\n\n" +
 
-                                   "Andrew Leppard (aleppard@picknowl.com.au)\n\n" +
+                                   "Andrew Leppard (andrew venice org nz)\n\n" +
 
 				   Locale.getString("ADDITIONAL_CODE") + "\n" +
                                    "Daniel Makovec, Quentin Bossard, Peter Fradley, Mark Hummel,\n" +

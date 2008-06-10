@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.parser;
+package nz.org.venice.parser;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * An exception which is thrown when there is a problem executing an

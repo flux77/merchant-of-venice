@@ -16,15 +16,15 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.util.SortedSet;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.util.Locale;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.util.Locale;
 
 /**
  * A set of dialogs used for querying the user for commodities either

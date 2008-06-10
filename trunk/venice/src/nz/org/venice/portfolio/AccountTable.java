@@ -16,21 +16,21 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mov.ui.AbstractTable;
-import org.mov.ui.AbstractTableModel;
-import org.mov.ui.AccountNameFormat;
-import org.mov.ui.ChangeFormat;
-import org.mov.ui.Column;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.EODQuoteBundle;
+import nz.org.venice.ui.AbstractTable;
+import nz.org.venice.ui.AbstractTableModel;
+import nz.org.venice.ui.AccountNameFormat;
+import nz.org.venice.ui.ChangeFormat;
+import nz.org.venice.ui.Column;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.EODQuoteBundle;
 
 /**
  * Display an account summary in a swing table for a portfolio. The table

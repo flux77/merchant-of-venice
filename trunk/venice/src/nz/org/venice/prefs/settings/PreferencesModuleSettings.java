@@ -18,7 +18,7 @@
 
 
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 
 /**
@@ -33,12 +33,12 @@ package org.mov.prefs.settings;
 import javax.swing.JDesktopPane;
 import java.util.*;
 
-import org.mov.main.Module;
+import nz.org.venice.main.Module;
 
-import org.mov.prefs.PreferencesModule;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.PreferencesException;
-import org.mov.prefs.settings.SettingsWriter;
+import nz.org.venice.prefs.PreferencesModule;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesException;
+import nz.org.venice.prefs.settings.SettingsWriter;
 
 public class PreferencesModuleSettings extends AbstractSettings {
     

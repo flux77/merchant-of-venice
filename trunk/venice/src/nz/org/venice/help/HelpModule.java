@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.help;
+package nz.org.venice.help;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -28,10 +28,10 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
-import org.mov.main.*;
-import org.mov.util.Locale;
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.HelpModuleSettings;
+import nz.org.venice.main.*;
+import nz.org.venice.util.Locale;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.HelpModuleSettings;
 
 /**
  * This module provides a help browser for Venice. It allows traveresal of a tree

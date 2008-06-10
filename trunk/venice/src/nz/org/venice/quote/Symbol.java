@@ -16,14 +16,14 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * An immutable representation of a stock symbol, e.g. <code>CBA</code> or <code>WBC</code>.

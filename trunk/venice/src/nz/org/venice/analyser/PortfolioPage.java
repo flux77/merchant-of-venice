@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -36,10 +36,10 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.ui.GridBagHelper;
-import org.mov.util.Locale;
-import org.mov.util.Money;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
 
 /**
  * An analysis tool page that lets the user enter basic portfolio

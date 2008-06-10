@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.awt.*;
 import java.util.*;
-import org.mov.util.*;
+import nz.org.venice.util.*;
 
 public class HorizontalAxis {
     

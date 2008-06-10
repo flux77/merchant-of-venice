@@ -16,21 +16,21 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser.gp;
+package nz.org.venice.analyser.gp;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.parser.EvaluationException;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.Quote;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.EODQuoteBundleIterator;
-import org.mov.quote.EODQuoteCache;
-import org.mov.quote.EODQuoteRange;
-import org.mov.quote.Symbol;
-import org.mov.quote.WeekendDateException;
-import org.mov.util.TradingDate;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.EODQuoteBundleIterator;
+import nz.org.venice.quote.EODQuoteCache;
+import nz.org.venice.quote.EODQuoteRange;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.WeekendDateException;
+import nz.org.venice.util.TradingDate;
 
 /**
  * This class is a specialised version of the EODQuoteBundle tailored specifically
@@ -41,7 +41,7 @@ import org.mov.util.TradingDate;
  * accessing quotes that would be in their future.
  *
  * @author Andrew Leppard
- * @see org.mov.quote.EODQuoteBundle
+ * @see nz.org.venice.quote.EODQuoteBundle
  */
 public class GPQuoteBundle extends EODQuoteBundle {
 

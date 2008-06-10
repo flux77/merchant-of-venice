@@ -18,7 +18,7 @@
 
 
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,39 +36,39 @@ import java.util.Collection;
 import java.util.Vector;
 import javax.swing.JDesktopPane;
 
-import org.mov.main.Main;
-import org.mov.macro.StoredMacro;
-import org.mov.util.Locale;
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.Quote;
-import org.mov.chart.source.OHLCVQuoteGraphSource;
-import org.mov.table.WatchScreen;
-import org.mov.table.WatchScreenParserException;
-import org.mov.table.WatchScreenReader;
-import org.mov.table.WatchScreenWriter;
+import nz.org.venice.main.Main;
+import nz.org.venice.macro.StoredMacro;
+import nz.org.venice.util.Locale;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.chart.source.OHLCVQuoteGraphSource;
+import nz.org.venice.table.WatchScreen;
+import nz.org.venice.table.WatchScreenParserException;
+import nz.org.venice.table.WatchScreenReader;
+import nz.org.venice.table.WatchScreenWriter;
 
-import org.mov.chart.graph.Graph;
-import org.mov.chart.source.GraphSource;
-import org.mov.main.Module;
+import nz.org.venice.chart.graph.Graph;
+import nz.org.venice.chart.source.GraphSource;
+import nz.org.venice.main.Module;
 
 
-import org.mov.chart.graph.LineGraph;
-import org.mov.chart.graph.BarChartGraph;
-import org.mov.chart.graph.HighLowBarGraph;
-import org.mov.chart.graph.CandleStickGraph;
-import org.mov.chart.graph.PointAndFigureGraph;
-import org.mov.chart.graph.BollingerBandsGraph;
-import org.mov.chart.graph.MACDGraph;
-import org.mov.chart.graph.MovingAverageGraph;
-import org.mov.chart.graph.ExpMovingAverageGraph;
-import org.mov.chart.graph.MultipleMovingAverageGraph;
-import org.mov.chart.graph.MomentumGraph;
-import org.mov.chart.graph.OBVGraph;
-import org.mov.chart.graph.StandardDeviationGraph;
-import org.mov.chart.graph.RSIGraph;
-import org.mov.chart.graph.CustomGraph;
+import nz.org.venice.chart.graph.LineGraph;
+import nz.org.venice.chart.graph.BarChartGraph;
+import nz.org.venice.chart.graph.HighLowBarGraph;
+import nz.org.venice.chart.graph.CandleStickGraph;
+import nz.org.venice.chart.graph.PointAndFigureGraph;
+import nz.org.venice.chart.graph.BollingerBandsGraph;
+import nz.org.venice.chart.graph.MACDGraph;
+import nz.org.venice.chart.graph.MovingAverageGraph;
+import nz.org.venice.chart.graph.ExpMovingAverageGraph;
+import nz.org.venice.chart.graph.MultipleMovingAverageGraph;
+import nz.org.venice.chart.graph.MomentumGraph;
+import nz.org.venice.chart.graph.OBVGraph;
+import nz.org.venice.chart.graph.StandardDeviationGraph;
+import nz.org.venice.chart.graph.RSIGraph;
+import nz.org.venice.chart.graph.CustomGraph;
 
 
 /**

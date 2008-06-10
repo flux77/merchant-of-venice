@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -41,15 +41,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.*;
 
-import org.mov.main.*;
-import org.mov.util.Currency;
-import org.mov.util.ExchangeRateCache;
-import org.mov.util.Locale;
-import org.mov.prefs.*;
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.PortfolioModuleSettings;
-import org.mov.quote.*;
-import org.mov.ui.*;
+import nz.org.venice.main.*;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.ExchangeRateCache;
+import nz.org.venice.util.Locale;
+import nz.org.venice.prefs.*;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.PortfolioModuleSettings;
+import nz.org.venice.quote.*;
+import nz.org.venice.ui.*;
 
 /**
  * Venice module for displaying a portfolio to the user. This module
@@ -518,7 +518,7 @@ public class PortfolioModule extends JPanel implements Module,
     // Delete this portfolio
     private void deletePortfolio() {
 	JDesktopPane desktop =
-	    org.mov.ui.DesktopManager.getDesktop();
+	    nz.org.venice.ui.DesktopManager.getDesktop();
 
 	ConfirmDialog dialog = new ConfirmDialog(desktop,
 				   Locale.getString("SURE_DELETE_PORTFOLIO"),
@@ -543,7 +543,7 @@ public class PortfolioModule extends JPanel implements Module,
     private void renamePortfolio() {
         String oldPortfolioName = portfolio.getName();
 	JDesktopPane desktop =
-	    org.mov.ui.DesktopManager.getDesktop();
+	    nz.org.venice.ui.DesktopManager.getDesktop();
 
         // Get new name for portfolio
 	TextDialog dialog = new TextDialog(desktop,
@@ -634,7 +634,7 @@ public class PortfolioModule extends JPanel implements Module,
      */
     public void newTransaction() {
 	JDesktopPane desktop =
-	    org.mov.ui.DesktopManager.getDesktop();
+	    nz.org.venice.ui.DesktopManager.getDesktop();
 	TransactionDialog dialog = new TransactionDialog(desktop, portfolio);
 
         // Update portfolio displayed if the user entered a new transaction

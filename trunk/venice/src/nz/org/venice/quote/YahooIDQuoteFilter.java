@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
-import org.mov.util.TradingTime;
-import org.mov.util.TradingTimeFormatException;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingDateFormatException;
+import nz.org.venice.util.TradingTime;
+import nz.org.venice.util.TradingTimeFormatException;
 
 /**
  * Provides a filter to parse the Yahoo intra-day stock quote format.

@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.mov.ui.DesktopManager;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingTime;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingTime;
 
 /**
  * This class controls the periodic downloading, or synchronisation, of new

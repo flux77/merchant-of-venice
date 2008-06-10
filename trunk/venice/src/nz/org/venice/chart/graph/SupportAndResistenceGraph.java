@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.awt.*;
 import java.util.Iterator;
@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.mov.chart.*;
-import org.mov.chart.source.*;
-import org.mov.util.*;
+import nz.org.venice.chart.*;
+import nz.org.venice.chart.source.*;
+import nz.org.venice.util.*;
 
 /**
  * Support and Resistence "graph". This graph draws single lines across common price occurrances. 

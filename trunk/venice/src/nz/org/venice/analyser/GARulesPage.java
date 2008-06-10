@@ -22,7 +22,7 @@
  * @author  Alberto Nacher
  */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -45,17 +45,17 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.border.TitledBorder;
 
-import org.mov.analyser.ga.GAIndividual;
-import org.mov.parser.Expression;
-import org.mov.parser.ExpressionException;
-import org.mov.parser.Parser;
-import org.mov.parser.Token;
-import org.mov.parser.Variable;
-import org.mov.parser.Variables;
-import org.mov.prefs.PreferencesManager;
-import org.mov.ui.ExpressionComboBox;
-import org.mov.ui.GridBagHelper;
-import org.mov.util.Locale;
+import nz.org.venice.analyser.ga.GAIndividual;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.ExpressionException;
+import nz.org.venice.parser.Parser;
+import nz.org.venice.parser.Token;
+import nz.org.venice.parser.Variable;
+import nz.org.venice.parser.Variables;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.ui.ExpressionComboBox;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.util.Locale;
 
 
 public class GARulesPage extends JPanel implements AnalyserPage {

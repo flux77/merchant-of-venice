@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.help;
+package nz.org.venice.help;
 
 import java.io.*;
 import java.net.*;
@@ -27,7 +27,7 @@ import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * This package defines a single help page that can be viewed by the

@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.parser.expression;
+package nz.org.venice.parser.expression;
 
-import org.mov.parser.Expression;
+import nz.org.venice.parser.Expression;
 
 /**
  * Abstract base class for all expressions requiring a single argument.

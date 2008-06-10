@@ -16,12 +16,12 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.util;
+package nz.org.venice.util;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.mov.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesManager;
 
 /**
  * This class implements internationalisation support for Venice. Each text message
@@ -64,9 +64,9 @@ public class Locale {
                 // defined at the top of the class.
                 // Each of them represent one of MoV acceptable localization.
 		if (locale == null)
-                    primaryResourceBundle = ResourceBundle.getBundle("org.mov.util.locale.venice");
+                    primaryResourceBundle = ResourceBundle.getBundle("nz.org.venice.util.locale.venice");
                 else
-                    primaryResourceBundle = ResourceBundle.getBundle("org.mov.util.locale.venice", locale);
+                    primaryResourceBundle = ResourceBundle.getBundle("nz.org.venice.util.locale.venice", locale);
                 locale = primaryResourceBundle.getLocale();
       	    }
 	    catch(Exception e) {
@@ -76,7 +76,7 @@ public class Locale {
 	    // Also load English as a fallback if the preferred language hasn't
 	    // been fully translated.
 	    try {
-		secondaryResourceBundle = ResourceBundle.getBundle("org.mov.util.locale.venice",
+		secondaryResourceBundle = ResourceBundle.getBundle("nz.org.venice.util.locale.venice",
 								   java.util.Locale.ENGLISH);
 	    }
 	    catch(Exception e) {

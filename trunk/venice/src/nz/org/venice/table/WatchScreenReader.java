@@ -16,11 +16,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.table;
+package nz.org.venice.table;
 
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.util.Locale;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.util.Locale;
 
 import java.io.InputStream;
 import java.io.IOException;

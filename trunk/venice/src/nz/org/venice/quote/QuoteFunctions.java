@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
-import org.mov.parser.EvaluationException;
+import nz.org.venice.parser.EvaluationException;
 
 /**
  * This class contains functions that manipulate stock quotes. By placing
@@ -48,9 +48,9 @@ public class QuoteFunctions {
      * @param source the source quottes
      * @param period the number of days to average
      * @return       the standard deviation
-     * @see          org.mov.chart.graph.StandardDeviationGraph
+     * @see          nz.org.venice.chart.graph.StandardDeviationGraph
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public double sd(QuoteFunctionSource source, int period)
         throws EvaluationException {
@@ -99,10 +99,10 @@ public class QuoteFunctions {
      * @param source source of quotes to average
      * @param period the number of days to average
      * @return       the average
-     * @see          org.mov.chart.graph.MovingAverageGraph
-     * @see          org.mov.parser.expression.AvgExpression
+     * @see          nz.org.venice.chart.graph.MovingAverageGraph
+     * @see          nz.org.venice.parser.expression.AvgExpression
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public double avg(QuoteFunctionSource source, int period)
         throws EvaluationException {
@@ -166,9 +166,9 @@ public class QuoteFunctions {
      * @param y      values to detect correlation against x
      * @param period number of days to analyse
      * @return       the correlation co-efficient
-     * @see          org.mov.parser.expression.CorrExpression
+     * @see          nz.org.venice.parser.expression.CorrExpression
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public double corr(QuoteFunctionSource x, QuoteFunctionSource y, int period) 
         throws EvaluationException {
@@ -224,10 +224,10 @@ public class QuoteFunctions {
      * @param source source of quotes to average
      * @param period one plus the period of the RSI
      * @return       RSI
-     * @see          org.mov.chart.graph.RSIGraph
-     * @see          org.mov.parser.expression.RSIExpression
+     * @see          nz.org.venice.chart.graph.RSIGraph
+     * @see          nz.org.venice.parser.expression.RSIExpression
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public double rsi(QuoteFunctionSource source, int period)
         throws EvaluationException {
@@ -301,9 +301,9 @@ public class QuoteFunctions {
      * @param period the number of days to analyse
      * @param smoothingConstant a smoothing constant
      * @return       the exponential moving average
-     * @see          org.mov.chart.graph.ExpMovingAverageGraph
+     * @see          nz.org.venice.chart.graph.ExpMovingAverageGraph
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public double ema(QuoteFunctionSource source, int period, double smoothingConstant)
         throws EvaluationException {
@@ -344,9 +344,9 @@ public class QuoteFunctions {
      * @param sourceSlow the source of quotes used by EMA to average (slow average)
      * @param sourceFast the source of quotes used by EMA to average (fast average)
      * @return       the moving average convergence divergence
-     * @see          org.mov.chart.graph.MACDGraph
+     * @see          nz.org.venice.chart.graph.MACDGraph
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public double macd(QuoteFunctionSource sourceSlow, QuoteFunctionSource sourceFast)
         throws EvaluationException {
@@ -375,9 +375,9 @@ public class QuoteFunctions {
      *
      * @param source the source of quotes
      * @return       the momentum
-     * @see          org.mov.chart.graph.MomentumGraph
+     * @see          nz.org.venice.chart.graph.MomentumGraph
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public double momentum(QuoteFunctionSource source, int period)
         throws EvaluationException {
@@ -420,9 +420,9 @@ public class QuoteFunctions {
      * @param range the range which we calculate over
      * @param initialValue the starting value of OBV
      * @return       the on balance volume value
-     * @see          org.mov.chart.graph.OBVGraph
+     * @see          nz.org.venice.chart.graph.OBVGraph
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public int obv(QuoteFunctionSource sourceOpen,
                           QuoteFunctionSource sourceClose,
@@ -459,9 +459,9 @@ public class QuoteFunctions {
      * @param source the source of quotes
      * @param period the number of days to analyse
      * @return       the upper bollinger band
-     * @see          org.mov.chart.graph.BollingerBandsGraph
+     * @see          nz.org.venice.chart.graph.BollingerBandsGraph
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public double bollingerUpper(QuoteFunctionSource source, int period)
         throws EvaluationException {
@@ -482,9 +482,9 @@ public class QuoteFunctions {
      * @param source the source of quotes
      * @param period the number of days to analyse
      * @return       the lower bollinger band
-     * @see          org.mov.chart.graph.BollingerBandsGraph
+     * @see          nz.org.venice.chart.graph.BollingerBandsGraph
      * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
-     *               allowed access to a quote. See {@link org.mov.analyser.gp.GPQuoteBundle}.
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
      */
     static public double bollingerLower(QuoteFunctionSource source, int period)
         throws EvaluationException {

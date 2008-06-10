@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.lang.String;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * Dialog for querying the user for numbers.

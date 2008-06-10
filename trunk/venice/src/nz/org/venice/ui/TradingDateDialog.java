@@ -16,18 +16,18 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.lang.String;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 
-import org.mov.quote.EODQuoteCache;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.quote.WeekendDateException;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
+import nz.org.venice.quote.EODQuoteCache;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.quote.WeekendDateException;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingDateFormatException;
 
 /**
  * Dialog for querying the user for a date.

@@ -16,10 +16,10 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.parser.expression;
+package nz.org.venice.parser.expression;
 
-import org.mov.parser.*;
-import org.mov.quote.*;
+import nz.org.venice.parser.*;
+import nz.org.venice.quote.*;
 
 /**
  * An expression which performs boolean <code>or</code> on two sub-expressions.

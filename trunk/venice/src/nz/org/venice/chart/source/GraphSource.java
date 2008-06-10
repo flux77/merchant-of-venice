@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.chart.source;
+package nz.org.venice.chart.source;
 
-import org.mov.chart.*;
+import nz.org.venice.chart.*;
 
 /**
  * Provides an abstraction of the data being graphed, this way graphs
@@ -55,7 +55,7 @@ public interface GraphSource {
      * axis.
      *
      * @return	array of doubles
-     * @see	org.mov.chart.graph.Graph#getAcceptableMajorDeltas
+     * @see	nz.org.venice.chart.graph.Graph#getAcceptableMajorDeltas
      */ 
     public double[] getAcceptableMajorDeltas();
 
@@ -64,7 +64,7 @@ public interface GraphSource {
      * axis.
      *
      * @return	array of doubles
-     * @see	org.mov.chart.graph.Graph#getAcceptableMajorDeltas
+     * @see	nz.org.venice.chart.graph.Graph#getAcceptableMajorDeltas
      */ 
     public double[] getAcceptableMinorDeltas();
 

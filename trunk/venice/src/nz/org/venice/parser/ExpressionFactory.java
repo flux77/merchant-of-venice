@@ -16,10 +16,10 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.parser;
+package nz.org.venice.parser;
 
-import org.mov.parser.expression.*;
-import org.mov.quote.Quote;
+import nz.org.venice.parser.expression.*;
+import nz.org.venice.quote.Quote;
 
 /**
  * Create an executable expression from the given token and arguments.

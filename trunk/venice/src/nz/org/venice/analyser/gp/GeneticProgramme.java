@@ -16,20 +16,20 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.mov.analyser.gp;
+package nz.org.venice.analyser.gp;
 
 import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.mov.analyser.GPGondolaSelection;
-import org.mov.analyser.GPModuleConstants;
-import org.mov.analyser.OrderCache;
+import nz.org.venice.analyser.GPGondolaSelection;
+import nz.org.venice.analyser.GPModuleConstants;
+import nz.org.venice.analyser.OrderCache;
 
-import org.mov.parser.Expression;
-import org.mov.parser.EvaluationException;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
 
 /**
  * The Genetic Programme creates and breeds random paper trading individuals. This

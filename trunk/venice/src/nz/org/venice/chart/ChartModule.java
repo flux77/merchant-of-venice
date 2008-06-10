@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,20 +26,20 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 
-import org.mov.chart.graph.*;
-import org.mov.chart.source.*;
-import org.mov.main.*;
-import org.mov.util.Locale;
-import org.mov.portfolio.*;
-import org.mov.quote.*;
-import org.mov.ui.*;
-import org.mov.ui.DesktopManager;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.PreferencesException;
+import nz.org.venice.chart.graph.*;
+import nz.org.venice.chart.source.*;
+import nz.org.venice.main.*;
+import nz.org.venice.util.Locale;
+import nz.org.venice.portfolio.*;
+import nz.org.venice.quote.*;
+import nz.org.venice.ui.*;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesException;
 
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.ChartModuleSettings;
-import org.mov.prefs.settings.GraphSettings;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.ChartModuleSettings;
+import nz.org.venice.prefs.settings.GraphSettings;
 
 /**
  * The charting module for venice. This class provides the user interface

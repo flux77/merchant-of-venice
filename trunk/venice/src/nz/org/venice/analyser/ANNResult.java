@@ -16,14 +16,14 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.util.*;
 
-import org.mov.portfolio.*;
-import org.mov.quote.*;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
+import nz.org.venice.portfolio.*;
+import nz.org.venice.quote.*;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
 
 public class ANNResult {
     private Portfolio portfolio;

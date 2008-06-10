@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart;
+package nz.org.venice.chart;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -25,8 +25,8 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 
-import org.mov.chart.graph.*;
-import org.mov.util.Locale;
+import nz.org.venice.chart.graph.*;
+import nz.org.venice.util.Locale;
 
 /**
  * New swing component that allows creation of charts. This charting

@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mov.chart.Graphable;
-import org.mov.chart.GraphTools;
-import org.mov.chart.source.GraphSource;
-import org.mov.util.Locale;
+import nz.org.venice.chart.Graphable;
+import nz.org.venice.chart.GraphTools;
+import nz.org.venice.chart.source.GraphSource;
+import nz.org.venice.util.Locale;
 
 /**
  * Momentum graph. This graph is used to show the direction that the

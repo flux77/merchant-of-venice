@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser.ann;
+package nz.org.venice.analyser.ann;
 
 /**
  * An exception which is thrown when the user try to load or to save a file

@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * This class is the only instance of a progress dialog in venice. When a progress

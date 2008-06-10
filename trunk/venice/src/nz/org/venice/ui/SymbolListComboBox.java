@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -24,13 +24,13 @@ import java.util.SortedSet;
 import java.util.Iterator;
 import javax.swing.JComboBox;
 
-import org.mov.quote.EODQuoteRange;
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.util.Locale;
-import org.mov.prefs.PreferencesException;
-import org.mov.prefs.PreferencesManager;
-import org.mov.table.WatchScreen;
+import nz.org.venice.quote.EODQuoteRange;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.util.Locale;
+import nz.org.venice.prefs.PreferencesException;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.table.WatchScreen;
 
 /**
  * A JComboBox which allows the user to choose from a selection of symbol lists.

@@ -20,13 +20,13 @@
  *
  * @author  Alberto Nacher
  */
-package org.mov.analyser.ga;
+package nz.org.venice.analyser.ga;
 
 import java.util.Random;
 
-import org.mov.parser.Expression;
-import org.mov.portfolio.Portfolio;
-import org.mov.util.Money;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.util.Money;
 
 /**
  * A trading individual evolved by the GA.

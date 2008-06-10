@@ -18,7 +18,7 @@
 
 
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 
 /**
@@ -34,27 +34,27 @@ package org.mov.prefs.settings;
 import javax.swing.JDesktopPane;
 import java.util.*;
 
-import org.mov.main.Module;
-import org.mov.main.ModuleFrame;
-import org.mov.main.CommandManager;
-import org.mov.portfolio.PortfolioModule;
-import org.mov.portfolio.Portfolio;
-import org.mov.portfolio.TransactionModule;
-import org.mov.portfolio.Transaction;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.main.CommandManager;
+import nz.org.venice.portfolio.PortfolioModule;
+import nz.org.venice.portfolio.Portfolio;
+import nz.org.venice.portfolio.TransactionModule;
+import nz.org.venice.portfolio.Transaction;
 
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.EODQuoteRange;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.util.TradingDate;
-import org.mov.util.Money;
+import nz.org.venice.quote.QuoteBundle;
+import nz.org.venice.quote.EODQuoteRange;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.Money;
 
-import org.mov.ui.AbstractTableModel;
-import org.mov.ui.Column;
-import org.mov.ui.FrameRegister;
+import nz.org.venice.ui.AbstractTableModel;
+import nz.org.venice.ui.Column;
+import nz.org.venice.ui.FrameRegister;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.PreferencesException;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesException;
 
 public class TransactionModuleSettings extends AbstractSettings {
     
@@ -119,7 +119,7 @@ public class TransactionModuleSettings extends AbstractSettings {
 	//this transaction window
 	FrameRegister register = CommandManager.getInstance().getDesktopManager().getFrameRegister();
 	
-	ModuleFrame frame = register.getFrameOfType("org.mov.portfolio.PortfolioModule");
+	ModuleFrame frame = register.getFrameOfType("nz.org.venice.portfolio.PortfolioModule");
 	if (frame != null) {	    
 	    portfolioModule = (PortfolioModule)frame.getModule();	    
 	    return portfolioModule;

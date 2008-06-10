@@ -16,12 +16,12 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.util.List;
 
-import org.mov.util.Currency;
-import org.mov.util.TradingDate;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.TradingDate;
 
 /**
  * Provides a generic interface in which we can query stock quotes from

@@ -16,19 +16,19 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mov.quote.IDQuote;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.QuoteBundle;
-import org.mov.quote.Quote;
-import org.mov.quote.Symbol;
-import org.mov.quote.WeekendDateException;
-import org.mov.util.Locale;
-import org.mov.util.TradingTime;
+import nz.org.venice.quote.IDQuote;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.QuoteBundle;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.WeekendDateException;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingTime;
 
 /**
  * Table model to display a mixture of end of day and intra-day quotes to the user.
@@ -39,7 +39,7 @@ import org.mov.util.TradingTime;
  * @see AbstractTable
  * @see Column
  * @see ExpressionColumn
- * @see org.mov.quote.MixedQuoteBundle
+ * @see nz.org.venice.quote.MixedQuoteBundle
  */
 public class MixedQuoteModel extends AbstractQuoteModel {
 

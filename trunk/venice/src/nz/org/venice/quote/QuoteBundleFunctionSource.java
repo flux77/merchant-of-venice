@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
-import org.mov.parser.EvaluationException;
+import nz.org.venice.parser.EvaluationException;
 
 /**
  * Allow the {@link QuoteFunctions} package to use quotes directly from
- * a {@link org.mov.quote.QuoteBundle}. The following code shows an exmaple of how to
+ * a {@link nz.org.venice.quote.QuoteBundle}. The following code shows an exmaple of how to
  * call a quote function from a Gondola expression:
  * 
  * <pre>
@@ -34,7 +34,7 @@ import org.mov.parser.EvaluationException;
  *
  * @author Andrew Leppard
  * @see QuoteFunctions
- * @see org.mov.parser.Expression
+ * @see nz.org.venice.parser.Expression
  */
 public class QuoteBundleFunctionSource implements QuoteFunctionSource {
 
@@ -59,7 +59,7 @@ public class QuoteBundleFunctionSource implements QuoteFunctionSource {
 
     /**
      * Create a new quote function source that uses quotes directly from a 
-     * {@link org.mov.quote.QuoteBundle}.
+     * {@link nz.org.venice.quote.QuoteBundle}.
      *
      * @param quoteBundle the quote bundle containing the quotes
      * @param symbol the symbol of the quotes to access

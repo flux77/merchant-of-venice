@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.source;
+package nz.org.venice.chart.source;
 
-import org.mov.chart.*;
-import org.mov.ui.QuoteFormat;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.quote.*;
+import nz.org.venice.chart.*;
+import nz.org.venice.ui.QuoteFormat;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.quote.*;
 
 /**
  * Provides a <code>EODQuoteBundle</code> graph source. This class

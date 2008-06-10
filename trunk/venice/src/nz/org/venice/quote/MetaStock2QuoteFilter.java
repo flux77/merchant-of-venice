@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.text.NumberFormat;
 
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingDateFormatException;
 
 /**
  * Provides a filter to parse the Meta Stock (volume/100) quote format. This

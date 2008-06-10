@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,8 +28,8 @@ import java.util.Map;
 
 import javax.swing.event.EventListenerList;
 
-import org.mov.util.TradingDate;
-import org.mov.util.TradingTime;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingTime;
 
 /**
  * This class contains all the intra-day stock quotes currently in memory. Its purpose is to

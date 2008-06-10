@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.chart.graph;
+package nz.org.venice.chart.graph;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -30,8 +30,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import org.mov.ui.GridBagHelper;
-import org.mov.util.Locale;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.util.Locale;
 
 /**
  * The MACD graph user interface.

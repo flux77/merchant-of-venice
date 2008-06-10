@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -39,13 +39,13 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 
-import org.mov.analyser.ann.ArtificialNeuralNetwork;
-import org.mov.analyser.ann.ANNConstants;
-import org.mov.analyser.ann.FileExtensionException;
-import org.mov.prefs.PreferencesManager;
-import org.mov.ui.GridBagHelper;
-import org.mov.ui.ProgressDialog;
-import org.mov.util.Locale;
+import nz.org.venice.analyser.ann.ArtificialNeuralNetwork;
+import nz.org.venice.analyser.ann.ANNConstants;
+import nz.org.venice.analyser.ann.FileExtensionException;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.util.Locale;
 
 
 /**

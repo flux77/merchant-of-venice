@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.util;
+package nz.org.venice.util;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.Date;
 import java.util.List;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * A replacement date for java.util.Date, java.util.Calendar &

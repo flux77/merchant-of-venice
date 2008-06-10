@@ -24,11 +24,11 @@
   <property name="lib.xml" value="${lib}/xstream-1.3.jar"/>
 
   <!-- Online help -->
-  <property name="help" value="${src}/org/mov/help/doc"/>
+  <property name="help" value="${src}/nz/org/venice/help/doc"/>
 
   <!-- Generate API documentation -->
   <target name="api">
-    <javadoc packagenames="org.mov.*"
+    <javadoc packagenames="nz.org.venice.*"
              sourcepath="${src}"
 	     source="1.4"
              destdir="${api}"
@@ -67,7 +67,7 @@
   	   optimize="on"
 	   source="1.4"
 	   includes="**/*.java"
-           excludes="org/mov/tools/*">
+           excludes="nz/org/venice/tools/*">
       <classpath>
         <pathelement path="${java.class.path}"/>
         <pathelement path="${src}"/>
@@ -193,11 +193,11 @@
     <copy todir="${temp}">
       <fileset dir="${src}"
                includes="**/*.class, **/*.gif, **/*.png,
-                         org/mov/help/doc/*.html,
+                         nz/org/venice/help/doc/*.html,
                          **/*.properties,
-                         org/mov/help/doc/index.xml,
-                         org/mov/quote/samples/*.txt"
-               excludes="org/mov/tools/*"/>
+                         nz/org/venice/help/doc/index.xml,
+                         nz/org/venice/quote/samples/*.txt"
+               excludes="nz/org/venice/tools/*"/>
     </copy>
 
     <jar jarfile="venice.jar"
@@ -229,16 +229,16 @@
     <javac srcdir="${src}"
            debug="on"
            source="1.4"
-           includes="org/mov/tools/Locale.java"/>
+           includes="nz/org/venice/tools/Locale.java"/>
     
     <!-- Compare each locale file to the english locale -->
 
     <echo>Comparing Chinese locale against English reference locale...</echo> 
-    <java classname="org.mov.tools.Locale"
+    <java classname="nz.org.venice.tools.Locale"
           dir="${src}"
           fork="yes">
-      <arg value="org/mov/util/locale/venice_en.properties"/>
-      <arg value="org/mov/util/locale/venice_zh.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_en.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_zh.properties"/>
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
@@ -247,11 +247,11 @@
     </java>
 
     <echo>Comparing French locale against English reference locale...</echo> 
-    <java classname="org.mov.tools.Locale"
+    <java classname="nz.org.venice.tools.Locale"
           dir="${src}"
           fork="yes">
-      <arg value="org/mov/util/locale/venice_en.properties"/>
-      <arg value="org/mov/util/locale/venice_fr.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_en.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_fr.properties"/>
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
@@ -260,11 +260,11 @@
     </java>
 
     <echo>Comparing Italian locale against English reference locale...</echo> 
-    <java classname="org.mov.tools.Locale"
+    <java classname="nz.org.venice.tools.Locale"
           dir="${src}"
           fork="yes">
-      <arg value="org/mov/util/locale/venice_en.properties"/>
-      <arg value="org/mov/util/locale/venice_it.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_en.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_it.properties"/>
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
@@ -273,11 +273,11 @@
     </java>
 
     <echo>Comparing Swedish locale against English reference locale...</echo> 
-    <java classname="org.mov.tools.Locale"
+    <java classname="nz.org.venice.tools.Locale"
           dir="${src}"
           fork="yes">
-      <arg value="org/mov/util/locale/venice_en.properties"/>
-      <arg value="org/mov/util/locale/venice_sv.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_en.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_sv.properties"/>
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
@@ -353,10 +353,10 @@
     <copy todir="${release}/venice-${VERSION}-src/src/">
       <fileset dir="${src}"
                 includes="**/*.java, **/*.gif, **/*.png,
-                          org/mov/help/doc/*.html,
+                          nz/org/venice/help/doc/*.html,
                           **/*.properties,
-                          org/mov/help/doc/index.xml,
-                          org/mov/quote/samples/*.txt,
+                          nz/org/venice/help/doc/index.xml,
+                          nz/org/venice/quote/samples/*.txt,
                           MANIFEST.MF"/>
     </copy>
     <copy todir="${release}/venice-${VERSION}-src/test/">
@@ -378,7 +378,7 @@
 
   <!-- Run Venice -->
   <target name="run" depends="build">
-    <java classname="org.mov.main.Main"
+    <java classname="nz.org.venice.main.Main"
           dir="${src}"
           fork="yes">
       <jvmarg value="-ea"/>

@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.prefs;
+package nz.org.venice.prefs;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -28,9 +28,9 @@ import javax.swing.JPanel;
 import javax.swing.JComboBox;
 import java.util.Vector;
 
-import org.mov.quote.EODQuoteCache;
-import org.mov.ui.GridBagHelper;
-import org.mov.util.Locale;
+import nz.org.venice.quote.EODQuoteCache;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.util.Locale;
 
 
 /**

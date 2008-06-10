@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import junit.framework.TestCase;
 
@@ -26,11 +26,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.mov.quote.DatabaseQuoteSource;
-import org.mov.quote.EODQuote;
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.util.TradingDate;
+import nz.org.venice.quote.DatabaseQuoteSource;
+import nz.org.venice.quote.EODQuote;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.util.TradingDate;
 
 public class DatabaseQuoteSourceTest extends TestCase
 {

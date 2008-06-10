@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.table;
+package nz.org.venice.table;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -40,33 +40,33 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.mov.main.CommandManager;
-import org.mov.main.Module;
-import org.mov.main.ModuleFrame;
-import org.mov.prefs.PreferencesException;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.settings.Settings;
-import org.mov.quote.IDQuote;
-import org.mov.quote.IDQuoteCache;
-import org.mov.quote.IDQuoteSync;
-import org.mov.quote.MissingQuoteException;
-import org.mov.quote.MixedQuoteBundle;
-import org.mov.quote.Quote;
-import org.mov.quote.QuoteEvent;
-import org.mov.quote.QuoteListener;
-import org.mov.quote.Symbol;
-import org.mov.ui.AbstractTable;
-import org.mov.ui.Column;
-import org.mov.ui.DesktopManager;
-import org.mov.ui.MainMenu;
-import org.mov.ui.MenuHelper;
-import org.mov.ui.MixedQuoteModel;
-import org.mov.ui.SymbolListDialog;
-import org.mov.ui.TextDialog;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingTime;
-import org.mov.prefs.settings.WatchScreenSettings;
+import nz.org.venice.main.CommandManager;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.prefs.PreferencesException;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.quote.IDQuote;
+import nz.org.venice.quote.IDQuoteCache;
+import nz.org.venice.quote.IDQuoteSync;
+import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.MixedQuoteBundle;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.QuoteEvent;
+import nz.org.venice.quote.QuoteListener;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.ui.AbstractTable;
+import nz.org.venice.ui.Column;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.ui.MainMenu;
+import nz.org.venice.ui.MenuHelper;
+import nz.org.venice.ui.MixedQuoteModel;
+import nz.org.venice.ui.SymbolListDialog;
+import nz.org.venice.ui.TextDialog;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingTime;
+import nz.org.venice.prefs.settings.WatchScreenSettings;
 
 /**
  * Venice module for displaying a watch screen to the user. This module allows a

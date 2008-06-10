@@ -17,11 +17,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import javax.swing.JInternalFrame;
-import org.mov.macro.StoredMacro;
-import org.mov.util.Locale;
+import nz.org.venice.macro.StoredMacro;
+import nz.org.venice.util.Locale;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;

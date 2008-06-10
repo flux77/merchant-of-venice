@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 
 import java.io.InputStream;
@@ -25,13 +25,13 @@ import java.io.IOException;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-import org.mov.prefs.settings.ModuleSettingsParserException;
-import org.mov.main.ModuleFrame;
-import org.mov.prefs.settings.ModuleFrameSettings;
-import org.mov.prefs.settings.GraphSettings;
-import org.mov.quote.Symbol;
-import org.mov.quote.SymbolFormatException;
-import org.mov.util.Locale;
+import nz.org.venice.prefs.settings.ModuleSettingsParserException;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.prefs.settings.ModuleFrameSettings;
+import nz.org.venice.prefs.settings.GraphSettings;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.util.Locale;
 
 
 /**

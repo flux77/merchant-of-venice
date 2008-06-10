@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mov.parser.EvaluationException;
-import org.mov.util.TradingDate;
+import nz.org.venice.parser.EvaluationException;
+import nz.org.venice.util.TradingDate;
 
 /**
  * When a task requires intra-day stock quotes, it should create an instance of this class

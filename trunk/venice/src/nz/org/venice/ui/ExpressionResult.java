@@ -16,9 +16,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
-import org.mov.parser.expression.NumberExpression;
+import nz.org.venice.parser.expression.NumberExpression;
 
 /**
  * Representation of a result to be displayed in an {@link ExpressionColumn}.
@@ -36,8 +36,8 @@ public class ExpressionResult implements Comparable {
     // if the result is empty.
     boolean isResult;
 
-    // Expression result type, e.g. {@link org.mov.parser.Expression#BOOLEAN_TYPE},
-    // {@link org.mov.parser.Expression#FLOAT_TYPE} etc
+    // Expression result type, e.g. {@link nz.org.venice.parser.Expression#BOOLEAN_TYPE},
+    // {@link nz.org.venice.parser.Expression#FLOAT_TYPE} etc
     int type;
 
     // Result
@@ -55,7 +55,7 @@ public class ExpressionResult implements Comparable {
     /**
      * Create a new result.
      *
-     * @param type   Type of the result, e.g. {@link org.mov.parser.Expression#BOOLEAN_TYPE}
+     * @param type   Type of the result, e.g. {@link nz.org.venice.parser.Expression#BOOLEAN_TYPE}
      * @param result Value of result.
      */
     public ExpressionResult(int type, double result) {

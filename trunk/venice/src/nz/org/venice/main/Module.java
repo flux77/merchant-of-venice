@@ -16,12 +16,12 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.main;
+package nz.org.venice.main;
 
 import java.beans.*;
 import javax.swing.*;
 
-import org.mov.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.Settings;
 
 /**
  * Provides a common interface that all modules must adhere to. This

@@ -25,10 +25,10 @@
 */
 
 
-package org.mov.util;
+package nz.org.venice.util;
 
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
 
  public class ImageExporterUI {
      private ProgressDialog progress = null;

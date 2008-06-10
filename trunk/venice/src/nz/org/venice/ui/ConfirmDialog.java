@@ -15,7 +15,7 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -29,7 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.mov.util.Locale;
+import nz.org.venice.util.Locale;
 
 /**
  * Replacement dialog for Java's JOptionPane InternalConfirmDialog

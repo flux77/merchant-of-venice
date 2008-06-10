@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -39,22 +39,22 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import org.mov.prefs.PreferencesManager;
-import org.mov.parser.Expression;
-import org.mov.parser.ExpressionException;
-import org.mov.parser.Parser;
-import org.mov.quote.EODQuoteBundle;
-import org.mov.quote.EODQuoteCache;
-import org.mov.quote.EODQuoteRange;
-import org.mov.quote.QuoteSourceManager;
-import org.mov.quote.SymbolFormatException;
-import org.mov.quote.WeekendDateException;
-import org.mov.ui.ExpressionComboBox;
-import org.mov.ui.GridBagHelper;
-import org.mov.ui.SymbolListComboBox;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
-import org.mov.util.TradingDateFormatException;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.ExpressionException;
+import nz.org.venice.parser.Parser;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.EODQuoteCache;
+import nz.org.venice.quote.EODQuoteRange;
+import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.quote.WeekendDateException;
+import nz.org.venice.ui.ExpressionComboBox;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.ui.SymbolListComboBox;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingDateFormatException;
 
 /**
  * An analysis tool page that lets the user enter data about which quotes

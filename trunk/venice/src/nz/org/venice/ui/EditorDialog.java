@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -30,8 +30,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
-import org.mov.main.ModuleFrame;
-import org.mov.util.Locale;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.util.Locale;
 
 public class EditorDialog {
     

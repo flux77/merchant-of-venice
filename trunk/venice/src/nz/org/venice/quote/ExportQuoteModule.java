@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.quote;
+package nz.org.venice.quote;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -44,16 +44,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.mov.main.Module;
-import org.mov.main.ModuleFrame;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.settings.Settings;
-import org.mov.ui.DesktopManager;
-import org.mov.ui.GridBagHelper;
-import org.mov.ui.ProgressDialog;
-import org.mov.ui.ProgressDialogManager;
-import org.mov.util.Locale;
-import org.mov.util.TradingDate;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.ui.GridBagHelper;
+import nz.org.venice.ui.ProgressDialog;
+import nz.org.venice.ui.ProgressDialogManager;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
 
 /**
  * The export module allows exporting of quotes from Venice.

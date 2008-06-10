@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.prefs;
+package nz.org.venice.prefs;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -42,11 +42,11 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.table.TableColumn;
 
-import org.mov.macro.StoredMacro;
-import org.mov.ui.AbstractTableModel;
-import org.mov.ui.MacroEditor;
-import org.mov.ui.MainMenu;
-import org.mov.util.Locale;
+import nz.org.venice.macro.StoredMacro;
+import nz.org.venice.ui.AbstractTableModel;
+import nz.org.venice.ui.MacroEditor;
+import nz.org.venice.ui.MainMenu;
+import nz.org.venice.util.Locale;
 
 /**
  * This class allows the user to set their preferences for macro loading and
@@ -98,7 +98,7 @@ public class MacrosPage extends JPanel implements PreferencesPage {
     /*
      * (non-Javadoc)
      * 
-     * @see org.mov.prefs.PreferencesPage#getTitle()
+     * @see nz.org.venice.prefs.PreferencesPage#getTitle()
      */
     public String getTitle() {
         return Locale.getString("MACROS_PAGE_TITLE");
@@ -107,7 +107,7 @@ public class MacrosPage extends JPanel implements PreferencesPage {
     /*
      * (non-Javadoc)
      * 
-     * @see org.mov.prefs.PreferencesPage#save()
+     * @see nz.org.venice.prefs.PreferencesPage#save()
      */
     public void save() {
         PreferencesManager.putStoredMacros(stored_macros);
@@ -117,7 +117,7 @@ public class MacrosPage extends JPanel implements PreferencesPage {
     /*
      * (non-Javadoc)
      * 
-     * @see org.mov.prefs.PreferencesPage#getComponent()
+     * @see nz.org.venice.prefs.PreferencesPage#getComponent()
      */
     public JComponent getComponent() {
         return this;

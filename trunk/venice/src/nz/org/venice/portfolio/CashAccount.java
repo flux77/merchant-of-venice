@@ -16,13 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
-import org.mov.util.Currency;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
+import nz.org.venice.util.Currency;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
 
-import org.mov.quote.EODQuoteBundle;
+import nz.org.venice.quote.EODQuoteBundle;
 
 /**
  * Representation of a cash account in a portfolio.

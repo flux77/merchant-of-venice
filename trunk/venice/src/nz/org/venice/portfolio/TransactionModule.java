@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 */
 
-package org.mov.portfolio;
+package nz.org.venice.portfolio;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -28,17 +28,17 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import org.mov.main.*;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.ui.AbstractTable;
-import org.mov.ui.AbstractTableModel;
-import org.mov.ui.Column;
-import org.mov.ui.MenuHelper;
-import org.mov.ui.*;
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.TransactionModuleSettings;
+import nz.org.venice.main.*;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.ui.AbstractTable;
+import nz.org.venice.ui.AbstractTableModel;
+import nz.org.venice.ui.Column;
+import nz.org.venice.ui.MenuHelper;
+import nz.org.venice.ui.*;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.TransactionModuleSettings;
 
 /** 
  * Venice module for displaying a portfolio's transaction history to
@@ -390,7 +390,7 @@ public class TransactionModule extends AbstractTable implements Module,
 
 		public void run() {
 		    JDesktopPane desktop = 
-			org.mov.ui.DesktopManager.getDesktop();
+			nz.org.venice.ui.DesktopManager.getDesktop();
 		    TransactionDialog dialog = 
 			new TransactionDialog(desktop, portfolio);
 		    
@@ -419,7 +419,7 @@ public class TransactionModule extends AbstractTable implements Module,
     // Delete the given transaction(s)
     private void deleteTransactions(final List deleteTransactions) {
 //	JDesktopPane desktop =
-//	    org.mov.ui.DesktopManager.getDesktop();
+//	    nz.org.venice.ui.DesktopManager.getDesktop();
 	
 //	int option = 
 //	    JOptionPane.showInternalConfirmDialog(desktop,
@@ -428,7 +428,7 @@ public class TransactionModule extends AbstractTable implements Module,
 //						  JOptionPane.YES_NO_OPTION);
 //	if(option == JOptionPane.YES_OPTION) {
 	JDesktopPane desktop =
-	    org.mov.ui.DesktopManager.getDesktop();
+	    nz.org.venice.ui.DesktopManager.getDesktop();
 
 	ConfirmDialog dialog = new ConfirmDialog(desktop,
 				   Locale.getString("SURE_DELETE_TRANSACTIONS"),

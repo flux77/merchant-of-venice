@@ -20,7 +20,7 @@
  *
  * @author  Alberto Nacher
  */
-package org.mov.analyser;
+package nz.org.venice.analyser;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -42,20 +42,20 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.mov.main.CommandManager;
-import org.mov.main.Module;
-import org.mov.main.ModuleFrame;
-import org.mov.ui.AbstractTable;
-import org.mov.ui.AbstractTableModel;
-import org.mov.ui.Column;
-import org.mov.ui.ChangeFormat;
-import org.mov.ui.ExpressionEditorDialog;
-import org.mov.ui.MenuHelper;
-import org.mov.util.Locale;
-import org.mov.util.Money;
-import org.mov.util.TradingDate;
-import org.mov.prefs.settings.Settings;
-import org.mov.prefs.settings.AnalyserResultSettings;
+import nz.org.venice.main.CommandManager;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.ui.AbstractTable;
+import nz.org.venice.ui.AbstractTableModel;
+import nz.org.venice.ui.Column;
+import nz.org.venice.ui.ChangeFormat;
+import nz.org.venice.ui.ExpressionEditorDialog;
+import nz.org.venice.ui.MenuHelper;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.Money;
+import nz.org.venice.util.TradingDate;
+import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.AnalyserResultSettings;
 
 public class GAResultModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;

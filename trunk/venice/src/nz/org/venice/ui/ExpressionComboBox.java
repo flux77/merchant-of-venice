@@ -16,7 +16,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package org.mov.ui;
+package nz.org.venice.ui;
 
 import java.awt.Point;
 import java.awt.Component;
@@ -36,11 +36,11 @@ import javax.swing.JTextField;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import org.mov.main.CommandManager;
-import org.mov.prefs.PreferencesManager;
-import org.mov.prefs.PreferencesModule;
-import org.mov.prefs.StoredExpression;
-import org.mov.util.Locale;
+import nz.org.venice.main.CommandManager;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesModule;
+import nz.org.venice.prefs.StoredExpression;
+import nz.org.venice.util.Locale;
 
 /**
  * Extension of JComboBox used for displaying an editable expression field

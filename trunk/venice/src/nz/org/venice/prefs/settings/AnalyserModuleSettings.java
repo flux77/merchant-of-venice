@@ -18,7 +18,7 @@
 
 
 
-package org.mov.prefs.settings;
+package nz.org.venice.prefs.settings;
 
 
 /**
@@ -33,12 +33,12 @@ package org.mov.prefs.settings;
 
 import javax.swing.JDesktopPane;
 import java.util.*;
-import org.mov.main.Module;
-import org.mov.analyser.PaperTradeModule;
-import org.mov.analyser.PaperTradeResult;
-import org.mov.analyser.GPModule;
-import org.mov.analyser.GAModule;
-import org.mov.analyser.ANNModule;
+import nz.org.venice.main.Module;
+import nz.org.venice.analyser.PaperTradeModule;
+import nz.org.venice.analyser.PaperTradeResult;
+import nz.org.venice.analyser.GPModule;
+import nz.org.venice.analyser.GAModule;
+import nz.org.venice.analyser.ANNModule;
 
 public class AnalyserModuleSettings extends AbstractSettings {
         

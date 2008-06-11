@@ -94,6 +94,11 @@ To run the unit tests you will need:
     JUnit 3.8.1 or higher
         http://www.junit.org/
 
+To create the manual you wll need:
+
+    Xalan-Java 2.7.1 or higher
+        http://xml.apache.org/xalan-j/
+
 To build Venice type the following:
 
 ant build

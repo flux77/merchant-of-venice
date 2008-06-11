@@ -187,7 +187,7 @@ public class ChartModule extends JPanel implements Module,
     private ChartModuleSettings settings;
 
     // Frame Icon
-    private String frameIcon = "org/mov/images/TableIcon.gif";
+    private String frameIcon = "nz/org/venice/images/TableIcon.gif";
 
     // ToolBar Images - these are from jlfgr-1.0.jar
     // Editing images (paint, erase, text scribble, move ) aren't the

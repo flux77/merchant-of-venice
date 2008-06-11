@@ -300,12 +300,12 @@ public class Main extends JFrame {
 		    newFrame.setPreferredSize(newFrameSettings.getBounds().getSize());
 		    count++;
 		} catch (ModuleSettingsParserException wpe) {
-
+		    continue;
 		}
 	    } catch (FileNotFoundException fnf) {
-
+		continue;
 	    } catch (IOException ioe) {
-
+		continue;
 	    }
 	}
 	ProgressDialogManager.closeProgressDialog(progress);

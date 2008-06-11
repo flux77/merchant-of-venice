@@ -37,6 +37,7 @@ import nz.org.venice.main.Main;
 import nz.org.venice.main.Module;
 import nz.org.venice.main.ModuleFrame;
 import nz.org.venice.prefs.settings.ModuleFrameSettingsWriter;
+import nz.org.venice.prefs.settings.ModuleSettingsParserException;
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.macro.StoredMacro;
 import nz.org.venice.portfolio.Account;
@@ -1439,6 +1440,8 @@ public class PreferencesManager {
 	    settingsWriter.write(frame, outputStream);
 	    outputStream.close();
 	} catch (IOException e) {
+	    throw new PreferencesException(e.getMessage());
+	} catch (ModuleSettingsParserException e) {
 	    throw new PreferencesException(e.getMessage());
 	} catch (SecurityException e) {
 	    throw new PreferencesException(e.getMessage());

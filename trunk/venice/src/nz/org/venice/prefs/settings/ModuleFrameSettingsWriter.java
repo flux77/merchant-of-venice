@@ -24,6 +24,7 @@ import nz.org.venice.main.Module;
 
 import java.io.OutputStream;
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.beans.XMLEncoder;
 import java.util.Iterator;
 import java.util.Vector;
@@ -43,6 +44,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.XStreamException;
 
 import nz.org.venice.quote.Symbol;
 import nz.org.venice.chart.graph.Graph;
@@ -62,7 +64,7 @@ import org.w3c.dom.Text;
  * @see PreferencesManager
  * @see SettingsWriter
  */
-public class ModuleFrameSettingsWriter implements SettingsWriter {
+public class ModuleFrameSettingsWriter  {
 
     public ModuleFrameSettingsWriter() {
         // Nothing to do
@@ -75,7 +77,7 @@ public class ModuleFrameSettingsWriter implements SettingsWriter {
      * @param frame the module frame data to write
      * @param stream      the output stream to write the window settings.
      */
-    public  void write(ModuleFrame frame, OutputStream stream) {
+    public  void write(ModuleFrame frame, OutputStream stream) throws IOException, ModuleSettingsParserException {
 
 	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 	
@@ -93,11 +95,8 @@ public class ModuleFrameSettingsWriter implements SettingsWriter {
 	    String xml = xStream.toXML(settings);
 	    stream.write(xml.getBytes());
 	    stream.close();
-	} catch (Exception e) {
+	} catch (XStreamException e) {
+	    throw new ModuleSettingsParserException(e.getMessage());
 	}
-    }
-
-    public void write(Settings settings, Document document, Element parent) {
-	
     }
 }

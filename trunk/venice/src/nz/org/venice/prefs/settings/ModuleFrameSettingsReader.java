@@ -24,6 +24,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.XStreamException;
 
 import nz.org.venice.prefs.settings.ModuleSettingsParserException;
 import nz.org.venice.main.ModuleFrame;
@@ -73,11 +74,15 @@ public class ModuleFrameSettingsReader {
 	stream.read(buf);
 	String xml = new String(buf);
 			
-	XStream xStream = new XStream(new DomDriver());
-	ModuleFrameSettings result = (ModuleFrameSettings)xStream.fromXML(xml);
-	stream.close();
-
-	return (ModuleFrameSettings)result;
+	try {	
+	    XStream xStream = new XStream(new DomDriver());
+	    ModuleFrameSettings result = (ModuleFrameSettings)xStream.fromXML(xml);
+	    stream.close();	    
+	    return (ModuleFrameSettings)result;
+	} catch (XStreamException xe) {
+	    //Caused by Malformed XML, unable to instantiate object
+	    throw new ModuleSettingsParserException(xe.getMessage());
+	}
 
     }
     

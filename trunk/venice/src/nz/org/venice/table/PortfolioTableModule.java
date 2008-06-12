@@ -55,7 +55,7 @@ public class PortfolioTableModule extends AbstractTable
     private Settings settings;
 
     // Frame Icon
-    private String frameIcon = "org/mov/images/TableIcon.gif";
+    private String frameIcon = "nz/org/venice/images/TableIcon.gif";
 
     /**
      * Creat a new portfolio table module.
@@ -64,7 +64,7 @@ public class PortfolioTableModule extends AbstractTable
      * @param quoteBundle quote bundle.
      */
     public PortfolioTableModule(Portfolio portfolio, EODQuoteBundle quoteBundle) {
-	
+
 	this.quoteBundle = quoteBundle;
         this.portfolio = portfolio;
 
@@ -93,7 +93,7 @@ public class PortfolioTableModule extends AbstractTable
             tableMenu.addSeparator();
 
             tableClose = MenuHelper.addMenuItem(this, tableMenu,
-                                                Locale.getString("CLOSE"));	
+                                                Locale.getString("CLOSE"));
         }
     }
 

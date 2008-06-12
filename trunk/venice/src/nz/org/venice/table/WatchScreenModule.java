@@ -103,7 +103,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     private WatchScreenSettings settings;
 
     // Frame Icon
-    private String frameIcon = "org/mov/images/TableIcon.gif";
+    private String frameIcon = "nz/org/venice/images/TableIcon.gif";
 
     // Set to true if weve deleted this watch screen and shouldn't try
     // to save it when we exit
@@ -122,7 +122,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 	this.quoteBundle = quoteBundle;
 
 	propertySupport = new PropertyChangeSupport(this);
-	
+
         model = new MixedQuoteModel(quoteBundle, getQuotes(), Column.HIDDEN, Column.VISIBLE);
 	setModel(model, MixedQuoteModel.SYMBOL_COLUMN, SORT_UP);
 	showColumns(model);

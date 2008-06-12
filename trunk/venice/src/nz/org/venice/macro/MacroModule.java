@@ -9,15 +9,15 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 package nz.org.venice.macro;
@@ -61,10 +61,10 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 	private JButton edit_button = null;
 	private JButton import_button = null;
 	private JButton delete_button = null;
-	
+
     private PropertyChangeSupport propertySupport;
 
-    private String frameIcon = "org/mov/images/TableIcon.gif";
+    private String frameIcon = "nz/org/venice/images/TableIcon.gif";
 
     private Settings settings;
 
@@ -128,7 +128,7 @@ public class MacroModule extends JPanel implements Module, ActionListener {
     }
 
     private JDesktopPane desktop;
-    
+
 	/**
 	 * This is the default constructor
 	 */
@@ -137,10 +137,10 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 		propertySupport = new PropertyChangeSupport(this);
 		initialize();
 	}
-	
+
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private  void initialize() {
@@ -150,10 +150,10 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 		this.add(getJPanel1(), java.awt.BorderLayout.SOUTH);
 	}
 	/**
-	 * This method initializes jPanel	
-	 * 	
-	 * @return javax.swing.JPanel	
-	 */    
+	 * This method initializes jPanel
+	 *
+	 * @return javax.swing.JPanel
+	 */
 	private JPanel getJPanel() {
 		if (list_panel == null) {
 			list_panel = new JPanel();
@@ -163,10 +163,10 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 		return list_panel;
 	}
 	/**
-	 * This method initializes jPanel1	
-	 * 	
-	 * @return javax.swing.JPanel	
-	 */    
+	 * This method initializes jPanel1
+	 *
+	 * @return javax.swing.JPanel
+	 */
 	private JPanel getJPanel1() {
 		if (button_panel == null) {
 			button_panel = new JPanel();
@@ -178,10 +178,10 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 		return button_panel;
 	}
 	/**
-	 * This method initializes macro_pane	
-	 * 	
-	 * @return javax.swing.JScrollPane	
-	 */    
+	 * This method initializes macro_pane
+	 *
+	 * @return javax.swing.JScrollPane
+	 */
 	private JScrollPane getMacro_pane() {
 		if (macro_pane == null) {
 			macro_pane = new JScrollPane();
@@ -190,10 +190,10 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 		return macro_pane;
 	}
 	/**
-	 * This method initializes jList	
-	 * 	
-	 * @return javax.swing.JList	
-	 */    
+	 * This method initializes jList
+	 *
+	 * @return javax.swing.JList
+	 */
 	private JList getJList() {
 		if (macro_list == null) {
 			macro_list = new JList();
@@ -201,17 +201,17 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 		return macro_list;
 	}
 	/**
-	 * This method initializes jButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */    
+	 * This method initializes jButton
+	 *
+	 * @return javax.swing.JButton
+	 */
 	private JButton getJButton() {
 		if (new_button == null) {
 			new_button = new JButton();
 			new_button.setText(Locale.getString("NEW"));
 			new_button.setMnemonic(java.awt.event.KeyEvent.VK_N);
-			new_button.addActionListener(new java.awt.event.ActionListener() { 
-				public void actionPerformed(java.awt.event.ActionEvent e) {    
+			new_button.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
 					System.out.println("actionPerformed()"); // TODO Auto-generated Event stub actionPerformed()
 				}
 			});
@@ -219,10 +219,10 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 		return new_button;
 	}
 	/**
-	 * This method initializes jButton1	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */    
+	 * This method initializes jButton1
+	 *
+	 * @return javax.swing.JButton
+	 */
 	private JButton getJButton1() {
 		if (edit_button == null) {
 			edit_button = new JButton();
@@ -232,10 +232,10 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 		return edit_button;
 	}
 	/**
-	 * This method initializes jButton2	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */    
+	 * This method initializes jButton2
+	 *
+	 * @return javax.swing.JButton
+	 */
 	private JButton getJButton2() {
 		if (import_button == null) {
 			import_button = new JButton();
@@ -245,10 +245,10 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 		return import_button;
 	}
 	/**
-	 * This method initializes jButton3	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */    
+	 * This method initializes jButton3
+	 *
+	 * @return javax.swing.JButton
+	 */
 	private JButton getJButton3() {
 	    if (delete_button == null) {
 	        delete_button = new JButton();
@@ -257,26 +257,26 @@ public class MacroModule extends JPanel implements Module, ActionListener {
 	    }
 	    return delete_button;
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
 	    if (e.getSource() == new_button) {
 	    } else if (e.getSource() == edit_button) {
 	    } else if (e.getSource() == import_button) {
 	        JFileChooser chooser;
 	        String lastDirectory = PreferencesManager.getDirectoryLocation("macros");
-	        
+
 	        if(lastDirectory != null)
 	            chooser = new JFileChooser(lastDirectory);
 	        else
 	            chooser = new JFileChooser();
-	        
+
 	        chooser.setMultiSelectionEnabled(false);
 	        int action = chooser.showOpenDialog(desktop);
 	        if(action == JFileChooser.APPROVE_OPTION) {
 	            // Remember directory
 	            lastDirectory = chooser.getCurrentDirectory().getAbsolutePath();
 	            PreferencesManager.putDirectoryLocation("importer",lastDirectory);
-	            
+
 	            File file = chooser.getSelectedFile();
 	            if (file != null) {
 	            }

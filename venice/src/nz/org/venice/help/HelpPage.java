@@ -39,8 +39,8 @@ import nz.org.venice.util.Locale;
 public class HelpPage extends DefaultMutableTreeNode {
 
     // Location of help docs
-    private final static String BASE_PATH = "org/mov/help/doc/";
-    private final static String INDEX_DOCUMENT = "org/mov/help/doc/index.xml";
+    private final static String BASE_PATH = "nz/org/venice/help/doc/";
+    private final static String INDEX_DOCUMENT = "nz/org/venice/help/doc/index.xml";
 
     private String name;
     private String link;
@@ -49,7 +49,7 @@ public class HelpPage extends DefaultMutableTreeNode {
 
     /**
      * Create a new help page with the given chapter name. The page will display
-     * the contents of the help file in the src/org/mov/help/doc/ directory which
+     * the contents of the help file in the src/nz/org/venice/help/doc/ directory which
      * has the same name as name with a trailing "html".
      *
      * @param name the name of the chapter
@@ -64,7 +64,7 @@ public class HelpPage extends DefaultMutableTreeNode {
 
     /**
      * Create a new root help page. The page will display
-     * the contents of the help file in the src/org/mov/help/doc/ directory which
+     * the contents of the help file in the src/nz/org/venice/help/doc/ directory which
      * has the same name as name with a trailing "html".
      *
      * No parameters for constructor to fit Java Beans interface
@@ -72,14 +72,14 @@ public class HelpPage extends DefaultMutableTreeNode {
     public HelpPage() {
 	super(Locale.getString("VENICE_SHORT"));
 	name = Locale.getString("VENICE_SHORT");
-	link = nameToLink(name);	
+	link = nameToLink(name);
 	isLoaded = false;
     }
 
 
     /**
      * Set the name of the page.
-     * 
+     *
      * @param name   The name of the page
      */
     public void setName(String name) {
@@ -109,7 +109,7 @@ public class HelpPage extends DefaultMutableTreeNode {
     /**
      *
      * Create a page link to this helppage
-     * 
+     *
      * @param link  The name of the page linking to this page
      */
 
@@ -169,11 +169,11 @@ public class HelpPage extends DefaultMutableTreeNode {
 		try {
 		    InputStream is = fileURL.openStream();
 		    InputStreamReader isr = new InputStreamReader(fileURL.openStream());
-		    BufferedReader br = new BufferedReader(isr);		
+		    BufferedReader br = new BufferedReader(isr);
 
 		    // ... one line at a time
 		    String line = br.readLine();
-		
+
 		    while(line != null) {
 			stringBuffer = stringBuffer.append(line);
                         stringBuffer = stringBuffer.append("\n");
@@ -181,7 +181,7 @@ public class HelpPage extends DefaultMutableTreeNode {
 			line = br.readLine();
 		    }
 
-		    br.close();		
+		    br.close();
 		}
 		catch(java.io.IOException e) {
 		    text = Locale.getString("ERROR_LOADING_HELP_PAGE");

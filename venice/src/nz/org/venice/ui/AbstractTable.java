@@ -59,9 +59,9 @@ public class AbstractTable extends SortedTable {
     private static final Color alternativeBackgroundColor = new Color(237, 237, 237);
 
     // Images used for arrows representing when stock has gone up, down or is unchanged
-    private String upImage = "org/mov/images/Up.png";
-    private String downImage = "org/mov/images/Down.png";
-    private String unchangedImage = "org/mov/images/Unchanged.png";
+    private String upImage = "nz/org/venice/images/Up.png";
+    private String downImage = "nz/org/venice/images/Down.png";
+    private String unchangedImage = "nz/org/venice/images/Unchanged.png";
 
     // Keep a single instance of the following so we don't have to instantiate
     // for each cell that is drawn

@@ -34,7 +34,7 @@ import nz.org.venice.prefs.PreferencesManager;
  * symbol in the english (default) language. If it could not find a match there,
  * it will display the string <code>Locale.UNKNOWN</code>.
  * <p>
- * The internationalisation files are kept in src/org/mov/util/locale/.
+ * The internationalisation files are kept in src/nz/org/venice/util/locale/.
  * <p>
  * @author Andrew Leppard
  * @see java.util.ResourceBundle

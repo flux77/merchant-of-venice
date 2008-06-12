@@ -87,7 +87,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     private QuoteModuleSettings settings;
 
     // Frame Icon
-    private String frameIcon = "org/mov/images/TableIcon.gif";
+    private String frameIcon = "nz/org/venice/images/TableIcon.gif";
 
     // Current expression we are filtering by
     private String filterExpressionString;
@@ -107,7 +107,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
      * @param quoteBundle quotes to table
      * @param singleDate if this is set to true then only display the quotes
      *                     on the last date in the quote bundle, otherwise
-     *                     display them all. 
+     *                     display them all.
      */
     public QuoteModule(EODQuoteBundle quoteBundle,
                        boolean singleDate) {
@@ -125,12 +125,12 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
      * @param filterExpressionString expression string to filter by
      * @param singleDate if this is set to true then only display the quotes
      *                     on the last date in the quote bundle, otherwise
-     *                     display them all. 
+     *                     display them all.
      */
     public QuoteModule(EODQuoteBundle quoteBundle,
                        String filterExpressionString,
                        boolean singleDate) {
-	
+
 	this.filterExpressionString = filterExpressionString;
 	this.quoteBundle = quoteBundle;
         this.singleDate = singleDate;
@@ -142,11 +142,11 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
         // If we are listing stocks on a single day then don't bother showing
         // the date column. On the other hand if we are only listing a single
         // stock then don't bother showing the symbol column
-        model = new EODQuoteModel(quoteBundle, quotes, 
+        model = new EODQuoteModel(quoteBundle, quotes,
                                   singleDate? Column.HIDDEN : Column.VISIBLE,
-                                  quoteBundle.getAllSymbols().size() == 1? 
+                                  quoteBundle.getAllSymbols().size() == 1?
                                   Column.HIDDEN : Column.VISIBLE);
-	setModel(model, 
+	setModel(model,
                  quoteBundle.getAllSymbols().size() == 1? EODQuoteModel.DATE_COLUMN :
                  EODQuoteModel.ACTIVITY_COLUMN, SORT_UP);
 	model.addTableModelListener(this);
@@ -212,7 +212,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             for(int i = 0; i < selectedRows.length; i++) {
                 Symbol symbol
                     = (Symbol)model.getValueAt(selectedRows[i],
-                                               
+
                                                EODQuoteModel.SYMBOL_COLUMN);
                 symbols.add(symbol);
             }
@@ -232,7 +232,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
         // Traverse all symbols on all dates
         while(iterator.hasNext()) {
             Quote quote = (Quote)iterator.next();
-            
+
             if(!singleDate || (lastDate.equals(quote.getDate())))
                 quotes.add(quote);
         }
@@ -244,15 +244,15 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     // expression to equate to true. If there is no expression (string is null or
     // empty) then extract all the quotes.
     private List extractQuotesUsingRule(String filterExpression,
-                                        EODQuoteBundle quoteBundle) {      
+                                        EODQuoteBundle quoteBundle) {
 
         // If there is no rule, then just return all quotes
-	if(filterExpression == null || filterExpression.length() == 0) 
+	if(filterExpression == null || filterExpression.length() == 0)
             return extractAllQuotes(quoteBundle);
 
         // First parse the expression
         Expression expression = null;
-        
+
         try {
             expression = Parser.parse(filterExpressionString);
         }
@@ -298,7 +298,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 					  expression.toString(),
 					  Locale.getString("ERROR_EVALUATION_EQUATION"),
 					  JOptionPane.ERROR_MESSAGE);
-	
+
 	    // delete erroneous expression
 	    expression = null;
 
@@ -317,37 +317,37 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 
             // Show columns menu
             tableMenu.add(createShowColumnMenu(model));
-            
+
             tableMenu.addSeparator();
 
             applyExpressions =
                 MenuHelper.addMenuItem(this, tableMenu,
                                        Locale.getString("APPLY_EQUATIONS"));
-            
+
             applyFilter =
                 MenuHelper.addMenuItem(this, tableMenu,
                                        Locale.getString("APPLY_FILTER"));
-            
+
             sortByMostActive =
                 MenuHelper.addMenuItem(this, tableMenu,
                                        Locale.getString("SORT_BY_MOST_ACTIVE"));
-            
+
             tableMenu.addSeparator();
-            
+
             tableClose = MenuHelper.addMenuItem(this, tableMenu,
-                                                Locale.getString("CLOSE"));	
-            
+                                                Locale.getString("CLOSE"));
+
         }
 
         // Symbols Menu
         {
             JMenu symbolsMenu = MenuHelper.addMenu(menuBar, Locale.getString("SYMBOLS"));
-            
+
             findSymbol =
                 MenuHelper.addMenuItem(this, symbolsMenu, Locale.getString("FIND"));
 
             symbolsMenu.addSeparator();
-            
+
             graphSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
                                        Locale.getString("GRAPH"));
@@ -357,8 +357,8 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
         }
 
         // Listen for changes in selection so we can update the menus
-        getSelectionModel().addListSelectionListener(new ListSelectionListener() {		
-                
+        getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
                 public void valueChanged(ListSelectionEvent e) {
                         checkMenuDisabledStatus();
                 }
@@ -398,7 +398,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 				}});
 		    }
 		}};
-	
+
 	thread.start();
     }
 
@@ -412,14 +412,14 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 		public void run() {
                     JDesktopPane desktop =
                         nz.org.venice.ui.DesktopManager.getDesktop();
-        
+
                     Symbol symbol = SymbolListDialog.getSymbol(desktop, Locale.getString("FIND_SYMBOL"));
 
                     if(symbol != null) {
                         List quotes = model.getQuotes();
                         int i = 0;
 
-                        for(Iterator iterator = quotes.iterator(); 
+                        for(Iterator iterator = quotes.iterator();
                             iterator.hasNext(); i++) {
                             Quote quote = (Quote)iterator.next();
 
@@ -439,7 +439,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                                                               JOptionPane.INFORMATION_MESSAGE);
                     }
                 }};
-        
+
         thread.start();
     }
 
@@ -561,7 +561,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
-                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i],
                                                          EODQuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
@@ -579,7 +579,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             List symbols = new ArrayList();
 
             for(int i = 0; i < selectedRows.length; i++) {
-                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i], 
+                Symbol symbol = (Symbol)model.getValueAt(selectedRows[i],
                                                          EODQuoteModel.SYMBOL_COLUMN);
 
                 symbols.add(symbol);
@@ -592,10 +592,10 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	else
             assert false;
     }
-    
+
     public Settings getSettings() {
 	return settings;
     }
-    
+
 
 }

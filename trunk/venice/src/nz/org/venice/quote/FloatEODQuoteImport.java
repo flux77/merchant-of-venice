@@ -152,7 +152,7 @@ public class FloatEODQuoteImport {
 
         String urlString = URL_PATTERN;
         urlString = Find.replace(urlString, DAY, format.format(date.getDay()));
-        urlString = Find.replace(urlString, MONTH, format.format(date.getMonth() - 1));
+        urlString = Find.replace(urlString, MONTH, format.format(date.getMonth()));
 
         format.setMinimumIntegerDigits(4);
         urlString = Find.replace(urlString, YEAR, format.format(date.getYear()));

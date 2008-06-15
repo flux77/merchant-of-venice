@@ -189,8 +189,6 @@ public class FrameRegister extends HashMap {
 	    String key = (String)iterator.next();
 	    ModuleFrame frame = (ModuleFrame)super.get(key);
 	    	    	   
-	    System.out.println("type = " + frame.getModule().getClass().getName());
-
 	    if (frame.getClass().getName().equals(type)) {
 		return frame;
 	    }	    

@@ -85,7 +85,7 @@ public class DesktopManager
     public DesktopManager(JDesktopPane desktop) {
 	super();
 	frameRegister = new FrameRegister();
-	setDesktop(desktop);	
+	setDesktop(desktop);
     }
 
     /**
@@ -493,8 +493,8 @@ public class DesktopManager
 				boolean honourSize, boolean resizable) {
 
         ModuleFrame frame = new ModuleFrame(this, module, centre, honourSize, resizable);
-	
-	frameRegister.add(frame);	
+
+	frameRegister.add(frame);
 	frameRegister.put(String.valueOf(frame.hashCode()), frame);
 
         // Make sure that the module added signal is sent before the module
@@ -504,19 +504,23 @@ public class DesktopManager
 	fireModuleAdded(module);
 
 	desktop_instance.add(frame);
-	
+
 	try {
 	    frame.setSelected(true);
 	}
 	catch(PropertyVetoException v) {
 	    // ignore
 	}
-	
-	frame.moveToFront();		
+
+	frame.moveToFront();
 
 	return frame;
     }
 
+    public void activateFrame(JInternalFrame frame) {
+        // Nothing to do. If we don't define this funtion then we get assertion
+        // errors if the user clicks on the background. I'm not sure why.
+    }
 
     /**
      *
@@ -548,8 +552,8 @@ public class DesktopManager
 		    PreferencesManager.putModuleFrameSettings(moduleFrame);
 		} catch (PreferencesException pfe) {
 		    //Not sure what to do about this yet.
-		}		
-	    }	    
+		}
+	    }
 	}
     }
 }

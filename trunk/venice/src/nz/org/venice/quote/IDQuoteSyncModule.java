@@ -1,16 +1,16 @@
 /* Merchant of Venice - technical analysis software for the stock market.
    Copyright (C) 2002 Andrew Leppard (aleppard@picknowl.com.au)
- 
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
- 
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -66,6 +66,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     private JCheckBox isEnabledCheckBox;
     private JComboBox sourceComboBox;
     private JTextField symbolListTextField;
+    private JTextField suffixTextField;
     private JTextField openTimeTextField;
     private JTextField closeTimeTextField;
     private JTextField periodTextField;
@@ -74,6 +75,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     private boolean isEnabled;
     private String symbolListText;
     private List symbolList;
+    private String suffix;
     private TradingTime openTime;
     private TradingTime closeTime;
     private int period;
@@ -81,7 +83,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     // Preferences
     private PreferencesManager.IDQuoteSyncPreferences prefs = null;
     private Settings settings;
-    
+
     /**
      * Create a new Intra-day quote sync module.
      *
@@ -119,7 +121,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         titledPanel.setLayout(gridbag);
-        
+
         c.weightx = 1.0;
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
@@ -132,15 +134,19 @@ public class IDQuoteSyncModule extends JPanel implements Module {
         titledPanel.add(label);
 
         sourceComboBox = new JComboBox();
-        sourceComboBox.addItem(Locale.getString("YAHOO"));        
+        sourceComboBox.addItem(Locale.getString("YAHOO"));
 
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(sourceComboBox, c);
         titledPanel.add(sourceComboBox);
-        
-        symbolListTextField = GridBagHelper.addTextRow(titledPanel, Locale.getString("SYMBOLS"), 
+
+        symbolListTextField = GridBagHelper.addTextRow(titledPanel, Locale.getString("SYMBOLS"),
                                                        prefs.symbols,
                                                        gridbag, c, 11);
+
+        suffixTextField = GridBagHelper.addTextRow(titledPanel, Locale.getString("ADD_SUFFIX"),
+                                                   prefs.suffix,
+                                                   gridbag, c, 11);
 
         openTimeTextField = GridBagHelper.addTextRow(titledPanel,
                                                      Locale.getString("OPEN_TIME"),
@@ -156,7 +162,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
                                                    Locale.getString("PERIOD_IN_SECONDS"),
                                                    Integer.toString(prefs.period),
                                                    gridbag, c, 11);
-        
+
         add(isEnabledCheckBox, BorderLayout.NORTH);
         add(titledPanel, BorderLayout.CENTER);
 
@@ -180,7 +186,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
 
         buttonPanel.add(OKButton);
         buttonPanel.add(cancelButton);
-        
+
         add(buttonPanel, BorderLayout.SOUTH);
 
         // Make sure the appropriate buttons are enabled and the others
@@ -192,11 +198,12 @@ public class IDQuoteSyncModule extends JPanel implements Module {
      * Enable/disable the appropriate widgets depending on which widgets
      * are checked.
      */
-    private void checkDisabledStatus() { 
+    private void checkDisabledStatus() {
         boolean isEnabled = isEnabledCheckBox.isSelected();
 
         sourceComboBox.setEnabled(isEnabled);
         symbolListTextField.setEnabled(isEnabled);
+        suffixTextField.setEnabled(isEnabled);
         openTimeTextField.setEnabled(isEnabled);
         closeTimeTextField.setEnabled(isEnabled);
         periodTextField.setEnabled(isEnabled);
@@ -238,7 +245,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
             symbolList = new ArrayList(Symbol.toSortedSet(symbolListText, false));
         }
         catch(SymbolFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop, 
+            JOptionPane.showInternalMessageDialog(desktop,
                                                   e.getMessage(),
                                                   Locale.getString("INVALID_SYMBOL_LIST"),
                                                   JOptionPane.ERROR_MESSAGE);
@@ -264,7 +271,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
             period = Integer.parseInt(periodTextField.getText());
         }
         catch(NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop, 
+            JOptionPane.showInternalMessageDialog(desktop,
                                                   Locale.getString("ERROR_PARSING_NUMBER",
                                                                    periodTextField.getText(),
                                                                    e.getMessage()),
@@ -272,6 +279,8 @@ public class IDQuoteSyncModule extends JPanel implements Module {
                                                   JOptionPane.ERROR_MESSAGE);
 	    return false;
         }
+
+        suffix = suffixTextField.getText().trim();
 
         return true;
     }
@@ -282,6 +291,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     private void saveConfiguration() {
         prefs.isEnabled = isEnabled;
         prefs.symbols = symbolListText;
+        prefs.suffix = suffix;
         prefs.openTime = openTime;
         prefs.closeTime = closeTime;
         prefs.period = period;
@@ -295,6 +305,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     private void activateConfiguration() {
         IDQuoteSync.getInstance().setPeriod(period);
         IDQuoteSync.getInstance().addSymbols(symbolList);
+        IDQuoteSync.getInstance().setSuffix(suffix);
         IDQuoteSync.getInstance().setTimeRange(openTime, closeTime);
         IDQuoteSync.getInstance().setEnabled(isEnabled);
     }
@@ -307,7 +318,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     public void addModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
     }
-    
+
     /**
      * Remove a property change listener for module change events.
      *
@@ -316,7 +327,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     public void removeModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
     }
-    
+
     /**
      * Return displayed component for this module.
      *
@@ -325,7 +336,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     public JComponent getComponent() {
         return this;
     }
-    
+
     /**
      * Return menu bar for quote source preferences module.
      *
@@ -334,7 +345,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     public JMenuBar getJMenuBar() {
         return null;
     }
-    
+
     /**
      * Return frame icon for quote source preferences module.
      *
@@ -343,7 +354,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     public ImageIcon getFrameIcon() {
         return null;
     }
-    
+
     /**
      * Returns the window title.
      *
@@ -352,7 +363,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     public String getTitle() {
         return Locale.getString("SYNC_ID_TITLE");
     }
-    
+
     /**
      * Return whether the module should be enclosed in a scroll pane.
      *
@@ -361,7 +372,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
     public boolean encloseInScrollPane() {
         return true;
     }
-    
+
     /**
      * Called when window is closing. We handle the saving explicitly so
      * this is only called when the user clicks on the close button in the

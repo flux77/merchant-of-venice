@@ -2,6 +2,12 @@ Changes for Venice, 0.72 beta ??/???/2008
 =========================================
 
 * Added support for downloading quotes from finance.google.com.
+* Added the ability to provide a suffix when importing from
+  Yahoo quotes. This allows you to download, say, "CBA.AX" as
+  "CBA".
+
+* Bug Fixes:
+  - Fixed an off-by-one month error when downloading from float.com.au.
 
 Changes for Venice, 0.71 beta 25/Feb/2007
 =========================================

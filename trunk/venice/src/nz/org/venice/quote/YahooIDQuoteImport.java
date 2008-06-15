@@ -61,13 +61,15 @@ public class YahooIDQuoteImport {
      * Retrieve intra-day quotes from Yahoo.
      *
      * @param symbols the symbols to import.
+     * @param suffix optional suffix to append (e.g. ".AX"). This suffix tells
+     *               Yahoo which exchange the symbol belongs to.
      * @exception ImportExportException if there was an error retrieving the quotes
      */
-    public static List importSymbols(List symbols)
+    public static List importSymbols(List symbols, String suffix)
          throws ImportExportException {
 
         List quotes = new ArrayList();
-        String URLString = constructURL(symbols);
+        String URLString = constructURL(symbols, suffix);
         IDQuoteFilter filter = new YahooIDQuoteFilter();
 
         PreferencesManager.ProxyPreferences proxyPreferences =
@@ -141,21 +143,34 @@ public class YahooIDQuoteImport {
      * the given dates from Yahoo.
      *
      * @param symbols the symbos to import.
+     * @param suffix optional suffix to append (e.g. ".AX"). This suffix tells
+     *               Yahoo which exchange the symbol belongs to.
      * @return URL string
      */
-    private static String constructURL(List symbols) {
+    private static String constructURL(List symbols, String suffix) {
         String URLString = YAHOO_URL_PATTERN;
-        String symbolString = "";
+        String symbolStringList = "";
 
         // Construct a plus separated list of symbols, e.g. IBM+MSFT+...
         for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
             Symbol symbol = (Symbol)iterator.next();
-            symbolString = symbolString.concat(symbol.toString());
+            String symbolString = symbol.toString();
+
+            // Append symbol with optional suffix. If the user has not provided a full-stop, provide
+            // them with one.
+            if(suffix.length() > 0) {
+                if(!suffix.startsWith("."))
+                    symbolString += ".";
+                symbolString += suffix;
+            }
+
+            symbolStringList += symbolString;
+
             if(iterator.hasNext())
-                symbolString = symbolString.concat("+");
+                symbolStringList += "+";
         }
 
-        URLString = Find.replace(URLString, SYMBOLS, symbolString);
+        URLString = Find.replace(URLString, SYMBOLS, symbolStringList);
         return URLString;
     }
 }

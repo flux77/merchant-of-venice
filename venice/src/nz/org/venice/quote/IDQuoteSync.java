@@ -41,7 +41,7 @@ import nz.org.venice.util.TradingTime;
  * @author Andrew Leppard
  */
 public class IDQuoteSync {
-    
+
     /**
      * This class contains the function that is periodically called to download
      * new intra-day quotes.
@@ -51,15 +51,19 @@ public class IDQuoteSync {
         // List of symbols to download
         private List symbols;
 
+        // Optional suffix to append to symbol, e.g. ".AX"
+        private String suffix;
+
         // Quote cache to store quotes
         private IDQuoteCache quoteCache;
 
         /**
          * Create a new object to periodically download intra-day quotes.
          */
-        public Sync(List symbols) {
+        public Sync(List symbols, String suffix) {
             assert symbols.size() > 0;
             this.symbols = symbols;
+            this.suffix = suffix;
             quoteCache = IDQuoteCache.getInstance();
         }
 
@@ -68,12 +72,12 @@ public class IDQuoteSync {
          */
         public void run() {
             try {
-                List quotes = YahooIDQuoteImport.importSymbols(symbols);
+                List quotes = YahooIDQuoteImport.importSymbols(symbols, suffix);
 
                 quoteCache.load(quotes);
-                
+
                 //System.out.println("---------");
-                //for(Iterator iterator = quotes.iterator(); iterator.hasNext();) 
+                //for(Iterator iterator = quotes.iterator(); iterator.hasNext();)
                 //    System.out.println(iterator.next());
             }
             catch(ImportExportException e) {
@@ -90,7 +94,7 @@ public class IDQuoteSync {
      * This class contains the function that starts the automatic quote sync.
      */
     private class StartSync extends TimerTask {
-        
+
         // Quote sync to start
         private IDQuoteSync idQuoteSync;
 
@@ -108,17 +112,17 @@ public class IDQuoteSync {
          */
         public void run() {
             idQuoteSync.startSyncTimer();
-        }        
+        }
     }
- 
+
     /**
      * This class contains the function that starts the automatic quote sync.
      */
     private class StopSync extends TimerTask {
-        
+
         // Quote sync to stop
         private IDQuoteSync idQuoteSync;
-        
+
         /**
          * Createa  new object to stop the automatic quote sync.
          *
@@ -135,10 +139,10 @@ public class IDQuoteSync {
             idQuoteSync.stopSyncTimer();
         }
     }
- 
+
     /** The default time period inbetween quote downloads. */
     public final static int DEFAULT_PERIOD = 60;
-    
+
     /** The default start time. */
     public final static TradingTime DEFAULT_START_TIME = new TradingTime(9, 0, 0); // 9am
 
@@ -156,6 +160,9 @@ public class IDQuoteSync {
 
     // List of symbols to import
     private List symbols;
+
+    // Optional suffix to append to symbol, e.g. ".AX"
+    private String suffix;
 
     // Status of whether the quote sync is enabled
     private boolean isEnabled;
@@ -219,7 +226,7 @@ public class IDQuoteSync {
             stopSyncTimer();
         }
     }
-    
+
     /**
      * Return whether the automatic downloading of intra-day quotes is enabled.
      *
@@ -271,6 +278,18 @@ public class IDQuoteSync {
         // Restart sync task so that it has the updated symbol list
         if(isNewSymbol)
             restartSyncTimer();
+    }
+
+    /**
+     * Set optional suffix to append to symbols, e.g. ".AX".
+     *
+     * @param suffix optional suffix
+     */
+    public void setSuffix(String suffix) {
+        if(!this.suffix.equals(suffix)) {
+            this.suffix = suffix;
+            restartSyncTimer();
+        }
     }
 
     /**
@@ -326,7 +345,7 @@ public class IDQuoteSync {
            !today.isWeekend()) {
 
             syncTimer = new Timer();
-            syncTimer.scheduleAtFixedRate(new Sync(symbols),
+            syncTimer.scheduleAtFixedRate(new Sync(symbols, suffix),
                                           0,
                                           period * TradingTime.MILLISECONDS_IN_SECOND);
         }
@@ -355,7 +374,7 @@ public class IDQuoteSync {
      */
     private synchronized void startStartStopTimers() {
         TradingDate today = new TradingDate();
-        
+
         // Start timers to occur once per day each
         if(startTimer == null) {
             startTimer = new Timer();

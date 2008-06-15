@@ -83,12 +83,14 @@ public class GoogleEODQuoteImport {
      *
      * @param report report to log warnings and errors
      * @param symbol symbol to import
+     * @param prefix optional prefix to prepend (e.g. "ASX:"). This prefix tells
+     *               Google which exchange the symbol belongs to.
      * @param startDate start of date range to import
      * @param endDate end of date range to import
      * @return list of quotes
      * @exception ImportExportException if there was an error retrieving the quotes
      */
-    public static List importSymbol(Report report, Symbol symbol,
+    public static List importSymbol(Report report, Symbol symbol, String prefix,
                                     TradingDate startDate, TradingDate endDate)
         throws ImportExportException {
 
@@ -105,7 +107,7 @@ public class GoogleEODQuoteImport {
                 retrievalStartDate = startDate;
             }
             // retrieve quotes and add to result
-            List quotes = retrieveQuotes(report, symbol, retrievalStartDate, retrievalEndDate);
+            List quotes = retrieveQuotes(report, symbol, prefix, retrievalStartDate, retrievalEndDate);
             result.addAll(quotes);
 
             // determine endDate for next retrieval
@@ -127,17 +129,19 @@ public class GoogleEODQuoteImport {
      *
      * @param report report to log warnings and errors
      * @param symbol symbol to import
+     * @param prefix optional prefix to prepend (e.g. "ASX:"). This prefix tells
+     *               Google which exchange the symbol belongs to.
      * @param startDate start of date range to import
      * @param endDate end of date range to import
      * @return list of quotes
      * @exception ImportExportException if there was an error retrieving the quotes
      */
-    private static List retrieveQuotes(Report report, Symbol symbol,
+    private static List retrieveQuotes(Report report, Symbol symbol, String prefix,
                                        TradingDate startDate, TradingDate endDate)
     	throws ImportExportException {
 
         List quotes = new ArrayList();
-        String URLString = constructURL(symbol, startDate, endDate);
+        String URLString = constructURL(symbol, prefix, startDate, endDate);
         EODQuoteFilter filter = new GoogleEODQuoteFilter(symbol);
 
         PreferencesManager.ProxyPreferences proxyPreferences =
@@ -216,15 +220,27 @@ public class GoogleEODQuoteImport {
      * the given dates from Google.
      *
      * @param symbol the symbol to retrieve
+     * @param prefix optional prefix to prepend (e.g. "ASX:"). This prefix tells
+     *               Google which exchange the symbol belongs to.
      * @param start the start date to retrieve
      * @param end the end date to retrieve
      * @return URL string
      */
-    private static String constructURL(Symbol symbol, TradingDate start, TradingDate end) {
+    private static String constructURL(Symbol symbol, String prefix, TradingDate start, TradingDate end) {
         String URLString = GOOGLE_URL_PATTERN;
         String months[]  = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
                             "Sep", "Oct", "Nov", "Dec"};
-        URLString = Find.replace(URLString, SYMBOL, symbol.toString());
+        String symbolString = symbol.toString();
+
+        // Prepend symbol with optional prefix. If the user has not provided a colon, provide
+        // them with one.
+        if(prefix.length() > 0) {
+            if(!prefix.endsWith(":"))
+                prefix += ":";
+            symbolString = (prefix + symbolString);
+        }
+
+        URLString = Find.replace(URLString, SYMBOL, symbolString);
         URLString = Find.replace(URLString, START_DAY, Integer.toString(start.getDay()));
         URLString = Find.replace(URLString, START_MONTH,
                                  months[start.getMonth() - 1]);
@@ -233,6 +249,7 @@ public class GoogleEODQuoteImport {
         URLString = Find.replace(URLString, END_MONTH,
                                  months[end.getMonth() - 1]);
         URLString = Find.replace(URLString, END_YEAR, Integer.toString(end.getYear()));
+
         return URLString;
     }
 

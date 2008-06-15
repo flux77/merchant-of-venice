@@ -42,6 +42,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -85,6 +86,8 @@ public class ImportQuoteModule extends JPanel implements Module {
     private JComboBox formatComboBox;
     private JRadioButton fromInternet;
     private JComboBox webSiteComboBox;
+    private JLabel prefixOrSuffixLabel;
+    private JTextField prefixOrSuffixTextField;
     private JTextField symbolList;
     private JTextField startDateTextField;
     private JTextField endDateTextField;
@@ -92,6 +95,7 @@ public class ImportQuoteModule extends JPanel implements Module {
     // Parsed fields for internet import
     private TradingDate startDate;
     private TradingDate endDate;
+    private String prefixOrSuffix;
     private List symbols;
     private Settings settings;
 
@@ -197,6 +201,19 @@ public class ImportQuoteModule extends JPanel implements Module {
                                                   gridbag, c, 11);
 
             c.gridx = 1;
+            prefixOrSuffixLabel = new JLabel(Locale.getString("ADD_PREFIX"));
+            c.gridwidth = 1;
+            gridbag.setConstraints(prefixOrSuffixLabel, c);
+            titledPanel.add(prefixOrSuffixLabel);
+
+            prefixOrSuffixTextField = new JTextField(p.get("prefixOrSuffix", ""), 11);
+            if(c.gridx != -1)
+                c.gridx++;
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            gridbag.setConstraints(prefixOrSuffixTextField, c);
+            titledPanel.add(prefixOrSuffixTextField);
+
+            c.gridx = 1;
             TradingDate today = new TradingDate();
             TradingDate previous = today.previous(30);
 
@@ -284,6 +301,22 @@ public class ImportQuoteModule extends JPanel implements Module {
         symbolList.setEnabled(fromInternet.isSelected() &&
                               (webSiteComboBox.getSelectedIndex() == GOOGLE_SITE ||
                                webSiteComboBox.getSelectedIndex() == YAHOO_SITE));
+
+        // Prefix or suffix is only applicable if importing from Yahoo or Google.
+        boolean prefixOrSuffixEnabled =
+           (fromInternet.isSelected() &&
+            (webSiteComboBox.getSelectedIndex() == GOOGLE_SITE ||
+             webSiteComboBox.getSelectedIndex() == YAHOO_SITE));
+
+        prefixOrSuffixTextField.setEnabled(prefixOrSuffixEnabled);
+        if (prefixOrSuffixEnabled) {
+            // If we are downloading from Google it's a prefix, e.g. "ASX:".
+            // If we are downloading from Yahoo, then it's a suffix, e.g. ".AX".
+            if(webSiteComboBox.getSelectedIndex() == GOOGLE_SITE)
+                prefixOrSuffixLabel.setText(Locale.getString("ADD_PREFIX"));
+            else
+                prefixOrSuffixLabel.setText(Locale.getString("ADD_SUFFIX"));
+        }
     }
 
     /**
@@ -331,6 +364,7 @@ public class ImportQuoteModule extends JPanel implements Module {
             p.put("webSite", "yahoo");
         else
             p.put("webSite", "float");
+        p.put("prefixOrSuffix", prefixOrSuffixTextField.getText());
     }
 
     /**
@@ -477,6 +511,9 @@ public class ImportQuoteModule extends JPanel implements Module {
         // Set up proxy support
         ProxyPage.setupNetworking();
 
+        // Get optional suffix
+        String suffix = prefixOrSuffix;
+
         // Now set up progress dialog to display the symbol by symbol progress
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setIndeterminate(false);
@@ -496,7 +533,7 @@ public class ImportQuoteModule extends JPanel implements Module {
 
                 // Load quotes from internet
                 List quotes =
-                    YahooEODQuoteImport.importSymbol(report, symbol, startDate, endDate);
+                    YahooEODQuoteImport.importSymbol(report, symbol, suffix, startDate, endDate);
 
                 // Import into database
                 if(quotes.size() > 0) {
@@ -542,6 +579,9 @@ public class ImportQuoteModule extends JPanel implements Module {
         // Set up proxy support
         ProxyPage.setupNetworking();
 
+        // Get optional prefix
+        String prefix = prefixOrSuffix;
+
         // Now set up progress dialog to display the symbol by symbol progress
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setIndeterminate(false);
@@ -561,7 +601,7 @@ public class ImportQuoteModule extends JPanel implements Module {
 
                 // Load quotes from internet
                 List quotes =
-                    GoogleEODQuoteImport.importSymbol(report, symbol, startDate, endDate);
+                    GoogleEODQuoteImport.importSymbol(report, symbol, prefix, startDate, endDate);
 
                 // Import into database
                 if(quotes.size() > 0) {
@@ -683,6 +723,9 @@ public class ImportQuoteModule extends JPanel implements Module {
                                                       JOptionPane.ERROR_MESSAGE);
                 return false;
             }
+
+            prefixOrSuffix = prefixOrSuffixTextField.getText().trim();
+
         }
 
         // Parse dates and validate

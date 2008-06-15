@@ -81,12 +81,14 @@ public class YahooEODQuoteImport {
      *
      * @param report report to log warnings and errors
      * @param symbol symbol to import
+     * @param suffix optional suffix to append (e.g. ".AX"). This suffix tells
+     *               Yahoo which exchange the symbol belongs to.
      * @param startDate start of date range to import
      * @param endDate end of date range to import
      * @return list of quotes
      * @exception ImportExportException if there was an error retrieving the quotes
      */
-    public static List importSymbol(Report report, Symbol symbol,
+    public static List importSymbol(Report report, Symbol symbol, String suffix,
                                     TradingDate startDate, TradingDate endDate)
         throws ImportExportException {
 
@@ -103,7 +105,7 @@ public class YahooEODQuoteImport {
                 retrievalStartDate = startDate;
             }
             // retrieve quotes and add to result
-            List quotes = retrieveQuotes(report, symbol, retrievalStartDate, retrievalEndDate);
+            List quotes = retrieveQuotes(report, symbol, suffix, retrievalStartDate, retrievalEndDate);
             result.addAll(quotes);
 
             // determine endDate for next retrieval
@@ -125,17 +127,19 @@ public class YahooEODQuoteImport {
      *
      * @param report report to log warnings and errors
      * @param symbol symbol to import
+     * @param suffix optional suffix to append (e.g. ".AX"). This suffix tells
+     *               Yahoo which exchange the symbol belongs to.
      * @param startDate start of date range to import
      * @param endDate end of date range to import
      * @return list of quotes
      * @exception ImportExportException if there was an error retrieving the quotes
      */
-    private static List retrieveQuotes(Report report, Symbol symbol,
+    private static List retrieveQuotes(Report report, Symbol symbol, String suffix,
                                        TradingDate startDate, TradingDate endDate)
     	throws ImportExportException {
 
         List quotes = new ArrayList();
-        String URLString = constructURL(symbol, startDate, endDate);
+        String URLString = constructURL(symbol, suffix, startDate, endDate);
         EODQuoteFilter filter = new YahooEODQuoteFilter(symbol);
 
         PreferencesManager.ProxyPreferences proxyPreferences =
@@ -214,13 +218,26 @@ public class YahooEODQuoteImport {
      * the given dates from Yahoo.
      *
      * @param symbol the symbol to retrieve
+     * @param suffix optional suffix to append (e.g. ".AX"). This suffix tells
+     *               Yahoo which exchange the symbol belongs to.
      * @param start the start date to retrieve
      * @param end the end date to retrieve
      * @return URL string
      */
-    private static String constructURL(Symbol symbol, TradingDate start, TradingDate end) {
+    private static String constructURL(Symbol symbol, String suffix, TradingDate start, TradingDate end) {
         String URLString = YAHOO_URL_PATTERN;
-        URLString = Find.replace(URLString, SYMBOL, symbol.toString());
+        String symbolString = symbol.toString();
+
+        // Append symbol with optional suffix. If the user has not provided a full-stop, provide
+        // them with one.
+        if(suffix.length() > 0) {
+            if(!suffix.startsWith("."))
+                symbolString += ".";
+            symbolString += suffix;
+        }
+
+        URLString = Find.replace(URLString, SYMBOL, symbolString);
+
         URLString = Find.replace(URLString, START_DAY, Integer.toString(start.getDay()));
         URLString = Find.replace(URLString, START_MONTH, Integer.toString(start.getMonth() - 1));
         URLString = Find.replace(URLString, START_YEAR, Integer.toString(start.getYear()));

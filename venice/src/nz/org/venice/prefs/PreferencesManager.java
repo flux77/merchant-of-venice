@@ -171,6 +171,9 @@ public class PreferencesManager {
         /** Symbols to automatically sync. */
         public String symbols;
 
+        /** Optional suffix to append (e.g. ".AX") */
+        public String suffix;
+
         /** Time exchange opens. */
         public TradingTime openTime;
 
@@ -1157,8 +1160,8 @@ public class PreferencesManager {
     }
 
 
-    /** 
-     * Save wether to restore windows on restart 
+    /**
+     * Save wether to restore windows on restart
      *
      * @param state a boolean flag which when true causes Venice to reconstruct
      * previously open windows.
@@ -1169,8 +1172,8 @@ public class PreferencesManager {
 	prefs.put("state", String.valueOf(state));
     }
 
-    /** 
-     * Return wether to restore windows on restart 
+    /**
+     * Return wether to restore windows on restart
      *
      * @ Return wether Venice should to reconstruct
      * previously open windows.
@@ -1182,8 +1185,8 @@ public class PreferencesManager {
 
 	return state.equals("true") ? true : false;
     }
-    
-    
+
+
 
     /**
      * Save default chart setting.
@@ -1340,6 +1343,8 @@ public class PreferencesManager {
 
         idQuoteSyncPreferences.isEnabled = prefs.getBoolean("isEnabled", false);
         idQuoteSyncPreferences.symbols = prefs.get("symbols", "");
+        idQuoteSyncPreferences.suffix = prefs.get("suffix", "");
+
 
         try {
             idQuoteSyncPreferences.openTime = new TradingTime(prefs.get("openTime", "9:00:00"));
@@ -1365,6 +1370,7 @@ public class PreferencesManager {
         Preferences prefs = getUserNode("/id_quote_sync");
         prefs.putBoolean("isEnabled", idQuoteSyncPreferences.isEnabled);
         prefs.put("symbols", idQuoteSyncPreferences.symbols);
+        prefs.put("suffix", idQuoteSyncPreferences.suffix);
         prefs.put("openTime", idQuoteSyncPreferences.openTime.toString());
         prefs.put("closeTime", idQuoteSyncPreferences.closeTime.toString());
         prefs.putInt("period", idQuoteSyncPreferences.period);
@@ -1379,9 +1385,9 @@ public class PreferencesManager {
     private static File getFrameSettingsHome() {
 	File veniceHome = getVeniceHome();
 	File frameSettingsHome = new File(veniceHome, "SavedWindows");
-	if (!frameSettingsHome.exists()) 
+	if (!frameSettingsHome.exists())
 	    frameSettingsHome.mkdir();
-	
+
 	return frameSettingsHome;
     }
 
@@ -1389,15 +1395,15 @@ public class PreferencesManager {
      * Save open frame settings.
      *
      * @param frame A ModuleFrame representing an open window on the Venice desktop.
-     * @see ModuleFrame     
+     * @see ModuleFrame
      */
 
     /**
      * Return a list of frames saved on the filesystem.
      *
-     * @return A vector where the elements are File objects containing saved 
+     * @return A vector where the elements are File objects containing saved
      * ModuleFrame data.
-     * 
+     *
      * The location of the saved frames is ~/Venice/SavedWindows.
      * As the restore saved windows feature is new, there is no
      * old preferences mechanism.
@@ -1407,10 +1413,10 @@ public class PreferencesManager {
 
 	Vector savedFrames = new Vector();
 	String suffix = ".xml";
-	
+
 	for (int i = 0; i < savedFrameFileNames.length; i++) {
 	    String savedFrameFileName = savedFrameFileNames[i];
-	    //Ignore files which are not XML 
+	    //Ignore files which are not XML
 	    if (!savedFrameFileName.endsWith(suffix)) {
 		continue;
 	    }
@@ -1420,17 +1426,17 @@ public class PreferencesManager {
 	    }
 
 	    File savedFrameFile = new File(PreferencesManager.getFrameSettingsHome(), savedFrameFileName);
-	    
-	    savedFrames.add(savedFrameFile);	    
+
+	    savedFrames.add(savedFrameFile);
 	}
 	return savedFrames;
     }
 
-    
+
     public static void putModuleFrameSettings(ModuleFrame frame) throws PreferencesException {
-	
+
 	try {
-	    File frameSettingsFile = new File(getFrameSettingsHome(), 
+	    File frameSettingsFile = new File(getFrameSettingsHome(),
 					      ("FrameDataFor" + frame.getTitle()).replaceAll(" ", "") + "_" + frame.hashCode() + ".xml");
 
 	    FileOutputStream outputStream = new FileOutputStream(frameSettingsFile);
@@ -1462,5 +1468,5 @@ public class PreferencesManager {
 	    f.delete();
 	}
     }
-        
+
 }

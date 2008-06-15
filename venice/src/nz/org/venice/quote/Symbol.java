@@ -80,7 +80,7 @@ public class Symbol implements Cloneable, Comparable {
             char letter = string.charAt(i);
 
             if(!Character.isLetterOrDigit(letter) &&
-               letter != '.' && letter != '^' && letter != '-' && letter != '&')
+               letter != '.' && letter != '^' && letter != '-' && letter != '&' && letter != ':')
                 throw new SymbolFormatException(Locale.getString("INVALID_SYMBOL",
 								 string));
         }

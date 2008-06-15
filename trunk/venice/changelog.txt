@@ -8,6 +8,8 @@ Changes for Venice, 0.72 beta ??/???/2008
 
 * Bug Fixes:
   - Fixed an off-by-one month error when downloading from float.com.au.
+  - Fixed a bug where an exception would be thrown if the user
+    clicked in the background.
 
 Changes for Venice, 0.71 beta 25/Feb/2007
 =========================================

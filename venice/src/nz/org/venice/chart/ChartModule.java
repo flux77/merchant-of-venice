@@ -288,6 +288,9 @@ public class ChartModule extends JPanel implements Module,
 	//Both chart.resetBuffer lines seem to be necessary
 	//to restore charts at all zoom levels.
 	
+	chart.setChartDrawingModel(settings.getDrawnElements());
+	chart.setOrientation(settings.getOrientation());
+
 	chart.resetBuffer();
 	chart.setXRange(settings.getStartX(),
 			settings.getEndX());
@@ -1111,7 +1114,8 @@ public class ChartModule extends JPanel implements Module,
 	settings.setHighlightedEnd(chart.getHighlightedEnd());
 	settings.setDefaultZoomEnabled(defaultZoomEnabled);
 	settings.setZoomInEnabled(zoomInEnabled);
-	
+	settings.setDrawnElements(chart.getChartDrawingModel());
+	settings.setOrientation(chart.getOrientation());
 	
 
     }

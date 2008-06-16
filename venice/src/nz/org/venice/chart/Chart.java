@@ -703,6 +703,10 @@ public class Chart extends JComponent implements MouseListener {
 	return drawnElements;
     }
 
+    public void setChartDrawingModel(ChartDrawingModel drawnElements) {
+	this.drawnElements = drawnElements;
+    }
+
     /**
      * Clear the highlighted region.
      */

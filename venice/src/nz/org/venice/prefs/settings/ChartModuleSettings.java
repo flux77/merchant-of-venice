@@ -43,6 +43,7 @@ import nz.org.venice.table.WatchScreenParserException;
 import nz.org.venice.table.WatchScreenReader;
 import nz.org.venice.table.WatchScreenWriter;
 import nz.org.venice.chart.ChartModule;
+import nz.org.venice.chart.ChartDrawingModel;
 
 
 import nz.org.venice.main.Module;
@@ -71,7 +72,9 @@ public class ChartModuleSettings extends AbstractSettings {
     private Comparable highlightedEnd;
     private boolean defaultZoomEnabled;
     private boolean zoomInEnabled;
-        
+    private ChartDrawingModel drawnElements;
+    private boolean normalOrientation;
+    
     /**
      *
      * Create new ChartModule settings. 
@@ -149,52 +152,173 @@ public class ChartModuleSettings extends AbstractSettings {
 	super.setTitle(title);
     }
 
+    /**
+     * Set the vertical bounds of the underlying chart
+     * 
+     * @param startX   The first entry of the chart. 
+     */
+
     public void setStartX(Comparable startX) {
 	this.startX = startX;
     }
+
+    /**
+     * Set the vertical bounds of the underlying chart
+     * 
+     * @param endX   The last entry of the chart. 
+     */
 
     public void setEndX(Comparable endX) {
 	this.endX = endX;
     }
 
+
+    /**
+     * Return the first entry of the underlying chart.
+     * 
+     * @return  A comparable representing the lower bound.
+     */
     public Comparable getStartX() {
 	return startX;
     }
 
+
+    /**
+     * Return the last entry of the underlying chart.
+     * 
+     * @return  A comparable representing the upper bound.
+     */
     public Comparable getEndX() {
 	return endX;
     }
+
+    /**
+     * Set the beginning of a highlighted area on the chart
+     * 
+     * @param  highlightedStart   The start of the highlighted area.
+     */
 
     public void setHighlightedStart(Comparable highlightedStart) {
 	this.highlightedStart = highlightedStart;
     }
 
+    /**
+     * Set the end of a highlighted area on the chart
+     * 
+     * @param  highlightedEnd   The end of the highlighted area.
+     */
+
     public void setHighlightedEnd(Comparable highlightedEnd) {
 	this.highlightedEnd = highlightedEnd;
     }
+
+    /**
+     * Get the beginning of a highlighted area on the chart
+     * 
+     * @return  The start of the highlighted area.
+     */
 
     public Comparable getHighlightedStart() {
 	return highlightedStart;
     }
 
+    /**
+     * Get the end of a highlighted area on the chart
+     * 
+     * @return  The end of the highlighted area.
+     */
+
     public Comparable getHighlightedEnd() {
 	return highlightedEnd;
     }
  
+    /**
+     * 
+     * Save the state of the defaultZoom button.
+     * 
+     * @param enabled  The state of the button
+     * 
+     */
     public void setDefaultZoomEnabled(boolean enabled) {
 	defaultZoomEnabled = enabled;
     }
+
+    /**
+     * 
+     * Retrieve the state of the defaultZoom button.
+     * 
+     * @return The state of the button
+     * 
+     */
 
     public boolean getDefaultZoomEnabled() {
 	return defaultZoomEnabled;
     }
 
+    /**
+     * 
+     * Save the state of the zoomIn button.
+     * 
+     * @param enabled  The state of the button
+     * 
+     */
+
     public void setZoomInEnabled(boolean enabled) {
 	zoomInEnabled = enabled;
     }
 
+
+    /**
+     * 
+     * Save the state of the zoomIn button.
+     * 
+     * @return The state of the button
+     * 
+     */
     public boolean getZoomInEnabled() {
 	return zoomInEnabled;
+    }
+
+    /**
+     * 
+     * Save the drawn graphic elements on the chart
+     * 
+     * @param  drawnElements  The ChartDrawingModel for the underlying  chart
+     */
+
+    public void setDrawnElements(ChartDrawingModel drawnElements) {
+	this.drawnElements = drawnElements;
+    }
+
+    /**
+     *
+     * Get the ChartDrawingModel for the underlying chart.
+     * 
+     * @return  A ChartDrawingModel containing graphic data drawn on the chart
+     */
+        
+    public ChartDrawingModel getDrawnElements() {
+	return drawnElements;
+    }
+
+
+    /**
+     * 
+     * Set the vertical orientation of the underlying chart.
+     * 
+     * @param normalOrientation  True if the origin is at at bottom left corner. 
+     */
+    public void setOrientation(boolean normalOrientation) {
+	this.normalOrientation = normalOrientation;
+    }
+
+
+    /**
+     *
+     * @Return the orientation of the chart.
+     */
+    public boolean getOrientation() {
+	return normalOrientation;
     }
 
     /**

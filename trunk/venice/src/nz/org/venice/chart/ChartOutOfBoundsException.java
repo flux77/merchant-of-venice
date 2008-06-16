@@ -29,15 +29,17 @@ public class ChartOutOfBoundsException extends Throwable {
 
 
     /**
-     * Create a new money format exception.
+     * Create a ChartOutOfBounds exception.
      *
      * @param reason for the exception.
      */    
     public ChartOutOfBoundsException(int reason) {
     }
 
-
-
+    /**
+     *  Create a ChartOutOfBounds exception.
+     *
+     */
     public ChartOutOfBoundsException() {
     }
 

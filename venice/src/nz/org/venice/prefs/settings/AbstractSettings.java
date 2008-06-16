@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
 import javax.swing.JDesktopPane;
+import javax.swing.JScrollPane;
+import javax.swing.JScrollBar;
 
 import nz.org.venice.main.Main;
 import nz.org.venice.main.Module;
@@ -66,6 +68,12 @@ public abstract class AbstractSettings implements Settings {
 
     private String key;
     private String title;
+
+    private int hbarValue;
+    private int vbarValue;
+
+    private int hbarPolicy;
+    private int vbarPolicy;
 
     public AbstractSettings(int group, int type) {
 	this.group = group;
@@ -141,4 +149,57 @@ public abstract class AbstractSettings implements Settings {
 	return rv;
     }
 
+    public void setHBarValue(int hbarValue) {
+	this.hbarValue = hbarValue;
+    }
+
+    public int getHBarValue() {
+	return hbarValue;
+    }
+
+    public void setVBarValue(int vbarValue) {
+	this.vbarValue = vbarValue;
+    }
+
+    public int getVBarValue() {
+	return vbarValue;
+    }
+
+    public int getHBarPolicy() {
+	return hbarPolicy;
+    }
+
+    public void setHBarPolicy(int policy) {
+	hbarPolicy = policy;
+    }
+
+    public void setVBarPolicy(int policy) {
+	vbarPolicy = policy;
+    }
+
+    
+    public int getVBarPolicy() {
+	return vbarPolicy;
+    }
+
+    public void getScrollBarValues(JScrollPane scrollPane) {
+
+	scrollPane.setHorizontalScrollBarPolicy(getHBarPolicy());
+	scrollPane.getHorizontalScrollBar().setValue(getHBarValue());	       
+	scrollPane.setVerticalScrollBarPolicy(getVBarPolicy());
+	scrollPane.getVerticalScrollBar().setValue(getVBarValue());
+	
+    }
+    
+    public void setScrollBarValues(JScrollPane scrollPane) {
+
+	JScrollBar hbar = scrollPane.getHorizontalScrollBar();
+	JScrollBar vbar = scrollPane.getVerticalScrollBar();
+	
+	setHBarValue(hbar.getValue());
+	setHBarPolicy(scrollPane.getHorizontalScrollBarPolicy());
+	setVBarValue(vbar.getValue());
+	setVBarPolicy(scrollPane.getVerticalScrollBarPolicy());
+	
+    }
 }

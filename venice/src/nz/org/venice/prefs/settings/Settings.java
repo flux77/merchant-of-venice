@@ -31,6 +31,7 @@ package nz.org.venice.prefs.settings;
 */
 
 import javax.swing.JDesktopPane;
+import javax.swing.JScrollPane;
 import java.util.*;
 import nz.org.venice.main.Module;
 
@@ -56,20 +57,21 @@ public interface Settings {
     public static final int CHARTMODULE = 1;
     public static final int GRAPHS      = 2;
     
-    public static final int QUOTEMODULE       = 3;
-    public static final int WATCHSCREENMODULE = 4;
-    public static final int HELPMODULE        = 5; 
-    public static final int PORTFOLIOMODULE   = 6;
-    public static final int PREFERENCESMODULE = 7;
-    public static final int TRANSACTIONMODULE = 8;    
-    public static final int PAPERTRADEMODULE  = 9;
-    public static final int PAPERTRADERESULTS = 10;
-    public static final int GPMODULE          = 11;
-    public static final int GAMODULE          = 12;
-    public static final int ANNMODULE         = 13;
-    public static final int GPRESULTS         = 14;
-    public static final int GARESULTS         = 15;
-    public static final int ANNRESULTS        = 16;
+    public static final int QUOTEMODULE          = 3;
+    public static final int WATCHSCREENMODULE    = 4;
+    public static final int HELPMODULE           = 5; 
+    public static final int PORTFOLIOMODULE      = 6;
+    public static final int PREFERENCESMODULE    = 7;
+    public static final int TRANSACTIONMODULE    = 8;    
+    public static final int PAPERTRADEMODULE     = 9;
+    public static final int PAPERTRADERESULTS    = 10;
+    public static final int GPMODULE             = 11;
+    public static final int GAMODULE             = 12;
+    public static final int ANNMODULE            = 13;
+    public static final int GPRESULTS            = 14;
+    public static final int GARESULTS            = 15;
+    public static final int ANNRESULTS           = 16;
+    public static final int PORTFOLIOTABLEMODULE = 17;
 
     /**
      * Return the Module group as defined by the Settings constants
@@ -137,6 +139,8 @@ public interface Settings {
      * Return a Module based on the settings.
      */
     public Module getModule(JDesktopPane desktop);
+
+    public void setScrollBarValues(JScrollPane scrollPane);
 
 
 }

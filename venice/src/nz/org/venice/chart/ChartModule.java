@@ -240,10 +240,11 @@ public class ChartModule extends JPanel implements Module,
     public ChartModule(JDesktopPane desktop, ChartModuleSettings settings) {
 	Vector levelSettingsList = (Vector)settings.getLevelSettingsList();
 	Vector symbolList = (Vector)settings.getSymbolList();
-	initChart(false);
 	int levelCount = 0;
 	int graphCount = 0;
-
+		
+	initChart(false);
+		
 	Iterator levelsIterator = levelSettingsList.iterator();
 	int symbolIndex = 0;
 
@@ -283,6 +284,31 @@ public class ChartModule extends JPanel implements Module,
 	    }
 	    levelCount++;
 	}
+
+	//Both chart.resetBuffer lines seem to be necessary
+	//to restore charts at all zoom levels.
+	
+	chart.resetBuffer();
+	chart.setXRange(settings.getStartX(),
+			settings.getEndX());
+
+	chart.setHighlightedStart(settings.getHighlightedStart());
+	chart.setHighlightedEnd(settings.getHighlightedEnd());
+	       
+	defaultZoomEnabled = settings.getDefaultZoomEnabled();
+	defaultZoom.setEnabled(defaultZoomEnabled);
+	zoomInEnabled = settings.getZoomInEnabled();
+
+	zoomIn.setEnabled(zoomInEnabled);
+	scrollPane.setViewportView(chart);
+
+	scrollPane.setHorizontalScrollBarPolicy(settings.getHBarPolicy());	
+	scrollPane.getHorizontalScrollBar().setValue(settings.getHBarValue());
+	scrollPane.setVerticalScrollBarPolicy(settings.getVBarPolicy());
+	scrollPane.getVerticalScrollBar().setValue(settings.getVBarValue());
+	chart.resetBuffer();
+	
+
     }
 
     private void initChart(boolean indexChart) {
@@ -1077,7 +1103,17 @@ public class ChartModule extends JPanel implements Module,
 
 	settings.setLevelSettingsList(levelSettingsList);
 	settings.setSymbolList(symbolList);
+	settings.setScrollBarValues(scrollPane);
+
+	settings.setStartX(chart.getStartX());
+	settings.setEndX(chart.getEndX());	
+	settings.setHighlightedStart(chart.getHighlightedStart());
+	settings.setHighlightedEnd(chart.getHighlightedEnd());
+	settings.setDefaultZoomEnabled(defaultZoomEnabled);
+	settings.setZoomInEnabled(zoomInEnabled);
 	
+	
+
     }
 
     public BufferedImage getImage() { 
@@ -1087,7 +1123,7 @@ public class ChartModule extends JPanel implements Module,
     public boolean isDataAvailable(Graph g) {
 	return chart.dataAvailable(g);
     }
-
+    
     public Settings getSettings() {
 	return settings;
     }

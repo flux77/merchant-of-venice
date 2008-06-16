@@ -41,6 +41,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.swing.JScrollPane;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -86,11 +87,22 @@ public class ModuleFrameSettingsWriter  {
 	settings.setModuleSettings(moduleSettings);
 	settings.setBounds(frame.getBounds());
 
+	/* ModuleFrames which are not enclosed have components which 
+	   manage their own scrollPane. That is why the scroll bar settings
+	   appears twice. 
+	 */
+	if (frame.getModule().encloseInScrollPane()) {	    
+	    JScrollPane scrollPane;		
+	    scrollPane = frame.getScrollPane();	    
+	    settings.setScrollBarValues(scrollPane);
+	    moduleSettings.setScrollBarValues(scrollPane);
+	} 
+	
 	BufferedOutputStream buffStream = new BufferedOutputStream(stream);	
 
 	XStream xStream = new XStream(new DomDriver());
 	xStream.omitField(ExchangeRateCache.class, "desktopPane");
-	
+
 	try {
 	    String xml = xStream.toXML(settings);
 	    stream.write(xml.getBytes());
@@ -99,4 +111,5 @@ public class ModuleFrameSettingsWriter  {
 	    throw new ModuleSettingsParserException(e.getMessage());
 	}
     }
+
 }

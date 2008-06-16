@@ -103,7 +103,7 @@ public class Chart extends JComponent implements MouseListener {
     // Create a set of X values containing every X value between startX
     // and endX (inclusive) that occurs in any one of the graphs we
     // are charting.
-    private void setXRange(Comparable startX, Comparable endX) {
+    protected void setXRange(Comparable startX, Comparable endX) {
 
 	// Algorithm work as follows:
 	//

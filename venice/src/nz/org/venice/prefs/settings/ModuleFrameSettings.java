@@ -62,7 +62,7 @@ public class ModuleFrameSettings extends AbstractSettings {
     Rectangle bounds;
     String moduleKey;
     Settings moduleSettings;
-        
+    
     
     /**
      *
@@ -147,6 +147,5 @@ public class ModuleFrameSettings extends AbstractSettings {
      * Return a SettingsWriter to write the settings.
      *
      */
-
 
 }

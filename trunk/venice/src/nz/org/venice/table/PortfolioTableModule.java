@@ -34,6 +34,7 @@ import nz.org.venice.portfolio.Portfolio;
 import nz.org.venice.quote.*;
 import nz.org.venice.ui.*;
 import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.prefs.settings.PortfolioTableModuleSettings;
 
 /**
  * Venice module for displaying a portfolio in a table.
@@ -52,7 +53,7 @@ public class PortfolioTableModule extends AbstractTable
     private EODQuoteBundle quoteBundle;
     private Portfolio portfolio;
     private PortfolioModel model;
-    private Settings settings;
+    private PortfolioTableModuleSettings settings;
 
     // Frame Icon
     private String frameIcon = "nz/org/venice/images/TableIcon.gif";
@@ -101,7 +102,8 @@ public class PortfolioTableModule extends AbstractTable
      * Tell module to save any current state data / preferences data because
      * the window is being closed.
      */
-    public void save() {
+    public void save() {  
+	settings = new PortfolioTableModuleSettings(portfolio.getName());
         // nothing to save to preferences
     }
 

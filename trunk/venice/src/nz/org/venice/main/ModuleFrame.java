@@ -24,6 +24,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import nz.org.venice.ui.DesktopManager;
 
+import nz.org.venice.chart.ChartModule;
+
 /**
  * An internal frame designed specifically for holding Module objects.  Every visible Module should run within
  * an ModuleFrame, and is supplied to it upon construction.
@@ -43,10 +45,13 @@ public class ModuleFrame extends JInternalFrame
     private Module module;
 
     private DesktopManager desktopManager;
+    private JScrollPane scrollPane;
 
     // Preferred width and height of frame
     static private int DEFAULT_FRAME_WIDTH = 535;
     static private int DEFAULT_FRAME_HEIGHT = 475;
+
+    
 
     /**
      * Construct a new frame around the given module and display.
@@ -69,15 +74,19 @@ public class ModuleFrame extends JInternalFrame
 
 	this.module = module;
 	this.desktopManager = desktopManager;
-
+	
 	JDesktopPane desktop = DesktopManager.getDesktop();
 
 	// Module can be enclosed in scroll pane if it desires to be
-	if(module.encloseInScrollPane())
-	    getContentPane().add(new JScrollPane(module.getComponent()));
-	else
+	if(module.encloseInScrollPane())  {
+	    scrollPane = new JScrollPane(module.getComponent());
+	    getContentPane().add(scrollPane); 
+	}  
+	else {
 	    getContentPane().add(module.getComponent());
-
+	    scrollPane = null;
+	}
+	
 	setSizeAndLocation(this, desktop, centre, honourSize);
 
 	if(module.getJMenuBar() != null)
@@ -158,6 +167,16 @@ public class ModuleFrame extends JInternalFrame
     }
 
     /**
+     * Gives a reference to the the scroll bars for the component module.
+     *
+     * @return  The JScrollPanel of the module component.
+     */
+
+    public JScrollPane getScrollPane() {
+	return scrollPane;
+    }
+
+    /**
      * Standard property change handler that listens for a WINDOW_CLOSE event
      */
     public void propertyChange(PropertyChangeEvent event) {
@@ -180,7 +199,7 @@ public class ModuleFrame extends JInternalFrame
     /* Make sure the internal modules saves its information before destroying it
      */
     public void internalFrameClosed(InternalFrameEvent e) {
-
+	
 	//Need to remove the frame from the register before
 	//saving the module (for the moment)
 	if (desktopManager.getFrameRegister().find(String.valueOf(hashCode()))) {
@@ -201,7 +220,6 @@ public class ModuleFrame extends JInternalFrame
     public void internalFrameDeiconified(InternalFrameEvent e) { }
     public void internalFrameIconified(InternalFrameEvent e) { }
     public void internalFrameOpened(InternalFrameEvent e) { }
-
 
 
 }

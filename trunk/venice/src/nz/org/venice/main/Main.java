@@ -298,6 +298,11 @@ public class Main extends JFrame {
 		    newFrame.setSizeAndLocation(newFrame, desktop, false, true);
 		    newFrame.setBounds(newFrameSettings.getBounds());
 		    newFrame.setPreferredSize(newFrameSettings.getBounds().getSize());
+
+		    if (newFrame.getModule().encloseInScrollPane()) {
+			newFrameSettings.getScrollBarValues(newFrame.getScrollPane());
+		    }
+		    
 		    count++;
 		} catch (ModuleSettingsParserException wpe) {
 		    continue;

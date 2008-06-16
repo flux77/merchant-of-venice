@@ -65,6 +65,12 @@ public class ChartModuleSettings extends AbstractSettings {
 
     private List symbolList;
     private List levelSettingsList;
+    private Comparable startX;
+    private Comparable endX;
+    private Comparable highlightedStart;
+    private Comparable highlightedEnd;
+    private boolean defaultZoomEnabled;
+    private boolean zoomInEnabled;
         
     /**
      *
@@ -143,7 +149,54 @@ public class ChartModuleSettings extends AbstractSettings {
 	super.setTitle(title);
     }
 
+    public void setStartX(Comparable startX) {
+	this.startX = startX;
+    }
+
+    public void setEndX(Comparable endX) {
+	this.endX = endX;
+    }
+
+    public Comparable getStartX() {
+	return startX;
+    }
+
+    public Comparable getEndX() {
+	return endX;
+    }
+
+    public void setHighlightedStart(Comparable highlightedStart) {
+	this.highlightedStart = highlightedStart;
+    }
+
+    public void setHighlightedEnd(Comparable highlightedEnd) {
+	this.highlightedEnd = highlightedEnd;
+    }
+
+    public Comparable getHighlightedStart() {
+	return highlightedStart;
+    }
+
+    public Comparable getHighlightedEnd() {
+	return highlightedEnd;
+    }
  
+    public void setDefaultZoomEnabled(boolean enabled) {
+	defaultZoomEnabled = enabled;
+    }
+
+    public boolean getDefaultZoomEnabled() {
+	return defaultZoomEnabled;
+    }
+
+    public void setZoomInEnabled(boolean enabled) {
+	zoomInEnabled = enabled;
+    }
+
+    public boolean getZoomInEnabled() {
+	return zoomInEnabled;
+    }
+
     /**
      * 
      * Creates a ChartModule based on this ChartModuleSettings.
@@ -160,5 +213,6 @@ public class ChartModuleSettings extends AbstractSettings {
 
 	return rv;
     }
+
 
 }

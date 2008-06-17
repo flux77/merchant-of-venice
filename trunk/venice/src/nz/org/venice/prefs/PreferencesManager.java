@@ -1435,6 +1435,12 @@ public class PreferencesManager {
 
     public static void putModuleFrameSettings(ModuleFrame frame) throws PreferencesException {
 
+	//Don't want to spam the filesystem with saved frames 
+	//unless the user is interested in restoring them.  
+	if (!PreferencesManager.getRestoreSavedWindowsSetting()) {
+	    return;
+	}
+
 	try {
 	    File frameSettingsFile = new File(getFrameSettingsHome(),
 					      ("FrameDataFor" + frame.getTitle()).replaceAll(" ", "") + "_" + frame.hashCode() + ".xml");

@@ -36,7 +36,7 @@ import nz.org.venice.util.Locale;
 
 
 /**
- * This class parses watch screens written in XML format.
+ * This class parses ModuleFrameSettings written in XML format.
  *
  * @author Mark Hummel
  * @see ModuleFrame
@@ -55,11 +55,11 @@ public class ModuleFrameSettingsReader {
     }
 
     /**
-     * Read and parse the watch screen in XML format from the input stream and return
-     * the watch screen object.
+     * Read and parse the moduleframe settings in XML format from the input stream and return
+     * the moduleframe settings object.
      *
      * @param stream the input stream containing the watch screen in XML format
-     * @return the watch screen
+     * @return the moduleframesettings
      * @exception IOException if there was an I/O error reading from the stream.
      * @exception ModuleSettingsParserException if there was an error parsing the watch screen.
      */

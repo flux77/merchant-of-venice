@@ -182,7 +182,15 @@ public abstract class AbstractSettings implements Settings {
 	return vbarPolicy;
     }
 
-    public void getScrollBarValues(JScrollPane scrollPane) {
+    /**
+     *
+     * Set the scrollPane scrollbar values with this settings scroll bar
+     * values 
+     * 
+     * @param scrollPane  The ModuleFrame scrollPane to update
+     */
+
+    public void updateScrollPane(JScrollPane scrollPane) {
 
 	scrollPane.setHorizontalScrollBarPolicy(getHBarPolicy());
 	scrollPane.getHorizontalScrollBar().setValue(getHBarValue());	       
@@ -191,6 +199,14 @@ public abstract class AbstractSettings implements Settings {
 	
     }
     
+    /**
+     *
+     * Set the Settings scrollbar values from the ModuleFame scrollPane
+     *
+     * @param scrollPane  The ModuleFrame scrollPane to read scrollbar values from
+
+     */
+
     public void setScrollBarValues(JScrollPane scrollPane) {
 
 	JScrollBar hbar = scrollPane.getHorizontalScrollBar();

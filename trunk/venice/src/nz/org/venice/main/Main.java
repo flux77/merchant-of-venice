@@ -300,7 +300,7 @@ public class Main extends JFrame {
 		    newFrame.setPreferredSize(newFrameSettings.getBounds().getSize());
 
 		    if (newFrame.getModule().encloseInScrollPane()) {
-			newFrameSettings.getScrollBarValues(newFrame.getScrollPane());
+			newFrameSettings.updateScrollPane(newFrame.getScrollPane());
 		    }
 		    
 		    count++;

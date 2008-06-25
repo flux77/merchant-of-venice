@@ -106,7 +106,7 @@ public class CountbackLineGraph extends AbstractGraph {
     /**
      * Return the name of this graph.
      *
-     * @return	<code>Exponentially Weighted Moving Average</code>
+     * @return	<code>3 bar Nett Countback Line</code>
      */
     public String getName() {
 	return Locale.getString("COUNTBACK_LINE");
@@ -174,7 +174,7 @@ public class CountbackLineGraph extends AbstractGraph {
         // Retrieve settings from hashmap
         int type = CountbackLineGraphUI.getType(settings);
         
-	// Create moving average graphable
+	// Create countback line graph
 	countback = createCountbackLine(dayHigh,
 					dayLow,
 					type);

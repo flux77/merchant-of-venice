@@ -85,13 +85,14 @@ public class CountbackLineGraphUI implements GraphUI {
     public String checkSettings() {
         HashMap settings = getSettings();
 
-        // Check period
+        // Check type
         String typeString = (String)settings.get(TYPE);
         int type;
 
 	if (typeString.compareTo("CBL_BREAKOUT") != 0 &&
 	    typeString.compareTo("CBL_STOP_LOSS") != 0) {
-	    
+
+	    assert false;
 	    //It's a non editable drop down list, so shouldn't happen
 	}
 	

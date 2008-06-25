@@ -38,6 +38,10 @@ import nz.org.venice.util.*;
  * The support and resistence levels are determined by the most numerous troughs and peaks within the last year of data that have the greatest vertical separation and do not overlap.
  *
  *
+ * There is a new heuristic which extends the peak/trough counting by placing 
+ * them into bins and counting their frequency. This improves the results for 
+ * some charts.
+ *
  * NOTE: Experimental and work in progress.
  * @author Mark Hummel
  */
@@ -52,6 +56,12 @@ public class SupportAndResistenceGraph extends AbstractGraph {
     private double average;
     private double variance;
 
+    private HashMap peakBins;
+    private HashMap troughBins;
+
+    public static final int HEURISTIC = 0;
+    public static final int BINS = 1;
+    
     /*
   Fudge factors: These values seemed to work well; I didn't do any sort of exhaustive experiment or optimisation to determine them.
 
@@ -76,12 +86,10 @@ public class SupportAndResistenceGraph extends AbstractGraph {
      * @param	source containing the data source, typically day close.
      */
     public SupportAndResistenceGraph(GraphSource source) {
-	super(source);
-
+	super(source);		
 	support = new Graphable();
-	resistence = new Graphable(); 
-
-	createSupportAndResistence(source.getGraphable(), support, resistence);
+	resistence = new Graphable();
+	setSettings(new HashMap());
 
     }
 
@@ -90,7 +98,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 		       double horizontalScale, double verticalScale,
 		       double bottomLineValue, List xRange, boolean vertOrientation) {
 
-
+		
 	g.setColor(Color.green.darker());
 	GraphTools.renderLine(g, support, xoffset, yoffset, 
 			      horizontalScale,
@@ -101,7 +109,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	GraphTools.renderLine(g, resistence, xoffset, yoffset, 
 			      horizontalScale,
 			      verticalScale, bottomLineValue, xRange, 
-			      vertOrientation);
+			      vertOrientation);	
 
     }
 
@@ -154,7 +162,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
      Currently only the points of the most numerous peaks and troughs are used       as a heuristic to determine the points of support and resistence. It's a 
      heuristic only, and still needs work.  
      */
-    public Graphable[] createSupportAndResistence(Graphable source, Graphable support, Graphable resistence) {
+    public Graphable[] createSupportAndResistence(Graphable source, Graphable support, Graphable resistence, int lag, int type) {
 	Graphable supportAndResistence[] = new Graphable[2];
 	double[] values = source.toArray();
 	double[] peaks, troughs;
@@ -165,7 +173,9 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	ArrayList peaksCount = new ArrayList(values.length);
 	ArrayList troughsCount = new ArrayList(values.length);
 	int peaksIndex = 0;
-	int troughsIndex = 0;
+	int troughsIndex = 0;	
+
+	double peakMaxBinPrice, troughMaxBinPrice;
 
 	int score = 0;
 	boolean upmove = false;
@@ -174,11 +184,13 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	double prev, diff;		
 	int start1, end1, start2, end2;
 	Set xRange = source.getXRange();
-	Iterator iterator = xRange.iterator();
+	Iterator iterator;
 	int i;
 
 	peaks = new double[values.length];
 	troughs = new double[values.length];
+	peakBins = new HashMap();
+	troughBins = new HashMap();
 
 	startPeaksPosn = new HashMap();
 	startTroughsPosn = new HashMap();
@@ -206,16 +218,18 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	    break;
 	}	
 
-	//Try to make levels relevant by only considering
-	//the last year's data
-	int stop = values.length - 365;
+	//Try to make levels relevant by not considering
+	//all of the data
+	int stop = values.length - lag;
 	if (stop < 0) {
 	    stop = 0;
 	}
 
 	// Get all the peaks and troughs
-
-	for (i = values.length-1; i > stop; i--) {
+	//Have to find at least 5 peaks and troughs to determine
+	//level
+	for (i = values.length-1; i > stop || peaksIndex < 5 || 
+		 troughsIndex < 5; i--) {
 	    diff = values[i] - prev;
 
 	    // previous price was end of downmove, hence trough
@@ -225,8 +239,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 		}
 		endTroughsPosn.put( new Double(prev), new Integer(i));
 		troughs[troughsIndex++] = prev;		    
-		upmove = true;
-		
+		upmove = true;		
 		directionCount = 0;
 	    }
 	    // previous price was end of upmove, hence peak		
@@ -246,12 +259,15 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	    }	    
 	    prev = values[i];
 	}
-	
+	      
 	Arrays.sort(peaks, 0, peaksIndex);
 	Arrays.sort(troughs, 0, troughsIndex);
 
 	countOccurances(peaksCount, peaks, peaksIndex-1);
 	countOccurances(troughsCount, troughs, troughsIndex-1);       	
+
+	peakMaxBinPrice = binOccur(peakBins, peaks, peaksIndex-1);
+	troughMaxBinPrice = binOccur(troughBins, troughs, troughsIndex-1);	
 
 	//Choose the most numerous peak and troughs 
 	start1 = start2 = 0;
@@ -266,7 +282,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	/* Mark levels high which are the most numerous, have the greatest
 	   vertical separation and whose separation is the least.
 	*/
-
+	
 	while (i < (Math.min(peaksCount.size(),
 			     troughsCount.size()))) {
 
@@ -309,8 +325,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	    
 	    i++;
 	}
-
-
+	
 	Arrays.sort(scoreList);	
 	i = scoreList.length - 1;
 	
@@ -320,25 +335,46 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	if (i > troughsCount.size()-1) {
 	    i = troughsCount.size() - 1;
 	}
-	
+
 	troughsPriceData = (double[])troughsCount.get(i);
 	peaksPriceData = (double[])peaksCount.get(i);
 	
 	double supportPrice = troughsPriceData[0];
 	double resistPrice = peaksPriceData[0];
 	
-	i = 0;
-	while (iterator.hasNext()) {   	    
-	    Comparable x = (Comparable)iterator.next();
-	    
-	    if (values[i] == resistPrice ||
-		values[i] == supportPrice) {
-		resistence.putY(x, new Double(resistPrice));
-		support.putY(x, new Double(supportPrice));		
+	iterator = xRange.iterator();
+	switch (type) {
+	case HEURISTIC:
+	    i = 0;
+	    while (iterator.hasNext()) {   	    
+		Comparable x = (Comparable)iterator.next();
+		
+		if (values[i] == resistPrice ||
+		    values[i] == supportPrice) {
+		    resistence.putY(x, new Double(resistPrice));
+		    support.putY(x, new Double(supportPrice));		
+		}
+		i++;
 	    }
-	    i++;
+	    break;
+	case BINS:
+	    //double binInc = Math.sqrt(variance);
+	    double binInc = 0.05;
+	    
+	    i = 0;
+	    while (iterator.hasNext()) {   	    
+		Comparable x = (Comparable)iterator.next();
+				
+		if (i >= lag) {
+		    resistence.putY(x, new Double(peakMaxBinPrice));
+		    support.putY(x, new Double(troughMaxBinPrice));		
+		}
+		
+		i++;
+	    }    
+	    break;
 	}
-	
+
 	supportAndResistence[0] = support;
 	supportAndResistence[1] = resistence;
 
@@ -359,6 +395,7 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	priceData[0] = 0.0;
 	priceData[1] = 0.0;
 
+
 	for (i = 0; i < length-3; i++) {	    
 	    average += values[i];
 	    
@@ -368,7 +405,6 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 		    double[] tmp = new double[2];
 		    tmp[0] = priceData[0];
 		    tmp[1] = priceData[1];
-
 		    list.add(priceIndex++, (double[])tmp);
 		}
 		
@@ -411,5 +447,77 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 		    return 0;
 		}
 	    });	
+    }
+
+    private double binOccur(HashMap bins, double values[], int length) {
+	
+	int i;
+	double maxValue = Double.MIN_VALUE;
+	double minValue = Double.MAX_VALUE;	
+	//double binInc = Math.sqrt(variance);
+	double binInc = 0.05;
+
+	for (i = 0; i < values.length; i++) {
+	    if (values[i] > maxValue) {
+		maxValue = values[i];
+	    }
+	    if (values[i] < minValue) {
+		minValue = values[i];
+	    }	    
+	}
+	
+	//Create the bins
+
+	for (double b = minValue; b < maxValue; b += binInc) {	    	    
+	    bins.put(new Double(b), new Integer(0));
+	}
+			
+	//Iterate over the bins, running all the
+	//peak or trough values to see how many fit.
+
+	double maxBinValue = 0.0;
+	int maxCount = 0;
+	Iterator iterator = bins.keySet().iterator();
+
+	while (iterator.hasNext()) {
+	    Double bin = (Double)iterator.next();
+	    double binValue = bin.doubleValue();
+	    
+	    //Count how many values fit in this bin 
+	    int count = 0;
+	    for (i = 0; i < values.length; i++) {
+		if (values[i] == 0.0) 
+		    continue;
+		
+		if (values[i] >= binValue &&
+		    values[i] < binValue + binInc) {
+
+		    count++;
+		    
+		    if (count > maxCount) {			
+			maxCount = count;
+			maxBinValue = binValue;
+		    }
+		}		
+		bins.put(bin, new Integer(count));			  
+	    }
+	}	    		
+
+	return maxBinValue;
+    }
+
+    public void setSettings(HashMap settings) {
+	super.setSettings(settings);
+
+	//retrieve values from hashmap
+	int lag = SRGraphUI.getLag(settings);
+	int type = SRGraphUI.getType(settings);
+	
+	createSupportAndResistence(getSource().getGraphable(), 
+				   support, resistence, lag, type);
+    }
+
+    public GraphUI getUI(HashMap settings) {
+	return new SRGraphUI(settings);
     }
 }

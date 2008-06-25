@@ -123,8 +123,8 @@ public class SRGraphUI implements GraphUI {
         if (period < MIN_LAG)
             return Locale.getString("PERIOD_TOO_SMALL");
                 
-	if (typeString.compareTo("SR_HEURISTIC") != 0 &&
-	    typeString.compareTo("SR_BINS") != 0) {
+	if (typeString.compareTo(Locale.getString("SR_HEURISTIC")) != 0 &&
+	    typeString.compareTo(Locale.getString("SR_BINS")) != 0) {
 	    //It's a non editable drop down list, so shouldn't happen
 	    assert false;
 	}

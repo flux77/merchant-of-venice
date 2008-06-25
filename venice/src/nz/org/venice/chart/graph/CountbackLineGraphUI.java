@@ -89,11 +89,13 @@ public class CountbackLineGraphUI implements GraphUI {
         String typeString = (String)settings.get(TYPE);
         int type;
 
-	if (typeString.compareTo("CBL_BREAKOUT") != 0 &&
-	    typeString.compareTo("CBL_STOP_LOSS") != 0) {
+	if (typeString.compareTo(Locale.getString("CBL_BREAKOUT")) != 0 &&
+	    typeString.compareTo(Locale.getString("CBL_STOP_LOSS")) != 0) {
+	    	    
 
-	    assert false;
 	    //It's a non editable drop down list, so shouldn't happen
+	    assert false;
+
 	}
 	
 	// Settings are OK

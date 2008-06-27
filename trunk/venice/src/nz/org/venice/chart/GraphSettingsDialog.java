@@ -165,10 +165,12 @@ public class GraphSettingsDialog extends JInternalFrame {
         buttonPanel.add(addButton);
         //        buttonPanel.add(editButton);
         // buttonPanel.add(deleteButton);
-        buttonPanel.add(cancelButton);
+        buttonPanel.add(cancelButton);	
+	getRootPane().setDefaultButton(addButton);
 
         getContentPane().add(panel, BorderLayout.CENTER);
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
     }
 
     /**

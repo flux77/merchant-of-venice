@@ -29,7 +29,6 @@ import nz.org.venice.main.*;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.prefs.PreferencesException;
 import nz.org.venice.util.Locale;
-import nz.org.venice.ui.FrameRegister;
 
 /**
  * This class manages activities to do with internal frames on the desktop
@@ -57,8 +56,6 @@ public class DesktopManager
     private static EventListenerList moduleListeners = new EventListenerList();
     private static int messagesDisplayed = 0;
 
-    private FrameRegister frameRegister;
-
     /**
      * Set the desktop we are managing.
      *
@@ -84,7 +81,6 @@ public class DesktopManager
      */
     public DesktopManager(JDesktopPane desktop) {
 	super();
-	frameRegister = new FrameRegister();
 	setDesktop(desktop);
     }
 
@@ -494,8 +490,8 @@ public class DesktopManager
 
         ModuleFrame frame = new ModuleFrame(this, module, centre, honourSize, resizable);
 
-	frameRegister.add(frame);
-	frameRegister.put(String.valueOf(frame.hashCode()), frame);
+	//frameRegister.add(frame);
+	//frameRegister.put(String.valueOf(frame.hashCode()), frame);
 
         // Make sure that the module added signal is sent before the module
         // is displayed. Otherwise it's possible for the user to quickly close the
@@ -522,12 +518,6 @@ public class DesktopManager
         // errors if the user clicks on the background. I'm not sure why.
     }
 
-    /**
-     *
-     */
-    public FrameRegister getFrameRegister() {
-	return frameRegister;
-    }
 
     /**
      * Call save() on every open module. This will save all the modules'

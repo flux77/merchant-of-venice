@@ -24,8 +24,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 import nz.org.venice.ui.DesktopManager;
 
-import nz.org.venice.chart.ChartModule;
-
 /**
  * An internal frame designed specifically for holding Module objects.  Every visible Module should run within
  * an ModuleFrame, and is supplied to it upon construction.
@@ -198,14 +196,7 @@ public class ModuleFrame extends JInternalFrame
 
     /* Make sure the internal modules saves its information before destroying it
      */
-    public void internalFrameClosed(InternalFrameEvent e) {
-	
-	//Need to remove the frame from the register before
-	//saving the module (for the moment)
-	if (desktopManager.getFrameRegister().find(String.valueOf(hashCode()))) {
-	    desktopManager.getFrameRegister().delete(this);
-	}
-	    
+    public void internalFrameClosed(InternalFrameEvent e) {		    
 	module.save();	
 	// Update menu containing list of windows
 	desktopManager.fireModuleRemoved(module);

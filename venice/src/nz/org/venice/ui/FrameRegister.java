@@ -38,9 +38,13 @@ import nz.org.venice.main.ModuleFrame;
  * discovered when trying to create multiple ChartModules and the decision was
  * made to serialise their creation under restoration rather than attempt to modify code that otherwise works perfectly well.
 
+ * This class is deprecated.
+
  * @author Mark Humel
 
  */
+
+/* For some reason, creation of multiple ChartModules isn't  a problem anymore, so this class is unnecessary.   */
 
 /* 
   FrameRegister is a HashMap rather than a Vector because although 

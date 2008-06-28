@@ -51,7 +51,6 @@ import nz.org.venice.util.Money;
 
 import nz.org.venice.ui.AbstractTableModel;
 import nz.org.venice.ui.Column;
-import nz.org.venice.ui.FrameRegister;
 
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.prefs.PreferencesException;
@@ -114,17 +113,7 @@ public class TransactionModuleSettings extends AbstractSettings {
 
     public Module getModule(JDesktopPane desktop) {	
 	PortfolioModule portfolioModule;
-	
-	//Determine if there is currently a portfolioModule frame for 
-	//this transaction window
-	FrameRegister register = CommandManager.getInstance().getDesktopManager().getFrameRegister();
-	
-	ModuleFrame frame = register.getFrameOfType("nz.org.venice.portfolio.PortfolioModule");
-	if (frame != null) {	    
-	    portfolioModule = (PortfolioModule)frame.getModule();	    
-	    return portfolioModule;
-	} 
-	
+		
 	try {
 	    Portfolio portfolio = PreferencesManager.getPortfolio(portfolioName);
 	    

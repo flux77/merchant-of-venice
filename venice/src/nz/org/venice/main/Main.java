@@ -38,7 +38,6 @@ import nz.org.venice.prefs.settings.Settings;
 import nz.org.venice.prefs.settings.ModuleFrameSettings;
 import nz.org.venice.prefs.settings.ModuleFrameSettingsReader;
 import nz.org.venice.prefs.settings.ModuleSettingsParserException;
-import nz.org.venice.ui.FrameRegister;
 import nz.org.venice.quote.IDQuoteSync;
 import nz.org.venice.quote.QuoteSourceManager;
 import nz.org.venice.quote.Symbol;
@@ -239,10 +238,6 @@ public class Main extends JFrame {
 	int savedFrames;
 	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 	int progressValue = 0;
-	FrameRegister frameRegister;
-	int count = 0;
-	int index;
-
 
 	if (!PreferencesManager.getRestoreSavedWindowsSetting())
 	    return;
@@ -250,7 +245,6 @@ public class Main extends JFrame {
 	savedFrameFiles = PreferencesManager.getSavedFrames();
 	iterator = savedFrameFiles.iterator();
 	savedFrames  = savedFrameFiles.size();
-	frameRegister = desktopManager.getFrameRegister();
 
 	if (savedFrames <= 0) {
 	    return;
@@ -269,7 +263,6 @@ public class Main extends JFrame {
 	    if (thread.isInterrupted()) {
 		break;
 	    }
-
 	    progress.increment();
 	    try {
 
@@ -283,18 +276,8 @@ public class Main extends JFrame {
 		    Module newModule = moduleSettings.getModule(desktop);
 
 		    //Place it initially at 0,0
-		    desktopManager.newFrame(newModule);
+		    ModuleFrame newFrame = desktopManager.newFrame(newModule);
 
-		    //The creation of a frame creates
-		    //two mappings for a frame.
-		    index = count + 1;
-
-		    ModuleFrame newFrame = frameRegister.get(String.valueOf(index));
-
-		    //Augment the key index with the hashcode so that
-		    //the frame can remove itself from the register
-
-		    frameRegister.put(String.valueOf(newFrame.hashCode()), newFrame);
 		    newFrame.setSizeAndLocation(newFrame, desktop, false, true);
 		    newFrame.setBounds(newFrameSettings.getBounds());
 		    newFrame.setPreferredSize(newFrameSettings.getBounds().getSize());
@@ -303,7 +286,6 @@ public class Main extends JFrame {
 			newFrameSettings.updateScrollPane(newFrame.getScrollPane());
 		    }
 		    
-		    count++;
 		} catch (ModuleSettingsParserException wpe) {
 		    continue;
 		}
@@ -318,7 +300,6 @@ public class Main extends JFrame {
 	    PreferencesManager.removeSavedFrames();
 	}
     }
-
 
 }
 

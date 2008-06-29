@@ -1231,7 +1231,7 @@ will be available soon.  For the moment, suffice to say that any Java object tha
 accessed by Venice source code is fair game for macrofication.</para>
 <para>Here's a trivial example of a simple script that displays a progress dialog:</para>
 <para><code><pre>
-import org.mov.ui.ProgressDialogManager as PM
+import nz.org.venice.ui.ProgressDialogManager as PM
 import java.lang.Thread as T
 p = PM.getProgressDialog()
 p.setMaximum(10)

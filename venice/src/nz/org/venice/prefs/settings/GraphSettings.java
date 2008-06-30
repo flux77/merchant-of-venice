@@ -76,9 +76,7 @@ import nz.org.venice.chart.graph.CustomGraph;
  *  of restoring the modules upon restart.
  * 
  * @author Mark Hummel
- * @see PreferencesManager
- * @see GraphSettingsWriter
- * @see GraphSettingReader 
+ * @see nz.org.venice.prefs.PreferencesManager
 */
 
 public class GraphSettings extends AbstractSettings {
@@ -107,8 +105,6 @@ public class GraphSettings extends AbstractSettings {
      *
      * Create new GraphSettings. 
      * 
-     * @param   key     The graph Settings Identifier
-     * @param   parent  The chart settings identifier
      */
 
     public GraphSettings() {
@@ -184,7 +180,7 @@ public class GraphSettings extends AbstractSettings {
      *
      * Set the symbol of the graph
      * 
-     * @param symbol  A string representing a Symbol
+     * @param s  A string representing a Symbol
      */
 
     public void setSymbol(String s) {

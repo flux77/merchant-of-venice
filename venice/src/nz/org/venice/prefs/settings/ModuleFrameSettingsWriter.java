@@ -61,8 +61,7 @@ import org.w3c.dom.Text;
  * This class writes settings in XML format.
  *
  * @author Mark Hummel
- * @see DesktopManager
- * @see PreferencesManager
+ * @see nz.org.venice.prefs.PreferencesManager
  * @see SettingsWriter
  */
 public class ModuleFrameSettingsWriter  {

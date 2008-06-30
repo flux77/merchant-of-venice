@@ -246,7 +246,7 @@ public class XMLHelper {
      * Convert a list whose elements consist of strings representing symbols
      * to elements representing Venice Symbols
      * 
-     * @param List   A list of string elements
+     * @param list   A list of string elements
      * @return  A list of Symbol elements
      */
 

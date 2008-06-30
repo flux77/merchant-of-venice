@@ -99,7 +99,7 @@ public class HelpModule extends JPanel implements Module {
      * Create a new help browser loaded at the root page.
      *
      * @param	desktop	the parent desktop.
-     * @param	the parent desktop.
+     * @param	settings the HelpModule settings
      */
     public HelpModule(JDesktopPane desktop, HelpModuleSettings settings) {
 	init();

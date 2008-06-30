@@ -25,9 +25,8 @@ package nz.org.venice.prefs.settings;
  * This provides an interface for Module settings which can used to restore modules upon restart. 
  * 
  * @author Mark Hummel
- * @see PreferencesManager
+ * @see nz.org.venice.prefs.PreferencesManager
  * @see SettingsWriter
- * @see SettingReader 
 */
 
 import javax.swing.JDesktopPane;

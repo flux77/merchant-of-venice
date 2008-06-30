@@ -22,10 +22,10 @@ package nz.org.venice.prefs.settings;
  * An exception raised when there is an error parsing Settings.
  *
  * @author Mark Hummel
- * @see ModuleSettingsReader
  * @see ModuleFrameSettingsReader
- * @see PortfolioParserException
- * @see WatchScreenParserException
+ * @see ModuleFrameSettingsWriter
+ * @see nz.org.venice.portfolio.PortfolioParserException
+ * @see nz.org.venice.table.WatchScreenParserException
  */
 public class ModuleSettingsParserException extends Throwable {
 

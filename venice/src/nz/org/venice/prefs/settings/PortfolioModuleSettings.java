@@ -93,7 +93,7 @@ public class PortfolioModuleSettings extends AbstractSettings {
      * 
      * Set the Portfolio for the PortfolioModuleSettings
      * 
-     * @param Portfolio  The portfolio of the PortfolioModule 
+     * @param portfolio  The portfolio of the PortfolioModule 
      */
     public void setPortfolio(Portfolio portfolio) {
 	this.portfolio = portfolio;

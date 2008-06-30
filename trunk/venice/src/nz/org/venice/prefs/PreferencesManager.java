@@ -886,7 +886,7 @@ public class PreferencesManager {
     /**
      * Load the portfolio with the given name.
      *
-     * @param portoflioName the name of the portfolio to load.
+     * @param portfolioName the name of the portfolio to load.
      * @return the portfolio.
      * @exception PreferencesException if there was an error loading the portfolio.
      */
@@ -1175,7 +1175,7 @@ public class PreferencesManager {
     /**
      * Return wether to restore windows on restart
      *
-     * @ Return wether Venice should to reconstruct
+     * @return wether Venice should to reconstruct
      * previously open windows.
      **/
 

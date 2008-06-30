@@ -54,7 +54,7 @@ import java.awt.Rectangle;
  * @author Mark Hummel
  * @see ModuleFrameSettingsReader
  * @see ModuleFrameSettingsWriter
- * @see PreferencesManager
+ * @see nz.org.venice.prefs.PreferencesManager
    
  */
 

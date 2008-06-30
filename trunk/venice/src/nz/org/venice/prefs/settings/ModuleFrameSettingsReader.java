@@ -39,8 +39,8 @@ import nz.org.venice.util.Locale;
  * This class parses ModuleFrameSettings written in XML format.
  *
  * @author Mark Hummel
- * @see ModuleFrame
- * @see ModuleSettingsWriter
+ * @see nz.org.venice.main.ModuleFrame
+ * @see ModuleFrameSettingsWriter
  */
 public class ModuleFrameSettingsReader {
 

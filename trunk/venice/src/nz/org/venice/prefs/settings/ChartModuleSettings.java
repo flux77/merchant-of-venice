@@ -56,9 +56,8 @@ import java.util.Vector;
  *  of restoring the modules upon restart.
  * 
  * @author Mark Hummel
- * @see PreferencesManager
- * @see ChartModuleSettingsWriter
- * @see ChartModuleSettingReader 
+ * @see nz.org.venice.prefs.PreferencesManager
+ * @see Settings
 */
 
 public class ChartModuleSettings extends AbstractSettings {
@@ -315,7 +314,7 @@ public class ChartModuleSettings extends AbstractSettings {
 
     /**
      *
-     * @Return the orientation of the chart.
+     * @return the orientation of the chart.
      */
     public boolean getOrientation() {
 	return normalOrientation;

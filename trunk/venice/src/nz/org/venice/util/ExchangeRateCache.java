@@ -93,7 +93,6 @@ public class ExchangeRateCache {
      * @param date                the date for the exchange
      * @param sourceCurrency      the source currency to convert from
      * @param destinationCurrency the destination currency to convert to
-     * @param the rate to change the source currency into the destination currency.
      */
     public synchronized double getRate(TradingDate date, Currency sourceCurrency,
                                        Currency destinationCurrency) {

@@ -206,12 +206,12 @@ public class GraphSettings extends AbstractSettings {
 
     public Graph getGraph(EODQuoteBundle bundle) {
 	Graph newGraph = null;
-	
+
 	if (title.equals("Bar Chart")) {
 	    newGraph = new BarChartGraph(getSource(bundle, Quote.DAY_OPEN),
-					 getSource(bundle, Quote.DAY_CLOSE),
+					 getSource(bundle, Quote.DAY_LOW),
 					 getSource(bundle, Quote.DAY_HIGH),
-					 getSource(bundle, Quote.DAY_LOW));
+					 getSource(bundle, Quote.DAY_CLOSE));
 	    
 	}
 	

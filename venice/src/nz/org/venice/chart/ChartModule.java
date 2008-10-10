@@ -24,6 +24,11 @@ import java.beans.*;
 import java.net.*;
 import java.util.*;
 import javax.swing.*;
+
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
 import java.awt.image.BufferedImage;
 
 import nz.org.venice.chart.graph.*;
@@ -40,6 +45,7 @@ import nz.org.venice.prefs.PreferencesException;
 import nz.org.venice.prefs.settings.Settings;
 import nz.org.venice.prefs.settings.ChartModuleSettings;
 import nz.org.venice.prefs.settings.GraphSettings;
+import nz.org.venice.prefs.settings.MenuSettings;
 
 /**
  * The charting module for venice. This class provides the user interface
@@ -240,49 +246,127 @@ public class ChartModule extends JPanel implements Module,
     public ChartModule(JDesktopPane desktop, ChartModuleSettings settings) {
 	Vector levelSettingsList = (Vector)settings.getLevelSettingsList();
 	Vector symbolList = (Vector)settings.getSymbolList();
-	int levelCount = 0;
-	int graphCount = 0;
-		
-	initChart(false);
-		
-	Iterator levelsIterator = levelSettingsList.iterator();
+	HashMap symbolMap = new HashMap();
+	HashMap symbolObjectMap = new HashMap();
+	HashMap bundleMap = new HashMap();
+	Vector sortedSymbolList = new Vector(symbolList);
 	int symbolIndex = 0;
+	String prevSymbol = ""; 
 
-	while (levelsIterator.hasNext()) {
+	initChart(false);	
 
-	    Vector graphList = (Vector)levelsIterator.next();
-	    Iterator graphSettingsIterator = graphList.iterator();
+	java.util.Collections.sort(sortedSymbolList);
+	Iterator symbolIterator = sortedSymbolList.iterator();
+
+	while (symbolIterator.hasNext()) {	    
+	    String symbol = (String)symbolIterator.next();
 	    
-	    graphCount = 0;
-
-	    while (graphSettingsIterator.hasNext()) { 
-		GraphSettings graphSettings = (GraphSettings)graphSettingsIterator.next();
+	    if (symbol.compareTo(prevSymbol) != 0) {
+		HashMap levelMap = new HashMap();
+		Iterator levelsIterator = levelSettingsList.iterator();
+		symbolIndex = 0;
+		
+		int levelCount = 0;
+		while (levelsIterator.hasNext()) {
+		    Vector graphList = (Vector)levelsIterator.next();
+		    Iterator graphSettingsIterator = graphList.iterator();
+		    Vector newGraphList = new Vector();
 		    
-		//Try to recreate the level from the data 
-		try {
-		    Symbol s = Symbol.find((String)symbolList.
-					   get(symbolIndex));
-		    
-		    EODQuoteBundle bundle = new 
-			EODQuoteBundle(new EODQuoteRange(s));
-		    
-		    Graph newGraph = graphSettings.getGraph(bundle);
-		    if (newGraph != null) {
-			if (graphCount > 0) {
-			    append(newGraph, levelCount);
-			} else {
-				add(newGraph, s, bundle, levelCount);	
-			}
+		    while (graphSettingsIterator.hasNext()) {
+			GraphSettings graphSettings = (GraphSettings)graphSettingsIterator.next();
 			
-		    }		    
-		} catch (SymbolFormatException sfe) {
-		    
-		}		    
-	    
-		symbolIndex++;
-		graphCount++;				    
+			String symbolCmp = (String)symbolList.get(symbolIndex);
+			if (symbolCmp.compareTo(symbol) == 0) {
+
+			    try {
+				Symbol s = Symbol.find(symbol);
+				
+				EODQuoteBundle bundle = new 
+				    EODQuoteBundle(new EODQuoteRange(s));
+				
+				symbolObjectMap.put(symbol, s);
+				bundleMap.put(symbol, bundle);
+
+				Graph newGraph = graphSettings.getGraph(bundle);
+				newGraphList.add(newGraph);			    				
+
+				
+				
+			    } catch (SymbolFormatException sfe) {
+				
+			    }
+			} 
+			symbolIndex++;
+		    }
+		    String levelKey = "" + levelCount;
+		    levelMap.put(levelKey, newGraphList);
+		    levelCount++;
+		}		
+		symbolMap.put(symbol, levelMap);
 	    }
-	    levelCount++;
+	    prevSymbol = symbol;
+	}
+	
+	/* Create a map associating symbols, graphs and levels.
+	   We need to have all the graph objects generated ahead of time
+	   so when a new symbol is added the graph menu items can be
+	   selected. 
+	*/
+	symbolIterator = symbolMap.keySet().iterator();
+	boolean symbolAdded;
+	while (symbolIterator.hasNext()) {
+	    String symbol = (String)symbolIterator.next();
+	    
+	    symbolAdded = false;
+	    //graphsMap associates a list of graphs with a level 
+	    HashMap graphsMap = (HashMap)symbolMap.get(symbol);	    
+	    HashMap graphMenuMap = new HashMap();
+
+	    //Create a map of graphs and graphNames for this symbol
+	    Iterator levelsIterator = graphsMap.keySet().iterator();
+	    while (levelsIterator.hasNext()) {
+		String level = (String)levelsIterator.next();
+		Vector graphList = (Vector)graphsMap.get(level);
+			    
+		Iterator graphIterator = graphList.iterator();
+		while (graphIterator.hasNext()) {
+		    Graph g = (Graph)graphIterator.next();
+		    graphMenuMap.put(g.getName(), g);
+		    
+		}
+	    }
+	    
+	    //Add the graphs to the chart
+	    levelsIterator = graphsMap.keySet().iterator();
+	    while (levelsIterator.hasNext()) {
+		String level = (String)levelsIterator.next();
+		Vector graphList = (Vector)graphsMap.get(level);
+			
+		Iterator graphIterator = graphList.iterator();
+		
+		while (graphIterator.hasNext()) {	       
+		    Graph g =  (Graph)graphIterator.next();
+		    
+		    if (!symbolAdded) {			
+			Symbol s = (Symbol)symbolObjectMap.get(symbol);
+			EODQuoteBundle bundle = (EODQuoteBundle)bundleMap.get(symbol);
+			    
+			int levelIndex = new Integer(level).intValue();
+			  
+			MenuSettings menuSettings = new MenuSettings();
+			menuSettings.setTitle(g.getSourceName());
+  
+			menuSettings.setMap(graphMenuMap);			
+			add(g, s, bundle, levelIndex, menuSettings);	
+			symbolAdded = true;
+						
+		    } else {
+			int levelIndex = new Integer(level).intValue();
+			append(g, levelIndex);			
+		    }
+		}
+	    }
+	    
 	}
 
 	//Both chart.resetBuffer lines seem to be necessary
@@ -465,8 +549,9 @@ public class ChartModule extends JPanel implements Module,
 	}
 
 	// If we haven't inserted the menu bar yet then append it
-	if(menuBarInserted == false)
+	if(menuBarInserted == false) {
 	    menuBar.add(menu);	
+	}
 
 	// Send signal that our frame name has changed
 	propertySupport.
@@ -489,9 +574,36 @@ public class ChartModule extends JPanel implements Module,
 
 	// Add menu for this quote
 	EODQuoteChartMenu menu = new EODQuoteChartMenu(this, quoteBundle, symbol,
-                                                       graph,indexChart);
+                                                       graph,indexChart);	
 
 	addMenu(menu);
+
+	
+    }
+
+    /**
+     * Add a new graph to the specified level. Add new menu for graph.
+     *
+     * @param	graph	the new graph to add
+     * @param	level	graph level to add the new graph
+     * @param   menuSettings The menusettings for the graph
+     */
+    public void add(Graph graph, Symbol symbol, EODQuoteBundle quoteBundle, 
+		    int level, MenuSettings menuSettings) {
+
+	// Make sure it has at least one value
+        assert graph.getXRange().size() > 0;
+
+	// Add graph to chart
+	chart.add(graph, level);
+
+	// Add menu for this quote
+	EODQuoteChartMenu menu = new EODQuoteChartMenu(this, quoteBundle, symbol,
+                                                       graph, indexChart, menuSettings);	
+
+	addMenu(menu);
+
+	
     }
 
     // Add the given symbols to the graph - should be run in a separate
@@ -1080,8 +1192,10 @@ public class ChartModule extends JPanel implements Module,
 	Vector symbolList = chart.getSymbols();
 	String type = String.valueOf(getClass().getName());
 	String key = String.valueOf(hashCode());
+	int graphIndex = 0;
 
 	Vector levelSettingsList = new Vector();
+	
 	settings = new ChartModuleSettings(key);
 	settings.setTitle(getTitle());
 	
@@ -1091,16 +1205,18 @@ public class ChartModule extends JPanel implements Module,
 	    Vector graphList = (Vector)levelsIterator.next();
 	    Iterator graphIterator = graphList.iterator();
 
+	    graphIndex = 0;
+	    
 	    while (graphIterator.hasNext()) {
 		Graph graph = (Graph)graphIterator.next();
 		GraphSettings graphSettings = 
 		    new GraphSettings(String.valueOf(graph.hashCode()),
 				      String.valueOf(chart.hashCode()),
 				      graph.getName());
-
-		graphSettings.setSettings(graph.getSettings());
+		
+		graphSettings.setSettings(graph.getSettings());		
 		graphSettingsList.add(graphSettings);
-	    }	    
+	    }
 	    levelSettingsList.add(graphSettingsList);
 	}
 
@@ -1117,9 +1233,8 @@ public class ChartModule extends JPanel implements Module,
 	settings.setDrawnElements(chart.getChartDrawingModel());
 	settings.setOrientation(chart.getOrientation());
 	
-
     }
-
+    
     public BufferedImage getImage() { 
 	return chart.getImage();
     }

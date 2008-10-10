@@ -21,6 +21,7 @@ package nz.org.venice.chart;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.Iterator;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -43,6 +44,7 @@ import nz.org.venice.quote.Symbol;
 import nz.org.venice.util.ImageFilter;
 import nz.org.venice.util.BMPFile;
 import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.settings.MenuSettings;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.
@@ -86,9 +88,11 @@ public class EODQuoteChartMenu extends JMenu {
     private GraphSource dayCloseGraphSource = null;
     private GraphSource dayVolumeGraphSource = null;
 
+    private JMenu graphMenu = null;
+
     /*
-      Is the data constitute and index?
-      Indices data is many symbols data averaged and thus has have their 
+      Does the data constitute an index?
+      Indices data is many symbols data averaged and thus has their 
       own source.      
     */
     private boolean indexChart = false;
@@ -116,13 +120,42 @@ public class EODQuoteChartMenu extends JMenu {
 
         buildMenu();
     }
+      
+    public EODQuoteChartMenu(final ChartModule listener, 
+			     EODQuoteBundle quoteBundle, 
+			     Symbol symbol,
+			     Graph graph,
+			     boolean indexChart,
+			     MenuSettings settings) {
+	super(settings.getTitle());
+	menuName = settings.getTitle();
+
+	this.quoteBundle = quoteBundle;
+	this.listener = listener;
+	this.currentViewGraph = graph;
+	this.indexChart = indexChart;
+
+	map = settings.getMap();	
+	buildMenu();
+
+	//Select all the graphs in the menu	
+	Iterator iterator = map.keySet().iterator();
+	while (iterator.hasNext()) {
+	    String key = (String)iterator.next();
+	    Graph value = (Graph)map.get(key); 
+	    
+	    selectMenuItem(value.getName());
+	}
+
+    }
+    
 
     /**
      * Builds the menu.
      */
     private void buildMenu() {
         // Graph main menus
-	JMenu graphMenu = new JMenu(Locale.getString("GRAPH"));
+	graphMenu = new JMenu(Locale.getString("GRAPH"));
 
 
 	/* Determine which chart type to be selected based
@@ -331,6 +364,7 @@ public class EODQuoteChartMenu extends JMenu {
                     final String text = menuItem.getText();
 
                     // If the menu is already selected then unselecting removes the
+
                     // graph...
                     if(!menuItem.getState())
                         removeGraph(text);
@@ -486,6 +520,7 @@ public class EODQuoteChartMenu extends JMenu {
      * @param graph the graph
      */
     private void addGraph(Graph graph) {
+
         String mapIdentifier = graph.getName();
 	map.put(mapIdentifier, graph);
 
@@ -504,7 +539,7 @@ public class EODQuoteChartMenu extends JMenu {
     private void removeGraph(String mapIdentifier) {
 	Graph graph = (Graph)map.get(mapIdentifier);
 	map.remove(mapIdentifier);
-	
+
 	// Remove graph
 	listener.remove(graph);
 	listener.redraw();
@@ -595,4 +630,21 @@ public class EODQuoteChartMenu extends JMenu {
 
         return graph;
     }
+
+    
+    //Select the menuItem for graphName.
+    private void selectMenuItem(String graphName) {
+	
+	for (int i = 0; i < graphMenu.getItemCount(); i++) {
+	    JMenuItem item = graphMenu.getItem(i);
+	    if (item != null) {
+
+		if (graphName.compareTo(item.getText()) == 0) {
+		    item.setSelected(true);
+		    return;
+		}
+	    }
+	}	
+    }
+       
 }

@@ -55,6 +55,7 @@ public interface Settings {
     public static final int MODULE      = 0;
     public static final int CHARTMODULE = 1;
     public static final int GRAPHS      = 2;
+    public static final int MENUS       = 18;
     
     public static final int QUOTEMODULE          = 3;
     public static final int WATCHSCREENMODULE    = 4;

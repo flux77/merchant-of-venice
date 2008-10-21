@@ -48,7 +48,7 @@ public class PortfolioGraphSource implements GraphSource {
     /** Graph the portfolio share value */
     public static final int SHARE_VALUE = 3;
 
-    /** Graph the numbre of stocks held */
+    /** Graph the number of stocks held */
     public static final int STOCKS_HELD = 4;
 
     // Graph the value of a single account in the portfolio
@@ -150,6 +150,8 @@ public class PortfolioGraphSource implements GraphSource {
                         int stocksHeld = portfolio.getStocksHeld().size();
 
                         value = new Money((double)stocksHeld);
+					    
+
                     }
                     else {
                         assert mode == ACCOUNT_VALUE;
@@ -159,11 +161,12 @@ public class PortfolioGraphSource implements GraphSource {
                         // for the portfolio. However, it's cleaner to put it here and
                         // its impact should be tiny.
                         Account account = portfolio.findAccountByName(accountName);
-                        assert account != null;
+                        
+			assert account != null;
 
                         value = account.getValue(quoteBundle, date);
                     }
-
+		    
                     graphable.putY((Comparable)date, new Double(value.doubleValue()));
                 }
 
@@ -181,6 +184,10 @@ public class PortfolioGraphSource implements GraphSource {
 
     public String getName() {
 	return portfolio.getName();
+    }
+
+    public int getType() {
+	return GraphSource.PORTFOLIO;
     }
 
     public String getToolTipText(Comparable x) {

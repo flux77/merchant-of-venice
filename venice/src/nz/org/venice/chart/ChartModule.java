@@ -41,6 +41,7 @@ import nz.org.venice.ui.*;
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.prefs.PreferencesException;
+import nz.org.venice.util.TradingDate;
 
 import nz.org.venice.prefs.settings.Settings;
 import nz.org.venice.prefs.settings.ChartModuleSettings;
@@ -253,6 +254,7 @@ public class ChartModule extends JPanel implements Module,
 	int symbolIndex = 0;
 	String prevSymbol = ""; 
 
+
 	initChart(false);	
 
 	java.util.Collections.sort(sortedSymbolList);
@@ -265,37 +267,89 @@ public class ChartModule extends JPanel implements Module,
 		HashMap levelMap = new HashMap();
 		Iterator levelsIterator = levelSettingsList.iterator();
 		symbolIndex = 0;
-		
+
 		int levelCount = 0;
 		while (levelsIterator.hasNext()) {
+
 		    Vector graphList = (Vector)levelsIterator.next();
 		    Iterator graphSettingsIterator = graphList.iterator();
 		    Vector newGraphList = new Vector();
+		    Graph newGraph = null;
 		    
 		    while (graphSettingsIterator.hasNext()) {
 			GraphSettings graphSettings = (GraphSettings)graphSettingsIterator.next();
 			
 			String symbolCmp = (String)symbolList.get(symbolIndex);
 			if (symbolCmp.compareTo(symbol) == 0) {
+			    switch (graphSettings.getSourceType()) {
+			    case GraphSource.SYMBOL:
+				try {
+				    Symbol s = Symbol.find(symbol);
+				    
+				    EODQuoteBundle bundle = new 
+					EODQuoteBundle(new EODQuoteRange(s));
+				    				    
+				    symbolObjectMap.put(symbol, s);
+				    bundleMap.put(symbol, bundle);
+				    
+				    newGraph = graphSettings.getGraph(bundle);
+				    newGraphList.add(newGraph);	
+				    
+				} catch (SymbolFormatException sfe) {
+				}
+				break;
+			    case GraphSource.INDEX:
 
-			    try {
-				Symbol s = Symbol.find(symbol);
-				
-				EODQuoteBundle bundle = new 
-				    EODQuoteBundle(new EODQuoteRange(s));
-				
-				symbolObjectMap.put(symbol, s);
-				bundleMap.put(symbol, bundle);
+				//There's a bug somewhere in EODQuoteBundle 
+				//et al which prevents quote lookups for 
+				//indeces. Don't create an index graph
+				//until the bug has been tracked down.
 
-				Graph newGraph = graphSettings.getGraph(bundle);
-				newGraphList.add(newGraph);			    				
+				/*
+				EODQuoteBundle quoteBundle = new 
+				    EODQuoteBundle(new EODQuoteRange(graphSettings.getSettingsSymbolList()));
+				
+				bundleMap.put(symbol, quoteBundle);
+				newGraph = graphSettings.getGraph(quoteBundle);
+				newGraphList.add(newGraph);
+				*/
 
+				break;
+			    case GraphSource.PORTFOLIO:
+				try {
 				
+				    Portfolio portfolio = PreferencesManager.getPortfolio(symbolCmp);
+				    
+				    TradingDate startDate = portfolio.getStartDate();
+				    TradingDate endDate = QuoteSourceManager.getSource().getLastDate();
+				    java.util.List symbolsTraded = portfolio.getSymbolsTraded();
+				    
+				    // Make sure the end date is after the start date! Otherwise the code
+				    // will assert later.
+				    if (endDate.before(startDate))
+					endDate = startDate;
+				    
+				    EODQuoteBundle bundle = 
+					new EODQuoteBundle(new EODQuoteRange(
+									     symbolsTraded, startDate, endDate));
+				    
+				    bundleMap.put(symbol, bundle);
+				    
+				    newGraph = graphSettings.getGraph(bundle, portfolio);
+
+				    newGraphList.add(newGraph);	
+				} catch (PreferencesException pfe) {
+				    
+				}
 				
-			    } catch (SymbolFormatException sfe) {
-				
-			    }
-			} 
+				break;
+			    case GraphSource.ADVANCEDECLINE:
+				//Graph newGraph = new AdvanceDeclineGraph();
+				//newGraphList.add(newGraph);
+				break;
+			    default: 				
+			    }			
+			}
 			symbolIndex++;
 		    }
 		    String levelKey = "" + levelCount;
@@ -330,12 +384,11 @@ public class ChartModule extends JPanel implements Module,
 			    
 		Iterator graphIterator = graphList.iterator();
 		while (graphIterator.hasNext()) {
-		    Graph g = (Graph)graphIterator.next();
-		    graphMenuMap.put(g.getName(), g);
-		    
+		    Graph g = (Graph)graphIterator.next();		   
+		    graphMenuMap.put(g.getName(), g);		    
 		}
 	    }
-	    
+	    	    
 	    //Add the graphs to the chart
 	    levelsIterator = graphsMap.keySet().iterator();
 	    while (levelsIterator.hasNext()) {
@@ -353,11 +406,27 @@ public class ChartModule extends JPanel implements Module,
 			    
 			int levelIndex = new Integer(level).intValue();
 			  
-			MenuSettings menuSettings = new MenuSettings();
-			menuSettings.setTitle(g.getSourceName());
-  
-			menuSettings.setMap(graphMenuMap);			
-			add(g, s, bundle, levelIndex, menuSettings);	
+			if (g.getSourceType() == GraphSource.SYMBOL) {
+			    
+			    MenuSettings menuSettings = new MenuSettings();
+			    menuSettings.setTitle(g.getSourceName());
+			    
+			    menuSettings.setMap(graphMenuMap);			
+			    add(g, s, bundle, levelIndex, menuSettings);	
+			} else if (g.getSourceType() == GraphSource.PORTFOLIO) {
+			    try {
+				Portfolio portfolio = PreferencesManager.getPortfolio(symbol);
+				
+				MenuSettings menuSettings = new MenuSettings();
+				menuSettings.setTitle(g.getSourceName());
+
+				menuSettings.setMap(graphMenuMap);		
+				add(g, portfolio, bundle, levelIndex, menuSettings);
+			    } catch (PreferencesException pfe) {
+				
+			    }
+			} else if (g.getSourceType() == GraphSource.ADVANCEDECLINE) {
+			}
 			symbolAdded = true;
 						
 		    } else {
@@ -703,6 +772,28 @@ public class ChartModule extends JPanel implements Module,
 	// Add menu for this portfolio
 	PortfolioChartMenu menu = new PortfolioChartMenu(this, quoteBundle,
 							 portfolio, graph);
+	
+	addMenu(menu);
+    }
+
+    /**
+     * Add a new portfolio graph to the specified level. Add new menu
+     * for graph.
+     *
+     * @param	graph	     the portfolio graph
+     * @param	portfolio    the portfolio
+     * @param	quoteBundle  the quote bundle
+     * @param	level	     specified level
+     */
+    public void add(Graph graph, Portfolio portfolio, EODQuoteBundle quoteBundle, int level, MenuSettings menuSettings) {
+	
+	// Add graph to chart
+	chart.add(graph, level);
+
+	// Add menu for this portfolio
+	PortfolioChartMenu menu = new PortfolioChartMenu(this, quoteBundle,
+							 portfolio, graph, menuSettings);
+	
 	addMenu(menu);
     }
 
@@ -1193,7 +1284,8 @@ public class ChartModule extends JPanel implements Module,
 	String type = String.valueOf(getClass().getName());
 	String key = String.valueOf(hashCode());
 	int graphIndex = 0;
-
+	boolean addedGraph = false;
+       
 	Vector levelSettingsList = new Vector();
 	
 	settings = new ChartModuleSettings(key);
@@ -1206,32 +1298,68 @@ public class ChartModule extends JPanel implements Module,
 	    Iterator graphIterator = graphList.iterator();
 
 	    graphIndex = 0;
-	    
+	    	    
 	    while (graphIterator.hasNext()) {
 		Graph graph = (Graph)graphIterator.next();
 		GraphSettings graphSettings = 
 		    new GraphSettings(String.valueOf(graph.hashCode()),
 				      String.valueOf(chart.hashCode()),
 				      graph.getName());
-		
-		graphSettings.setSettings(graph.getSettings());		
-		graphSettingsList.add(graphSettings);
+		/*
+		  Exclude AdvanceDecline graphs because of the length
+		  of time required to construct them.
+		 */		
+
+		/* Exclude Index graphs because of a bug in retrieving 
+		   quotes.
+		*/
+		if (graph.getSourceType() != GraphSource.ADVANCEDECLINE &&
+		    graph.getSourceType() != GraphSource.INDEX) {
+		    graphSettings.setSourceType(graph.getSourceType());
+		    graphSettings.setSettings(graph.getSettings());		
+		    graphSettingsList.add(graphSettings);
+
+		    if (graph.getSourceType() == GraphSource.INDEX) {
+			Vector settingsSymbolList = new Vector();
+			String sourceName = graph.getSourceName();
+			
+			String tmp = sourceName.replaceAll("\\s",",");
+			String tmp2 = tmp.replaceAll(",+",",");
+			String[] symbols = tmp2.split(",");
+			
+			for (int i = 1; i < symbols.length; i++) {
+			    try {
+				Symbol symbol = Symbol.find(symbols[i]);
+				settingsSymbolList.add(symbol);
+
+			    } catch (SymbolFormatException sfe) {
+			    }
+			}
+			graphSettings.setSettingsSymbolList(settingsSymbolList);
+		    }
+
+		    addedGraph = true;
+		} 		
 	    }
 	    levelSettingsList.add(graphSettingsList);
 	}
 
-	settings.setLevelSettingsList(levelSettingsList);
-	settings.setSymbolList(symbolList);
-	settings.setScrollBarValues(scrollPane);
-
-	settings.setStartX(chart.getStartX());
-	settings.setEndX(chart.getEndX());	
-	settings.setHighlightedStart(chart.getHighlightedStart());
-	settings.setHighlightedEnd(chart.getHighlightedEnd());
-	settings.setDefaultZoomEnabled(defaultZoomEnabled);
-	settings.setZoomInEnabled(zoomInEnabled);
-	settings.setDrawnElements(chart.getChartDrawingModel());
-	settings.setOrientation(chart.getOrientation());
+	if (addedGraph == false) {
+	    settings = null;
+	} else {
+	    settings.setLevelSettingsList(levelSettingsList);
+	    settings.setSymbolList(symbolList);
+	    settings.setScrollBarValues(scrollPane);
+	    
+	    settings.setStartX(chart.getStartX());
+	    settings.setEndX(chart.getEndX());	
+	    settings.setHighlightedStart(chart.getHighlightedStart());
+	    settings.setHighlightedEnd(chart.getHighlightedEnd());
+	    settings.setDefaultZoomEnabled(defaultZoomEnabled);
+	    settings.setZoomInEnabled(zoomInEnabled);
+	    settings.setDrawnElements(chart.getChartDrawingModel());
+	    settings.setOrientation(chart.getOrientation());
+	}
 	
     }
     

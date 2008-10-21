@@ -134,6 +134,16 @@ abstract public class AbstractGraph implements Graph {
 	return source.getName();
     }
 
+   /**
+     * Return the type of the source data that we are graphing, e.g.
+     * <code>Portfolio</code>.
+     *
+     * @return the name of the source
+     */
+    public int getSourceType() {
+	return source.getType();
+    }
+
     /**
      * Return the Y value for the given X value.
      *

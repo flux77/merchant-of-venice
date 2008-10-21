@@ -37,6 +37,8 @@ import java.util.Vector;
 import javax.swing.JDesktopPane;
 
 import nz.org.venice.main.Main;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.PreferencesException;
 import nz.org.venice.macro.StoredMacro;
 import nz.org.venice.util.Locale;
 import nz.org.venice.quote.Symbol;
@@ -44,6 +46,9 @@ import nz.org.venice.quote.SymbolFormatException;
 import nz.org.venice.quote.EODQuoteBundle;
 import nz.org.venice.quote.Quote;
 import nz.org.venice.chart.source.OHLCVQuoteGraphSource;
+import nz.org.venice.chart.source.OHLCVIndexQuoteGraphSource;
+import nz.org.venice.chart.source.PortfolioGraphSource;
+import nz.org.venice.portfolio.Portfolio;
 import nz.org.venice.table.WatchScreen;
 import nz.org.venice.table.WatchScreenParserException;
 import nz.org.venice.table.WatchScreenReader;
@@ -55,6 +60,7 @@ import nz.org.venice.main.Module;
 
 
 import nz.org.venice.chart.graph.LineGraph;
+import nz.org.venice.chart.graph.BarGraph;
 import nz.org.venice.chart.graph.BarChartGraph;
 import nz.org.venice.chart.graph.HighLowBarGraph;
 import nz.org.venice.chart.graph.CandleStickGraph;
@@ -82,9 +88,18 @@ import nz.org.venice.chart.graph.CustomGraph;
 public class GraphSettings extends AbstractSettings {
     
     
+    //Portfolio Graphs
+                                               
+    private static final String MARKET_VALUE = Locale.getString("MARKET_VALUE");
+    private static final String CASH_VALUE = Locale.getString("CASH_VALUE");
+    private static final String SHARE_VALUE = Locale.getString("SHARE_VALUE");
+    private static final String RETURN_VALUE = Locale.getString("RETURN_VALUE");
+    private static final String STOCKS_HELD = Locale.getString("STOCKS_HELD");
+
     private HashMap settings;
-    String title;
-    Symbol symbol;
+    private String title;
+    private int sourceType;    
+    private List settingsSymbolList;
 
     /**
      *
@@ -134,7 +149,7 @@ public class GraphSettings extends AbstractSettings {
 	this.settings = settings;
     }
 
-    
+   
     /**
      * Return the graph title
      * 
@@ -156,41 +171,42 @@ public class GraphSettings extends AbstractSettings {
     }
 
     /**
-     *
-     * Set the symbol of the graph
      * 
-     * @param symbol  A symbol
+     * Set the graph source type
+     * 
+     * @param   sourceType The graph source type  
      */
 
-    public void setSymbol(Symbol symbol) {
-	this.symbol = symbol;
+    public void setSourceType(int sourceType) {
+	this.sourceType = sourceType;
     }
 
     /**
-     *
-     * Return the symbol assigned to this graph
-     * @return The quote symbol
+     * Return the graph source type
+     * 
+     * @return  The graph source type
      */
+    public int getSourceType() {
+	return sourceType;
+    }
 
-    public Symbol getSymbol() {
-	return symbol;
+    /** 
+     * Return the symbolList
+     * 
+     * @return  A list of symbols for this graph
+     */    
+    public List getSettingsSymbolList() {
+	return settingsSymbolList;
     }
 
     /**
+     * Set the symbollist
      *
-     * Set the symbol of the graph
-     * 
-     * @param s  A string representing a Symbol
+     * @param symbolList  A list of symbols for this graph
      */
-
-    public void setSymbol(String s) {
-	try {
-	    symbol = Symbol.find(s);
-	} catch (SymbolFormatException sfe) {
-
-	}
+    public void setSettingsSymbolList(List settingsSymbolList) {
+	this.settingsSymbolList = settingsSymbolList;
     }
-
 
     //Graph settings are data of the chart module, so nothing is returned here
     public Module getModule(JDesktopPane desktop) {
@@ -207,7 +223,8 @@ public class GraphSettings extends AbstractSettings {
     public Graph getGraph(EODQuoteBundle bundle) {
 	Graph newGraph = null;
 
-	if (title.equals("Bar Chart")) {
+	if (title.equals(Locale.getString("BAR_CHART"))) {
+
 	    newGraph = new BarChartGraph(getSource(bundle, Quote.DAY_OPEN),
 					 getSource(bundle, Quote.DAY_LOW),
 					 getSource(bundle, Quote.DAY_HIGH),
@@ -215,7 +232,7 @@ public class GraphSettings extends AbstractSettings {
 	    
 	}
 	
-	if (title.equals("Candle Stick")) {
+	if (title.equals(Locale.getString("CANDLE_STICK"))) {
 	    newGraph = new CandleStickGraph(getSource(bundle, Quote.DAY_OPEN),
 					    getSource(bundle, Quote.DAY_LOW),
 					    getSource(bundle, Quote.DAY_HIGH),
@@ -223,7 +240,7 @@ public class GraphSettings extends AbstractSettings {
 					    	    
 	}
 
-	if (title.equals("Point and Figure")) {
+	if (title.equals(Locale.getString("POINT_AND_FIGURE"))) {
 	    newGraph = new PointAndFigureGraph(getSource(bundle, Quote.DAY_CLOSE),
 					  settings);
 	}
@@ -237,8 +254,8 @@ public class GraphSettings extends AbstractSettings {
 						
 	    }
 
-	if (title.equals("Line Chart") ||
-	    title.equals("Day Close")) {
+	if (title.equals(Locale.getString("LINE_CHART")) ||
+	    title.equals(Locale.getString("DAY_CLOSE"))) {
 	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_CLOSE),
 				     title,
 				     true);
@@ -247,28 +264,28 @@ public class GraphSettings extends AbstractSettings {
 	}
 
 	
-	if (title.equals("Day Open")) {
+	if (title.equals(Locale.getString("DAY_OPEN"))) {
 	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_OPEN),
 				     title,
 				     true);
 					       	    
 	}
 	
-	if (title.equals("Day High")) {
+	if (title.equals(Locale.getString("DAY_HIGH"))) {
 	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_HIGH),
 				     title,
 				     true);
 					       	    
 	}
 
-	if (title.equals("Day Low")) {
+	if (title.equals(Locale.getString("DAY_LOW"))) {
 	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_LOW),
 				     title,
 				     true);
 					       	    
 	}
 
-	if (title.equals("Volume")) {
+	if (title.equals(Locale.getString("VOLUME"))) {
 	    newGraph = new LineGraph(getSource(bundle, Quote.DAY_VOLUME),
 				     title,
 				     true);
@@ -276,13 +293,13 @@ public class GraphSettings extends AbstractSettings {
 	}
 
 		
-	if (title.equals("Simple Moving Average")) {
+	if (title.equals(Locale.getString("SIMPLE_MOVING_AVERAGE"))) {
 	    newGraph = new 
 		MovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE), settings);
 	}
 
 
-	if (title.equals("Exponential Moving Average")) {
+	if (title.equals(Locale.getString("EXPONENTIAL_MOVING_AVERAGE"))) {
 	    newGraph = new 
 		MovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE), settings);
 	}
@@ -290,26 +307,26 @@ public class GraphSettings extends AbstractSettings {
 	
 	
 
-	if (title.equals("Bollinger Bands")) {
+	if (title.equals(Locale.getString("BOLLINGER_BANDS"))) {
 	    newGraph = new 
 		BollingerBandsGraph(getSource(bundle, Quote.DAY_CLOSE),
 				    settings);
 	}
 
-	if (title.equals(Locale.getString("MOMENTUM"))) {	    	    
+	if (title.equals(Locale.getString(Locale.getString("MOMENTUM")))) {	    	    
 	    newGraph = new
 		MomentumGraph(getSource(bundle, Quote.DAY_CLOSE),
 			       settings);
 	    
 	}
 
-	if (title.equals("Multiple Moving Average")) {
+	if (title.equals(Locale.getString("MULTIPLE_MOVING_AVERAGE"))) {
 	    newGraph = new
 		MultipleMovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE));
 	}
 
 	
-	if (title.equals("OBV")) {
+	if (title.equals((Locale.getString("OBV")))) {
 	    
 	    newGraph = new
 		OBVGraph(getSource(bundle, Quote.DAY_OPEN),
@@ -317,46 +334,104 @@ public class GraphSettings extends AbstractSettings {
 			 getSource(bundle, Quote.DAY_VOLUME));	    
 	}
 
-	if (title.equals("Standard Deviation")) {
+	if (title.equals(Locale.getString("STANDARD_DEVIATION"))) {
 	    newGraph = new 
 		StandardDeviationGraph(getSource(bundle, Quote.DAY_CLOSE),
 				       settings);
 		
 	}
 	
-	if (title.equals("MACD")) {
+	if (title.equals(Locale.getString("MACD"))) {
 	    newGraph = new
 		MACDGraph(getSource(bundle, Quote.DAY_CLOSE),
 			  settings);
 	}
 
-	if (title.equals("RSI")) {
+	if (title.equals(Locale.getString("RSI"))) {
 	    newGraph = new
 		RSIGraph(getSource(bundle, Quote.DAY_CLOSE),
 			 settings);
 	}
 
-
-	if (title.equals("Custom")) {
+	
+	if (title.equals(Locale.getString("CUSTOM"))) {
+	    //Eventually, custom graph will be able to graph
+	    //groups of symbols, so the problem of just getting the first symbol
+	    //is temporary.
+	    Symbol symbol = (Symbol)settingsSymbolList.get(0);
 	    newGraph = new
 		CustomGraph(getSource(bundle, Quote.DAY_CLOSE),
 			    symbol,
 			    bundle,
 			    settings);
 	}
+	
 
 	return newGraph;
 
     }
 
+    public Graph getGraph(EODQuoteBundle bundle, Portfolio portfolio) {
+	
+	Graph newGraph = null;	
+	PortfolioGraphSource portfolioGraphSource;
+	
+	
+	if (title.equals(MARKET_VALUE)) {
+	    portfolioGraphSource = new PortfolioGraphSource(portfolio, 
+							    bundle,
+							    PortfolioGraphSource.MARKET_VALUE);
+	    
+	    newGraph = new LineGraph(portfolioGraphSource, 
+				     Locale.getString("MARKET_VALUE"),
+				     true);
+	    
+	} else if (title.equals(RETURN_VALUE)) {
+	    portfolioGraphSource = new PortfolioGraphSource(portfolio, 
+							    bundle,
+							    PortfolioGraphSource.RETURN_VALUE);
+	    
+	    newGraph = new LineGraph(portfolioGraphSource, RETURN_VALUE, true);
+	} else if (title.equals(CASH_VALUE)) {
+	    
+	    portfolioGraphSource = new PortfolioGraphSource(portfolio, 
+							    bundle,
+							    PortfolioGraphSource.CASH_VALUE);
+	    newGraph = new LineGraph(portfolioGraphSource, CASH_VALUE, true);
+	} else if (title.equals(SHARE_VALUE)) {
+	    portfolioGraphSource = new PortfolioGraphSource(portfolio, 
+							    bundle,
+							    PortfolioGraphSource.SHARE_VALUE);
+	    newGraph = new LineGraph(portfolioGraphSource, SHARE_VALUE, true);
+	} else if (title.equals(STOCKS_HELD)) {
+	    portfolioGraphSource = new PortfolioGraphSource(portfolio, 
+							    bundle,
+							    PortfolioGraphSource.STOCKS_HELD);
+	    newGraph = new BarGraph(portfolioGraphSource, STOCKS_HELD, false);
+	} else {
+	    //Graph is an account.
+	    portfolioGraphSource = new PortfolioGraphSource(portfolio, 
+							    bundle,
+							    title);
+	    newGraph = new LineGraph(portfolioGraphSource, title, false);
+	}
+	
+	return newGraph;
+    }
     
-    
-    private GraphSource getSource(EODQuoteBundle bundle, int type) {
+    private GraphSource getSource(EODQuoteBundle bundle, int quoteType) {
 
-	assert (type >= Quote.DAY_CLOSE ||
-		type <= Quote.DAY_VOLUME);
-
-	return new OHLCVQuoteGraphSource(bundle, type);
+	switch (sourceType) {
+	case GraphSource.SYMBOL:
+	case GraphSource.PORTFOLIO:
+	    assert (quoteType >= Quote.DAY_CLOSE ||
+		    quoteType <= Quote.DAY_VOLUME);
+	    return new OHLCVQuoteGraphSource(bundle, quoteType);
+	case GraphSource.INDEX:
+	    return new OHLCVIndexQuoteGraphSource(bundle, quoteType);
+	default:
+	    return null;
+	}
     }
 }
 

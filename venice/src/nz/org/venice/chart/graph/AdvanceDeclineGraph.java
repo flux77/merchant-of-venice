@@ -29,6 +29,7 @@ import java.util.Vector;
 
 import nz.org.venice.chart.Graphable;
 import nz.org.venice.chart.GraphTools;
+import nz.org.venice.chart.source.GraphSource;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.TradingDate;
 import nz.org.venice.quote.MissingQuoteException;
@@ -236,7 +237,7 @@ public class AdvanceDeclineGraph implements Graph {
 
 		advanceDecline.putY((Comparable)date,
 				    new Double(cumulativeAdvanceDecline));
-            }
+	    }
             catch(MissingQuoteException e) {
                 // Don't have this date in the quote source... no problem
             }
@@ -245,7 +246,7 @@ public class AdvanceDeclineGraph implements Graph {
             if(thread.isInterrupted())
                 break;
 
-	    progress.increment();
+	    progress.increment();	    
 	}
 
 	ProgressDialogManager.closeProgressDialog(progress);	
@@ -277,6 +278,10 @@ public class AdvanceDeclineGraph implements Graph {
 
     public String getSourceName() {
         return Locale.getString("ADVANCE_DECLINE");
+    }
+
+    public int getSourceType() {
+        return GraphSource.ADVANCEDECLINE;
     }
 
     public boolean isPrimary() {

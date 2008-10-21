@@ -85,6 +85,10 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	return symbol.toString();
     }
 
+    public int getType() {
+	return GraphSource.SYMBOL;
+    }
+
     public String getToolTipText(Comparable x) {
 	// In OHLCV graphs the x axis is in dates
 	TradingDate date = (TradingDate)x;

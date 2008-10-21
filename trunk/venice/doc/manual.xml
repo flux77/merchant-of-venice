@@ -88,6 +88,8 @@ a database.</para>
 
 <para><link to="Tuning">Tuning</link> describes how to
 configure Venice for optimal performance.</para>
+
+<para><link to="User Interface">User Interface</link> describes how to configure the user interface of Venice.</para>
 </help>
 
 <chapter name="Equations">
@@ -281,7 +283,7 @@ time to time, Venice may need to go a little higher than this amount.</para>
 </chapter>
 
 <chapter name="User Interface">
-<para>The user interface page allows you to configure how Venice shows information.</para>
+<para>The user interface page allows you to enable some optional features as well as configure how Venice shows information.</para>
 <para>You can reach the user interface configuration page by:</para>
 <list><item>Clicking on the <highlight>File</highlight> menu item.
 </item>
@@ -294,6 +296,7 @@ time to time, Venice may need to go a little higher than this amount.</para>
 <para>You can specify the minimum and maximum number of decimal digits which can be shown. So for example
 if you want to display the number 12.1234567 and you obtain the following strings according to minimum and
 maximum values:</para>
+<list>
 <item>Minimum 3, Maximum 7 -> 12.1234567.
 </item>
 <item>Minimum 3, Maximum 5 -> 12.12345.
@@ -302,9 +305,13 @@ maximum values:</para>
 </item>
 <item>Minimum 8, Maximum 8 -> 12.12345670.
 </item>
+</list>
 
 <para>When you change the above parameters, you should restart Venice,
 so that these parameters are effective.</para>
+
+<para>You can also enable the feature to save the state of windows which are open when you exit Venice so that they are restored the next time you run Venice. To turn on the restore feature, click the <quote>tick</quote>box. </para>
+
 </chapter>
 
 <chapter name="Chart Defaults">

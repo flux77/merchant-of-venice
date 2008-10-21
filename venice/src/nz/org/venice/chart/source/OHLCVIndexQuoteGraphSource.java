@@ -56,6 +56,8 @@ public class OHLCVIndexQuoteGraphSource implements GraphSource {
 	List symbolList = quoteBundle.getAllSymbols();
 	numSymbols = symbolList.size();
 
+	assert numSymbols > 0;
+
 	// Build graphable so this source can be directly graphed
 	graphable = new Graphable();
 	Double value;
@@ -69,7 +71,7 @@ public class OHLCVIndexQuoteGraphSource implements GraphSource {
 	    int valueCnt = 0;
 
 	    temp = 0.0;
-	    addValue = true;
+	    addValue = false;
 
 	    for (int i = 0; i < numSymbols; i++) {
 		symbol = (Symbol)symbolList.get(i);
@@ -77,11 +79,11 @@ public class OHLCVIndexQuoteGraphSource implements GraphSource {
 		    value = new Double(quoteBundle.getQuote(symbol, quote, date));
 		    temp += value.doubleValue();
 		    valueCnt++;
-
+		    addValue = true;
 		}
 		catch(MissingQuoteException e) {
 		    // ignore
-		    addValue = false;
+		    //addValue = false;
 		}
 	    }
 
@@ -89,11 +91,11 @@ public class OHLCVIndexQuoteGraphSource implements GraphSource {
 		// Simple average for index	   
 		temp = temp / valueCnt;
 		value = new Double(temp);
-	    
+    
 		graphable.putY((Comparable)date, value);
 	    }
 	    
-	}	
+	}
         
         // Make sure we contain at least one value!
         assert graphable.getXRange().size() > 0;        
@@ -104,7 +106,18 @@ public class OHLCVIndexQuoteGraphSource implements GraphSource {
     }
 
     public String getName() {
-	return Locale.getString("INDEX");
+	String rv = Locale.getString("INDEX");
+
+	Iterator iterator = quoteBundle.getAllSymbols().iterator();
+	while (iterator.hasNext()) {
+	    Symbol symbol = (Symbol)iterator.next();
+	    rv += (" " + symbol.toString() + " ");
+	}
+	return rv;
+    }
+
+    public int getType() {
+	return GraphSource.INDEX;
     }
 
     public String getToolTipText(Comparable x) {
@@ -215,4 +228,5 @@ public class OHLCVIndexQuoteGraphSource implements GraphSource {
 	    return minor;
 	}
     }
+
 }

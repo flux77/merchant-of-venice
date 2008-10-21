@@ -83,31 +83,37 @@ public class ModuleFrameSettingsWriter  {
 	
 	ModuleFrameSettings settings = new ModuleFrameSettings();
 	Settings moduleSettings = frame.getModule().getSettings();
-	settings.setModuleSettings(moduleSettings);
-	settings.setBounds(frame.getBounds());
 
-	/* ModuleFrames which are not enclosed have components which 
-	   manage their own scrollPane. That is why the scroll bar settings
-	   appears twice. 
-	 */
-	if (frame.getModule().encloseInScrollPane()) {	    
-	    JScrollPane scrollPane;		
-	    scrollPane = frame.getScrollPane();	    
-	    settings.setScrollBarValues(scrollPane);
-	    moduleSettings.setScrollBarValues(scrollPane);
-	} 
+	if (moduleSettings != null) {
+
+	    settings.setModuleSettings(moduleSettings);
+	    settings.setBounds(frame.getBounds());
+
+	    /* ModuleFrames which are not enclosed have components which 
+	       manage their own scrollPane. That is why the scroll bar settings
+	       appears twice. 
+	    */
+	    if (frame.getModule().encloseInScrollPane()) {	    
+		JScrollPane scrollPane;		
+		scrollPane = frame.getScrollPane();	    
+		settings.setScrollBarValues(scrollPane);
+		moduleSettings.setScrollBarValues(scrollPane);
+	    } 
 	
-	BufferedOutputStream buffStream = new BufferedOutputStream(stream);	
+	    BufferedOutputStream buffStream = new BufferedOutputStream(stream);	
 
-	XStream xStream = new XStream(new DomDriver());
-	xStream.omitField(ExchangeRateCache.class, "desktopPane");
-
-	try {
-	    String xml = xStream.toXML(settings);
-	    stream.write(xml.getBytes());
-	    stream.close();
-	} catch (XStreamException e) {
-	    throw new ModuleSettingsParserException(e.getMessage());
+	    XStream xStream = new XStream(new DomDriver());
+	    xStream.omitField(ExchangeRateCache.class, "desktopPane");
+	    
+	    try {
+		String xml = xStream.toXML(settings);
+		stream.write(xml.getBytes());
+		stream.close();
+	    } catch (XStreamException e) {
+		throw new ModuleSettingsParserException(e.getMessage());
+	    }
+	} else {
+	    throw new ModuleSettingsParserException("No Settings to save");
 	}
     }
 

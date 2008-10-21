@@ -26,12 +26,24 @@ import nz.org.venice.chart.*;
  */
 public interface GraphSource {
 
+    public final static int SYMBOL = 0;
+    public final static int INDEX = 1;
+    public final static int PORTFOLIO = 2;
+    public final static int ADVANCEDECLINE = 3;
+
     /**
      * Return the name of the data.
      *
      * @return the name
      */
     public String getName();
+
+    /**
+     * Return the type of the data.
+     *
+     * @return the type
+     */
+    public int getType();
 
     /**
      * Get the tool tip text for the given X value

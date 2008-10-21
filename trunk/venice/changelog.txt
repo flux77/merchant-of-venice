@@ -1,6 +1,7 @@
 Changes for Venice, 0.72 beta ??/???/2008
 =========================================
 
+* Added the ability to save and restore the state and position of windows.
 * Added support for downloading quotes from finance.google.com.
 * Added the ability to provide a suffix when importing from
   Yahoo quotes. This allows you to download, say, "CBA.AX" as

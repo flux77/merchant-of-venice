@@ -134,6 +134,15 @@ public interface Graph {
     public String getSourceName();
 
     /**
+     * Return the type of the source data that we are graphing, e.g.
+     * <code>Portfolio</code>.
+     *
+     * @return the type of the source
+     */
+    public int getSourceType();
+
+
+    /**
      * Return the Y value for the given X value.
      *
      * @param	xRange value
@@ -244,6 +253,9 @@ public interface Graph {
     */
 
     public boolean dataAvailable(Vector xRange);
+
+
+
 }
 
 

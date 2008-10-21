@@ -27,6 +27,7 @@ import nz.org.venice.chart.source.*;
 import nz.org.venice.util.Locale;
 import nz.org.venice.portfolio.*;
 import nz.org.venice.quote.*;
+import nz.org.venice.prefs.settings.MenuSettings;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.
@@ -71,6 +72,43 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 	this.listener = listener;
 	this.portfolio = portfolio;
 	
+	init();
+       
+    }
+
+    /**
+     * Create a new menu allowing the user to graph related graphs
+     * for the given graph. The symbol we are associated with will be
+     * extracted from the graph.
+     *
+     * @param	listener	the chart module associated with the menu
+     * @param	graph		the graph we are associated with
+     * @param	menuSettings	the menuSettings for the menu
+     */
+    public PortfolioChartMenu(ChartModule listener, EODQuoteBundle quoteBundle,
+			      Portfolio portfolio, Graph graph, MenuSettings menuSettings) {
+
+	super(menuSettings.getTitle());
+	
+	this.quoteBundle = quoteBundle;
+	this.graph = graph;
+	this.listener = listener;
+	this.portfolio = portfolio;
+	
+	init();	
+	map = menuSettings.getMap();
+
+	//Select all the graphs in the menu
+	Iterator iterator = map.keySet().iterator();
+	while (iterator.hasNext()) {
+	    String key = (String)iterator.next();
+	    Graph value = (Graph)map.get(key);
+	    selectMenuItem(value.getName());
+	}
+
+    }
+
+    private void init() {
 	// Create graph + annotation menus
 	graphMenu = new JMenu(Locale.getString("GRAPH"));
 	this.add(graphMenu);
@@ -203,4 +241,20 @@ public class PortfolioChartMenu extends JMenu implements ActionListener {
 	listener.handleAnnotation(graph, false);
 	listener.redraw();
     }
+
+    //Select the menuItem for graphName.
+    private void selectMenuItem(String graphName) {
+	
+	for (int i = 0; i < graphMenu.getItemCount(); i++) {
+	    JMenuItem item = graphMenu.getItem(i);
+	    if (item != null) {
+
+		if (graphName.compareTo(item.getText()) == 0) {
+		    item.setSelected(true);
+		    return;
+		}
+	    }
+	}	
+    }
+
 }

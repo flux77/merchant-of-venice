@@ -310,7 +310,7 @@ maximum values:</para>
 <para>When you change the above parameters, you should restart Venice,
 so that these parameters are effective.</para>
 
-<para>You can also enable the feature to save the state of windows which are open when you exit Venice so that they are restored the next time you run Venice. To turn on the restore feature, click the <quote>tick</quote>box. </para>
+<para>You can also enable the feature to save the state of windows which are open when you exit Venice so that they are restored the next time you run Venice. To turn on the restore feature, click the "tick" box. </para>
 
 </chapter>
 
@@ -632,7 +632,37 @@ appear in its own smaller graph below.</para>
 
 <para>
 If you switch to the Point and Figure graph while zoomed in on an area which does not have any Point and Figure data or you attempt to zoom in on such an area, a warning dialogue is displayed and the operation will be cancelled.
-  </para>
+</para>
+
+</section>
+
+<section name="Chart Functions">
+  <para>The graph functions are accessed via the toolbar which is created on the left of the chart by default. The functions are:  </para>
+  <list>
+    <item>Zoom in</item>    
+    <item>Zoom out</item>
+    <item>Clone</item>
+    <item>Draw straight line</item>
+    <item>Move line</item>
+    <item>Draw freehand line</item>
+    <item>Write text on chart</item>
+    <item>Erase</item>
+    <item>Flip chart</item>    
+  </list>
+
+  <section name="Zoom">
+    <para>The "Zoom in" function will zoom in on a selected area, where as "Zoom out" always returns to the intial setting, regardless of how many times the user zooms in.</para>
+  </section>
+
+  <section name="Chart Drawing">
+    <para>The chart drawing functions allow the user to draw lines and add text to a chart in a fairly basic manner. Any lines drawn on a chart scale with the zoom level. </para>
+  </section>
+  
+  <section name="Others">
+    <para>The "Clone" button opens a window with the same chart type.</para>
+    <para>The "Flip chart" button toggles the orientation of the chart. The initial orientation is for the origin of the chart to be in the top left hand corner. Therefore, pressing the button twice returns the chart to it's original position. </para>
+  </section>
+
 </section>
 
 </section>

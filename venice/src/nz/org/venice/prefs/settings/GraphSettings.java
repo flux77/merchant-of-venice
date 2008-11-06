@@ -299,9 +299,9 @@ public class GraphSettings extends AbstractSettings {
 	}
 
 
-	if (title.equals(Locale.getString("EXPONENTIAL_MOVING_AVERAGE"))) {
+	if (title.equals(Locale.getString("EXP_MOVING_AVERAGE"))) {
 	    newGraph = new 
-		MovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE), settings);
+		ExpMovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE), settings);	    
 	}
 
 	
@@ -313,7 +313,8 @@ public class GraphSettings extends AbstractSettings {
 				    settings);
 	}
 
-	if (title.equals(Locale.getString(Locale.getString("MOMENTUM")))) {	    	    
+	if (title.equals(Locale.getString("MOMENTUM"))) {	    	    
+
 	    newGraph = new
 		MomentumGraph(getSource(bundle, Quote.DAY_CLOSE),
 			       settings);

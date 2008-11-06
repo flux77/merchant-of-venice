@@ -47,6 +47,7 @@ import nz.org.venice.prefs.settings.Settings;
 import nz.org.venice.prefs.settings.ChartModuleSettings;
 import nz.org.venice.prefs.settings.GraphSettings;
 import nz.org.venice.prefs.settings.MenuSettings;
+import nz.org.venice.prefs.settings.GraphSettingsGroup;
 
 /**
  * The charting module for venice. This class provides the user interface
@@ -246,197 +247,92 @@ public class ChartModule extends JPanel implements Module,
 
     public ChartModule(JDesktopPane desktop, ChartModuleSettings settings) {
 	Vector levelSettingsList = (Vector)settings.getLevelSettingsList();
-	Vector symbolList = (Vector)settings.getSymbolList();
-	HashMap symbolMap = new HashMap();
-	HashMap symbolObjectMap = new HashMap();
-	HashMap bundleMap = new HashMap();
-	Vector sortedSymbolList = new Vector(symbolList);
-	int symbolIndex = 0;
-	String prevSymbol = ""; 
+	HashMap graphMenuMap; 
+	int levelIndex = 0;
+	String symbol;
 
+	initChart(false);
 
-	initChart(false);	
+	Iterator levelIterator = levelSettingsList.iterator();
+	while (levelIterator.hasNext()) {	    	    
+	    GraphSettingsGroup settingsGroup = 
+		(GraphSettingsGroup)levelIterator.next();
 
-	java.util.Collections.sort(sortedSymbolList);
-	Iterator symbolIterator = sortedSymbolList.iterator();
-
-	while (symbolIterator.hasNext()) {	    
-	    String symbol = (String)symbolIterator.next();
+	    GraphSettings primaryGraphSettings = settingsGroup.getGraphSettings();
 	    
-	    if (symbol.compareTo(prevSymbol) != 0) {
-		HashMap levelMap = new HashMap();
-		Iterator levelsIterator = levelSettingsList.iterator();
-		symbolIndex = 0;
+	    symbol = settingsGroup.getSymbol();
+	    levelIndex = settingsGroup.getLevelIndex();
+	    graphMenuMap = new HashMap();
 
-		int levelCount = 0;
-		while (levelsIterator.hasNext()) {
+	    EODQuoteBundle primaryQuoteBundle = getQuoteBundle(symbol, settingsGroup.getGraphSettings());
 
-		    Vector graphList = (Vector)levelsIterator.next();
-		    Iterator graphSettingsIterator = graphList.iterator();
-		    Vector newGraphList = new Vector();
-		    Graph newGraph = null;
-		    
-		    while (graphSettingsIterator.hasNext()) {
-			GraphSettings graphSettings = (GraphSettings)graphSettingsIterator.next();
-			
-			String symbolCmp = (String)symbolList.get(symbolIndex);
-			if (symbolCmp.compareTo(symbol) == 0) {
-			    switch (graphSettings.getSourceType()) {
-			    case GraphSource.SYMBOL:
-				try {
-				    Symbol s = Symbol.find(symbol);
-				    
-				    EODQuoteBundle bundle = new 
-					EODQuoteBundle(new EODQuoteRange(s));
-				    				    
-				    symbolObjectMap.put(symbol, s);
-				    bundleMap.put(symbol, bundle);
-				    
-				    newGraph = graphSettings.getGraph(bundle);
-				    newGraphList.add(newGraph);	
-				    
-				} catch (SymbolFormatException sfe) {
-				}
-				break;
-			    case GraphSource.INDEX:
+	    Graph primaryGraph = getGraph(primaryGraphSettings, 
+					  primaryQuoteBundle, 
+					  symbol);
 
-				//There's a bug somewhere in EODQuoteBundle 
-				//et al which prevents quote lookups for 
-				//indeces. Don't create an index graph
-				//until the bug has been tracked down.
+	    java.util.List subGraphSettingsList = settingsGroup.getSubGraphSettingsList();
 
-				/*
-				EODQuoteBundle quoteBundle = new 
-				    EODQuoteBundle(new EODQuoteRange(graphSettings.getSettingsSymbolList()));
-				
-				bundleMap.put(symbol, quoteBundle);
-				newGraph = graphSettings.getGraph(quoteBundle);
-				newGraphList.add(newGraph);
-				*/
+	    //The child graphs of a primary graph have to created ahead
+	    //of time so the menu item can be selected and the graphs
+	    //removed. 
 
-				break;
-			    case GraphSource.PORTFOLIO:
-				try {
-				
-				    Portfolio portfolio = PreferencesManager.getPortfolio(symbolCmp);
-				    
-				    TradingDate startDate = portfolio.getStartDate();
-				    TradingDate endDate = QuoteSourceManager.getSource().getLastDate();
-				    java.util.List symbolsTraded = portfolio.getSymbolsTraded();
-				    
-				    // Make sure the end date is after the start date! Otherwise the code
-				    // will assert later.
-				    if (endDate.before(startDate))
-					endDate = startDate;
-				    
-				    EODQuoteBundle bundle = 
-					new EODQuoteBundle(new EODQuoteRange(
-									     symbolsTraded, startDate, endDate));
-				    
-				    bundleMap.put(symbol, bundle);
-				    
-				    newGraph = graphSettings.getGraph(bundle, portfolio);
+	    //But we can't append the graph to the chart before the
+	    //primary graph to preserve the ordering of the graphs.	    
 
-				    newGraphList.add(newGraph);	
-				} catch (PreferencesException pfe) {
-				    
-				}
-				
-				break;
-			    case GraphSource.ADVANCEDECLINE:
-				//Graph newGraph = new AdvanceDeclineGraph();
-				//newGraphList.add(newGraph);
-				break;
-			    default: 				
-			    }			
-			}
-			symbolIndex++;
-		    }
-		    String levelKey = "" + levelCount;
-		    levelMap.put(levelKey, newGraphList);
-		    levelCount++;
-		}		
-		symbolMap.put(symbol, levelMap);
-	    }
-	    prevSymbol = symbol;
-	}
-	
-	/* Create a map associating symbols, graphs and levels.
-	   We need to have all the graph objects generated ahead of time
-	   so when a new symbol is added the graph menu items can be
-	   selected. 
-	*/
-	symbolIterator = symbolMap.keySet().iterator();
-	boolean symbolAdded;
-	while (symbolIterator.hasNext()) {
-	    String symbol = (String)symbolIterator.next();
-	    
-	    symbolAdded = false;
-	    //graphsMap associates a list of graphs with a level 
-	    HashMap graphsMap = (HashMap)symbolMap.get(symbol);	    
-	    HashMap graphMenuMap = new HashMap();
-
-	    //Create a map of graphs and graphNames for this symbol
-	    Iterator levelsIterator = graphsMap.keySet().iterator();
-	    while (levelsIterator.hasNext()) {
-		String level = (String)levelsIterator.next();
-		Vector graphList = (Vector)graphsMap.get(level);
-			    
-		Iterator graphIterator = graphList.iterator();
-		while (graphIterator.hasNext()) {
-		    Graph g = (Graph)graphIterator.next();		   
-		    graphMenuMap.put(g.getName(), g);		    
-		}
-	    }
-	    	    
-	    //Add the graphs to the chart
-	    levelsIterator = graphsMap.keySet().iterator();
-	    while (levelsIterator.hasNext()) {
-		String level = (String)levelsIterator.next();
-		Vector graphList = (Vector)graphsMap.get(level);
-			
-		Iterator graphIterator = graphList.iterator();
+	    Iterator graphIterator = subGraphSettingsList.iterator();
+	    while (graphIterator.hasNext()) {
+		GraphSettingsGroup subSettingsGroup = 
+		    (GraphSettingsGroup)graphIterator.next();
 		
-		while (graphIterator.hasNext()) {	       
-		    Graph g =  (Graph)graphIterator.next();
-		    
-		    if (!symbolAdded) {			
-			Symbol s = (Symbol)symbolObjectMap.get(symbol);
-			EODQuoteBundle bundle = (EODQuoteBundle)bundleMap.get(symbol);
-			    
-			int levelIndex = new Integer(level).intValue();
-			  
-			if (g.getSourceType() == GraphSource.SYMBOL) {
-			    
-			    MenuSettings menuSettings = new MenuSettings();
-			    menuSettings.setTitle(g.getSourceName());
-			    
-			    menuSettings.setMap(graphMenuMap);			
-			    add(g, s, bundle, levelIndex, menuSettings);	
-			} else if (g.getSourceType() == GraphSource.PORTFOLIO) {
-			    try {
-				Portfolio portfolio = PreferencesManager.getPortfolio(symbol);
+		GraphSettings graphSettings = subSettingsGroup.getGraphSettings();
+		
+		EODQuoteBundle subQuoteBundle = getQuoteBundle(symbol, graphSettings);
+		
+		Graph newGraph = getGraph(graphSettings, subQuoteBundle, 
+					  symbol);
 				
-				MenuSettings menuSettings = new MenuSettings();
-				menuSettings.setTitle(g.getSourceName());
-
-				menuSettings.setMap(graphMenuMap);		
-				add(g, portfolio, bundle, levelIndex, menuSettings);
-			    } catch (PreferencesException pfe) {
-				
-			    }
-			} else if (g.getSourceType() == GraphSource.ADVANCEDECLINE) {
-			}
-			symbolAdded = true;
-						
-		    } else {
-			int levelIndex = new Integer(level).intValue();
-			append(g, levelIndex);			
-		    }
-		}
+		if (newGraph != null) {
+		    graphMenuMap.put(newGraph.getName(), newGraph);
+		}				
 	    }
 	    
+	    MenuSettings menuSettings = new MenuSettings();
+	    menuSettings.setTitle(primaryGraph.getSourceName()); 
+	    menuSettings.setMap(graphMenuMap);	    
+	    
+	    if (primaryGraph.getSourceType() == GraphSource.SYMBOL) {
+		try {
+		    Symbol s = Symbol.find(symbol);
+		    
+		    add(primaryGraph, s, primaryQuoteBundle, levelIndex, 
+			menuSettings);	    
+		} catch (SymbolFormatException sfe) {
+		    
+		}
+	    } else if (primaryGraph.getSourceType() == GraphSource.PORTFOLIO) {
+		try {
+		    Portfolio portfolio = PreferencesManager.getPortfolio(symbol);
+		    add(primaryGraph, portfolio, primaryQuoteBundle, levelIndex,
+			menuSettings);
+		} catch (PreferencesException pfe) {
+		    
+		}
+	    } else {
+		
+	    }
+	    
+	    //Having added the primary graph, append the child graphs	    
+	    graphIterator = settingsGroup.getSubGraphSettingsList().iterator();
+	    while (graphIterator.hasNext()) {
+		GraphSettingsGroup graphSettingsGroup = (GraphSettingsGroup)graphIterator.next();
+		GraphSettings graphSettings = graphSettingsGroup.getGraphSettings();
+		
+		Graph newGraph = (Graph)graphMenuMap.get(graphSettings.getTitle());
+		append(newGraph, graphSettingsGroup.getLevelIndex());
+		
+	    }
 	}
+		
 
 	//Both chart.resetBuffer lines seem to be necessary
 	//to restore charts at all zoom levels.
@@ -814,6 +710,7 @@ public class ChartModule extends JPanel implements Module,
     public void append(Graph graph, int level) {
 	// Add graph to chart to given level, redraw chart but dont add it
 	// to menu as it is already there
+	
 	chart.add(graph, level);
 
     }
@@ -1283,67 +1180,131 @@ public class ChartModule extends JPanel implements Module,
 	Vector symbolList = chart.getSymbols();
 	String type = String.valueOf(getClass().getName());
 	String key = String.valueOf(hashCode());
-	int graphIndex = 0;
 	boolean addedGraph = false;
-       
-	Vector levelSettingsList = new Vector();
-	
+       	Vector levelSettingsList = new Vector();
+	HashMap graphAdded = new HashMap();
+	HashMap symbolAdded = new HashMap();
+	Vector sortedSymbolList = new Vector(symbolList);		
+	GraphSettingsGroup primaryGroup;
+
 	settings = new ChartModuleSettings(key);
 	settings.setTitle(getTitle());
 	
-	Iterator levelsIterator = chart.getLevels().iterator();
-	while (levelsIterator.hasNext()) {
-	    Vector graphSettingsList = new Vector();
-	    Vector graphList = (Vector)levelsIterator.next();
-	    Iterator graphIterator = graphList.iterator();
+	//Create a map associating symbols and a tree of graphs consisting of
+	//a primary graph and associated secondary graphs with the same symbol.
+	//The nodes of the tree contain the level, symbol and graph settings.
+		
+	java.util.Collections.sort(sortedSymbolList);
+	Iterator symbolIterator = sortedSymbolList.iterator();
+	String prev = "";
+	while (symbolIterator.hasNext()) {
+	    String symbol = (String)symbolIterator.next();
 
-	    graphIndex = 0;
-	    	    
-	    while (graphIterator.hasNext()) {
-		Graph graph = (Graph)graphIterator.next();
-		GraphSettings graphSettings = 
-		    new GraphSettings(String.valueOf(graph.hashCode()),
-				      String.valueOf(chart.hashCode()),
-				      graph.getName());
-		/*
-		  Exclude AdvanceDecline graphs because of the length
-		  of time required to construct them.
-		 */		
+	    if (symbol.compareTo(prev) != 0) {
+		int levelIndex = 0;
+		int symbolIndex = 0;
+		Iterator levelIterator = chart.getLevels().iterator();
+		while (levelIterator.hasNext()) {
+		    Vector graphList = (Vector)levelIterator.next();
+		    Iterator graphIterator = graphList.iterator();
 
-		/* Exclude Index graphs because of a bug in retrieving 
-		   quotes.
-		*/
-		if (graph.getSourceType() != GraphSource.ADVANCEDECLINE &&
-		    graph.getSourceType() != GraphSource.INDEX) {
-		    graphSettings.setSourceType(graph.getSourceType());
-		    graphSettings.setSettings(graph.getSettings());		
-		    graphSettingsList.add(graphSettings);
+		    while (graphIterator.hasNext()) {
+			Graph graph = (Graph)graphIterator.next();
 
-		    if (graph.getSourceType() == GraphSource.INDEX) {
-			Vector settingsSymbolList = new Vector();
-			String sourceName = graph.getSourceName();
-			
-			String tmp = sourceName.replaceAll("\\s",",");
-			String tmp2 = tmp.replaceAll(",+",",");
-			String[] symbols = tmp2.split(",");
-			
-			for (int i = 1; i < symbols.length; i++) {
-			    try {
-				Symbol symbol = Symbol.find(symbols[i]);
-				settingsSymbolList.add(symbol);
 
-			    } catch (SymbolFormatException sfe) {
+			//Check if the graph setting have already been added
+			String graphSymbol = (String)symbolList.get(symbolIndex);
+			String graphKey = graph.getName() + "-" + String.valueOf(graphSymbol);
+
+			if (graphSymbol.compareTo(symbol) == 0 &&
+			    graphAdded.get(graphKey) == null) {
+			    GraphSettings graphSettings = 
+				new GraphSettings(String.valueOf(graph.hashCode()),
+						  String.valueOf(chart.hashCode()),
+						  graph.getName());
+			    
+			    graphAdded.put(graphKey, graphSettings);
+			    /*
+			      Exclude AdvanceDecline graphs because of the length
+			      of time required to construct them.
+			    */		
+			    
+			    /* Exclude Index graphs because of a bug in retrieving 
+			       quotes.
+			    */
+			    if (graph.getSourceType() != GraphSource.ADVANCEDECLINE &&
+				graph.getSourceType() != GraphSource.INDEX) {
+				graphSettings.setSourceType(graph.getSourceType());
+				graphSettings.setSettings(graph.getSettings());	
+
+
+				if (graph.getSourceType() == GraphSource.INDEX) {
+				    Vector settingsSymbolList = new Vector();
+				    String sourceName = graph.getSourceName();
+				    
+				    String tmp = sourceName.replaceAll("\\s",",");
+				    String tmp2 = tmp.replaceAll(",+",",");
+				    String[] symbols = tmp2.split(",");
+				    
+				    for (int i = 1; i < symbols.length; i++) {
+					try {
+					    Symbol indexSymbol = Symbol.find(symbols[i]);
+					    settingsSymbolList.add(indexSymbol);
+					    
+					} catch (SymbolFormatException sfe) {
+					}
+				    }
+				    graphSettings.setSettingsSymbolList(settingsSymbolList);
+				}
+       
+				addedGraph = true;
+			    }
+
+			    
+			    primaryGroup = 
+				(GraphSettingsGroup)symbolAdded.get(graphSymbol);
+			    //Primary Graph
+			    if (levelIndex == 0 && primaryGroup == null) {
+				primaryGroup = new GraphSettingsGroup();
+				primaryGroup.setGraphSettings(graphSettings);
+				primaryGroup.setLevelIndex(levelIndex);
+				primaryGroup.setSymbol(graphSymbol);
+				
+				
+				primaryGroup.setSubGraphSettingsList(new Vector());
+
+				symbolAdded.put(graphSymbol, primaryGroup);
+				levelSettingsList.add(primaryGroup);
+
+			    } else {
+				//Secondary graph associated with primary graph
+				GraphSettingsGroup subGraphSettingsGroup = 
+				    new GraphSettingsGroup();
+				
+				java.util.List subGraphSettingsList = 
+				    primaryGroup.getSubGraphSettingsList();
+
+				if (subGraphSettingsList == null) {
+				    subGraphSettingsList = new Vector();
+				}
+				
+				subGraphSettingsGroup.setGraphSettings(graphSettings);
+				subGraphSettingsGroup.setLevelIndex(levelIndex);
+				subGraphSettingsGroup.setSymbol(graphSymbol);
+				
+				subGraphSettingsList.add(subGraphSettingsGroup);
+			    
 			    }
 			}
-			graphSettings.setSettingsSymbolList(settingsSymbolList);
+			symbolIndex++;
 		    }
-
-		    addedGraph = true;
-		} 		
+		    levelIndex++;
+		}
 	    }
-	    levelSettingsList.add(graphSettingsList);
 	}
-
+	
+	//If no graph settings were added, then we don't want to 
+	//save any settings.
 	if (addedGraph == false) {
 	    settings = null;
 	} else {
@@ -1360,7 +1321,6 @@ public class ChartModule extends JPanel implements Module,
 	    settings.setDrawnElements(chart.getChartDrawingModel());
 	    settings.setOrientation(chart.getOrientation());
 	}
-	
     }
     
     public BufferedImage getImage() { 
@@ -1375,6 +1335,68 @@ public class ChartModule extends JPanel implements Module,
 	return settings;
     }
 
+
+
+    private EODQuoteBundle getQuoteBundle(String symbol, GraphSettings graphSettings) {
+	
+    	switch (graphSettings.getSourceType()) {
+	case GraphSource.SYMBOL:
+	    try {
+		Symbol s = Symbol.find(symbol);
+		
+		EODQuoteBundle bundle = new 
+		    EODQuoteBundle(new EODQuoteRange(s));
+
+		return bundle;
+		
+	    } catch (SymbolFormatException sfe) {
+
+	    }
+	    break;
+	case GraphSource.PORTFOLIO:
+	    try {
+		Portfolio portfolio = PreferencesManager.getPortfolio(symbol);
+	    
+		TradingDate startDate = portfolio.getStartDate();
+		TradingDate endDate = QuoteSourceManager.getSource().getLastDate();
+		java.util.List symbolsTraded = portfolio.getSymbolsTraded();
+		
+		// Make sure the end date is after the start date! Otherwise the code
+		// will assert later.
+		if (endDate.before(startDate))
+		    endDate = startDate;
+		
+		EODQuoteBundle bundle = 
+		    new EODQuoteBundle(new EODQuoteRange(
+							 symbolsTraded, 
+							 startDate, 
+							 endDate));
+	    
+		return bundle;	    
+	    } catch (PreferencesException pfe) {
+		
+	    }
+	}
+	return null;
+    }
+
+    private Graph getGraph(GraphSettings graphSettings, EODQuoteBundle bundle, 
+			   String symbol) {
+	Graph rv = null;
+
+	if (graphSettings.getSourceType() == GraphSource.SYMBOL) {
+	    rv = graphSettings.getGraph(bundle);
+	} else if (graphSettings.getSourceType() == GraphSource.PORTFOLIO) {
+	    try {
+		Portfolio portfolio = PreferencesManager.getPortfolio(symbol);
+		rv = graphSettings.getGraph(bundle, portfolio);
+	    } catch (PreferencesException pfe) {
+		
+	    }
+	}
+	return rv;
+    }    
 }
+
 
 

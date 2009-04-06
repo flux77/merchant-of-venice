@@ -286,6 +286,11 @@ public class IDQuoteSync {
      * @param suffix optional suffix
      */
     public void setSuffix(String suffix) {
+	
+	if (this.suffix == null) {
+	    this.suffix = "";
+	}
+
         if(!this.suffix.equals(suffix)) {
             this.suffix = suffix;
             restartSyncTimer();

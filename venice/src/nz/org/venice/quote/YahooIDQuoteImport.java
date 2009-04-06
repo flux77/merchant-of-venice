@@ -151,6 +151,10 @@ public class YahooIDQuoteImport {
         String URLString = YAHOO_URL_PATTERN;
         String symbolStringList = "";
 
+	if (suffix == null) {
+	    suffix = "";
+	}
+
         // Construct a plus separated list of symbols, e.g. IBM+MSFT+...
         for(Iterator iterator = symbols.iterator(); iterator.hasNext();) {
             Symbol symbol = (Symbol)iterator.next();

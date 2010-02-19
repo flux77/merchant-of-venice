@@ -38,7 +38,7 @@ public class YahooIDQuoteImportTest extends TestCase
     public void testImport() {
         try {
             List symbols = new ArrayList(Symbol.toSortedSet("CSCO, GE, MSFT, IBM", false));
-            List quotes = YahooIDQuoteImport.importSymbols(symbols);
+            List quotes = YahooIDQuoteImport.importSymbols(symbols, "");
 
             // Check we downloaded the right number of quotes
             assertEquals(symbols.size(), quotes.size());

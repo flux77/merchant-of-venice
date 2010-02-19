@@ -100,6 +100,7 @@ public class ExpressionTest extends TestCase {
         // *
         assertEquals("50", simplify("10*5"));
         assertEquals("x", simplify("x*1"));
+	//Bug here
         assertEquals("x", simplify("1*x"));
         assertEquals("0", simplify("x*0"));
         assertEquals("0", simplify("0*x"));

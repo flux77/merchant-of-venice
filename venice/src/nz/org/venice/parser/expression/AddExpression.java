@@ -52,6 +52,10 @@ public class AddExpression extends ArithmeticExpression {
             if(right != null && right.equals(0.0D))
                 return getChild(0);
 
+	    // 0 + a -> a
+	    if (left != null && left.equals(0.0D))
+		return getChild(1);
+
             // a+a -> 2*a. This doesn't seem like a simplification but
             // remember a could be a complicated expression like:
             // (lag(day_close, 0) * lag(day_open, 0))

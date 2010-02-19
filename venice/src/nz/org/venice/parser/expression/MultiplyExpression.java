@@ -58,6 +58,11 @@ public class MultiplyExpression extends ArithmeticExpression {
             // a*1 -> a.
             else if(right != null && right.equals(1.0D))
                 return getChild(0);
+
+	    //1 * a -> a
+	    else if (left != null && left.equals(1.0D))
+		return getChild(1);
+
         }
         return simplified;
     }

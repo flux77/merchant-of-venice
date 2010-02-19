@@ -1,7 +1,7 @@
 Merchant of Venice, 0.71 beta 25/Feb/2007
 =========================================
 
-Copyright (C) 2003-8, Andrew Leppard (andrew venice org nz)
+Copyright (C) 2003-10, Andrew Leppard (andrew venice org nz)
 See COPYING.txt for license terms.
 
 1 Introduction

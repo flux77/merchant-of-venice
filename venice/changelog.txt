@@ -1,4 +1,4 @@
-Changes for Venice, 0.72 beta ??/???/2008
+Changes for Venice, 0.72 beta 01/03/2010
 =========================================
 
 * Added the ability to save and restore the state and position of windows.
@@ -13,7 +13,8 @@ Changes for Venice, 0.72 beta ??/???/2008
     clicked in the background.
   - Fixed an off-by-one day error in PointAndFigure chart (bug # 1880869)
   - Fixed bug in GeneticProgramming where date offsets of 2147483647 did not  
-    throw the expected exception.
+    throw the expected exception. (bug #2929664)
+  - Fixed bugs expression simplify 
 
 Changes for Venice, 0.71 beta 25/Feb/2007
 =========================================

@@ -71,10 +71,10 @@ public class Main extends JFrame {
     public static String LONG_VERSION = "0.71 beta";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "25/" + Locale.getString("FEB") + "/2007";
+    public static String RELEASE_DATE = "01/" + Locale.getString("MAR") + "/2010";
 
     /** Copyright date range, e.g. "2003-5" */
-    public static String COPYRIGHT_DATE_RANGE = "2003-7";
+    public static String COPYRIGHT_DATE_RANGE = "2003-10";
 
     /**
      * Get the main frame for the current application

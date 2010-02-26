@@ -212,7 +212,7 @@ public class EODQuoteChartMenu extends JMenu {
 	addMenuItem(graphMenu, Locale.getString("STANDARD_DEVIATION"));
 	addMenuItem(graphMenu, Locale.getString("COUNTBACK_LINE"));
 	addMenuItem(graphMenu, Locale.getString("SUPPORT_AND_RESISTENCE"));
-	
+	addMenuItem(graphMenu, Locale.getString("FIBO_CHART"));       	
 
 	// Add all static menus
 	JMenuItem removeMenu = new JMenuItem(Locale.getString("REMOVE"));
@@ -608,6 +608,9 @@ public class EODQuoteChartMenu extends JMenu {
 	    	    
 	else if (text == Locale.getString("SUPPORT_AND_RESISTENCE"))
 	    graph = new SupportAndResistenceGraph(getDayClose());
+
+	else if (text == Locale.getString("FIBO_CHART")) 
+	    graph = new FiboGraph(getDayClose());
 
         else if(text == Locale.getString("RSI"))
             graph = new RSIGraph(getDayClose());

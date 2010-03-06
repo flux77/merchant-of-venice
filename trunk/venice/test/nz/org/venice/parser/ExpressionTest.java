@@ -20,7 +20,6 @@ package nz.org.venice.parser;
 
 import junit.framework.TestCase;
 
-import nz.org.venice.parser.Expression;
 
 public class ExpressionTest extends TestCase {
     public void testEquals() {
@@ -38,7 +37,7 @@ public class ExpressionTest extends TestCase {
         assertEquals(parse("12.0"), parse("12.0"));
         assertEquals(parse("12"), parse("12"));
         assertEquals(parse("a"), parse("a"));
-        assertEquals(parse("x"), parse("x"));
+        assertEquals(parse("x"), parse("x"));	
     }
 
     public void testSimplify() {
@@ -113,7 +112,7 @@ public class ExpressionTest extends TestCase {
         assertEquals("x<y", simplify("x<y"));
 
         // >
-        assertEquals("true", simplify("10>5"));
+       assertEquals("true", simplify("10>5"));
         assertEquals("false", simplify("5>10"));
         assertEquals("false", simplify("x>x"));
         assertEquals("x>y", simplify("x>y"));
@@ -157,6 +156,35 @@ public class ExpressionTest extends TestCase {
         assertEquals("10", simplify("abs(-10)"));
     }
 
+    public void testEvaluate() {
+	String absExpString = "abs(-0.0001)";
+	String cosExpString = "cos(0.0)";
+	String cos2ExpString = "cos(3.141592653/2.0)";
+	String sinExpString = "sin(3.141592653)";
+
+	Expression absExp = parse(absExpString);
+	Expression cosExp = parse(cosExpString);
+	Expression sinExp = parse(sinExpString);
+
+	try {
+	    Variables emptyVars = new Variables();
+	    double absVal = absExp.evaluate(emptyVars, null, null, 0);	    
+	    double cosVal = cosExp.evaluate(emptyVars, null, null, 0);
+	    double sinVal = sinExp.evaluate(emptyVars, null, null, 0);
+	    
+	    assertTrue(absVal > 0.0);
+	    assertTrue(withinEpsilon(cosVal, 1.0));
+	    assertTrue(withinEpsilon(sinVal, 0.0));
+	    
+	} catch (EvaluationException e) {
+	    System.out.println("Evaluation Exception: " + e);
+	}
+	
+
+
+    }
+
+
     private Expression parse(String string) {
         try {
             Variables variables = new Variables();
@@ -180,4 +208,15 @@ public class ExpressionTest extends TestCase {
         expression = expression.simplify();
         return expression.toString();
     }
+
+    private boolean withinEpsilon(double val, double testVal) {
+	double epsilon = 0.000005;
+	
+	if (val - epsilon <= testVal &&
+	    val + epsilon >= testVal) {
+	    return true;
+	}
+	return false;
+    } 
+
 }

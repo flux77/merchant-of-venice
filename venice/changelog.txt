@@ -1,3 +1,7 @@
+Changes for Venice, 0.721 beta ??/??/???? 
+=========================================
+* Fix Artificial Neural Network functionality 
+
 Changes for Venice, 0.72 beta 01/03/2010
 =========================================
 

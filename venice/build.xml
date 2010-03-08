@@ -111,17 +111,28 @@
       <dtd publicID="-//Venice//DTD XML Document V1.0//EN"
            location="${doc}/document.dtd"/>
     </xmlcatalog>
+    
+    
+    <!--
+	Current version of Xalan at time of writing (2.7) doesn't support
+	 xsl:result-document. Using xsl:result-document to remove dependency
+   	 on XSLT extensions.
+      -->
+    <xslt-saxon in="${doc}/manual.xml" style="${doc}/manual-help.xsl" out="venice.html" destdir="${help}"/>    
+
 
     <!-- This will say it's generating manual.html but we override this. -->
-    <!-- and write out files for individual chapters.                    -->
+    <!-- and write out files for individual chapters.                    -->    
+    <!--
     <xslt basedir="${doc}"
           destdir="${help}"
           includes="manual.xml"
-          extension=".html"
+          extension=".html"	  
           style="${doc}/manual-help.xsl">
-      <xmlcatalog refid="document"/>
+	  <xmlcatalog refid="document"/>
     </xslt>
-
+    -->
+    
     <!-- Generate online help index.                                     -->
     <xslt in="${doc}/manual.xml"
           out="${help}/index.xml"
@@ -133,7 +144,7 @@
     <xslt in="${doc}/manual.xml"
           out="${web}/manual.html"
           style="${doc}/manual-web.xsl">
-      <xmlcatalog refid="document"/>
+      <!--<xmlcatalog reid="document"/>-->
     </xslt>
 
     <!-- Generate text version of manual.                                -->
@@ -277,6 +288,32 @@
           fork="yes">
       <arg value="nz/org/venice/util/locale/venice_en.properties"/>
       <arg value="nz/org/venice/util/locale/venice_sv.properties"/>
+      <jvmarg value="-ea"/>
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+      </classpath>
+    </java>
+
+    <echo>Comparing Polish locale against English reference locale...</echo> 
+    <java classname="nz.org.venice.tools.Locale"
+          dir="${src}"
+          fork="yes">
+      <arg value="nz/org/venice/util/locale/venice_en.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_pl.properties"/>
+      <jvmarg value="-ea"/>
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+      </classpath>
+    </java>
+
+    <echo>Comparing Catalan locale against English reference locale...</echo> 
+    <java classname="nz.org.venice.tools.Locale"
+          dir="${src}"
+          fork="yes">
+      <arg value="nz/org/venice/util/locale/venice_en.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_ca.properties"/>
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
@@ -461,5 +498,24 @@
     <gzip zipfile="${web}/web.tar.gz"
       src="${web}/web.tar"/>
   </target>
+
+<macrodef name="xslt-saxon">
+  <attribute name="in"/>
+  <attribute name="out"/>
+  <attribute name="destdir"/>
+  <attribute name="style"/>
+  <sequential>
+    <echo level="info">XSLT Generating @{out}</echo>
+    <java classname="net.sf.saxon.Transform"
+          classpath="/Users/mark/lib/xml/saxon/current/saxon8sa.jar"
+          logError="true"
+          output="@{out}"
+          fork="true">
+      <arg value="@{in}"/>
+      <arg value="@{style}"/>
+      <arg value="destdir=@{destdir}"/>
+    </java>
+  </sequential>
+</macrodef>
 
 </project>

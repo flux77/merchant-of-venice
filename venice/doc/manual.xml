@@ -310,7 +310,7 @@ maximum values:</para>
 <para>When you change the above parameters, you should restart Venice,
 so that these parameters are effective.</para>
 
-<para>You can also enable the feature to save the state of windows which are open when you exit Venice so that they are restored the next time you run Venice. To turn on the restore feature, click the "tick" box. </para>
+<para>You can also save the state of windows which are open when you exit Venice so that they are restored the next time you run Venice. To turn on the restore feature, click the "tick" box. Note that for table windows, currently the entire table is saved. For large tables this can take a long time and use up a lot of storage. </para>
 
 </chapter>
 
@@ -614,7 +614,7 @@ future direction of the market.</para>
 
 <section name="Stock Charts">
 
-<para>Venice supports a variety of technical charts. Some of these charts are
+ <para>Venice supports a variety of technical charts. Some of these charts are
 described below, for the others, please consult the literature for their
 meaning and interpretation.</para>
 
@@ -635,6 +635,17 @@ If you switch to the Point and Figure graph while zoomed in on an area which doe
 </para>
 
 </section>
+
+ <section name="Fibonacci Charts">
+   <para>The Fibonacci Retracement Chart is used to estimate possible support and resistence levels between two price levels. This indicator draws horizontal lines at levels corresponding to the following Fibonacci Ratios: 0%, 23.6%, 38.2% , 50.0%, 61.8%, 78.6%, 100%</para>   
+
+   <para>The Fibonacci Chart takes two parameters:
+     <list>
+       <item>0% Level: Minimum price point for the indicator</item>
+       <item>100% Level: Maximum price point for the indicator</item>
+     </list>     
+   </para>   
+ </section>
 
 <section name="Chart Functions">
   <para>The graph functions are accessed via the toolbar which is created on the left of the chart by default. The functions are:  </para>

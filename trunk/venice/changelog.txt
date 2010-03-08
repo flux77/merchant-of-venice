@@ -6,15 +6,16 @@ Changes for Venice, 0.72 beta 01/03/2010
 * Added the ability to provide a suffix when importing from
   Yahoo quotes. This allows you to download, say, "CBA.AX" as
   "CBA".
+* Added Fibonacci indicator
 
 * Bug Fixes:
   - Fixed an off-by-one month error when downloading from float.com.au.
   - Fixed a bug where an exception would be thrown if the user
     clicked in the background.
   - Fixed an off-by-one day error in PointAndFigure chart (bug # 1880869)
-  - Fixed bug in GeneticProgramming where date offsets of 2147483647 did not  
+  - Fixed bug in GeneticProgramming wher date offsets of 2147483647 did not  
     throw the expected exception. (bug #2929664)
-  - Fixed bugs expression simplify 
+  - Fixed bugs in expression simplify 
 
 Changes for Venice, 0.71 beta 25/Feb/2007
 =========================================

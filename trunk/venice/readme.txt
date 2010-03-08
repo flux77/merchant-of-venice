@@ -1,4 +1,4 @@
-Merchant of Venice, 0.71 beta 25/Feb/2007
+Merchant of Venice, 0.72 beta 25/Mar/2010
 =========================================
 
 Copyright (C) 2003-10, Andrew Leppard (andrew venice org nz)
@@ -99,6 +99,9 @@ To create the manual you wll need:
     Xalan-Java 2.7.1 or higher
         http://xml.apache.org/xalan-j/
 
+    Saxon 8.0.0 or higher
+    	http://saxon.sourceforge.net/
+   
 To build Venice type the following:
 
 ant build

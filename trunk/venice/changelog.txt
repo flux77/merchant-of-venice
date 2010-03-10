@@ -1,6 +1,8 @@
 Changes for Venice, 0.721 beta ??/??/???? 
 =========================================
-* Fix Artificial Neural Network functionality 
+* Fix Artificial Neural Network functionality
+* Allow Settings for graphs to be changed without "toggling" the graph
+* Improve performance of AdvanceDecline (Reduce number of database queries)
 
 Changes for Venice, 0.72 beta 01/03/2010
 =========================================

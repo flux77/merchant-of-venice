@@ -15,6 +15,7 @@
   <property name="temp" value="${basedir}/temp"/>
   <property name="test" value="${basedir}/test"/>
   <property name="web" value="${basedir}/web"/>
+  <property name="saxonPath" value="/YOUR/PATH/TO/SAXON/HERE/"/>
 
   <!-- Libraries -->
   <property name="lib.hsql" value="${lib}/hsqldb.jar"/>
@@ -111,18 +112,18 @@
       <dtd publicID="-//Venice//DTD XML Document V1.0//EN"
            location="${doc}/document.dtd"/>
     </xmlcatalog>
-    
-    
+        
     <!--
-	Current version of Xalan at time of writing (2.7) doesn't support
-	 xsl:result-document. Using xsl:result-document to remove dependency
-   	 on XSLT extensions.
+	 Want to use xsl:result-document to remove dependency
+   	 on XSLT extensions.	
       -->
+    
     <xslt-saxon in="${doc}/manual.xml" style="${doc}/manual-help.xsl" out="venice.html" destdir="${help}"/>    
 
-
+    
     <!-- This will say it's generating manual.html but we override this. -->
     <!-- and write out files for individual chapters.                    -->    
+    
     <!--
     <xslt basedir="${doc}"
           destdir="${help}"
@@ -132,7 +133,7 @@
 	  <xmlcatalog refid="document"/>
     </xslt>
     -->
-    
+        
     <!-- Generate online help index.                                     -->
     <xslt in="${doc}/manual.xml"
           out="${help}/index.xml"
@@ -507,7 +508,7 @@
   <sequential>
     <echo level="info">XSLT Generating @{out}</echo>
     <java classname="net.sf.saxon.Transform"
-          classpath="/Users/mark/lib/xml/saxon/current/saxon8sa.jar"
+	  classpath="${saxonPath}"	  
           logError="true"
           output="@{out}"
           fork="true">

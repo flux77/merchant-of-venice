@@ -2,9 +2,12 @@ Changes for Venice, 0.721 beta ??/??/????
 =========================================
 * Fix Artificial Neural Network functionality
 * Allow Settings for graphs to be changed without "toggling" the graph
-* Improve performance of AdvanceDecline (Reduce number of database queries)
+* Improve performance of Quote Import from File
 
-Changes for Venice, 0.72 beta 01/03/2010
+Bug Fixes:
+
+
+Changes for Venice, 0.72 beta 20/03/2010
 =========================================
 
 * Added the ability to save and restore the state and position of windows.
@@ -13,6 +16,8 @@ Changes for Venice, 0.72 beta 01/03/2010
   Yahoo quotes. This allows you to download, say, "CBA.AX" as
   "CBA".
 * Added Fibonacci indicator
+* Improved performance of AdvanceDecline from Database (Reduced number of database queries)
+
 
 * Bug Fixes:
   - Fixed an off-by-one month error when downloading from float.com.au.

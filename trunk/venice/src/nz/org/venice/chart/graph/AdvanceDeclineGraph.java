@@ -26,6 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import nz.org.venice.chart.Graphable;
 import nz.org.venice.chart.GraphTools;
@@ -213,7 +215,8 @@ public class AdvanceDeclineGraph implements Graph {
         // Get a list of all dates between the first and last
         TradingDate firstDate = QuoteSourceManager.getSource().getFirstDate();
         TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
-        List dates = TradingDate.dateRangeToList(firstDate, lastDate);
+
+	List dates = TradingDate.dateRangeToList(firstDate, lastDate);	
 
 	Thread thread = Thread.currentThread();
 	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
@@ -224,29 +227,32 @@ public class AdvanceDeclineGraph implements Graph {
 	progress.show(Locale.getString("CALCULATING_ADVANCE_DECLINE"));
 
 	int cumulativeAdvanceDecline = START_VALUE;
+	
+	try {
+	    HashMap advanceDeclines = QuoteSourceManager.getSource().getAdvanceDecline(firstDate, lastDate);	    
 
-	// Iterate over every date
-        for(Iterator iterator = dates.iterator(); iterator.hasNext();) {
-	    TradingDate date = (TradingDate)iterator.next();
-
-            try {
-                int todayAdvanceDecline =
-                    QuoteSourceManager.getSource().getAdvanceDecline(date);
-
-		cumulativeAdvanceDecline += todayAdvanceDecline;
-
+	    SortedSet sortedAdvanceDeclines = new TreeSet(advanceDeclines.keySet());
+	    Iterator iterator =  sortedAdvanceDeclines.iterator();
+	    Iterator datesIterator = dates.iterator();
+	    	    
+	    while (iterator.hasNext()) {
+		TradingDate date = (TradingDate)iterator.next();
+	       
+		Integer advanceDeclineValue = 
+		    (Integer)advanceDeclines.get(date);
+		
+		cumulativeAdvanceDecline += advanceDeclineValue.intValue();
+						
 		advanceDecline.putY((Comparable)date,
 				    new Double(cumulativeAdvanceDecline));
+		
+		if (thread.isInterrupted()) 
+		    break;
+		progress.increment();
 	    }
-            catch(MissingQuoteException e) {
-                // Don't have this date in the quote source... no problem
-            }
-
-            // Stop if the user hit cancel
-            if(thread.isInterrupted())
-                break;
-
-	    progress.increment();	    
+	    
+	} catch (MissingQuoteException e) {
+	    
 	}
 
 	ProgressDialogManager.closeProgressDialog(progress);	

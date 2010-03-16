@@ -19,6 +19,7 @@
 package nz.org.venice.quote;
 
 import java.util.List;
+import java.util.HashMap;
 
 import nz.org.venice.util.Currency;
 import nz.org.venice.util.TradingDate;
@@ -108,10 +109,28 @@ public interface QuoteSource {
      * ordinary stocks that fell.
      *
      * @param date the date
-     * @exception throws MissingQuoteException if the date wasn't in the source
+     * @return the difference between the number of advances and declines for 
+     *         date
+     * @exception throw MissingQuoteException if the date isn't in the source
      */
     public int getAdvanceDecline(TradingDate date)
         throws MissingQuoteException;
+
+
+    /**
+     * Return the advance/decline for the given date range. This returns the number
+     * of all ordinary stocks that rose (day close > day open) - the number of all
+     * ordinary stocks that fell.
+     *
+     * @param startDate the start of the inclusive date range
+     * @param endDate the end of the inclusive date range
+     * @return A map of dates and advance/decline differences for each date in 
+     *         the range 
+     * @exception throw MissingQuoteException if the date range isn't in the source
+     */
+    public HashMap getAdvanceDecline(TradingDate startDate, TradingDate endDate)
+        throws MissingQuoteException;
+
 
     /**
      * Return all the stored exchange rates between the two currencies.

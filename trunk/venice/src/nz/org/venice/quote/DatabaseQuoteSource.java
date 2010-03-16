@@ -27,6 +27,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.HashMap;
 
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.ui.ProgressDialog;
@@ -1164,6 +1165,126 @@ public class DatabaseQuoteSource implements QuoteSource
             return 0;
         }
     }
+
+
+
+
+    /**
+     * Return the advance/decline for the given date. This returns the number
+     * of all ordinary stocks that rose (day close > day open) - the number of all
+     * ordinary stocks that fell.
+     *
+     * @param firstDate the first date in the range
+     * @param lastDate  the last date in the range
+     * @exception throw MissingQuoteException if none of the dates are in the source
+     */
+    public HashMap getAdvanceDecline(TradingDate firstDate, TradingDate lastDate)
+        throws MissingQuoteException {
+       
+	if(!checkConnection())
+            return null;
+
+        try {
+            //
+            // First get number of stocks where close > open
+            //
+
+            Statement statement = connection.createStatement();
+
+            String query =
+                new String("SELECT COUNT(*), date FROM " + SHARE_TABLE_NAME +
+                           " WHERE " + DATE_FIELD + " >= '" + toSQLDateString(firstDate) + "' AND " + DATE_FIELD + " <= '" + toSQLDateString(lastDate) + "' AND " + 
+                           DAY_CLOSE_FIELD + " > " + DAY_OPEN_FIELD + " AND " +
+                           "LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
+                           left(SYMBOL_FIELD ,1)  + " != 'X' GROUP BY " + DATE_FIELD + " ORDER BY " + DATE_FIELD + " ASC ");
+
+            ResultSet RS = statement.executeQuery(query);
+            boolean areDatesPresent = false;
+	    HashMap advanceDeclineMap = new HashMap();
+	    TradingDate firstDateFromQuery = (TradingDate)lastDate.clone();
+	    
+	    boolean firstRow = true;
+	    while (RS.next()) {
+		areDatesPresent = true;
+		int advanceDecline = 0;
+		TradingDate keyDate = new TradingDate(RS.getDate(2));		
+                advanceDeclineMap.put(keyDate, new Integer(RS.getInt(1)));
+
+		if (firstRow) {
+		    firstRow = false;
+		    firstDateFromQuery = keyDate;
+		} 
+	    } 
+	    
+
+	    // Clean up after ourselves
+	    RS.close();
+	    statement.close();
+
+	    if (!areDatesPresent) {
+                throw MissingQuoteException.getInstance();
+            }
+
+            //
+            // Now get number of stocks where close < open
+            //
+
+            statement = connection.createStatement();
+
+            query =
+                new String("SELECT COUNT(*), date FROM " + SHARE_TABLE_NAME +
+                           " WHERE " + DATE_FIELD + " >= '" + toSQLDateString(firstDate) + "' AND " + DATE_FIELD + " <= '" + toSQLDateString(lastDate) + "' AND " + 
+                           DAY_CLOSE_FIELD + " < " + DAY_OPEN_FIELD + " AND " +
+                           "LENGTH(" + SYMBOL_FIELD + ") = 3 AND " +
+                           left(SYMBOL_FIELD, 1) + " != 'X' GROUP BY " + DATE_FIELD + " ORDER BY " + DATE_FIELD + " ASC ");
+
+            RS = statement.executeQuery(query);
+            areDatesPresent = false; 
+	  
+	    firstRow = true;
+	    while (RS.next()) {
+		areDatesPresent = true;
+		TradingDate keyDate = new TradingDate(RS.getDate(2));
+		Integer advanceVal = (Integer)(advanceDeclineMap.get(keyDate));
+		
+		int advanceValue = (advanceVal != null) ? advanceVal.intValue() : 0;
+		
+		advanceDeclineMap.
+		    put( keyDate, new Integer(advanceValue - RS.getInt(1)));		
+		if (firstRow && !firstDateFromQuery.before(keyDate)) {
+		    firstRow = false;
+		    firstDateFromQuery = keyDate;
+		}      
+	    }
+	    
+	    //Backfill map with 0 for all dates 
+	    //between firstDate and firstDateFromQuery	    
+	    while (firstDate.before(firstDateFromQuery)) {
+		//Decrement the date first, otherwise the first
+		//data value will be zeroed.
+		firstDateFromQuery = firstDateFromQuery.previous(1);
+		advanceDeclineMap.put(firstDateFromQuery, new Integer(0));
+	    }
+
+	    // Clean up after ourselves
+	    RS.close();
+	    statement.close();
+            	    
+            if (!areDatesPresent) {
+                // Shouldn't happen!
+                assert false;
+            }
+
+            return advanceDeclineMap;
+        }
+        catch (SQLException e) {
+	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+							     e.getMessage()));
+            return null;
+        }
+    }
+
+
 
     /**
      * Shutdown the database. Only used for the internal database.

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.HashMap;
 
 import nz.org.venice.util.Currency;
 import nz.org.venice.util.Locale;
@@ -488,6 +489,20 @@ public class FileQuoteSource implements QuoteSource
         }
         else
             return 0;
+    }
+    
+    public HashMap getAdvanceDecline(TradingDate firstDate, TradingDate lastDate)
+        throws MissingQuoteException {
+
+	HashMap advanceDeclines = new HashMap(); 
+	TradingDate date = firstDate;
+	while (date.before(lastDate)) {
+	    int advanceDeclineValue = getAdvanceDecline(date);
+	    advanceDeclines.put(date, new Integer(advanceDeclineValue));
+	    date = date.next(1);
+	}
+
+	return advanceDeclines;
     }
 
     /**

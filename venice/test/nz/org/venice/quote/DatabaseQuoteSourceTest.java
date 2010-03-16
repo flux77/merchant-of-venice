@@ -25,12 +25,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Iterator;
+import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 
 import nz.org.venice.quote.DatabaseQuoteSource;
 import nz.org.venice.quote.EODQuote;
 import nz.org.venice.quote.Symbol;
 import nz.org.venice.quote.SymbolFormatException;
 import nz.org.venice.util.TradingDate;
+
+import nz.org.venice.quote.MissingQuoteException;
 
 public class DatabaseQuoteSourceTest extends TestCase
 {
@@ -134,4 +141,57 @@ public class DatabaseQuoteSourceTest extends TestCase
         assertEquals(dates.get(3), new TradingDate(2005, 9, 16));
     }
 
+    //Test that bulk date AdvanceDecline returns the same data
+    //as cumulating individual dates
+    public void testAdvanceDecline() {
+	TradingDate firstDate = QuoteSourceManager.getSource().getFirstDate();
+        TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
+	
+	//Don't want the whole database for this test.
+	//So we move firstDate until it's less than maxDaysdBetween lastdate
+	int maxDaysBetween = 50;
+       
+	TradingDate prevDate = lastDate.previous(maxDaysBetween);	
+	if (prevDate.before(firstDate)) {
+	} else {
+	    firstDate = prevDate;
+	}
+	       
+	//Get advance decline by individual dates
+	int cumTotalByDates = 0;
+	int cumTotalSingle = 0;
+
+	List dates = TradingDate.dateRangeToList(firstDate, lastDate);
+	Iterator iterator = dates.iterator();
+
+	try {
+	    int value = 0;
+	    while (iterator.hasNext()) {
+		TradingDate date = (TradingDate)iterator.next();		
+		value = QuoteSourceManager.getSource().getAdvanceDecline(date);					
+		cumTotalByDates += value; 
+
+	    }
+
+	    //Test against generating adv/dec using a pair of SQL queries	    
+	    HashMap advanceDeclines = QuoteSourceManager.getSource().getAdvanceDecline(firstDate, lastDate);	    	    
+	    SortedSet sortedAdvDeclines = new TreeSet(advanceDeclines.keySet());
+
+	    iterator =  sortedAdvDeclines.iterator();
+	    while (iterator.hasNext()) {
+		TradingDate date = (TradingDate)iterator.next();
+		
+		Integer advanceDeclineValue = 
+		    (Integer)advanceDeclines.get(date);
+		
+		cumTotalSingle += advanceDeclineValue.intValue();
+	    }
+
+	    if (cumTotalByDates != cumTotalSingle) {
+		fail("Expected: " + cumTotalByDates + " got: " + cumTotalSingle);
+	    }	
+	} catch (MissingQuoteException e) {
+	    
+	}
+    }
 }

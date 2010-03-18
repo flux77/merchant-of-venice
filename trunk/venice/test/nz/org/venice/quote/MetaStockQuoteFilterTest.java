@@ -25,6 +25,9 @@ import nz.org.venice.quote.MetaStockQuoteFilter;
 import nz.org.venice.quote.Symbol;
 import nz.org.venice.quote.SymbolFormatException;
 import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.Locale;
+import nz.org.venice.util.LocaleConstants;
+import nz.org.venice.prefs.PreferencesManager;
 
 public class MetaStockQuoteFilterTest extends TestCase
 {
@@ -54,4 +57,42 @@ public class MetaStockQuoteFilterTest extends TestCase
 
         assertEquals(filteredQuote, quote);
     }
+
+    //Number format for German locale uses "," for decimal point   
+    //This test will be identical to the above test
+    // on systems with a German Default locale but we want bugs like 
+    //this to be triggered for all locales. 
+    public void testConvertGermanLocale() {
+        EODQuoteFilter filter = new MetaStockQuoteFilter();
+	EODQuote quote = null;
+
+	java.util.Locale prevDefault = java.util.Locale.getDefault();
+	java.util.Locale.setDefault(java.util.Locale.GERMAN);
+
+        try {
+            quote = new EODQuote(Symbol.find("AAA"), new TradingDate(), 10000,
+                                 10.00D, 20.00D, 30.00D, 40.00D);
+        }
+        catch(SymbolFormatException e) {
+            fail("Couldn't create symbol AAA");
+        }
+
+        EODQuote filteredQuote = null;
+	String filteredString;
+
+        filteredString = filter.toString(quote);
+
+        try {
+            filteredQuote = filter.toEODQuote(filteredString);
+        }
+        catch(QuoteFormatException e) {
+            fail("Error parsing '" + filteredString + "'");
+        } finally {
+	    java.util.Locale.setDefault(prevDefault);
+	}
+        assertEquals(filteredQuote, quote);
+    }
+
+    
+    
 }

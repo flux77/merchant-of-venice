@@ -467,8 +467,8 @@ public class PaperTrade {
             // do nothing
         }
         finally {
-            return retValue;
         }
+	return retValue;
     }
 
 
@@ -489,8 +489,8 @@ public class PaperTrade {
             // Ignore and move on
         }
         finally {
-            return retValue;
         }
+	return retValue;
     }
 
 

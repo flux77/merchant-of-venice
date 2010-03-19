@@ -25,9 +25,7 @@ import nz.org.venice.quote.MetaStockQuoteFilter;
 import nz.org.venice.quote.Symbol;
 import nz.org.venice.quote.SymbolFormatException;
 import nz.org.venice.util.TradingDate;
-import nz.org.venice.util.Locale;
-import nz.org.venice.util.LocaleConstants;
-import nz.org.venice.prefs.PreferencesManager;
+
 
 public class MetaStockQuoteFilterTest extends TestCase
 {

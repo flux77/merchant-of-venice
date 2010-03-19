@@ -202,7 +202,7 @@ public class GraphSettings extends AbstractSettings {
     /**
      * Set the symbollist
      *
-     * @param symbolList  A list of symbols for this graph
+     * @param settingsSymbolList  A list of symbols for this graph
      */
     public void setSettingsSymbolList(List settingsSymbolList) {
 	this.settingsSymbolList = settingsSymbolList;

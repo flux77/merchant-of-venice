@@ -98,9 +98,6 @@ To create the manual you wll need:
 
     Xalan-Java 2.7.1 or higher
         http://xml.apache.org/xalan-j/
-
-    Saxon 8.0.0 or higher
-    	http://saxon.sourceforge.net/
    
 To build Venice type the following:
 
@@ -142,7 +139,7 @@ Thanks to the following people for providing additional code, patches or
 bugfixes:
 
 Daniel Makovec, Quentin Bossard, Peter Fradley, Mark Hummel, Bryan Lin,
-Alberto Nacher, Matthias Stöckel and Dennis van den Berg.
+Alberto Nacher, Matthias Stöckel, Dennis van den Berg, Andrew Goh, Christian Brom
 
 And the following for providing translations:
 

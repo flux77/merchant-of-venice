@@ -15,7 +15,6 @@
   <property name="temp" value="${basedir}/temp"/>
   <property name="test" value="${basedir}/test"/>
   <property name="web" value="${basedir}/web"/>
-  <property name="saxonPath" value="/YOUR/PATH/TO/SAXON/HERE/"/>
 
   <!-- Libraries -->
   <property name="lib.hsql" value="${lib}/hsqldb.jar"/>
@@ -93,6 +92,7 @@
     <delete dir="${api}"/>
     <delete file="${doc}/manual.html"/>
     <delete file="${doc}/manual.txt"/>
+    <delete file="${web}/venice.jar"/>
     <delete dir="${release}"/>
     <delete dir="${temp}"/>
     <delete>
@@ -103,7 +103,12 @@
     <delete file="${web}/web.tar.gz"/>
     <delete file="${web}/manual.html"/>
     <delete dir="${web}/api"/>
-    <delete dir="${web}/report"/>
+    <delete dir="${report}"/>
+    <delete file=".database.data"/>
+    <delete file=".database.backup"/>
+    <delete file=".database.lck"/>
+    <delete file=".database.properties"/>
+    <delete file=".database.log"/>
   </target>
 
   <!-- Generate docs -->
@@ -112,19 +117,10 @@
       <dtd publicID="-//Venice//DTD XML Document V1.0//EN"
            location="${doc}/document.dtd"/>
     </xmlcatalog>
-        
-    <!--
-	 Want to use xsl:result-document to remove dependency
-   	 on XSLT extensions.	
-      -->
-    
-    <xslt-saxon in="${doc}/manual.xml" style="${doc}/manual-help.xsl" out="venice.html" destdir="${help}"/>    
-
-    
+                
     <!-- This will say it's generating manual.html but we override this. -->
     <!-- and write out files for individual chapters.                    -->    
-    
-    <!--
+        
     <xslt basedir="${doc}"
           destdir="${help}"
           includes="manual.xml"
@@ -132,7 +128,7 @@
           style="${doc}/manual-help.xsl">
 	  <xmlcatalog refid="document"/>
     </xslt>
-    -->
+    
         
     <!-- Generate online help index.                                     -->
     <xslt in="${doc}/manual.xml"
@@ -414,7 +410,7 @@
   </target>
 
   <!-- Run Venice -->
-  <target name="run" depends="build">
+  <target name="run" depends="build, doc">
     <java classname="nz.org.venice.main.Main"
           dir="${src}"
           fork="yes">
@@ -499,24 +495,5 @@
     <gzip zipfile="${web}/web.tar.gz"
       src="${web}/web.tar"/>
   </target>
-
-<macrodef name="xslt-saxon">
-  <attribute name="in"/>
-  <attribute name="out"/>
-  <attribute name="destdir"/>
-  <attribute name="style"/>
-  <sequential>
-    <echo level="info">XSLT Generating @{out}</echo>
-    <java classname="net.sf.saxon.Transform"
-	  classpath="${saxonPath}"	  
-          logError="true"
-          output="@{out}"
-          fork="true">
-      <arg value="@{in}"/>
-      <arg value="@{style}"/>
-      <arg value="destdir=@{destdir}"/>
-    </java>
-  </sequential>
-</macrodef>
 
 </project>

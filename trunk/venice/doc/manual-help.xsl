@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:lxslt="http://xml.apache.org/xslt"
-                xmlns:redirect2="org.apache.xalan.xslt.extensions.Redirect"
-		xmlns:redirect="http://xml.apache.org/xalan/redirect"
+                xmlns:redirect="org.apache.xalan.xslt.extensions.Redirect"
                 extension-element-prefixes="redirect"
                 version="1.0">  
   <xsl:output method="html" indent="yes"/>
@@ -19,21 +18,14 @@
 
   <xsl:template match="document">
     <xsl:variable name='filename' select='concat($destdir,"/",@name,".html")'/>
-    <xsl:result-document href='{$filename}'>
-      <h2>
-	<xsl:apply-templates select='@name'/>
-      </h2>
-      <xsl:apply-templates/>
-    </xsl:result-document>    
-
-    <!--
+    
     <redirect:open file="{@name}.html"/>
     <redirect:write file="{@name}.html">
       <h2><xsl:value-of select="@name"/></h2>
       <xsl:apply-templates/>
     </redirect:write>
     <redirect:close file="{@name}.html"/>
-    -->    
+      
   </xsl:template>
 
   <xsl:template match="emphasis">
@@ -77,18 +69,7 @@
 
   <xsl:template match="chapter">
     <xsl:variable name='filename' select='concat($destdir,"/",@name,".html")'/>
-    <xsl:result-document href='{$filename}'>
-      <html>
-	<body>
-	  <h2>
-	    <xsl:apply-templates select='@name'/>
-	  </h2>
-	  <xsl:apply-templates/>
-	</body>
-      </html>
-    </xsl:result-document>
-    
-    <!--
+            
     <redirect:open file="{@name}.html"/>
     <redirect:write file="{@name}.html">
       <html><body>
@@ -97,7 +78,7 @@
       </body></html>
     </redirect:write>
     <redirect:close file="{@name}.html"/>
-    -->
+    
   </xsl:template>
 
   <xsl:template match="section">

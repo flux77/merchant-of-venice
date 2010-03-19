@@ -1025,8 +1025,8 @@ public class CommandManager {
 
 				   Locale.getString("ADDITIONAL_CODE") + "\n" +
                                    "Daniel Makovec, Quentin Bossard, Peter Fradley, Mark Hummel,\n" +
-                                   "Bryan Lin, Alberto Nacher, Matthias St\366ckel &\n" +
-                                   "Dennis van den Berg.\n\n" +
+                                   "Bryan Lin, Alberto Nacher, Matthias St\366ckel, Dennis van den Berg\n" +
+                                   "Andrew Goh & Christian Brom.\n\n" +
 
                                    Locale.getString("TRANSLATORS") + "\n" +
                                    "Benedict P. Barszcz (" + polish.getDisplayName() + "), " +

@@ -6,7 +6,7 @@ Changes for Venice, 0.721 beta ??/??/????
 
 
 Bug Fixes:
-
+* Fix Quote Import/Export for locales which use commas as decimal points. (e.g. Germany)
 
 Changes for Venice, 0.72 beta 20/03/2010
 =========================================

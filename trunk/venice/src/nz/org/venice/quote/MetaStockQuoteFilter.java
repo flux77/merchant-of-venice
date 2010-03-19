@@ -118,7 +118,11 @@ public class MetaStockQuoteFilter implements EODQuoteFilter {
      */
     public String toString(EODQuote quote) {
         if(format == null) {
-            format = NumberFormat.getInstance();
+	    //FIXME
+	    //Replace this with something like opencsv.CSVWriter
+	    //which will write CSV files
+	    //Then fix the importers so they can handle the CSV that it writes  
+            format = NumberFormat.getInstance(java.util.Locale.UK);
             format.setMinimumIntegerDigits(1);
             format.setMinimumFractionDigits(1);
             format.setMaximumFractionDigits(3);

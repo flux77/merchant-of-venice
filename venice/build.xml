@@ -2,7 +2,7 @@
 <project name="Venice" default="run" basedir=".">
 
   <!-- Current version we are working towards -->
-  <property name="VERSION" value="0.8alpha"/>
+  <property name="VERSION" value="0.72alpha"/>
 
   <!-- Paths -->
   <property name="api" value="${basedir}/api"/>
@@ -79,8 +79,8 @@
     </javac>
   </target>
 
-  <!-- Remove all built files -->
-  <target name="clean">
+  <!-- Remove all built files and generated documentation. -->
+  <target name="clean" depends="cleanDocs">
     <delete>
       <fileset dir="${src}" includes="**/*.class"/>
     </delete>
@@ -89,12 +89,22 @@
     </delete>
     <delete file="venice.jar"/>
     <delete dir="Venice.app"/>
-    <delete dir="${api}"/>
-    <delete file="${doc}/manual.html"/>
-    <delete file="${doc}/manual.txt"/>
+    <delete dir="${api}"/>    
     <delete file="${web}/venice.jar"/>
     <delete dir="${release}"/>
-    <delete dir="${temp}"/>
+    <delete dir="${temp}"/>        
+    <delete dir="${report}"/>
+    <delete file=".database.data"/>
+    <delete file=".database.backup"/>
+    <delete file=".database.lck"/>
+    <delete file=".database.properties"/>
+    <delete file=".database.log"/>
+  </target>
+
+  
+  <target name="cleanDocs">
+    <delete file="${doc}/manual.html"/>
+    <delete file="${doc}/manual.txt"/>
     <delete>
       <fileset dir="${help}" includes="*.html"/>
     </delete>
@@ -103,12 +113,6 @@
     <delete file="${web}/web.tar.gz"/>
     <delete file="${web}/manual.html"/>
     <delete dir="${web}/api"/>
-    <delete dir="${report}"/>
-    <delete file=".database.data"/>
-    <delete file=".database.backup"/>
-    <delete file=".database.lck"/>
-    <delete file=".database.properties"/>
-    <delete file=".database.log"/>
   </target>
 
   <!-- Generate docs -->

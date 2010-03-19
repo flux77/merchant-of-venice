@@ -2,6 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version="1.0">
 
+  <xsl:import href='utils.xsl'/>
+
   <xsl:strip-space elements="document"/>
   <xsl:output method="text" 
               indent="no"

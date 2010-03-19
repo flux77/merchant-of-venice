@@ -114,9 +114,7 @@ public class MenuSettings extends AbstractSettings {
 	map = new HashMap();
 	
     }
-    
-
-    
+      
     /**
      * Return the graph title
      * 
@@ -126,22 +124,12 @@ public class MenuSettings extends AbstractSettings {
 	return title;
     }
 
-    /**
-     * 
-     * Set the graph title
-     * 
-     * @param   title The graph title  
-     */
-
-    public void setTitle(String title) {
-	this.title = title;
-    }
 
     /**
      *
      * Set the symbol of the graph
      * 
-     * @param symbol  A symbol
+     * @param item  
      */
 
     public void setMenu(JMenuItem item) {
@@ -194,9 +182,6 @@ public class MenuSettings extends AbstractSettings {
     public HashMap getMap() {
 	return map;
     }
-
-    
-
 
     //Menu settings are data of the graph settings, so nothing is returned here
     public Module getModule(JDesktopPane desktop) {

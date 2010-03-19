@@ -7,8 +7,9 @@ Changes for Venice, 0.721 beta ??/??/????
 
 Bug Fixes:
 * Fix Quote Import/Export for locales which use commas as decimal points. (e.g. Germany)
+* Fix Bug #1617089 Average Cost not included in average cost of share
 
-Changes for Venice, 0.72 beta 20/03/2010
+Changes for Venice, 0.72 beta 21/03/2010
 =========================================
 
 * Added the ability to save and restore the state and position of windows.

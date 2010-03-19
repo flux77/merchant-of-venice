@@ -4,11 +4,13 @@
                 xmlns:redirect="org.apache.xalan.xslt.extensions.Redirect"
                 extension-element-prefixes="redirect"
                 version="1.0">  
+
+  <xsl:import href='utils.xsl'/>
+  
   <xsl:output method="html" indent="yes"/>
 
-  <xsl:param name='destdir' select='"."'/>
-
   <xsl:template match="/">
+    <xsl:call-template name='writeWarningMessage'/>
     <html>
       <body bgcolor="#FFFFFF">
       <xsl:apply-templates/>
@@ -17,10 +19,8 @@
   </xsl:template>
 
   <xsl:template match="document">
-    <xsl:variable name='filename' select='concat($destdir,"/",@name,".html")'/>
-    
     <redirect:open file="{@name}.html"/>
-    <redirect:write file="{@name}.html">
+    <redirect:write file="{@name}.html">      
       <h2><xsl:value-of select="@name"/></h2>
       <xsl:apply-templates/>
     </redirect:write>
@@ -68,10 +68,9 @@
   </xsl:template>
 
   <xsl:template match="chapter">
-    <xsl:variable name='filename' select='concat($destdir,"/",@name,".html")'/>
-            
     <redirect:open file="{@name}.html"/>
     <redirect:write file="{@name}.html">
+      <xsl:call-template name='writeWarningMessage'/>
       <html><body>
       <h2><xsl:value-of select="@name"/></h2>
       <xsl:apply-templates/>
@@ -94,5 +93,5 @@
   <xsl:template match='text()'>
     <xsl:value-of select='.'/>
   </xsl:template>
-
+  
 </xsl:stylesheet>

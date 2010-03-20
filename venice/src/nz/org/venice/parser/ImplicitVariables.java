@@ -65,7 +65,7 @@ public class ImplicitVariables {
 	if (!variables.contains("capital")) {
 	    variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
 	}
-	if (!variables.contains("capital")) {
+	if (!variables.contains("stockcapital")) {
 	    variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
 	}
     }

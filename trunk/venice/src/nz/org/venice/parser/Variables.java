@@ -35,6 +35,7 @@ public class Variables {
 		variables = new HashMap();
 	}
 
+
 	/**
 	 * Creates a deep clone of variables.
 	 * 
@@ -72,7 +73,7 @@ public class Variables {
 	 *            set to <code>TRUE</code> if the variable is a constant.
 	 */
 	public void add(String name, int type, boolean isConstant) {
-		add(name, type, isConstant, 0.0D);
+	    add(name, type, isConstant, 0.0D);
 	}
 
 	/**
@@ -91,8 +92,12 @@ public class Variables {
 		if (!variables.containsKey(name)) {
 			Variable variable = new Variable(name, type, isConstant, value);
 			variables.put(name, variable);
-		} else
-			assert false;
+		} else {
+		    //This can happen if a user enters one of the implicit
+		    //parameters which is always added.
+		    
+		    assert false;
+		}
 	}
 
 	/**
@@ -195,4 +200,9 @@ public class Variables {
 	public Variable get(String name) {
 		return (Variable) variables.get(name);
 	}
+
+
+    public int getSize() {
+	return variables.size();
+    }
 }

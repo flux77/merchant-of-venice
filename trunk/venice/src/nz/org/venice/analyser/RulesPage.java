@@ -41,6 +41,7 @@ import nz.org.venice.parser.ExpressionException;
 import nz.org.venice.parser.Parser;
 import nz.org.venice.parser.Variable;
 import nz.org.venice.parser.Variables;
+import nz.org.venice.parser.ImplicitVariables;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.ui.ExpressionComboBox;
 import nz.org.venice.ui.GridBagHelper;
@@ -174,12 +175,7 @@ public class RulesPage extends JPanel implements AnalyserPage {
             variables.add("c", Expression.INTEGER_TYPE, Variable.CONSTANT);
         }
         
-        variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+	ImplicitVariables.getInstance().setup(variables, true);
         
         if (buyRuleString.length() == 0) {
             JOptionPane.showInternalMessageDialog(desktop, Locale

@@ -52,6 +52,7 @@ import nz.org.venice.parser.Parser;
 import nz.org.venice.parser.Token;
 import nz.org.venice.parser.Variable;
 import nz.org.venice.parser.Variables;
+import nz.org.venice.parser.ImplicitVariables;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.ui.ExpressionComboBox;
 import nz.org.venice.ui.GridBagHelper;
@@ -157,17 +158,12 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         // We need to specify the variables that are given to the buy/sell rule
         // expressions so they can be parsed properly.
         Variables variables = new Variables();
+	
+	ImplicitVariables.getInstance().setup(variables, true);
         
         String buyRuleString = buyRuleExpressionComboBox.getExpressionText();
         String sellRuleString = sellRuleExpressionComboBox.getExpressionText();
-        
-        variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        
+        		        
         // Insert all the parameters in variables.
         // We use lowestGAIndividual, but highestGAIndividual should be the same.
         // All the GAIndividual have the same parameters during all GA Algorithm,
@@ -363,6 +359,16 @@ public class GARulesPage extends JPanel implements AnalyserPage {
         for (int ii=0; ii<sizeOfIndividual; ii++) {
             parameters[ii]=(String)GARulesPageModule.getValueAt(ii, 
                     GARulesPageModule.PARAMETER_COLUMN);
+
+	    //Check that the user can't add implicit variables
+	    if (ImplicitVariables.getInstance().contains(parameters[ii])) {
+		JOptionPane.showInternalMessageDialog(desktop, Locale.getString("VARIABLE_DEFINED_ERROR",
+										parameters[ii], parameters[ii]),
+						      Locale.getString("VARIABLE_DEFINED_ERROR"),
+						      JOptionPane.ERROR_MESSAGE);
+		return false;
+	    }
+
             for (int jj=0; jj<words.length; jj++) {
                 if (words[jj].indexOf(parameters[ii]) >= 0) {
                     JOptionPane.showInternalMessageDialog(desktop, Locale.getString("ERROR_PARSING_PARAMETER",

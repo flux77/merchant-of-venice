@@ -31,6 +31,7 @@ import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.ExpressionFactory;
 import nz.org.venice.parser.Variable;
 import nz.org.venice.parser.Variables;
+import nz.org.venice.parser.ImplicitVariables;
 import nz.org.venice.portfolio.CashAccount;
 import nz.org.venice.portfolio.Portfolio;
 import nz.org.venice.portfolio.ShareAccount;
@@ -536,20 +537,9 @@ public class PaperTrade {
                                                              tradeValueBuy,
                                                              tradeValueSell);
         int dateOffset = environment.startDateOffset;
-
-        // Paper Trading variables
-        if(orderCache.isOrdered() && !variables.contains("order"))
-            variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("held"))
-            variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("daysfromstart"))
-            variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("transactions"))
-            variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("capital"))
-            variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        if(!variables.contains("stockcapital"))
-            variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+	
+	// Paper Trading variables
+	ImplicitVariables.getInstance().setup(variables, orderCache.isOrdered());
         
         // daysfromstart
         int daysRest = (int)(-1) * dateOffset;
@@ -633,19 +623,8 @@ public class PaperTrade {
         int dateOffset = environment.startDateOffset;
 
         // Paper Trading variables
-        if(orderCache.isOrdered() && !variables.contains("order"))
-            variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("held"))
-            variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("daysfromstart"))
-            variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("transactions"))
-            variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("capital"))
-            variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        if(!variables.contains("stockcapital"))
-            variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-
+	ImplicitVariables.getInstance().setup(variables, orderCache.isOrdered());
+        
         // daysfromstart
         int daysRest = (int)(-1) * dateOffset;
         

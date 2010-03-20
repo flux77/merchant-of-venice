@@ -32,6 +32,7 @@ import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.ExpressionFactory;
 import nz.org.venice.parser.Variable;
 import nz.org.venice.parser.Variables;
+import nz.org.venice.parser.ImplicitVariables;
 import nz.org.venice.portfolio.Portfolio;
 import nz.org.venice.portfolio.StockHolding;
 import nz.org.venice.quote.MissingQuoteException;
@@ -330,20 +331,9 @@ public class ANNPaperTrade extends PaperTrade {
                                                              tradeValueSell);
         int dateOffset = environment.startDateOffset;
 
-        // Paper Trading variables
-        if(orderCache.isOrdered() && !variables.contains("order"))
-            variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("held"))
-            variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("daysfromstart"))
-            variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("transactions"))
-            variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("capital"))
-            variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        if(!variables.contains("stockcapital"))
-            variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-
+	// Paper Trading variables
+	ImplicitVariables.getInstance().setup(variables, orderCache.isOrdered());
+	
         // daysfromstart
         int daysRest = (int)(-1) * dateOffset;
 
@@ -461,21 +451,9 @@ public class ANNPaperTrade extends PaperTrade {
                 new double[ANNArrayLength][inputExpressions.length];
         ANNOutputDesiredArray =
                 new double[ANNArrayLength][artificialNeuralNetwork.OUTPUT_NEURONS];
-
-        // Paper Trading variables
-        if(orderCache.isOrdered() && !variables.contains("order"))
-            variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("held"))
-            variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("daysfromstart"))
-            variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("transactions"))
-            variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("capital"))
-            variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        if(!variables.contains("stockcapital"))
-            variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-
+	// Paper Trading variables
+	ImplicitVariables.getInstance().setup(variables, orderCache.isOrdered());
+		    
         // daysfromstart
         int daysRest = (int)(-1) * dateOffset;
 
@@ -596,21 +574,9 @@ public class ANNPaperTrade extends PaperTrade {
         ANNInputArray = new double[ANNArrayLength][inputExpressions.length];
         ANNOutputDesiredArray = new double[ANNArrayLength][artificialNeuralNetwork.OUTPUT_NEURONS];
 
-        // Paper Trading variables
-        if(orderCache.isOrdered() && !variables.contains("order"))
-            variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("held"))
-            variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("daysfromstart"))
-            variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("transactions"))
-            variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("capital"))
-            variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        if(!variables.contains("stockcapital"))
-            variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-
-        // daysfromstart
+	// Paper Trading variables
+	ImplicitVariables.getInstance().setup(variables, orderCache.isOrdered());
+	// daysfromstart
         int daysRest = (int)(-1) * dateOffset;
 
         // Now iterate through each trading date and decide whether
@@ -721,20 +687,8 @@ public class ANNPaperTrade extends PaperTrade {
                                                              tradeValueSell);
         int dateOffset = environment.startDateOffset;
 
-        // Paper Trading variables
-        if(orderCache.isOrdered() && !variables.contains("order"))
-            variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("held"))
-            variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("daysfromstart"))
-            variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("transactions"))
-            variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        if(!variables.contains("capital"))
-            variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        if(!variables.contains("stockcapital"))
-            variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-
+	ImplicitVariables.getInstance().setup(variables, orderCache.isOrdered());
+			        
         // daysfromstart
         int daysRest = (int)(-1) * dateOffset;
         

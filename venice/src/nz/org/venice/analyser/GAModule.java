@@ -46,6 +46,7 @@ import nz.org.venice.main.ModuleFrame;
 import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.Variable;
 import nz.org.venice.parser.Variables;
+import nz.org.venice.parser.ImplicitVariables;
 import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.EODQuoteBundle;
 import nz.org.venice.ui.ProgressDialog;
@@ -293,12 +294,9 @@ public class GAModule extends JPanel implements Module {
         // All the GAIndividual have the same parameters during all GA Algorithm,
         // they just differ one from another because of the values.
         Variables variables = new Variables();
-        variables.add("held", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("order", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("daysfromstart", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("transactions", Expression.INTEGER_TYPE, Variable.CONSTANT);
-        variables.add("capital", Expression.FLOAT_TYPE, Variable.CONSTANT);
-        variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
+
+	ImplicitVariables.getInstance().setup(variables, true);
+
         for (int ii=0; ii<lowestGAIndividual.size(); ii++)
             variables.add(lowestGAIndividual.parameter(ii), lowestGAIndividual.type(ii), Variable.CONSTANT);
  

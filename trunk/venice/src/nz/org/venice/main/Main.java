@@ -71,7 +71,7 @@ public class Main extends JFrame {
     public static String LONG_VERSION = "0.72 beta";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "12/" + Locale.getString("MAR") + "/2010";
+    public static String RELEASE_DATE = "21/" + Locale.getString("MAR") + "/2010";
 
     /** Copyright date range, e.g. "2003-5" */
     public static String COPYRIGHT_DATE_RANGE = "2003-10";

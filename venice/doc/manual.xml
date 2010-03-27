@@ -57,9 +57,9 @@ See COPYING.txt for license terms.
 
 <para>Venice is a stock market trading programme that supports portfolio
 management, charting, technical analysis, paper trading and
-experimental methods like genetic programming. Venice runs in a
+experimental methods like Genetic Programming. Venice runs in a
 graphical user interface with online help and has full documentation.
-Venice runs on UNIX, including Mac OS X and Windows.</para>
+Venice runs on UNIX (including Mac OS X), and Windows.</para>
 
 </chapter>
 
@@ -70,7 +70,7 @@ the way Venice works.</para>
 <para><link to="Equations">Equations</link> describes how to get Venice to
 remember functions or equations based on a keyword. This way instead of
 typing in a long equation, such as a buy indicator, you could type in
-a short name instead.</para>
+it's short name instead.</para>
 
 <para><link to="Language">Language</link> describes how to select the
 current language.</para>
@@ -93,7 +93,7 @@ configure Venice for optimal performance.</para>
 </help>
 
 <chapter name="Equations">
-<para>You can store commonly used functions, such as indicators, so you do not
+<para>You can store commonly used functions like indicators, so you do not
 need to retype them. Once an equation is stored, you can access it from
 any equation entry field by clicking on the small down arrow, which
 appears next to all the equation entry fields. It will then display a list
@@ -107,9 +107,9 @@ will display the equations preferences page.</para>
 
 <para>You have to write the equations according to the English localization.
 For example you cannot write a number inside an equation as 17,17
-(with comma as decimal separator), but you have to write it as 17.17
-(with point as decimal separator), without mattering what localization you're using.
-This rule applies only to equations, all other numbers in Venice follow
+(with comma as decimal separator). Instead you must write it as 17.17
+(with point as decimal separator), regardless of the localization you're using.
+This rule applies only to equations; all other numbers in Venice follow
 the selected localization.</para>
 
 <para>You can reach the equations page by:</para>
@@ -179,7 +179,7 @@ database automatically set up by Venice (HSQLDB) or you can work with the
 sample quotes provided.</para>
 <para>The best way of storing your quotes is to set up an external database.
 This provides the best performance. However, using the internal database
-requires no setup, so it is extremely easy. The sample quotes are only
+is extremely easy because it requires no setup. The sample quotes are only
 provided as a demonstration.</para>
 <para>You can reach the quote source configuration page by:</para>
 <list><item>Clicking on the <highlight>File</highlight> menu item.
@@ -190,7 +190,7 @@ provided as a demonstration.</para>
 </item>
 </list>
 <section name="Samples">
-<para>Venice has some inbuilt sample quotes, so you can test out Venice without
+<para>Venice has some inbuilt sample quotes, so you can test Venice without
 going to all the trouble of importing stock quotes. It contains a small
 selection of quotes from the Australian Stock Exchange (ASX) from 1986. Venice
 will default to using the sample quotes when you run it for the first time.</para>
@@ -207,7 +207,7 @@ page, click on the <highlight>Internal</highlight> tab and select the <highlight
 <para>Once you have played with Venice for a while you might get annoyed at the time
 it takes Venice to load quotes from the internal database. You can fix this by
 reading quotes from an external database. Currently Venice is only tested
-with MySQL, PostgreSQL and HSQLDB, but other databases should also work. To read
+with MySQL, PostgreSQL and HSQLDB, but other databases (SQL) should also work. To read
 quotes from an external database, you'll need to download a copy of the
 database software and the relevant Java software driver (JDBC) that lets Venice
 talk to the database. However, if you use MySQL, then you do not need to
@@ -219,7 +219,7 @@ set up you'll need to create a database for Venice. Call the database
 <para>Next you'll need to configure Venice to use the database.
 From the quote source page, to tell Venice to read quotes from an external
 database click on the <highlight>Database</highlight> tab and select the <highlight>Use Database</highlight>
-radio button. You'll be confronted with several fields you need to fill in:</para>
+radio button. You'll be presented with several fields you need to fill in:</para>
 <list><item><highlight>Database</highlight> - Select the database software that you are using.
 </item>
 <item><highlight>Driver</highlight> - Select the JDBC database driver software.
@@ -416,8 +416,7 @@ Yahoo Finance is supported.
 <item><highlight>Symbols</highlight> - Write in a comma or a space separated listed of symbols
 that should always be downloaded by Venice. This does not mean that if you don't
 list a symbol here it won't be downloaded. All symbols will be downloaded when
-they are specified for the first time, this just lets you specify some symbols
-so that Venice can automatically start downloading the quote's day history.
+they are specified for the first time, this just lets you specify some symbols in advance so that Venice can automatically start downloading the quote's day history.
 Since intra-day charting is currently not supported, this field has little
 value.
 </item>
@@ -601,8 +600,8 @@ advance/decline indicator. You can graph this indicator by:</para>
 <item>Then clicking on the <highlight>Advance/Decline</highlight> menu item.
 </item>
 </list>
-<para>This operation reads in almost all of the available stock quotes, so it might
-be very slow.</para>
+<para>This operation reads in almost all of the available stock quotes, so it may take a while.</para>
+
 <para>The advance/decline indicator is calculated by taking an arbitrary start value
 (currently 0). Each day's value is calculated by taking the number of stocks
 that advanced (i.e. have a higher day close than day open) minus the number of
@@ -865,6 +864,7 @@ and <highlight>not</highlight>. For example:</para>
 The following examples explain the behaviour:</para>
 <list><item>INTEGER_TYPE + INTEGER_TYPE returns an INTEGER_TYPE</item>
 <item>INTEGER_TYPE - FLOAT_TYPE returns an INTEGER_TYPE</item>
+<item>FLOAT_TYPE - INTEGER_TYPE returns a FLOAT_TYPE</item>
 <item>FLOAT_TYPE / INTEGER_TYPE returns a FLOAT_TYPE</item>
 <item>FLOAT_TYPE * FLOAT_TYPE returns a FLOAT_TYPE</item>
 </list>
@@ -1311,7 +1311,7 @@ evolutionary computation (genetic algorithm methodology) to evovle new buy/sell 
 </help>
 
 <chapter name="Paper Trade">
-<para>Venice allows you to perform historical paper trading, this allows you to test
+<para>Venice allows you to perform historical paper tradingm, which allows you to test
 buy/sell rules using historical share data. You need to enter basic data such
 as which shares you wish to trade (either from a select list or say all
 ordinary shares), the buy/sell rules you wish to trigger the trades, the date
@@ -1545,7 +1545,7 @@ GP algorithm will choose the words in accordance with user defined probabilities
 If you set any of these values to zero, the GP algorithm will work without considering
 this word as a Gondola language's word.</para>
 
-<para>To make easy the selection, there are some selectable tabbed panes.
+<para>To make the selection easy, there are some selectable tabbed panes.
 Each of them has two buttons: the former can be clicked to calculate the values
 so that their sum is 100%, the latter can be clicked to set all the tabbed pane values
 to the default. Normal behaviour should be: put values as you like, then click on
@@ -1556,26 +1556,24 @@ the former button to transform the inserted values to percentages.</para>
 
 <chapter name="Genetic Algorithm">
 <para>Genetic Algorithm is similar to <link to="Genetic Programming">Genetic Programming Module</link>.
-Differently from Genetic Programming, you have to write a buy and a sell rule with many parameters as you wish.
-Then you have to declare the minimum and the maximum values for each parameter.
+It differs from Genetic Programming in that you have to write a buy and a sell rule with as many parameters as you wish, and declare the minimum and the maximum values for each parameter.
 If you use minimum and maximum values of float type (2.3, 1.7, 1.1, ...) you'll use that parameter as float,
-so be aware to put it in the rules so that it doesn't generate syntax error.
+but be aware you need to put it in the rules so that it doesn't generate a syntax error.
 If you use minimum and maximum values of integer type (2, 3, 4, ...) you'll use that parameter as integer,
-so be aware to put it in the rules so that it doesn't generate syntax error.
+but be aware to put it in the rules so that it doesn't generate a syntax error.
 The Genetic Algorithm process will modifiy the parameter values inside the rules,
 according to the range inserted.</para>
 
 <para>A frequently asked question is the following: I've tried the genetic algorithm, but it doesn't work,
-it is not able to finish or it stops after having found just some solutions.
-Well, the answer is: the genetic algorithm doesn't assure the ending of itself, even more, sometimes it cannot
-find neither one solution. The only hint that can be done is choosing the buy and sell rules the best you can,
-so that the genetic algorithm can find out a solution more easily, if a solution exists!
-The following sections show you two examples which can help you.</para>
+is unable to finish or it stops after having found just some solutions.
+The genetic algorithm doesn't assure completion and sometimes a solution cannot be found. The only hint that can be given is choosing the buy and sell rules the best you can,
+so that the genetic algorithm can find a solution more easily, assuming it exists!
+The following sections show you two examples which may be of help.</para>
 
 <section name="RSI Example">
 <para>A simple example is to use the following rules: buy rule: <code>rsi(14)&lt;32.0 + paramBuy</code>,
 sell rule: <code>rsi(14)>72.0 + paramSell</code>. If you set paramBuy and paramSell with values changing from 0.0 to 1.0,
-I suppose you to find good solutions to the most of the trading periods. Pain attention to the parameters' setting;
+you may find good solutions to the most of the trading periods. Pay attention to the parameters' setting:
 In this example we've set the parameters as float, otherwise set as integer you would have had only few solutions (4):
 (0,0), (0,1), (1,0), and (1,1), and the algorithm could not work properly.</para>
 </section>
@@ -1583,8 +1581,8 @@ In this example we've set the parameters as float, otherwise set as integer you 
 <section name="Neural Network Example">
 <para>A more complex but interesting example are the artificial neural networks.
 If you do not know anything about neural networks you can look at the Joone project on sourceforge.
-Here you can find just an example of neural networks of whom weights are got from the genetic selection of the
-genetic algorithm. And this is the only thing that can be done in genetic algorithm analysis section.
+Here you can find just an example of neural networks, where the weights are from the genetic selection of the
+genetic algorithm. This is the only thing that can be done in genetic algorithm analysis section.
 For the sake of simplicity we use the sigmoid function, so the neuron is modelled by the Gondola expression:
 <code>(1.0/(1.0+exp(-1.0*input)))</code>.
 The neurons are input for the hidden layer through the synapses, so each hidden layer will be 
@@ -1596,7 +1594,7 @@ in Venice.</para>
 <para>If you want a quick couple of rules, I give you the rules that represent two artificial neural networks of
 4 input neurons and 6 hidden neurons and 1 output neuron.
 The first neural network can be used for the buy rule, the second for the sell rule.
-The input are open, close, high and low, but you can modifiy as you like as soon as you've practised with
+The input are open, close, high and low, but you can modify as you like as soon as you've practised with
 that expressions.
 The parameters that you have to set are: v11 .. v64 (24 parameters), w11 .. w16 (6 parameters),
 y11 .. y64 (24 parameters), z11 .. z16 (6 parameters). I put them ranging from -1.0 to 1.0.</para>
@@ -1617,37 +1615,36 @@ y11 .. y64 (24 parameters), z11 .. z16 (6 parameters). I put them ranging from -
 
 <chapter name="Artificial Neural Network">
 <para>Venice is able to use Artificial Neural Network (ANN) for technical analysis.
-Venice can be used standalone, but the best performance can be achieved using it together with Joone,
+Venice can be used standalone, but the best performance is achieved using it together with Joone,
 you can download Joone from http://www.jooneworld.com/.
-You can use the ANN in two ways. You can use the default ANN, that is to say you use Venice standalone;
+You can use the ANN in two ways. You can use the default ANN, that is to say you use Venice standalone:
 a default ANN will be created with a Linear Layer as input, and a Sigmoid Layer as hidden and another
 Sigmoid Layer as output.
 You can use a custom ANN, that is to say you use Venice together with Joone; the custom ANN can be imported from
-file system, all accepted files are .snet and .xml formats, which can be obtained exporting any ANN from Joone.
-When you export an ANN from Joone, you have to take care to make the ANN with the right number of input and
+the file system. All accepted files are .snet and .xml formats, which can be obtained by exporting any ANN from Joone.
+When you export an ANN from Joone, make sure the ANN has the right number of input and
 output neurons. The number of input neurons must be equal to the input expressions defined in ANN I/O Params section,
 the number of output neurons must be equal to two (buy and sell signals). If you import an ANN
 which have a different number of input/output neurons, before running or training it, the system will ask
 you to resize automatically the input/output neurons to the correct number.
-The ANN is not saved in the preferences. So when you open the ANN window, you have no ANN in memory, the only
-choice you have is to build a new one using the default model or to load an existing one from file system.
-When you close the ANN window, be sure to have saved the ANN, because the ANN is not automatically saved
-in the preferences. Anyway if ANN has not been saved, the system will ask you to save it.</para>
+The ANN is not saved in the preferences. So when you open the ANN window, you have no ANN in memory. The only
+choice available is to build a new one using the default model or to load an existing one from the file system.
+When you close the ANN window, be sure to save the ANN, because the ANN is not automatically saved
+in the preferences. If the ANN has not been saved, the system will ask you to save it.</para>
 
-<para>Another interesting point to be explained is how we can get the output buy and sell signals from the ANN.
-The theory (Cross Target technique, by prof. Pietro Terna) that resolves this problem can be seen 
+<para>Another interesting point is how we can get the output buy and sell signals from the ANN.
+The theory (Cross Target technique, by Prof. Pietro Terna) that resolves this problem can be seen 
 at the following internet site:
 http://web.econ.unito.it/terna/ct-era/ct-era.html
-You must think to the above technique used in the following way: the actions are buy and sell signals,
-the effect of the actions is the capital.
-For the sake of simplicity we have not put the capital as output of ANN, so the ANN have only two
-outputs: the actions (buy and sell signals, one buy and one sell used for all stocks, as usually in Venice).
+You must think about the above technique in the following way: the actions are buy and sell signals; the effect of the actions is the capital.
+For the sake of simplicity we have not put the capital as output of the ANN, so the ANN has only two
+outputs: buy and sell signals; one buy and one sell used for all stocks, as usual in Venice.
 We train the buy and sell signals according to cross target parameters.
 We train a buy signal if in one of the days from the trading day to the last window forecast day
-we can gain an amount equal to or higher than earning percentage.
-For example if we have window forecast = 7 and earning percentage = 2.0, we look for the next 7 days trading,
-if in at least one of them you can get a gain equal to or greater than 2%, then the ANN will be trained
-with a buy signal, if you cannot gain so much, the ANN will be trained with a sell signal.</para>
+we can gain an amount equal to or higher than the earning percentage.
+For example if we have window forecast = 7 and earning percentage = 2.0, we look for the next 7 days trading. 
+If in at least one of those days, gain equal to or greater than 2% is made, the ANN will be trained
+with a buy signal. If the gain is less than 2%, the ANN will be trained with a sell signal.</para>
 
 <section name="The Range Page">
 <para>This is the same as the range page in the <link to="Paper Trade">Paper Trade Module</link>.</para>
@@ -1666,18 +1663,20 @@ with a buy signal, if you cannot gain so much, the ANN will be trained with a se
 so do not add equations (a boolean value is returned), but expressions (an integer/double value is returned).
 The input expressions will be the input values for ANN during running and training. The order of input expressions
 will be the same as the order of Joone input neurons.
-Pain attention to what kind of input you put. Because if you put wrong inputs the CT method could work bad.
-For example if you want to trade with 20 stocks and not only one, you have to take into consideration that
-an input expression of that kind: <code>ema(close, 30)</code>, have the following problems:
-it depends on very different values beacause of diversity of the stocks so it has to be normalized somehow,
-another problem is that the default network must have large positive and negative numbers, so that
-little differences in the historical data can be easily learned by the ANN. So a better input expression
-could be the following one: <code>1000*((ema(close,50)-close)/close)</code>.
-You can define also the thresholds for buy and sell signals. The threshold is the value that define the firing of
+Pay attention to what kind of input you put, because if the inputs are wrong the CT method will not work well.
+For example if you want to trade with 20 stocks (instead of  one), you have to take into consideration that
+an input expression of this kind: <code>ema(close, 30)</code>. This has the following problems:
+It depends on very different values due to stock diversity, so normalization has to occur somehow;
+The default network must have large positive and negative numbers, so that
+tiny differences in the historical data can be easily learned by the ANN. 
+
+Therefore, a better input expression
+might be the following one: <code>1000*((ema(close,50)-close)/close)</code>.
+You can define also the thresholds for buy and sell signals. The threshold is the value that defines the firing of
 output neurons, so for example if the ANN has a output buy signal of 0.7, and a threshold for buy signal of 0.5,
 the ANN will buy, but if we have a threshold of 0.8 and the same output buy signal (0.7), the ANN won't buy.
-The thresholds values can be changed, if one wants to have more or less transactions. With high value thresholds
-ANN will buy and sell few times, with low value thresholds ANN will buy and sell much more.</para>
+If one wants to have more or less transactions, the threshold values can be changed. With high value thresholds
+ANN will buy and sell rarely, with low value thresholds ANN will buy and sell more often.</para>
 
 <para>Some example values:</para>
 <list><item>Buy Threshold: 0.5
@@ -1689,12 +1688,11 @@ ANN will buy and sell few times, with low value thresholds ANN will buy and sell
 
 <section name="ANN Training">
 <para>Here you can define all the training and cross target parameters. The learning rate and momentum
-are parameters of ANN, you can have further details about them in Joone documentation, anyway them both
-must be values between 0.0 and 1.0. The pre learning patterns are the patterns which are not considered
-while training: for example if we train the ANN with 10 stocks for 20 days (so 10 patterns each day),
-if you want to skip 3 days of training, it is enough setting pre learning to 3 days x 10 stocks = 30;
-the default pre learning is zero, so all the period selected in the Venice GUI is taken into consideration.
-The tot cycles are the number of training cycles, many training cycles slow the training session, but
+are parameters of ANN, (further details are availble in the Joone documentation). Both values must be between 0.0 and 1.0. The pre learning patterns are the patterns which are not considered
+while training. For example we train the ANN with 10 stocks for 20 days (10 patterns per day), if we want to skip 3 days of training, we set pre learning to 30 ( 3 days x 10 stocks = 30).
+
+The default pre learning is zero, so all the periods selected in the Venice GUI are taken into consideration.
+The 'tot cycles' are the number of training cycles. Having many training cycles slows the training session, but
 the ANN will have better performance once trained. The earning percentage and the window forecast are
 the Cross Target parameters, as described above in the Artificial Neural Network introduction.</para>
 
@@ -1714,17 +1712,15 @@ the Cross Target parameters, as described above in the Artificial Neural Network
 </section>
 
 <section name="ANN Type">
-<para>Here you can load/save ANN from/to file system. You can also decide if using a default ANN or a custom one.
-If you decide to use a custom ANN, you have to load it from file system.</para>
+<para>Here you can load/save ANN from/to file system. You can also decide to use a default ANN or a custom one.
+If you decide to use a custom ANN, you will have to load it from the file system.</para>
 </section>
 
 <section name="ANN Example">
-<para>Almost all the parameters have default values, so I give you just an example of input values for the input
-expressions of the ANN. Another important thing is to consider the stocks one by one, because the trend
-can vary a lot from one stock to another one. Training one neural network for one stock only, is the best
-way to achieve the best performance. If you want to train and run the ANN with more than one stock in the stock
-text box, take care to choose carefully the bundle of stocks, because the system manage always only one
-neural network with two output signals for all the stocks in the bundle.</para>
+<para>Almost all the parameters have default values, so we'll give you just an example of input values for the input
+expressions of the ANN. Another important thing is to consider the stocks, because the trend
+can vary a lot from one stock to another. Training one neural network for one stock only is the way to achieve the best performance. If you want to train and run the ANN with more than one stock in the stock
+text box, choose the bundle of stocks carefully, because the system manages only one neural network with two output signals for all the stocks in the bundle.</para>
 <para>Example of input values of input expressions of the ANN:</para>
 <list><item><code>(1000*(close-lag(close,-1)))/close</code>
 </item>

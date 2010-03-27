@@ -154,6 +154,16 @@ public class ExpressionTest extends TestCase {
         // Abs
         assertEquals("10", simplify("abs(10)"));
         assertEquals("10", simplify("abs(-10)"));
+
+    }
+    
+    //Test that simplify maintains type correctness
+    public void testSimplifyTypes() {
+	//Simplify can change the type of an expression
+	String exp1 = "-3.076121";
+	String exp2 = "(exp(-23.259159) + x) == -3.076121";
+
+	typeTest(exp1, exp2);
     }
 
     public void testEvaluate() {
@@ -205,8 +215,37 @@ public class ExpressionTest extends TestCase {
 
     private String simplify(String string) {
         Expression expression = parse(string);
-        expression = expression.simplify();
-        return expression.toString();
+
+	if (expression != null) {
+	    expression = expression.simplify();
+	    return expression.toString();
+	}
+        return "";
+    }
+
+    private void typeTest(String e1, String e2) {
+	int t1;
+	int t2;
+	
+	Expression exp1 = parse(e1);
+	Expression exp2 = parse(e2);
+	if (exp1 != null && exp2 != null) {
+	    exp2 = exp2.simplify();
+
+	    try {
+		t1 = exp1.checkType();
+		t2 = exp2.checkType();
+
+		System.out.println("type = " + t1 + " " + t2);
+		System.out.println("ex2 = " + exp2);
+
+		assertTrue(t1 == t2);
+				
+	    } catch (TypeMismatchException e) {
+		System.out.println(e);
+		assert false;
+	    }	    
+	} 
     }
 
     private boolean withinEpsilon(double val, double testVal) {

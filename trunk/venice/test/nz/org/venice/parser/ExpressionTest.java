@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 
 public class ExpressionTest extends TestCase {
+    
     public void testEquals() {
         // Symmetry
         assertEquals(parse("a or b"), parse("b or a"));
@@ -39,7 +40,9 @@ public class ExpressionTest extends TestCase {
         assertEquals(parse("a"), parse("a"));
         assertEquals(parse("x"), parse("x"));	
     }
+    
 
+    
     public void testSimplify() {
         // Not
         assertEquals("true", simplify("not(false)"));
@@ -157,15 +160,47 @@ public class ExpressionTest extends TestCase {
 
     }
     
+    
     //Test that simplify maintains type correctness
+    //Simplify used to change the type of an expression
+    //as in (0.0 + x) == -3.076. When x is integer, 
+    //simplified expression, x == -3.076 is no type correct
     public void testSimplifyTypes() {
-	//Simplify can change the type of an expression
-	String exp1 = "-3.076121";
-	String exp2 = "(exp(-23.259159) + x) == -3.076121";
 
-	typeTest(exp1, exp2);
+	String left1 = "x == -3.076121";
+	String right1 = "(exp(-23.259159) + x) == -3.076121";
+	String left2 = "x + 0 == -3.076121"; 
+	String right2 = "x == -3.076121";
+	String left3 = "1.0 * x == -3.076121";
+	String right3 = "x == -3.076121";
+	String left4 = "1.0 * x == -3.076121";
+	String right4 = "x == -3.076121";
+	
+	try {
+	    
+	    assertEquals(typeTest(left1, right1, 
+				  Expression.FLOAT_TYPE,
+				  Expression.INTEGER_TYPE), true);
+	    
+	    
+	    assertEquals(typeTest(left2, right2, 
+				  Expression.FLOAT_TYPE,
+				  Expression.FLOAT_TYPE), true);	    
+
+	    assertEquals(typeTest(left3, right3, 
+				  Expression.INTEGER_TYPE,
+				  Expression.FLOAT_TYPE), true);	    
+	    
+	    assertEquals(typeTest(left4, right4, 
+				  Expression.FLOAT_TYPE,
+				  Expression.FLOAT_TYPE), true);	    
+
+	} catch (TypeMismatchException e) {
+	    fail("Type Mistmatch UnExpected" + e);
+	}
     }
-
+          
+    
     public void testEvaluate() {
 	String absExpString = "abs(-0.0001)";
 	String cosExpString = "cos(0.0)";
@@ -190,16 +225,20 @@ public class ExpressionTest extends TestCase {
 	    System.out.println("Evaluation Exception: " + e);
 	}
 	
-
-
+	
     }
+    
 
 
     private Expression parse(String string) {
+	return parse(string, Expression.INTEGER_TYPE);	
+    }
+
+    private Expression parse(String string, int type) {
         try {
             Variables variables = new Variables();
-            variables.add("x", Expression.INTEGER_TYPE, false);
-            variables.add("y", Expression.INTEGER_TYPE, false);
+            variables.add("x", type, false);
+            variables.add("y", type, false);
             variables.add("a", Expression.BOOLEAN_TYPE, false);
             variables.add("b", Expression.BOOLEAN_TYPE, false);
             variables.add("c", Expression.BOOLEAN_TYPE, false);
@@ -207,6 +246,8 @@ public class ExpressionTest extends TestCase {
             return Parser.parse(variables, string);
         }
         catch(ExpressionException e) {
+	    System.out.println("GOT HERE!!!!!: " + e + " end Etext");
+	    System.out.println(" type = " + type);
             System.out.println(e);
             assert false;
             return null;
@@ -220,34 +261,34 @@ public class ExpressionTest extends TestCase {
 	    expression = expression.simplify();
 	    return expression.toString();
 	}
-        return "";
+          return "";
     }
 
-    private void typeTest(String e1, String e2) {
-	int t1;
-	int t2;
+    //Test that the types of the two expressions are compatible after
+    //simplification. 
+    //
+    //e1, e2 are the expressions
+    //type1, type2 are the types of the variables in e1, e2 respectively. 
+    private boolean typeTest(String e1, String e2, 
+			     int type1, int type2) throws TypeMismatchException {
+	int t1 = -1;
+	int t2 = -1;
 	
-	Expression exp1 = parse(e1);
-	Expression exp2 = parse(e2);
+	Expression exp1 = parse(e1, type1);	
+	Expression exp2 = parse(e2, type2);
+
 	if (exp1 != null && exp2 != null) {
+	    t1 = exp1.checkType();
 	    exp2 = exp2.simplify();
-
-	    try {
-		t1 = exp1.checkType();
-		t2 = exp2.checkType();
-
-		System.out.println("type = " + t1 + " " + t2);
-		System.out.println("ex2 = " + exp2);
-
-		assertTrue(t1 == t2);
-				
-	    } catch (TypeMismatchException e) {
-		System.out.println(e);
-		assert false;
-	    }	    
-	} 
+	   
+	    if (exp2 != null) {
+		t2 = exp2.checkType();		
+		return (t1 == t2);
+	    }	    	    
+	}	
+	return false;
     }
-
+    
     private boolean withinEpsilon(double val, double testVal) {
 	double epsilon = 0.000005;
 	

@@ -176,6 +176,11 @@ public class ExpressionTest extends TestCase {
 	String left4 = "1.0 * x == -3.076121";
 	String right4 = "x == -3.076121";
 	
+	String left5 = "(obv(abs(-43), -17, 1*(ema(low, x, -4, 0.434678))))>(momentum(volume, 5, -26))";
+
+	String right5 = "(obv(43, -17, ema(low, x, -4, 0.434678)))>(momentum(volume, 5, -26))";
+
+
 	try {
 	    
 	    assertEquals(typeTest(left1, right1, 
@@ -194,6 +199,10 @@ public class ExpressionTest extends TestCase {
 	    assertEquals(typeTest(left4, right4, 
 				  Expression.FLOAT_TYPE,
 				  Expression.FLOAT_TYPE), true);	    
+
+	    assertEquals(typeTest(left5, right5, 
+				  Expression.INTEGER_TYPE,
+				  Expression.INTEGER_TYPE), true);	    
 
 	} catch (TypeMismatchException e) {
 	    fail("Type Mistmatch UnExpected" + e);
@@ -246,8 +255,6 @@ public class ExpressionTest extends TestCase {
             return Parser.parse(variables, string);
         }
         catch(ExpressionException e) {
-	    System.out.println("GOT HERE!!!!!: " + e + " end Etext");
-	    System.out.println(" type = " + type);
             System.out.println(e);
             assert false;
             return null;

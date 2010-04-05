@@ -32,6 +32,7 @@ import nz.org.venice.main.*;
 import nz.org.venice.util.Locale;
 import nz.org.venice.prefs.settings.Settings;
 import nz.org.venice.prefs.settings.HelpModuleSettings;
+import nz.org.venice.ui.TextDialog;
 
 /**
  * This module provides a help browser for Venice. It allows traveresal of a tree
@@ -78,6 +79,10 @@ public class HelpModule extends JPanel implements Module {
     private int positionInStack;
 
     private HelpModuleSettings settings;
+
+    private HelpModule helpModule;
+    int prevSearchIndex;
+    String prevSearchTerm;
     
     /**
      * Create a new help browser loaded at the root page.
@@ -111,7 +116,8 @@ public class HelpModule extends JPanel implements Module {
     }
 
     private void init() {
-	this.desktop = desktop;
+	this.desktop = desktop;	
+	helpModule = this;
 
         propertySupport = new PropertyChangeSupport(this);       
 
@@ -126,12 +132,16 @@ public class HelpModule extends JPanel implements Module {
         splitPane.setResizeWeight(2.0F/7.0F);
 
         indexTree = createIndexTree();
-        editorPane = createEditorPane();
-
+        editorPane = createEditorPane();	
+	
         splitPane.setLeftComponent(new JScrollPane(indexTree));
         splitPane.setRightComponent(new JScrollPane(editorPane));
 
         add(splitPane, BorderLayout.CENTER);        
+	
+	prevSearchIndex = 0;
+	prevSearchTerm = "";
+
     }
     
 
@@ -188,6 +198,34 @@ public class HelpModule extends JPanel implements Module {
                 }
             });
         helpMenu.add(closeMenuItem);
+
+		     
+	JMenuItem findMenuItem = new JMenuItem(Locale.getString("FIND"));
+	findMenuItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    Thread thread = new Thread(new Runnable() {
+                    public void run() {			
+			TextDialog dlg = new TextDialog(helpModule, Locale.getString("FIND"), Locale.getString("FIND"), prevSearchTerm);
+			
+			String rv = dlg.showDialog();
+
+			if (rv != null &&
+			    !rv.equals("") ) {
+				String htmlText = editorPane.getText();
+				
+				int index = search(rv);
+				
+				if (index != -1) {
+				    
+				}				
+			}
+                    }});
+
+            thread.start();
+		}
+	    });
+
+	helpMenu.add(findMenuItem);
 
         JMenu goMenu = new JMenu(Locale.getString("GO"));
         backMenuItem = new JMenuItem(Locale.getString("BACK"));
@@ -297,7 +335,11 @@ public class HelpModule extends JPanel implements Module {
         // Make sure it's selected in the tree
         ignoreTreeSelectionEvent = true;
         indexTree.setSelectionPath(new TreePath(currentPage.getPath()));
-        ignoreTreeSelectionEvent = false;       
+        ignoreTreeSelectionEvent = false;     
+
+	//Reset the search parameters
+	prevSearchIndex = 0;
+	prevSearchTerm = "";
     }
 
     // Enable/disable the back/forward buttons depending on whether we can
@@ -431,8 +473,38 @@ public class HelpModule extends JPanel implements Module {
 	
     }
 
+    private int search(String searchTerm) {
+	assert searchTerm != null;
+
+	//We searched to the end and didn't find the search term. 
+	if (prevSearchTerm.equals(searchTerm) &&
+	    prevSearchIndex == -1) {
+	    return -1;
+	}
+
+	int index;
+	String regex = "\\<.*?\\>";
+	String htmlText = editorPane.getText();
+	String plainText = htmlText.replaceAll(regex, "");		       
+	
+	plainText = plainText.replaceAll("[\n\t' ']+"," ");				    
+	index = plainText.indexOf(searchTerm, prevSearchIndex+1);
+	
+	prevSearchIndex = index;
+	prevSearchTerm = searchTerm;
+	if (index != -1) {	
+	    editorPane.setSelectionStart(index);
+	    editorPane.setSelectionEnd(index + searchTerm.length());
+	    //Ensures the user doesn't have to 
+	    //explicitly click inside the editorPane 
+	    //before searching
+	    editorPane.requestFocus();
+	}     
+	return index;
+    }
+    
     public Settings getSettings() {
 	return settings;
     }
-
+    
 }

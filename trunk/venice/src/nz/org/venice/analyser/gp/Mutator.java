@@ -23,6 +23,7 @@ import java.util.Random;
 
 import nz.org.venice.analyser.GPGondolaSelection;
 import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.ExpressionFactory;
 import nz.org.venice.parser.expression.*;
 import nz.org.venice.quote.Quote;
 
@@ -1126,7 +1127,7 @@ public class Mutator {
         }
         else {
             int childNumber = parent.getIndex(destination);
-	    parent = ExpressionFactorySquareWheel.setChild(parent, source, childNumber);
+	    parent = ExpressionFactory.setChild(parent, source, childNumber);
 	    //parent.setChild(source, childNumber);
             return root;
         }

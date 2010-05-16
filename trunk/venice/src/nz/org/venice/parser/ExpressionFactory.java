@@ -18,6 +18,8 @@
 
 package nz.org.venice.parser;
 
+import java.util.Vector;
+
 import nz.org.venice.parser.expression.*;
 import nz.org.venice.quote.Quote;
 
@@ -294,5 +296,144 @@ public class ExpressionFactory {
         }
         return expression;
     }
+
+    public static Expression newExpression(Expression exp, Expression[] children) {
+
+		Expression expression;
+
+	if (exp instanceof AndExpression) {
+	    expression = new AndExpression(children[0], children[1]);
+	} else if (exp instanceof OrExpression) {
+	    expression = new OrExpression(children[0], children[1]);
+	} else if (exp instanceof EqualThanExpression) {
+	    expression = new EqualThanExpression(children[0], children[1]);
+	} else if (exp instanceof LessThanEqualExpression) {
+	    expression = new LessThanEqualExpression(children[0], children[1]);
+	} else if (exp instanceof LessThanExpression) {
+	    expression = new LessThanExpression(children[0], children[1]);
+	} else if (exp instanceof GreaterThanExpression) {
+	    expression = new GreaterThanExpression(children[0], children[1]);
+	} else if (exp instanceof GreaterThanEqualExpression) {
+	    expression = new GreaterThanEqualExpression(children[0], children[1]);
+	} else if (exp instanceof AddExpression) {
+	    expression = new AddExpression(children[0], children[1]);
+	} else if (exp instanceof SubtractExpression) {
+	    expression = new SubtractExpression(children[0], children[1]);
+	} else if (exp instanceof MultiplyExpression) {
+	    expression = new MultiplyExpression(children[0], children[1]);
+	} else if (exp instanceof DivideExpression) {
+	    expression = new DivideExpression(children[0], children[1]);
+	} else if (exp instanceof QuoteExpression) {
+	    expression = new QuoteExpression( ((QuoteExpression)exp).getQuoteKind());	    
+	} else if (exp instanceof LagExpression) {
+	    expression = new LagExpression(children[0], children[1]);
+	} else if (exp instanceof MinExpression) {
+	    expression = new MinExpression(children[0], children[1], children[2]);
+	} else if (exp instanceof MaxExpression) {
+	    expression = new MaxExpression(children[0], children[1], children[2]);
+	} else if (exp instanceof AvgExpression) {
+	    expression = new AvgExpression(children[0], children[1], children[2]);
+	} else if (exp instanceof RSIExpression) {
+	    expression = new RSIExpression(children[0], children[1]);
+	} else if (exp instanceof NotExpression) {
+	    expression = new NotExpression(children[0]);
+	} else if (exp instanceof IfExpression) {
+	    expression = new IfExpression(children[0], children[1], children[2]);
+	} else if (exp instanceof PercentExpression) {
+	    expression = new PercentExpression(children[0], children[1]);
+	} else if (exp instanceof NotEqualExpression) {
+	    expression = new NotEqualExpression(children[0], children[1]);
+	} else if (exp instanceof NumberExpression) {
+	    expression = new NumberExpression( ((NumberExpression)exp).getValue(), ((NumberExpression)exp).getType());
+	} else if (exp instanceof StringExpression) {
+	    expression = new StringExpression( ((StringExpression)exp).getText()); 
+	} else if (exp instanceof DayOfWeekExpression) {
+	    expression = new DayOfWeekExpression();	    
+	} else if (exp instanceof DayOfYearExpression) {
+	    expression = new DayOfYearExpression();	    
+	} else if (exp instanceof DayExpression) {
+	    expression = new DayExpression();	    
+	} else if (exp instanceof MonthExpression) {
+	    expression = new MonthExpression();	    
+	} else if (exp instanceof YearExpression) {
+	    expression = new YearExpression();	    
+	} else if (exp instanceof SumExpression) {
+	    expression = new SumExpression(children[0], children[1], children[2]);	    
+        } else if (exp instanceof SqrtExpression) {
+	    expression = new SqrtExpression(children[0]);            
+        } else if (exp instanceof AbsExpression) {
+	    expression = new AbsExpression(children[0]);            
+        } else if (exp instanceof ForExpression) {
+	    expression = new ForExpression(children[0], children[1], children[2], children[3]);            
+        } else if (exp instanceof WhileExpression) {
+	    expression = new WhileExpression(children[0], children[1]);
+            
+        } else if (exp instanceof CorrExpression) {
+	    expression = new CorrExpression(children[0], children[1], children[2], children[3]);            
+        } else if (exp instanceof EMAExpression) {
+            expression = new EMAExpression(children[0], children[1], children[2], children[3]);            
+        } else if (exp instanceof BBLExpression) {
+            expression = new BBLExpression(children[0], children[1], children[2]);            
+        } else if (exp instanceof BBUExpression) {
+            expression = new BBUExpression(children[0], children[1], children[2]);            
+        } else if (exp instanceof MACDExpression) {
+            expression = new MACDExpression(children[0], children[1]);            
+        } else if (exp instanceof MomentumExpression) {
+            expression = new MomentumExpression(children[0], children[1], children[2]);            
+        } else if (exp instanceof OBVExpression) {
+            expression = new OBVExpression(children[0], children[1], children[2]);            
+        } else if (exp instanceof StandardDeviationExpression) {
+            expression = new StandardDeviationExpression(children[0], children[1], children[2]);            
+        } else if (exp instanceof SineExpression) {
+            expression = new SineExpression(children[0]);            
+        } else if (exp instanceof CosineExpression) {
+            expression = new CosineExpression(children[0]);            
+        } else if (exp instanceof LogarithmExpression) {
+            expression = new LogarithmExpression(children[0]);            
+        } else if (exp instanceof ExponentialExpression) {
+            expression = new ExponentialExpression(children[0]);
+	} else if (exp instanceof TrendExpression) {
+	    expression = new TrendExpression(children[0], children[1], children[2]);
+	} else if (exp instanceof GetVariableExpression) {
+	    expression = new GetVariableExpression( ((GetVariableExpression)exp).getName(), ((GetVariableExpression)exp).getType());
+	} else if (exp instanceof SetVariableExpression) {
+	    expression = exp;	
+	} else if (exp instanceof ClauseExpression) {
+	    Vector newChildren = new Vector(exp.getChildCount());
+	    for (int i = 0; i < exp.getChildCount(); i++) {
+		newChildren.add(exp.getChild(i));
+	    }
+	    expression = new ClauseExpression(newChildren);
+	} else {
+	    //Forgot an instance
+	    System.out.println("We get: " + exp.getClass().getName());
+	    assert false;
+	    expression = null;
+	}
+	
+	if (expression == null) {
+	    System.out.println("BOOM2");
+	}
+	assert expression != null;
+
+	return expression;
+    }
+
+        public static Expression setChild(Expression exp, Expression child, int index) {
+	
+	Expression[] children = new Expression[exp.getChildCount()];
+
+	children[index] = child;
+	for (int i = 0; i < exp.getChildCount(); i++) {
+	    if (i != index) {
+		children[i] = exp.getChild(i);
+	    }
+	}
+	
+	Expression rv = newExpression(exp, children);
+
+	return rv;
+    }
+
 }
 

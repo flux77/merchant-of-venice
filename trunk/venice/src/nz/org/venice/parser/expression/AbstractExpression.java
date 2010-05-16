@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import nz.org.venice.parser.Expression;
+import nz.org.venice.parser.ExpressionFactory;
 import nz.org.venice.util.VeniceLog;
 
 /**
@@ -131,7 +132,7 @@ public abstract class AbstractExpression implements Expression {
 	assert index <= getChildCount();
 	assert child != this;
 
-	return ExpressionFactorySquareWheel.setChild(this, child, index);
+	return ExpressionFactory.setChild(this, child, index);
     }
 
     /**
@@ -225,7 +226,7 @@ public abstract class AbstractExpression implements Expression {
 	    newChildren[i] = newChild;
 	}		
 
-	Expression rv =  ExpressionFactorySquareWheel.newExpression(this, newChildren);
+	Expression rv =  ExpressionFactory.newExpression(this, newChildren);
        
 	return rv;
     }

@@ -80,11 +80,16 @@ public class SetVariableExpression extends UnaryExpression {
         return type;
     }
 
+
+
     public int checkType() throws TypeMismatchException {
 	if(getType() == getChild(0).checkType())
 	    return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	    throw new TypeMismatchException(this, 
+					    getChild(0).checkType(), 
+					    type);
+	}
     }
 
     public boolean equals(Object object) {
@@ -103,4 +108,5 @@ public class SetVariableExpression extends UnaryExpression {
     public Object clone() {
         return new SetVariableExpression(name, type, (Expression)getChild(0).clone());
     }
+
 }

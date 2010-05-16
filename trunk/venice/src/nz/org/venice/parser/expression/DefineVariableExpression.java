@@ -97,7 +97,7 @@ public class DefineVariableExpression extends UnaryExpression {
     public int getType() {
         return type;
     }
-
+   
     public boolean isConstant() {
 	return isConstant;
     }
@@ -105,8 +105,11 @@ public class DefineVariableExpression extends UnaryExpression {
     public int checkType() throws TypeMismatchException {
 	if(getType() == getChild(0).checkType())
 	    return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	    throw new TypeMismatchException(this, 
+					    getType(), 
+					    getChild(0).getType());
+	}
     }
 
     public boolean equals(Object object) {

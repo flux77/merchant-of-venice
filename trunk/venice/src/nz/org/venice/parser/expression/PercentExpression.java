@@ -46,28 +46,37 @@ public class PercentExpression extends BinaryExpression {
 
     public Expression simplify() {
         // First simplify all the child arguments
-        super.simplify();
+        Expression simplified = super.simplify();
 
         // If both the child arguments are constant we can precompute.
-        if(getChild(0) instanceof NumberExpression &&
-           getChild(1) instanceof NumberExpression) {
+        if(simplified.getChild(0) instanceof NumberExpression &&
+           simplified.getChild(1) instanceof NumberExpression) {
             try {
-                return new NumberExpression(evaluate(null, null, null, 0),
-                                            getType());
+                return new NumberExpression(simplified.evaluate(null, null, null, 0),
+                                            simplified.getType());
             }
             catch(EvaluationException e) {
                 // Shouldn't happen
                 assert false;
-                return this;
+                return simplified;
             }
         }
         else
-            return this;
+            return simplified;
     }
 
     public String toString() {
+	String rv = "";
+
+	String child1 = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+	String child2 = (getChild(1) != null) ? getChild(1).toString() : "(null)";
+	
+	return new String("percent(" + child1 + ", " + child2 + ")");
+
+	    /*
 	return new String("percent(" + getChild(0).toString() + ", " +
 			  getChild(1).toString() + ")");
+	    */
     }
 
     /** 
@@ -84,8 +93,11 @@ public class PercentExpression extends BinaryExpression {
 	if((leftType == FLOAT_TYPE || leftType == INTEGER_TYPE) &&
            (rightType == FLOAT_TYPE || rightType == INTEGER_TYPE))
             return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	    String types = leftType + " , " + rightType;
+	    String expectedTypes = FLOAT_TYPE + " , " + FLOAT_TYPE;
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     /**
@@ -94,8 +106,20 @@ public class PercentExpression extends BinaryExpression {
      * @return {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
     public int getType() {
-        return getChild(0).getType();
+	int childCount = getChildCount();
+	int type = UNDEFINED_TYPE;
+	
+	for (int i = 0; i < childCount; i++) {
+	    if (getChild(i) != null) {
+		type = getChild(i).getType();
+		if (type == Expression.FLOAT_TYPE) {
+		    return type;
+		}
+	    }
+	}
+        return type;
     }
+
 
     public Object clone() {
         return new PercentExpression((Expression)getChild(0).clone(), 

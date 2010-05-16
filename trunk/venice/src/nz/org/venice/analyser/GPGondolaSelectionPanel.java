@@ -38,6 +38,7 @@ import javax.swing.ScrollPaneLayout;
 
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.util.Locale;
+import nz.org.venice.util.VeniceLog;
 
 public class GPGondolaSelectionPanel extends JPanel {
 
@@ -58,7 +59,10 @@ public class GPGondolaSelectionPanel extends JPanel {
     private boolean isLastButOneEnough = true;
 
     private JDesktopPane desktop;
-    private Random random = new Random(System.currentTimeMillis());
+    private long seed = System.currentTimeMillis();
+    private Random random = new Random(seed);
+
+
 
     public GPGondolaSelectionPanel(int elements,
                                    JDesktopPane desktop,
@@ -73,7 +77,9 @@ public class GPGondolaSelectionPanel extends JPanel {
         defTextFieldValues = defaultTextFieldValues;
         
         setGraphic();
-        
+	
+	VeniceLog.getInstance().log("GPGondolaSelectionPanel seed = " + seed);
+
     }
     
     public void setLastNotEnough() {

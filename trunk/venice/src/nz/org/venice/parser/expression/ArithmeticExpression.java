@@ -37,8 +37,7 @@ abstract public class ArithmeticExpression extends BinaryExpression {
     /**
      * Check the input arguments to the expression. They can only be
      * {@link #INTEGER_TYPE} or {@link #FLOAT_TYPE}.
-     *
-     * There are 4 possible cases:
+     *     * There are 4 possible cases:
      * {@link #INTEGER_TYPE} operator {@link #INTEGER_TYPE} returns a {@link #INTEGER_TYPE}
      * {@link #INTEGER_TYPE} operator {@link #FLOAT_TYPE} returns a {@link #INTEGER_TYPE}
      * {@link #FLOAT_TYPE} operator {@link #INTEGER_TYPE} returns a {@link #FLOAT_TYPE}
@@ -54,27 +53,30 @@ abstract public class ArithmeticExpression extends BinaryExpression {
 	if((leftType == FLOAT_TYPE || leftType == INTEGER_TYPE) && 
            (rightType == FLOAT_TYPE || rightType == INTEGER_TYPE))
             return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	    String types = leftType + " , " + rightType;
+	    String expectedTypes = FLOAT_TYPE + " , " + FLOAT_TYPE;
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     public Expression simplify() {
         // First simplify all the child arguments
-        super.simplify();
+        Expression simplified = super.simplify();
 
         // If both the child arguments are constant we can precompute.
-        if(getChild(0) instanceof NumberExpression &&
-           getChild(1) instanceof NumberExpression) {
+        if(simplified.getChild(0) instanceof NumberExpression &&
+           simplified.getChild(1) instanceof NumberExpression) {
             try {
-                return new NumberExpression(evaluate(null, null, null, 0), getType());
+                return new NumberExpression(simplified.evaluate(null, null, null, 0), simplified.getType());
             }
             catch(EvaluationException e) {
                 // Can happen if we hit 1/0. In which case don't bother to simplify.
-                return this;
+                return simplified;
             }
         }
         else
-            return this;
+            return simplified;
     }
 
     /**
@@ -83,6 +85,18 @@ abstract public class ArithmeticExpression extends BinaryExpression {
      * @return either {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
     public int getType() {
-        return getChild(0).getType();
+	int childCount = getChildCount();
+	int type = -1;
+	
+	for (int i = 0; i < childCount; i++) {
+	    if (getChild(i) != null) {
+		type = getChild(i).getType();
+	    }
+	    if (type == Expression.FLOAT_TYPE) {
+		return type;
+	    }
+	}
+        return type;
     }
+
 }

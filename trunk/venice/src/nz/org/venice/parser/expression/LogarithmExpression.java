@@ -47,25 +47,27 @@ public class LogarithmExpression extends UnaryExpression {
 
     public Expression simplify() {
         // First simplify child argument
-        super.simplify();
+        Expression simplified = super.simplify();
         
         // If the child argument is a constant we can precompute.
-        if(getChild(0) instanceof NumberExpression) {
+        if(simplified.getChild(0) instanceof NumberExpression) {
             try {
-                return new NumberExpression(evaluate(null, null, null, 0), getType());
+                return new NumberExpression(simplified.evaluate(null, null, null, 0), simplified.getType());
             }
             catch(EvaluationException e) {
                 // Can happen if we hit log(-1). In which case don't bother to simplify.
-                return this;
+                return simplified;
             }
         }
         else {
-            return this;
+            return simplified;
         }
     }
-
+    
     public String toString() {
-	return new String("log(" + getChild(0).toString() + ")");
+	String childString = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+
+	return new String("log(" + childString + ")");
     }
 
     /**
@@ -79,8 +81,9 @@ public class LogarithmExpression extends UnaryExpression {
 
         if(type == FLOAT_TYPE || type == INTEGER_TYPE)
             return getType();
-        else
-            throw new TypeMismatchException();
+        else {
+            throw new TypeMismatchException(this, type, FLOAT_TYPE);
+	}
     }
 
     /**

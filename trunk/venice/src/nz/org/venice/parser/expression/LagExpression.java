@@ -65,9 +65,15 @@ public class LagExpression extends BinaryExpression {
         Expression quoteExpression = getChild(0);
         Expression lagExpression = getChild(1);
 
+	String quoteStr = (getChild(0) != null) ? getChild(0).toString() : "(nulL)";
+	String lagStr = (getChild(1) != null) ? getChild(1).toString() : "(null)";
+	return new String("lag(" + quoteStr + ", " + lagStr + ")");
+
+	/*
         return new String("lag(" +
                           quoteExpression.toString() + ", " +
                           lagExpression.toString() + ")");
+	*/
     }
 
     public int checkType() throws TypeMismatchException {
@@ -76,8 +82,19 @@ public class LagExpression extends BinaryExpression {
             getChild(0).checkType() == INTEGER_QUOTE_TYPE) &&
 	   getChild(1).checkType() == INTEGER_TYPE)
 	    return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	 String types = 
+		getChild(0).getType() + " , " + 
+		getChild(1).getType() + " , " + 
+		getChild(2).getType();
+
+	    String expectedTypes =
+		FLOAT_QUOTE_TYPE + " , " + 
+		INTEGER_TYPE     + " , " + 
+		INTEGER_TYPE;
+	    
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     public int getType() {

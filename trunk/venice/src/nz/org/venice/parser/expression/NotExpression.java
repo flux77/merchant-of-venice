@@ -41,13 +41,22 @@ public class NotExpression extends UnaryExpression {
     }
 
     public Expression simplify() {
-        // First simplify all the child arguments
-        super.simplify();
+	
+	//System.out.println("In NOT exp, this = " + this);
 
+        // First simplify all the child arguments
+	Expression simplified = super.simplify();
+
+	//System.out.println("In NOT exp, after super.simpl, this = " + this + " this copy = " + simplified);
+	
         // If the child argument is a number expression we can precompute
-        if(getChild(0) instanceof NumberExpression) {
+        if(simplified.getChild(0) instanceof NumberExpression) {
             try {
-                return new NumberExpression(evaluate(null, null, null, 0), BOOLEAN_TYPE);
+		Expression retExp = new NumberExpression(simplified.evaluate(null, null, null, 0), BOOLEAN_TYPE);
+
+		//System.out.println("In NOT exp, got here, returning: " + retExp);
+
+		return retExp;
             }
             catch(EvaluationException e) {
                 // Shouldn't happen
@@ -58,46 +67,58 @@ public class NotExpression extends UnaryExpression {
         // If the child argument is a logic expression then we can reverse it.
 
         // not(x == y) -> x != y
-        else if(getChild(0) instanceof EqualThanExpression) 
-            return new NotEqualExpression(getChild(0).getChild(0), getChild(0).getChild(1));
+        else if(simplified.getChild(0) instanceof EqualThanExpression) {
 
+            Expression retExp = new NotEqualExpression(simplified.getChild(0).getChild(0), simplified.getChild(0).getChild(1));
+
+	    //System.out.println("In NOT exp, returning new not, ret  = " + retExp);
+	    
+	    return retExp;
+	}
         // not(x != y) -> x == y
-        else if(getChild(0) instanceof NotEqualExpression) 
-            return new EqualThanExpression(getChild(0).getChild(0), getChild(0).getChild(1));
+        else if(simplified.getChild(0) instanceof NotEqualExpression) 
+            return new EqualThanExpression(simplified.getChild(0).getChild(0), simplified.getChild(0).getChild(1));
 
         // not(x < y) -> x >= y
-        else if(getChild(0) instanceof LessThanExpression) 
-            return new GreaterThanEqualExpression(getChild(0).getChild(0), getChild(0).getChild(1));
+        else if(simplified.getChild(0) instanceof LessThanExpression) 
+            return new GreaterThanEqualExpression(simplified.getChild(0).getChild(0), simplified.getChild(0).getChild(1));
 
         // not(x > y) -> x <= y
-        else if(getChild(0) instanceof GreaterThanExpression) 
-            return new LessThanEqualExpression(getChild(0).getChild(0), getChild(0).getChild(1));
-
+        else if(getChild(0) instanceof GreaterThanExpression) {
+	    Expression retExp = new LessThanEqualExpression(simplified.getChild(0).getChild(0), simplified.getChild(0).getChild(1));
+	    return retExp;
+	}
         // not(x <= y) -> x > y
-        else if(getChild(0) instanceof LessThanEqualExpression) 
-            return new GreaterThanExpression(getChild(0).getChild(0), getChild(0).getChild(1));
-
+        else if(simplified.getChild(0) instanceof LessThanEqualExpression)  {
+            return new GreaterThanExpression(simplified.getChild(0).getChild(0), simplified.getChild(0).getChild(1));
+	}
         // not(x >= y) -> x < y
-        else if(getChild(0) instanceof GreaterThanEqualExpression) 
-            return new LessThanExpression(getChild(0).getChild(0), getChild(0).getChild(1));
+        else if(simplified.getChild(0) instanceof GreaterThanEqualExpression) 
+            return new LessThanExpression(simplified.getChild(0).getChild(0), simplified.getChild(0).getChild(1));
 
         // not(not(x)) -> x
-        else if(getChild(0) instanceof NotExpression)
-            return getChild(0).getChild(0);
-        else
-            return this;
+        else if(simplified.getChild(0) instanceof NotExpression)
+            return simplified.getChild(0).getChild(0);
+        else {
+	    //System.out.println("In not exp, returning myself: " ); 
+            return simplified;
+	}
     }
 
     public String toString() {
-	return new String("not(" + getChild(0).toString() + ")");
+	String c1 = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+	return new String("not(" + c1 + ")");
     }
 
     public int checkType() throws TypeMismatchException {
 	// sub type must be boolean
 	if(getChild(0).checkType() == BOOLEAN_TYPE)
 	    return BOOLEAN_TYPE;
-	else
-	    throw new TypeMismatchException();
+	else {
+	    int type = getChild(0).checkType();
+	    int expectedType = BOOLEAN_TYPE;
+	    throw new TypeMismatchException(this, type, expectedType);
+	}
     }
 
     /**
@@ -108,6 +129,8 @@ public class NotExpression extends UnaryExpression {
     public int getType() {
         return BOOLEAN_TYPE;
     }
+
+
 
     public Object clone() {
         return new NotExpression((Expression)getChild(0).clone());

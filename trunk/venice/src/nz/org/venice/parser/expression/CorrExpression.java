@@ -99,13 +99,27 @@ public class CorrExpression extends QuaternaryExpression {
 	   getChild(2).checkType() == INTEGER_TYPE &&
 	   getChild(3).checkType() == INTEGER_TYPE)
 	    return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	    String types = 
+		getChild(0).getType() + " , " + 
+		getChild(1).getType() + " , " + 
+		getChild(2).getType() + " , " + 
+		getChild(3).getType();
+
+	    String expectedTypes =
+		FLOAT_QUOTE_TYPE + " , " + 
+		INTEGER_TYPE     + " , " + 
+		INTEGER_TYPE     + " , " + 
+		FLOAT_TYPE;
+	    
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     public int getType() {
         return FLOAT_TYPE;
     }
+
 
     public Object clone() {
         return new CorrExpression((Expression)getChild(0).clone(), 

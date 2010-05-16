@@ -72,11 +72,19 @@ public class EMAExpression extends QuaternaryExpression {
     }
 
     public String toString() {
+	String rv = "";
+
+	String c1 = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+	String c2 = (getChild(1) != null) ? getChild(1).toString() : "(null)";
+	String c3 = (getChild(2) != null) ? getChild(2).toString() : "(null)";
+	String c4 = (getChild(3) != null) ? getChild(3).toString() : "(null)";
+	
+
 	return new String("ema(" + 
-			  getChild(0).toString() + ", " +
-			  getChild(1).toString() + ", " +
-			  getChild(2).toString() + ", " +
-			  getChild(3).toString() + ")");
+			  c1 + ", " +
+			  c2 + ", " +
+			  c3 + ", " +
+			  c4 + ")");
     }
 
     public int checkType() throws TypeMismatchException {
@@ -88,8 +96,21 @@ public class EMAExpression extends QuaternaryExpression {
 	   getChild(2).checkType() == INTEGER_TYPE &&
 	   getChild(3).checkType() == FLOAT_TYPE)
 	    return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	    String types = 
+		getChild(0).getType() + "," + 
+		getChild(1).getType() + "," + 
+		getChild(2).getType() + "," + 
+		getChild(3).getType();
+
+	    String expectedTypes =
+		FLOAT_QUOTE_TYPE + " , " + 
+		INTEGER_TYPE     + " , " + 
+		INTEGER_TYPE     + " , " + 
+		FLOAT_TYPE;
+	    
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     public int getType() {
@@ -100,6 +121,7 @@ public class EMAExpression extends QuaternaryExpression {
             return INTEGER_TYPE;
         }
     }
+
 
     public Object clone() {
         return new EMAExpression((Expression)getChild(0).clone(), 

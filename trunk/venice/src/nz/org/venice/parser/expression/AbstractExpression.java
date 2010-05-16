@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import nz.org.venice.parser.Expression;
+import nz.org.venice.util.VeniceLog;
 
 /**
  * The abstract base class for all expressions in the <i>Gondola</i> language. This
@@ -46,27 +47,46 @@ public abstract class AbstractExpression implements Expression {
     private final static DecimalFormat decimalFormat = new DecimalFormat(format, new DecimalFormatSymbols(Locale.ENGLISH));
 
     // Pointer to parent node (if any)
-    private Expression parent = null;
+    private Expression parent;
 
     // Array of children.
-    private Expression children[];
-
-    /**
-     * Create a new expression.
-     */
-    public AbstractExpression() {
-	children = new Expression[getChildCount()];
-    }
+    private final Expression children[];
+    
+    private static java.util.logging.Handler handler;
+    private static java.util.logging.Logger logger;
 
     /**
      * Create a new expression with the given number of children.
      *
-     * @param childCount the number of children in the expression.
+     * @param children the children of the expression.
      */
-    public AbstractExpression(int childCount) {
-	children = new Expression[childCount];
+
+    //Terminal Expression    
+    public AbstractExpression() {
+	children = null;
+	this.parent = getParent();
+    }
+                
+    public AbstractExpression(Expression[] children) {	
+	for (int i = 0; i < children.length; i++) {
+	    assert children[i] != null;
+	    children[i].setParent(this);
+	}
+	this.children = children;
+	this.parent = null;
     }
 
+    public AbstractExpression(List children) {	
+	this.children = new Expression[children.size()];
+	for (int i = 0; i < children.size(); i++) {
+	    Expression child = (Expression)children.get(i);
+	    child.setParent(this);
+	    this.children[i] = child;
+	}
+	
+	this.parent = null;
+    }
+    
     /**
      * Get the parent of this node.
      */
@@ -81,18 +101,19 @@ public abstract class AbstractExpression implements Expression {
      */
     public void setParent(Expression parent) {
         assert parent != this;
-
+       	
         this.parent = parent;
-    }
 
+    }
+    
     /**
      * Return the child of this node at the given index.
      *
      * @return child at given index.
      */
-    public Expression getChild(int index) {
+    public Expression getChild(int index) {	
         assert index <= getChildCount();
-
+	
         return children[index];
     }
 
@@ -106,6 +127,13 @@ public abstract class AbstractExpression implements Expression {
         return getParent() == null;
     }
 
+    public Expression setChild(Expression child, int index) {
+	assert index <= getChildCount();
+	assert child != this;
+
+	return ExpressionFactorySquareWheel.setChild(this, child, index);
+    }
+
     /**
      * Set this expression's child to the given child. The new child
      * will be removed from its parent.
@@ -113,14 +141,29 @@ public abstract class AbstractExpression implements Expression {
      * @param child the new child.
      * @param index the index of the new child.
      */
-    public void setChild(Expression child, int index) {
+    public void setChildMutableVersion(Expression child, int index) {
         assert index <= getChildCount();
         assert child != this;
 
+	Expression oldParent = null;
+
+	VeniceLog.getInstance().log("setChild: Index = " + index + " child = " + child);
+
         // Remove reference to new child from its old parent
-        if (child != null && child.getParent() != null) {
-            Expression oldParent = child.getParent();
-            oldParent.setChild(null, oldParent.getIndex(child));
+	
+	//But the old parent can be this expression!
+	//What does that mean?
+        if (child != null && child.getParent() != null) {	    
+            oldParent = child.getParent();
+	    	    
+	    if (oldParent != this) {
+		//Calling the oldet child for oldparent causes null to end up in tree
+		//Which is ok as long as it's replaceimmediately.
+		//However, there's a bug somewhere which means this isn't 
+		//happening.
+		//oldParent.setChildMutableVersion(null, oldParent.getIndex(child));	    
+		oldParent.setChild(null, oldParent.getIndex(child));	    
+	    }
         }
 
         // Remove parent reference to this class from old child
@@ -132,21 +175,82 @@ public abstract class AbstractExpression implements Expression {
             child.setParent(this);
 
         // Set reference to new child in this class
-        children[index] = child;
+	
+	//When oldParent = this, this method is run recursively, so
+	//children[index] is null.
+	children[index] = child;
+	
+	VeniceLog.getInstance().log("SetChild Exit");
     }
     
+
+    /**
+     * Return true if none of the children of this expression are null.
+     * This means the expression can be simplified safely.
+     *
+     * @return true if all children are not null
+     */
+    public boolean validTree() {
+	boolean rv = true;
+	for (int i = 0; i < getChildCount(); i++) {
+	    if (getChild(i) == null) {
+		return false;
+	    } else {
+		rv = getChild(i).validTree();
+		if (rv == false) {
+		    return false;
+		}
+	    }
+	}
+	return rv;
+    }
+
     /**
      * Perform simplifications and optimisations on the expression tree.
      * For example, if the expression tree was <code>a and true</code> then the
      * expression tree would be simplified to <code>a</code>.
      */
+    
+    //This version replaces the expression with new children
+    //instead of setting child to null/replacing and avoiding the problem 
+    //of nulls in the expression tree.  
     public Expression simplify() {
+	Expression[] newChildren = new Expression[getChildCount()];
+	
+	for (int i = 0; i < getChildCount(); i++) {
+	    Expression newChild = children[i].simplify();
+	    if (newChild == null) {
+		System.out.println("BOOM at i " + i + " child = " + children[i] + " type = " + children[i].getClass().getName());
+	    }
+	    newChildren[i] = newChild;
+	}		
+
+	Expression rv =  ExpressionFactorySquareWheel.newExpression(this, newChildren);
+       
+	return rv;
+    }
+
+    /**
+     * Perform simplifications and optimisations on the expression tree.
+     * For example, if the expression tree was <code>a and true</code> then the
+     * expression tree would be simplified to <code>a</code>.
+     */
+    //Deprecated
+    public Expression simplifyMutableVersion() {
+	assert validTree() == true;
+
+	VeniceLog.getInstance().log("Simplify: Type = " + getClass().getName() + " val = " + toString());	    
+
         // Simplify child arguments
         if(getChildCount() > 0) {
-            for(int i = 0; i < getChildCount(); i++) 
-                setChild(getChild(i).simplify(), i);
+            for(int i = 0; i < getChildCount(); i++)  {		
+		Expression childi = getChild(i);
+		Expression simplified = childi.simplify();
+		setChildMutableVersion(simplified, i);    
+	    }	
         }
-
+	
+	VeniceLog.getInstance().log("Exit Simplify");	    
         return this;
     }
 
@@ -361,5 +465,38 @@ public abstract class AbstractExpression implements Expression {
             buildIterationList(list, expression.getChild(i));
     }
 
+    public String toString() {
+	String rv = "";
+	for (int i = 0; i < getChildCount(); i++) {
+	    if (getChild(i) != null) {
+		rv += getChild(i).toString();
+	    }
+	}
+	return rv;
+    }
+
     abstract public Object clone();
+
+
+    /**
+     * Debugging function which prints out an expresison tree
+     * in a string.
+     *
+     * @return A string which represents the expression tree
+     */
+    public String printTree(int level, int code) {
+	String rv = "";
+	
+	for (int i = 0; i < level; i++) {
+	    rv += " ";
+	}
+	String subTree = "\n";
+	for (int i = 0; i < getChildCount(); i++) {
+	    if (getChild(i) != null) {
+		subTree += " " + getChild(i).printTree(level+1, code) + " ";
+	    }
+	}
+	rv += subTree;
+	return rv;
+    }
 }

@@ -48,7 +48,8 @@ public class SqrtExpression extends UnaryExpression {
     }
 
     public String toString() {
-	return new String("sqrt(" + getChild(0).toString() + ")");
+	String c1 = (getChild(0) != null) ? getChild(0).toString() : "(mull)";
+	return new String("sqrt(" + c1 + ")");
     }
 
     /**
@@ -62,26 +63,27 @@ public class SqrtExpression extends UnaryExpression {
 
         if(type == FLOAT_TYPE || type == INTEGER_TYPE)
             return getType();
-        else
-            throw new TypeMismatchException();
+        else {
+            throw new TypeMismatchException(this, type, FLOAT_TYPE);
+	}
     }
 
     public Expression simplify() {
         // First simplify child argument
-        super.simplify();
+        Expression simplified = super.simplify();
 
         // If the child argument is a constant we can precompute.
-        if(getChild(0) instanceof NumberExpression) {
+        if(simplified.getChild(0) instanceof NumberExpression) {
             try {
-                return new NumberExpression(evaluate(null, null, null, 0), getType());
+                return new NumberExpression(simplified.evaluate(null, null, null, 0), simplified.getType());
             }
             catch(EvaluationException e) {
                 // Can happen if we hit sqrt(-1). In which case don't bother to simplify.
-                return this;
+                return simplified;
             }
         }
         else
-            return this;
+            return simplified;
     }
 
     /**
@@ -89,8 +91,20 @@ public class SqrtExpression extends UnaryExpression {
      *
      * @return either {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
+
     public int getType() {
-        return getChild(0).getType();
+	int childCount = getChildCount();
+	int type = UNDEFINED_TYPE;
+	
+	for (int i = 0; i < childCount; i++) {
+	    if (getChild(i) != null) {
+		type = getChild(i).getType();
+		if (type == Expression.FLOAT_TYPE) {
+		    return type;
+		}
+	    }
+	}
+        return type;
     }
 
     public Object clone() {

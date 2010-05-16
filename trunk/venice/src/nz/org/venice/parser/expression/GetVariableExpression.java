@@ -36,9 +36,10 @@ public class GetVariableExpression extends TerminalExpression {
     private String name;
     private int type;
     
+    
     public GetVariableExpression(String name, int type) {
         assert name != null && name.length() > 0;
-
+	
         this.name = name;
         this.type = type;
     }
@@ -49,7 +50,7 @@ public class GetVariableExpression extends TerminalExpression {
         Variable variable = variables.get(name);
 
         if(variable != null) {
-            assert variable.getType() == type;
+            assert (variable.getType() == type);
             return variables.getValue(name);
         }
         else
@@ -67,7 +68,7 @@ public class GetVariableExpression extends TerminalExpression {
     public int getType() {
         return type;
     }
-
+    
     public boolean equals(Object object) {
         if(object instanceof GetVariableExpression) {
             GetVariableExpression expression = (GetVariableExpression)object;
@@ -83,4 +84,5 @@ public class GetVariableExpression extends TerminalExpression {
     public Object clone() {
         return new GetVariableExpression(name, type);
     }
+    
 }

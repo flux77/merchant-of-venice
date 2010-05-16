@@ -44,15 +44,18 @@ public class ClauseExpression extends AbstractExpression {
      *            list of expressions.
      */
     public ClauseExpression(List children) {
-        super(children.size());
+        super(children);
 
         childCount = children.size();
         assert childCount > 0;
 
         // Transfer the children in the list to the base class array, so we
         // can reuse its functionality.
-        for (int child = 0; child < getChildCount(); child++)
-            setChild((Expression) children.get(child), child);
+        for (int child = 0; child < getChildCount(); child++) {	    
+	    //Not sure if we need this/how to implement 
+	    //now that the child list is immutable for an expression
+            //setChild((Expression) children.get(child), child);
+	}
     }
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle,

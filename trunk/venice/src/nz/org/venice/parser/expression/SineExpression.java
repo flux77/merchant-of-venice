@@ -42,25 +42,26 @@ public class SineExpression extends UnaryExpression {
 
     public Expression simplify() {
         // First simplify child argument
-        super.simplify();
+        Expression simplified = super.simplify();
         
         // If the child argument is a constant we can precompute.
-        if(getChild(0) instanceof NumberExpression) {
+        if(simplified.getChild(0) instanceof NumberExpression) {
             try {
-                return new NumberExpression(evaluate(null, null, null, 0), getType());
+                return new NumberExpression(simplified.evaluate(null, null, null, 0), simplified.getType());
             }
             catch(EvaluationException e) {
                 // Shouldn't happen.
-                return this;
+                return simplified;
             }
         }
         else {
-            return this;
+            return simplified;
         }
     }
 
     public String toString() {
-	return new String("sin(" + getChild(0).toString() + ")");
+	String c1 = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+	return new String("sin(" + c1 + ")");
     }
 
     /**
@@ -74,8 +75,9 @@ public class SineExpression extends UnaryExpression {
 
         if(type == FLOAT_TYPE || type == INTEGER_TYPE)
             return getType();
-        else
-            throw new TypeMismatchException();
+        else  {
+            throw new TypeMismatchException(this, type, FLOAT_TYPE);
+	}
     }
 
     /**

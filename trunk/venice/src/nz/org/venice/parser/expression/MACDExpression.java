@@ -68,9 +68,12 @@ public class MACDExpression extends BinaryExpression {
     }
 
     public String toString() {
+	String c1 = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+	String c2 = (getChild(1) != null) ? getChild(1).toString() : "(null)";
+	
 	return new String("macd(" + 
-			  getChild(0).toString() + ", " +
-			  getChild(1).toString() + ")");
+			  c1 + ", " +
+			  c2 + ")");
     }
 
     public int checkType() throws TypeMismatchException {
@@ -79,8 +82,17 @@ public class MACDExpression extends BinaryExpression {
             getChild(0).checkType() == INTEGER_QUOTE_TYPE) &&
 	   getChild(1).checkType() == INTEGER_TYPE)
 	    return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	    String types = 
+		getChild(0).getType() + " , " + 
+		getChild(1).getType();
+
+	    String expectedTypes =
+		FLOAT_QUOTE_TYPE + " , " + 
+		INTEGER_TYPE;
+	    
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     public int getType() {

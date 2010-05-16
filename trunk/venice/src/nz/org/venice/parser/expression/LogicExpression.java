@@ -47,8 +47,15 @@ abstract public class LogicExpression extends BinaryExpression {
 
 	if(leftType == BOOLEAN_TYPE && rightType == BOOLEAN_TYPE)
 	    return BOOLEAN_TYPE;
-	else
-	    throw new TypeMismatchException();
+	else {
+	    String types = 
+		getChild(0).checkType() + " , " + 
+		getChild(1).checkType();
+	    
+	    String expectedTypes = BOOLEAN_TYPE + " , " + BOOLEAN_TYPE;
+		
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     /**
@@ -72,18 +79,30 @@ abstract public class LogicExpression extends BinaryExpression {
     protected String toString(String operator) {
 	String string = "";
 
-	if(getChild(0).getChildCount() < 2)
-	    string += getChild(0).toString();
-	else
-	    string += "(" + getChild(0).toString() + ")";
-	
+	Expression c1 = getChild(0);
+	Expression c2 = getChild(1);
+
+	if (c1 != null) {
+	    if (c1.getChildCount() < 2) {
+		string += c1.toString();
+	    } else {
+		string += "(" + c1.toString() + ")";
+	    }
+	} else {
+	    string += "(null)";
+	}
 	string += " " + operator + " ";
 	
-	if(getChild(1).getChildCount() < 2)
-	    string += getChild(1).toString();
-	else
-	    string += "(" + getChild(1).toString() + ")";
-
+	if (c2 != null) {
+	    if(c2.getChildCount() < 2) {
+		string += getChild(1).toString();
+	    } else {
+		string += "(" + getChild(1).toString() + ")";
+	    } 
+	} else {
+	    string += "(null)";
+	}
+	
 	return string;
     }
 }

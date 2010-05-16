@@ -62,10 +62,15 @@ public class MinExpression extends TernaryExpression {
     }
 
     public String toString() {
+	String c1 = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+	String c2 = (getChild(1) != null) ? getChild(1).toString() : "(null)";
+	String c3 = (getChild(2) != null) ? getChild(2).toString() : "(null)";
+	
+
 	return new String("min(" + 
-			  getChild(0).toString() + ", " +
-			  getChild(1).toString() + ", " +
-			  getChild(2).toString() + ")");
+			  c1 + ", " +
+			  c2 + ", " +
+			  c3 + ")");
     }
 
     public int checkType() throws TypeMismatchException {
@@ -75,8 +80,19 @@ public class MinExpression extends TernaryExpression {
 	   getChild(1).checkType() == INTEGER_TYPE &&
 	   getChild(2).checkType() == INTEGER_TYPE)
 	    return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	 String types = 
+		getChild(0).getType() + " , " + 
+		getChild(1).getType() + " , " + 
+		getChild(2).getType();
+
+	    String expectedTypes =
+		FLOAT_QUOTE_TYPE + " , " + 
+		INTEGER_TYPE     + " ,"  + 
+		INTEGER_TYPE;
+	    
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     public int getType() {

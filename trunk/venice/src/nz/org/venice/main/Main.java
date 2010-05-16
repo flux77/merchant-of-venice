@@ -49,7 +49,8 @@ import nz.org.venice.ui.ProgressDialog;
 import nz.org.venice.ui.ProgressDialogManager;
 import nz.org.venice.util.ExchangeRateCache;
 import nz.org.venice.util.Locale;
-
+import nz.org.venice.util.VeniceLog;
+    
 /**
  * The top level class which contains the main() function. This class builds
  * the outer frame and creates the desktop.
@@ -158,6 +159,9 @@ public class Main extends JFrame {
 
         // Shutdown the database if necessary
         QuoteSourceManager.shutdown();
+
+	//Close the log if necessary
+	VeniceLog.getInstance().close();
 
 	dispose();
 	System.exit(0);

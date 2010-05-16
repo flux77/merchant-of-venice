@@ -62,18 +62,36 @@ public class RSIExpression extends BinaryExpression {
     public String toString() {
         Expression periodExpression = getChild(0);
         Expression lagExpression = getChild(1);
+	
+	String periodExpressionString = (periodExpression != null) 
+	    ? periodExpression.toString() 
+	    : "(null)";
+
+	String lagExpressionString = (lagExpression != null) 
+	    ? lagExpression.toString() 
+	    : "(null)";
+	
 
         return new String("rsi(" +
-                          periodExpression.toString() + ", " +
-                          lagExpression.toString() + ")");
+                          periodExpressionString + ", " +
+                          lagExpressionString + ")");
     }
 
     public int checkType() throws TypeMismatchException {
 	if(getChild(0).checkType() == INTEGER_TYPE &&
 	   getChild(1).checkType() == INTEGER_TYPE)
 	    return FLOAT_TYPE;
-	else
-	    throw new TypeMismatchException();
+	else {
+	    String types = 
+		getChild(0).getType() + " , " + 
+		getChild(1).getType();
+
+	    String expectedTypes = 
+		INTEGER_TYPE + " , " +
+		INTEGER_TYPE;
+		
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     /**
@@ -84,6 +102,8 @@ public class RSIExpression extends BinaryExpression {
     public int getType() {
         return FLOAT_TYPE;
     }
+
+
 
     public Object clone() {
         return new RSIExpression((Expression)getChild(0).clone(),

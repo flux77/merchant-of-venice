@@ -43,6 +43,7 @@ import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.ui.ConfirmDialog;
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.util.Locale;
+import nz.org.venice.util.VeniceLog;
 
 public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
     
@@ -61,7 +62,8 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
     private JTextField generateInitPopTextRow;
     private JTextField generateRandomPopTextRow;
     
-    private Random random = new Random(System.currentTimeMillis());
+    private long seed = System.currentTimeMillis();
+    private Random random = new Random(seed);
     
     private GPPageInitialPopulationModule GPPageInitialPopulationModule;
     
@@ -79,6 +81,8 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         
         setGraphic(preferredSize);
         
+	VeniceLog.getInstance().log("GPPageInitialPopulation seed = " + seed);
+
     }
     
     public void save(String key) {

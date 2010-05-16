@@ -79,10 +79,12 @@ public class WhileExpression extends BinaryExpression {
      */
     public int checkType() throws TypeMismatchException {
 	getChild(COMMAND).checkType();
-
-	if(getChild(CONDITION).checkType() != BOOLEAN_TYPE)
-	    throw new TypeMismatchException();
-	else
+       
+	if(getChild(CONDITION).checkType() != BOOLEAN_TYPE) {
+	    int type = getChild(CONDITION).getType();
+	    int expected = BOOLEAN_TYPE;
+	    throw new TypeMismatchException(this, type, expected);
+	} else
 	    return getType();
     }
 

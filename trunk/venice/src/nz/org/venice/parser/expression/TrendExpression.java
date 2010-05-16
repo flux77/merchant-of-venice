@@ -84,7 +84,17 @@ public class TrendExpression extends TernaryExpression {
 	   getChild(2).checkType() == INTEGER_TYPE)	    
 	    return getType();
 	else {
-	    throw new TypeMismatchException();
+	    String types = 
+		getChild(0).getType() + " , " + 
+		getChild(1).getType() + " , " + 
+		getChild(2).getType();
+
+	    String expectedTypes =
+		FLOAT_QUOTE_TYPE + " , " + 
+		INTEGER_TYPE     + " , " + 
+		INTEGER_TYPE;
+
+	    throw new TypeMismatchException(this, types, expectedTypes);
 	}
     }
 

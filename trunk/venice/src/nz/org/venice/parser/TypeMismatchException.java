@@ -31,10 +31,38 @@ import nz.org.venice.util.Locale;
 public class TypeMismatchException extends ExpressionException {
 
     /**
-     * Create a new type mistmatch exception.
-     */
+     * Create a new type mismatch exception.
+     */    
     public TypeMismatchException() {
 	super(Locale.getString("TYPE_MISMATCH_ERROR"));
+    }
+    
+    /**
+     * Create a new type mismatch exception where the message text explains
+     * what caused the type mismatch.
+     * 
+     * @param exp           The expression object which throws the exception
+     * @param type          A string list where the items are the types of the
+     *                      expression.
+     * @param expectedTypes A string list where the items are the types the
+     *                      expected by the expression. 
+     */
+    public TypeMismatchException(Expression expression, String type, String expectedTypes) {
+	super(Locale.getString("TYPE_MISMATCH_ERROR") + " on expression object: " + expression.getClass().getName() + " expression = " + expression.toString() + " expected types = " + expectedTypes  + " got: " + type);
+    }
+
+    /**
+     * Create a new type mismatch exception where the message text explains
+     * what caused the type mismatch.
+     * 
+     * @param exp           The expression object which throws the exception
+     * @param type          The type of the expression.
+     *                      
+     * @param expectedType  The type expected by the expression.
+     *                      
+     */
+    public TypeMismatchException(Expression expression, int type, int expectedType) {
+	super(Locale.getString("TYPE_MISMATCH_ERROR") + " on expression object: " + expression.getClass().getName() + " expression = " + expression.toString() + " Expected Type: " + expectedType  + " got: " + type);
     }
 
 }

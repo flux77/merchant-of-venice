@@ -71,14 +71,30 @@ public class IfExpression extends TernaryExpression {
      *
      * @return	the type of the second and third arguments
      */
+
+    //Second and third arguments must be either the same, or if not
+    //the same, then not boolean
     public int checkType() throws TypeMismatchException {
 	if(getChild(0).checkType() == BOOLEAN_TYPE &&
-           getChild(1).checkType() == getChild(2).checkType() &&
-           (getChild(1).getType() == FLOAT_TYPE || getChild(1).getType() == INTEGER_TYPE ||
-            getChild(1).getType() == BOOLEAN_TYPE))
+           (getChild(1).checkType() == getChild(2).checkType() ||
+	    ((getChild(1).getType() == BOOLEAN_TYPE &&
+	      getChild(2).getType() == BOOLEAN_TYPE))
+	    )) {	        
 	    return getType();
-	else
-	    throw new TypeMismatchException();
+	}
+	else {
+	 String types = 
+	     getChild(0).getType() + " , " + 
+	     getChild(1).getType() + " , " +
+	     getChild(2).getType();
+
+	    String expectedTypes =
+		BOOLEAN_TYPE + " , " + 
+		BOOLEAN_TYPE + " , " + 
+		BOOLEAN_TYPE;
+	    
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     /**
@@ -86,45 +102,68 @@ public class IfExpression extends TernaryExpression {
      *
      * @return {@link #FLOAT_TYPE}, {@link #INTEGER_TYPE} or {@link #BOOLEAN_TYPE}.
      */
+    
     public int getType() {
-        assert getChild(1).getType() == getChild(2).getType();
+	
+	if (getChild(1) == null ||
+	    getChild(2) == null) {
+	    //Must not happen
+	    return UNDEFINED_TYPE;
+	}
+	
+	if (getChild(1).getType() == BOOLEAN_TYPE &&
+	    getChild(2).getType() == BOOLEAN_TYPE) {
+	    return BOOLEAN_TYPE;
+	} else if (getChild(1).getType() == FLOAT_TYPE || 
+		   getChild(2).getType() == FLOAT_TYPE) {
+	    return FLOAT_TYPE;
+	} else if (getChild(1).getType() == INTEGER_TYPE &&
+		   getChild(2).getType() == INTEGER_TYPE) {
+	    return INTEGER_TYPE;
+	} else {		
+	    //Must not happen either
+	    return UNDEFINED_TYPE;
+	}
+	
+	//Numeric Types no longer have to match 
+	//assert getChild(1).getType() == getChild(2).getType();
 
-        return getChild(1).getType();
     }
 
     public Expression simplify() {
         // First simplify all the child arguments
-        super.simplify();
+        Expression simplified = super.simplify();
 
-        NumberExpression first = (getChild(0) instanceof NumberExpression? 
-                                  (NumberExpression)getChild(0) : null);
+        NumberExpression first = (simplified.getChild(0) instanceof NumberExpression? 
+                                  (NumberExpression)simplified.getChild(0) : null);
 
         // If the first argument is the constant TRUE then we simplify to the
         // second argument. Otherwise if the first argument is the constant FALSE
         // then we simplify to the third argument.
         if(first != null) {
             if(first.getValue() >= TRUE_LEVEL)
-                return getChild(1);
+                return simplified.getChild(1);
             else
-                return getChild(2);
+                return simplified.getChild(2);
         }
-
+	
         // If the second and third arguments are the same then we can simplify
         // to the second argument.
-        else if(getChild(1).equals(getChild(2)))
-            return getChild(1);
+        else if(simplified.getChild(1).equals(simplified.getChild(2)))
+            return simplified.getChild(1);
 
         // If the first argument is not, create a new If expression that
         // reverses argument 1 and 2. I.e.
         // if(not(c)) {a} else {b}")) => if(c) {b} else {a}
-        else if(getChild(0) instanceof NotExpression)
-            return new IfExpression(getChild(0).getChild(0), getChild(2), getChild(1));
-
-        else
-            return this;
+        else if(simplified.getChild(0) instanceof NotExpression) {
+            return new IfExpression(simplified.getChild(0).getChild(0), simplified.getChild(2), simplified.getChild(1));
+	}
+        else {
+            return simplified;
+	}
     }
 
-    public Object clone() {
+    public Object clone() {	
         return new IfExpression((Expression)getChild(0).clone(), 
                                 (Expression)getChild(1).clone(),
                                 (Expression)getChild(2).clone());

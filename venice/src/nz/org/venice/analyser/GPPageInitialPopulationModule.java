@@ -54,6 +54,7 @@ import nz.org.venice.ui.TextsEditorDialog;
 import nz.org.venice.ui.MenuHelper;
 import nz.org.venice.util.Locale;
 import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.util.VeniceLog;
 
 public class GPPageInitialPopulationModule extends AbstractTable implements Module {
     private PropertyChangeSupport propertySupport;
@@ -75,7 +76,8 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
     private JDesktopPane desktop;
     private Model model;
     private int[] perc = new int[0];
-    private Random random = new Random(System.currentTimeMillis());
+    private long seed = System.currentTimeMillis();
+    private Random random = new Random(seed);
     private Settings settings;
     
     // Menus
@@ -214,6 +216,8 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
             }
         });
         
+	VeniceLog.getInstance().log("GPPageInitPopModule seed = " + seed);
+
         showColumns(model);
     }
     

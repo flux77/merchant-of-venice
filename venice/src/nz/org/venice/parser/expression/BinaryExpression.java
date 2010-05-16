@@ -33,11 +33,12 @@ abstract public class BinaryExpression extends AbstractExpression {
      * @param	right	the right argument
      */
     public BinaryExpression(Expression left,
-			    Expression right) {
-        super();
-        assert left != null && right != null;
-        setChild(left, 0);
-        setChild(right, 1);
+			    Expression right) {	
+	super(new Expression[] {left, right});
+	assert left != null && right != null;
+
+        //setChild(left, 0);
+        //setChild(right, 1);
     }
 
     /**
@@ -61,19 +62,27 @@ abstract public class BinaryExpression extends AbstractExpression {
      */
     protected String toString(String operator) {
 	String string = "";
-
-	if(getChild(0).getChildCount() < 2)
-	    string += getChild(0).toString();
-	else
-	    string += "(" + getChild(0).toString() + ")";
 	
+	if (getChild(0) != null) {
+	    if(getChild(0).getChildCount() < 2) {
+		string += getChild(0).toString();
+	    } else {
+		string += "(" + getChild(0).toString() + ")";
+	    }	    	
+	} else {
+	    string += "(null)";
+	}
 	string += operator;
 	
-	if(getChild(1).getChildCount() < 2)
-	    string += getChild(1).toString();
-	else
-	    string += "(" + getChild(1).toString() + ")";
-
+	if (getChild(1) != null) {
+	    if(getChild(1).getChildCount() < 2) {
+		string += getChild(1).toString();
+	    } else {
+		string += "(" + getChild(1).toString() + ")";
+	    } 
+	} else {
+	    string += "(null)";
+	}
 	return string;
     }
 }

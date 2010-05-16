@@ -30,6 +30,7 @@ import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.EvaluationException;
 import nz.org.venice.util.Money;
 import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.VeniceLog;
 
 /**
  * The Genetic Programme creates and breeds random paper trading individuals. This
@@ -162,7 +163,10 @@ public class GeneticProgramme {
         
         nextBreedingPopulation = new TreeMap();
         breedingPopulation = new TreeMap();
-        random = new Random(System.currentTimeMillis());
+	long seed = System.currentTimeMillis(); 
+
+	VeniceLog.getInstance().log("GeneticProgramme seed = " + seed);
+        random = new Random(seed);
         
         // Create a mutator for the buy and sell rules. Buy rules shouldn't
         // use the "held" variable (buy rules won't be evaluated if held > 0).
@@ -322,12 +326,13 @@ public class GeneticProgramme {
             // if we must create an individual according to
             // the buy/sell rules passed as parameters
             // (got from Initial Population Section).
-            if ((buyRule==null) || (sellRule==null)) {
+            if ((buyRule==null) || (sellRule==null)) {				
                 return new Individual(buyRuleMutator, sellRuleMutator);
             } else {
                 Expression newBuyExpression;
                 Expression newSellExpression;
                 if (twice) {
+
                     newBuyExpression = buyRuleMutator.mutate(buyRule, MUTATION_PERCENT);
                     newSellExpression = sellRuleMutator.mutate(sellRule, MUTATION_PERCENT);
                 } else {
@@ -340,6 +345,7 @@ public class GeneticProgramme {
                     newBuyExpression = buyRuleMutator.mutate(newBuyExpression, MUTATION_PERCENT);
                     newSellExpression = sellRuleMutator.mutate(newSellExpression, MUTATION_PERCENT);
                 }
+
                 return new Individual(newBuyExpression.simplify(), newSellExpression.simplify());
             }
         else {
@@ -351,7 +357,7 @@ public class GeneticProgramme {
             
             Individual mother = getBreedingIndividual(motherValue);
             Individual father = getBreedingIndividual(fatherValue);
-            
+	    
             return new Individual(random, buyRuleMutator, sellRuleMutator, mother, father);
         }
     }

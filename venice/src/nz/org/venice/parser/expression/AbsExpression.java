@@ -43,7 +43,8 @@ public class AbsExpression extends UnaryExpression {
     }
 
     public String toString() {
-	return new String("abs(" + getChild(0).toString() + ")");
+	String c1 = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+	return new String("abs(" + c1 + ")");
     }
 
     /**
@@ -57,27 +58,28 @@ public class AbsExpression extends UnaryExpression {
 
         if(type == FLOAT_TYPE || type == INTEGER_TYPE)
             return getType();
-        else
-            throw new TypeMismatchException();
+        else {
+            throw new TypeMismatchException(this, type, FLOAT_TYPE);
+	}
     }
 
     public Expression simplify() {
         // First simplify child argument
-        super.simplify();
+        Expression simplified = super.simplify();
 
         // If the child argument is a constant we can precompute.
-        if(getChild(0) instanceof NumberExpression) {
+        if(simplified.getChild(0) instanceof NumberExpression) {
             try {
-                return new NumberExpression(evaluate(null, null, null, 0), getType());
+                return new NumberExpression(simplified.evaluate(null, null, null, 0), simplified.getType());
             }
             catch(EvaluationException e) {
                 // abs() should never raise EvaluationException
                 assert false;
-                return this;
+                return simplified;
             }
         }
         else
-            return this;
+            return simplified;
 
         // abs(x * x)
         // abs(abs()) simplification.
@@ -92,10 +94,14 @@ public class AbsExpression extends UnaryExpression {
      *
      * @return either {@link #FLOAT_TYPE} or {@link #INTEGER_TYPE}.
      */
-    public int getType() {
-        return getChild(0).getType();
+    public int getType() {	
+	if (getChild(0) != null) {
+	    return getChild(0).getType();
+	} else {
+	    return -1;
+	}
     }
-
+    
     public Object clone() {
         return new AbsExpression((Expression)getChild(0).clone());
     }

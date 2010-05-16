@@ -37,34 +37,40 @@ public class MultiplyExpression extends ArithmeticExpression {
 	    getChild(1).evaluate(variables, quoteBundle, symbol, day);
     }
 
-    public Expression simplify() {
+    public Expression simplify() {       
         // First perform arithmetic simplifications
         Expression simplified = super.simplify();
 
-        if(simplified == this) {
-            NumberExpression left = (getChild(0) instanceof NumberExpression? 
-                                     (NumberExpression)getChild(0) : null);
-            NumberExpression right = (getChild(1) instanceof NumberExpression? 
-                                      (NumberExpression)getChild(1) : null);
+	NumberExpression left = null;
+	NumberExpression right = null;
+
+        if(simplified.equals(this)) {
+            left = (simplified.getChild(0) instanceof NumberExpression? 
+                                     (NumberExpression)simplified.getChild(0) : null);
+            right = (simplified.getChild(1) instanceof NumberExpression? 
+		     (NumberExpression)simplified.getChild(1) : null);
 
             // 0*a -> 0.
-            if(left != null && left.equals(0.0D))
-                return new NumberExpression(0.0D, getType());
+            if(left != null && left.equals(0.0D)) {	       
+                return new NumberExpression(0.0D, simplified.getType());
+	    }
 
             // a*0 -> 0.
-            else if(right != null && right.equals(0.0D))
-                return new NumberExpression(0.0D, getType());
+            else if(right != null && right.equals(0.0D)) {
+                return new NumberExpression(0.0D, simplified.getType());
+	    }
 
             // a*1 -> a.
-            else if(right != null && right.equals(1.0D))
-                return getChild(0);
+            else if(right != null && right.equals(1.0D)) {
+                return simplified.getChild(0);
+	    }
 
 	    //1 * a -> a
-	    else if (left != null && left.equals(1.0D))
-		return getChild(1);
-
+	    else if (left != null && left.equals(1.0D)) {
+		return simplified.getChild(1);
+	    }
         }
-        return simplified;
+	return simplified;    
     }
 
     public boolean equals(Object object) {

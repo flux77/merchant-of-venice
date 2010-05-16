@@ -42,30 +42,41 @@ public class AddExpression extends ArithmeticExpression {
         // First perform arithmetic simplifications
         Expression simplified = super.simplify();
 
-        if(simplified == this) {
-            NumberExpression left = (getChild(0) instanceof NumberExpression?
-                (NumberExpression)getChild(0) : null);
-            NumberExpression right = (getChild(1) instanceof NumberExpression?
-                (NumberExpression)getChild(1) : null);
+        if(simplified.equals(this)) {
+            NumberExpression left = (simplified.getChild(0) instanceof NumberExpression?
+				     (NumberExpression)simplified.getChild(0) : null);
+            NumberExpression right = (simplified.getChild(1) instanceof NumberExpression?
+                (NumberExpression)simplified.getChild(1) : null);
 
             // a+0 -> a.
-            if(right != null && right.equals(0.0D))
-                return getChild(0);
+            if(right != null && right.equals(0.0D)) {
+		return simplified.getChild(0);
+	    }
 
 	    // 0 + a -> a
-	    if (left != null && left.equals(0.0D))
-		return getChild(1);
+	    //The type of an expression is no longer determined by the
+	    //left operand.
+	    
+	    //Since the type of an expression is determined by the
+	    //type of the left operand, if that gets simplified away
+	    //the simplified expression should have the same type
+	    
+	    if (left != null && left.equals(0.0D))  {
+		return simplified.getChild(1);
+	    }	    
 
             // a+a -> 2*a. This doesn't seem like a simplification but
             // remember a could be a complicated expression like:
             // (lag(day_close, 0) * lag(day_open, 0))
-            else if(getChild(0).equals(getChild(1)))
-                return new MultiplyExpression(new NumberExpression(2.0D, getChild(0).getType()),
-                getChild(0));
-        }
-        return simplified;
-    }
+            else if(simplified.getChild(0).equals(simplified.getChild(1))) {
 
+                return new MultiplyExpression(new NumberExpression(2.0D, simplified.getChild(0).getType()),
+					      simplified.getChild(0));
+	    }
+        }
+	return simplified;	
+    }
+    
     public boolean equals(Object object) {
 
         // Are they both add expressions?

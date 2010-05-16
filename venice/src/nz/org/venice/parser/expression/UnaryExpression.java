@@ -31,9 +31,9 @@ abstract public class UnaryExpression extends AbstractExpression {
      * @param	sub	the sub argument
      */
     public UnaryExpression(Expression sub) {
-        super();
+        super(new Expression[] {sub});
         assert sub != null;
-        setChild(sub, 0);
+        //setChild(sub, 0);
     }
 
     /**

@@ -27,6 +27,7 @@ import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.QuoteBundleFunctionSource;
 import nz.org.venice.quote.QuoteFunctions;
 import nz.org.venice.quote.Symbol;
+import nz.org.venice.util.VeniceLog;
 
 /**
  * An expression which finds the OBV (On Balance Volume) over a given trading period.
@@ -70,21 +71,68 @@ public class OBVExpression extends TernaryExpression {
         return QuoteFunctions.obv(sourceOpen, sourceClose, sourceVolume, period, initialValue);
     }
 
-    public String toString() {
+    public String toString() {	
+	/*
+	assert getChild(0) != null;
+	assert getChild(1) != null;
+	assert getChild(2) != null;
+	*/
+		
+	String rv = "obv(";
+
+	for (int i = 0; i < getChildCount(); i++) {
+	    rv += (getChild(i) == null) ? "(null)" : getChild(i).toString();
+	    if (i < getChildCount()-1) {
+		rv += ",";
+	    }
+	}
+	rv += ")";
+	return rv;
+
+	/*
 	return new String("obv(" + 
 			  getChild(0).toString() + ", " +
 			  getChild(1).toString() + ", " +
 			  getChild(2).toString() + ")");
+	*/
     }
+    
+    /*
+    public boolean testSimplify() {
+	for (int i = 0; i < getChildCount(); i++) {
+	    if (getChild(i) == null) {
+		return false;
+	    }
+	}
+	return true;
+    }
+    */
 
     public int checkType() throws TypeMismatchException {
+	assert getChild(0) != null;
+	assert getChild(1) != null;
+	assert getChild(2) != null;
+
 	// All inputs must be integer values.
 	if(getChild(0).checkType() == INTEGER_TYPE &&
 	   getChild(1).checkType() == INTEGER_TYPE &&
 	   getChild(2).checkType() == INTEGER_TYPE)
 	    return getType();
-	else
-	    throw new TypeMismatchException();
+	else {
+	    String types = 
+		getChild(0).getType() + " , " + 
+		getChild(1).getType() + " , " + 
+		getChild(2).getType();
+
+	    String expectedTypes =
+		INTEGER_TYPE + " , " + 
+		INTEGER_TYPE + " , " + 
+		INTEGER_TYPE;
+	    
+	    
+
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     public int getType() {

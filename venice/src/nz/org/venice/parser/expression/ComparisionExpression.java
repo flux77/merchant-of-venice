@@ -44,32 +44,44 @@ abstract public class ComparisionExpression extends BinaryExpression {
 	// left & right types must be the same and not boolean or quote
 	int leftType = getChild(0).checkType();
 	int rightType = getChild(1).checkType();
-
+		
 	if(leftType == rightType && 
            (leftType == FLOAT_TYPE || leftType == INTEGER_TYPE))
-            return getType();
-	else
-	    throw new TypeMismatchException();
+            return getType();	
+	
+	if ( (leftType == FLOAT_TYPE || leftType == INTEGER_TYPE) &&
+	     (rightType == FLOAT_TYPE || rightType == INTEGER_TYPE)) 
+	    return getType();
+	
+	else {
+	    String types = 
+		getChild(0).getType() + " , " +
+		getChild(1).getType();
+	    String expectedTypes = FLOAT_TYPE + "," + FLOAT_TYPE;
+
+	    throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     public Expression simplify() {
+
         // First simplify all the child arguments
-        super.simplify();
+        Expression simplified = super.simplify();
 
         // If both the child arguments are constant we can precompute.
-        if(getChild(0) instanceof NumberExpression &&
-           getChild(1) instanceof NumberExpression) {
+        if(simplified.getChild(0) instanceof NumberExpression &&
+           simplified.getChild(1) instanceof NumberExpression) {
             try {
-                return new NumberExpression(evaluate(null, null, null, 0), getType());
+                return new NumberExpression(simplified.evaluate(null, null, null, 0), getType());
             }
             catch(EvaluationException e) {
                 // Shouldn't happen
                 assert false;
-                return this;
+                return simplified;
             }
         }
         else
-            return this;
+            return simplified;
     }
 
     /**
@@ -80,4 +92,5 @@ abstract public class ComparisionExpression extends BinaryExpression {
     public int getType() {
         return BOOLEAN_TYPE;
     }
+
 }

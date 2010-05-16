@@ -38,11 +38,11 @@ abstract public class TernaryExpression extends AbstractExpression {
     public TernaryExpression(Expression arg1,
 			     Expression arg2,
 			     Expression arg3) {
-        super();
+        super(new Expression[] {arg1, arg2, arg3});
         assert arg1 != null && arg2 != null && arg3 != null;
-        setChild(arg1, 0);
-        setChild(arg2, 1);
-        setChild(arg3, 2);
+        //setChild(arg1, 0);
+        //setChild(arg2, 1);
+        //setChild(arg3, 2);
     }
 
     /**
@@ -54,4 +54,5 @@ abstract public class TernaryExpression extends AbstractExpression {
     public int getChildCount() {
 	return 3;
     }
+
 }

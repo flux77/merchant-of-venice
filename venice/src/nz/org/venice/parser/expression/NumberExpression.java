@@ -34,7 +34,8 @@ public class NumberExpression extends TerminalExpression {
     // The number's value and typey
     private double value;
     private int type;
-
+    private boolean typeModified;
+    
     private final static double EPSILON = 0.001F;
 
     private static NumberFormat format = AbstractExpression.getNumberFormat();
@@ -42,21 +43,24 @@ public class NumberExpression extends TerminalExpression {
     public NumberExpression(boolean value) {
         this.value = value? TRUE: FALSE;
         this.type = BOOLEAN_TYPE;
+	typeModified = false;
     }
 
     public NumberExpression(double value) {
         this.value = value;
         this.type = FLOAT_TYPE;
+	typeModified = false;
     }
 
     public NumberExpression(int value) {
         this.value = (double)value;
         this.type = INTEGER_TYPE;
+	typeModified = false;
     }
 
     public NumberExpression(double value, int type) {
         assert(type == Expression.BOOLEAN_TYPE || type == Expression.FLOAT_TYPE ||
-               type == Expression.INTEGER_TYPE);
+               type == Expression.INTEGER_TYPE || typeModified == true);
 
 	this.value = value;
         this.type = type;
@@ -153,6 +157,7 @@ public class NumberExpression extends TerminalExpression {
     public int getType() {
         return type;
     }
+
 
     public Object clone() {
         return new NumberExpression(value, type);

@@ -42,33 +42,40 @@ public class OrExpression extends LogicExpression {
 
     public Expression simplify() {
         // First simplify all the child arguments
-        super.simplify();
+	
+	Expression retExp = null;
+        Expression simplified = super.simplify();
 
-        NumberExpression left = (getChild(0) instanceof NumberExpression? 
-                                 (NumberExpression)getChild(0) : null);
-        NumberExpression right = (getChild(1) instanceof NumberExpression? 
-                                  (NumberExpression)getChild(1) : null);
-
+        NumberExpression left = (simplified.getChild(0) instanceof NumberExpression? 
+                                 (NumberExpression)simplified.getChild(0) : null);
+        NumberExpression right = (simplified.getChild(1) instanceof NumberExpression? 
+                                  (NumberExpression)simplified.getChild(1) : null);
+	
         // If either child argument is the constant TRUE we can simplify to the
         // constant TRUE
         if((left != null && left.getValue() >= TRUE_LEVEL) ||
-           (right != null && right.getValue() >= TRUE_LEVEL))
-            return new NumberExpression(true);
+           (right != null && right.getValue() >= TRUE_LEVEL)) {
+	    retExp = new NumberExpression(true);
+	}
 
         // If either child argument is the constant FALSE we can simplify to the 
         // other child arguement
-        else if(left != null && left.getValue() < TRUE_LEVEL)
-            return getChild(1);
-        else if(right != null && right.getValue() < TRUE_LEVEL)
-            return getChild(0);
+        else if(left != null && left.getValue() < TRUE_LEVEL) {
+            retExp = simplified.getChild(1);
+	}
+        else if(right != null && right.getValue() < TRUE_LEVEL) {
+            retExp = simplified.getChild(0);
+	}
 
         // If both child arguments are the same we can simplify to the left
         // argument
-        else if(getChild(0).equals(getChild(1)))
-            return getChild(0);
-
-        else
-            return this;
+        else if(getChild(0).equals(getChild(1))) {
+            retExp = simplified.getChild(0);
+	}
+        else {
+            retExp = simplified;
+	}
+	return retExp;
     }
 
     public boolean equals(Object object) {

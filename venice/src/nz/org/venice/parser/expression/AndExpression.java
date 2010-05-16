@@ -43,19 +43,19 @@ public class AndExpression extends LogicExpression {
 
     public Expression simplify() {
         // First simplify all the child arguments
-        super.simplify();
+        Expression simplified = super.simplify();
 
-        NumberExpression left = (getChild(0) instanceof NumberExpression? 
-                                 (NumberExpression)getChild(0) : null);
-        NumberExpression right = (getChild(1) instanceof NumberExpression? 
-                                  (NumberExpression)getChild(1) : null);
+        NumberExpression left = (simplified.getChild(0) instanceof NumberExpression? 
+                                 (NumberExpression)simplified.getChild(0) : null);
+        NumberExpression right = (simplified.getChild(1) instanceof NumberExpression? 
+                                  (NumberExpression)simplified.getChild(1) : null);
 
         // If either child argument is the constant TRUE we can simplify to the 
         // other child argument
         if(left != null && left.getValue() >= TRUE_LEVEL)
-            return getChild(1);
+            return simplified.getChild(1);
         else if(right != null && right.getValue() >= TRUE_LEVEL)
-            return getChild(0);
+            return simplified.getChild(0);
 
         // If either child argument is the constant FALSE we can simplify to the
         // constant FALSE
@@ -65,11 +65,11 @@ public class AndExpression extends LogicExpression {
 
         // If both child arguments are the same then we can simplify to the constant
         // TRUE.
-        else if(getChild(0).equals(getChild(1)))
+        else if(simplified.getChild(0).equals(simplified.getChild(1)))
             return new NumberExpression(true);
 
         else
-            return this;
+            return simplified;
     }
 
     public boolean equals(Object object) {

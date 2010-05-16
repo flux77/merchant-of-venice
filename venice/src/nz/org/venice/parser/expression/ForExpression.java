@@ -95,8 +95,11 @@ public class ForExpression extends QuaternaryExpression {
 	getChild(LOOP).checkType();
 	getChild(COMMAND).checkType();
 
-	if(getChild(CONDITION).checkType() != BOOLEAN_TYPE)
-	    throw new TypeMismatchException();
+	if(getChild(CONDITION).checkType() != BOOLEAN_TYPE) {
+	    int type = getChild(CONDITION).getType();
+	    int expectedType = BOOLEAN_TYPE;
+	    throw new TypeMismatchException(this, type, expectedType);
+	}
 	else
 	    return getType();
     }

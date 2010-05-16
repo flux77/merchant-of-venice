@@ -20,6 +20,8 @@ package nz.org.venice.parser;
 
 import junit.framework.TestCase;
 
+import nz.org.venice.parser.expression.NumberExpression;
+import nz.org.venice.parser.expression.AddExpression;
 
 public class ExpressionTest extends TestCase {
     
@@ -157,7 +159,7 @@ public class ExpressionTest extends TestCase {
         // Abs
         assertEquals("10", simplify("abs(10)"));
         assertEquals("10", simplify("abs(-10)"));
-
+	
     }
     
     
@@ -176,10 +178,11 @@ public class ExpressionTest extends TestCase {
 	String left4 = "1.0 * x == -3.076121";
 	String right4 = "x == -3.076121";
 	
+	//These expressions shouldn't be generated anymore from GP
 	String left5 = "(obv(abs(-43), -17, 1*(ema(low, x, -4, 0.434678))))>(momentum(volume, 5, -26))";
-
+	
 	String right5 = "(obv(43, -17, ema(low, x, -4, 0.434678)))>(momentum(volume, 5, -26))";
-
+	
 
 	try {
 	    
@@ -200,16 +203,17 @@ public class ExpressionTest extends TestCase {
 				  Expression.FLOAT_TYPE,
 				  Expression.FLOAT_TYPE), true);	    
 
+	    /*
 	    assertEquals(typeTest(left5, right5, 
 				  Expression.INTEGER_TYPE,
-				  Expression.INTEGER_TYPE), true);	    
+				  Expression.FLOAT2_TYPE), true);	    
+	    */
 
 	} catch (TypeMismatchException e) {
 	    fail("Type Mistmatch UnExpected" + e);
 	}
     }
-          
-    
+        
     public void testEvaluate() {
 	String absExpString = "abs(-0.0001)";
 	String cosExpString = "cos(0.0)";
@@ -261,14 +265,18 @@ public class ExpressionTest extends TestCase {
         }
     }
 
-    private String simplify(String string) {
-        Expression expression = parse(string);
+    private String simplify(String string) {       
+	Expression expression = parse(string);
+
+	//System.out.println("Str = " + string + " exp = " + expression);
 
 	if (expression != null) {
-	    expression = expression.simplify();
-	    return expression.toString();
+	    Expression retExp = expression.simplify();	
+	    //System.out.println("After simplify = " + retExp);
+
+	    return retExp.toString();
 	}
-          return "";
+	return "";
     }
 
     //Test that the types of the two expressions are compatible after

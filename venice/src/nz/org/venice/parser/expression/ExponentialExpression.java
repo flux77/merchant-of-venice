@@ -42,25 +42,26 @@ public class ExponentialExpression extends UnaryExpression {
 
     public Expression simplify() {
         // First simplify child argument
-        super.simplify();
+        Expression simplified = super.simplify();
         
         // If the child argument is a constant we can precompute.
-        if(getChild(0) instanceof NumberExpression) {
+        if(simplified.getChild(0) instanceof NumberExpression) {
             try {
-                return new NumberExpression(evaluate(null, null, null, 0), getType());
+                return new NumberExpression(simplified.evaluate(null, null, null, 0), simplified.getType());
             }
             catch(EvaluationException e) {
                 // Shouldn't happen.
-                return this;
+                return simplified;
             }
         }
         else {
-            return this;
+            return simplified;
         }
     }
 
     public String toString() {
-	return new String("exp(" + getChild(0).toString() + ")");
+	String childString = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+	return new String("exp(" + childString + ")");
     }
 
     /**
@@ -74,8 +75,11 @@ public class ExponentialExpression extends UnaryExpression {
 
         if(type == FLOAT_TYPE || type == INTEGER_TYPE)
             return getType();
-        else
-            throw new TypeMismatchException();
+        else {
+	    String types = "" + type;
+	    String expectedTypes = "" + FLOAT_TYPE;
+            throw new TypeMismatchException(this, types, expectedTypes);
+	}
     }
 
     /**

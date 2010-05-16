@@ -48,7 +48,7 @@ public class GreaterThanEqualExpression extends ComparisionExpression {
         // If we haven't simplified the whole expression away and
         // the left and right arguments are the same expression
         // then the comparision must be true.
-        if(simplified == this && getChild(0).equals(getChild(1)))
+        if(simplified.equals(this) && simplified.getChild(0).equals(simplified.getChild(1)))
             return new NumberExpression(true);
         else
             return simplified;

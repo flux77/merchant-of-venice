@@ -38,7 +38,11 @@ import nz.org.venice.quote.Symbol;
  * classes.
  * Those classes would however be contained by this class.
  */
+
 public interface Expression extends Cloneable {
+
+    /** Type is undefined. Initial or default value only. Shouldn't be returned unless there's a bug. */
+    public static final int UNDEFINED_TYPE = -1;
 
     /** A boolean type that can be either {@link #TRUE} or {@link #FALSE}. */
     public static final int BOOLEAN_TYPE = 0;
@@ -59,7 +63,13 @@ public interface Expression extends Cloneable {
     public static final int STRING_TYPE = 5;
 
     /** Threshold level where a number is registered as <code>TRUE</code> */
-    public final static double TRUE_LEVEL = 0.1D;
+    public static final double TRUE_LEVEL = 0.1D;
+    
+    /** Represents a type than can contain any short number. */
+    public static final int INTEGER_SHORT_TYPE = 6;        
+
+    /** Represents either a float or an integer.  */
+    public static final int NUMERIC_TYPE = 7;
 
     /** Value of <code>TRUE</code> */
     public final static double TRUE = 1.0D;
@@ -158,7 +168,7 @@ public interface Expression extends Cloneable {
      * @param child new argument expression
      * @param index index of the argument expression
      */
-    public void setChild(Expression child, int index);
+    public Expression setChild(Expression child, int index);
 
     /**
      * Perform simplifications and optimisations on the expression tree.
@@ -208,6 +218,22 @@ public interface Expression extends Cloneable {
      * @return number of nodes in the tree with the given type.
      */
     public int size(int type);
+
+    /**
+     *
+     * @return true if none of the children of the expression are null
+     */
+    public boolean validTree();
+
+    /**
+     *
+     * Print a string of all the children in a tree form.
+     * @param level The depth of the tree
+     * @param code A code (e.g. hashcode) of a node
+     * @return A string representing the expresison tree tree
+     */
+    public String printTree(int level, int code);
+
 }
 
 

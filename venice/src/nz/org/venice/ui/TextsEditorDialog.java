@@ -125,7 +125,10 @@ public class TextsEditorDialog {
                     wasCancelled = false;
                     close();
                 }});
-        buttonPanel.add(okButton);
+	
+	panel.getRootPane().setDefaultButton(okButton);
+        buttonPanel.add(okButton);	
+	okButton.requestFocus();
 
         // The cancel button may not be displayed
         if(buttonArray == OK_CANCEL_BUTTON) {

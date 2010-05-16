@@ -33,6 +33,7 @@ import javax.swing.ScrollPaneLayout;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.ui.ConfirmDialog;
 import nz.org.venice.util.Locale;
+import nz.org.venice.util.VeniceLog;
 
 public class GPGondolaSelection extends JPanel implements AnalyserPage {
 
@@ -46,7 +47,11 @@ public class GPGondolaSelection extends JPanel implements AnalyserPage {
 
     public GPGondolaSelection(JDesktopPane desktop, double maxHeight) {
         this.desktop = desktop;
-        random = new Random(System.currentTimeMillis());
+	
+	long seed = System.currentTimeMillis();	
+        random = new Random(seed);
+
+	VeniceLog.getInstance().log("GPGondolaSelection seed = " + seed);
 
         Dimension preferredSize = new Dimension();
         preferredSize.setSize(this.getPreferredSize().getWidth(), maxHeight/20);

@@ -83,8 +83,11 @@ public class AvgExpression extends TernaryExpression {
 	// First type must be quote, second and third types must be value
 	if((getChild(0).checkType() == FLOAT_QUOTE_TYPE ||
             getChild(0).checkType() == INTEGER_QUOTE_TYPE) &&
-	   getChild(1).checkType() == INTEGER_TYPE &&
-	   getChild(2).checkType() == INTEGER_TYPE)
+	   (getChild(1).checkType() == INTEGER_TYPE || 
+	    getChild(1).checkType() == FLOAT_TYPE) &&
+	   (getChild(2).checkType() == INTEGER_TYPE || 
+	    getChild(2).checkType() == FLOAT_TYPE)
+	   )
 	    return getType();
 	else {
 	    String types = 

@@ -220,8 +220,11 @@ public class Token {
     /** Represents "<code>trend()</code>" symbol */
     public static final int TREND_TOKEN = 62;
 
+    /** Represnets "<code>random()</code>" symbol */
+    public static final int RANDOM_TOKEN = 63; 
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 63;
+    private static final int FIXED_LENGTH_TOKENS = 64;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -321,6 +324,7 @@ public class Token {
         tokenStrings[LOG_TOKEN]                = "log";
         tokenStrings[EXP_TOKEN]                = "exp";
 	tokenStrings[TREND_TOKEN]              = "trend";
+	tokenStrings[RANDOM_TOKEN]              = "random";
         
         return tokenStrings;
     }

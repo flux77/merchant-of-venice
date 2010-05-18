@@ -86,6 +86,7 @@ import nz.org.venice.util.Locale;
  *                     "dayfromstart" "(" ")" |
  *                     "capital" "(" ")" |
  *                     "stockcapital" "(" ")" |
+ *                     "random" "(" ")"       |
  *                     "trend" (" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")"
  * FLOW_CONTROL      = "if"  "(" SUB_EXPR ")" EXPR "else" EXPR |
  *                     "for" "(" SUB_EXPR ";" SUB_EXPR ";" SUB_EXPR ")" EXPR |
@@ -332,7 +333,8 @@ public class Parser {
                 tokens.match(Token.COS_TOKEN) ||
                 tokens.match(Token.LOG_TOKEN) ||
                 tokens.match(Token.EXP_TOKEN) ||
-	        tokens.match(Token.TREND_TOKEN))
+	        tokens.match(Token.TREND_TOKEN) ||
+		tokens.match(Token.RANDOM_TOKEN))
 	    expression = parseFunction(variables, tokens);
 
         // ABBREVIATION QUOTE FUNCTIONS
@@ -689,6 +691,7 @@ public class Parser {
         case(Token.DAY_TOKEN):
         case(Token.MONTH_TOKEN):
         case(Token.YEAR_TOKEN):
+        case(Token.RANDOM_TOKEN):
             break;
 
 	default:

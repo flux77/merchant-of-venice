@@ -262,6 +262,9 @@ public class ExpressionFactory {
 	case (Token.TREND_TOKEN):
 	    expression = new TrendExpression(arg1, arg2, arg3);
 	    break;
+	case (Token.RANDOM_TOKEN):
+	    expression = new RandomExpression();
+	    break;
         default:
             // No such token
 	    assert false;

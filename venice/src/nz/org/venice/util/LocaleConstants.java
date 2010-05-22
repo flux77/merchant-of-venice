@@ -25,6 +25,7 @@ public final class LocaleConstants {
 	new java.util.Locale("CA"), // Catalan
         java.util.Locale.ENGLISH,
         java.util.Locale.FRENCH,
+	java.util.Locale.GERMAN,
         java.util.Locale.ITALIAN,
         java.util.Locale.SIMPLIFIED_CHINESE,
 	new java.util.Locale("SV"), // Swedish

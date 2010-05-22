@@ -3,8 +3,8 @@
 use strict;
 
 my %engIndex = ();
-my @locales = ("en", "zh", "sv", "pl", "it", "fr", "ca");
-my @localeDesc = ("English", "Chinese", "Swedish", "Polish", "Italian", "French", "Catalan");
+my @locales = ("en", "zh", "sv", "pl", "it", "fr", "ca", "de");
+my @localeDesc = ("English", "Chinese", "Swedish", "Polish", "Italian", "French", "Catalan", "German");
 
 my $basePath = "src/nz/org/venice/util/Locale/";
 my $localeEngPath = "venice_en.properties";

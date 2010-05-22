@@ -144,7 +144,8 @@ Alberto Nacher, Matthias Stöckel, Dennis van den Berg, Andrew Goh, Christian Bro
 And the following for providing translations:
 
 Benedict P. Barszcz (Polish), Quentin Bossard (French), Bryan Lin (Chinese),
-Alberto Nacher (Italian), Jordi Pujol (Catalan) & Pontus Strömdahl (Swedish) 
+Alberto Nacher (Italian), Jordi Pujol (Catalan), Pontus Strömdahl (Swedish)
+& Christian Brom (German)
 
 The winged lion image is:
 

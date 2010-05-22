@@ -7,7 +7,7 @@ use strict;
 
 my $locale;
 my %engIndex = ();
-my @locales = ("en", "zh", "sv", "pl", "it", "fr", "ca");
+my @locales = ("en", "zh", "sv", "pl", "it", "fr", "ca", "de");
 my %localeFileRefs = ();
 my %localeRefs = ();
 

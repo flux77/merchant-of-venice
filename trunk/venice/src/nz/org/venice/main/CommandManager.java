@@ -100,6 +100,7 @@ public class CommandManager {
     // Locales for about box translation credits
     private java.util.Locale catalan = new java.util.Locale("CA");
     private java.util.Locale french = new java.util.Locale("FR");
+    private java.util.Locale german = new java.util.Locale("DE");
     private java.util.Locale italian = new java.util.Locale("IT");
     private java.util.Locale polish = new java.util.Locale("PL");
     private java.util.Locale swedish = new java.util.Locale("SV");
@@ -1033,8 +1034,9 @@ public class CommandManager {
                                    "Quentin Bossard (" + french.getDisplayName() + "),\n" +
                                    "Bryan Lin (" + simplifiedChinese.getDisplayName() + "), " +
                                    "Alberto Nacher (" + italian.getDisplayName() + "),\n" +
-                                   "Jordi Pujol (" + catalan.getDisplayName() + ") & " +
-				   "Pontus Str\366mdahl (" + swedish.getDisplayName() + ")"
+                                   "Jordi Pujol (" + catalan.getDisplayName() + "), " +
+				   "Pontus Str\366mdahl (" + swedish.getDisplayName() + ") &\n" +
+				   "Christian Brom (" + german.getDisplayName() + ")"
 				   );
 
 	    String aboutVenice = Locale.getString("ABOUT_VENICE",

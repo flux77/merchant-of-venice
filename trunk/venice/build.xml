@@ -322,6 +322,19 @@
       </classpath>
     </java>
 
+    <echo>Comparing German locale against English reference locale...</echo> 
+    <java classname="nz.org.venice.tools.Locale"
+          dir="${src}"
+          fork="yes">
+      <arg value="nz/org/venice/util/locale/venice_en.properties"/>
+      <arg value="nz/org/venice/util/locale/venice_de.properties"/>
+      <jvmarg value="-ea"/>
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${src}"/>
+      </classpath>
+    </java>
+
   </target>
 
   <!-- Package venice up ready for release -->

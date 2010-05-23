@@ -1,0 +1,1971 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title></title>
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+<meta content="DocBook XSL Stylesheets V1.73.2" name="generator">
+</head>
+<body bgcolor="#ffffff" text="black" link="#0000cc" vlink="#840084" alink="#0000ff">
+<div id="header">
+
+<center>
+
+<img width="64" height="64" src="winged_lion.png">
+</center>
+
+<div>
+
+<h1 class="title">
+
+<a name="N10001"></a>Merchant of Venice</h1>
+
+</div>
+
+</div>
+<div id="sidebar">
+
+<h3>User</h3>
+
+<ul>
+
+<li>
+
+<a href="index.html">Main</a>
+
+</li>
+
+<li>
+
+<a href="contact.html">Contact Us/Mailing List</a>
+
+</li>
+
+<li>
+
+<a href="Contribute.html">Contribute</a>
+
+</li>
+
+<li>
+
+<a href="credits.html">Credits</a>
+
+</li>
+
+<li>
+
+<a href="https://sourceforge.net/projects/mov/files/">Download</a>
+
+</li>
+
+<li>
+
+<a href="features.html">Features</a>
+
+</li>
+
+<li>
+
+<a href="links.html">Links</a>
+
+</li>
+
+<li>
+
+<a href="manual.html">Manual</a>
+
+</li>
+
+<li>
+
+<a href="screenshots.html">Screenshots</a>
+
+</li>
+
+</ul>
+
+<h3>Developer</h3>
+
+<ul>
+
+<li>
+
+<a href="api/index.html">API</a>
+
+</li>
+
+<li>
+
+<a href="future.html">Future Features</a>
+
+</li>
+
+</ul>
+
+</div>
+<div xmlns:xlink="http://www.w3.org/xlink" id="mainbody">
+<div>
+<a name="Introduction"></a>
+<h4>
+<a name=""></a>1 Introduction</h4>
+<p>Thank you for trying Merchant of Venice (Venice).</p>
+<p>Venice is a stock market trading programme that supports portfolio
+management, charting, technical analysis, paper trading and
+experimental methods like Genetic Programming. Venice runs in a
+graphical user interface with online help and has full documentation.
+Venice runs on UNIX (including Mac OS X), and Windows.</p>
+</div>
+<div>
+<a name="Preferences"></a>
+<h4>
+<a name=""></a>2 Preferences</h4>
+</div>
+<div>
+<a name="Importing and Exporting Preferences"></a>
+<h4>
+<a name=""></a>3 Importing and Exporting Preferences</h4>
+<p>You can load from or save to an XML file the whole Venice preferences.</p>
+<p>You can reach the import preferences dialog by:</p>
+<p>You can reach the export preferences dialog by:</p>
+<p>This feature can be used in several ways:</p>
+</div>
+<div>
+<a name="Importing and Exporting Quotes"></a>
+<h4>
+<a name=""></a>4 Importing and Exporting Quotes</h4>
+</div>
+<div>
+<a name="Tables"></a>
+<h4>
+<a name=""></a>5 Tables</h4>
+<p>Venice has the ability to list quote prices for a single day's trading in a
+table, and the ability to list all quote prices for a list of given stocks.
+When listing you need to decide which stocks you are interested in. Currently
+you can select from <span class="emphasis"><em>All Ordinaries</em></span>, <span class="emphasis"><em>Market Indices</em></span> and <span class="emphasis"><em>All Symbols</em></span>.
+These categories are based on the ASX (Australian Stock Exchange) so might not
+be very relevant for other exchanges. Currently Venice is very ASX-centric. At
+the moment Venice does not have access to any data relating to the symbols it
+is given, so it has to guess which category the symbol falls in. All
+Ordinaries lists all 3 letter symbols except those starting with an <span class="emphasis"><em>X</em></span>.
+Market Indices lists all symbols starting with an <span class="emphasis"><em>X</em></span>, on
+the ASX almost all of these are market indices. All Symbols lists all the
+symbols.</p>
+<p>You can display a table by doing the following:</p>
+<p>The <span class="emphasis"><em>List All</em></span> option allows you to list all the stock quotes
+on the given date.</p>
+<p>The <span class="emphasis"><em>List By Date</em></span> option allows you to specify the date of the stock
+quotes to list.</p>
+<p>The <span class="emphasis"><em>List By Rule</em></span> option allows you to specify the initial
+filter. The filter is an equation which specifies which stocks should be
+listed and which hidden, see below for more details about this, also see the
+<a class="xref" href="#Gondola Language"></a> for details about the format of
+the equations.</p>
+<p>The <span class="emphasis"><em>List By Symbols</em></span> option allows you to specify the stock symbols
+to list. Then all the quotes for those stock symbols will be listed.</p>
+<div>
+<a name="Apply Equations"></a>
+<h4>
+<a name=""></a>5.1 Apply Equations</h4>
+<p>You can run multiple equations against every stock listed in the table and
+list the result of the equation. Click on the <span class="emphasis"><em>Table</em></span> menu, then
+click on the <span class="emphasis"><em>Apply Equations</em></span> menu item. This will bring up a dialog
+where you can enter up to 5 equations that can be run against each stock. For
+each you can enter the name of the column and the equation to be run. See
+<a class="xref" href="#Gondola Language"></a> for details about the format of these equations.
+Also see <a class="xref" href="#Preferences"></a> for how to get Venice to remember equations
+so you don't have to keep typing them in all the time. To get you started, an
+example equation is <div class="literallayout">
+<p>
+<span style="white-space: pre;">avg(close, 30, 0)</span>
+</p>
+</div> which will calculate the average
+day close value over the last 30 days, including today.</p>
+</div>
+<div>
+<a name="Apply Filter"></a>
+<h4>
+<a name=""></a>5.2 Apply Filter</h4>
+<p>You can restrict which stocks are listed in the table by setting up an equation
+filter. This equation is run against each stock listed in the table, if the
+equation equates to true for a stock, then that stock is listed. Otherwise it
+is hidden. You can reach this by clicking on the <span class="emphasis"><em>Apply Filter</em></span> menu item.
+Again, see <a class="xref" href="#Gondola Language"></a> for details about the format of these equations.
+Also see <a class="xref" href="#Preferences"></a> for how to get Venice to remember equations so
+you don't have to keep typing them in all the time. To get you started, an
+example equation filter is <div class="literallayout">
+<p>
+<span style="white-space: pre;">lag(close, 0) &gt; lag(close, -1)</span>
+</p>
+</div> which will
+list all quotes where the day close of today is higher than the day close of
+the last trading day.</p>
+</div>
+<div>
+<a name="General Table Features"></a>
+<h4>
+<a name=""></a>5.3 General Table Features</h4>
+<p>Every table in Venice supports the following:</p>
+<p>By clicking on a column header you can sort by that column, click again and
+you reverse the sort. You can change the order of the columns by dragging a
+column and dropping it into a new position.</p>
+<p>Some tables in Venice support the following:</p>
+<p>By right clicking on a row you can raise a context sensitive menu. If you
+double click on a row the most common operation is invoked, typically
+Graphing. Some tables also have a menu item <span class="emphasis"><em>Show Columns</em></span> which lets
+you specify which columns are shown.</p>
+</div>
+</div>
+<div>
+<a name="Watch Screens"></a>
+<h4>
+<a name=""></a>6 Watch Screens</h4>
+<p>Watch screens provide a way to monitor the value of a group of stocks. Watch
+screens can be created using any stocks, and any indicator can be applied to the
+stocks. Venice supports both intra-day and end of day watch screens. If Venice
+is currently downloading intra-day quotes, it will display the latest quotes,
+otherwise it will display the latest end of day quotes. You can create a new
+watch screen by doing the following:</p>
+<p>This will create a new watch screen which you will need to name. You
+can then add symbols that should be displayed in this watch screen.</p>
+</div>
+<div>
+<a name="Graphs"></a>
+<h4>
+<a name=""></a>7 Graphs</h4>
+<div>
+<a name="Portfolio Graphs"></a>
+<h4>
+<a name=""></a>7.1 Portfolio Graphs</h4>
+<p>You can graph the value of any portfolio over time by doing the following:</p>
+<div class="itemizedlist">
+<ul type="disc">
+<li>Clicking on the <span class="emphasis"><em>Graph</em></span> menu item.
+</li>
+<li>Then clicking on the <span class="emphasis"><em>Portfolio</em></span> menu item.
+</li>
+<li>Then clicking on the name of the portfolio you wish to graph.
+</li>
+</ul>
+</div>
+<p>Depending on the size of your portfolio and the time it has existed, this
+might take a while as Venice has to load in stock quotes for every stock
+traded for every day of the portfolio.</p>
+<p>Apart from graphing the value of the portfolio over time, you can also graph
+the profit/loss of the portfolio. To do this, graph the portfolio as above,
+then click on the menu item with the same name as your portfolio, then select
+the <span class="emphasis"><em>Graph</em></span> menu item and then click on <span class="emphasis"><em>Profit/Loss</em></span>. The profit and loss
+graph is calculated by ignoring any deposits and withdrawals made to the
+portfolio, the balance of that portfolio over time will reflect the profit and
+loss made.</p>
+</div>
+<div>
+<a name="Market Indicator Charts"></a>
+<h4>
+<a name=""></a>7.2 Market Indicator Charts</h4>
+<p>A market indicator is an indicator that can be used to help determine the
+state of the market. They are calculated using multiple stocks on the market,
+for example <span class="emphasis"><em>Advance/Decline</em></span> uses all ordinary stocks in its calculations.</p>
+<div>
+<a name="Advance/Decline"></a>
+<h4>
+<a name=""></a>7.2.1 Advance/Decline</h4>
+<p>Currently the only market indicator that Venice can graph is the
+advance/decline indicator. You can graph this indicator by:</p>
+<div class="itemizedlist">
+<ul type="disc">
+<li>Clicking on <span class="emphasis"><em>Graph</em></span> menu item.
+</li>
+<li>Then clicking on the <span class="emphasis"><em>Market Indicator</em></span> menu item.
+</li>
+<li>Then clicking on the <span class="emphasis"><em>Advance/Decline</em></span> menu item.
+</li>
+</ul>
+</div>
+<p>This operation reads in almost all of the available stock quotes, so it may take a while.</p>
+<p>The advance/decline indicator is calculated by taking an arbitrary start value
+(currently 0). Each day's value is calculated by taking the number of stocks
+that advanced (i.e. have a higher day close than day open) minus the number of
+stocks that declined and adding that to the previous day's value. This creates
+a cumulative graph whose trend may be used to give an indication of possible
+future direction of the market.</p>
+</div>
+</div>
+<div>
+<a name="Stock Charts"></a>
+<h4>
+<a name=""></a>7.3 Stock Charts</h4>
+<p>Venice supports a variety of technical charts. Some of these charts are
+described below, for the others, please consult the literature for their
+meaning and interpretation.</p>
+<div>
+<a name="Custom"></a>
+<h4>
+<a name=""></a>7.3.1 Custom</h4>
+<p>Venice supports the charting of user-defined custom indicators. Using the
+<a class="xref" href="#Gondola Language"></a> you can write custom indicators which can
+then be charted. The custom chart user interface allows you to enter a Gondola
+equation to chart and to specify the chart as either primary or secondary.
+A primary chart is one that appears in the top graph. A secondary chart will
+appear in its own smaller graph below.</p>
+</div>
+<div>
+<a name="Point And Figure"></a>
+<h4>
+<a name=""></a>7.3.2 Point And Figure</h4>
+<p>The Point and Figure graph attempts to highligh only significant price movement, independant of time. This means it differs from most of the other charts in that there is not necessarily any data shown for a particular date range. </p>
+<p>
+If you switch to the Point and Figure graph while zoomed in on an area which does not have any Point and Figure data or you attempt to zoom in on such an area, a warning dialogue is displayed and the operation will be cancelled.
+</p>
+</div>
+<div>
+<a name="Fibonacci Charts"></a>
+<h4>
+<a name=""></a>7.3.3 Fibonacci Charts</h4>
+<p>The Fibonacci Retracement Chart is used to estimate possible support and resistence levels between two price levels. This indicator draws horizontal lines at levels corresponding to the following Fibonacci Ratios: 0%, 23.6%, 38.2% , 50.0%, 61.8%, 78.6%, 100%</p>
+<p>The Fibonacci Chart takes two parameters:
+     <div class="itemizedlist">
+<ul type="disc">
+<li>0% Level: Minimum price point for the indicator</li>
+<li>100% Level: Maximum price point for the indicator</li>
+</ul>
+</div>     
+   
+</p>
+</div>
+<div>
+<a name="Chart Functions"></a>
+<h4>
+<a name=""></a>7.3.4 Chart Functions</h4>
+<p>The graph functions are accessed via the toolbar which is created on the left of the chart by default. The functions are:  </p>
+<div class="itemizedlist">
+<ul type="disc">
+<li>Zoom in</li>
+<li>Zoom out</li>
+<li>Clone</li>
+<li>Draw straight line</li>
+<li>Move line</li>
+<li>Draw freehand line</li>
+<li>Write text on chart</li>
+<li>Erase</li>
+<li>Flip chart</li>
+</ul>
+</div>
+<div>
+<a name="Zoom"></a>
+<h4>
+<a name=""></a>7.3.4.1 Zoom</h4>
+<p>The "Zoom in" function will zoom in on a selected area, where as "Zoom out" always returns to the intial setting, regardless of how many times the user zooms in.</p>
+</div>
+<div>
+<a name="Chart Drawing"></a>
+<h4>
+<a name=""></a>7.3.4.2 Chart Drawing</h4>
+<p>The chart drawing functions allow the user to draw lines and add text to a chart in a fairly basic manner. Any lines drawn on a chart scale with the zoom level. </p>
+</div>
+<div>
+<a name="Others"></a>
+<h4>
+<a name=""></a>7.3.4.3 Others</h4>
+<p>The "Clone" button opens a window with the same chart type.</p>
+<p>The "Flip chart" button toggles the orientation of the chart. The initial orientation is for the origin of the chart to be in the top left hand corner. Therefore, pressing the button twice returns the chart to it's original position. </p>
+</div>
+</div>
+</div>
+</div>
+<div>
+<a name="Portfolios"></a>
+<h4>
+<a name=""></a>8 Portfolios</h4>
+<p>Venice allows you to keep track of multiple portfolios. One portfolio
+might be for your actual portfolio and others could be used for paper
+trading. You can create a new portfolio by:</p>
+<p>A portfolio is made up of several <span class="emphasis"><em>Cash Accounts</em></span> and several
+<span class="emphasis"><em>Share Accounts</em></span>. A <span class="emphasis"><em>Cash Account</em></span> can be a bank account, a term deposit,
+a Cash Management Account or any account which stores money. A <span class="emphasis"><em>Share Account</em></span>
+is any account where you can trade shares. To create a trading account you
+will need at least one of each.</p>
+<p>A portfolio is made up of several accounts and also transactions. A
+transaction is any financial transaction that involves one or more of the
+accounts. See transactions for more details.</p>
+<div>
+<a name="Graph"></a>
+<h4>
+<a name=""></a>8.1 Graph</h4>
+<p>You can graph the value of a portfolio over time. See <a class="xref" href="#Graphs"></a>
+for more details.</p>
+</div>
+<div>
+<a name="Transaction History"></a>
+<h4>
+<a name=""></a>8.2 Transaction History</h4>
+<p>You can view a list of all the transactions that have occurred in the
+portfolio. You can reach this by clicking on the <span class="emphasis"><em>Transaction</em></span> menu
+item and then clicking on the <span class="emphasis"><em>Show History</em></span> menu item.</p>
+</div>
+<div>
+<a name="Transactions"></a>
+<h4>
+<a name=""></a>8.3 Transactions</h4>
+<p>Venice currently supports several common transactions:
+<span class="emphasis"><em>Accumulate Transaction</em></span>, <span class="emphasis"><em>Deposit Transaction</em></span>, <span class="emphasis"><em>Dividend Transaction</em></span>,
+<span class="emphasis"><em>Dividend DRP Transaction</em></span>, <span class="emphasis"><em>Fee Transaction</em></span>, <span class="emphasis"><em>Interest Transaction</em></span>,
+<span class="emphasis"><em>Reduce Transaction</em></span>, <span class="emphasis"><em>Transfer Transaction</em></span> and <span class="emphasis"><em>Withdrawal Transaction</em></span>.</p>
+<p>Once a portfolio is open, you can add a transaction by clicking on the
+<span class="emphasis"><em>Transaction</em></span> menu item, then clicking on the <span class="emphasis"><em>New</em></span> menu item.
+You will see in a drop down box a list of the transactions available. Some of
+these might not be available yet, e.g. you cannot enter a Reduce Transaction
+(sell shares) without having bought any.</p>
+<div>
+<a name="Accumulate Transaction"></a>
+<h4>
+<a name=""></a>8.3.1 Accumulate Transaction</h4>
+<p>The accumulate transaction is the "buy shares" transaction. To enter this
+transaction you will need the date the transaction took place, the cash
+account where you withdrew the money from, the share account that accumulated
+the shares, the symbol of the stock you accumulated (e.g. CBA), the number of
+shares you accumulated, the total value of the shares at the time of purchase
+and finally the cost of the trade. This information should all be available
+from your broker.</p>
+</div>
+<div>
+<a name="Deposit Transaction"></a>
+<h4>
+<a name=""></a>8.3.2 Deposit Transaction</h4>
+<p>The deposit transaction is the transaction where you
+deposit money into a cash account such as a bank account. To enter this
+transaction you will need the date the transaction took place, the cash
+account you deposited the money to and the amount you deposited.</p>
+</div>
+<div>
+<a name="Dividend Transaction"></a>
+<h4>
+<a name=""></a>8.3.3 Dividend Transaction</h4>
+<p>The dividend transaction is the transaction when you receive a share
+dividend. To enter this transaction you will need the date the transaction
+took place, the cash account that received the money, the share account
+containing the stock, the symbol of the stock and the dividend amount paid to
+you.</p>
+</div>
+<div>
+<a name="Dividend DRP Transaction"></a>
+<h4>
+<a name=""></a>8.3.4 Dividend DRP Transaction</h4>
+<p>The dividend DRP (dividend re-investment programme) transaction is the
+transaction when you receive a share dividend that is automatically
+re-invested back into the company by buying more shares. To enter this
+transaction you will need the date the transaction took place, the
+share account containing the stock, the symbol of the stock and the amount
+of shares acquired.</p>
+</div>
+<div>
+<a name="Fee Transaction"></a>
+<h4>
+<a name=""></a>8.3.5 Fee Transaction</h4>
+<p>The fee transaction is the transaction when you receive any kind of
+fee such as account keeping fees, Tax etc. To enter this transaction you
+will need the date the transaction took place, the cash account that
+received the fee and the amount that you were charged.</p>
+</div>
+<div>
+<a name="Interest Transaction"></a>
+<h4>
+<a name=""></a>8.3.6 Interest Transaction</h4>
+<p>The interest transaction is the transaction when you receive any
+interest in one of your cash accounts. To enter this transaction you will
+need the date the transaction took place, the cash account that received
+the interest and the amount that you were credited. If your account is in
+the negative and this was the interest that was debited from your account,
+then put a minus sign in front of the value.</p>
+</div>
+<div>
+<a name="Reduce Transaction"></a>
+<h4>
+<a name=""></a>8.3.7 Reduce Transaction</h4>
+<p>The reduce transaction is the "sell shares" transaction. To enter this
+transaction you will need the date the transaction took place, the cash
+account where the money from the sale will go, the share account that
+reduced the shares, the symbol of the stock you reduced (e.g. CBA), the
+number of shares you reduced, the total value of the shares at the time of
+sale and finally the cost of the trade. This information should all be
+available from your broker.</p>
+</div>
+<div>
+<a name="Transfer Transaction"></a>
+<h4>
+<a name=""></a>8.3.8 Transfer Transaction</h4>
+<p>The transfer transaction is the transaction where you transfer money from
+one cash account to another. To enter this transaction you will need the
+cash account where you withdrew the money, the destination cash account and
+the amount you transferred. If there was a fee for the transfer, you need
+to enter this as a separate transaction.</p>
+</div>
+<div>
+<a name="Withdrawal Transaction"></a>
+<h4>
+<a name=""></a>8.3.9 Withdrawal Transaction</h4>
+<p>The withdrawal transaction is the transaction where you
+withdraw money from a cash account such as a bank account. To enter this
+transaction you will need the date the transaction took place, the cash
+account you withdrew the money from and the amount you withdrew.</p>
+</div>
+</div>
+</div>
+<div>
+<a name="Gondola Language"></a>
+<h4>
+<a name=""></a>9 Gondola Language</h4>
+<p>The <span class="emphasis"><em>Gondola Language</em></span> is a language for analysing stock market data.
+The language allows you to do a variety of tasks from listing stocks in tables
+that only match your criteria to creating automated buy/sell paper trade rules.
+The language is closely modelled after the C programming language, so if you
+know that language, then you should find Gondola easy and familliar to
+work with.
+</p>
+<p>Whenever you enter a Gondola expression there are two implicit variables that
+are always set: the current date and the current stock. For example if
+you are displaying a <a class="xref" href="#Tables"></a> of stock quotes, you can execute an
+equation for each stock. If you entered this line:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">avg(close, 30)</span>
+</p>
+</div>
+
+</p>
+<p>It would display, for each stock, the average day close value over the last
+30 days starting from today. Here the current date would be set to the most
+recent day you have a quote for and the current stock would be set to the
+current stock.</p>
+<p>You can also enter equations when performing <a class="xref" href="#Analysis"></a>. If you
+entered the following as a buy rule:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">avg(close, 15) &gt; avg(close, 30, -1)</span>
+</p>
+</div>
+
+</p>
+<p>It would only buy the stock when the average day close over the last 15 days
+was higher than the average day close of over the last 30 days, where the
+30 day average would be calculated starting from the previous day and working
+backwards. So here the current date would be set to whatever date the trade
+was to be analysed for.</p>
+<p>The Gondola language is very type strict. What this means is that each value
+has a given type, whether it is an <span class="emphasis"><em>integer</em></span>, <span class="emphasis"><em>real</em></span> or <span class="emphasis"><em>boolean</em></span>. This means
+that the numbers <div class="literallayout">
+<p>
+<span style="white-space: pre;">12</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">12.0</span>
+</p>
+</div> are different, and <div class="literallayout">
+<p>
+<span style="white-space: pre;">1</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">true</span>
+</p>
+</div>
+are different. If you get a type mismatch error, you've probably entered an
+<span class="emphasis"><em>integer</em></span> number (e.g. <div class="literallayout">
+<p>
+<span style="white-space: pre;">12</span>
+</p>
+</div>) instead of a <span class="emphasis"><em>real</em></span> number (e.g. <div class="literallayout">
+<p>
+<span style="white-space: pre;">12.0</span>
+</p>
+</div>).</p>
+<div>
+<a name="Gondola Operators"></a>
+<h4>
+<a name=""></a>9.1 Gondola Operators</h4>
+<p>The Gondola language supports the following boolean operators: <span class="emphasis"><em>and</em></span>, <span class="emphasis"><em>or</em></span>
+and <span class="emphasis"><em>not</em></span>. For example:</p>
+<div class="itemizedlist">
+<ul type="disc">
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close &gt; 12.0 or open &gt; 12.0
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close &gt; 12.0 and open &gt; 12.0
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">not(avg(open, 15) &gt; 12.0)
+</span>
+</p>
+</div>
+</li>
+</ul>
+</div>
+<p>It also supports basic arithmetic: +, -, * and /. For example:</p>
+<div class="itemizedlist">
+<ul type="disc">
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close + lag(close, -1)
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close - lag(close, -1)
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close / lag(close, -1)
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close * lag(close, -1)
+</span>
+</p>
+</div>
+</li>
+</ul>
+</div>
+<p>The type of returned value of arithmetic operators is the same of the first operand.
+The following examples explain the behaviour:</p>
+<div class="itemizedlist">
+<ul type="disc">
+<li>INTEGER_TYPE + INTEGER_TYPE returns an INTEGER_TYPE</li>
+<li>INTEGER_TYPE - FLOAT_TYPE returns an INTEGER_TYPE</li>
+<li>FLOAT_TYPE - INTEGER_TYPE returns a FLOAT_TYPE</li>
+<li>FLOAT_TYPE / INTEGER_TYPE returns a FLOAT_TYPE</li>
+<li>FLOAT_TYPE * FLOAT_TYPE returns a FLOAT_TYPE</li>
+</ul>
+</div>
+<p>And finally it also supports the relational operators: <span class="emphasis"><em>==</em></span>, <span class="emphasis"><em>&gt;</em></span>, <span class="emphasis"><em>&gt;=</em></span>, <span class="emphasis"><em>&lt;</em></span>,
+<span class="emphasis"><em>&lt;=</em></span> and <span class="emphasis"><em>!=</em></span>. For example:</p>
+<div class="itemizedlist">
+<ul type="disc">
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">volume == lag(volume, -1)
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close &gt; lag(close, -1)
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close &gt;= lag(close, -1)
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close &lt; lag(close, -1)
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">close &lt;= lag(close, -1)
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">volume != lag(volume, -1)
+</span>
+</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div>
+<a name="Gondola Variables"></a>
+<h4>
+<a name=""></a>9.2 Gondola Variables</h4>
+<p>The Gondola language has full support for variables, which allow you to
+store, retrieve and manipulate values. When defining a new variable you
+need to specify whether the variable can change or is constant, the variable
+type, the name of the variable and optionally the initial value of the
+variable.</p>
+<p>Examples:</p>
+<div class="itemizedlist">
+<ul type="disc">
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">int averageValue
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">const boolean myValue = true
+</span>
+</p>
+</div>
+</li>
+<li>
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">float averageValue = 10.0*12.0
+</span>
+</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div>
+<a name="Gondola Functions"></a>
+<h4>
+<a name=""></a>9.3 Gondola Functions</h4>
+<div>
+<a name="Absolute Value"></a>
+<h4>
+<a name=""></a>9.3.1 Absolute Value</h4>
+<p>The absoluate value function returns the absolute value of the given value.
+The absolute value is the positive value of a number. For example the absolute
+value of -12 is 12, and the absolute value of 12 is 12.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">abs(VALUE)</span>
+</p>
+</div>
+
+</p>
+<p>Where VALUE is the initial value.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">abs(-28.0)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the absolute value of -28.0 which is 28.0.</p>
+</div>
+<div>
+<a name="Average"></a>
+<h4>
+<a name=""></a>9.3.2 Average</h4>
+<p>The average function averages a series of stock quotes.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">avg(QUOTE, DAYS[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where DAYS is the number of days to average.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">avg(open, 15, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the average of the day open value for the current stock for the last
+15 days, ending with yesterday.</p>
+</div>
+<div>
+<a name="Bollinger Bands"></a>
+<h4>
+<a name=""></a>9.3.3 Bollinger Bands</h4>
+<p>The bollinger bands are: bol_upper=avg+2sd, bol_lower=avg-2sd .</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">bol_lower(QUOTE, DAYS[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">bol_upper(QUOTE, DAYS[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where DAYS is the number of days to average.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">bol_upper(close, 26, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the bollinger band value of the day close value for the current stock for the last
+26 days, ending with yesterday.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">bol_lower(close, 26, 0)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">bol_lower(close, 26)</span>
+</p>
+</div>
+similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">bol_upper(close, 26, 0)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">bol_upper(close, 26)</span>
+</p>
+</div>
+similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+</div>
+<div>
+<a name="Correlation"></a>
+<h4>
+<a name=""></a>9.3.4 Correlation</h4>
+<p>The correlation function returns the correlation between two stock
+quotes.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">corr(SYMBOL, QUOTE, DAYS[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where SYMBOL is the stock symbol. Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>,
+<span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where DAYS is the number of days to correlate.
+Where START_OFFSET is the most recent date to correlate, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">corr("CBA", close, 30, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the correlation of the day close values of this stock and
+CBA over 30 days ending in yesterday.</p>
+</div>
+<div>
+<a name="Cosine"></a>
+<h4>
+<a name=""></a>9.3.5 Cosine</h4>
+<p>The cosine function returns the cosine of the given value.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">cos(VALUE)</span>
+</p>
+</div>
+
+</p>
+<p>Where VALUE can be any float or integer.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">cos(0)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 1.0</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">cos(3.141592653589793/2)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 0.0</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">cos(3.141592653589793)</span>
+</p>
+</div>
+
+</p>
+<p>Returns -1.0</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">cos((3*3.141592653589793)/2)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 0.0</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">cos(2*3.141592653589793)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 1.0</p>
+</div>
+<div>
+<a name="Day"></a>
+<h4>
+<a name=""></a>9.3.6 Day</h4>
+<p>The day function returns the current day of the month.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">day()</span>
+</p>
+</div>
+
+</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">day()</span>
+</p>
+</div>
+
+</p>
+<p>Returns the current day, which will be 31, if it is the 31st.</p>
+</div>
+<div>
+<a name="Day of Week"></a>
+<h4>
+<a name=""></a>9.3.7 Day of Week</h4>
+<p>The day of week function returns the current day of the week.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">dayofweek()</span>
+</p>
+</div>
+
+</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">dayofweek()</span>
+</p>
+</div>
+
+</p>
+<p>Returns the current day of the week, which will be 1, if it is a Sunday.</p>
+</div>
+<div>
+<a name="Day of Year"></a>
+<h4>
+<a name=""></a>9.3.8 Day of Year</h4>
+<p>The day of year function returns the current day of the year.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">dayofyear()</span>
+</p>
+</div>
+
+</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">dayofyear()</span>
+</p>
+</div>
+
+</p>
+<p>Returns the current day of the year, which might be 365, if it is New Years Eve.</p>
+</div>
+<div>
+<a name="Exponential"></a>
+<h4>
+<a name=""></a>9.3.9 Exponential</h4>
+<p>The exp function returns the exponential of the given value.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">exp(VALUE)</span>
+</p>
+</div>
+
+</p>
+<p>Where VALUE is any float or integer.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">exp(0)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 1.0</p>
+</div>
+<div>
+<a name="Exponential Moving Average"></a>
+<h4>
+<a name=""></a>9.3.10 Exponential Moving Average</h4>
+<p>The exponential moving average function averages a series of stock quotes according to
+the following equation: EMA(current) = EMA(previous) + SMOOTHING_CONSTANT * (QUOTE - EMA(previous).</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">ema(QUOTE, DAYS[, START_OFFSET][, SMOOTHING_CONSTANT])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where DAYS is the number of days to average.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.
+Where SMOOTHING_CONSTANT is the smoothing constant.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">ema(close, 26, 0.1, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the average of the day close value for the current stock for the last
+26 days, ending with yesterday.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">ema(close, 26, 0, 0.1)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">ema(close, 26)</span>
+</p>
+</div>
+similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">ema(close, 26, 0, 0.2)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">ema(close, 26, 0.2)</span>
+</p>
+</div>
+similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">ema(close, 26, -1, 0.1)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">ema(close, 26, -1)</span>
+</p>
+</div>
+similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+</div>
+<div>
+<a name="For"></a>
+<h4>
+<a name=""></a>9.3.11 For</h4>
+<p>The for function is a looping function that allows you to loop over
+an expression of code. Typically the loop is tied to a variable, so you
+need to set the initial value of the variable, a condition where the loop
+will terminate, and how the variable should change after each loop.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">for(INITIAL; CONDITION; LOOP) { COMMAND }</span>
+</p>
+</div>
+
+</p>
+<p>The function will execute the INITIAL expression, then execute
+the COMMAND expression, and then execute the LOOP expression. It will
+then execute the CONDITION expression. If the CONDITION expression
+was FALSE then the function will return. Otherwise it will run the
+COMMAND expression, then the LOOP expression, then check the CONDITION
+expression, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">int b = 0
+
+for(int i = 0; i &lt; 10; i = i + 1) {
+  b = b + i
+}
+</span>
+</p>
+</div>
+
+</p>
+<p>The above code will sum the numbers 0, 1, 2, ... 9 and store the result
+in the b variable.</p>
+</div>
+<div>
+<a name="If"></a>
+<h4>
+<a name=""></a>9.3.12 If</h4>
+<p>The if function allows a selection of which code to be executed.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">if(VALUE) { TRUE } else { FALSE }</span>
+</p>
+</div>
+
+</p>
+<p>If the value of the VALUE expression is true, then the TRUE expression
+will be executed, otherwise the FALSE expression will be.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">if(lag(open, 0) &gt; lag(open, -1)) {
+   lag(open, 0)
+}
+else {
+   lag(open, -1)
+}</span>
+</p>
+</div>
+
+</p>
+<p>Returns the greater of today and yesterday's day open values.</p>
+</div>
+<div>
+<a name="Lag"></a>
+<h4>
+<a name=""></a>9.3.13 Lag</h4>
+<p>The lag function returns a stock quote.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">lag(QUOTE[, OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where OFFSET is the date to retrieve the stock quote, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">lag(high, -5)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the day high value of the current stock, 5 days previous.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">lag(close, 0)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">lag(close)</span>
+</p>
+</div> and they can both be
+abbreviated to <div class="literallayout">
+<p>
+<span style="white-space: pre;">close</span>
+</p>
+</div>; similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+</div>
+<div>
+<a name="Logarithm"></a>
+<h4>
+<a name=""></a>9.3.14 Logarithm</h4>
+<p>The log function returns the natural logarithm of the given value.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">log(VALUE)</span>
+</p>
+</div>
+
+</p>
+<p>Where VALUE is any positive float or integer.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">log(1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 0.0</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">log(exp(1)))</span>
+</p>
+</div>
+
+</p>
+<p>Returns 1.0</p>
+</div>
+<div>
+<a name="Minimum"></a>
+<h4>
+<a name=""></a>9.3.15 Minimum</h4>
+<p>The minimum function finds the minimum of a series of stock quotes.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">min(QUOTE, DAYS[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where DAYS is the number of days to search.
+Where START_OFFSET is the most recent date to search, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">min(volume, 15, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the minimum volume of trade for the current stock for the last
+15 days, ending with yesterday.</p>
+</div>
+<div>
+<a name="Maximum"></a>
+<h4>
+<a name=""></a>9.3.16 Maximum</h4>
+<p>The maximum function finds the maximum of a series of stock quotes.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">max(QUOTE, DAYS[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where DAYS is the number of days to search.
+Where START_OFFSET is the most recent date to search, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">max(volume, 15, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the maximum volume of trade for the current stock for the last
+15 days, ending with yesterday.</p>
+</div>
+<div>
+<a name="Moving Average Convergence Divergence"></a>
+<h4>
+<a name=""></a>9.3.17 Moving Average Convergence Divergence</h4>
+<p>The MACD is: MACD = 26 days EMA - 12 days EMA.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">macd(QUOTE[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">macd(close, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the macd value of the day close value for the current stock ending with yesterday.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">macd(close, 0)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">macd(close)</span>
+</p>
+</div>
+similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">macd(close, 0)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">ema(close,26,0,0.1)-ema(close,12,0,0.1)</span>
+</p>
+</div>
+similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+</div>
+<div>
+<a name="Momentum"></a>
+<h4>
+<a name=""></a>9.3.18 Momentum</h4>
+<p>The momentum is: momentum(now)=quote(now)-quote(period deleyed).</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">momentum(QUOTE, DAYS[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where DAYS is the number of days to delay.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">momentum(close, 26, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the momentum value of the day close value for the current stock for the last
+26 days, ending with yesterday.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">momentum(close, 26, 0)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">momentum(close, 26)</span>
+</p>
+</div>
+similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+</div>
+<div>
+<a name="Month"></a>
+<h4>
+<a name=""></a>9.3.19 Month</h4>
+<p>The month function returns the current month.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">month()</span>
+</p>
+</div>
+
+</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">month()</span>
+</p>
+</div>
+
+</p>
+<p>Returns the current month, which will be 8, if it is August.</p>
+</div>
+<div>
+<a name="On Balance Volume"></a>
+<h4>
+<a name=""></a>9.3.20 On Balance Volume</h4>
+<p>The OBV is the sum of volumes in the period, counted as positive if close is greater than open or
+as negative if open is greater then close.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">obv(DAYS[, START_OFFSET[, INITIAL_VALUE]])</span>
+</p>
+</div>
+
+</p>
+<p>Where DAYS is the number of days to count over.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.
+Where INITIAL_VALUE is the initial value which counting from</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">obv(200, -1, 50000)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the obv value counted over the last
+200 days, ending with yesterday, starting with value 50000.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">obv(200)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">obv(200, 0, 50000)</span>
+</p>
+</div>.</p>
+</div>
+<div>
+<a name="Percent"></a>
+<h4>
+<a name=""></a>9.3.21 Percent</h4>
+<p>The percent function returns the given percent of the given value.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">percent(VALUE, PERCENT)</span>
+</p>
+</div>
+
+</p>
+<p>Where VALUE is the initial value and PERCENT is the ratio to return.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">percent(200, 10)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 10% of 200 which is 20.</p>
+</div>
+<div>
+<a name="Relative Strength Index"></a>
+<h4>
+<a name=""></a>9.3.22 Relative Strength Index</h4>
+<p>This function calculates the Relative Strength Index (RSI) of the current stock.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">rsi([PERIOD[, START_OFFSET]])</span>
+</p>
+</div>
+
+</p>
+<p>Where PERIOD is the period to apply the RSI.
+Where START_OFFSET is the most recent date to calculate, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">rsi()</span>
+</p>
+</div>
+
+</p>
+<p>Returns the RSI of the current stock.</p>
+</div>
+<div>
+<a name="Sine"></a>
+<h4>
+<a name=""></a>9.3.23 Sine</h4>
+<p>The sine function returns the sine of the given value.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sin(VALUE)</span>
+</p>
+</div>
+
+</p>
+<p>Where VALUE can be any float or integer.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sin(0)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 0.0</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sin(3.141592653589793/2)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 1.0</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sin(3.141592653589793)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 0.0</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sin((3*3.141592653589793)/2)</span>
+</p>
+</div>
+
+</p>
+<p>Returns -1.0</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sin(2*3.141592653589793)</span>
+</p>
+</div>
+
+</p>
+<p>Returns 0.0</p>
+</div>
+<div>
+<a name="Square Root"></a>
+<h4>
+<a name=""></a>9.3.24 Square Root</h4>
+<p>The square root function returns the square root of the given value.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sqrt(VALUE)</span>
+</p>
+</div>
+
+</p>
+<p>Where VALUE is the initial value.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sqrt(144)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the square root of 144 which is 12.</p>
+</div>
+<div>
+<a name="Standard Deviation"></a>
+<h4>
+<a name=""></a>9.3.25 Standard Deviation</h4>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sd(QUOTE, DAYS[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where DAYS is the number of days to average.
+Where START_OFFSET is the most recent date to average, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sd(close, 26, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the standard deviation value of the day close value for the current stock for the last
+26 days, ending with yesterday.</p>
+<p>The expression <div class="literallayout">
+<p>
+<span style="white-space: pre;">sd(close, 26, 0)</span>
+</p>
+</div> is the same as <div class="literallayout">
+<p>
+<span style="white-space: pre;">sd(close, 26)</span>
+</p>
+</div>
+similarly for <div class="literallayout">
+<p>
+<span style="white-space: pre;">open</span>
+</p>
+</div>, <div class="literallayout">
+<p>
+<span style="white-space: pre;">high</span>
+</p>
+</div> and <div class="literallayout">
+<p>
+<span style="white-space: pre;">low</span>
+</p>
+</div>.</p>
+</div>
+<div>
+<a name="Sum"></a>
+<h4>
+<a name=""></a>9.3.26 Sum</h4>
+<p>The sum function sums a series of stock quotes.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sum(QUOTE, DAYS[, START_OFFSET])</span>
+</p>
+</div>
+
+</p>
+<p>Where QUOTE is <span class="emphasis"><em>open</em></span>, <span class="emphasis"><em>close</em></span>, <span class="emphasis"><em>low</em></span>, <span class="emphasis"><em>high</em></span> or <span class="emphasis"><em>volume</em></span>.
+Where DAYS is the number of days to sum.
+Where START_OFFSET is the most recent date to sum, 0 means the current
+trading date, -1 means the previous trading date, etc.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">sum(open, 15, -1)</span>
+</p>
+</div>
+
+</p>
+<p>Returns the sum of the day open value for the current stock for the last
+15 days, ending with yesterday.</p>
+</div>
+<div>
+<a name="While"></a>
+<h4>
+<a name=""></a>9.3.27 While</h4>
+<p>The while function is a looping function that allows you to loop over an
+expression of code. The loop contains an expression that will be executed until
+a specific condition is not met.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">while(CONDITION) { COMMAND }</span>
+</p>
+</div>
+
+</p>
+<p>The function will execute the COMMAND expression until the CONDITION
+is not met. If the CONDITION is never met, the loop will not be entered.</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">int sum = 1
+
+while(sum &lt; 100) {
+  sum = sum + 1
+}
+</span>
+</p>
+</div>
+
+</p>
+<p>The above code will keep increment the value of sum until it is equal to 100.</p>
+</div>
+<div>
+<a name="Year"></a>
+<h4>
+<a name=""></a>9.3.28 Year</h4>
+<p>The year function returns the current year.</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">year()</span>
+</p>
+</div>
+
+</p>
+<p>Example:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">year()</span>
+</p>
+</div>
+
+</p>
+<p>Returns the current year, which will be 2004, if it is 2004.</p>
+</div>
+</div>
+</div>
+<div>
+<a name="Jython Macros"></a>
+<h4>
+<a name=""></a>10 Jython Macros</h4>
+<p>Since version 0.5, Venice supports the use of the Jython (http://www.jython.org)
+scripts to automate the operation of the program.  More information and example scripts
+will be available soon.  For the moment, suffice to say that any Java object that can be
+accessed by Venice source code is fair game for macrofication.</p>
+<p>Here's a trivial example of a simple script that displays a progress dialog:</p>
+<p>
+
+<div class="literallayout">
+<p>
+<span style="white-space: pre;">
+import nz.org.venice.ui.ProgressDialogManager as PM
+import java.lang.Thread as T
+p = PM.getProgressDialog()
+p.setMaximum(10)
+p.setProgress(0)
+p.show("performing task");
+p.setProgress(6)
+T.sleep(500);
+p.setProgress(4)
+T.sleep(500);
+p.setProgress(3)
+T.sleep(500);
+p.setProgress(9)
+</span>
+</p>
+</div>
+
+</p>
+</div>
+<div>
+<a name="Analysis"></a>
+<h4>
+<a name=""></a>11 Analysis</h4>
+</div>
+</div>
+</body>
+</html>

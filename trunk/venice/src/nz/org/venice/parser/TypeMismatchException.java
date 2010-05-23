@@ -41,7 +41,7 @@ public class TypeMismatchException extends ExpressionException {
      * Create a new type mismatch exception where the message text explains
      * what caused the type mismatch.
      * 
-     * @param exp           The expression object which throws the exception
+     * @param expression    The expression object which throws the exception
      * @param type          A string list where the items are the types of the
      *                      expression.
      * @param expectedTypes A string list where the items are the types the
@@ -55,7 +55,7 @@ public class TypeMismatchException extends ExpressionException {
      * Create a new type mismatch exception where the message text explains
      * what caused the type mismatch.
      * 
-     * @param exp           The expression object which throws the exception
+     * @param expression    The expression object which throws the exception
      * @param type          The type of the expression.
      *                      
      * @param expectedType  The type expected by the expression.

@@ -1,0 +1,1 @@
+This directory contains the source XML (Docbook V5) and stylesheets to generate the website. The stylesheets generate a div-span website instead of using tables for layout. This was also done to make editing the content whilst still maintaining the layout easier.

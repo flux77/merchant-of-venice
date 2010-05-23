@@ -16,6 +16,12 @@
   <property name="test" value="${basedir}/test"/>
   <property name="web" value="${basedir}/web"/>
 
+  <!-- Static webpage replaced with generated html to make releases 
+    easier. (Easier to modify credits, news, changes etc. ) 
+    Replace generated/html with static to use the old static pages.    
+    -->
+  <property name="webstyle" value="generated/html"/>
+
   <!-- Libraries -->
   <property name="lib.hsql" value="${lib}/hsqldb.jar"/>
   <property name="lib.joone" value="${lib}/joone-engine.jar"/>
@@ -25,6 +31,8 @@
 
   <!-- Online help -->
   <property name="help" value="${src}/nz/org/venice/help/doc"/>
+  
+  <import file="${web}/${webstyle}/../build.xml"/>
 
   <!-- Generate API documentation -->
   <target name="api">
@@ -102,7 +110,7 @@
   </target>
 
   
-  <target name="cleanDocs">
+  <target name="cleanDocs" depends="webclean">
     <delete file="${doc}/manual.html"/>
     <delete file="${doc}/manual.txt"/>
     <delete>
@@ -490,24 +498,24 @@
   </target>
 
   <!-- Package up the web page ready for deployment -->
-  <target name="web" depends="api, doc, jar">
+  <target name="web" depends="api, doc, jar, layout">
 
     <!-- Copy venice.jar to web page for WebStart -->
     <copy file="venice.jar" todir="${web}"/>
 
     <!-- Copy API files to web page -->
-    <copy todir="${web}/api">
+    <copy todir="${web}/${webstyle}/api">
       <fileset dir="${api}"/>
     </copy>
 
     <!-- Make sure permissions are OK -->
     <chmod perm="u=rw,go=r">
-      <fileset dir="${web}/"/>
+      <fileset dir="${web}/${webstyle}"/>
     </chmod>
 
     <!-- Package it up ready for deployment -->
     <tar tarfile="${web}/web.tar">
-      <tarfileset dir="${web}/" excludes="web.tar*"/>
+      <tarfileset dir="${web}/${webstyle}" excludes="web.tar*"/>
     </tar>
     <gzip zipfile="${web}/web.tar.gz"
       src="${web}/web.tar"/>

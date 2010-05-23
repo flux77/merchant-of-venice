@@ -1,0 +1,69 @@
+<section>
+  <sectioninfo>
+    <title>News</title>
+  </sectioninfo>
+  
+  <para>This release includes some extra functionality and also fixes bugs which have been accumulating in the source repository.
+    <variablelist>      
+      <varlistentry>
+	<term><para>21/March/2010: Venice 0.72 beta released</para>
+	<para>The bugs fixed include:</para></term>
+	<listitem>
+	  <itemizedlist>
+	    <listitem>
+	      <para>Genetic Programming Processing</para>
+	    </listitem>
+	    <listitem>
+	      <para>Exceptions thrown when user clicks in the background.</para>
+	    </listitem>
+	    <listitem>
+	      <para>Exporting MetaStock quotes in locales which use commas as decimals points.</para>
+	    </listitem>
+	    <listitem>
+	      <para>Point and Figure initial chart direction</para>
+	    </listitem>
+	    <listitem>
+	      <para>Other miscellaneous bugs.</para>
+	    </listitem>
+	  </itemizedlist>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>11/June/2008: Launch of new website - venice.org.nz</term>	
+      </varlistentry>
+      <varlistentry>
+	<term><para>25/February/2007: Venice 0.71beta released.</para>
+	  <para>This release enhances XML support, and provides better downloading of ASX quotes.</para></term>
+      </varlistentry>
+      <varlistentry>
+	<term><para>17/April/2006: Venice 0.6beta released.</para>
+	  <para>This release brings basic intra-day quote support, a Polish translation and many bug fixes.</para></term>
+      </varlistentry>
+      <varlistentry>
+	<term><para>13/March/2005: Venice 0.5alpha released</para><para>The biggest release yet. This release brings the addition of Genetic Algorithm support, Jython scripting, and charting of custom indicators. Stock quote import and management have been improved and simplified. Venice has now been translated into Swedish.</para></term>
+      </varlistentry>
+      <varlistentry>
+	<term><para>14/August/2004: Venice 0.4alpha released</para><para>Venice has now been translated Chinese, Italian &amp; French. This release brings incremental improvements to charting, portfolio management, the Gondola language and Genetic Programming. There have also been many bug fixes.</para></term>
+      </varlistentry>
+      <varlistentry>
+	<term><para>14/March/2004: Venice 0.3alpha released</para><para>The third release brings support for importing quotes from the internet, improved stored equation support, further improvements to the Gondolda Language and many bug fixes.</para></term>
+      </varlistentry>
+      <varlistentry>
+	<term><para>24/Aug/2003: Venice 0.2alpha released</para><para>The second release brings more stock listing tables, improved paper trading with more Gondola functions, and also Genetic Programming.</para></term>
+      </varlistentry>
+      <varlistentry>
+	<term><para>13/April/2003: Venice 0.1alpha released</para><para>The first release.</para></term>
+      </varlistentry>
+      <varlistentry>
+	<term><para>17/August/2002: Project Venice web page created.</para><para>Venice now has a web page!</para></term>
+      </varlistentry>
+      <varlistentry>
+	<term><para>15/May/2002: Project Venice moved to Sourceforge</para><para>This is the first step in making Venice publicly available and will hopefully soon lead to a first release.</para></term>
+      </varlistentry>
+      <varlistentry>
+	<term><para>1/March/2001: Start of Project Venice</para><para>Project Venice was initially started as a genetic programming implementation that evolved buy/sell rules. Since then the project scope has expanded to provide much more.</para></term>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+</section>

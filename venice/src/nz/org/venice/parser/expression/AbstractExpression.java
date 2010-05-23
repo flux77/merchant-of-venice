@@ -56,18 +56,23 @@ public abstract class AbstractExpression implements Expression {
     private static java.util.logging.Handler handler;
     private static java.util.logging.Logger logger;
 
-    /**
-     * Create a new expression with the given number of children.
-     *
-     * @param children the children of the expression.
-     */
 
+
+    /**
+     * Create a new expression with no children.
+     *
+     */                
     //Terminal Expression    
     public AbstractExpression() {
 	children = null;
 	this.parent = getParent();
     }
-                
+
+    /**
+     * Create a new expression with the given number of children.
+     *
+     * @param children An array of the children of the expression.
+     */                
     public AbstractExpression(Expression[] children) {	
 	for (int i = 0; i < children.length; i++) {
 	    assert children[i] != null;
@@ -77,6 +82,12 @@ public abstract class AbstractExpression implements Expression {
 	this.parent = null;
     }
 
+
+    /**
+     * Create a new expression with the given number of children.
+     *
+     * @param children A List of the children of the expression.
+     */
     public AbstractExpression(List children) {	
 	this.children = new Expression[children.size()];
 	for (int i = 0; i < children.size(); i++) {

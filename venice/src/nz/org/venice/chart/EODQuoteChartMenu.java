@@ -327,8 +327,9 @@ public class EODQuoteChartMenu extends JMenu {
                                 if (graph != null) {
 
                                     // Remove last graph first
-                                    if(currentViewGraph != null)
+                                    if(currentViewGraph != null) {
                                         listener.remove(currentViewGraph);
+				    }
 
                                     addGraph(graph);
                                     currentViewGraph = graph;
@@ -366,8 +367,9 @@ public class EODQuoteChartMenu extends JMenu {
                     // If the menu is already selected then unselecting removes the
 
                     // graph...
-                    if(!menuItem.getState())
+                    if(!menuItem.getState() && menuItem.getState()) {
                         removeGraph(text);
+		    } 
 
                     // ... otherwise it adds the graph
                     else {
@@ -377,11 +379,39 @@ public class EODQuoteChartMenu extends JMenu {
                         // hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
                         Thread thread = new Thread() {
                                 public void run() {
-                                    Graph graph = getGraph(text);
-                                    if (graph != null)
-                                        addGraph(graph);
-                                    else
-                                        menuItem.setSelected(false);
+
+				    //This menu is setSelected automatically
+				    //unless it's specifically modified.
+				    menuItem.setSelected(true);
+				    
+				    /* graph can be null or not null. No side effects.
+				       Scenarios:
+				       1. Graph opened, removed => remove graph, unselect menuitem
+				       2. Graph not opened, cancelled => unselect menuitem.
+				       3. Graph opened, cancalled => do nothing
+				       4. Graph opened, updated => redraw.
+
+				       getGraph == null, when:
+				       button is cancelled, but no graph exists,
+				       button is delete.
+				    */
+
+                                    Graph graph = getGraph(text);				    
+                                    if (graph != null) {					
+					//Graph not in the map, means it's being added for the first
+					//time.
+					if (map.get(text) == null) {
+					    addGraph(graph);
+					} else {
+					    updateGraph(graph);
+					}					
+				    } else {
+					if (map.get(text) != null) {
+					    removeGraph(text);
+					}
+					menuItem.setSelected(false);
+										
+				    }
                                 }};
 
                         thread.start();
@@ -478,13 +508,13 @@ public class EODQuoteChartMenu extends JMenu {
     }
 
     /**
-     * Creates an instance of the graph that has the given localised name.
-     * Raises the graph's parameter user interface if it has one. Returns
-     * the graph or <code>null</code> if the user cancelled the operation.
+     * Create an instance of the graph that has the given localised name.
+     * Raise the graph's parameter user interface if it has one. Return
+     * the graph or <code>null</code> if the user cancels the operation.
      *
      * @param text localised name of graph
-     * @return the instance of that graph or <code>null</code> if the
-     *         operation was cancelled
+     * @return the instance of the graph or <code>null</code> if the
+     *         operation is cancelled
      */
     private Graph getGraph(final String text) {
         Graph graph = newGraph(text);
@@ -496,21 +526,26 @@ public class EODQuoteChartMenu extends JMenu {
 
         if(graphUI != null) {
             GraphSettingsDialog dialog =
-                new GraphSettingsDialog(graphUI, graph.getName());
+                new GraphSettingsDialog(graphUI, graph.getName(), map.get(text) == null);
 
             int buttonPressed = dialog.showDialog();
 
-            if (buttonPressed == GraphSettingsDialog.ADD) 
-                graph.setSettings(dialog.getSettings());	    	    
-            else 
-                graph = null;	    
+	    if (buttonPressed == GraphSettingsDialog.ADD || 
+		buttonPressed == GraphSettingsDialog.EDIT) {
+                graph.setSettings(dialog.getSettings());	
+	    } else if (buttonPressed == GraphSettingsDialog.DELETE) {
+		graph = null;
+		graph = null;
+	    }  else if (buttonPressed == GraphSettingsDialog.CANCEL) {
+		graph = (map.get(text) == null) ? null : graph;		
+	    }
         }
 	
 	if (graph != null && !listener.isDataAvailable(graph)) {
 	    DesktopManager.showWarningMessage(Locale.getString("CHART_NO_DATA_AVAILABLE_WARNING"));
 	    graph = null;
 	}
-
+	
         return graph;
     }
 
@@ -531,12 +566,32 @@ public class EODQuoteChartMenu extends JMenu {
 	listener.redraw();
     }
 
+    private void updateGraph(Graph graph) {
+	/*
+	  There's a race here somewhere	
+	  Steps to reproduce:
+	  1. Open a graph
+	  2. Select an indicator
+	  3. Change the type of graph (e.g. from line to bar)
+	  4. Update the indicator	
+
+	  The problem appears with the addGraph - comment out or add delay and the problem disappears.
+  	  
+	*/
+
+	removeGraph(graph.getName());	
+	addGraph(graph);
+
+	listener.redraw();
+    }
+
     /**
      * Removes a graph from the chart.
      *
      * @param mapIdentifier name of graph
      */
     private void removeGraph(String mapIdentifier) {
+	
 	Graph graph = (Graph)map.get(mapIdentifier);
 	map.remove(mapIdentifier);
 
@@ -544,6 +599,7 @@ public class EODQuoteChartMenu extends JMenu {
 	listener.remove(graph);
 	listener.redraw();
     }
+    
 
     /**
      * This method creates an instance of the graph that has the given

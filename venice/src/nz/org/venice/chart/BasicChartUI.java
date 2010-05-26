@@ -877,6 +877,13 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     /**
      * Reset the double buffer and force the chart to redraw.
      */
+
+    //This should be synchronized. Otherwise, the chart attempts to 
+    //draw before this method completes.
+
+    //But if it is synchronized EODQuoteChartMenu.updateGraph() breaks. 
+    //We need to fix the chart/ui threading issues. 
+
     public void resetBuffer() {
 	// Recalculate everything
 	quartersHorizontalAxis = null;

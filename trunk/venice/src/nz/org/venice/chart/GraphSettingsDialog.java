@@ -50,8 +50,11 @@ public class GraphSettingsDialog extends JInternalFrame {
     /** The user has pressed the ADD button. */
     public final static int ADD = 1;
 
-    // public final static int EDIT = 2;
-    // public final static int DELETE = 3;
+    /** The user has pressed the EDIT button. */
+    public final static int EDIT = 2;
+
+    /** The user has pressed the DELETE button. */
+    public final static int DELETE = 3;
 
     /** The user has pressed the CANCEL button. */
     public final static int CANCEL = 4;
@@ -61,6 +64,12 @@ public class GraphSettingsDialog extends JInternalFrame {
 
     // The graph's user interface
     private GraphUI graphUI;
+
+    // Wether this is a new graph or an existing one
+    private boolean newGraph;
+
+    //FIXME: 
+    //Don't show add buttons for adding, etc
 
     /**
      * Create a new graph settings dialog.
@@ -72,6 +81,23 @@ public class GraphSettingsDialog extends JInternalFrame {
         super(name);
 
         this.graphUI = graphUI;
+	newGraph = true;
+
+        buildUI(graphUI);
+    }
+
+    /**
+     * Create a new graph settings dialog.
+     *
+     * @param graphUI the graph settings user interface
+     * @param name the name of the graph
+     * @param newGraph wether this is a newly created graph
+     */
+    public GraphSettingsDialog(GraphUI graphUI, String name, boolean newGraph) {
+        super(name);
+
+        this.graphUI = graphUI;
+	this.newGraph = newGraph;
 
         buildUI(graphUI);
     }
@@ -79,7 +105,7 @@ public class GraphSettingsDialog extends JInternalFrame {
     /**
      * Show the dialog.
      *
-     * @return the button pressed, {@link #ADD} or {@link #CANCEL}.
+     * @return the button pressed, {@link #ADD}, {@link #EDIT}, {@link #DELETE}, or {@link #CANCEL} .
      */
     public int showDialog() {
 	// Open dialog in centre of window
@@ -110,7 +136,8 @@ public class GraphSettingsDialog extends JInternalFrame {
      * @return the settings
      */
     public HashMap getSettings() {
-        assert buttonPressed == ADD;
+	//FIXME
+	//Add assert
 
         return graphUI.getSettings();
     }
@@ -130,7 +157,7 @@ public class GraphSettingsDialog extends JInternalFrame {
                     }
                 }});
 
-        /*
+        
         JButton editButton = new JButton(Locale.getString("EDIT"));
         editButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -144,7 +171,7 @@ public class GraphSettingsDialog extends JInternalFrame {
                     buttonPressed = DELETE;
                     dispose();
                 }});
-        */
+        
 
         JButton cancelButton = new JButton(Locale.getString("CANCEL"));
         cancelButton.addActionListener(new ActionListener() {
@@ -162,11 +189,20 @@ public class GraphSettingsDialog extends JInternalFrame {
 
         JPanel buttonPanel = new JPanel();
 
-        buttonPanel.add(addButton);
-        //        buttonPanel.add(editButton);
-        // buttonPanel.add(deleteButton);
+	if (newGraph) {
+	    buttonPanel.add(addButton);
+	} else { 	
+	    buttonPanel.add(editButton);
+	    buttonPanel.add(deleteButton);
+	}
+	
         buttonPanel.add(cancelButton);	
-	getRootPane().setDefaultButton(addButton);
+
+	if (newGraph) {
+	    getRootPane().setDefaultButton(addButton);
+	} else {
+	    getRootPane().setDefaultButton(editButton);
+	}
 
         getContentPane().add(panel, BorderLayout.CENTER);
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);

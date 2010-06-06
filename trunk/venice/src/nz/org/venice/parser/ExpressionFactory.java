@@ -263,7 +263,16 @@ public class ExpressionFactory {
 	    expression = new TrendExpression(arg1, arg2, arg3);
 	    break;
 	case (Token.RANDOM_TOKEN):
-	    expression = new RandomExpression();
+	    //When no seed argument is provided, the expression 
+	    //is a Terminal expression.
+	    //When a seed is provided, the expression is
+	    //a Unary expression.
+
+	    if (arg1 == null) {
+		expression = new RandomWithoutSeedExpression(); 
+	    } else {	    
+		expression = new RandomWithSeedExpression(arg1);
+	    }
 	    break;
         default:
             // No such token
@@ -413,10 +422,7 @@ public class ExpressionFactory {
 	    assert false;
 	    expression = null;
 	}
-	
-	if (expression == null) {
-	    System.out.println("BOOM2");
-	}
+		 
 	assert expression != null;
 
 	return expression;

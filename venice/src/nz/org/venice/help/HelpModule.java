@@ -482,14 +482,21 @@ public class HelpModule extends JPanel implements Module {
 	    return -1;
 	}
 
+
 	int index;
 	String regex = "\\<.*?\\>";
 	String htmlText = editorPane.getText();
-	String plainText = htmlText.replaceAll(regex, "");		       
+	String plainText = htmlText.replaceAll(regex, "");  
 	
-	plainText = plainText.replaceAll("[\n\t' ']+"," ");				    
-	index = plainText.indexOf(searchTerm, prevSearchIndex+1);
-	
+	//Remove whitespace
+	plainText = plainText.replaceAll("[\n\t' ']+"," "); 
+	//Replace entities with space
+	plainText = plainText.replaceAll("&[#a-zA-Z0-9]*;", " ");
+	//Replace comments with space
+	plainText = plainText.replaceAll("<!--(.*?)-->", " ");
+
+	index = plainText.indexOf(searchTerm, prevSearchIndex+1);	
+       	
 	prevSearchIndex = index;
 	prevSearchTerm = searchTerm;
 	if (index != -1) {	
@@ -505,6 +512,5 @@ public class HelpModule extends JPanel implements Module {
     
     public Settings getSettings() {
 	return settings;
-    }
-    
+    }    
 }

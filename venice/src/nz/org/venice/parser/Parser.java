@@ -86,7 +86,7 @@ import nz.org.venice.util.Locale;
  *                     "dayfromstart" "(" ")" |
  *                     "capital" "(" ")" |
  *                     "stockcapital" "(" ")" |
- *                     "random" "(" ")"       |
+ *                     "random" "(" SUB_EXPR ")"       |
  *                     "trend" (" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")"
  * FLOW_CONTROL      = "if"  "(" SUB_EXPR ")" EXPR "else" EXPR |
  *                     "for" "(" SUB_EXPR ";" SUB_EXPR ";" SUB_EXPR ")" EXPR |
@@ -683,7 +683,11 @@ public class Parser {
 	case(Token.COS_TOKEN):
 	case(Token.LOG_TOKEN):
 	case(Token.EXP_TOKEN):
-	    arg1 = parseSubExpression(variables, tokens);
+	case (Token.RANDOM_TOKEN):
+	    //Parse optional seed argument
+	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		arg1 = parseSubExpression(variables, tokens);
+	    } 
 	    break;
 	
         case(Token.DAY_OF_WEEK_TOKEN):
@@ -691,7 +695,6 @@ public class Parser {
         case(Token.DAY_TOKEN):
         case(Token.MONTH_TOKEN):
         case(Token.YEAR_TOKEN):
-        case(Token.RANDOM_TOKEN):
             break;
 
 	default:

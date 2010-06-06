@@ -34,16 +34,16 @@ import nz.org.venice.quote.Symbol;
  *
  * @author Mark Hummel
  */
-public class RandomExpression extends TerminalExpression {
+public class RandomWithoutSeedExpression extends TerminalExpression {
 
     private Random random;
 
     /**
-     * Create a new random expression for the given <code>seed</code>,
-     * for the given number of <code>days</code>, starting with <code>lag</code> days away, and the given value.
-     */    
+     * Create a new random expression 
+     */
 
-    public RandomExpression() {
+    public RandomWithoutSeedExpression() {
+	super();
         random = new Random();
     }
 
@@ -53,16 +53,26 @@ public class RandomExpression extends TerminalExpression {
 	return random.nextDouble();            	
     }
 
+    /**
+     * Return the name of the expression. *
+     * @return random()
+     */
+
     public String toString() {
 	return new String("random()");
     }
+    
 
+    /**
+     * Get the type of the expression
+     * 
+     * @return {@link #FLOAT_TYPE}
+     */
     public int getType() {
 	return FLOAT_TYPE;
     }
 
-    public Object clone() {
-	
-        return new RandomExpression();
+    public Object clone() {	
+        return new RandomWithoutSeedExpression();
     }
 }

@@ -1,16 +1,25 @@
-Changes for Venice, 0.721 beta ??/??/???? 
+Changes for Venice, 0.722 beta ??/??/????
+-----------------------------------------
+
+* Improve performance of Quote Import from File
+
+* Fix Artificial Neural Network functionality
+* Fix Bug #1617089 Average Cost not included in average cost of share
+* Change table state save/restore to avoid saving the entire table contents 
+
+Changes for Venice, 0.721 beta 13/06/2010
 =========================================
 * Internationalisation:
   - German translation added (Christian Brom).
 
-* Fix Artificial Neural Network functionality
 * Allow Settings for graphs to be changed without "toggling" the graph
-* Improve performance of Quote Import from File
-
+* Ability to search Online Help 
+* Gondola Language expression types are now determined by all the subexpressions not 
 
 Bug Fixes:
+
 * Fix Quote Import/Export for locales which use commas as decimal points. (e.g. Germany)
-* Fix Bug #1617089 Average Cost not included in average cost of share
+
 
 Changes for Venice, 0.72 beta 21/03/2010
 =========================================

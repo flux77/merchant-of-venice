@@ -860,10 +860,11 @@ and <highlight>not</highlight>. For example:</para>
 </code></item>
 </list>
 
-<para>The type of returned value of arithmetic operators is the same of the first operand.
+<para>The type of the returned value is determined by the operands, with floating point types having precedence. The type determinations changed as of version 0.72. Prior to this version, the type of an expression was determined by the type of the first operand. 
+
 The following examples explain the behaviour:</para>
 <list><item>INTEGER_TYPE + INTEGER_TYPE returns an INTEGER_TYPE</item>
-<item>INTEGER_TYPE - FLOAT_TYPE returns an INTEGER_TYPE</item>
+<item>INTEGER_TYPE - FLOAT_TYPE returns a FLOAT_TYPE</item>
 <item>FLOAT_TYPE - INTEGER_TYPE returns a FLOAT_TYPE</item>
 <item>FLOAT_TYPE / INTEGER_TYPE returns a FLOAT_TYPE</item>
 <item>FLOAT_TYPE * FLOAT_TYPE returns a FLOAT_TYPE</item>
@@ -1179,6 +1180,12 @@ Where INITIAL_VALUE is the initial value which counting from</para>
 <para>Example:</para>
 <para><code>percent(200, 10)</code></para>
 <para>Returns 10% of 200 which is 20.</para>
+</section>
+
+<section name="Random">
+  <para>The random function returns a positive floating point random number between 0.0 and 1.0. This function can be used to test expressions to see if following a rule produces better results than just choosing randomly. Note that the analyser (Genetic Programming etc) functions do not generate this function.</para>
+  <para><code>random(seed)</code></para>
+  <para>Returns a random number between 0.0 and 1.0. Seed is optional</para>
 </section>
 
 <section name="Relative Strength Index">

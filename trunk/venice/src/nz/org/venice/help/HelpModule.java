@@ -81,9 +81,9 @@ public class HelpModule extends JPanel implements Module {
     private HelpModuleSettings settings;
 
     private HelpModule helpModule;
-    int prevSearchIndex;
-    String prevSearchTerm;
-    
+    private int prevSearchIndex;
+    private String prevSearchTerm;
+
     /**
      * Create a new help browser loaded at the root page.
      *
@@ -211,13 +211,7 @@ public class HelpModule extends JPanel implements Module {
 
 			if (rv != null &&
 			    !rv.equals("") ) {
-				String htmlText = editorPane.getText();
-				
-				int index = search(rv);
-				
-				if (index != -1) {
-				    
-				}				
+			    int index = search(rv);
 			}
                     }});
 
@@ -319,7 +313,7 @@ public class HelpModule extends JPanel implements Module {
     // to handle the user pressing the back/forward buttons.
     private void displayPage(HelpPage page) {
         // Display page
-        editorPane.setText(page.getText());
+        editorPane.setText(page.getText());	
 
         // By default it'll be viewing the bottom of the page - so
         // make it view the top of the page.
@@ -482,26 +476,14 @@ public class HelpModule extends JPanel implements Module {
 	    return -1;
 	}
 
+	HelpSearch helpSearch = new HelpSearch(editorPane.getText());
+	int index = helpSearch.find(searchTerm, prevSearchIndex+1);
 
-	int index;
-	String regex = "\\<.*?\\>";
-	String htmlText = editorPane.getText();
-	String plainText = htmlText.replaceAll(regex, "");  
-	
-	//Remove whitespace
-	plainText = plainText.replaceAll("[\n\t' ']+"," "); 
-	//Replace entities with space
-	plainText = plainText.replaceAll("&[#a-zA-Z0-9]*;", " ");
-	//Replace comments with space
-	plainText = plainText.replaceAll("<!--(.*?)-->", " ");
-
-	index = plainText.indexOf(searchTerm, prevSearchIndex+1);	
-       	
 	prevSearchIndex = index;
 	prevSearchTerm = searchTerm;
-	if (index != -1) {	
+	if (index != -1) {		    	    
 	    editorPane.setSelectionStart(index);
-	    editorPane.setSelectionEnd(index + searchTerm.length());
+	    editorPane.setSelectionEnd(index + searchTerm.length() );
 	    //Ensures the user doesn't have to 
 	    //explicitly click inside the editorPane 
 	    //before searching
@@ -513,4 +495,6 @@ public class HelpModule extends JPanel implements Module {
     public Settings getSettings() {
 	return settings;
     }    
+
+
 }

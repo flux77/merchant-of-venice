@@ -42,6 +42,14 @@ public class HelpSearch  {
 	    new HTMLEditorKit.ParserCallback () {
 		boolean listOpen = false;
 
+		/*
+		  Parse the HTML creating a text string which resembles closely
+		  as possible how the output appears in the EditorPane.
+		  
+		  When a search is done, the index of the text in the pane
+		  will be the same as the string created here.
+		 */
+
 		public void handleText(char[] data, int pos) {
 		    if (listOpen) {
 			for (int i = 0; i < data.length; i++) {
@@ -106,7 +114,6 @@ public class HelpSearch  {
     }
 
     public int find(String searchTerm, int prevIndex) {
-	//System.out.println("st = " + searchText);
 	return searchText.indexOf(searchTerm, prevIndex);
     }
 

@@ -524,6 +524,11 @@ public class EODQuoteChartMenu extends JMenu {
 	    graphUI = graph.getUI(new HashMap());
 	}
 
+	//Remove the graph if it exists and it has no settings 
+	if (graphUI == null && map.get(text) != null) {
+	    graph = null;
+	}
+
         if(graphUI != null) {
             GraphSettingsDialog dialog =
                 new GraphSettingsDialog(graphUI, graph.getName(), map.get(text) == null);
@@ -534,7 +539,6 @@ public class EODQuoteChartMenu extends JMenu {
 		buttonPressed == GraphSettingsDialog.EDIT) {
                 graph.setSettings(dialog.getSettings());	
 	    } else if (buttonPressed == GraphSettingsDialog.DELETE) {
-		graph = null;
 		graph = null;
 	    }  else if (buttonPressed == GraphSettingsDialog.CANCEL) {
 		graph = (map.get(text) == null) ? null : graph;		
@@ -554,7 +558,7 @@ public class EODQuoteChartMenu extends JMenu {
      *
      * @param graph the graph
      */
-    private void addGraph(Graph graph) {
+    private synchronized void addGraph(Graph graph) {
 
         String mapIdentifier = graph.getName();
 	map.put(mapIdentifier, graph);
@@ -566,7 +570,7 @@ public class EODQuoteChartMenu extends JMenu {
 	listener.redraw();
     }
 
-    private void updateGraph(Graph graph) {
+    private synchronized void updateGraph(Graph graph) {
 	/*
 	  There's a race here somewhere	
 	  Steps to reproduce:
@@ -577,6 +581,10 @@ public class EODQuoteChartMenu extends JMenu {
 
 	  The problem appears with the addGraph - comment out or add delay and the problem disappears.
   	  
+	  UPDATE: Appears to have been resolved by adding synchronized calls
+	  too BasicChartUI.resetBuffer and BasicChartUI.bufferedPaint - 
+	  currently testing
+
 	*/
 
 	removeGraph(graph.getName());	

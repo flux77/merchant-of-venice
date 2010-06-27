@@ -326,7 +326,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     }
 
     // Repaint the component and recalculate everything
-    private void bufferedPaint(Graphics g, Chart chart,
+    private synchronized void bufferedPaint(Graphics g, Chart chart,
 			       int width, int height) {
 
 	// Calculate horizontal axis
@@ -884,7 +884,9 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     //But if it is synchronized EODQuoteChartMenu.updateGraph() breaks. 
     //We need to fix the chart/ui threading issues. 
 
-    public void resetBuffer() {
+    //Seems to have been resolved - currently testing
+
+    public synchronized void resetBuffer() {
 	// Recalculate everything
 	quartersHorizontalAxis = null;
 	monthsHorizontalAxis = null;

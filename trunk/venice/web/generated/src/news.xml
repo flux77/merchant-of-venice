@@ -6,19 +6,25 @@
   <para>The latest release includes a German translation, some UI improvements, a bug fix and a reworking of the Gondola Language type system.
   <variablelist>      
       <varlistentry>
-	<term><para>03/July/2010: Venice 0.721 beta released</para></term>
-	<para>Updates in this release:</para>
+	<term>
+	  <para>03/July/2010: Venice 0.721 beta released</para>	  
+	  <para>Updates in this release:</para>
+	</term>
 	<listitem>
-	  <para>Can now update an indicator's settings instead of turning off removing the indicator and adding it againt.</para>
-	</listitem>
-	<listitem>
-	  <para>Fixed quote Import/Export for locales which use a comma as a decimal point</para>
-	</listitem>
-	<listitem>
-	  <para>Added the ability to search the online help.</para>
-	</listitem>
-	<listitem>
-	  <para>The type inference of Gondola expressions is no longer determined by the type of the first operand.</para>
+	  <itemizedlist>
+	    <listitem>
+	      <para>Can now update an indicator's settings instead of turning off removing the indicator and adding it againt.</para>
+	    </listitem>
+	    <listitem>
+	      <para>Fixed quote Import/Export for locales which use a comma as a decimal point</para>
+	    </listitem>
+	    <listitem>
+	      <para>Added the ability to search the online help.</para>
+	    </listitem>
+	  <listitem>
+	    <para>The type inference of Gondola expressions is no longer determined by the type of the first operand.</para>
+	  </listitem>
+	  </itemizedlist>
 	</listitem>
       </varlistentry>
       <varlistentry>

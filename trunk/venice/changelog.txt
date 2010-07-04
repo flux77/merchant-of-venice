@@ -14,7 +14,7 @@ Changes for Venice, 0.721 beta 3/07/2010
 
 * Allow Settings for graphs to be changed without "toggling" the graph
 * Ability to search Online Help 
-* Gondola Language expression types are now determined by all the subexpressions not 
+* Gondola Language expression types are now determined by all the subexpressions not just the first operator.
 
 Bug Fixes:
 

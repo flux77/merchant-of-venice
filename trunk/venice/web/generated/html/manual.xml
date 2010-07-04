@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns:xlink="http://www.w3.org/xlink" role="user" fileref="manual-db.xml" id="manual">
+<chapter id="manual" fileref="manual-db.xml" role="user" xmlns:xlink="http://www.w3.org/xlink">
 <chapterinfo>
 <title>Manual</title>
 </chapterinfo>

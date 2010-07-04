@@ -61,7 +61,7 @@ public class RandomWithSeedExpression extends UnaryExpression {
 
     /**
      * Check the optional input argument to the expression. It can only be
-     * {@link #INTEGET_TYPE} or {@link #FLOAT_TYPE}
+     * {@link #INTEGER_TYPE} or {@link #FLOAT_TYPE}
      *
      * @return the type of the expression
      */

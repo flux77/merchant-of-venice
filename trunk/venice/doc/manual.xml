@@ -1666,8 +1666,8 @@ with a buy signal. If the gain is less than 2%, the ANN will be trained with a s
 </section>
 
 <section name="ANN I/O Params">
-<para>Here you can add/modify/delete input expressions. These expressions must be valid Gondola expressions,
-so do not add equations (a boolean value is returned), but expressions (an integer/double value is returned).
+<para>Here you can add/modify/delete input expressions. At least one expression must be added. These expressions must be valid Gondola expressions where an integer or double value is returned; do not add equations (where a boolean value is returned). 
+
 The input expressions will be the input values for ANN during running and training. The order of input expressions
 will be the same as the order of Joone input neurons.
 Pay attention to what kind of input you put, because if the inputs are wrong the CT method will not work well.

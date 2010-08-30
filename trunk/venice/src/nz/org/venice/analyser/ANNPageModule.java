@@ -562,6 +562,22 @@ public class ANNPageModule extends AbstractTable implements Module {
     public boolean parse() {
         // Check if input strings are ok for parsing
         inputExpressions = new Expression[model.getRowCount()];
+
+
+	//At least one input expression must be added otherwise
+	//indexoutofbounds exceptions occur in Joone.  
+
+	//FIXME: NO_GENERATION_ERROR is for Genetic Algorithm
+	//Add specific error message in language properties 
+	if (inputExpressions.length <= 0) {
+	    JOptionPane.showInternalMessageDialog(desktop,
+	    Locale.getString("NO_GENERATION_ERROR"),
+	    Locale.getString("INVALID_ANN_ERROR"),
+	    JOptionPane.ERROR_MESSAGE);
+
+	    return false;
+	}
+
         for (int ii=0; ii<inputExpressions.length; ii++) {
             // We must order the expressions according to order column
             int index=0;

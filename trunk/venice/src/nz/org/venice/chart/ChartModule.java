@@ -392,9 +392,11 @@ public class ChartModule extends JPanel implements Module,
 
 	menuBar.add(menu);
 
-	scrollPane = new JScrollPane(chart);
 	
+	scrollPane = new JScrollPane(chart);
+		
 	add(scrollPane, BorderLayout.CENTER);
+		
     }
 
 
@@ -1079,6 +1081,7 @@ public class ChartModule extends JPanel implements Module,
 	}
 
 	else if (flipChart != null && e.getSource() == flipChart) {
+	    chart.getChartDrawingModel().rotateHorizontal();
 	    chart.setOrientation( chart.getOrientation() ? false : true);
 	    chart.repaint();
 	}
@@ -1396,6 +1399,17 @@ public class ChartModule extends JPanel implements Module,
 	}
 	return rv;
     }    
+
+    
+    /**
+     * Move the horizontal scroll bar to the end of the pane.
+     *
+     */    
+    public void setHBarToMax() {
+	JScrollBar hbar = scrollPane.getHorizontalScrollBar();
+	int max = hbar.getMaximum();
+	hbar.setValue(max);
+    }
 }
 
 

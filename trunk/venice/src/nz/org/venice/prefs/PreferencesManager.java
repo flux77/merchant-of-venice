@@ -1159,6 +1159,18 @@ public class PreferencesManager {
         return str;
     }
 
+    /**
+     * Load default chart scroll bar position.
+     *
+     * @return whether to move the scroll bar to the end of the pane when 
+     *         creating a new chart.   
+     */
+    public static boolean getDefaultChartScrollToEnd() {
+        Preferences prefs = getUserNode("/default_chart_defaults");
+        String str = prefs.get("scroll_to_end", "Line Graph");
+        return new Boolean(str).booleanValue();
+    }
+
 
     /**
      * Save wether to restore windows on restart
@@ -1198,6 +1210,19 @@ public class PreferencesManager {
         Preferences prefs = getUserNode("/default_chart_defaults");
 	prefs.put("default_chart", defaultChart);
     }
+
+    /**
+     * Save default chart scroll bar setting .
+     *
+     * @param isSelected if the scroll bar on a chart should be moved to the end
+     */
+    public static void putDefaultChartScrollToEnd(boolean isSelected) {
+
+        Preferences prefs = getUserNode("/default_chart_defaults");
+	prefs.put("scroll_to_end", new Boolean(isSelected).toString());
+    }
+
+        
 
     /**
      * Get quote source setting.

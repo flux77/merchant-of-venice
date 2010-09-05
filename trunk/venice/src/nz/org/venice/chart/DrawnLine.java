@@ -91,6 +91,15 @@ public class DrawnLine
 
 
     /**
+     * Horiztonally rotate the line 180 degrees.
+     */
+    public void horizRotate() {	
+	start.horizRotate();		
+	end.horizRotate();
+	
+    }
+
+    /**
      * 
      * Direct comparison between this line and a specified one
      *

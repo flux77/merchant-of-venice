@@ -143,8 +143,20 @@ public class ShareAccount extends AbstractAccount implements Cloneable {
 	if(type == Transaction.ACCUMULATE) {
             assert shares > 0;
 
-            double averageCost = (transaction.getAmount().doubleValue() /
-                                  transaction.getShares());
+	    /*	      
+	      Bug fix #1617089 and patch from TomekC
+
+	      double averageCost = (transaction.getAmount().doubleValue() /
+	      transaction.getShares());
+	    */
+
+	    //averageCost doesn't seem to be used at all
+	    //seems to be calculated from the consideration 	    
+	    	   
+	    double averageCost = ((transaction.getAmount().doubleValue() + 
+				  transaction.getTradeCost().doubleValue()) /transaction.getShares());
+
+	    
 
 	    // Do we already own the stock? If so accumulate
 	    if(holding != null)

@@ -704,6 +704,9 @@ public class CommandManager {
             chart.add(graph, portfolio, quoteBundle, 0);
             chart.redraw();
             desktopManager.newFrame(chart);
+	    if (PreferencesManager.getDefaultChartScrollToEnd()) {
+		chart.setHBarToMax();
+	    }
         }
 
         ProgressDialogManager.closeProgressDialog(progress);
@@ -787,6 +790,9 @@ public class CommandManager {
                     chart.redraw();
 
                     desktopManager.newFrame(chart);
+		    if (PreferencesManager.getDefaultChartScrollToEnd()) {
+			chart.setHBarToMax();
+		    }
                 }
 	    }
 	    });
@@ -945,8 +951,12 @@ public class CommandManager {
                     progress.increment();
             }
 
-            if (!thread.isInterrupted())
+            if (!thread.isInterrupted()) {
                 desktopManager.newFrame(chart);
+		if (PreferencesManager.getDefaultChartScrollToEnd()) {
+		    chart.setHBarToMax();
+		}
+	    }
 
             ProgressDialogManager.closeProgressDialog(progress);
         }
@@ -999,8 +1009,12 @@ public class CommandManager {
 		progress.increment();
 
 
-	    if (!thread.isInterrupted())
+	    if (!thread.isInterrupted()) {
 		desktopManager.newFrame(chart);
+		if (PreferencesManager.getDefaultChartScrollToEnd()) {
+		    chart.setHBarToMax();
+		}
+	    }
 
 
 	    ProgressDialogManager.closeProgressDialog(progress);

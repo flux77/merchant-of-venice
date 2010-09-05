@@ -27,6 +27,7 @@ package nz.org.venice.chart;
 
 import java.util.Vector;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class ChartDrawingModel
 {
@@ -230,7 +231,23 @@ public class ChartDrawingModel
 	return dataExists;
     }
 
-    /* Determine if there is any drawn elements left on the chart
+    /**
+     * Horizontally rotate all the drawn elements 180 degrees (pi radians).        
+     */
+    public void rotateHorizontal() {
+	if (!dataExists) {
+	    return;
+	}
+
+	Iterator linesIterator = lines.iterator();
+	while (linesIterator.hasNext()) {
+	    DrawnLine line = (DrawnLine)linesIterator.next();
+	    line.horizRotate();
+	}
+	
+    }
+
+    /* Determine if there are any drawn elements left on the chart
        after a delete */
     private void setDataExists() {
 
@@ -241,5 +258,7 @@ public class ChartDrawingModel
 	    dataExists = false;
 	}	    
     }
+
+
 
 }

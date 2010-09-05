@@ -26,6 +26,8 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JCheckBox;
 import java.util.Vector;
 
 import nz.org.venice.quote.EODQuoteCache;
@@ -45,7 +47,8 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 {
     private JDesktopPane desktop;
     private JComboBox defaultChart;     
-   
+    private JCheckBox scrollToLatestData;
+
     /**
      * Create a new user interface preferences page.
      *
@@ -56,12 +59,12 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        add(createQuotesPanel());
+        add(createChartDefaultsPanel());
     }
     
-    private JPanel createQuotesPanel() {
-        JPanel quotesPanel = new JPanel();
-        quotesPanel.setLayout(new BorderLayout());
+    private JPanel createChartDefaultsPanel() {
+        JPanel chartDefaultsPanel = new JPanel();
+        chartDefaultsPanel.setLayout(new BorderLayout());
         JPanel borderPanel = new JPanel();
 
         GridBagLayout gridbag = new GridBagLayout();
@@ -74,7 +77,9 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 
 	Vector chartList = new Vector();
 
-	String defaultC = PreferencesManager.getDefaultChart();
+	boolean isSelected = PreferencesManager.getDefaultChartScrollToEnd();
+
+	String defaultC = PreferencesManager.getDefaultChart();	
 	if (defaultC == null) {
 	    defaultC = "LINE_CHART";
 	}
@@ -104,8 +109,16 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
                                      Locale.getString("CHART_DEFAULT"), 
                                      chartList,
                                      gridbag, c);
-        quotesPanel.add(borderPanel, BorderLayout.NORTH);
-        return quotesPanel;
+
+	scrollToLatestData = 
+	    GridBagHelper.addCheckBoxRow(borderPanel,
+					 Locale.getString("CHART_SHOW_LATEST_LABEL"),
+					 isSelected,
+					 gridbag, c);
+		
+        chartDefaultsPanel.add(borderPanel, BorderLayout.NORTH);	
+	chartDefaultsPanel.add(scrollToLatestData);
+        return chartDefaultsPanel;
     }
 
     public JComponent getComponent() {
@@ -117,27 +130,28 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
     }
 
     public void save() {
-	String tmp = (String)defaultChart.getSelectedItem();
-	String saveValue;
-
+	String defaultChartStr = (String)defaultChart.getSelectedItem();
+	boolean isSelected = scrollToLatestData.isSelected();
 
 	//We want to save the Venice name of the chart 
 	//and not a location specific one
  
-	if (tmp.compareTo(Locale.getString("LINE_CHART")) == 0) {
-	    saveValue = "LINE_CHART";
-	} else if (tmp.compareTo(Locale.getString("BAR_CHART")) == 0) {
-	    saveValue = "BAR_CHART";
-	}  else if (tmp.compareTo(Locale.getString("CANDLE_STICK")) == 0) {
-	    saveValue = "CANDLE_STICK";	    
-	} else if (tmp.compareTo(Locale.getString("HIGH_LOW_BAR")) == 0) {
-	    saveValue = "HIGH_LOW_BAR";
-	} else if (tmp.compareTo(Locale.getString("POINT_AND_FIGURE")) == 0 ) {
-	    saveValue = "POINT_AND_FIGURE";
+	if (defaultChartStr.equals(Locale.getString("LINE_CHART"))) {
+	    defaultChartStr = "LINE_CHART";
+	} else if (defaultChartStr.equals(Locale.getString("BAR_CHART"))) {
+	    defaultChartStr = "BAR_CHART";
+	}  else if (defaultChartStr.equals(Locale.getString("CANDLE_STICK"))) {
+	    defaultChartStr = "CANDLE_STICK";	    
+	} else if (defaultChartStr.equals(Locale.getString("HIGH_LOW_BAR"))) {
+	    defaultChartStr = "HIGH_LOW_BAR";
+	} else if (defaultChartStr.equals(Locale.getString("POINT_AND_FIGURE"))) {
+	    defaultChartStr = "POINT_AND_FIGURE";
 	} else {
-	    saveValue = "LINE_CHART";
+	    defaultChartStr = "LINE_CHART";
 	}
-
-	PreferencesManager.putDefaultChart(saveValue);        
+	
+	
+	PreferencesManager.putDefaultChart(defaultChartStr);        
+	PreferencesManager.putDefaultChartScrollToEnd(isSelected);
     }
 }

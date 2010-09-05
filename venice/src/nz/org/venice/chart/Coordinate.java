@@ -117,6 +117,9 @@ public class Coordinate
     
     
 
+    public void horizRotate() {
+    }
+
     /**
      * 
      * Direct comparison between this coordinate and a specified one
@@ -134,7 +137,7 @@ public class Coordinate
 	}
 	return false;
     }
-    
+       
     //Debugging
     public String toString() {
 	String rv = "(" + dataX + "," + dataY + "," + yCoord + ")";

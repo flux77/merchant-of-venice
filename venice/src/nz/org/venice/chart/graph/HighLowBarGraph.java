@@ -60,7 +60,8 @@ public class HighLowBarGraph extends AbstractGraph {
     // See Graph.java
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange, 
+		       double topLineValue, double bottomLineValue, 
+		       List xRange, 
 		       boolean vertOrientation) {
 
 	g.setColor(colour);
@@ -97,16 +98,19 @@ public class HighLowBarGraph extends AbstractGraph {
 		xCoordinate = (int)(xoffset + horizontalScale * i);
 
 		lowY = GraphTools.calcYCoord(yoffset, dayLowY.doubleValue(),
-					     bottomLineValue, verticalScale,
+					     topLineValue, bottomLineValue, 
+					     verticalScale,
 					     vertDirection);
 
 		highY = GraphTools.calcYCoord(yoffset, dayHighY.doubleValue(),
-					     bottomLineValue, verticalScale,
-					     vertDirection);
+					      topLineValue, bottomLineValue, 
+					      verticalScale,
+					      vertDirection);
 
 		closeY = GraphTools.calcYCoord(yoffset, dayCloseY.doubleValue(),
-					     bottomLineValue, verticalScale,
-					     vertDirection);
+					       topLineValue, bottomLineValue, 
+					       verticalScale,
+					       vertDirection);
 		
 		// Draw bar
 //		g.drawLine(xCoordinate, lowY, xCoordinate, highY);		g.drawLine(xCoordinate+halfbarWidth+1 +halfBlankWidth, lowY, xCoordinate+halfbarWidth+1 +halfBlankWidth, highY);//bryan

@@ -111,14 +111,17 @@ public class CustomGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange, 
+		       double topLineValue, double bottomLineValue, 
+		       List xRange, 
 		       boolean vertOrientation) {
 
 	// We ignore the graph colours and use our own custom colours
 	g.setColor(Color.green.darker());
 	GraphTools.renderLine(g, indicatorGraphable, xoffset, yoffset,
 			      horizontalScale,
-			      verticalScale, bottomLineValue, xRange, 
+			      verticalScale, 
+			      topLineValue, bottomLineValue, 
+			      xRange, 
 			      vertOrientation);
     }
 

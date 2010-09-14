@@ -59,7 +59,8 @@ public class CandleStickGraph extends AbstractGraph {
 
 	// See Graph.java
     public void render(Graphics g, Color c, int xoffset, int yoffset,
-        double horizontalScale, double verticalScale, double bottomLineValue,
+        double horizontalScale, double verticalScale, 
+		       double topLineValue, double bottomLineValue,
 		       List xRange, boolean vertOrientation) {
 
         int xCoordinate, lowY, highY, closeY, openY;
@@ -97,20 +98,24 @@ public class CandleStickGraph extends AbstractGraph {
                 xCoordinate = (int) (xoffset + horizontalScale * i);
 
 		openY = GraphTools.calcYCoord(yoffset, dayOpenY.doubleValue(),
-					     bottomLineValue, verticalScale,
-					     vertDirection);
+					      topLineValue, bottomLineValue, 
+					      verticalScale,
+					      vertDirection);
 
 		lowY = GraphTools.calcYCoord(yoffset, dayLowY.doubleValue(),
-					     bottomLineValue, verticalScale,
+					     topLineValue, bottomLineValue, 
+					     verticalScale,
 					     vertDirection);
 
 		highY = GraphTools.calcYCoord(yoffset, dayHighY.doubleValue(),
-					     bottomLineValue, verticalScale,
-					     vertDirection);
+					      topLineValue, bottomLineValue, 
+					      verticalScale,
+					      vertDirection);
 
 		closeY = GraphTools.calcYCoord(yoffset, dayCloseY.doubleValue(),
-					     bottomLineValue, verticalScale,
-					     vertDirection);
+					       topLineValue, bottomLineValue,
+					       verticalScale,
+					       vertDirection);
 
                 // Draw bar
                 if (closeY > openY) { // red candle : open higher than close

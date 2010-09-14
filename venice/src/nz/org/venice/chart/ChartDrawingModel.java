@@ -231,22 +231,6 @@ public class ChartDrawingModel
 	return dataExists;
     }
 
-    /**
-     * Horizontally rotate all the drawn elements 180 degrees (pi radians).        
-     */
-    public void rotateHorizontal() {
-	if (!dataExists) {
-	    return;
-	}
-
-	Iterator linesIterator = lines.iterator();
-	while (linesIterator.hasNext()) {
-	    DrawnLine line = (DrawnLine)linesIterator.next();
-	    line.horizRotate();
-	}
-	
-    }
-
     /* Determine if there are any drawn elements left on the chart
        after a delete */
     private void setDataExists() {

@@ -63,16 +63,20 @@ public class MomentumGraph extends AbstractGraph {
 	super(source);
 	setSettings(settings);
     }
+    
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange, 
+		       double topLineValue, double bottomLineValue, 
+		       List xRange, 
 		       boolean vertOrientation) {
 
 	g.setColor(colour);
 	GraphTools.renderBar(g, momentum, xoffset, yoffset,
 			     horizontalScale,
-			     verticalScale, bottomLineValue, xRange, 
+			     verticalScale, 
+			     topLineValue, bottomLineValue, 
+			     xRange, 
 			     vertOrientation);
     }
 

@@ -116,10 +116,6 @@ public class Coordinate
     }
     
     
-
-    public void horizRotate() {
-    }
-
     /**
      * 
      * Direct comparison between this coordinate and a specified one

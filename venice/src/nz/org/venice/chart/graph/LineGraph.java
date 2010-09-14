@@ -52,14 +52,17 @@ public class LineGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange, boolean vertOrientation) {
+		       double topLineValue, double bottomLineValue, 
+		       List xRange, boolean vertOrientation) {
 
 	g.setColor(colour);
 
 
 	GraphTools.renderLine(g, getSource().getGraphable(), xoffset, yoffset,
 			      horizontalScale,
-			      verticalScale, bottomLineValue, xRange, vertOrientation);
+			      verticalScale, 
+			      topLineValue, bottomLineValue, 
+			      xRange, vertOrientation);
     }
 
     public String getToolTipText(Comparable x, int yCoordinate, int yoffset,

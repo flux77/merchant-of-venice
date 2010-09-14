@@ -61,12 +61,15 @@ public class AdvanceDeclineGraph implements Graph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange, 
+		       double topLineValue, double bottomLineValue, 
+		       List xRange, 
 		       boolean vertOrientation) {
 
 	GraphTools.renderLine(g, advanceDecline, xoffset, yoffset,
 			      horizontalScale,
-			      verticalScale, bottomLineValue, xRange, 
+			      verticalScale, 
+			      topLineValue, bottomLineValue, 
+			      xRange, 
 			      vertOrientation);
     }
 

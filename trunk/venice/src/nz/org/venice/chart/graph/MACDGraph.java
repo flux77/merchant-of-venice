@@ -115,7 +115,8 @@ public class MACDGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List dates, 
+		       double topLineValue, double bottomLineValue, 
+		       List dates, 
 		       boolean vertOrientation) {
 
 	// We ignore the graph colours and use our own custom colours
@@ -124,14 +125,18 @@ public class MACDGraph extends AbstractGraph {
 	g.setColor(Color.green.darker());
 	GraphTools.renderLine(g, fastMovingAverage, xoffset, yoffset,
 			      horizontalScale,
-			      verticalScale, bottomLineValue, dates, 
+			      verticalScale, 
+			      topLineValue, bottomLineValue, 
+			      dates, 
 			      vertOrientation);
 
 	// Slow moving line
 	g.setColor(Color.red.darker());
 	GraphTools.renderLine(g, slowMovingAverage, xoffset, yoffset,
 			      horizontalScale,
-			      verticalScale, bottomLineValue, dates, 
+			      verticalScale, 
+			      topLineValue, bottomLineValue, 
+			      dates, 
 			      vertOrientation);
     }
 

@@ -63,15 +63,18 @@ public interface Graph {
      *			cartesian coordinate x
      * @param	verticalScale	vertical scale factor; use this to convert
      *                  between Y value to a cartesian coordinate y
+     * @param	topLineValue	the Y value of the lowest line in the graph
      * @param	bottomLineValue	the Y value of the lowest line in the graph
      * @param	xRange	a <code>List</code> of <code>Comparable</code>
      *			that contain the X values to plot
      * @param   vertOrientation true if increasing y values mean decreasing Y values 
      */
+
     public void render(Graphics g, Color colour,
 		       int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange, 
+		       double topLineValue, double bottomLineValue, 
+		       List xRange, 
 		       boolean vertOrientation);
 
     /**

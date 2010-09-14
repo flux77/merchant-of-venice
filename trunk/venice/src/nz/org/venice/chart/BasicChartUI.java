@@ -339,7 +339,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	drawAnnotations(g, chart);
 
 	drawLines(g, chart);
-	drawPoints(g, chart);
+	drawPoints(g, chart, height);
 	drawText(g, chart);
 
 	
@@ -410,7 +410,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
       Show free hand lines drawn on chart.
     */
 
-    private void drawPoints(Graphics g, Chart chart) {
+    private void drawPoints(Graphics g, Chart chart, int height) {
 
 	ChartDrawingModel elements = chart.getChartDrawingModel();
 	Vector points = elements.getDrawnPoints();
@@ -421,6 +421,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    int x2, y2;
 	    int absY1, absY2;
 	    Coordinate coord1, coord2;
+	    boolean normalOrientation = chart.getOrientation();
 	    
 	    Color prev = g.getColor();
 	    g.setColor(Color.MAGENTA);
@@ -454,18 +455,22 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		    if (absY2 != Coordinate.BREAK) {
 			x2 = getXCoordinate(chart, coord2);
 			y2 = getYCoordinate(chart, coord2);
-		    }
-		    
-		    if (absY1 == Coordinate.BREAK) {
+		    }		    
+
+		    if (absY1 == Coordinate.BREAK) {			
 			g.drawLine(x2,y2,x2+1,y2+1);
-		    } else if (absY2 == Coordinate.BREAK) {
+		    } else if (absY2 == Coordinate.BREAK) {			
 			g.drawLine(x1,y1,x1+1,y1+1);
 		    } else {
-			//otherwise connect the dots
+			//otherwise connect the dots			
+			if (!normalOrientation) {
+			    y1 = height - y1;
+			    y2 = height - y2;
+			}
 			g.drawLine(x1,y1,x2,y2);
-		    }
-		    
-		}
+		    }		       					
+		}				
+
 	    }
 	    g.setColor(prev);
 	    g.setPaintMode();
@@ -498,7 +503,15 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 		
 		endX = getXCoordinate(chart, line.getEnd());
 		endY = getYCoordinate(chart, line.getEnd());
-
+		
+		boolean normalOrientation = chart.getOrientation(); 
+		if (!normalOrientation) {
+		    int tmp;
+		    tmp = startY;
+		    startY = endY;
+		    endY = tmp;
+		}		
+		
 		prev = g.getColor();
 		
 		g.setColor(Color.MAGENTA);
@@ -1069,6 +1082,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 			 (height-verticalAxis.getHeightOfGraph())/2,
 			 horizontalScale,
 			 verticalAxis.getScale(),
+			 verticalAxis.getTopLineValue(),
 			 verticalAxis.getBottomLineValue(),
 			 chart.getXRange(),
 			 chart.getOrientation());

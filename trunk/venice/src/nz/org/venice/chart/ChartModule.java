@@ -1081,7 +1081,6 @@ public class ChartModule extends JPanel implements Module,
 	}
 
 	else if (flipChart != null && e.getSource() == flipChart) {
-	    chart.getChartDrawingModel().rotateHorizontal();
 	    chart.setOrientation( chart.getOrientation() ? false : true);
 	    chart.repaint();
 	}

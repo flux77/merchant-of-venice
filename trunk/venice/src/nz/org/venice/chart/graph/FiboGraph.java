@@ -60,7 +60,8 @@ public class FiboGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange, boolean vertOrientation) {
+		       double topLineValue, double bottomLineValue, 
+		       List xRange, boolean vertOrientation) {
 	// We ignore the graph colours and use our own custom colours
 	g.setColor(Color.blue);
 
@@ -75,29 +76,34 @@ public class FiboGraph extends AbstractGraph {
 	for( int i = 0 ; i< fibopct.length ; i++ ) {
 		yValue = (hundredpctlevel - zeropctlevel) * fibopct[i] + zeropctlevel; 
 	    GraphTools.renderHorizontalLine(g, yValue, xoffset, yoffset,    		
-					    horizontalScale, verticalScale, bottomLineValue, xRange, vertOrientation
+					    horizontalScale, verticalScale, 
+					    bottomLineValue, topLineValue, 
+					    xRange, vertOrientation
 					    );
 
 	    label = fmt.format(fibopct[i]*100) + "% " + fmt1.format(yValue);  
 	    renderLabel(g, yValue, label, xoffset, yoffset,
-	            horizontalScale, verticalScale, bottomLineValue, xRange);
+	            horizontalScale, verticalScale, 
+			topLineValue, bottomLineValue, xRange);
 
 		}
     }
 
     public static void renderLabel(Graphics g,
-            double yValue,
-            String text,
-            int xoffset,
-            int yoffset,
-            double horizontalScale,
-            double verticalScale,
-            double bottomLineValue,
-            List xRange) {
+				   double yValue,
+				   String text,
+				   int xoffset,
+				   int yoffset,
+				   double horizontalScale,
+				   double verticalScale,				   
+				   double topLineValue,
+				   double bottomLineValue,
+				   List xRange) {
 
     	//int startX = xoffset;
     	int endX = (int)(xoffset + (xRange.size() - 1) * horizontalScale);
-    	int y = yoffset - GraphTools.scaleAndFitPoint(yValue, bottomLineValue, verticalScale);
+    	int y = yoffset - GraphTools.scaleAndFitPoint(yValue, 
+						      bottomLineValue, verticalScale);
     	
     	endX -= 30; // space for text
     	y -= 1; //move on top of line

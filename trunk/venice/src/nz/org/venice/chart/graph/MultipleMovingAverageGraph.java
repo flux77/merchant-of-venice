@@ -79,7 +79,8 @@ public class MultipleMovingAverageGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List dates, 
+		       double topLineValue, double bottomLineValue, 
+		       List dates, 
 		       boolean vertOrientation) {
 
 	// We ignore the graph colours and use our own custom colours
@@ -90,7 +91,8 @@ public class MultipleMovingAverageGraph extends AbstractGraph {
 	    Graphable avg = (Graphable)iterator.next();
 	    GraphTools.renderLine(g, avg, xoffset, yoffset,
 				  horizontalScale,
-				  verticalScale, bottomLineValue, dates, 
+				  verticalScale, 
+				  topLineValue, bottomLineValue, dates, 
 				  vertOrientation);
 	    
 	}
@@ -100,7 +102,9 @@ public class MultipleMovingAverageGraph extends AbstractGraph {
 	    Graphable avg = (Graphable)iterator.next();
 	    GraphTools.renderLine(g, avg, xoffset, yoffset,
 				  horizontalScale,
-				  verticalScale, bottomLineValue, dates, 
+				  verticalScale, 
+				  topLineValue, bottomLineValue, 
+				  dates, 
 				  vertOrientation);
 	}
 	

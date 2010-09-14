@@ -27,10 +27,11 @@ public class GraphTools {
 
     public static void renderHorizontalLine(Graphics g,
                                             double yValue,
-                                            int xoffset,
+					    int xoffset,
                                             int yoffset,
                                             double horizontalScale,
                                             double verticalScale,
+					    double topLineValue, 
                                             double bottomLineValue,
                                             List xRange, 
 					    boolean vertOrientation) {
@@ -39,7 +40,7 @@ public class GraphTools {
         int startX = xoffset;
         int endX = (int)(xoffset + (xRange.size() - 1) * horizontalScale);
 	
-	int y = calcYCoord(yoffset, yValue, bottomLineValue, 
+	int y = calcYCoord(yoffset, yValue, topLineValue, bottomLineValue, 
 			   verticalScale, vertDirection);
 
         g.drawLine(startX, y, endX, y);
@@ -48,17 +49,20 @@ public class GraphTools {
     public static void renderLine(Graphics g, Graphable source,
 				  int xoffset, int yoffset,
 				  double horizontalScale, double verticalScale,
-				  double bottomLineValue, List xRange) {
+				  double topLineValue, double bottomLineValue, 
+				  List xRange) {
 	renderLine(g, source, xoffset, yoffset, 
 		   horizontalScale, verticalScale,
-		   bottomLineValue, xRange, 
+		   topLineValue, bottomLineValue, 
+		   xRange, 
 		   true);
     }
 
     public static void renderLine(Graphics g, Graphable source,
 				  int xoffset, int yoffset,
 				  double horizontalScale, double verticalScale,
-				  double bottomLineValue, List xRange, boolean vertOrientation) {
+				  double topLineValue, double bottomLineValue, 
+				  List xRange, boolean vertOrientation) {
 	
 	int xCoordinate, yCoordinate;
 	int lastXCoordinate = -1 , lastYCoordinate = -1;
@@ -89,7 +93,8 @@ public class GraphTools {
 	    if(y != null) {
 		xCoordinate = (int)(xoffset + horizontalScale * i);
 		yCoordinate = calcYCoord(yoffset, y.doubleValue(), 
-					 bottomLineValue, verticalScale,
+					 topLineValue, bottomLineValue, 
+					 verticalScale,
 					 vertDirection);
 		
 		
@@ -108,20 +113,24 @@ public class GraphTools {
 	}
     }
 
-        public static void renderBar(Graphics g, Graphable source,
+
+    public static void renderBar(Graphics g, Graphable source,
 				 int xoffset, int yoffset,
 				 double horizontalScale, double verticalScale,
-				 double bottomLineValue, List xRange) {
-	    renderBar(g, source, xoffset, yoffset, 
-		      horizontalScale, verticalScale, bottomLineValue, xRange,
-		      true);
-	}
+				 double topLineValue, double bottomLineValue, 
+				 List xRange) {
+	renderBar(g, source, xoffset, yoffset, 
+		  horizontalScale, verticalScale, 
+		  topLineValue, bottomLineValue, xRange,
+		  true);
+    }
 
 
     public static void renderBar(Graphics g, Graphable source,
 				 int xoffset, int yoffset,
 				 double horizontalScale, double verticalScale,
-				 double bottomLineValue, List xRange, 
+				 double topLineValue, double bottomLineValue, 
+				 List xRange, 
 				 boolean vertOrientation) {
 	int x2, y1, y2;
 //	int x1 = -1;    int halfbarWidth=(int)(0.309 * horizontalScale);//bryan    int halfBlankWidth=(int) (horizontalScale-halfbarWidth*2)/2;//bryan
@@ -132,7 +141,7 @@ public class GraphTools {
 	int i = 0;
 	int vertDirection = (vertOrientation) ? 1 : -1;
 	
-	y2 = calcYCoord(yoffset, 0, bottomLineValue, verticalScale, 
+	y2 = calcYCoord(yoffset, 0, topLineValue, bottomLineValue, verticalScale, 
 			vertDirection);
 	
 	//y2 = yoffset - scaleAndFitPoint(0, bottomLineValue, verticalScale);
@@ -165,7 +174,8 @@ public class GraphTools {
 	    //y1 = yoffset - scaleAndFitPoint(doubleValue,
 	    //			    bottomLineValue, verticalScale);
 
-	    y1 = calcYCoord(yoffset, doubleValue, bottomLineValue, 
+	    y1 = calcYCoord(yoffset, doubleValue, 
+			    topLineValue, bottomLineValue, 
 			    verticalScale, vertDirection);
 
 		g.fillRect( x2 +halfBlankWidth, Math.min(y1, y2),	    				halfbarWidth*2+1, Math.abs(y2-y1));
@@ -204,12 +214,15 @@ public class GraphTools {
 
     // chars is character to draw - in synch with list xRange
     public static void renderChar(Graphics g, PFGraphable source,
-				 int xoffset, int yoffset,
-				 double horizontalScale, double verticalScale,
-				  double bottomLineValue, List xRange) {
+				  int xoffset, int yoffset,
+				  double horizontalScale, double verticalScale,
+				  double topLineValue, double bottomLineValue, 
+				  List xRange) {
 				  
 	renderChar(g, source, xoffset, yoffset, 
-		   horizontalScale, verticalScale, bottomLineValue, xRange,
+		   horizontalScale, verticalScale, 
+		   topLineValue, bottomLineValue, 
+		   xRange,
 		   true);
 	
     }
@@ -217,8 +230,9 @@ public class GraphTools {
     // chars is character to draw - in synch with list xRange
     public static void renderChar(Graphics g, PFGraphable source,
 				 int xoffset, int yoffset,
-				 double horizontalScale, double verticalScale,
-				  double bottomLineValue, List xRange, 
+				  double horizontalScale, double verticalScale,
+				  double topLineValue, double bottomLineValue, 
+				  List xRange, 
 				  boolean vertOrientation) {
 
 	int xCoordinate, yCoordinate;
@@ -254,13 +268,12 @@ public class GraphTools {
 		if(y != null) {
 		
 		    xCoordinate = (int)(xoffset + horizontalScale * i);
-		    yCoordinate = yoffset - scaleAndFitPoint(y.doubleValue(),
-							     bottomLineValue,
-							     verticalScale);
-		    
+		    		    
 		    yCoordinate = calcYCoord(yoffset, y.doubleValue(),
-					     bottomLineValue, verticalScale,
+					     topLineValue, bottomLineValue, 
+					     verticalScale,
 					     vertDirection);
+
 		    g.drawString(source.getString(x),xCoordinate, yCoordinate);
 		
 		}				
@@ -271,24 +284,28 @@ public class GraphTools {
 	
     }
 
-
-            // chars is character to draw - in synch with list xRange
+    
+    // chars is character to draw - in synch with list xRange
     public static void renderMarker(Graphics g, PFGraphable source,
 				    int xoffset, int yoffset,
 				    double horizontalScale, double verticalScale,
-				    double bottomLineValue, List xRange) {
+				    double topLineValue, double bottomLineValue, 
+				    List xRange) {
 	
 	renderMarker(g, source, xoffset, yoffset,
-		     horizontalScale, verticalScale, bottomLineValue,xRange,
+		     horizontalScale, verticalScale, 
+		     topLineValue, bottomLineValue,
+		     xRange,
 		     true);
 
     }
 
-        // chars is character to draw - in synch with list xRange
+    // chars is character to draw - in synch with list xRange
     public static void renderMarker(Graphics g, PFGraphable source,
 				    int xoffset, int yoffset,
 				    double horizontalScale, double verticalScale,
-				    double bottomLineValue, List xRange, boolean vertOrientation) {
+				    double topLineValue, double bottomLineValue, 
+				    List xRange, boolean vertOrientation) {
 
 	int xCoordinate, yCoordinate;
 	int xCoordinate2, yCoordinate2;
@@ -330,13 +347,15 @@ public class GraphTools {
 		    xCoordinate = (int)(xoffset + horizontalScale * i);
 
 		    yCoordinate = calcYCoord(yoffset, y.doubleValue(),
-					     bottomLineValue, verticalScale,
+					     topLineValue, bottomLineValue, 
+					     verticalScale,
 					     vertDirection);
 		    
 		    xCoordinate2 = (int)(xoffset + horizontalScale * (i + columnSpan));
 		    		    
 		    yCoordinate2 = calcYCoord(yoffset, y.doubleValue() - boxPrice,
-					     bottomLineValue, verticalScale,
+					      topLineValue, bottomLineValue, 
+					      verticalScale,
 					     vertDirection);
 		    
 		    deltaX = xCoordinate2 - xCoordinate;
@@ -377,6 +396,7 @@ public class GraphTools {
      * @param   yoffset The yoffset in the graphics object where the graph 
      *                  starts 
      * @param   yValue  The data point (Y value)
+     * @param   topLineValue The Y value of the highest line in the graph
      * @param   bottomLineValue The Y value of the lowest line in the graph
      * @param   verticalScale  The verticalScale used to convert between
      *                         Y value and cartesian coordinate y.
@@ -386,19 +406,19 @@ public class GraphTools {
      * 
      */
 
-    public static int calcYCoord(int yoffset, double yValue, 
-				double bottomLineValue, 
-				double verticalScale,
+    public static int calcYCoord(int yoffset, double yValue,
+				 double topLineValue,
+				 double bottomLineValue, 
+				 double verticalScale,
 				 int vertDirection) {
-				
-	
-	int vertOffset = (vertDirection == 1) ? yoffset : 0;
+		
+	int levelHeight = yoffset - scaleAndFitPoint(topLineValue, bottomLineValue, verticalScale);
+
+	int vertOffset = (vertDirection == 1) ? yoffset : levelHeight;
 	
 	return vertOffset - scaleAndFitPoint(vertDirection * yValue, 
-					 vertDirection * bottomLineValue,
-					 verticalScale);
-    }
-				
-
+					     vertDirection * bottomLineValue,
+					     verticalScale);
+    }				
 }
 

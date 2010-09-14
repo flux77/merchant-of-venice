@@ -72,7 +72,8 @@ public class CountbackLineGraph extends AbstractGraph {
 
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange, 
+		       double topLineValue, double bottomLineValue, 
+		       List xRange, 
 		       boolean vertOrientation) {
 
 	// We ignore the graph colours and use our own custom colours
@@ -82,7 +83,9 @@ public class CountbackLineGraph extends AbstractGraph {
 
 	GraphTools.renderLine(g, countback, xoffset, yoffset,
 			      horizontalScale,
-			      verticalScale, bottomLineValue, xRange, 
+			      verticalScale, 
+			      topLineValue, bottomLineValue, 
+			      xRange, 
 			      vertOrientation);
     }
 

@@ -60,16 +60,19 @@ public class BarChartGraph extends AbstractGraph {
 
     public void render(Graphics g, Color c, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange) {
+		       double topLineValue, double bottomLineValue, 
+		       List xRange) {
+
 	render(g, c, xoffset, yoffset, horizontalScale, verticalScale,
-	       bottomLineValue, xRange, true);
+	       topLineValue, bottomLineValue, xRange, true);
     }
 		       
 
     // See Graph.java
     public void render(Graphics g, Color c, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
-		       double bottomLineValue, List xRange, 
+		       double topLineValue, double bottomLineValue, 
+		       List xRange, 
 		       boolean vertOrientation) {
 
 	g.setColor(Color.RED);
@@ -111,20 +114,24 @@ public class BarChartGraph extends AbstractGraph {
 		xCoordinate = (int)(xoffset + horizontalScale * i);
 		
 		openY = GraphTools.calcYCoord(yoffset, dayOpenY.doubleValue(),
-					     bottomLineValue, verticalScale,
-					     vertDirection);
-
+					      topLineValue, bottomLineValue, 
+					      verticalScale,
+					      vertDirection);
+		
 		lowY = GraphTools.calcYCoord(yoffset, dayLowY.doubleValue(),
-					     bottomLineValue, verticalScale,
+					     topLineValue, bottomLineValue, 
+					     verticalScale,
 					     vertDirection);
 
 		highY = GraphTools.calcYCoord(yoffset, dayHighY.doubleValue(),
-					     bottomLineValue, verticalScale,
-					     vertDirection);
-
+					      topLineValue, bottomLineValue, 
+					      verticalScale,
+					      vertDirection);
+		
 		closeY = GraphTools.calcYCoord(yoffset, dayCloseY.doubleValue(),
-					     bottomLineValue, verticalScale,
-					     vertDirection);
+					       topLineValue, bottomLineValue, 
+					       verticalScale,
+					       vertDirection);
 	       		
 								
 

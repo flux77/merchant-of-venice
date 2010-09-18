@@ -188,11 +188,14 @@ public class MainMenu implements ActionListener, ModuleListener
         // File -> Preferences
         filePreferencesMenuItem = MenuHelper.addMenuItem(this, fileMenu,
                 Locale.getString("PREFERENCES"), 'R');
+        filePreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke('R', InputEvent.CTRL_MASK));
+
         fileMenu.addSeparator();
         
         // File -> Exit
         fileExitMenuItem = MenuHelper.addMenuItem(this, fileMenu, Locale.getString("EXIT"), 'Q');
-        
+        fileExitMenuItem.setAccelerator(KeyStroke.getKeyStroke('Q', InputEvent.CTRL_MASK));
+
         /**********************************************
          * Table
          **********************************************/
@@ -243,16 +246,25 @@ public class MainMenu implements ActionListener, ModuleListener
         quoteCommoditiesListAllMenuItem =
             MenuHelper.addMenuItem(this, quoteMenuCommodities,
                     Locale.getString("LIST_ALL"), 'L');
+        quoteCommoditiesListAllMenuItem.setAccelerator(KeyStroke.getKeyStroke('L', 
+		    InputEvent.CTRL_MASK));
+
         
         // Table -> All Stocks -> List by Rule
         quoteCommoditiesListRuleMenuItem =
             MenuHelper.addMenuItem(this, quoteMenuCommodities,
-                    Locale.getString("LIST_BY_RULE"),'B');
+                    Locale.getString("LIST_BY_RULE"),'U');
+        quoteCommoditiesListRuleMenuItem.setAccelerator(KeyStroke.getKeyStroke('U', 
+                    InputEvent.CTRL_MASK));
+
         
         // Table -> All Stocks -> List by Date
         quoteCommoditiesListDateMenuItem =
             MenuHelper.addMenuItem(this, quoteMenuCommodities,
                     Locale.getString("LIST_BY_DATE"),'D');
+        quoteCommoditiesListDateMenuItem.setAccelerator(KeyStroke.getKeyStroke('D',
+                    InputEvent.CTRL_MASK));
+
         
         // Table -> Stocks -> List by Symbols
         JMenu quoteMenuStocks = MenuHelper.addMenu(quoteMenu,
@@ -261,6 +273,8 @@ public class MainMenu implements ActionListener, ModuleListener
         quoteStocksListSymbolsMenuItem =
             MenuHelper.addMenuItem(this, quoteMenuStocks,
                     Locale.getString("LIST_BY_SYMBOLS"), 'B');
+        quoteStocksListSymbolsMenuItem.setAccelerator(KeyStroke.getKeyStroke('B',
+                    InputEvent.CTRL_MASK));
         
         quoteMenu.addSeparator();
         
@@ -281,6 +295,9 @@ public class MainMenu implements ActionListener, ModuleListener
         graphCommodityCodeMenuItem =
             MenuHelper.addMenuItem(this, graphCommodityMenu,
                     Locale.getString("GRAPH_BY_SYMBOLS"), 'G');
+        graphCommodityCodeMenuItem.setAccelerator(KeyStroke.getKeyStroke('G',
+                    InputEvent.CTRL_MASK));
+
         
         // Graph -> Commodities -> By Name
         //	    graphCommodityNameMenuItem =
@@ -706,6 +723,9 @@ public class MainMenu implements ActionListener, ModuleListener
         macroManageMenuItem =
             MenuHelper.addMenuItem(this, macroMenu,
                     Locale.getString("MANAGE"), 'M');
+        macroManageMenuItem.setAccelerator(KeyStroke.getKeyStroke('M',
+                    InputEvent.CTRL_MASK));
+
         macroMenu.addSeparator();
 
         for (int i = 0; i < stored_macros.size(); i++) {

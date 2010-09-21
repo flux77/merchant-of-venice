@@ -72,18 +72,7 @@
   </target>
 
   <target name='webclean'>
-    <delete dir='${webdest}/api'/>
-    <delete>
-      <fileset dir='${webdest}' includes='*.html'/>
-    </delete>
-    <delete>
-      <fileset dir='${webdest}/' includes='*.png'/>
-    </delete>
-    <delete>
-      <fileset dir='${webdest}' includes='*.css'/>
-    </delete>
-    <delete file='${webdest}/common.xml'/>
-    <delete file='${webdest}/manual.xml'/>
+    <delete dir='${webdest}'/>
   </target>
 
 </project>

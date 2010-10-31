@@ -1,12 +1,14 @@
-Changes for Venice, 0.722 beta ??/??/????
+Changes for Venice, 0.723 beta ??/??/????
+
+* Change table state save/restore to avoid saving the entire table contents 
+
+Changes for Venice, 0.722 beta 01/11/2010
 -----------------------------------------
 
-* Improve performance of Quote Import from File
-
-* Fix Artificial Neural Network functionality
+* Fixed Artificial Neural Network functionality
   (Updated manual, added input check)
-* Fix Bug #1617089 Average Cost not included in average cost of share
-* Change table state save/restore to avoid saving the entire table contents 
+* Fixed Bug #1617089 Average Cost not included in average cost of share
+* Fixed bug #3062208 Keyboard shortcuts
 
 Changes for Venice, 0.721 beta 3/07/2010
 =========================================

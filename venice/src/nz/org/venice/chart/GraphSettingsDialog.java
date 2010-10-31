@@ -201,7 +201,7 @@ public class GraphSettingsDialog extends JInternalFrame {
 	if (newGraph) {
 	    getRootPane().setDefaultButton(addButton);
 	} else {
-	    getRootPane().setDefaultButton(editButton);
+	    getRootPane().setDefaultButton(deleteButton);
 	}
 
         getContentPane().add(panel, BorderLayout.CENTER);

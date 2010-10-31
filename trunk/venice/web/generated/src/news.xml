@@ -2,9 +2,26 @@
   <sectioninfo>
     <title>News</title>
   </sectioninfo>
-  
-  <para>The latest release includes a German translation, some UI improvements, a bug fix and a reworking of the Gondola Language type system.
+
+   
+  <para>Only bug fixes and miscellaneous user interface improvements were included in the latest release.  
   <variablelist>      
+    <varlistentry>
+      <term>
+	<para>01/November/2010: Venice 0.722 beta released</para>
+	<para>Bug fixes released:</para>
+	</term>
+      <listitem>
+	<itemizedlist>
+	  <listitem>
+	    <para>Bug #3062208 Keyboard shortcuts not working</para>
+	  </listitem>
+	  <listitem>
+	    <para>Bug #1617089 Average Cost not included in average cost of share</para>
+	  </listitem>	  	  
+	</itemizedlist>
+      </listitem>
+    </varlistentry>
       <varlistentry>
 	<term>
 	  <para>03/July/2010: Venice 0.721 beta released</para>	  

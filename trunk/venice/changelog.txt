@@ -9,6 +9,7 @@ Changes for Venice, 0.722 beta 01/11/2010
   (Updated manual, added input check)
 * Fixed Bug #1617089 Average Cost not included in average cost of share
 * Fixed bug #3062208 Keyboard shortcuts
+* Now have the option for charts to display the newest data first. 
 
 Changes for Venice, 0.721 beta 3/07/2010
 =========================================

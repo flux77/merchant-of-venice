@@ -137,8 +137,9 @@ public class ExpressionColumn extends Column implements Cloneable {
             for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
                 Quote quote = (Quote)iterator.next();
                 
-                try {
+                try {		   
                     int offset = quoteBundle.getOffset(quote);
+
                     double result = expression.evaluate(new Variables(), 
                                                         quoteBundle, quote.getSymbol(), 
                                                         offset);
@@ -149,6 +150,18 @@ public class ExpressionColumn extends Column implements Cloneable {
                     // Shouldn't happen
                     assert false;
                 }
+		catch (EvaluationException e) {
+		    //Some expressions evaluation will be undefined for
+		    //the parameters. (e.g. the expression evaluations to 
+		    //determining the maximum of the empty set. )
+		    //This could because of the applied date range 
+		    //doesn't contain any data.
+		    //We don't want to halt the application of equations
+		    //for all instances. 
+		    double result = 0.0;
+		    results.put(quote.getSymbol().toString() + quote.getDate().toString(),
+                                new ExpressionResult(expression.getType(), result));
+		}
             }
         }
     }

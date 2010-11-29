@@ -52,9 +52,12 @@ public class MaxExpression extends TernaryExpression {
 
         int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
+	
+
         if(days <= 0)
             throw EvaluationException.MAX_RANGE_EXCEPTION;
         int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+
         if (offset > 0)
            throw EvaluationException.MAX_OFFSET_EXCEPTION;
         
@@ -114,31 +117,28 @@ String c1 = (getChild(0) != null) ? getChild(0).toString() : "(null)";
 	boolean missingQuotes = false;
 	
 	for(int i = offset - days + 1; i <= offset; i++) {
-
             try {
                 double value = quoteBundle.getQuote(symbol, quote, day, i);
-                
-                if(value > max)
+                if(value > max) {
                     max = value;
-
+		}
+		
 		setValue = true;
-            }
-            catch(MissingQuoteException e) {
+            } catch(MissingQuoteException e) {
 		missingQuotes = true;
                 // nothing to do
             }
-
-	    /* 
-	       Returning Double.MIN_VALUE here causes offset to overflow
-	       when the parent is a LagExpression. Consequently, offset becomes
-	       a positive value which triggers assertions which halt analyser 
-	       processes. 
-	    */	   
-	    if (!setValue && missingQuotes) {
-		throw EvaluationException.UNDEFINED_RESULT_EXCEPTION;
-	    }
 	}
-
+	/* 
+	   Returning Double.MIN_VALUE here causes offset to overflow
+	   when the parent is a LagExpression. Consequently, offset becomes
+	   a positive value which triggers assertions which halt analyser 
+	   processes. 
+	*/
+	   
+	if (!setValue && missingQuotes) {
+	    throw EvaluationException.UNDEFINED_RESULT_EXCEPTION;
+	}            	   
 	return max;
     }
 

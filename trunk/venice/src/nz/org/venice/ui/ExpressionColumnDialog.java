@@ -122,6 +122,8 @@ public class ExpressionColumnDialog extends JInternalFrame implements ActionList
 	buttonPanel.add(okButton);
 	buttonPanel.add(cancelButton);
 
+	getRootPane().setDefaultButton(okButton);
+
 	getContentPane().add(mainPanel, BorderLayout.NORTH);
 	getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 

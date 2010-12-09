@@ -39,6 +39,7 @@ import javax.swing.border.TitledBorder;
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.quote.DatabaseQuoteSource;
+import nz.org.venice.quote.DatabaseManager;
 import nz.org.venice.quote.QuoteSourceManager;
 import nz.org.venice.util.Locale;
 
@@ -188,14 +189,14 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         databaseSoftware.addItem(Locale.getString("HSQLDB"));
         databaseSoftware.addItem(Locale.getString("OTHER"));
         
-		if(databasePreferences.software.equals(DatabaseQuoteSource.MYSQL_SOFTWARE))
-   	       databaseSoftware.setSelectedIndex(DatabaseQuoteSource.MYSQL);
-	    else if(databasePreferences.software.equals(DatabaseQuoteSource.POSTGRESQL_SOFTWARE))
-	       databaseSoftware.setSelectedIndex(DatabaseQuoteSource.POSTGRESQL);
-		else if(databasePreferences.software.equals(DatabaseQuoteSource.HSQLDB_SOFTWARE))
-	       databaseSoftware.setSelectedIndex(DatabaseQuoteSource.HSQLDB);
+	if(databasePreferences.software.equals(DatabaseManager.MYSQL_SOFTWARE))
+	    databaseSoftware.setSelectedIndex(DatabaseManager.MYSQL);
+	    else if(databasePreferences.software.equals(DatabaseManager.POSTGRESQL_SOFTWARE))
+	       databaseSoftware.setSelectedIndex(DatabaseManager.POSTGRESQL);
+		else if(databasePreferences.software.equals(DatabaseManager.HSQLDB_SOFTWARE))
+	       databaseSoftware.setSelectedIndex(DatabaseManager.HSQLDB);
 		else
-		   databaseSoftware.setSelectedIndex(DatabaseQuoteSource.OTHER);
+		   databaseSoftware.setSelectedIndex(DatabaseManager.OTHER);
         // If the user changes the database, then update the port
         // field to reflect the default port of the database.
         databaseSoftware.addActionListener(new ActionListener() {
@@ -204,11 +205,11 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                         populateDatabaseDrivers();
                         databaseUsername.setEnabled(true);
                         databasePassword.setEnabled(true);
-                        if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.MYSQL)
+                        if(databaseSoftware.getSelectedIndex() == DatabaseManager.MYSQL)
                             databasePort.setText(Integer.toString(MYSQL_DEFAULT_PORT));
-                        else if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.POSTGRESQL)
+                        else if(databaseSoftware.getSelectedIndex() == DatabaseManager.POSTGRESQL)
                             databasePort.setText(Integer.toString(POSTGRESQL_DEFAULT_PORT));
-                        else if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.HSQLDB) {
+                        else if(databaseSoftware.getSelectedIndex() == DatabaseManager.HSQLDB) {
                             databasePort.setText(Integer.toString(HSQLDB_DEFAULT_PORT));
                             // And enable/disable the username and password fields if applicable
                             // Hypesonic SQL does not accept the username password fields
@@ -262,7 +263,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                                                         gridbag, c, 15);
         
         // Hypesonic SQL does not accept the username password fields
-        if(databaseSoftware.getSelectedIndex() == DatabaseQuoteSource.HSQLDB) {
+        if(databaseSoftware.getSelectedIndex() == DatabaseManager.HSQLDB) {
             databaseUsername.setEnabled(false);
             databasePassword.setEnabled(false);
         }

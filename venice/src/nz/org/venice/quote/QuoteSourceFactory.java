@@ -42,7 +42,9 @@ public class QuoteSourceFactory {
      */
     public static DatabaseQuoteSource createInternalQuoteSource() {
         String fileName = PreferencesManager.getInternalFileName();
-        return new DatabaseQuoteSource(fileName);
+	DatabaseManager dbm = new DatabaseManager(fileName);
+
+	return new DatabaseQuoteSource(dbm);
     }
 
     /**
@@ -118,13 +120,16 @@ public class QuoteSourceFactory {
         PreferencesManager.DatabasePreferences prefs = 
            PreferencesManager.getDatabaseSettings();
         
-        return new DatabaseQuoteSource(prefs.software, 
-                                       prefs.driver,
-                                       prefs.host, 
-                                       prefs.port, 
-                                       prefs.database, 
-                                       prefs.username, 
-                                       prefs.password);
+        DatabaseManager dbm = new DatabaseManager( 
+						 prefs.software, 
+						 prefs.driver,
+						 prefs.host, 
+						 prefs.port, 
+						 prefs.database, 
+						 prefs.username, 
+						 prefs.password);
+
+	return new DatabaseQuoteSource(dbm);
     }
 }
     

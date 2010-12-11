@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-
+import nz.org.venice.quote.DatabaseManager;
 import nz.org.venice.quote.DatabaseQuoteSource;
 import nz.org.venice.quote.EODQuote;
 import nz.org.venice.quote.Symbol;
@@ -83,7 +83,8 @@ public class DatabaseQuoteSourceTest extends TestCase
             fail(e.getMessage());
         }
 
-        DatabaseQuoteSource database = new DatabaseQuoteSource(databaseFile);
+	DatabaseManager databaseManager = new DatabaseManager(databaseFile);
+        DatabaseQuoteSource database = new DatabaseQuoteSource(databaseManager);
 
         //
         // Test import

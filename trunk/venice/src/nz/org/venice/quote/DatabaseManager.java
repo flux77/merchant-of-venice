@@ -749,7 +749,7 @@ public class DatabaseManager
 
 
     public boolean multipleStatementSupported() {
-	return (software == HSQLDB_SOFTWARE) ? false : true;
+	return (software == HSQLDB_SOFTWARE) ? true : false;
     }
    
 }

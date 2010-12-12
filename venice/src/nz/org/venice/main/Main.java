@@ -85,12 +85,32 @@ public class Main extends JFrame {
 	return Main.venice;
     }
 
+    // Set the codepage to get correct console output
+    private void setConsoleCodePage() {
+	String osName = System.getProperty("os.name");
+	String codePage = "";
+	if(osName.startsWith("Windows")) codePage = "CP850";  
+	else if(osName.startsWith("Mac")) codePage = "UTF-8";
+	if(codePage != "") {
+	    try {
+		System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out),
+					      false, codePage));
+		System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.err), 
+					      true, codePage));
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    } 
+	}
+    }
+
     // Go!
     private Main() {
         // Set the preferred language if any is defined as preferred,
         // otherwise setLocale gets the current language from the system.
         Locale.setLocale();
-        // Display a brief copyright message
+	// Set the console code page depending on your operating system.
+	setConsoleCodePage();
+	// Display a brief copyright message
         String title = (Locale.getString("VENICE_LONG") + ", " + LONG_VERSION + " / " +
 			RELEASE_DATE);
         System.out.println(title);

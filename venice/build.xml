@@ -11,6 +11,7 @@
   <property name="release" value="${basedir}/release"/>
   <property name="report" value="${basedir}/report"/>
   <property name="src" value="${basedir}/src"/>
+  <property name="classes" value="${basedir}/classes"/>
   <property name="lib" value="${basedir}/lib"/>
   <property name="temp" value="${basedir}/temp"/>
   <property name="test" value="${basedir}/test"/>
@@ -30,7 +31,7 @@
   <property name="lib.xml" value="${lib}/xstream-1.3.jar"/>
 
   <!-- Online help -->
-  <property name="help" value="${src}/nz/org/venice/help/doc"/>
+  <property name="help" value="${classes}/nz/org/venice/help/doc"/>
   
   <import file="${web}/${webstyle}/../build.xml"/>
 
@@ -69,7 +70,9 @@
 
   <!-- Build venice -->
   <target name="build">
+    <mkdir dir="${classes}"/>
     <javac srcdir="${src}"
+	   destdir="${classes}"
 	   debug="on"
   	   optimize="on"
 	   source="1.4"
@@ -77,7 +80,7 @@
            excludes="nz/org/venice/tools/*">
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
         <pathelement path="${lib.hsql}"/>
         <pathelement path="${lib.mysql}"/>
         <pathelement path="${lib.joone}"/>
@@ -85,13 +88,17 @@
         <pathelement path="${lib.xml}"/>
       </classpath>
     </javac>
+
+    <copy todir="${classes}" overwrite="y">
+      <fileset dir="${src}"
+               includes="**/*.gif, **/*.png,
+                         **/*.properties,
+                         nz/org/venice/quote/samples/*.txt"/>
+    </copy>
   </target>
 
   <!-- Remove all built files and generated documentation. -->
   <target name="clean" depends="cleanDocs">
-    <delete>
-      <fileset dir="${src}" includes="**/*.class"/>
-    </delete>
     <delete>
       <fileset dir="${test}" includes="**/*.class"/>
     </delete>
@@ -99,6 +106,7 @@
     <delete dir="Venice.app"/>
     <delete dir="${api}"/>    
     <delete file="${web}/venice.jar"/>
+    <delete dir="${classes}"/>
     <delete dir="${release}"/>
     <delete dir="${temp}"/>        
     <delete dir="${report}"/>
@@ -113,9 +121,6 @@
   <target name="cleanDocs" depends="webclean">
     <delete file="${doc}/manual.html"/>
     <delete file="${doc}/manual.txt"/>
-    <delete>
-      <fileset dir="${help}" includes="*.html"/>
-    </delete>
     <delete file="${help}/index.xml"/>
     <delete file="${web}/web.tar"/>
     <delete file="${web}/web.tar.gz"/>
@@ -210,7 +215,7 @@
     </unjar>
 
     <copy todir="${temp}">
-      <fileset dir="${src}"
+      <fileset dir="${classes}"
                includes="**/*.class, **/*.gif, **/*.png,
                          nz/org/venice/help/doc/*.html,
                          **/*.properties,
@@ -244,8 +249,16 @@
   <!-- Check the locale files for consistency -->
   <target name="locale">
     
+    <mkdir dir="${classes}"/>
+    <copy todir="${classes}" overwrite="y">
+      <fileset dir="${src}"
+               includes="**/*.properties"/>
+    </copy>
+
+    
     <!-- Make sure locale tool is compiled -->
     <javac srcdir="${src}"
+	   destdir="${classes}"
            debug="on"
            source="1.4"
            includes="nz/org/venice/tools/Locale.java"/>
@@ -254,14 +267,14 @@
 
     <echo>Comparing Chinese locale against English reference locale...</echo> 
     <java classname="nz.org.venice.tools.Locale"
-          dir="${src}"
+          dir="${classes}"
           fork="yes">
       <arg value="nz/org/venice/util/locale/venice_en.properties"/>
       <arg value="nz/org/venice/util/locale/venice_zh.properties"/>
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
       </classpath>
     </java>
 
@@ -274,7 +287,7 @@
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
       </classpath>
     </java>
 
@@ -287,7 +300,7 @@
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
       </classpath>
     </java>
 
@@ -300,7 +313,7 @@
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
       </classpath>
     </java>
 
@@ -313,7 +326,7 @@
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
       </classpath>
     </java>
 
@@ -326,7 +339,7 @@
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
       </classpath>
     </java>
 
@@ -339,7 +352,7 @@
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
       </classpath>
     </java>
 
@@ -437,12 +450,12 @@
   <!-- Run Venice -->
   <target name="run" depends="build, doc">
     <java classname="nz.org.venice.main.Main"
-          dir="${src}"
+          dir="${classes}"
           fork="yes">
       <jvmarg value="-ea"/>
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
         <pathelement path="${lib.hsql}"/>
         <pathelement path="${lib.joone}"/>
         <pathelement path="${lib.mysql}"/>
@@ -464,7 +477,7 @@
 	   includes="**/*.java">
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
         <pathelement path="${test}"/>
         <pathelement path="${lib.hsql}"/>
         <pathelement path="${lib.joone}"/>
@@ -480,7 +493,7 @@
            haltonfailure="no">
       <classpath>
         <pathelement path="${java.class.path}"/>
-        <pathelement path="${src}"/>
+        <pathelement path="${classes}"/>
         <pathelement path="${test}"/>
         <pathelement path="${lib.hsql}"/>
         <pathelement path="${lib.joone}"/>

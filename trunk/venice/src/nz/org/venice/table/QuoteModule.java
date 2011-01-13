@@ -71,6 +71,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     private JMenuItem findSymbol;
     private JMenuItem graphSymbols;
     private JMenuItem tableSymbols;
+    private JMenuItem alertSymbols;
     private JMenuItem applyExpressions;
     private JMenuItem applyFilter;
     private JMenuItem sortByMostActive;
@@ -178,8 +179,9 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
     private void checkMenuDisabledStatus() {
 	int numberOfSelectedRows = getSelectedRowCount();
 
-        graphSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
-        tableSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
+        graphSymbols.setEnabled(numberOfSelectedRows > 0 ? true : false);
+        tableSymbols.setEnabled(numberOfSelectedRows > 0 ? true : false);
+	alertSymbols.setEnabled(numberOfSelectedRows == 1? true : false);
     }
 
     // If the user double clicks on a stock with the LMB, graph the stock.
@@ -354,6 +356,10 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             tableSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
                                        Locale.getString("TABLE"));
+
+	    alertSymbols = 
+		MenuHelper.addMenuItem(this, symbolsMenu,
+				       Locale.getString("ALERT_TITLE"));
         }
 
         // Listen for changes in selection so we can update the menus
@@ -571,7 +577,7 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             CommandManager.getInstance().graphStockBySymbol(symbols);
         }
 
-        // Table symbols, either by the popup menu or the main menu
+	// Table symbols, either by the popup menu or the main menu
         else if((popupTableSymbols != null && e.getSource() == popupTableSymbols) ||
                 e.getSource() == tableSymbols) {
 
@@ -588,7 +594,13 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
             // Table the highlighted symbols
             CommandManager.getInstance().tableStocks(symbols);
         }
+	else if (e.getSource() == alertSymbols) {
+	    int[] selectedRows = getSelectedRows();
+	    Symbol symbol = (Symbol)model.getValueAt(selectedRows[0],
+						    EODQuoteModel.SYMBOL_COLUMN);
 
+	    CommandManager.getInstance().newAlert(symbol);
+	}
 	else
             assert false;
     }

@@ -38,6 +38,8 @@ automated buy/sell paper trade rules.
 frequently executed tasks in Venice.
 </para>
 
+<para><link to='Alerts'>Alerts</link> are a way to display alarms when certain user defined conditions are met.</para>
+
 <para><link to="Analysis">Analysis</link> describes some
 of the more advance technical analysis that is available
 in Venice. For charting see <link to="Graphs">Graphs</link>.
@@ -1747,4 +1749,48 @@ text box, choose the bundle of stocks carefully, because the system manages only
 </chapter>
 
 </chapter>
+
+<chapter name='Alerts'>
+<para>An alert is a trigger which fires based upon a criteria set by a user previously and which alert the user when that critiera is met. An alert consists of a symbol, a date of effect and a triggering condition. For example, trigger an alert when symbol 'FOO' closes above $10.00. </para>
+
+<para>Notification that an alert has triggered appears when Venice is started, and whenever new quotes are imported. </para>
+
+<section name='Alert Types'>
+<para>Alerts can be set on quote values (ie Open, High, Low, Close &amp; Volume) or on Gondola Expressions. For quote alerts, upper , lower and exact bounds can be set. </para>
+</section>
+
+<section name='Enabling and Disabling Alert Notifications'>
+<para>Enabling and disabling alerts is set via 'Preferences -> Alert Destination'. If the destination is 'Disable', alert notifications will not be shown. Note that when notifications are disabled alerts cannot be set nor modified.</para>
+
+<section name='Choosing where to store alerts'>
+<para>Alerts can be stored on the local filesystem or in the Database where quote data is stored. Record your choice in 'Preferences -> Alert Destination'. </para>
+</section>
+
+</section>
+
+<section name='Setting Alerts'>
+<para>Alerts can be set via a Watch Screen, a chart, or through the menu option 'Table -> List Alerts -> Add Alert'. The latter option will not have a symbol defaulted and must be entered. </para>
+<para>The Alert type is the first field in the 'Add Alert' dialog.</para>
+<para>For a quote alert, the data value to test (e.g. Open, Close, etc) and the bound type (ie upper, lower, or exact) must be supplied. For an expression alert, only the expression must be supplied.
+</para>
+</section>
+
+<section name='Enabling and Disabling Alerts'>
+<para>Alerts are turned on or off by listing the alerts through 'Table -> List Alerts'. Select the alerts you want to enable or disable and select the appropriate option in the 'Alerts' dialog. The 'Add Alert' dialog will display. Fill in the form and press the 'OK' button. The new alert will appear in the list of alerts.</para>
+</section>
+
+<section name='Modifying Alerts'>
+<para>Alerts are modified by selecting the alert you wish to modify and selecting the 'Modify Alert' menu option. The 'Edit Alert' dialog will display with the alert's values in the dialog. Modify the values and press the 'OK' button and the alert list will refresh.</para>
+</section>
+
+<section name='Removing Alerts'>
+<para>Alerts are removed by selecting the alerts you wish to remove and select the 'Remove Alert' menu option. A confirmation dialog will display, and when the 'yes' button is pressed, the alerts will be removed and the Alert List updated.</para>
+</section>
+
+<section name='Replaying Triggered Alerts'>
+<para>If you wish to replay the alert notifications, select the 'Table -> Alerts -> Show Triggered Alerts'.</para>
+</section>
+
+</chapter>
+
 </document>

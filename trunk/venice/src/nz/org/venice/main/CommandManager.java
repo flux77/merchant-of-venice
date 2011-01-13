@@ -28,6 +28,10 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.Icon;
+
 import nz.org.venice.analyser.ANNModule;
 import nz.org.venice.analyser.ANNResultModule;
 import nz.org.venice.analyser.GAModule;
@@ -63,6 +67,14 @@ import nz.org.venice.table.PortfolioTableModule;
 import nz.org.venice.table.QuoteModule;
 import nz.org.venice.table.WatchScreen;
 import nz.org.venice.table.WatchScreenModule;
+import nz.org.venice.alert.Alert;
+import nz.org.venice.alert.AlertModule;
+import nz.org.venice.alert.AlertReader;
+import nz.org.venice.alert.AlertWriter;
+import nz.org.venice.alert.AlertManager;
+import nz.org.venice.alert.AlertException;
+import nz.org.venice.alert.AlertDialog;
+import nz.org.venice.alert.AlertTriggeredDialog;
 import nz.org.venice.importer.PreferencesXML;
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.ui.ExpressionQuery;
@@ -232,6 +244,7 @@ public class CommandManager {
                 }
             });
         thread.start();
+
     }
 
     public void tableStocksByRule(final int type) {
@@ -295,6 +308,148 @@ public class CommandManager {
         }
 
         ProgressDialogManager.closeProgressDialog(progressDialog);
+    }
+    
+    public void tableAlerts() {
+	Thread thread = new Thread(new Runnable() {
+                public void run() {
+		    AlertReader ar = AlertManager.getReader();		    
+		    AlertWriter aw = AlertManager.getWriter();
+		    AlertModule alertModule;
+
+		    if (ar == null) {
+			JOptionPane.showInternalMessageDialog(desktop,
+							      Locale.
+							      getString("ALERT_DISABLED_ERROR"),
+							      Locale.
+							      getString("ALERT_DISABLED_ERROR"),
+							      JOptionPane.WARNING_MESSAGE);
+		    } else {
+			try {
+			    alertModule = new AlertModule(desktop, ar, aw);
+			    desktopManager.newFrame(alertModule);		    			} catch (AlertException e) {
+			    JOptionPane.showInternalMessageDialog(desktop,
+								  "localiseme",									      
+								  e.getMessage(),
+								  JOptionPane.ERROR_MESSAGE);
+			}
+		    }
+
+
+                }
+            });
+        thread.start();
+    }
+
+    public void tableAlertsBySymbol(final List symbols) {
+	Thread thread = new Thread(new Runnable() {
+                public void run() {
+		    
+		    List symbolsCopy;
+
+		    if(symbols == null) {
+                        symbolsCopy =
+			    (List)SymbolListDialog.getSymbols(desktop,
+							Locale.getString("GRAPH_BY_SYMBOLS")); 
+		    } else {
+			symbolsCopy = symbols;
+		    }
+		    
+		    AlertReader ar = AlertManager.getReader();
+		    AlertWriter aw = AlertManager.getWriter();
+		    AlertModule alertModule;
+		    
+		    if (ar == null) {
+			JOptionPane.showInternalMessageDialog(desktop,
+							      Locale.
+							      getString("ALERT_DISABLED_ERROR"),
+							      Locale.
+							      getString("ALERT_DISABLED_ERROR"),
+							      JOptionPane.WARNING_MESSAGE);
+		    } else {
+			try {
+			    alertModule = new AlertModule(desktop, 
+							  symbolsCopy, 
+							  ar, aw);
+			    desktopManager.newFrame(alertModule);		    			} catch (AlertException e) {
+			    JOptionPane.showInternalMessageDialog(desktop,
+								  Locale.
+								  getString("ALERT_EXCEPTION"),
+								  e.getMessage(),
+								  JOptionPane.ERROR_MESSAGE);
+			}
+		    }
+		
+		}
+            });
+        thread.start();
+    }
+
+    public void newAlert(final Symbol symbol) {
+	Thread showAddDialog = new Thread() {
+		public void run() {
+		    AlertWriter alertWriter = AlertManager.getWriter();
+		    AlertDialog dialog = 
+			new AlertDialog(desktop, symbol, alertWriter);
+
+		    dialog.newAlert();
+		}
+	    };
+	showAddDialog.start();
+    }
+
+    public void triggeredAlerts() {
+	ArrayList triggeredAlerts = new ArrayList();
+	ArrayList triggerValues = new ArrayList();
+	boolean alertsTriggered = AlertManager.alertsTriggered(triggeredAlerts,
+							       triggerValues);
+
+	if (alertsTriggered) {
+	    showTriggeredAlerts(triggeredAlerts, triggerValues);
+	}
+    }
+
+    private void showTriggeredAlerts(final List alerts, final List triggerValues) {
+	Thread thread = new Thread(new Runnable() {
+                public void run() {
+		    Iterator alertIterator = alerts.iterator();
+		    Iterator valueIterator = triggerValues.iterator();
+		    Double triggerValue = null;
+		    while (alertIterator.hasNext()) {
+			Alert alert = (Alert)alertIterator.next();
+			if (!valueIterator.hasNext()) {
+			    assert false;
+			} else {
+			    triggerValue = (Double)valueIterator.next();
+			}
+
+			int optionSelected = 
+			    AlertTriggeredDialog.show(desktop, 
+						      alert, 
+						      triggerValue.toString());
+			
+			ArrayList symbols = new ArrayList();
+			
+			symbols.add(alert.getSymbol());
+			
+			switch (optionSelected) {
+			case AlertTriggeredDialog.OPEN_TABLE:
+			    tableStocks(symbols);
+			    break;
+			case AlertTriggeredDialog.OPEN_CHART:
+			    graphStockBySymbol(symbols);
+			    break;
+			case AlertTriggeredDialog.OPEN_ALERT:
+			    tableAlertsBySymbol(symbols);
+			    break;
+			default:
+			    break;
+			}
+		    }
+
+		}
+	    });
+	thread.start();
     }
 
     /**
@@ -1112,6 +1267,7 @@ public class CommandManager {
 	    if(!wakeIfPresent(importQuoteModuleFrame)) {
                 ImportQuoteModule importQuoteModule = new ImportQuoteModule(desktop);
 		importQuoteModuleFrame = desktopManager.newFrame(importQuoteModule, true, true, false);
+		
 	    }
 	}
     }
@@ -1220,6 +1376,6 @@ public class CommandManager {
 	    graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
 	}
 	return graph;
-    }
+    }    
 
 }

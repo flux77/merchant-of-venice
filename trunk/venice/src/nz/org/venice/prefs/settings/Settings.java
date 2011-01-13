@@ -50,6 +50,7 @@ public interface Settings {
     public static final int HELP        = 6;
     public static final int PORTFOLIO   = 7;
     public static final int PREFERENCES = 8;
+    public static final int ALERTS      = 9;
 
     //Module Types
     public static final int MODULE      = 0;

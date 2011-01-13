@@ -81,13 +81,8 @@ public class DatabaseQuoteSource implements QuoteSource
     /**
      * Creates a new quote source to connect to an external database.
      *
-     * @param   software  the database software
-     * @param   driver    the class name for the driver to connect to the database
-     * @param	host	  the host location of the database
-     * @param	port	  the port of the database
-     * @param	database  the name of the database
-     * @param	username  the user login
-     * @param	password  the password for the login
+     * @param   manager   The DatabaseManager object which manages software,
+     *                    username/host/port etc.
      */
     public DatabaseQuoteSource(DatabaseManager manager) {
         this.manager = manager;
@@ -335,7 +330,7 @@ public class DatabaseQuoteSource implements QuoteSource
      * @see EODQuoteCache
      */
     public boolean loadQuoteRange(EODQuoteRange quoteRange) {
-        
+
 	String queryString = buildSQLString(quoteRange);
         boolean success;
 	
@@ -343,9 +338,10 @@ public class DatabaseQuoteSource implements QuoteSource
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
         progress.setNote(Locale.getString("LOADING_QUOTES"));
         progress.setIndeterminate(true);
+	
 	success = executeSQLString(progress, queryString);
         ProgressDialogManager.closeProgressDialog(progress);
-
+	
         return success;
     }
 
@@ -519,7 +515,10 @@ public class DatabaseQuoteSource implements QuoteSource
             
             filterString = filterString.concat(DatabaseManager.DATE_FIELD + 
 					       " = '" +
-                                               toSQLDateString(quoteRange.getFirstDate()) + "' ");
+                                               manager.
+					       toSQLDateString(quoteRange.
+							       getFirstDate()) 
+					       + "' ");
         }
 	
         // Otherwise check within a range of dates
@@ -529,11 +528,15 @@ public class DatabaseQuoteSource implements QuoteSource
             
             filterString = filterString.concat(DatabaseManager.DATE_FIELD + 
 					       " >= '" +
-                                               toSQLDateString(quoteRange.getFirstDate()) +
+                                               manager.
+					       toSQLDateString(quoteRange.
+							       getFirstDate()) +
                                                "' AND " +
                                                DatabaseManager.DATE_FIELD + 
 					       " <= '" +
-                                               toSQLDateString(quoteRange.getLastDate()) +
+                                               manager.
+					       toSQLDateString(quoteRange.
+							       getLastDate()) +
                                                "' ");
         }
 	
@@ -566,7 +569,7 @@ public class DatabaseQuoteSource implements QuoteSource
             }
 
             if(newQuotes.size() > 0) {
-                if(manager.multipleStatementSupported()) {
+                if(manager.supportForSingleRowUpdatesOnly()) {
                     quotesImported = importQuoteMultipleStatements(newQuotes);
 		} else {
                     quotesImported = importQuoteSingleStatement(newQuotes);
@@ -618,14 +621,22 @@ public class DatabaseQuoteSource implements QuoteSource
                 String insertQuery = new String("INSERT INTO " + 
 						DatabaseManager.SHARE_TABLE_NAME +
                                                 " VALUES (" +
-                                                "'" + toSQLDateString(quote.getDate()) + "', " +
-                                                "'" + quote.getSymbol()                + "', " +
-                                                "'" + quote.getDayOpen()               + "', " +
-                                                "'" + quote.getDayClose()              + "', " +
-                                                "'" + quote.getDayHigh()               + "', " +
-                                                "'" + quote.getDayLow()                + "', " +
-                                                "'" + quote.getDayVolume()             + 
-                                                "')");
+                                                "'" + manager.
+						toSQLDateString(quote
+								.getDate()) 
+						+ "', " +
+                                                "'" + quote.getSymbol()
+						+ "', " +
+                                                "'" + quote.getDayOpen()
+						+ "', " +
+                                                "'" + quote.getDayClose()
+						+ "', " +
+                                                "'" + quote.getDayHigh()
+						+ "', " +
+                                                "'" + quote.getDayLow()
+						+ "', " +
+                                                "'" + quote.getDayVolume()
+						+ "')");
                 
                 // Now insert the quote into database
                 Statement statement = manager.createStatement();
@@ -668,7 +679,8 @@ public class DatabaseQuoteSource implements QuoteSource
                 insertString.append(", (");
             
             // Add new quote
-            insertString.append("'" + toSQLDateString(quote.getDate()) + "', " +
+            insertString.append("'" + manager.toSQLDateString(quote.getDate()) 
+				+ "', " +
                                 "'" + quote.getSymbol()                + "', " +
                                 "'" + quote.getDayOpen()               + "', " +
                                 "'" + quote.getDayClose()              + "', " +
@@ -791,7 +803,7 @@ public class DatabaseQuoteSource implements QuoteSource
                 new String("SELECT COUNT(*) FROM " + 
 			   DatabaseManager.SHARE_TABLE_NAME +
                            " WHERE " + DatabaseManager.DATE_FIELD + " = '" + 
-			   toSQLDateString(date) + "' AND " +
+			   manager.toSQLDateString(date) + "' AND " +
                            DatabaseManager.DAY_CLOSE_FIELD + " > " + 
 			   DatabaseManager.DAY_OPEN_FIELD + " AND " +
                            "LENGTH(" + DatabaseManager.SYMBOL_FIELD + 
@@ -828,7 +840,7 @@ public class DatabaseQuoteSource implements QuoteSource
                 new String("SELECT COUNT(*) FROM " + 
 			   DatabaseManager.SHARE_TABLE_NAME +
                            " WHERE " + DatabaseManager.DATE_FIELD + " = '" + 
-			   toSQLDateString(date) + "' AND " +
+			   manager.toSQLDateString(date) + "' AND " +
                            DatabaseManager.DAY_CLOSE_FIELD + " < " + 
 			   DatabaseManager.DAY_OPEN_FIELD + " AND " +
                            "LENGTH(" + DatabaseManager.SYMBOL_FIELD + 
@@ -893,9 +905,10 @@ public class DatabaseQuoteSource implements QuoteSource
                 new String("SELECT COUNT(*), date FROM " + 
 			   DatabaseManager.SHARE_TABLE_NAME +
                            " WHERE " + DatabaseManager.DATE_FIELD + 
-			   " >= '" + toSQLDateString(firstDate) + "' AND " + 
+			   " >= '" + manager.toSQLDateString(firstDate) + 
+			   "' AND " + 
 			   DatabaseManager.DATE_FIELD + " <= '" + 
-			   toSQLDateString(lastDate) + "' AND " + 
+			   manager.toSQLDateString(lastDate) + "' AND " + 
                            DatabaseManager.DAY_CLOSE_FIELD + " > " + 
 			   DatabaseManager.DAY_OPEN_FIELD + " AND " +
                            "LENGTH(" + DatabaseManager.SYMBOL_FIELD + 
@@ -941,9 +954,9 @@ public class DatabaseQuoteSource implements QuoteSource
                 new String("SELECT COUNT(*), date FROM " + 
 			   DatabaseManager.SHARE_TABLE_NAME +
                            " WHERE " + DatabaseManager.DATE_FIELD + " >= '" + 
-			   toSQLDateString(firstDate) + "' AND " + 
+			   manager.toSQLDateString(firstDate) + "' AND " + 
 			   DatabaseManager.DATE_FIELD + " <= '" + 
-			   toSQLDateString(lastDate) + "' AND " + 
+			   manager.toSQLDateString(lastDate) + "' AND " + 
                            DatabaseManager.DAY_CLOSE_FIELD + " < " + 
 			   DatabaseManager.DAY_OPEN_FIELD + " AND " +
                            "LENGTH(" + DatabaseManager.SYMBOL_FIELD + 
@@ -1064,14 +1077,14 @@ public class DatabaseQuoteSource implements QuoteSource
             buffer.append(DatabaseManager.SYMBOL_FIELD + " = '" + 
 			  symbol.toString() + "' AND " +
                           DatabaseManager.DATE_FIELD + " >= '" + 
-			  toSQLDateString(startDate) + "' AND " +
+			  manager.toSQLDateString(startDate) + "' AND " +
                           DatabaseManager.DATE_FIELD + " <= '" + 
-			  toSQLDateString(endDate) + "' ");
+			  manager.toSQLDateString(endDate) + "' ");
 
         // 2. All quotes are on the same date.
         else if(sameDate)
             buffer.append(DatabaseManager.DATE_FIELD + " = '" + 
-			  toSQLDateString(date) + "'");
+			  manager.toSQLDateString(date) + "'");
 
         // 3. The quotes contain a mixture of symbols and dates. Bite the bullet
         // and do a slow SQL query which checks each one individually.
@@ -1081,7 +1094,7 @@ public class DatabaseQuoteSource implements QuoteSource
                 buffer.append("(" + DatabaseManager.SYMBOL_FIELD + " = '" + 
 			      quote.getSymbol() + "' AND " +
                               DatabaseManager.DATE_FIELD + " = '" + 
-			      toSQLDateString(quote.getDate()) + "')");
+			      manager.toSQLDateString(quote.getDate()) + "')");
 		
                 if(iterator.hasNext())
                     buffer.append(" OR ");
@@ -1176,10 +1189,15 @@ public class DatabaseQuoteSource implements QuoteSource
                         new String("INSERT INTO " + 
 				   DatabaseManager.EXCHANGE_TABLE_NAME + 
 				   " VALUES (" +
-                                   "'" + toSQLDateString(exchangeRate.getDate()) + "', " +
-                                   "'" + sourceCurrencyCode                      + "', " +
-                                   "'" + destinationCurrencyCode                 + "', " +
-                                   "'" + exchangeRate.getRate()                  + "')");
+                                   "'" + manager.
+				   toSQLDateString(exchangeRate.getDate()) 
+				   + "', " +
+                                   "'" + sourceCurrencyCode
+				   + "', " +
+                                   "'" + destinationCurrencyCode
+				   + "', " +
+                                   "'" + exchangeRate.getRate()
+				   + "')");
 
                     // Now insert the exchange rate into the dataqbase
                     Statement statement = manager.createStatement();
@@ -1226,16 +1244,7 @@ public class DatabaseQuoteSource implements QuoteSource
         return list;
     }
 
-    /**
-     * Return a date string that can be used as part of an SQL query.
-     * E.g. 2000-12-03.
-     *
-     * @param date Date.
-     * @return Date string ready for SQL query.
-     */
-    private String toSQLDateString(TradingDate date) {
-    	return date.getYear() + "-" + date.getMonth() + "-" + date.getDay();
-    }
+
 
     public void shutdown() {
 	manager.shutdown();

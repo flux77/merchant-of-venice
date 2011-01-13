@@ -50,6 +50,7 @@ import nz.org.venice.ui.ProgressDialogManager;
 import nz.org.venice.util.ExchangeRateCache;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.VeniceLog;
+import nz.org.venice.alert.AlertManager;
     
 /**
  * The top level class which contains the main() function. This class builds
@@ -66,16 +67,16 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.722b";
+    public static String SHORT_VERSION = "0.724b";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION = "0.722 beta";
+    public static String LONG_VERSION = "0.724 beta";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "03/" + Locale.getString("JUN") + "/2010";
+    public static String RELEASE_DATE = "20/" + Locale.getString("DEC") + "/2010";
 
     /** Copyright date range, e.g. "2003-5" */
-    public static String COPYRIGHT_DATE_RANGE = "2003-10";
+    public static String COPYRIGHT_DATE_RANGE = "2003-11";
 
     /**
      * Get the main frame for the current application
@@ -144,7 +145,6 @@ public class Main extends JFrame {
 
 	setContentPane(desktop);
 
-
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    // User closed window by hitting "X" button
@@ -161,6 +161,7 @@ public class Main extends JFrame {
 	setVisible(true);
 	restoreSavedFrames();
 
+	CommandManager.getInstance().triggeredAlerts();
 
     }
 
@@ -246,6 +247,7 @@ public class Main extends JFrame {
         IDQuoteSync.getInstance().setTimeRange(idQuoteSyncPreferences.openTime,
                                                idQuoteSyncPreferences.closeTime);
         IDQuoteSync.getInstance().setEnabled(idQuoteSyncPreferences.isEnabled);
+
     }
 
 
@@ -263,8 +265,10 @@ public class Main extends JFrame {
 	ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 	int progressValue = 0;
 
-	if (!PreferencesManager.getRestoreSavedWindowsSetting())
+	if (!PreferencesManager.getRestoreSavedWindowsSetting()) {
+	    ProgressDialogManager.closeProgressDialog(progress);
 	    return;
+	}
 
 	savedFrameFiles = PreferencesManager.getSavedFrames();
 	iterator = savedFrameFiles.iterator();

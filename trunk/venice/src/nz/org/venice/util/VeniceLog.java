@@ -40,7 +40,7 @@ public class VeniceLog
 
     private VeniceLog() {
 	try {
-	    writer = new FileWriter("/Volumes/backup_2/venice.log");
+	    writer = new FileWriter("/tmp/venice.log");
 	    bwriter = new BufferedWriter(writer);
 	    
 	} catch (IOException e) {

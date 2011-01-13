@@ -45,6 +45,7 @@ import nz.org.venice.util.ImageFilter;
 import nz.org.venice.util.BMPFile;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.prefs.settings.MenuSettings;
+import nz.org.venice.main.CommandManager;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.
@@ -233,6 +234,14 @@ public class EODQuoteChartMenu extends JMenu {
 		    notes.moveToFront();
                 }});
 
+	JMenuItem alertMenu = new JMenuItem(Locale.getString("ALERT_ADD"));
+	alertMenu.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    CommandManager.getInstance().newAlert(symbol);
+		}});
+    
+	
+
 	JMenuItem exportMenu = new JMenuItem(Locale.getString("GRAPH_EXPORT"));
 
 	exportMenu.addActionListener(new ActionListener() {
@@ -292,6 +301,7 @@ public class EODQuoteChartMenu extends JMenu {
 	this.add(graphMenu);
 	this.add(annotateMenu);
 	this.add(exportMenu);
+	this.add(alertMenu);
 	this.add(removeMenu);	
     }
 

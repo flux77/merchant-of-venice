@@ -36,7 +36,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JDesktopPane;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -55,6 +57,9 @@ import nz.org.venice.quote.Quote;
 import nz.org.venice.quote.QuoteEvent;
 import nz.org.venice.quote.QuoteListener;
 import nz.org.venice.quote.Symbol;
+import nz.org.venice.alert.AlertDialog;
+import nz.org.venice.alert.AlertWriter;
+import nz.org.venice.alert.AlertManager;
 import nz.org.venice.ui.AbstractTable;
 import nz.org.venice.ui.Column;
 import nz.org.venice.ui.DesktopManager;
@@ -89,6 +94,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
     private JMenuItem renameWatchScreen;
     private JMenuItem deleteWatchScreen;
     private JMenuItem applyExpressionsMenuItem;
+    private JMenuItem addAlert;
 
     // Poup menu items
     private JMenuItem popupRemoveSymbols = null;
@@ -139,7 +145,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
         // Update the table on new intra-day quotes
         IDQuoteCache.getInstance().addQuoteListener(new QuoteListener() {
-                public void newQuotes(QuoteEvent event) {
+               public void newQuotes(QuoteEvent event) {
                     updateTable();
                 }
             });
@@ -153,6 +159,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
         graphSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
 	graphIndexSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
         tableSymbols.setEnabled(numberOfSelectedRows > 0? true : false);
+	addAlert.setEnabled(numberOfSelectedRows == 1? true : false);
     }
 
     // If the user double clicks on a stock with the LMB, graph the stock.
@@ -257,6 +264,10 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             tableSymbols =
                 MenuHelper.addMenuItem(this, symbolsMenu,
                                        Locale.getString("TABLE"));
+
+	    addAlert = 
+		MenuHelper.addMenuItem(this, symbolsMenu,
+				       "addLert - Localise me");
         }
 
         // Listen for changes in selection so we can update the menus
@@ -445,9 +456,33 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
             // Table the highlighted symbols
             CommandManager.getInstance().tableStocks(symbols);
         }
+	else if (e.getSource() == addAlert) {
+	    int[] selectedRows = getSelectedRows();
 
+	    assert selectedRows.length == 1;
+
+	    Symbol symbol = (Symbol)model.getValueAt(0,
+						     MixedQuoteModel.
+						     SYMBOL_COLUMN);
+	    addAlert(symbol);
+	}
 	else
             assert false;
+    }
+
+    private void addAlert(final Symbol symbol) {
+	
+	// Handle action in a separate thread so we dont
+	// hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
+	Thread showAddDialog = new Thread() {
+
+		public void run() {
+		    CommandManager.getInstance().newAlert(symbol);
+		}
+	    };
+	
+	showAddDialog.start();
+
     }
 
     // Delete this watch screen

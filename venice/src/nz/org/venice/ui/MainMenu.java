@@ -58,6 +58,9 @@ public class MainMenu implements ActionListener, ModuleListener
     private JMenuItem graphMarketAdvanceDeclineMenuItem;
     
     private JMenuItem quoteWatchScreenNewMenuItem;
+    private JMenuItem quoteAlertListAllMenuItem;
+    private JMenuItem quoteAlertListSymbolsMenuItem;
+    private JMenuItem quoteAlertRefreshMenuItem;
     private JMenuItem quoteCompanyListAllMenuItem;
     private JMenuItem quoteCompanyListRuleMenuItem;
     private JMenuItem quoteCompanyListDateMenuItem;
@@ -94,6 +97,7 @@ public class MainMenu implements ActionListener, ModuleListener
     private JMenu graphPortfolioMenu;
     private JMenu tablePortfolioMenu;
     private JMenu quoteWatchScreenMenu;
+    private JMenu quoteAlertMenu;
     private JMenu macroMenu;
     
     private nz.org.venice.ui.DesktopManager desktopManager;
@@ -206,6 +210,25 @@ public class MainMenu implements ActionListener, ModuleListener
         
         quoteMenu.addSeparator();
         
+
+	// Table -> Alerts
+	quoteAlertMenu = MenuHelper.addMenu(quoteMenu, 
+					    Locale.getString("ALERT_TITLE"), 'A');
+		
+	// Table -> Alerts -> List All
+	quoteAlertListAllMenuItem = 
+	    MenuHelper.addMenuItem(this, quoteAlertMenu, Locale.getString("LIST_ALL"));
+	
+	// Table -> Alerts -> List by Symbol
+	quoteAlertListSymbolsMenuItem = 
+	    MenuHelper.addMenuItem(this, quoteAlertMenu, Locale.getString("LIST_BY_SYMBOLS"));
+
+	quoteAlertRefreshMenuItem = 
+	    MenuHelper.addMenuItem(this, quoteAlertMenu, 
+				   Locale.getString("ALERT_SHOW_TRIGGERED"));
+
+	quoteMenu.addSeparator();
+
         // Table -> Companies + Funds
         JMenu quoteMenuCompany = MenuHelper.addMenu(quoteMenu,
                 Locale.getString("ALL_ORDINARIES"), 'C');
@@ -491,7 +514,17 @@ public class MainMenu implements ActionListener, ModuleListener
                         (String)watchScreenHash.get(menu);
                     CommandManager.getInstance().openWatchScreen(watchScreenName);
                 }
-                
+
+		// Table -> Alerts Menu
+		else if (menu == quoteAlertListAllMenuItem) 
+		    CommandManager.getInstance().tableAlerts();
+
+		else if (menu == quoteAlertListSymbolsMenuItem) 
+		    CommandManager.getInstance().tableAlertsBySymbol(null);
+		    
+		else if (menu == quoteAlertRefreshMenuItem) 
+		    CommandManager.getInstance().triggeredAlerts();
+
                 else if(menu == quoteCommoditiesListAllMenuItem)
                     CommandManager.getInstance().tableStocks(EODQuoteRange.ALL_SYMBOLS);
                 else if (menu == quoteCommoditiesListRuleMenuItem)
@@ -513,8 +546,9 @@ public class MainMenu implements ActionListener, ModuleListener
                 else if (menu == quoteIndicesListDateMenuItem)
                     CommandManager.getInstance().tableStocksByDate(EODQuoteRange.MARKET_INDICES);
                 
-                else if (menu == quoteStocksListSymbolsMenuItem)
+                else if (menu == quoteStocksListSymbolsMenuItem) 
                     CommandManager.getInstance().tableStocks(null);
+		
                 
                 // Maybe its a portfolio?
                 else if(portfolioTableHash.get(menu) != null) {
@@ -567,8 +601,7 @@ public class MainMenu implements ActionListener, ModuleListener
                     CommandManager.getInstance().openAboutDialog();
                 else if (menu == helpViewLicenseMenuItem)
                     CommandManager.getInstance().openLicenseDialog();
-                
-                else
+		else
                     assert false;
             }
         };

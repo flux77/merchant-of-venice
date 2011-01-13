@@ -26,11 +26,24 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Vector;
 import java.util.List;
+
+
+import java.util.Properties;
+import java.util.HashMap;
+import java.util.regex.*;
+import javax.xml.parsers.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
+import org.safehaus.uuid.UUID;
+import org.safehaus.uuid.UUIDGenerator;
 
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.TradingDate;
+
+
 
 
 /**
@@ -39,7 +52,8 @@ import nz.org.venice.util.TradingDate;
  * 
  * @author Mark Hummel
  * @see DatabaseQuoteSource
- * @see DatabaseAlert
+ * @see nz.org.venice.alert.DatabaseAlertReader
+ * @see nz.org.venice.alert.DatabaseAlertWriter
  */
 public class DatabaseManager 
 {
@@ -80,7 +94,7 @@ public class DatabaseManager
     // Shares table
     public final static String SHARE_TABLE_NAME  = "shares";
 
-    // Column names
+    // Column names for Share Table
     public final static String DATE_FIELD        = "date";
     public final static String SYMBOL_FIELD      = "symbol";
     public final static String DAY_OPEN_FIELD    = "open";
@@ -89,7 +103,7 @@ public class DatabaseManager
     public final static String DAY_LOW_FIELD     = "low";
     public final static String DAY_VOLUME_FIELD  = "volume";
 
-    // Column numbers
+    // Column numbers for Share Table
     public final static int DATE_COLUMN       = 1;
     public final static int SYMBOL_COLUMN     = 2;
     public final static int DAY_OPEN_COLUMN   = 3;
@@ -109,13 +123,53 @@ public class DatabaseManager
     // Exchange rate table
     public final static String EXCHANGE_TABLE_NAME = "exchange";
 
-    // Column names
+    // Column names for Exchange Table
     // DATE_FIELD
     public final static String SOURCE_CURRENCY_FIELD      = "source_currency";
     public final static String DESTINATION_CURRENCY_FIELD = "destination_currency";
     public final static String EXCHANGE_RATE_FIELD        = "exchange_rate";
 
+    // Alert Tables
+    public final static String ALERT_TABLE_NAME = "venice_alerts";
+    public final static String OHLCV_ALERT_TABLE_NAME = "alert_OHLCV_targets";
+    public final static String GONDOLA_ALERT_TABLE_NAME = "alert_Gondola_targets";
+    public final static String START_DATE_ALERT_TABLE_NAME = "alert_start_dates";
+    public final static String END_DATE_ALERT_TABLE_NAME = "alert_end_dates";
 
+    //Column numbers for get all Alerts query
+    public final static int ALERT_UUID_COLUMN         = 1;
+    public final static int ALERT_HOST_COLUMN         = 2;
+    public final static int ALERT_USER_COLUMN         = 3;
+    public final static int ALERT_SYMBOL_COLUMN       = 4;
+    public final static int ALERT_START_DATE_COLUMN   = 5;
+    public final static int ALERT_END_DATE_COLUMN     = 6;
+    public final static int ALERT_TARGET_COLUMN       = 7;
+    public final static int ALERT_BOUND_TYPE_COLUMN   = 8;
+    public final static int ALERT_TARGET_TYPE_COLUMN  = 9;
+    public final static int ALERT_ENABLED_COLUMN      = 10;
+    public final static int ALERT_DATESET_COLUMN      = 11;
+    
+
+    
+    // column names for Share Table
+    public final static String ALERT_HOST_FIELD        = "host";
+    public final static String ALERT_USER_FIELD        = "username";    
+    public final static String ALERT_SYMBOL_FIELD      = "symbol";
+    public final static String ALERT_START_DATE_FIELD  = "start_date";
+    public final static String ALERT_END_DATE_FIELD    = "end_date";
+    public final static String ALERT_TARGET_FIELD      = "target";
+    public final static String ALERT_BOUND_TYPE_FIELD  = "bound_type";
+    public final static String ALERT_TARGET_TYPE_FIELD = "target_type";
+    public final static String ALERT_ENABLED_FIELD     = "enabled";
+
+    //Maximum size of Gondola expression in alert
+    //On default mysql, max key len = 1000 bytes
+    //After symbol, dates, and types we have 960 bytes left.
+    //Unix username max is 255, IIRC.
+    
+    public final static int ALERT_MAX_TARGET_EXP_LEN  = 450;
+    public final static int ALERT_MAX_HOST_LEN        = 255;
+    public final static int ALERT_MAX_USER_LEN       = 255;
 
     // Database details
     private int mode;
@@ -137,6 +191,9 @@ public class DatabaseManager
     // Fields for samples mode
     private EODQuoteFilter filter;
     private List fileURLs;
+
+    //HashMap containing queries read from sql library
+    private HashMap transactionMap;
 
     /**
      * Creates a new database connection.
@@ -160,6 +217,8 @@ public class DatabaseManager
         this.database = database;
         this.username = username;
         this.password = password;
+
+	readQueriesFromLibrary();
     }
 
     /**
@@ -173,6 +232,8 @@ public class DatabaseManager
         software = HSQLDB_SOFTWARE;
         this.driver = "org.hsqldb.jdbcDriver";
         this.fileName = fileName;
+
+	readQueriesFromLibrary();
     }
 
     /**
@@ -182,7 +243,7 @@ public class DatabaseManager
 
     // Get the driver and connect to the database. Return FALSE if failed.
 
-    protected boolean getConnection() {
+    public boolean getConnection() {
         boolean success = true;
 	
 	success = connect();
@@ -192,6 +253,14 @@ public class DatabaseManager
 	    success = checkedTables = checkDatabase() && createTables();
 	}
         return success;
+    }
+
+    public String getHost() {
+	return host;
+    }
+
+    public String getUserName() {
+	return username;
     }
 
     // Connect to the database
@@ -388,7 +457,7 @@ public class DatabaseManager
                                     DAY_VOLUME_FIELD +	" BIGINT DEFAULT 0, "  +
                                     "PRIMARY KEY(" + DATE_FIELD + ", " + SYMBOL_FIELD + "))");
             
-            // Create a couple of indices to speed things up.
+            // CreatsgeTye a couple of indices to speed things up.
             statement.executeUpdate("CREATE INDEX " + DATE_INDEX_NAME + " ON " +
                                     SHARE_TABLE_NAME + " (" + DATE_FIELD + ")");
             statement.executeUpdate("CREATE INDEX " + SYMBOL_INDEX_NAME + " ON " +
@@ -493,6 +562,96 @@ public class DatabaseManager
         return success;
     }
 
+    /**
+     * Create the share table.
+     *
+     * @return <code>true</code> iff this function was successful.
+     */
+
+    /*
+      alert([username, host], symbol, daterange, target, field, enabled, dateSet)
+
+      Target is the price or expression which will trigger the alert.
+      e.g. (close > 5.0) 
+
+      Bound type is one of [upper, lower, exact] and applies for non 
+      expression alerts. 
+
+      Target type is one of [open, close, high, low, volume, expression]
+      The field to trigger on for value alerts.
+
+      The actual bare minimum fields for an alert are:  
+      * symbol
+      * effective date range
+      * Gondola expression
+
+      since normal bounds like (open > 10.00) map easily to Gondola expressions.
+      However, if we want to allow alerts to be editable, then we need to 
+      record the fact that the user set a price alert, not an expression alert.
+            
+     */
+
+    private boolean createAlertTables() {
+        boolean success = false;
+	
+        try {
+            // Create the shares table.
+	    success = connect();
+
+	    if (success) {
+		List queries = (List)transactionMap.get("createAlerts");
+		executeUpdateTransaction(queries);
+		Iterator iterator = queries.iterator();
+		while (iterator.hasNext()) {
+		    String query = (String)iterator.next();
+		    
+		    Statement statement = connection.createStatement();
+		    statement.executeUpdate(query);
+		}
+            
+		success = true;
+	    }
+	} catch (SQLException e) {
+	    // Since hypersonic won't let us check if the table is already created,
+	    // we need to ignore the inevitable error about the table already being present.
+	    if(software != HSQLDB_SOFTWARE)
+		DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+								 e.getMessage()));
+	    else {
+		success = true;
+	    }
+	}
+	return success;
+    }    
+
+    public String addField(String field, String type, boolean last) {
+	String rv = (last) ? field + " " + type : field + " " + type + ",";
+	return rv;
+    }
+
+    public String addField(String field, String type) {
+	return addField(field, type, false);
+    }
+
+    public String addField(String field, boolean last) {
+	String rv = (last) ? field + " " : field + ",";
+	return rv;
+    }
+
+    public String addField(String field) {
+	return addField(field, false);
+    }
+
+
+    public String addQuotedField(String field, boolean last) {
+	String rv = (last) ? "'" + field + "' " : "'" + field + "',";
+	return rv;
+    }
+
+    public String addQuotedField(String field) {
+	return addQuotedField(field, false);
+    }
+
     //Return true if the tables were created successfully
     //or if they already exist.    
     private boolean createTables() {
@@ -501,6 +660,17 @@ public class DatabaseManager
         try {
             boolean foundShareTable = false;
             boolean foundExchangeTable = false;
+	    boolean foundAlertTables = false;
+
+	    //Using a HashMap instead of adding four extra booleans
+	    //to track all these tables. As they are found, they are removed
+	    //from the map.
+	    HashMap alertTableMap = new HashMap();
+	    alertTableMap.put(ALERT_TABLE_NAME, "");
+	    alertTableMap.put(OHLCV_ALERT_TABLE_NAME, "");
+	    alertTableMap.put(GONDOLA_ALERT_TABLE_NAME, "");
+	    alertTableMap.put(START_DATE_ALERT_TABLE_NAME, "");
+	    alertTableMap.put(END_DATE_ALERT_TABLE_NAME, "");	    
 
             // Skip this check for hypersonic - it doesn't support it
             if(software != HSQLDB_SOFTWARE) {
@@ -516,7 +686,17 @@ public class DatabaseManager
 
                     if(traverseTables.equals(EXCHANGE_TABLE_NAME))
                         foundExchangeTable = true;
+
+		    //Remove the table from the list of alert tables to 
+		    //find. 
+		    if (alertTableMap.get(traverseTables) != null) {
+			alertTableMap.remove(traverseTables);
+		    }
                 }
+		//If empty, it means all the required alert tables exist.
+		if (alertTableMap.isEmpty()) {
+		    foundAlertTables = true;
+		}
             }
 
             // No table? Let's try and create them.
@@ -524,6 +704,8 @@ public class DatabaseManager
                 success = createShareTable();
             if(!foundExchangeTable && success)
                 success = createExchangeTable();
+	    if (!foundAlertTables && success) 
+		success = createAlertTables();
         }
         catch (SQLException e) {
             DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
@@ -555,99 +737,6 @@ public class DatabaseManager
         } 	
     }
 
-    /**
-     * The database is very slow at taking an arbitrary list of symbol and date pairs
-     * and finding whether they exist in the database. This is unfortuante because
-     * we need this functionality so we don't try to import quotes that are already
-     * in the database. If we try to import a quote that is already present, we
-     * get a constraint violation error. We can't just ignore this error because
-     * we can't tell errors apart and we don't want to ignore all import errors.
-     * <p>
-     * This function examines the list of quotes and optimises the query for returning
-     * matching quotes. This basically works by seeing if all the quotes are on
-     * the same date or have the same symbol.
-     * <p>
-     * CAUTION: This function will return all matches, but it may return some false ones too.
-     * The SQL query returned will only return the symbol and date fields.
-     * Don't call this function if the quote list is empty.
-     *
-     * @param quotes the quote list.
-     * @return SQL query statement
-     */
-    private String buildMatchingQuoteQuery(List quotes) {
-        boolean sameSymbol = true;
-        boolean sameDate = true;
-        Symbol symbol = null;
-        TradingDate date = null;
-        TradingDate startDate = null;
-        TradingDate endDate = null;
-
-        // This function should only be called if there are any quotes to match
-        assert quotes.size() > 0;
-
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("SELECT " + SYMBOL_FIELD + "," + DATE_FIELD + " FROM " +
-                      SHARE_TABLE_NAME + " WHERE ");
-        
-        // Check if all the quotes have the same symbol or fall on the same date.
-        for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-            EODQuote quote = (EODQuote)iterator.next();
-
-            if(symbol == null || date == null) {
-                symbol = quote.getSymbol();
-                startDate = endDate = date = quote.getDate();
-            }
-            else {
-                if(!symbol.equals(quote.getSymbol()))
-                    sameSymbol = false;
-                if(!date.equals(quote.getDate()))
-                    sameDate = false;
-
-                // Keep a track of the date range in case we do a symbol query, as if
-                // they are importing a single symbol, we don't want to pull in every date
-                // to check!
-                if(quote.getDate().before(startDate))
-                    startDate = quote.getDate();
-                if(quote.getDate().after(endDate))
-                    endDate = quote.getDate();
-            }
-        }
-
-        // 1. All quotes have the same symbol.
-        if(sameSymbol)
-            buffer.append(SYMBOL_FIELD + " = '" + symbol.toString() + "' AND " +
-                          DATE_FIELD + " >= '" + toSQLDateString(startDate) + "' AND " +
-                          DATE_FIELD + " <= '" + toSQLDateString(endDate) + "' ");
-
-        // 2. All quotes are on the same date.
-        else if(sameDate)
-            buffer.append(DATE_FIELD + " = '" + toSQLDateString(date) + "'");
-
-        // 3. The quotes contain a mixture of symbols and dates. Bite the bullet
-        // and do a slow SQL query which checks each one individually.
-        else {
-            for(Iterator iterator = quotes.iterator(); iterator.hasNext();) {
-                EODQuote quote = (EODQuote)iterator.next();
-                buffer.append("(" + SYMBOL_FIELD + " = '" + quote.getSymbol() + "' AND " +
-                              DATE_FIELD + " = '" + toSQLDateString(quote.getDate()) + "')");
-                if(iterator.hasNext())
-                    buffer.append(" OR ");
-            }
-        }
-
-        return buffer.toString();
-    }
-
-    /**
-     * This function shows an error message if there are no quotes in the
-     * database. We generally only care about this when trying to get the
-     * the current date or the lowest or highest. This method will also
-     * interrupt the current thread. This way calling code only needs to
-     * check for cancellation, rather than each individual fault.
-     */
-    private void showEmptyDatabaseError() {
-        DesktopManager.showErrorMessage(Locale.getString("NO_QUOTES_FOUND"));
-    }
 
     /**
      * Return the SQL clause for returning the left most characters in
@@ -729,11 +818,11 @@ public class DatabaseManager
                               + symbol + "' LIMIT 1");
     }
 
-        /**
+    /**
      * Return the SQL clause for detecting whether the given date appears
      * in the table.
      *
-     * @param data the date
+     * @param date the date
      * @return the SQL clause
      */
     protected String buildDatePresentQuery(TradingDate date) {
@@ -747,11 +836,193 @@ public class DatabaseManager
                               + toSQLDateString(date) + "' LIMIT 1");
     }
 
+    /**
+     * @return false if the database does not allow multiple row inserts
+     * in a single statement.
+     *
+     * i.e. to insert or update two rows requires two SQL statements.
+     */
 
-    public boolean multipleStatementSupported() {
+    public boolean supportForSingleRowUpdatesOnly() {
 	return (software == HSQLDB_SOFTWARE) ? true : false;
     }
+    
+    /**
+     * @return true if the database supports transactions .
+     *
+     */
+
+    //Don't know yet if HSQLDB supports transactions
+    public boolean supportForTransactions() {
+	return true;
+    }
+
+    private String buildTransactionString(List queries) {
+	String queryString;
+	if (supportForTransactions()) {
+	    queryString = "BEGIN;";
+	} else {
+	    queryString = "";
+	}
+	
+	Iterator iterator = queries.iterator();
+	while (iterator.hasNext()) {
+	    String query = (String)iterator.next();
+	    queryString += query;
+	}
+	queryString += "COMMIT;";
+	return queryString;
+    }
+
+    public void executeUpdateTransaction(List queries) throws SQLException {
+	assert connection != null;
+	boolean autoCommit = connection.getAutoCommit();
+	connection.setAutoCommit(false);
+
+	try {
+	    Iterator iterator = queries.iterator();
+	    while (iterator.hasNext()) {
+		String query = (String)iterator.next();
+		Statement statement = connection.createStatement();
+		statement.executeUpdate(query);
+	    }
+	    connection.commit();
+	    connection.setAutoCommit(autoCommit);
+	} catch (SQLException e) {
+	    connection.rollback();
+	    throw new SQLException(e.getMessage());
+	}
+    }
+
+    private List executeQueryTransaction(List queries) throws SQLException {
+	Vector results = new Vector();
+	Iterator iterator = queries.iterator();
+	while (iterator.hasNext()) {
+	    String query = (String)iterator.next();
+	    Statement statement = connection.createStatement();
+	    ResultSet rs = statement.executeQuery(query);
+	    results.add(rs);
+	}
+	return results;	
+    }
    
+    private void readQueriesFromLibrary() {
+	transactionMap = new HashMap();
+	
+	
+	Properties sysProps = System.getProperties();
+	String prop = "sqlpath.property";
+	String path = sysProps.get(prop).toString();
+	java.io.File file = null;
+
+	try {
+	
+	    SAXParserFactory factory = SAXParserFactory.newInstance();
+	    SAXParser parser = factory.newSAXParser();
+	    file = new java.io.File(path, "/");
+	    
+	    
+	    parser.parse(file, new DefaultHandler() {
+		    private boolean newQuery = false;
+		    private boolean newTransaction = false;
+		    private String newTransactionName;
+		    private String newQueryString = "";
+		    private Vector queryStack = new Vector();
+
+		    public void startElement(String uri, String local,
+					     String qname, 
+					     Attributes attributes) {
+	
+			if (qname.equals("transaction")) {
+			    if (newTransaction) {
+				//Parse error
+			    }
+			    newTransactionName = attributes.getValue("name");
+			    newTransaction = true;
+			}
+
+			if (qname.equals("query")) {
+			    if (newQuery) {
+				//Parse error
+			    }			    
+			    newQuery = true;		
+			}
+			
+			if (qname.equals("parameter")) {
+			    if (!newQuery) {
+				//Parse error
+			    }
+			    String parm = attributes.getValue("name");
+			    if (parm.equals("tableType")) {
+				newQueryString += getTableType();
+			    } else if (parm.equals("maxSymbolLength")) {
+				newQueryString += Symbol.MAXIMUM_SYMBOL_LENGTH;
+			    } else {
+				//User supplied parameter
+				newQueryString += "%" + parm;
+			    }
+			}
+		    }
+
+		    public void endElement(String uri, String local, 
+					   String qname) {
+			
+			if (qname.equals("transaction") && newTransaction) {
+			    transactionMap.put(newTransactionName, 
+					       queryStack);
+			    queryStack = new Vector();
+			}
+			
+			if (qname.equals("query") && newQuery) {
+			    queryStack.add(newQueryString);
+			    newQuery = false;
+			    newQueryString = new String();
+			}
+		    }
+
+		    public void characters(char[] text, int start, int length) {
+			String str = new String(text, start, length);
+
+			if (newQuery) {
+			    newQueryString += str;
+			}
+		    }
+		});	    
+	} catch (SAXException e) {
+
+	} catch (ParserConfigurationException e) {
+
+	} catch (java.io.IOException e) {
+
+	} finally {
+	    
+	}	
+    }
+
+    public List getQueries(String transactionName) {
+	return (List)transactionMap.get(transactionName); 
+    }
+
+    public String replaceParameter(String query, String parameterName, 
+				 String parameterValue) {
+	
+	Pattern p = Pattern.compile("%" + parameterName);
+	Matcher m = p.matcher(query);
+
+	StringBuffer sb = new StringBuffer();
+	while (m.find()) {
+	    m.appendReplacement(sb, parameterValue);
+	}
+	m.appendTail(sb);
+	
+	return sb.toString();
+
+    }
+
+    public String getUUID() {
+	UUID id = UUIDGenerator.getInstance().generateRandomBasedUUID();
+	return id.toString();
+    }
 }
 
 

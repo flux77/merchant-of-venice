@@ -54,6 +54,7 @@ import nz.org.venice.main.ModuleFrame;
 import nz.org.venice.prefs.ProxyPage;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.prefs.settings.Settings;
+import nz.org.venice.main.CommandManager;
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.ui.ProgressDialog;
@@ -336,6 +337,10 @@ public class ImportQuoteModule extends JPanel implements Module {
                         assert fromInternet.isSelected();
                         importQuotesFromInternet();
                     }
+		    //Having imported new quotes, check if the new data
+		    //triggers alerts.
+		    CommandManager.getInstance().triggeredAlerts();
+		    
                 }
             };
         thread.start();

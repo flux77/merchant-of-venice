@@ -183,6 +183,7 @@ public class PreferencesManager {
         /** Polling period in seconds. */
         public int period;
     }
+    
 
     /**
      * Forces the preferences data to be saved to the backend store (e.g. disk).
@@ -365,7 +366,7 @@ public class PreferencesManager {
         String xpath = "/userNotes/" + symbol;
         Preferences prefs = getUserNode("/userNotes");
 
-        prefs = getUserNode("/userNotes");
+        prefs = getUserNode("/table/userNotes/" + symbol);
         prefs.put(symbol, text);
     }
 
@@ -377,9 +378,15 @@ public class PreferencesManager {
 	text = "";
 	xpath = "/userNotes" + symbol;
 
-	prefs = getUserNode("/userNotes");
+	//Pre 0.724b version saved userNotes in /userNotes
+	//Check there if no notes are found in the new location.
+	prefs = getUserNode("/table/userNotes/" + symbol);
 	if (prefs != null) {
 	    text = prefs.get(symbol, "");
+	    if (text.equals("")) {
+		prefs = getUserNode("/userNotes");
+		return prefs.get(symbol, text);
+	    }
 	}
 
 	return text;
@@ -1500,4 +1507,29 @@ public class PreferencesManager {
 	}
     }
 
+    /** 
+     * Retrieve where the users is storing alerts
+     */
+    public static String getAlertDestination() {
+	Preferences prefs = getUserNode("/alert_destination");
+	
+	return prefs.get("destination","disabled");
+    }
+
+    /**
+     * Save alert destination 
+     *
+     * @param destination Where the alerts should be stored
+     */
+    public static void putAlertDestination(String destination) {
+	if (!destination.equals(Locale.getString("ALERT_DISABLE_ALL")) &&
+	    !destination.equals(Locale.getString("FILE")) &&
+	    !destination.equals(Locale.getString("DATABASE"))) {
+	    assert false;
+	}
+	    
+	Preferences prefs = getUserNode("/alert_destination");
+	prefs.put("destination", destination);
+
+    }
 }

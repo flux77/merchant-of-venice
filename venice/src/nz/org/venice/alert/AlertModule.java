@@ -139,6 +139,7 @@ public class AlertModule extends AbstractTable implements Module, ActionListener
 	    if (column >= 9) {
 		return "";
 	    }
+	    
 	    Alert alert = (Alert)alerts.get(row);
 
 	    switch (column) {

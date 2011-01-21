@@ -186,97 +186,15 @@ public class DatabaseAlertReader implements AlertReader {
     public List getAlertsBySymbol(Symbol symbol) throws AlertException {
 	ArrayList alerts = new ArrayList();
 	
-	if (manager.getConnection()) {
-	    String queryString = "SELECT " + 
-		manager.addField(manager.ALERT_HOST_FIELD) + 
-		manager.addField(manager.ALERT_USER_FIELD) + 
-		manager.addField(manager.ALERT_SYMBOL_FIELD) + 
-		manager.addField(manager.ALERT_START_DATE_FIELD) + 
-		manager.addField(manager.ALERT_END_DATE_FIELD) + 
-		manager.addField(manager.ALERT_TARGET_FIELD) + 
-		manager.addField(manager.ALERT_BOUND_TYPE_FIELD) + 
-		manager.addField(manager.ALERT_TARGET_TYPE_FIELD) + 
-		manager.addField(manager.ALERT_ENABLED_FIELD, true);
-	    
-	    queryString += " FROM " + manager.ALERT_TABLE_NAME + " WHERE " + 
-		manager.ALERT_SYMBOL_FIELD + " = '" + symbol + "' AND " + 
-		manager.ALERT_HOST_FIELD   + " = '" + manager.getHost() + 
-		"' AND " + manager.ALERT_USER_FIELD + 
-		"' = " + manager.getUserName() + "'";
-	   
-	    try {
-		Statement statement = manager.createStatement();
-		ResultSet RS = statement.executeQuery(queryString);
-		
-		while (RS.next()) {
-		    String startDateString = 
-			RS.getString(manager.ALERT_START_DATE_COLUMN);
-		    String endDateString = 
-			RS.getString(manager.ALERT_END_DATE_COLUMN);
-		    String targetString = 
-			RS.getString(manager.ALERT_TARGET_COLUMN);
-		    String boundTypeString = 
-			RS.getString(manager.ALERT_BOUND_TYPE_COLUMN);
-		    String targetTypeString = 
-			RS.getString(manager.ALERT_TARGET_TYPE_COLUMN);
-		    String enabledString = 
-			RS.getString(manager.ALERT_ENABLED_COLUMN);
-		    
-		    try {
-			TradingDate startDate = 
-			    new TradingDate(startDateString, 
-					    TradingDate.BRITISH);
-			TradingDate endDate = 
-			    new TradingDate(endDateString, 
-					    TradingDate.BRITISH);
-
-			int boundType = 
-			    Alert.stringToBoundType(boundTypeString);
-			
-			double targetValue = 0.0;
-			try {
-			    targetValue = 
-				new Double(targetValue).doubleValue();
-			} catch (NumberFormatException e) {
-			    throw new AlertException(AlertException.
-						     INVALID_NUMBER_VALUE,
-						     e.getMessage());
-			}
-			
-			//Workaround the MySQL Boolean "feature" 
-			boolean enabled = readBoolean(enabledString);
-			
-			if (!boundTypeString.equals("GONDOLA_TRIGGER") &&
-			    !targetTypeString.equals(Alert.EXP_FIELD)) {
-			    Alert alert = new OHLCVAlert(symbol, 
-							 startDate,
-							 endDate,
-							 targetValue,
-							 boundType,
-							 targetTypeString,
-							 enabled);
-
-			    alerts.add(alert);			      
-			}
-		    } catch (TradingDateFormatException e) {
-			throw new AlertException(AlertException.
-						 INVALID_DATE_FORMAT, 
-						 e.getMessage());
-		    } finally {
-			
-		    }
-		}
-		return alerts;
-	    } catch (SQLException e) {
-		DesktopManager.
-		    showErrorMessage(Locale.
-				     getString("ERROR_TALKING_TO_DATABASE",
-					       e.getMessage()));
-	    } finally {
-		return alerts;
+	List allAlerts = getAlerts();
+	Iterator iterator = allAlerts.iterator();
+	while (iterator.hasNext()) {
+	    Alert alert = (Alert)iterator.next();
+	    if (alert.getSymbol().equals(symbol)) {
+		alerts.add(alert);
 	    }
-	} 
-	return null;
+	}
+	return alerts;
     }
 
     public List getAlertsBySymbolList(List symbols) throws AlertException {
@@ -288,7 +206,11 @@ public class DatabaseAlertReader implements AlertReader {
 	while (iterator.hasNext()) {
 	    Symbol symbol = (Symbol)iterator.next();
 	    
-	    alerts.add(getAlertsBySymbol(symbol));
+	    List alertsForSymbol = getAlertsBySymbol(symbol);
+	    Iterator alertIterator = alertsForSymbol.iterator();
+	    while (alertIterator.hasNext()) {
+		alerts.add(alertIterator.next());
+	    }
 	}
 	return alerts;
     }

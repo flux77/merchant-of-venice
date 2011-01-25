@@ -223,10 +223,11 @@ public class TradingDate implements Cloneable, Comparable {
         catch(StringIndexOutOfBoundsException e) {
             throw new TradingDateFormatException(date);
         }
-
-        // Simple range checking.
-        if(month == 0 || month > 12 || day == 0 || day > 31)
-            throw new TradingDateFormatException(date);
+	
+	if (!isValidDate(year, month, day)) {
+	    throw new TradingDateFormatException(date);
+	}
+	
     }
 
     /**
@@ -533,7 +534,7 @@ public class TradingDate implements Cloneable, Comparable {
 	else {
             assert false;
 	    return Locale.getString("DEC");
-        }
+        }	
     }
 
     // Converts a month name to the month of the year. Returns
@@ -608,6 +609,16 @@ public class TradingDate implements Cloneable, Comparable {
     }
 
     /**
+     * Convert a TradingDate to a java.util.Calendar.
+     *
+     * @return	<code>java.util.Calendar</code>
+     */
+    public Calendar toCalendar(int year, int month, int day) {
+	// Convert from our month of 1-12 to theirs of 0-11
+	return new GregorianCalendar(year, month - 1, day);
+    }
+
+    /**
      * Converts a two digit year to four digit year. The year 0 to 30
      * are transformed to 2000 to 2030 respecitvely; the years 31 to 99 to
      * 1931 and 1999 respectively.
@@ -650,5 +661,29 @@ public class TradingDate implements Cloneable, Comparable {
 
 	return dates;
     }
+
+    //Rather use in built methods for validation, but they are too lenient,
+    //even with setLenient(false)  
+    private boolean isValidDate(int year, int month, int day) {	
+
+	// Simple range checking.
+        if(month == 0 || month > 12 || day == 0)
+            return false;
+
+	//Have to use 1 here for getActualMaximum to return the 
+	//correct number of days in the month. So if we want to validate the 
+	//the number of days in February and we are given the day 31,
+	//getActualMaximum will return 31, instead of 28/29.
+
+	GregorianCalendar gc = (GregorianCalendar)toCalendar(year, month, 1);
+	int daysInMonth = gc.getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
+
+	if (day > daysInMonth) {
+	    return false;
+	}
+	return true;
+    }
+
+    
 }
 

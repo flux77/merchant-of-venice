@@ -26,9 +26,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import javax.swing.JInternalFrame;
 import javax.swing.JButton;
+import javax.swing.JLayeredPane;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Date;
 import java.text.DateFormat;
+
+
 
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.util.Locale;
@@ -44,7 +48,11 @@ public class UserNotes extends JInternalFrame {
     private JTextArea notes;
     private String symbol;    
 
-    public UserNotes(String name) {
+    public UserNotes(String name) {	
+	super();
+
+	// Make sure we can't be hidden behind other windows
+	setLayer(JLayeredPane.MODAL_LAYER);
 
 	String prevText = "";
 	
@@ -52,8 +60,7 @@ public class UserNotes extends JInternalFrame {
 
 	String frameTitle = "Notes for " + name;
 	setTitle(frameTitle);		    
-	setSize(250,250);
-	setVisible(true);
+	setSize(250,250);	
 	setResizable(true);
 	setClosable(true);
 	setIconifiable(true);
@@ -63,6 +70,8 @@ public class UserNotes extends JInternalFrame {
 	JPanel notePane = new JPanel();
 	JPanel buttonPane = new JPanel();
 	
+	notePane.setLayout(new BorderLayout());
+
 	notes = new JTextArea(10,15);
 
 	prevText = PreferencesManager.getUserNotes(symbol);
@@ -106,8 +115,8 @@ public class UserNotes extends JInternalFrame {
 
 	revert.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    String foo = PreferencesManager.getUserNotes(symbol);
-		    notes.setText(foo);
+		    String userNotes = PreferencesManager.getUserNotes(symbol);
+		    notes.setText(userNotes);
 		}
 	    });
 	
@@ -118,7 +127,11 @@ public class UserNotes extends JInternalFrame {
 	buttonPane.add(revert, BorderLayout.EAST);
 	getContentPane().add(notePane, BorderLayout.CENTER);		 
 	getContentPane().add(buttonPane,BorderLayout.SOUTH);
-	
+
+	//Set everything up first, otherwise you get a blank window
+	//until you activate it.	
+	setVisible(true);
+
     }
 
     public void setText(String text) {

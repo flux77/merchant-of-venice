@@ -22,6 +22,12 @@ import java.awt.Dimension;
 import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import java.awt.event.*;
+import javax.swing.KeyStroke;
+import java.awt.Event;
+
+
+
 import nz.org.venice.ui.DesktopManager;
 
 /**
@@ -93,11 +99,28 @@ public class ModuleFrame extends JInternalFrame
 	// Listen to events from module
 	module.addModuleChangeListener(this);
 
+	InputMap inputMap = getInputMap();
+	ActionMap actionMap = getActionMap();
+	KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_W,
+						     Event.CTRL_MASK);
+	inputMap.put(keyStroke, "windowClose");
+	actionMap.put("windowClose", new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    //This action will also call InternalFrameClosed
+		    //which saves the module state and notifies the 
+		    //desktopmanager, so we don't have to here.
+		    dispose();		    
+		}
+	    });
+
 	super.setFrameIcon(module.getFrameIcon());
 
 	// We want to notify module when it is closing so it can save data
 	addInternalFrameListener(this);
 	show();	
+
+
+
     }
 
     /**

@@ -41,7 +41,11 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
     private JDesktopPane desktop;
     private JTextField minDecimalDigitsTextField;
     private JTextField maxDecimalDigitsTextField;
+    private JCheckBox scrollToLatestDataChart;
+    private JCheckBox scrollToLatestDataTable; 
     private JCheckBox restoreWindowsCheckBox;
+    private JCheckBox confirmExitCheckBox;
+    
     
    
     /**
@@ -72,6 +76,7 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
 
         int minDecimalDigits = PreferencesManager.getMinDecimalDigits();
         int maxDecimalDigits = PreferencesManager.getMaxDecimalDigits();
+
         minDecimalDigitsTextField = 
             GridBagHelper.addTextRow(borderPanel, 
                                      Locale.getString("MIN_DECIMAL_DIGITS"), 
@@ -83,6 +88,18 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
                                      Integer.toString(maxDecimalDigits),
                                      gridbag, c, 10);
 
+
+	scrollToLatestDataChart = 
+	    GridBagHelper.addCheckBoxRow(borderPanel,
+					 Locale.getString("CHART_SHOW_LATEST_LABEL"),
+					 PreferencesManager.getDefaultChartScrollToEnd(),
+					 gridbag, c);
+
+	scrollToLatestDataTable = 
+	    GridBagHelper.addCheckBoxRow(borderPanel,
+					 Locale.getString("TABLE_SHOW_LATEST_LABEL"),
+					 PreferencesManager.getDefaultTableScrollToEnd(),
+					 gridbag, c);
 	
 	
 	restoreWindowsCheckBox = 
@@ -92,6 +109,12 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
 					 gridbag, c);
 	
 	
+	confirmExitCheckBox = 
+	    GridBagHelper.addCheckBoxRow(borderPanel,
+					 Locale.getString("CONFIRM_VENICE_EXIT_TITLE"),
+					 PreferencesManager.getConfirmExitSetting(),
+					 gridbag, c);
+
         quotesPanel.add(borderPanel, BorderLayout.NORTH);
 	
         return quotesPanel;
@@ -108,7 +131,10 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
     public void save() {
         int minDecimalDigits = 0;
         int maxDecimalDigits = 0;
+	boolean scrollToChartEnd;
+	boolean scrollToTableEnd;
 	boolean restoreSavedWindows;
+	boolean confirmExit;
 
         try {
             minDecimalDigits = Integer.parseInt(minDecimalDigitsTextField.getText());
@@ -125,8 +151,17 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
             PreferencesManager.putMaxDecimalDigits(maxDecimalDigitsTextField.getText());
         }
 
+	scrollToChartEnd =  scrollToLatestDataChart.isSelected(); 
+	PreferencesManager.putDefaultChartScrollToEnd(scrollToChartEnd);
+
+	scrollToTableEnd =  scrollToLatestDataTable.isSelected(); 
+	PreferencesManager.putDefaultTableScrollToEnd(scrollToTableEnd);
+
 	restoreSavedWindows = restoreWindowsCheckBox.isSelected();
 	PreferencesManager.putRestoreSavedWindowsSetting(restoreSavedWindows);
+
+	confirmExit = confirmExitCheckBox.isSelected();
+	PreferencesManager.putConfirmExitSetting(confirmExit);
 
     }
 }

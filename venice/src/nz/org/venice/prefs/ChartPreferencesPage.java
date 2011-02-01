@@ -47,7 +47,7 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 {
     private JDesktopPane desktop;
     private JComboBox defaultChart;     
-    private JCheckBox scrollToLatestData;
+
 
     /**
      * Create a new user interface preferences page.
@@ -63,10 +63,9 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
     }
     
     private JPanel createChartDefaultsPanel() {
-        JPanel chartDefaultsPanel = new JPanel();
-        chartDefaultsPanel.setLayout(new BorderLayout());
         JPanel borderPanel = new JPanel();
-
+	JPanel chartDefaultsPanel = new JPanel();
+	    
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         borderPanel.setLayout(gridbag);
@@ -77,7 +76,7 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 
 	Vector chartList = new Vector();
 
-	boolean isSelected = PreferencesManager.getDefaultChartScrollToEnd();
+	
 
 	String defaultC = PreferencesManager.getDefaultChart();	
 	if (defaultC == null) {
@@ -109,15 +108,10 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
                                      Locale.getString("CHART_DEFAULT"), 
                                      chartList,
                                      gridbag, c);
+				
 
-	scrollToLatestData = 
-	    GridBagHelper.addCheckBoxRow(borderPanel,
-					 Locale.getString("CHART_SHOW_LATEST_LABEL"),
-					 isSelected,
-					 gridbag, c);
-		
         chartDefaultsPanel.add(borderPanel, BorderLayout.NORTH);	
-	chartDefaultsPanel.add(scrollToLatestData);
+		
         return chartDefaultsPanel;
     }
 
@@ -131,7 +125,6 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 
     public void save() {
 	String defaultChartStr = (String)defaultChart.getSelectedItem();
-	boolean isSelected = scrollToLatestData.isSelected();
 
 	//We want to save the Venice name of the chart 
 	//and not a location specific one
@@ -152,6 +145,6 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 	
 	
 	PreferencesManager.putDefaultChart(defaultChartStr);        
-	PreferencesManager.putDefaultChartScrollToEnd(isSelected);
+	
     }
 }

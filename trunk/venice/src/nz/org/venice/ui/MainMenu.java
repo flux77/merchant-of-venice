@@ -198,7 +198,10 @@ public class MainMenu implements ActionListener, ModuleListener
         
         // File -> Exit
         fileExitMenuItem = MenuHelper.addMenuItem(this, fileMenu, Locale.getString("EXIT"), 'Q');
-        fileExitMenuItem.setAccelerator(KeyStroke.getKeyStroke('Q', InputEvent.CTRL_MASK));
+
+	fileExitMenuItem.setAccelerator(KeyStroke.getKeyStroke('Q', InputEvent.CTRL_MASK));
+
+
 
         /**********************************************
          * Table
@@ -496,9 +499,27 @@ public class MainMenu implements ActionListener, ModuleListener
                 }
                 
                 else if(menu == fileExitMenuItem) {
+		    boolean exitConfirmed = true;
+		    if (PreferencesManager.getConfirmExitSetting()) {
+			int choice = JOptionPane.
+			    showConfirmDialog(desktop,
+					      Locale.getString("CONFIRM_VENICE_EXIT"),
+					      Locale.getString("CONFIRM_VENICE_EXIT"),
+					      
+					      JOptionPane.
+					      YES_NO_OPTION);
+
+			if (choice == JOptionPane.YES_OPTION) {
+			    exitConfirmed = true;
+			} else {
+			    exitConfirmed = false;
+			}
+		    }
                     // This exits the application
-                    frame.dispose();
-                    return;
+		    if (exitConfirmed) {
+			frame.dispose();
+			return;
+		    }
                 }
                 else if(menu == filePreferencesMenuItem)
                     // Display preferences

@@ -21,8 +21,10 @@ package nz.org.venice.table;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -64,7 +66,8 @@ import nz.org.venice.prefs.settings.QuoteModuleSettings;
  *
  * @author Andrew Leppard
  */
-public class QuoteModule extends AbstractTable implements Module, ActionListener {
+public class QuoteModule extends AbstractTable 
+    implements Module, ActionListener, KeyListener {
 
     // Main menu items
     private JMenuBar menuBar;
@@ -162,6 +165,8 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
                     handleMouseClicked(evt);
                 }
 	    });
+
+	addKeyListener(this);
 
         // Set up DND
         //dragSource = DragSource.getDefaultDragSource();
@@ -603,6 +608,24 @@ public class QuoteModule extends AbstractTable implements Module, ActionListener
 	}
 	else
             assert false;
+    }
+
+    public void keyPressed(KeyEvent e) {
+	//For future functionality - chart tracking
+	if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+	    
+	}
+
+	if (e.getKeyCode() == KeyEvent.VK_UP) {
+	}
+    }
+
+    public void keyTyped(KeyEvent e) {
+	
+    }
+
+    public void keyReleased(KeyEvent e) {
+
     }
 
     public Settings getSettings() {

@@ -379,7 +379,7 @@ public class PreferencesManager {
 	xpath = "/userNotes" + symbol;
 
 	//Pre 0.724b version saved userNotes in /userNotes
-	//Check there if no notes are found in the new location.
+	//Check in old location if no notes are found in the new location.
 	prefs = getUserNode("/table/userNotes/" + symbol);
 	if (prefs != null) {
 	    text = prefs.get(symbol, "");
@@ -1178,6 +1178,18 @@ public class PreferencesManager {
         return new Boolean(str).booleanValue();
     }
 
+    /**
+     * Load default table scroll bar position.
+     *
+     * @return whether to move the scroll bar to the end of the pane when 
+     *         creating a new table.   
+     */
+    public static boolean getDefaultTableScrollToEnd() {
+        Preferences prefs = getUserNode("/default_table_defaults");
+        String str = prefs.get("scroll_to_end", "false");
+        return new Boolean(str).booleanValue();
+    }
+
 
     /**
      * Save wether to restore windows on restart
@@ -1205,6 +1217,33 @@ public class PreferencesManager {
 	return state.equals("true") ? true : false;
     }
 
+    /**
+     * Save whether Venice should confirm exit.
+     *
+     * @param State Flag when true causes venice to prompt the user to 
+     *        confirm their exit.
+     *
+     **/
+    public static void putConfirmExitSetting(boolean state) {
+	Preferences prefs = getUserNode("/confirm_exit_to_venice");
+	prefs.put("state", String.valueOf(state));
+    }
+
+    /**
+     * Return true if Venice should confirm exit.
+     *
+     * @return true if Venice should prompt the user to 
+     *        confirm their exit.
+     *
+     **/
+    
+    public static boolean getConfirmExitSetting() {
+	Preferences prefs = getUserNode("/confirm_exit_to_venice");
+	String state = prefs.get("state", "false");
+
+	return state.equals("true") ? true : false;
+    }
+
 
 
     /**
@@ -1226,6 +1265,17 @@ public class PreferencesManager {
     public static void putDefaultChartScrollToEnd(boolean isSelected) {
 
         Preferences prefs = getUserNode("/default_chart_defaults");
+	prefs.put("scroll_to_end", new Boolean(isSelected).toString());
+    }
+    
+    /**
+     * Save default table scroll bar setting .
+     *
+     * @param isSelected if the scroll bar on a table should be moved to the end
+     */
+    public static void putDefaultTableScrollToEnd(boolean isSelected) {
+
+        Preferences prefs = getUserNode("/default_table_defaults");
 	prefs.put("scroll_to_end", new Boolean(isSelected).toString());
     }
 

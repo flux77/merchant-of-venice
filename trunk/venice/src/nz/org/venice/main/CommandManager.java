@@ -31,6 +31,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.Icon;
+import javax.swing.JScrollPane;
+import javax.swing.JScrollBar;
 
 import nz.org.venice.analyser.ANNModule;
 import nz.org.venice.analyser.ANNResultModule;
@@ -304,7 +306,10 @@ public class CommandManager {
 
         if (!thread.isInterrupted()) {
             table = new QuoteModule(quoteBundle, rule, singleDate);
-            desktopManager.newFrame(table);
+            ModuleFrame newFrame = desktopManager.newFrame(table);
+	    if (PreferencesManager.getDefaultTableScrollToEnd()) {
+		setVBarToMax(newFrame);
+	    }
         }
 
         ProgressDialogManager.closeProgressDialog(progressDialog);
@@ -922,7 +927,10 @@ public class CommandManager {
 
         if (!thread.isInterrupted()) {
             PortfolioTableModule table = new PortfolioTableModule(portfolio, quoteBundle);
-            desktopManager.newFrame(table);
+            ModuleFrame newFrame = desktopManager.newFrame(table);
+	    if (PreferencesManager.getDefaultTableScrollToEnd()) {		
+		setVBarToMax(newFrame);
+	    }
         }
 
         ProgressDialogManager.closeProgressDialog(progress);
@@ -1377,5 +1385,13 @@ public class CommandManager {
 	}
 	return graph;
     }    
+
+    //Automatically move the vertical scrollbar to the end of the pane
+    private void setVBarToMax(ModuleFrame frame) {
+	JScrollPane scrollPane = frame.getScrollPane();
+	JScrollBar vbar = scrollPane.getVerticalScrollBar();
+	vbar.setValue(vbar.getMaximum());
+	
+    }
 
 }

@@ -67,7 +67,7 @@ import nz.org.venice.prefs.settings.QuoteModuleSettings;
  * @author Andrew Leppard
  */
 public class QuoteModule extends AbstractTable 
-    implements Module, ActionListener, KeyListener {
+    implements Module, ActionListener {
 
     // Main menu items
     private JMenuBar menuBar;
@@ -85,7 +85,7 @@ public class QuoteModule extends AbstractTable
     private JMenuItem popupTableSymbols = null;
 
     private PropertyChangeSupport propertySupport;
-    private EODQuoteBundle quoteBundle;
+    protected EODQuoteBundle quoteBundle;
 
     private EODQuoteModel model;
     private QuoteModuleSettings settings;
@@ -98,7 +98,7 @@ public class QuoteModule extends AbstractTable
 
     // If set to true we only display the quotes for the last date in the
     // quote bundle
-    private boolean singleDate;
+    protected boolean singleDate;
 
     // DND objects
     //    DragSource dragSource;
@@ -166,7 +166,7 @@ public class QuoteModule extends AbstractTable
                 }
 	    });
 
-	addKeyListener(this);
+
 
         // Set up DND
         //dragSource = DragSource.getDefaultDragSource();
@@ -181,7 +181,7 @@ public class QuoteModule extends AbstractTable
 
 
     // Graph menu item is only enabled when items are selected in the table.
-    private void checkMenuDisabledStatus() {
+    protected void checkMenuDisabledStatus() {
 	int numberOfSelectedRows = getSelectedRowCount();
 
         graphSymbols.setEnabled(numberOfSelectedRows > 0 ? true : false);
@@ -454,6 +454,10 @@ public class QuoteModule extends AbstractTable
         thread.start();
     }
 
+    public int getRowCount() {
+	return model.getRowCount();
+    }
+
     /**
      * Tell module to save any current state data / preferences data because
      * the window is being closed.
@@ -608,24 +612,6 @@ public class QuoteModule extends AbstractTable
 	}
 	else
             assert false;
-    }
-
-    public void keyPressed(KeyEvent e) {
-	//For future functionality - chart tracking
-	if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-	    
-	}
-
-	if (e.getKeyCode() == KeyEvent.VK_UP) {
-	}
-    }
-
-    public void keyTyped(KeyEvent e) {
-	
-    }
-
-    public void keyReleased(KeyEvent e) {
-
     }
 
     public Settings getSettings() {

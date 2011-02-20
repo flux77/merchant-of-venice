@@ -240,8 +240,19 @@ public class EODQuoteChartMenu extends JMenu {
 		    CommandManager.getInstance().newAlert(symbol);
 		}});
     
+	//TODO - get this menuitem to select/deselect
+	JMenuItem trackerMenu = new JMenuItem(Locale.getString("CHART_TRACKED_TOGGLE"));
+	trackerMenu.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    if (listener.getTracker() == null) {
+			listener.addTracker(symbol);
+		    } else if (listener.getTracker().isActive()) {
+			listener.disableTracker();
+		    } else {
+			listener.enableTracker();
+		    }
+		}});
 	
-
 	JMenuItem exportMenu = new JMenuItem(Locale.getString("GRAPH_EXPORT"));
 
 	exportMenu.addActionListener(new ActionListener() {
@@ -302,6 +313,7 @@ public class EODQuoteChartMenu extends JMenu {
 	this.add(annotateMenu);
 	this.add(exportMenu);
 	this.add(alertMenu);
+	this.add(trackerMenu);
 	this.add(removeMenu);	
     }
 

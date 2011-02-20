@@ -153,13 +153,14 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
      * @param	yCoordinate	an y coordinate on the screen
      * @return	the Y value at the y coordinate
      */
-    public Double getYAtPoint(Chart chart, int yCoordinate) {
+    public synchronized Double getYAtPoint(Chart chart, int yCoordinate) {
 
 	/* calculate the verticalScale for the level at this point */
 
 	// Get graph level at this point
 	int level = getLevelAtPoint(yCoordinate);
 	// Get vertical axis of graph level
+	
 	VerticalAxis verticalAxis =
 	    (VerticalAxis)verticalAxes.elementAt(level);
 	int yoffset = getStartOfLevel(level) + firstHorizontalLine + 
@@ -226,7 +227,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     public String getToolTipText(Chart chart, int xCoordinate,
 				 int yCoordinate) {
 
-	// Abort if some of our variables are set yet
+	// Abort if some of our variables are not set yet
 	if(verticalAxes == null)
 	    return null;
 
@@ -341,6 +342,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	drawLines(g, chart);
 	drawPoints(g, chart, height);
 	drawText(g, chart);
+	drawCursor(g, chart);
 
 	
     }
@@ -573,6 +575,35 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	g.setColor(prevColour);
 	g.setFont(prevFont);
 	g.setPaintMode();
+    }
+
+    private void drawCursor(Graphics g, Chart chart) {
+	int x;
+	int y;
+	
+	//System.out.println("GOT HERE0 in bcui.dt = " + chart.getTracker());
+
+	if (chart.getTracker() == null) {
+	    return;
+	}
+
+	if (!chart.getTracker().isActive()) {
+	    return; 
+	}
+	//System.out.println("GOT HERE in bcui.dt");
+
+	Coordinate point = chart.getTracker().getCoordinate(); 
+
+	//System.out.println("Coord = " + point);
+
+	x = getXCoordinate(chart, point);
+	y = getYCoordinate(chart, point) - (MINIMUM_LEVEL_HEIGHT / 2);
+	
+	Color prev = g.getColor();
+	
+	g.setColor(Color.BLACK);
+	g.drawOval(x,y, 5, 5);
+	g.setColor(prev);
     }
 
     // For the given point, return the X coordinate

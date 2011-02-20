@@ -672,7 +672,13 @@ If you switch to the Point and Figure graph while zoomed in on an area which doe
   
   <section name="Others">
     <para>The "Clone" button opens a window with the same chart type.</para>
-    <para>The "Flip chart" button toggles the orientation of the chart. The initial orientation is for the origin of the chart to be in the top left hand corner. Therefore, pressing the button twice returns the chart to it's original position. </para>
+    <para>The "Flip chart" button toggles the orientation of the chart. The initial orientation is for the origin of the chart to be in the top left hand corner. Therefore, pressing the button twice returns the chart to it's original position. </para>    
+  </section>
+
+  <section name="Chart Cursor">
+    <para>When you hover the mouse over a graph region, a tooltip appears showing the quote value under the pointer. If however you require a more immediate or accurate view of the data, Venice can display a cursor on the chart. </para>
+    <para>Enable the cursor by selecting 'Enable/Disable Chart Cursor' in the Graph menu. When you enable the cursor, it is drawn on the chart, and table opens up with a row selected which corresponds to the cursors location on the chart. </para>
+    <para>When you select a different row, the cursor will appear at that location on the chart. When you move the cursor on the chart (using the mouse), the table will select the row which corresponds to the cursor's new location.</para>
   </section>
 
 </section>

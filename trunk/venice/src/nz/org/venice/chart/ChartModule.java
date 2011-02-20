@@ -159,6 +159,7 @@ public class ChartModule extends JPanel implements Module,
     private Chart chart;
     private JScrollPane scrollPane;
     private JMenuBar menuBar = new JMenuBar();
+    private ChartTracking tracker;
 
     // Function Toolbar
     private JButton defaultZoom = null;
@@ -915,9 +916,14 @@ public class ChartModule extends JPanel implements Module,
 	if (x != null && viewMode == SCRIBBLING) {
 	    Coordinate c = new Coordinate();
 	    chart.setPoint(c);
-
 	}
-
+	
+	//When the user releases the mouse, place the cursor on the chart 
+	//at this location
+	if (tracker != null && tracker.isActive()) {	    
+	    tracker.setCursorCoord(x,y, mouseY);
+	}	
+	
     }
     public void mouseDragged(MouseEvent e) {
 
@@ -1399,7 +1405,28 @@ public class ChartModule extends JPanel implements Module,
 	return rv;
     }    
 
+    public void enableTracker() {
+	tracker.setActive(true);
+    }
+
+    public void disableTracker() {
+	tracker.setActive(false);
+    }
+
+    public void removeTracker() {
+	tracker = null;
+	chart.setTracker(tracker);
+    }
+
+    public void addTracker(Symbol symbol) {
+	tracker = CommandManager.getInstance().getTracker(this, chart, symbol);
+	chart.setTracker(tracker);
+    }
     
+    public ChartTracking getTracker() {
+	return tracker;
+    }
+
     /**
      * Move the horizontal scroll bar to the end of the pane.
      *

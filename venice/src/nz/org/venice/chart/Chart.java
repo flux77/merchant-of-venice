@@ -55,6 +55,7 @@ public class Chart extends JComponent implements MouseListener {
     private Comparable endHighlightedX;
 
     private ChartDrawingModel drawnElements;
+    private ChartTracking tracker;
     private boolean normalOrientation; //Is the chart normally oriented? (origin in top left corner)
 
     // Are we in a zoomed in view?
@@ -558,7 +559,31 @@ public class Chart extends JComponent implements MouseListener {
 	repaint();
     }
 
-    
+    public void setTracker(ChartTracking tracker) {
+	this.tracker = tracker;
+	//When the tracker is removed, don't want the cursor to be left
+	//behind
+	if (tracker == null) {
+	    resetBuffer();
+	    repaint();
+	}
+    }
+
+    public ChartTracking getTracker() {
+	return tracker;
+    }
+
+    public void updateCursor() {
+	//Won't display the cursor without this.
+	//Drawn elements get drawn on the chart as the user moves the mouse,
+	//so the buffer doesn't need to be reset to display the lines.
+	resetBuffer();
+	//This repaint seems to be necessary otherwise none of the
+	//variables reset in resetBuffer get calculated in time.
+	//Still some threading issues to resolve I think.
+	repaint();
+    }
+
     /** 
      * Generate the equation of the line passing through points specified by 
      * index, and return the difference between those points and x,y
@@ -577,7 +602,7 @@ public class Chart extends JComponent implements MouseListener {
 	return gui.getDifference(this, x, y, start, end);
     }
 
-
+    
     /** 
      * Find the graph element intersecting at x,y and delete it
      *
@@ -886,6 +911,12 @@ public class Chart extends JComponent implements MouseListener {
     public boolean getOrientation() {
 	return normalOrientation;
     }
+
+    public int getLevelAtPoint(int point) {
+	return gui.getLevelAtPoint(point);
+    }
+
+
 
 }
 

@@ -67,6 +67,7 @@ import nz.org.venice.quote.Symbol;
 import nz.org.venice.quote.IDQuoteSyncModule;
 import nz.org.venice.table.PortfolioTableModule;
 import nz.org.venice.table.QuoteModule;
+import nz.org.venice.table.TrackedQuoteModule;
 import nz.org.venice.table.WatchScreen;
 import nz.org.venice.table.WatchScreenModule;
 import nz.org.venice.alert.Alert;
@@ -230,6 +231,7 @@ public class CommandManager {
                 }
             });
         thread.start();
+	
     }
 
     public void tableStocksByDate(final int type) {
@@ -275,36 +277,15 @@ public class CommandManager {
         boolean singleDate = false;
 
         if (!thread.isInterrupted()) {
+	    Object[] quoteBundleSingleDate = getQuoteBundle(type, 
+							    symbols, 
+							    date);
 
-            if(type == EODQuoteRange.GIVEN_SYMBOLS) {
-                quoteRange =
-                    new EODQuoteRange(new ArrayList(symbols));
-                singleDate = false;
-            }
-            else {
-                // If this fails it'll throw a thread interupted to cancel the operation
-                // If we were given a date use that, otherwise use the latest date
-                // available. Load the last two dates - we need yesterday's quotes to
-                // calculate each stocks percent change.
-                if(date == null)
-                    date = QuoteSourceManager.getSource().getLastDate();
+	    quoteBundle = (EODQuoteBundle)quoteBundleSingleDate[0];
+	    Boolean tmp = (Boolean)quoteBundleSingleDate[1];
+	    singleDate = tmp.booleanValue();
 
-                if(!thread.isInterrupted()) {
-                    // If we couldn't load a date, the quote source will have interrupted
-                    // the thead. So this shouldn't be null here.
-                    assert date != null;
-
-                    quoteRange = new EODQuoteRange(type, date.previous(1), date);
-                }
-
-                singleDate = true;
-            }
-        }
-
-        if (!thread.isInterrupted())
-            quoteBundle = new EODQuoteBundle(quoteRange);
-
-        if (!thread.isInterrupted()) {
+	    
             table = new QuoteModule(quoteBundle, rule, singleDate);
             ModuleFrame newFrame = desktopManager.newFrame(table);
 	    if (PreferencesManager.getDefaultTableScrollToEnd()) {
@@ -313,6 +294,72 @@ public class CommandManager {
         }
 
         ProgressDialogManager.closeProgressDialog(progressDialog);
+    }
+    
+    private TrackedQuoteModule tableStocksWithTracker(String title, int type, String rule, SortedSet symbols,
+						      TradingDate date) {
+	Thread thread = Thread.currentThread();
+        EODQuoteBundle quoteBundle = null;
+        EODQuoteRange quoteRange = null;
+        TrackedQuoteModule table = null;
+        ProgressDialog progressDialog = ProgressDialogManager.getProgressDialog();
+        progressDialog.show(title);
+        boolean singleDate = false;
+	
+        if (!thread.isInterrupted()) {
+	    Object[] bundleDate = getQuoteBundle(type, symbols, date);
+	    quoteBundle = (EODQuoteBundle)bundleDate[0];
+	    Boolean tmp = (Boolean)bundleDate[1];
+	    singleDate = tmp.booleanValue();
+	}
+	
+        if (!thread.isInterrupted()) {
+            table = new TrackedQuoteModule(quoteBundle, rule, singleDate);
+            ModuleFrame newFrame = desktopManager.newFrame(table);
+	    if (PreferencesManager.getDefaultTableScrollToEnd()) {
+		setVBarToMax(newFrame);
+	    }
+        }
+
+        ProgressDialogManager.closeProgressDialog(progressDialog);
+	return table;
+    }
+
+    private Object[] getQuoteBundle(int type, 
+				    SortedSet symbols, 
+				    TradingDate date) {
+	EODQuoteRange quoteRange = null;
+	boolean singleDate;
+	Object[] rv = new Object[2];
+
+	//Should be the same thread as the caller
+	Thread thread = Thread.currentThread();
+
+	if(type == EODQuoteRange.GIVEN_SYMBOLS) {
+	    quoteRange =
+		new EODQuoteRange(new ArrayList(symbols));
+	    singleDate = false;
+	}
+	else {
+	    // If this fails it'll throw a thread interupted to cancel the operation
+	    // If we were given a date use that, otherwise use the latest date
+	    // available. Load the last two dates - we need yesterday's quotes to
+	    // calculate each stocks percent change.
+	    if(date == null)
+		date = QuoteSourceManager.getSource().getLastDate();
+	    
+	    if(!thread.isInterrupted()) {
+		// If we couldn't load a date, the quote source will have interrupted
+		// the thead. So this shouldn't be null here.
+		assert date != null;		
+		quoteRange = new EODQuoteRange(type, date.previous(1), date);
+	    }	    
+	    singleDate = true;
+	}
+	
+	rv[0] = new EODQuoteBundle(quoteRange);
+	rv[1] = Boolean.valueOf(singleDate);
+	return rv;
     }
     
     public void tableAlerts() {
@@ -1183,6 +1230,26 @@ public class CommandManager {
 	    ProgressDialogManager.closeProgressDialog(progress);
 	}
 
+    }
+
+    public ChartTracking getTracker(ChartModule chartModule, Chart chart, Symbol symbol) {
+	ArrayList symbols = new ArrayList();
+	symbols.add(symbol);
+	       
+	String description = EODQuoteRange.getDescription(EODQuoteRange.GIVEN_SYMBOLS);
+	String title =
+	    new String(Locale.getString("LIST_IT", description));
+	
+	SortedSet symbolsCopy = new TreeSet(symbols);
+	TrackedQuoteModule table = tableStocksWithTracker(title, EODQuoteRange.GIVEN_SYMBOLS, null, symbolsCopy, null);
+
+	ChartTracking tracker = new ChartTracking(chartModule, 
+						  chart, 
+						  table, 
+						  symbol);
+	desktopManager.addModuleListener(tracker);
+	table.setTracker(tracker);
+	return tracker;
     }
 
     /**

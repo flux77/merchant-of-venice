@@ -1,6 +1,15 @@
-Changes for Venice, 0.723 beta ??/??/????
+Changes for Venice, 0.724 beta ??/??/????
 
 * Change table state save/restore to avoid saving the entire table contents 
+
+Changes for Venice, 0.723 beta 22/02/2011
+=========================================
+
+* Fixed bug #3137455 February 31st is accepted as a date
+* Added alert functionality
+* Added cursor tracking
+* Keyboard shortcut to close windows.
+* Improved internationalisation for console (Christian Brom) 
 
 Changes for Venice, 0.722 beta 01/11/2010
 -----------------------------------------

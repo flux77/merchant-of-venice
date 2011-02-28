@@ -41,20 +41,13 @@ public class NotExpression extends UnaryExpression {
     }
 
     public Expression simplify() {
-	
-	//System.out.println("In NOT exp, this = " + this);
-
-        // First simplify all the child arguments
+	// First simplify all the child arguments
 	Expression simplified = super.simplify();
 
-	//System.out.println("In NOT exp, after super.simpl, this = " + this + " this copy = " + simplified);
-	
         // If the child argument is a number expression we can precompute
         if(simplified.getChild(0) instanceof NumberExpression) {
             try {
 		Expression retExp = new NumberExpression(simplified.evaluate(null, null, null, 0), BOOLEAN_TYPE);
-
-		//System.out.println("In NOT exp, got here, returning: " + retExp);
 
 		return retExp;
             }
@@ -71,8 +64,6 @@ public class NotExpression extends UnaryExpression {
 
             Expression retExp = new NotEqualExpression(simplified.getChild(0).getChild(0), simplified.getChild(0).getChild(1));
 
-	    //System.out.println("In NOT exp, returning new not, ret  = " + retExp);
-	    
 	    return retExp;
 	}
         // not(x != y) -> x == y
@@ -100,7 +91,6 @@ public class NotExpression extends UnaryExpression {
         else if(simplified.getChild(0) instanceof NotExpression)
             return simplified.getChild(0).getChild(0);
         else {
-	    //System.out.println("In not exp, returning myself: " ); 
             return simplified;
 	}
     }

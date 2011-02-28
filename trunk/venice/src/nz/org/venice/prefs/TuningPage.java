@@ -21,11 +21,18 @@ package nz.org.venice.prefs;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JLabel;
+import javax.swing.JCheckBox;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
 
 import nz.org.venice.quote.EODQuoteCache;
 import nz.org.venice.ui.GridBagHelper;
@@ -35,11 +42,15 @@ import nz.org.venice.util.Locale;
  * Provides a preferences page to let the user view and set tuning
  * parameters.
  */
-public class TuningPage extends JPanel implements PreferencesPage
+public class TuningPage extends JPanel implements PreferencesPage, ActionListener
 {
     private JDesktopPane desktop;
     private JTextField maxCachedQuotesTextField;
-   
+    private JLabel currentCachedQuotesLabel;
+    private JTextField maxCacheAgeTextField;
+    private JCheckBox enableCacheExpiryButton;
+    private JButton flushCacheButton;
+
     /**
      * Create a new tuning preferences page.
      *
@@ -69,7 +80,8 @@ public class TuningPage extends JPanel implements PreferencesPage
         int currentCachedQuotes = (EODQuoteCache.isInstantiated()?
                                    EODQuoteCache.getInstance().size() :
                                    0);
-        GridBagHelper.addLabelRow(borderPanel, 
+
+        currentCachedQuotesLabel = GridBagHelper.addLabelRow(borderPanel, 
                                   Locale.getString("CURRENT_CACHED_QUOTES"), 
                                   Integer.toString(currentCachedQuotes),
                                   gridbag, c);
@@ -80,6 +92,34 @@ public class TuningPage extends JPanel implements PreferencesPage
                                      Locale.getString("MAXIMUM_CACHED_QUOTES"), 
                                      Integer.toString(maximumCachedQuotes),
                                      gridbag, c, 10);
+
+	boolean cacheExpires = PreferencesManager.getCacheExpiryEnabled();
+	enableCacheExpiryButton = 
+	    GridBagHelper.addCheckBoxRow(borderPanel, 
+					 Locale.getString("CACHE_EXPIRY_ENABLED"), 
+					 cacheExpires,
+					 gridbag, c);
+
+	enableCacheExpiryButton.addActionListener(this);
+
+	int maximumCacheAge = PreferencesManager.getCacheExpiryTime();
+	maxCacheAgeTextField = 
+	    GridBagHelper.addTextRow(borderPanel, 
+                                     Locale.getString("MAXIMUM_CACHE_LIFETIME"), 
+                                     Integer.toString(maximumCacheAge),
+                                     gridbag, c, 10);
+
+	if (!cacheExpires) {
+	    maxCacheAgeTextField.setEnabled(false);
+	}
+
+	flushCacheButton = 
+	    GridBagHelper.addButtonRow(borderPanel, 
+				       Locale.getString("FLUSH_CACHE"), 
+                                     gridbag, c);
+
+	flushCacheButton.addActionListener(this);
+	    
 
         quotesPanel.add(borderPanel, BorderLayout.NORTH);
         return quotesPanel;
@@ -95,15 +135,49 @@ public class TuningPage extends JPanel implements PreferencesPage
 
     public void save() {
         int maximumCachedQuotes = 0;
+	int maximumCacheAge = 60 * 8; //Default of 8 hours
+	boolean cacheExpires = false;
 
         try {
             maximumCachedQuotes = Integer.parseInt(maxCachedQuotesTextField.getText());
+	    maximumCacheAge = Integer.parseInt(maxCacheAgeTextField.getText());
         }
         catch(NumberFormatException e) {
             // ignore
         }
 
+	cacheExpires = (enableCacheExpiryButton.isSelected()) ? true : false;
+
         if(maximumCachedQuotes > 0)
             PreferencesManager.putMaximumCachedQuotes(maximumCachedQuotes);
+
+	PreferencesManager.putCacheExpiryEnabled(cacheExpires);
+	if (maximumCacheAge > 0) 
+	    PreferencesManager.putCacheExpiryTime(maximumCacheAge);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+	if (e.getSource() == enableCacheExpiryButton) {
+	    maxCacheAgeTextField.setEnabled(enableCacheExpiryButton.isSelected());
+	}
+
+	if (e.getSource() == flushCacheButton) {
+	    int confirmed = JOptionPane.showConfirmDialog(this, 
+							  Locale.getString("CONFIRM_FLUSH"), 
+							  Locale.getString("CONFIRM_FLUSH"), 
+							  JOptionPane.YES_NO_OPTION);
+
+	    
+	    if (confirmed == JOptionPane.YES_OPTION) {
+		EODQuoteCache.expire();
+		
+		int currentCachedQuotes = (EODQuoteCache.isInstantiated()?
+					   EODQuoteCache.getInstance().size() :
+					   0);
+
+		currentCachedQuotesLabel.
+		    setText(Integer.toString(currentCachedQuotes));
+	    }
+	}
     }
 }

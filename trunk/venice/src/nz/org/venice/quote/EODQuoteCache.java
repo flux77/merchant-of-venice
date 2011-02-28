@@ -23,7 +23,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+
+import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.TradingTime;
 import nz.org.venice.util.TradingDateComparator;
 
 /**
@@ -60,6 +63,13 @@ public class EODQuoteCache {
 
     // Number of quotes in cache
     private int size = 0;
+
+    // When the cache was instantiated. 
+    private TradingTime instanceTimeStamp;
+
+    //Max age set to 8 hours because market open is usually 10-4 
+    //Practically earliest that new EOD date would be available.
+    private static int expiryTime = 60 * 60 * 8; 
 
     // Singleton instance of this class
     private static EODQuoteCache instance = null;
@@ -132,7 +142,8 @@ public class EODQuoteCache {
     // Class should only be constructed once by this class
     private EODQuoteCache() {
         cache = new ArrayList();
-        dates = new ArrayList();
+        dates = new ArrayList();	
+	instanceTimeStamp = new TradingTime();
 
         TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();
 
@@ -146,10 +157,29 @@ public class EODQuoteCache {
      * @return  singleton instance of this class
      */
     public static synchronized EODQuoteCache getInstance() {
-	if(instance == null)
+	if(instance == null) {
 	    instance = new EODQuoteCache();
+	} else {		
+	    //Check for Cache Expiry (For loading new quotes without restarting venice)	
 
+	    if (PreferencesManager.getCacheExpiryEnabled()) {
+		//Preferences is in minutes, convert to seconds
+		expiryTime = PreferencesManager.getCacheExpiryTime() * 60;
+		TradingTime now = new TradingTime();
+		int timeElapsed = instance.instanceTimeStamp.diff(now);
+		    
+		if (timeElapsed >= expiryTime) {
+		    expire();
+		}
+	    }
+	}
         return instance;
+    }
+
+    public static synchronized void expire() {
+	instance = new EODQuoteCache();				
+	EODQuoteBundleCache.expire();
+	QuoteSourceManager.getSource().cacheExpiry();
     }
 
     /**
@@ -386,7 +416,7 @@ public class EODQuoteCache {
         Object previousQuote = quotesForDate.put(symbol, todayQuote);
 
         // If the quote wasn't already there then increase size counter
-        if(previousQuote == null)
+        if(previousQuote == null) 
             size++;
     }
 

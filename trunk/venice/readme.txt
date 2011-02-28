@@ -1,7 +1,7 @@
-Merchant of Venice, 0.722 beta 1/Nov/2010
+Merchant of Venice, 0.723 beta 22/Feb/2011
 =========================================
 
-Copyright (C) 2003-10, Andrew Leppard (andrew venice org nz)
+Copyright (C) 2003-11, Andrew Leppard (andrew venice org nz)
 See COPYING.txt for license terms.
 
 1 Introduction
@@ -127,7 +127,7 @@ web     Packages the web files ready for deployment (Not included in
 
 6 Licenses
 
-Venice is Copyright (C) 2003-2008, Andrew Leppard.
+Venice is Copyright (C) 2003-2011, Andrew Leppard.
 HSQLDB is Copyright (C) 1995-2000, The Hypersonic SQL Group.
 Joone is Copyright (C) 2004, Paolo Marrone and the Joone team.
 Jython is Copyright (C) 2000, Jython Developers.

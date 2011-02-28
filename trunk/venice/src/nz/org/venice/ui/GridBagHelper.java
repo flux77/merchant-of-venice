@@ -22,6 +22,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.lang.String;
 import javax.swing.JCheckBox;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -78,6 +79,27 @@ public class GridBagHelper {
         panel.add(checkBox);
 
         return checkBox;
+    }
+
+    /**
+     * Append a new row containing a button to the form.
+     *
+     * @param panel form panel
+     * @param field text to display next to check box
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @return the check box
+     */
+    public static JButton addButtonRow(JPanel panel, String field,
+                                           GridBagLayout gridbag,
+                                           GridBagConstraints c) {
+
+        JButton button = new JButton(field);
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        gridbag.setConstraints(button, c);
+        panel.add(button);
+
+        return button;
     }
 
     /**

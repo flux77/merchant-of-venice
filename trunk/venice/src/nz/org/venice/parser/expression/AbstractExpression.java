@@ -232,7 +232,7 @@ public abstract class AbstractExpression implements Expression {
 	for (int i = 0; i < getChildCount(); i++) {
 	    Expression newChild = children[i].simplify();
 	    if (newChild == null) {
-		System.out.println("BOOM at i " + i + " child = " + children[i] + " type = " + children[i].getClass().getName());
+		assert false;
 	    }
 	    newChildren[i] = newChild;
 	}		

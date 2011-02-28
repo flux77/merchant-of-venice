@@ -132,6 +132,7 @@ public class EODQuoteChartMenu extends JMenu {
 	menuName = settings.getTitle();
 
 	this.quoteBundle = quoteBundle;
+	this.symbol = symbol;
 	this.listener = listener;
 	this.currentViewGraph = graph;
 	this.indexChart = indexChart;

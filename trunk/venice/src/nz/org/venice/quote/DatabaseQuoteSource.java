@@ -258,12 +258,20 @@ public class DatabaseQuoteSource implements QuoteSource
     }
 
     /**
+     * Force the database to reset the first and last dates so that new data
+     * can be displayed.
+     */
+    public synchronized void cacheExpiry() {
+	firstDate = null;
+	lastDate = null;
+    }
+
+    /**
      * Return the last date in the database that has any quotes.
      *
      * @return	newest date with quotes
      */
     public TradingDate getLastDate() {
-
 	// Do we have it buffered?
 	if(lastDate != null)
 	    return lastDate;
@@ -399,7 +407,7 @@ public class DatabaseQuoteSource implements QuoteSource
     // This function creates a new thread that monitors the current thread
     // for the interrupt call. If the current thread is interrupted it
     // will cancel the given SQL statement. If cancelOnInterrupt() is called,
-    // once the SQL statement has finisehd, you should make sure the
+    // once the SQL statement has finished, you should make sure the
     // thread is terminated by calling "interrupt" on the returned thread.
     private Thread cancelOnInterrupt(final Statement statement) {
         final Thread sqlThread = Thread.currentThread();

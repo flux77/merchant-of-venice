@@ -521,4 +521,13 @@ public class FileQuoteSource implements QuoteSource
     public void shutdown() {
         // nothing to do
     }
+
+    /**
+     * Reset the first and last dates, forcing this quotesource to reload
+     * data from the filesystem.
+     */
+    public void cacheExpiry() {
+	firstDate = null;
+	lastDate = null;
+    }
 }

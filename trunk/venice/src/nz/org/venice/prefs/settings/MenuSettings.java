@@ -124,6 +124,15 @@ public class MenuSettings extends AbstractSettings {
 	return title;
     }
 
+    /**
+     * Set the graph title
+     * 
+     * @param title The graph title
+     */
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
 
     /**
      *

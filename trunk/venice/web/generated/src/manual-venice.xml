@@ -38,6 +38,8 @@ automated buy/sell paper trade rules.
 frequently executed tasks in Venice.
 </para>
 
+<para><link to='Alerts'>Alerts</link> are a way to display alarms when certain user defined conditions are met.</para>
+
 <para><link to="Analysis">Analysis</link> describes some
 of the more advance technical analysis that is available
 in Venice. For charting see <link to="Graphs">Graphs</link>.
@@ -670,7 +672,13 @@ If you switch to the Point and Figure graph while zoomed in on an area which doe
   
   <section name="Others">
     <para>The "Clone" button opens a window with the same chart type.</para>
-    <para>The "Flip chart" button toggles the orientation of the chart. The initial orientation is for the origin of the chart to be in the top left hand corner. Therefore, pressing the button twice returns the chart to it's original position. </para>
+    <para>The "Flip chart" button toggles the orientation of the chart. The initial orientation is for the origin of the chart to be in the top left hand corner. Therefore, pressing the button twice returns the chart to it's original position. </para>    
+  </section>
+
+  <section name="Chart Cursor">
+    <para>When you hover the mouse over a graph region, a tooltip appears showing the quote value under the pointer. If however you require a more immediate or accurate view of the data, Venice can display a cursor on the chart. </para>
+    <para>Enable the cursor by selecting 'Enable/Disable Chart Cursor' in the Graph menu. When you enable the cursor, it is drawn on the chart, and table opens up with a row selected which corresponds to the cursors location on the chart. </para>
+    <para>When you select a different row, the cursor will appear at that location on the chart. When you move the cursor on the chart (using the mouse), the table will select the row which corresponds to the cursor's new location.</para>
   </section>
 
 </section>
@@ -860,10 +868,11 @@ and <highlight>not</highlight>. For example:</para>
 </code></item>
 </list>
 
-<para>The type of returned value of arithmetic operators is the same of the first operand.
+<para>The type of the returned value is determined by the operands, with floating point types having precedence. The type determinations changed as of version 0.72. Prior to this version, the type of an expression was determined by the type of the first operand. 
+
 The following examples explain the behaviour:</para>
 <list><item>INTEGER_TYPE + INTEGER_TYPE returns an INTEGER_TYPE</item>
-<item>INTEGER_TYPE - FLOAT_TYPE returns an INTEGER_TYPE</item>
+<item>INTEGER_TYPE - FLOAT_TYPE returns a FLOAT_TYPE</item>
 <item>FLOAT_TYPE - INTEGER_TYPE returns a FLOAT_TYPE</item>
 <item>FLOAT_TYPE / INTEGER_TYPE returns a FLOAT_TYPE</item>
 <item>FLOAT_TYPE * FLOAT_TYPE returns a FLOAT_TYPE</item>
@@ -1179,6 +1188,12 @@ Where INITIAL_VALUE is the initial value which counting from</para>
 <para>Example:</para>
 <para><code>percent(200, 10)</code></para>
 <para>Returns 10% of 200 which is 20.</para>
+</section>
+
+<section name="Random">
+  <para>The random function returns a positive floating point random number between 0.0 and 1.0. This function can be used to test expressions to see if following a rule produces better results than just choosing randomly. Note that the analyser (Genetic Programming etc) functions do not generate this function.</para>
+  <para><code>random(seed)</code></para>
+  <para>Returns a random number between 0.0 and 1.0. Seed is optional</para>
 </section>
 
 <section name="Relative Strength Index">
@@ -1659,8 +1674,8 @@ with a buy signal. If the gain is less than 2%, the ANN will be trained with a s
 </section>
 
 <section name="ANN I/O Params">
-<para>Here you can add/modify/delete input expressions. These expressions must be valid Gondola expressions,
-so do not add equations (a boolean value is returned), but expressions (an integer/double value is returned).
+<para>Here you can add/modify/delete input expressions. At least one expression must be added. These expressions must be valid Gondola expressions where an integer or double value is returned; do not add equations (where a boolean value is returned). 
+
 The input expressions will be the input values for ANN during running and training. The order of input expressions
 will be the same as the order of Joone input neurons.
 Pay attention to what kind of input you put, because if the inputs are wrong the CT method will not work well.
@@ -1740,4 +1755,48 @@ text box, choose the bundle of stocks carefully, because the system manages only
 </chapter>
 
 </chapter>
+
+<chapter name='Alerts'>
+<para>An alert is a trigger which fires based upon a criteria set by a user previously and which alert the user when that critiera is met. An alert consists of a symbol, a date of effect and a triggering condition. For example, trigger an alert when symbol 'FOO' closes above $10.00. </para>
+
+<para>Notification that an alert has triggered appears when Venice is started, and whenever new quotes are imported. </para>
+
+<section name='Alert Types'>
+<para>Alerts can be set on quote values (ie Open, High, Low, Close &amp; Volume) or on Gondola Expressions. For quote alerts, upper , lower and exact bounds can be set. </para>
+</section>
+
+<section name='Enabling and Disabling Alert Notifications'>
+<para>Enabling and disabling alerts is set via 'Preferences -> Alert Destination'. If the destination is 'Disable', alert notifications will not be shown. Note that when notifications are disabled alerts cannot be set nor modified.</para>
+
+<section name='Choosing where to store alerts'>
+<para>Alerts can be stored on the local filesystem or in the Database where quote data is stored. Record your choice in 'Preferences -> Alert Destination'. </para>
+</section>
+
+</section>
+
+<section name='Setting Alerts'>
+<para>Alerts can be set via a Watch Screen, a chart, or through the menu option 'Table -> List Alerts -> Add Alert'. The latter option will not have a symbol defaulted and must be entered. </para>
+<para>The Alert type is the first field in the 'Add Alert' dialog.</para>
+<para>For a quote alert, the data value to test (e.g. Open, Close, etc) and the bound type (ie upper, lower, or exact) must be supplied. For an expression alert, only the expression must be supplied.
+</para>
+</section>
+
+<section name='Enabling and Disabling Alerts'>
+<para>Alerts are turned on or off by listing the alerts through 'Table -> List Alerts'. Select the alerts you want to enable or disable and select the appropriate option in the 'Alerts' dialog. The 'Add Alert' dialog will display. Fill in the form and press the 'OK' button. The new alert will appear in the list of alerts.</para>
+</section>
+
+<section name='Modifying Alerts'>
+<para>Alerts are modified by selecting the alert you wish to modify and selecting the 'Modify Alert' menu option. The 'Edit Alert' dialog will display with the alert's values in the dialog. Modify the values and press the 'OK' button and the alert list will refresh.</para>
+</section>
+
+<section name='Removing Alerts'>
+<para>Alerts are removed by selecting the alerts you wish to remove and select the 'Remove Alert' menu option. A confirmation dialog will display, and when the 'yes' button is pressed, the alerts will be removed and the Alert List updated.</para>
+</section>
+
+<section name='Replaying Triggered Alerts'>
+<para>If you wish to replay the alert notifications, select the 'Table -> Alerts -> Show Triggered Alerts'.</para>
+</section>
+
+</chapter>
+
 </document>

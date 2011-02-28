@@ -74,6 +74,12 @@ public class EODQuoteBundleCache {
         return instance;
     }
 
+    public static synchronized void expire() {
+	instance = null;
+	getInstance();
+
+    }
+
     /**
      * Expand the given quote bundle to include quotes from the new quote range.
      * When this function is called, the quote bundle should still have its old
@@ -108,7 +114,7 @@ public class EODQuoteBundleCache {
     public void load(EODQuoteBundle quoteBundle) {
 	if(!isLoaded(quoteBundle)) {
             loadedQuoteBundles.add(quoteBundle);
-
+	    
             if(!forceLoad(quoteBundle.getQuoteRange()))
                 loadedQuoteBundles.remove(quoteBundle);
         }
@@ -135,14 +141,15 @@ public class EODQuoteBundleCache {
         if(!quoteRange.isEmpty()) { 
             // Load the quote range into the quote cache. Return immediately if
             // we couldn't load it.
+
             if(!QuoteSourceManager.getSource().loadQuoteRange(quoteRange))
                 return false;
-           
+
             // If the quote cache has too many quotes then keep
             // freeing the oldest bundle - but don't free the
             // newest bundle, since that is the one we are loading.
             int maximumCachedQuotes = PreferencesManager.getMaximumCachedQuotes();
-
+	    
             synchronized(loadedQuoteBundles) {
                 while(quoteCache.size() > maximumCachedQuotes &&
                       loadedQuoteBundles.size() > 1) {

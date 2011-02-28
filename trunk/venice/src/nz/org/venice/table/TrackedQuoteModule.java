@@ -71,6 +71,7 @@ public class TrackedQuoteModule extends QuoteModule {
     private ChartTracking chartTracker = null;
     private PropertyChangeSupport propertySupport;
     private int position; //Which row in the table is selected
+    private QuoteModuleSettings settings = null;
 
     /**
      * Create a new module that lists all the quotes in the given quote bundle.
@@ -198,6 +199,11 @@ public class TrackedQuoteModule extends QuoteModule {
      */
     public void removeModuleChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
+    }
+
+    //Don't want to save the state of the tracker    
+    public void save() {
+	
     }
 
 }

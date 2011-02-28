@@ -2,7 +2,7 @@
 <project name="Venice" default="run" basedir=".">
 
   <!-- Current version we are working towards -->
-  <property name="VERSION" value="0.722beta"/>
+  <property name="VERSION" value="0.723beta"/>
 
   <!-- Paths -->
   <property name="api" value="${basedir}/api"/>

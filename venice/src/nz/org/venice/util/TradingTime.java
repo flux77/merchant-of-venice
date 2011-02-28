@@ -284,6 +284,16 @@ public class TradingTime implements Cloneable, Comparable {
     }
 
     /**
+     * @return the difference between this and another TradingTime in seconds
+     * 
+     */     
+    public int diff(TradingTime time) {
+	return (time.getHour() - getHour()) * MINUTES_IN_HOUR * SECONDS_IN_MINUTE + 
+	    (time.getMinute() - getMinute()) * SECONDS_IN_MINUTE +
+	    (time.getSecond() - getSecond());
+    }
+
+    /**
      * Returns a string version of the time.
      *
      * @return string version

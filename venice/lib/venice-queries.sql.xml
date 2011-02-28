@@ -249,5 +249,27 @@
 	</query>
       </transaction>
     </method>
-</queries>
+    <method name='getAdvanceDeclineDateRange'>
+      <transaction name='getAdvanceDecline'>
+	<query>
+	  SELECT COUNT(*), date FROM <parameter name='share_table'/> WHERE
+	  date &gt;= <parameter name='firstDate'/> AND 
+	  date &lt;= <parameter name='lastDate'/> AND
+          close &gt; open AND length(symbol) = 3 AND 
+	  <parameter name='symbol_first_char'/> != 'X' 
+	  GROUP BY date 
+	  ORDER BY date ASC;
+	</query>
+	<query>
+	  SELECT COUNT(*), date FROM <parameter name='share_table'/> WHERE
+	  date &gt;= <parameter name='firstDate'/> AND 
+	  date &lt;= <parameter name='lastDate'/> AND
+          close &lt; open AND length(symbol) = 3 AND 
+	  <parameter name='symbol_first_char'/> != 'X' 
+	  GROUP BY date 
+	  ORDER BY date ASC;
+	</query>	  
+      </transaction>
+    </method>
+  </queries>
 </venice_sql>

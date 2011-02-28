@@ -483,6 +483,50 @@ public class PreferencesManager {
     }
 
     /**
+     * Load the users preference for whether the quotes in the cache expire.
+     * 
+     * @return True if cacheExpiry is enabled. 
+     */
+    public static boolean getCacheExpiryEnabled() {
+	Preferences prefs = getUserNode("/cache");
+	return prefs.getBoolean("expiryEnabled", false);
+    }
+
+    /**
+     * Save the users preferences for whether the quotes in the cache expire. 
+     *
+     * @param expiry  If true, the quotes in the cache will expire.  
+     */
+    public static void putCacheExpiryEnabled(boolean expiry) {
+	Preferences prefs = getUserNode("/cache");
+	prefs.putBoolean("expiryEnabled", expiry);
+    }
+
+    
+    /**
+     * Save the users preference for when the quotes in the cache expire.
+     * 
+     * @param The number of minutes that must elapse before refreshing the 
+     * cache.
+     */
+    public static void putCacheExpiryTime(int lifespan) {
+	Preferences prefs = getUserNode("/cache");
+	prefs.putInt("expiryTime", lifespan);
+    }
+
+    /**
+     * Load the users preference for when the quotes in the cache expire.
+     * 
+     * @return The number of minutes that must elapse before refreshing the 
+     * cache.
+     */
+    public static int getCacheExpiryTime() {
+	int defaultLifetime = 60 * 8; //8 hours
+	Preferences prefs = getUserNode("/cache");
+	return prefs.getInt("expiryTime", defaultLifetime);
+    }
+
+    /**
      * Return a list of the names of all the watch screens.
      *
      * @return the list of watch screen names.
@@ -1524,6 +1568,12 @@ public class PreferencesManager {
 	}
 
 	try {
+
+	    //Don't save an empty file
+	    if (frame.getModule().getSettings() == null) {
+		return;
+	    }
+
 	    File frameSettingsFile = new File(getFrameSettingsHome(),
 					      ("FrameDataFor" + frame.getTitle()).replaceAll(" ", "") + "_" + frame.hashCode() + ".xml");
 

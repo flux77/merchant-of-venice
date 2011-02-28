@@ -325,7 +325,7 @@ public class CommandManager {
 	return table;
     }
 
-    private Object[] getQuoteBundle(int type, 
+    private synchronized Object[] getQuoteBundle(int type, 
 				    SortedSet symbols, 
 				    TradingDate date) {
 	EODQuoteRange quoteRange = null;
@@ -339,6 +339,7 @@ public class CommandManager {
 	    quoteRange =
 		new EODQuoteRange(new ArrayList(symbols));
 	    singleDate = false;
+
 	}
 	else {
 	    // If this fails it'll throw a thread interupted to cancel the operation
@@ -359,6 +360,9 @@ public class CommandManager {
 	
 	rv[0] = new EODQuoteBundle(quoteRange);
 	rv[1] = Boolean.valueOf(singleDate);
+
+	EODQuoteBundle tmp2 = (EODQuoteBundle)rv[0];
+
 	return rv;
     }
     

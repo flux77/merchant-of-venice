@@ -418,7 +418,6 @@ public class ExpressionFactory {
 	    expression = new ClauseExpression(newChildren);
 	} else {
 	    //Forgot an instance
-	    System.out.println("We get: " + exp.getClass().getName());
 	    assert false;
 	    expression = null;
 	}

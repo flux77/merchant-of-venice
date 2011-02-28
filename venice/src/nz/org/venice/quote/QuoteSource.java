@@ -146,4 +146,9 @@ public interface QuoteSource {
      * Shutdown the quote source.
      */
     public void shutdown();
+
+    /**
+     * Force the quote source to reload and not use cached values. 
+     */
+    public void cacheExpiry();
 }

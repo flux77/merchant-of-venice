@@ -664,7 +664,12 @@ public class MainMenu implements ActionListener, ModuleListener
      */
     public void moduleRemoved(ModuleEvent moduleEvent) {
         Module module = (Module)moduleEvent.getSource();
-        
+	
+	//Can happen when removing modules quickly.
+	if (moduleToMenuItemHash.get(module) == null) {
+	    return;
+	}
+
         windowMenu.remove((JMenuItem)moduleToMenuItemHash.get(module));
         menuItemToModuleHash.remove(moduleToMenuItemHash.get(module));
         moduleToMenuItemHash.remove(module);

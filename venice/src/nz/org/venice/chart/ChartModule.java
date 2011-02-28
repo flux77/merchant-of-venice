@@ -299,7 +299,7 @@ public class ChartModule extends JPanel implements Module,
 	    
 	    MenuSettings menuSettings = new MenuSettings();
 	    menuSettings.setTitle(primaryGraph.getSourceName()); 
-	    menuSettings.setMap(graphMenuMap);	    
+	    menuSettings.setMap(graphMenuMap);	   
 	    
 	    if (primaryGraph.getSourceType() == GraphSource.SYMBOL) {
 		try {
@@ -564,6 +564,8 @@ public class ChartModule extends JPanel implements Module,
 
 	// Add graph to chart
 	chart.add(graph, level);
+
+	
 
 	// Add menu for this quote
 	EODQuoteChartMenu menu = new EODQuoteChartMenu(this, quoteBundle, symbol,

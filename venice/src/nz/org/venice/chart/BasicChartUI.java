@@ -581,8 +581,6 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	int x;
 	int y;
 	
-	//System.out.println("GOT HERE0 in bcui.dt = " + chart.getTracker());
-
 	if (chart.getTracker() == null) {
 	    return;
 	}
@@ -590,11 +588,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	if (!chart.getTracker().isActive()) {
 	    return; 
 	}
-	//System.out.println("GOT HERE in bcui.dt");
-
 	Coordinate point = chart.getTracker().getCoordinate(); 
-
-	//System.out.println("Coord = " + point);
 
 	x = getXCoordinate(chart, point);
 	y = getYCoordinate(chart, point) - (MINIMUM_LEVEL_HEIGHT / 2);

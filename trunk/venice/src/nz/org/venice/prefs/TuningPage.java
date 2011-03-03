@@ -163,8 +163,8 @@ public class TuningPage extends JPanel implements PreferencesPage, ActionListene
 
 	if (e.getSource() == flushCacheButton) {
 	    int confirmed = JOptionPane.showConfirmDialog(this, 
-							  Locale.getString("CONFIRM_FLUSH"), 
-							  Locale.getString("CONFIRM_FLUSH"), 
+							  Locale.getString("SURE_FLUSH_CACHE"), 
+							  Locale.getString("SURE_FLUSH_CACHE"), 
 							  JOptionPane.YES_NO_OPTION);
 
 	    

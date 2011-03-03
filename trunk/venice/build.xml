@@ -31,7 +31,6 @@
   <property name="lib.xml" value="${lib}/xstream-1.3.jar"/>
   
   <property name='lib.uuid' value="${lib}/jug-lgpl-2.0.0.jar"/>
-  <property name='lib.sql' value='${lib}/venice-queries.sql.xml'/>
 
   <!-- Online help -->
   <property name="help" value="${classes}/nz/org/venice/help/doc"/>
@@ -96,7 +95,7 @@
 
     <copy todir="${classes}" overwrite="y">
       <fileset dir="${src}"
-               includes="**/*.gif, **/*.png,
+               includes="**/*.gif, **/*.png, **/*.sql.xml,
                          **/*.properties,
                          nz/org/venice/quote/samples/*.txt"/>
     </copy>
@@ -218,10 +217,11 @@
         <include name="com/**"/>
       </patternset>
     </unjar>
-
+       
     <copy todir="${temp}">
       <fileset dir="${classes}"
                includes="**/*.class, **/*.gif, **/*.png,
+			 **/*.sql.xml,
                          nz/org/venice/help/doc/*.html,
                          **/*.properties,
                          nz/org/venice/help/doc/index.xml,
@@ -468,8 +468,6 @@
         <pathelement path="${lib.xml}"/>	
 	<pathelement path="${lib.uuid}"/>
       </classpath>
-      <sysproperty key="sqlpath.property"
-		   value="/${lib.sql}"/>
     </java>
   </target>
 

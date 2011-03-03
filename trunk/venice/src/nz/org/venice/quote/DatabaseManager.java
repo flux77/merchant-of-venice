@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.List;
-
+import java.io.InputStream;
 
 import java.util.Properties;
 import java.util.HashMap;
@@ -909,20 +909,23 @@ public class DatabaseManager
     private void readQueriesFromLibrary() {
 	transactionMap = new HashMap();
 	
+	String queryLib = "nz/org/venice/util/sql/venice-queries.sql.xml";
+	InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(queryLib);
 	
-	Properties sysProps = System.getProperties();
-	String prop = "sqlpath.property";
-	String path = sysProps.get(prop).toString();
-	java.io.File file = null;
-
+	if (inputStream == null) {
+	    DesktopManager.
+		showErrorMessage(Locale.getString("VENICE_PROBLEM_TITLE"),
+				 Locale.getString("ERROR_TALKING_TO_DATABASE", "Resource " + queryLib + " not found"));
+	    return;
+	}
+	
 	try {
 	
 	    SAXParserFactory factory = SAXParserFactory.newInstance();
 	    SAXParser parser = factory.newSAXParser();
-	    file = new java.io.File(path, "/");
 	    
 	    
-	    parser.parse(file, new DefaultHandler() {
+	    parser.parse(inputStream, new DefaultHandler() {
 		    private boolean newQuery = false;
 		    private boolean newTransaction = false;
 		    private String newTransactionName;

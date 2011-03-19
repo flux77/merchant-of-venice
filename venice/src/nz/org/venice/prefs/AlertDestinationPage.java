@@ -91,13 +91,15 @@ public class AlertDestinationPage extends JPanel implements PreferencesPage, Act
     }
 
     private void resetButtons() {
-	disableButton.setSelected(destination.
-				  equals(Locale.getString("ALERT_DISABLE_ALL")));
-	fileButton.setSelected(destination.
-			       equals(Locale.getString("FILE")));
-	databaseButton.setSelected(destination.
-				   equals(Locale.getString("DATABASE")));
-
+      if (destination.equals(Locale.getString("FILE")))
+	fileButton.setSelected(true);
+      else if (destination.equals(Locale.getString("DATABASE")))
+	databaseButton.setSelected(true);
+      else
+	{
+	    destination = Locale.getString("ALERT_DISABLE_ALL");
+	    disableButton.setSelected(true);
+	}
     }
 
     /**

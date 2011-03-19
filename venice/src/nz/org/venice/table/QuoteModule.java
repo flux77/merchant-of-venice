@@ -454,10 +454,6 @@ public class QuoteModule extends AbstractTable
         thread.start();
     }
 
-    public int getRowCount() {
-	return model.getRowCount();
-    }
-
     /**
      * Tell module to save any current state data / preferences data because
      * the window is being closed.

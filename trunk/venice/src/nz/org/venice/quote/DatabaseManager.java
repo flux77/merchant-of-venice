@@ -665,12 +665,14 @@ public class DatabaseManager
 	    //Using a HashMap instead of adding four extra booleans
 	    //to track all these tables. As they are found, they are removed
 	    //from the map.
+	    //Names are converted to lowercase here because the 
+	    //existence check below is converted to lower case.	    
 	    HashMap alertTableMap = new HashMap();
-	    alertTableMap.put(ALERT_TABLE_NAME, "");
-	    alertTableMap.put(OHLCV_ALERT_TABLE_NAME, "");
-	    alertTableMap.put(GONDOLA_ALERT_TABLE_NAME, "");
-	    alertTableMap.put(START_DATE_ALERT_TABLE_NAME, "");
-	    alertTableMap.put(END_DATE_ALERT_TABLE_NAME, "");	    
+	    alertTableMap.put(ALERT_TABLE_NAME.toLowerCase(), "");
+	    alertTableMap.put(OHLCV_ALERT_TABLE_NAME.toLowerCase(), "");
+	    alertTableMap.put(GONDOLA_ALERT_TABLE_NAME.toLowerCase(), "");
+	    alertTableMap.put(START_DATE_ALERT_TABLE_NAME.toLowerCase(), "");
+	    alertTableMap.put(END_DATE_ALERT_TABLE_NAME.toLowerCase(), "");	    
 
             // Skip this check for hypersonic - it doesn't support it
             if(software != HSQLDB_SOFTWARE) {
@@ -679,12 +681,13 @@ public class DatabaseManager
                 String traverseTables;
                 
                 while(RS.next()) {
-                    traverseTables = RS.getString(3);
+		    //MySQL/PostgreSQL is not case sensitive
+                    traverseTables = RS.getString(3).toLowerCase();
                     
-                    if(traverseTables.equals(SHARE_TABLE_NAME))
+                    if(traverseTables.equalsIgnoreCase(SHARE_TABLE_NAME))
                         foundShareTable = true;
 
-                    if(traverseTables.equals(EXCHANGE_TABLE_NAME))
+                    if(traverseTables.equalsIgnoreCase(EXCHANGE_TABLE_NAME))
                         foundExchangeTable = true;
 
 		    //Remove the table from the list of alert tables to 

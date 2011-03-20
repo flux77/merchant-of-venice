@@ -160,7 +160,7 @@ public class AlertDialog extends JInternalFrame
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
 
-	alertTypeLabel = new JLabel("ALERT_TYPE");
+	alertTypeLabel = new JLabel(Locale.getString("ALERT_TYPE"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(alertTypeLabel, c);
 	mainPanel.add(alertTypeLabel);

@@ -283,13 +283,13 @@ public class AlertModule extends AbstractTable implements Module, ActionListener
                                Column.VISIBLE));
 	
 	columns.add(new Column(FIELD_COLUMN,
-                               Locale.getString("ALERT_TARGET"),
+                               Locale.getString("ALERT_FIELD_TYPE"),
                                Locale.getString("ALERT_FIELD_TYPE"),
                                String.class,
                                Column.VISIBLE));
        
 	columns.add(new Column(DATE_SET_COLUMN,
-                               Locale.getString("DateSet"),
+                               Locale.getString("DATE_COLUMN_HEADER"),
                                Locale.getString("DATE_COLUMN_HEADER"),
                                TradingDate.class,
                                Column.VISIBLE));

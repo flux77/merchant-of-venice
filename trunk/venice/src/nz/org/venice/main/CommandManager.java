@@ -280,12 +280,17 @@ public class CommandManager {
 	    Object[] quoteBundleSingleDate = getQuoteBundle(type, 
 							    symbols, 
 							    date);
-
+	   
 	    quoteBundle = (EODQuoteBundle)quoteBundleSingleDate[0];
 	    Boolean tmp = (Boolean)quoteBundleSingleDate[1];
 	    singleDate = tmp.booleanValue();
 
-	    
+	    //Happens when the quotesource is empty.
+	    if (quoteBundle == null) {
+		progressDialog.hide();
+		return;
+	    }
+	   
             table = new QuoteModule(quoteBundle, rule, singleDate);
             ModuleFrame newFrame = desktopManager.newFrame(table);
 	    if (PreferencesManager.getDefaultTableScrollToEnd()) {
@@ -311,6 +316,10 @@ public class CommandManager {
 	    quoteBundle = (EODQuoteBundle)bundleDate[0];
 	    Boolean tmp = (Boolean)bundleDate[1];
 	    singleDate = tmp.booleanValue();
+
+	    //This shouldn't happen because to get a tracker you need a chart.
+	    //Can't get a chart if there are no symbols.
+	    assert quoteBundle != null;
 	}
 	
         if (!thread.isInterrupted()) {
@@ -325,6 +334,8 @@ public class CommandManager {
 	return table;
     }
 
+    //Return a quoteBundle and a flag if the bundle contains a single date.
+    //If there are no dates in the quotesource, return null for the bundle.
     private synchronized Object[] getQuoteBundle(int type, 
 				    SortedSet symbols, 
 				    TradingDate date) {
@@ -339,15 +350,15 @@ public class CommandManager {
 	    quoteRange =
 		new EODQuoteRange(new ArrayList(symbols));
 	    singleDate = false;
-
 	}
 	else {
 	    // If this fails it'll throw a thread interupted to cancel the operation
 	    // If we were given a date use that, otherwise use the latest date
 	    // available. Load the last two dates - we need yesterday's quotes to
 	    // calculate each stocks percent change.
-	    if(date == null)
+	    if(date == null) {
 		date = QuoteSourceManager.getSource().getLastDate();
+	    }
 	    
 	    if(!thread.isInterrupted()) {
 		// If we couldn't load a date, the quote source will have interrupted
@@ -357,11 +368,10 @@ public class CommandManager {
 	    }	    
 	    singleDate = true;
 	}
-	
-	rv[0] = new EODQuoteBundle(quoteRange);
-	rv[1] = Boolean.valueOf(singleDate);
 
-	EODQuoteBundle tmp2 = (EODQuoteBundle)rv[0];
+	//date will be null here if the quote source is empty.
+	rv[0] = (date != null) ? new EODQuoteBundle(quoteRange) : null;
+	rv[1] = Boolean.valueOf(singleDate);
 
 	return rv;
     }

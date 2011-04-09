@@ -376,7 +376,7 @@ public class DatabaseQuoteSource implements QuoteSource
                     EODQuoteCache quoteCache = EODQuoteCache.getInstance();
 
                     while (RS.next()) {
-                        quoteCache.load(Symbol.find(RS.getString(DatabaseManager.SYMBOL_COLUMN)),
+                        quoteCache.load(Symbol.find(RS.getString(DatabaseManager.SYMBOL_COLUMN).trim()),
                                         new TradingDate(RS.getDate(DatabaseManager.DATE_COLUMN)),
                                         RS.getLong(DatabaseManager.DAY_VOLUME_COLUMN),
                                         RS.getFloat(DatabaseManager.DAY_LOW_COLUMN),

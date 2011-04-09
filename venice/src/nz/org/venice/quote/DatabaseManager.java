@@ -445,10 +445,12 @@ public class DatabaseManager
 	
         try {
             // Create the shares table.
+	    //Changed symbol to VARCHAR because of issues with 
+	    //space handling in PostgreSQL. 
             Statement statement = connection.createStatement();
             statement.executeUpdate("CREATE " + getTableType() + " TABLE " + SHARE_TABLE_NAME + " (" +
                                     DATE_FIELD +	" DATE NOT NULL, " +
-                                    SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
+                                    SYMBOL_FIELD +	" VARCHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
                                     ") NOT NULL, " +
                                     DAY_OPEN_FIELD +	" FLOAT DEFAULT 0.0, " +
                                     DAY_CLOSE_FIELD +	" FLOAT DEFAULT 0.0, " +
@@ -465,7 +467,7 @@ public class DatabaseManager
             
             // Create the lookup table.
             //statement.executeUpdate("CREATE " + getTableType() + " TABLE " + LOOKUP_TABLE_NAME + " (" +
-            //                        SYMBOL_FIELD +	" CHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
+            //                        SYMBOL_FIELD +	" VARCHAR(" + Symbol.MAXIMUM_SYMBOL_LENGTH + 
             //                         ") NOT NULL, " +
             //                        NAME_FIELD +	" VARCHAR(100), " +
             //                        "PRIMARY KEY(" + SYMBOL_FIELD + "))");

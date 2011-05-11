@@ -4,8 +4,30 @@
   </sectioninfo>
 
    
-  <para>In addition to a few bug fixes, the latest release includes two new features: alerts and a chart cursor.
+  <para>The latest release changes the symbol definition in SQL tables from CHAR to VARCHAR. In addition to some bug fixes, the latest release also includes the ability to flush the Quote Cache so that newly imported data is visible in Venice without restarting.
   <variablelist>      
+    <varlistentry>
+      <term>
+	<para>10/March/2011: Venice 0.73 beta released</para>
+	<para>Updates in this release:</para>
+      </term>
+      <listitem>
+	<itemizedlist>
+	  <listitem>
+	    <para>Symbol definition changed to VARCHAR (Patch #3228829)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Quote Cache Expiry</para>
+	  </listitem>
+	  <listitem>
+	    <para>Check whether SQL Tables exist is no longer case sensitive (Patch #3226995)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Fix for bug #3191299.</para>
+	  </listitem>
+	</itemizedlist>
+      </listitem>
+    </varlistentry>
     <varlistentry>
       <term>
 	<para>22/February/2011: Venice 0.723 beta released</para>

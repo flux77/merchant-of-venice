@@ -2,7 +2,7 @@
 <project name="Venice" default="run" basedir=".">
 
   <!-- Current version we are working towards -->
-  <property name="VERSION" value="0.723beta"/>
+  <property name="VERSION" value="0.73beta"/>
 
   <!-- Paths -->
   <property name="api" value="${basedir}/api"/>
@@ -364,7 +364,7 @@
   </target>
 
   <!-- Package venice up ready for release -->
-  <target name="release" depends="doc, jar, test">
+  <target name="release" depends="doc, jar">
 
     <!-- Binary Release -->
 

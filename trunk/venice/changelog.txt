@@ -1,6 +1,15 @@
-Changes for Venice, 0.724 beta ??/??/????
+Changes for Venice, 0.7251 beta ??/??/????
 
 * Change table state save/restore to avoid saving the entire table contents 
+
+Changes for Venice, 0.723 beta 10/05/2011
+=========================================
+* Changed symbol column from CHAR to VARCHAR (Patch #3228829)
+* Added expiry and flush functionality for Quote Cache. (Makes imported data visible without restarting Venice), 
+* Fixed Alert bugs and German translations.
+* Updated table checks to be case insensitive (Patch #3226995)
+* Bug fix for Bug #3191299 
+
 
 Changes for Venice, 0.723 beta 22/02/2011
 =========================================

@@ -481,7 +481,8 @@ public class MacrosPage extends JPanel implements PreferencesPage {
             add_button = new JButton();
             add_button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    selected_row = -1;
+		    selected_row = -1;
+		    edited_row = -1;
                     if (editor != null) { return; }
                     editMacro(new StoredMacro());
                 }

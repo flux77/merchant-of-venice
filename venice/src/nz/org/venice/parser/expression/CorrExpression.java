@@ -84,11 +84,16 @@ public class CorrExpression extends QuaternaryExpression {
     }
 
     public String toString() {
+	String c1 = (getChild(0) != null) ? getChild(0).toString() : "(null)";
+	String c2 = (getChild(1) != null) ? getChild(1).toString() : "(null)";
+	String c3 = (getChild(2) != null) ? getChild(2).toString() : "(null)";
+	String c4 = (getChild(3) != null) ? getChild(3).toString() : "(null)";
+	
 	return new String("corr(" + 
-			  getChild(0).toString() + ", " +
-			  getChild(1).toString() + ", " +
-			  getChild(2).toString() + ", " +
-			  getChild(3).toString() + ")");
+			  c1 + ", " +
+			  c2 + ", " +
+			  c3 + ", " +
+			  c4 + ")");	
     }
 
     public int checkType() throws TypeMismatchException {

@@ -205,7 +205,8 @@ public class ModuleFrame extends JInternalFrame
 
 	// Window closed? Close window!
 	if(property.equals(WINDOW_CLOSE_PROPERTY)) {
-	    dispose();
+	  super.hide();
+	  super.dispose();
 	}
 
 	// Title changed? Change title!

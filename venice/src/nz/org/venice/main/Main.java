@@ -162,6 +162,7 @@ public class Main extends JFrame {
 	restoreSavedFrames();
 
 	CommandManager.getInstance().triggeredAlerts();
+	
 
     }
 
@@ -269,12 +270,13 @@ public class Main extends JFrame {
 	    ProgressDialogManager.closeProgressDialog(progress);
 	    return;
 	}
-
+	
 	savedFrameFiles = PreferencesManager.getSavedFrames();
 	iterator = savedFrameFiles.iterator();
 	savedFrames  = savedFrameFiles.size();
 
 	if (savedFrames <= 0) {
+	    ProgressDialogManager.closeProgressDialog(progress);
 	    return;
 	}
 
@@ -326,9 +328,8 @@ public class Main extends JFrame {
 	ProgressDialogManager.closeProgressDialog(progress);
 	if (!thread.isInterrupted()) {
 	    PreferencesManager.removeSavedFrames();
-	}
+	}	
     }
-
 }
 
 

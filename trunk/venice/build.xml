@@ -218,6 +218,12 @@
       </patternset>
     </unjar>
        
+    <unjar src="${lib.uuid}" dest="${temp}">
+      <patternset>
+	<include name="org/**"/>
+      </patternset>
+    </unjar>
+
     <copy todir="${temp}">
       <fileset dir="${classes}"
                includes="**/*.class, **/*.gif, **/*.png,
@@ -364,7 +370,7 @@
   </target>
 
   <!-- Package venice up ready for release -->
-  <target name="release" depends="doc, jar">
+  <target name="release" depends="doc, jar, test">
 
     <!-- Binary Release -->
 

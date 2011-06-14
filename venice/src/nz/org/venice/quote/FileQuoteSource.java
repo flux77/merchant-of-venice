@@ -201,6 +201,7 @@ public class FileQuoteSource implements QuoteSource
         ProgressDialog p = ProgressDialogManager.getProgressDialog();
         p.setMaster(true);
         p.setMaximum(fileURLs.size());
+	p.setProgress(0);
         p.setNote(Locale.getString("INDEXING_FILES"));
         p.show(Locale.getString("INDEXING_FILES"));
         

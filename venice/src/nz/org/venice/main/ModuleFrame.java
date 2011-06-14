@@ -205,8 +205,13 @@ public class ModuleFrame extends JInternalFrame
 
 	// Window closed? Close window!
 	if(property.equals(WINDOW_CLOSE_PROPERTY)) {
-	  super.hide();
-	  super.dispose();
+	  
+	  // To avoid problems in java.awt.EventDispatchThread.run 
+	  // that tries to repaint the JInternalFrame while it is
+	  // disposed in jre implementations earlier than 1.6.0_10
+	  // first hide the JInternalFrame and then dispose it.
+	  hide();
+	  dispose();
 	}
 
 	// Title changed? Change title!

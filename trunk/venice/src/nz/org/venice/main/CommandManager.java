@@ -414,9 +414,11 @@ public class CommandManager {
 		    List symbolsCopy;
 
 		    if(symbols == null) {
-                        symbolsCopy =
-			    (List)SymbolListDialog.getSymbols(desktop,
-							Locale.getString("GRAPH_BY_SYMBOLS")); 
+			TreeSet symbolsSet = 
+			    (TreeSet)SymbolListDialog.getSymbols(desktop,
+								 Locale.getString("GRAPH_BY_SYMBOLS")); 
+			
+			symbolsCopy = new ArrayList(symbolsSet);
 		    } else {
 			symbolsCopy = symbols;
 		    }

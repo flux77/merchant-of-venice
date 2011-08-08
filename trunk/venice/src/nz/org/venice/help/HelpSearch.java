@@ -80,6 +80,10 @@ public class HelpSearch  {
 
 		    if (t == Tag.I) {
 		    }
+
+		    if (t == Tag.PRE) {
+			searchText += "\n";
+		    }
 		}
 
 

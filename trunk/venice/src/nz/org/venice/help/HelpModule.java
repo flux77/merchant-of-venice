@@ -476,14 +476,16 @@ public class HelpModule extends JPanel implements Module {
 	    return -1;
 	}
 
-	HelpSearch helpSearch = new HelpSearch(editorPane.getText());
-	int index = helpSearch.find(searchTerm, prevSearchIndex+1);
+	//Use currentPage to search in and not editorPane because
+	//the text displayed may differ from the document 
+	HelpSearch helpSearch = new HelpSearch(currentPage.getText());
+	int index = helpSearch.find(searchTerm, prevSearchIndex + 1);
 
 	prevSearchIndex = index;
 	prevSearchTerm = searchTerm;
 	if (index != -1) {		    	    
 	    editorPane.setSelectionStart(index);
-	    editorPane.setSelectionEnd(index + searchTerm.length() );
+	    editorPane.setSelectionEnd(index + searchTerm.length());
 	    //Ensures the user doesn't have to 
 	    //explicitly click inside the editorPane 
 	    //before searching

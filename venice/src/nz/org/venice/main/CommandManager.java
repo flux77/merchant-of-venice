@@ -290,7 +290,7 @@ public class CommandManager {
 		progressDialog.hide();
 		return;
 	    }
-	   
+
             table = new QuoteModule(quoteBundle, rule, singleDate);
             ModuleFrame newFrame = desktopManager.newFrame(table);
 	    if (PreferencesManager.getDefaultTableScrollToEnd()) {
@@ -337,8 +337,8 @@ public class CommandManager {
     //Return a quoteBundle and a flag if the bundle contains a single date.
     //If there are no dates in the quotesource, return null for the bundle.
     private synchronized Object[] getQuoteBundle(int type, 
-				    SortedSet symbols, 
-				    TradingDate date) {
+						 SortedSet symbols, 
+						 TradingDate date) {
 	EODQuoteRange quoteRange = null;
 	boolean singleDate;
 	Object[] rv = new Object[2];
@@ -369,8 +369,8 @@ public class CommandManager {
 	    singleDate = true;
 	}
 
-	//date will be null here if the quote source is empty.
-	rv[0] = (date != null) ? new EODQuoteBundle(quoteRange) : null;
+	//quoterange will be null here if the quote source is empty.
+	rv[0] = (quoteRange != null) ? new EODQuoteBundle(quoteRange) : null;
 	rv[1] = Boolean.valueOf(singleDate);
 
 	return rv;

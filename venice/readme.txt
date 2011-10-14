@@ -1,4 +1,4 @@
-Merchant of Venice, 0.723 beta 22/Feb/2011
+Merchant of Venice, 0.731 beta 15/Oct/2011
 =========================================
 
 Copyright (C) 2003-11, Andrew Leppard (andrew venice org nz)
@@ -57,6 +57,7 @@ Venice contains the following technologies
    MySQL Connector/J V3.1.12 from http://www.mysql.com
    Joone V1.2.1              from http://www.jooneworld.com
    XStream V1.1.2            from http://xstream.codehaus.org
+   Java Uuid Generator (JUG) from http://wiki.fasterxml.com/JugHome
 
 4 Bug Reports and Enhancements
 
@@ -132,6 +133,7 @@ HSQLDB is Copyright (C) 1995-2000, The Hypersonic SQL Group.
 Joone is Copyright (C) 2004, Paolo Marrone and the Joone team.
 Jython is Copyright (C) 2000, Jython Developers.
 XStream is Copyright (C) 2003-2005, Joe Walnes.
+JUG is Copyright (C) 2010, Tatu Saloranta.
 
 7 Thanks
 

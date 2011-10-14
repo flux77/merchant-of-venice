@@ -2,9 +2,9 @@
 <!DOCTYPE document SYSTEM "document.dtd">
 <document name="Venice">
 <help>
-To get help, click on any of the topics on the left.
+<para>To get help, click on any of the topics on the left.
 If you click on any blue underlined text, it will take you to
-the appropriate help section.
+the appropriate help section.</para>
 
 <para><link to="Introduction">Introduction</link> gives a brief
 introduction to Venice.</para>

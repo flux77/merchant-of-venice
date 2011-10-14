@@ -4,8 +4,27 @@
   </sectioninfo>
 
    
-  <para>The latest release changes the symbol definition in SQL tables from CHAR to VARCHAR. In addition to some bug fixes, the latest release also includes the ability to flush the Quote Cache so that newly imported data is visible in Venice without restarting.
+  <para>The latest release contains only bug fixes. 
   <variablelist>      
+    <varlistentry>
+      <term>
+	<para>16/Oct/2011: Venice 0.731 beta released</para>
+	<para>Updates in this release</para>
+      </term>
+      <listitem>
+	<itemizedlist>
+	  <listitem>
+	    <para>Find highlights wrong region in help text (Bug #3302556)</para>
+	    </listitem>
+	  <listitem>
+	    <para>Fixed bug in Save and Restore (Bug #3315179)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Add Macro overwrites previous one (Bug #1328208)</para>
+	  </listitem>
+	</itemizedlist>
+      </listitem>
+    </varlistentry>
     <varlistentry>
       <term>
 	<para>10/March/2011: Venice 0.73 beta released</para>

@@ -1,8 +1,15 @@
-Changes for Venice, 0.7251 beta ??/??/????
+Changes for Venice, 0.732 beta ??/??/????
 
 * Change table state save/restore to avoid saving the entire table contents 
 
-Changes for Venice, 0.723 beta 10/05/2011
+Changes for Venice, 0.731 beta 16/10/2011
+=========================================
+* Fixed bug "Find highlights wrong region in help text" - (Bug #3302556)
+* Fixed bug in Saving and restoring windows (Bug #3315179)
+* Added missing library for alerts and fixed bug.
+* Fixed bug "Add Macro overwrites previous one" (Bug #1328208) 
+
+Changes for Venice, 0.73 beta 10/05/2011
 =========================================
 * Changed symbol column from CHAR to VARCHAR (Patch #3228829)
 * Added expiry and flush functionality for Quote Cache. (Makes imported data visible without restarting Venice), 

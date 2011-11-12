@@ -20,21 +20,21 @@ package nz.org.venice.parser.expression;
 
 import nz.org.venice.parser.*;
 import nz.org.venice.quote.*;
+import nz.org.venice.util.Locale;
 
 
 /**
- * Class that represents a quote kind, e.g. day open, day close, etc.
- * Originally there was a separate class for each quote kind but
- * this was deemed a little excessive, so it was all folded into
- * a single class.
+ * Class that represents a quote kind where the user supplies a symbol 
+ * different to that of the implicit symbol.
+ * 
  */
-public class QuoteExpression 
-    extends TerminalExpression
-    implements QuoteSymbol {
+public class QuoteSymbolExpression 
+    extends UnaryExpression 
+    implements QuoteSymbol  {
 
     // Quote kind - Quote.DAY_OPEN, Quote.DAY_CLOSE, Quote.DAY_LOW, etc...
     private int quoteKind;
-
+    
     /**
      * Create a new quote expression.
      *
@@ -42,18 +42,29 @@ public class QuoteExpression
      *        {@link Quote#DAY_CLOSE}, {@link Quote#DAY_LOW},
      *        {@link Quote#DAY_HIGH} or {@link Quote#DAY_VOLUME}
      */
-        
-    public QuoteExpression(int quoteKind) {
-	assert(quoteKind == Quote.DAY_OPEN || quoteKind == Quote.DAY_CLOSE ||
+    
+    
+    public QuoteSymbolExpression(int quoteKind) {
+	super(null);
+        assert(quoteKind == Quote.DAY_OPEN || quoteKind == Quote.DAY_CLOSE ||
                quoteKind == Quote.DAY_LOW || quoteKind == Quote.DAY_HIGH ||
                quoteKind == Quote.DAY_VOLUME);
 
-
         this.quoteKind = quoteKind;
-    }
-    
 
-    
+    }
+
+    public QuoteSymbolExpression(int quoteKind, Expression symbolExpression) {
+	super(symbolExpression);
+        assert(quoteKind == Quote.DAY_OPEN || quoteKind == Quote.DAY_CLOSE ||
+               quoteKind == Quote.DAY_LOW || quoteKind == Quote.DAY_HIGH ||
+               quoteKind == Quote.DAY_VOLUME);
+	
+	
+        this.quoteKind = quoteKind;
+
+    }
+       
     /**
      * Get the quote kind.
      *
@@ -63,12 +74,6 @@ public class QuoteExpression
      */
     public int getQuoteKind() {
 	return quoteKind;
-    }
-
-
-
-    public Symbol getSymbol() {
-	return null;
     }
 
     /**
@@ -83,16 +88,30 @@ public class QuoteExpression
             return FLOAT_QUOTE_TYPE;
     }
 
+    public Symbol getSymbol() throws EvaluationException {
+	try { 
+	    StringExpression symbolExpression = (StringExpression)getChild(0);
+	    Symbol symbol = Symbol.find(symbolExpression.getText());
+	    return symbol;
+	} catch (SymbolFormatException e) {
+	    throw new EvaluationException(Locale.getString("SYMBOL_NOT_FOUND"));
+	}
+    }
+
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
 
 	try {
-	    return quoteBundle.getQuote(symbol, getQuoteKind(), day, 0);
-	}
-	catch(MissingQuoteException e) {
+	    Symbol explicitSymbol = getSymbol();
+	    
+	    return quoteBundle.getQuote(explicitSymbol, 
+					getQuoteKind(), 
+					day, 
+					0);
+	} catch(MissingQuoteException e) {
 	    // What should I do in this case?
-	    return 0.0D;
-	}	       
+		return 0.0D;
+	}
     }
 
     public String toString() {
@@ -112,7 +131,7 @@ public class QuoteExpression
     }
 
     public Object clone() {
-        return new QuoteExpression(quoteKind);
+        return new QuoteSymbolExpression(quoteKind, (Expression)getChild(0).clone());
     }
 
     public int checkType() {

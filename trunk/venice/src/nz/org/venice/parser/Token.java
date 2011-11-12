@@ -220,11 +220,14 @@ public class Token {
     /** Represents "<code>trend()</code>" symbol */
     public static final int TREND_TOKEN = 62;
 
-    /** Represnets "<code>random()</code>" symbol */
+    /** Represents "<code>random()</code>" symbol */
     public static final int RANDOM_TOKEN = 63; 
 
+    /** Represents "<code>alert()</code>" symbol */
+    public static final int ALERT_TOKEN = 64;
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 64;
+    private static final int FIXED_LENGTH_TOKENS = 65;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -234,6 +237,9 @@ public class Token {
     
     /** Represents a string */
     public static final int STRING_TOKEN = 102;
+
+    /** Represents a comment */
+    public static final int COMMENT_TOKEN = 103;
     
     // Token type (e.g. PERCENT_TOKEN, FULLSTOP_TOKEN etc)
     private int type;
@@ -324,7 +330,8 @@ public class Token {
         tokenStrings[LOG_TOKEN]                = "log";
         tokenStrings[EXP_TOKEN]                = "exp";
 	tokenStrings[TREND_TOKEN]              = "trend";
-	tokenStrings[RANDOM_TOKEN]              = "random";
+	tokenStrings[RANDOM_TOKEN]             = "random";
+	tokenStrings[ALERT_TOKEN]              = "alert";
         
         return tokenStrings;
     }
@@ -381,6 +388,24 @@ public class Token {
             token.setValueType(valueType);
             matched = true;
         }
+
+	// Is it a comment?
+	else if (string.charAt(0) == '/' && (string.length() >= 2 && string.charAt(1) == '*')) {
+	    int closingComment = string.indexOf("*/", 1);
+	    int lastComment = string.lastIndexOf("*/");
+	    
+	    closingComment = (lastComment >= 0) ? lastComment : closingComment;
+	    
+	    if (closingComment >= 0) {
+		String comment = string.substring(1, closingComment);
+		string = string.substring(closingComment + 2);
+		token.setType(Token.COMMENT_TOKEN);
+		matched = true;
+	    } else {
+		//Missing closing comment  
+		throw new ParserException(Locale.getString("MISSING_END_COMMENT"));
+	    }
+	}
         
         // Is it a string?
         else if(string.charAt(0) == '\"') {
@@ -442,7 +467,7 @@ public class Token {
         else {
             char symbol = string.charAt(0);
             
-            for(int i = 0; !matched && i < tokenStrings.length; i++)
+            for(int i = 0; !matched && i < tokenStrings.length; i++) {
                 if(string.startsWith(tokenStrings[i])) {
                     token.setType(i);
                     
@@ -450,6 +475,7 @@ public class Token {
                     string = string.substring(tokenStrings[i].length());
                     matched = true;
                 }
+	    }
             
             if(!matched)
                 throw new ParserException(Locale.getString("UNKNOWN_SYMBOL_ERROR", symbol));

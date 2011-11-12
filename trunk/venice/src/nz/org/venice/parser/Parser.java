@@ -27,6 +27,9 @@ import nz.org.venice.parser.expression.GetVariableExpression;
 import nz.org.venice.parser.expression.LagExpression;
 import nz.org.venice.parser.expression.NumberExpression;
 import nz.org.venice.parser.expression.SetVariableExpression;
+
+import nz.org.venice.parser.expression.StringExpression;
+
 import nz.org.venice.quote.QuoteFunctions;
 import nz.org.venice.util.Locale;
 
@@ -54,7 +57,10 @@ import nz.org.venice.util.Locale;
  * VARIABLE_NAME     = {a-zA-Z}{a-zA-Z0-9_}*
  * TYPE              = "boolean" | "float" | "int"
  * VARIABLE          = [["const"] [TYPE]] VARIABLE_NAME ["=" SUB_EXPR]
- * QUOTE             = "open" | "close" | "low" | "high" | "volume"
+ * QUOTE             = "open" [ "(" SYMBOL ")" ] | "close" [ "(" SYMBOL ")" ] |
+                        "low" [ "(" SYMBOL ")" ] | "high" [ "(" SYMBOL ")" | 
+			"volume" [ "(" SYMBOL ")" ] 
+ * SYMBOL            = {A-Za-z}*
  * FUNCTION          = "lag" "(" QUOTE ["," SUB_EXPR] ")" |
  *                     "min" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
  *                     "max" "(" QUOTE "," SUB_EXPR ["," SUB_EXPR] ")" |
@@ -158,11 +164,13 @@ public class Parser {
 		string = string.substring(1);
 
 	    if(string.length() > 0) {
-
+		
 		// Extract next token
 		token = new Token();
 		string = Token.stringToToken(variables, token, string);
-		tokens.add(token);
+		if (token.getType() != Token.COMMENT_TOKEN) {
+		    tokens.add(token);
+		}
 	    }
 	}
 
@@ -334,8 +342,9 @@ public class Parser {
                 tokens.match(Token.LOG_TOKEN) ||
                 tokens.match(Token.EXP_TOKEN) ||
 	        tokens.match(Token.TREND_TOKEN) ||
-		tokens.match(Token.RANDOM_TOKEN))
-	    expression = parseFunction(variables, tokens);
+		tokens.match(Token.RANDOM_TOKEN) ||
+	        tokens.match(Token.ALERT_TOKEN))
+		    expression = parseFunction(variables, tokens);
 
         // ABBREVIATION QUOTE FUNCTIONS
         else if (tokens.match(Token.DAY_OPEN_TOKEN) ||
@@ -382,9 +391,9 @@ public class Parser {
 	assert token.getType() == Token.VARIABLE_TOKEN;
 	
 	Variable variable = variables.get(token.getVariableName());
-
+       
 	// Make sure the variable is defined
-	if(variable == null)
+	if(variable == null) 
 	    throw new ParserException(Locale.getString("UNKNOWN_IDENTIFIER_ERROR",
                                                        token.getVariableName()));
 
@@ -460,15 +469,23 @@ public class Parser {
 	
 	Token quote = tokens.pop();
 	Expression expression;
-	
+	Expression symbol = null;
+
+	//Has the user supplied an explicit symbol?
+	if(tokens.match(Token.LEFT_PARENTHESIS_TOKEN)) {
+	    parseLeftParenthesis(variables, tokens);	    
+	    symbol = parseString(variables, tokens);	    
+	    parseRightParenthesis(variables, tokens);
+	}
+
 	switch(quote.getType()) {
 	case(Token.DAY_OPEN_TOKEN):
 	case(Token.DAY_CLOSE_TOKEN):
 	case(Token.DAY_LOW_TOKEN):
 	case(Token.DAY_HIGH_TOKEN):
 	case(Token.DAY_VOLUME_TOKEN):
-	    expression = ExpressionFactory.newExpression(quote);
-	    break;
+	    expression = ExpressionFactory.newExpression(quote, symbol); 
+	    break;	    
 	default:
 	    throw new ParserException(Locale.getString("EXPECTED_QUOTE_TYPE_ERROR"));
 	}
@@ -688,6 +705,21 @@ public class Parser {
 	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
 		arg1 = parseSubExpression(variables, tokens);
 	    } 
+	case (Token.ALERT_TOKEN):
+	    arg1 = parseSubExpression(variables, tokens);
+	    //Parse String arguments 
+	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		parseComma(variables, tokens);
+		arg2 = parseSubExpression(variables, tokens);
+	    }
+	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		parseComma(variables, tokens);
+		arg3 = parseSubExpression(variables, tokens);
+	    }
+	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		parseComma(variables, tokens);
+		arg4 = parseSubExpression(variables, tokens);
+	    }
 	    break;
 	
         case(Token.DAY_OF_WEEK_TOKEN):

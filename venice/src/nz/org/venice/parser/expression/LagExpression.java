@@ -25,6 +25,8 @@ import nz.org.venice.parser.Variables;
 import nz.org.venice.quote.MissingQuoteException;
 import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.Symbol;
+import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.util.Locale;
 
 /**
  * An expression which returns a quote.
@@ -46,14 +48,19 @@ public class LagExpression extends BinaryExpression {
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
+	
+	//Need a better name for this
+	QuoteSymbol quoteChild = (QuoteSymbol)getChild(0);
 
-        int lag = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+	int lag = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         if (lag > 0)
-           throw EvaluationException.LAG_OFFSET_EXCEPTION;
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-
+	    throw EvaluationException.LAG_OFFSET_EXCEPTION;
+	
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) ? quoteChild.getSymbol() : symbol;
+	int quoteKind = quoteChild.getQuoteKind();
+	
         try {
-            return quoteBundle.getQuote(symbol, quoteKind, day, lag);
+            return quoteBundle.getQuote(explicitSymbol, quoteKind, day, lag);
         }
         catch(MissingQuoteException e) {
             // What should I do in this case?

@@ -895,6 +895,13 @@ The following examples explain the behaviour:</para>
 </list>
 </section>
 
+<section name="Gondola Comments">
+<para>You can add comments to your rule definitions which are ignored by Venice. Comments are enclosed by pairs of "/*" and "*/" strings. </para>
+<para>For example in the rule: </para><para><code>/* Buy if the close is higher than yesterdays close */ close &gt; lag(close, -1). </code></para>
+<para>the comment is "Buy if the close is higher than yesterdays close" and will be ignored. Unlike the C language, comments can be nested.  </para>
+</section>
+
+
 <section name="Gondola Variables">
 <para>The Gondola language has full support for variables, which allow you to
 store, retrieve and manipulate values. When defining a new variable you
@@ -921,6 +928,15 @@ value of -12 is 12, and the absolute value of 12 is 12.</para>
 <para>Example:</para>
 <para><code>abs(-28.0)</code></para>
 <para>Returns the absolute value of -28.0 which is 28.0.</para>
+</section>
+
+<section name="Alert">
+  <para>The alert function displays a message on the screen. The purpose of this function is to aid rule debugging and always returns 0.0. <emphasis>Note: When this function is evaluated, it will pause execution!</emphasis> Also note that the alert will display for every date in the range. So if you have 30 days data in the range, you may end up with 20 alert messages appearing, all of which have to be dismissed before execution can continue.</para>
+  <para><code>alert(STRING, [ argument2 ], [ argument3 ], [ argument4 ])</code></para>
+  <para>Where STRING is an expression or a string, and the optional arguments argument2 - argument4 are also expressions or strings. The value of the optional parameters is appended to the output message. </para> 
+  <para>Example:</para>
+  <para><code>float mesg1 = alert("Days held = ", held, "stock capital = ", stockcapital)</code></para> 
+  <para>Displays the following message: "Days held = held, stock capital = stockcaptial", with the values for held and stockcapital displayed respectively. The variable mesg1 will contain the value 0.0.</para>
 </section>
 
 <section name="Average">

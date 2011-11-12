@@ -140,19 +140,39 @@ public class ExpressionFactory {
 	    expression = new DivideExpression(arg1, arg2);
 	    break;
 	case(Token.DAY_OPEN_TOKEN):
-	    expression = new QuoteExpression(Quote.DAY_OPEN);
+	    if (arg1 == null) {
+		expression = new QuoteExpression(Quote.DAY_OPEN);
+	    } else {
+		expression = new QuoteSymbolExpression(Quote.DAY_OPEN, arg1);
+	    }
 	    break;
 	case(Token.DAY_CLOSE_TOKEN):
-	    expression = new QuoteExpression(Quote.DAY_CLOSE);
+	    if (arg1 == null) {
+		expression = new QuoteExpression(Quote.DAY_CLOSE);
+	    } else {
+		expression = new QuoteSymbolExpression(Quote.DAY_CLOSE, arg1);
+	    }
 	    break;
 	case(Token.DAY_LOW_TOKEN):
-	    expression = new QuoteExpression(Quote.DAY_LOW);
+	    if (arg1 == null) {
+		expression = new QuoteExpression(Quote.DAY_LOW);
+	    } else {
+		expression = new QuoteSymbolExpression(Quote.DAY_LOW, arg1);
+	    }
 	    break;
 	case(Token.DAY_HIGH_TOKEN):
-	    expression = new QuoteExpression(Quote.DAY_HIGH);
+	    if (arg1 == null) {
+		expression = new QuoteExpression(Quote.DAY_HIGH);
+	    } else {
+		expression = new QuoteSymbolExpression(Quote.DAY_HIGH, arg1);
+	    }
 	    break;
 	case(Token.DAY_VOLUME_TOKEN):
-	    expression = new QuoteExpression(Quote.DAY_VOLUME);
+	    if (arg1 == null) {
+		expression = new QuoteExpression(Quote.DAY_VOLUME);
+	    } else {
+		expression = new QuoteSymbolExpression(Quote.DAY_VOLUME, arg1);
+	    }
 	    break;
 	case(Token.LAG_TOKEN):
 	    expression = new LagExpression(arg1, arg2);
@@ -274,11 +294,13 @@ public class ExpressionFactory {
 		expression = new RandomWithSeedExpression(arg1);
 	    }
 	    break;
+	case (Token.ALERT_TOKEN):
+	    expression = new AlertExpression(arg1, new Expression[] {arg2, arg3, arg4});
+	    break;
         default:
             // No such token
 	    assert false;
 	}
-
 	return expression;
     }
     

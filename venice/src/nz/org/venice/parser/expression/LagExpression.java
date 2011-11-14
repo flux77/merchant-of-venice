@@ -56,7 +56,8 @@ public class LagExpression extends BinaryExpression {
         if (lag > 0)
 	    throw EvaluationException.LAG_OFFSET_EXCEPTION;
 	
-	Symbol explicitSymbol = (quoteChild.getSymbol() != null) ? quoteChild.getSymbol() : symbol;
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
+	    ? quoteChild.getSymbol() : symbol;
 	int quoteKind = quoteChild.getQuoteKind();
 	
         try {

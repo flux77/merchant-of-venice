@@ -55,11 +55,21 @@ public class CorrExpression extends QuaternaryExpression {
 
         // Get and check arguments
         String correlatedSymbolString = ((StringExpression)getChild(0)).getText();
-        int quoteKind = ((QuoteExpression)getChild(1)).getQuoteKind();
-	int period = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+	QuoteSymbol quoteChild = (QuoteSymbol)getChild(1);
+        int quoteKind = quoteChild.getQuoteKind();
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
+	    ? quoteChild.getSymbol() : symbol;
+
+	int period = (int)getChild(2).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
         if(period <= 1)
             throw EvaluationException.CORR_RANGE_EXCEPTION;
-        int offset = (int)getChild(3).evaluate(variables, quoteBundle, symbol, day);
+        int offset = (int)getChild(3).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
         if (offset > 0)
             throw EvaluationException.CORR_OFFSET_EXCEPTION;
 

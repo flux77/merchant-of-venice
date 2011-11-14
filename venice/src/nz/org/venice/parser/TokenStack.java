@@ -85,5 +85,29 @@ public class TokenStack extends Vector {
 	    return false;
     }
 
+    public String toString() {
+	String rv = "";
+	String[] words = Token.wordsOfGondola();
+	
+	Iterator stackIterator = iterator();
+	while (stackIterator.hasNext()) {
+	    Token t = (Token)stackIterator.next();
+
+	    switch (t.getType()) {
+	    case Token.NUMBER_TOKEN:
+		rv += "num";
+		break;
+	    case Token.VARIABLE_TOKEN:
+		rv += "var";
+		break;
+	    case Token.STRING_TOKEN:
+		rv += "str";
+		break;
+	    default:
+		rv += words[t.getType()];
+	    }	    
+	}
+	return rv;
+    }
 
 }

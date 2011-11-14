@@ -49,18 +49,33 @@ public class BBLExpression extends TernaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
 
+	QuoteSymbol quoteChild = (QuoteSymbol)getChild(0);
+
         // Extract arguments
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-	int period = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = quoteChild.getQuoteKind();
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
+	    ? quoteChild.getSymbol() : symbol;
+
+	int period = (int)getChild(1).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, day);
         if(period <= 0)
             throw EvaluationException.BBL_RANGE_EXCEPTION;
-        int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        int offset = (int)getChild(2).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
         if (offset > 0)
            throw EvaluationException.BBL_OFFSET_EXCEPTION;
 
         // Calculate and return the BBL.
         QuoteBundleFunctionSource source =
-            new QuoteBundleFunctionSource(quoteBundle, symbol, quoteKind, day, offset, period);
+            new QuoteBundleFunctionSource(quoteBundle, 
+					  explicitSymbol, 
+					  quoteKind, 
+					  day, 
+					  offset, 
+					  period);
 
         return QuoteFunctions.bollingerLower(source, period);
     }

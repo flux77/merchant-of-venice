@@ -1342,7 +1342,7 @@ evolutionary computation (genetic algorithm methodology) to evovle new buy/sell 
 </help>
 
 <chapter name="Paper Trade">
-<para>Venice allows you to perform historical paper tradingm, which allows you to test
+<para>Venice allows you to perform historical paper trading, which allows you to test
 buy/sell rules using historical share data. You need to enter basic data such
 as which shares you wish to trade (either from a select list or say all
 ordinary shares), the buy/sell rules you wish to trigger the trades, the date
@@ -1460,7 +1460,7 @@ an average value between maximum and minimum values (in Gondola: (low+high)/2.0)
 an average value between open and close values (in Gondola: (open+close)/2.0),
 the minimum value (in Gondola: low),
 the maximum value (in Gondola: high).
-Pain attention to the 'open' key word: if you put 'open' alone, you will buy or sell the stocks at open price the next day;
+Pay attention to the 'open' key word: if you put 'open' alone, you will buy or sell the stocks at open price the next day;
 if you put 'lag(open,0)', you will buy or sell the stocks at a price equal to the open price of the day before and only if this price will be reached by the stock during the next day.</para>
 </section>
 </chapter>

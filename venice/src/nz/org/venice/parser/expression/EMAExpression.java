@@ -52,21 +52,39 @@ public class EMAExpression extends QuaternaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
 
+	QuoteSymbol quoteChild = (QuoteSymbol)getChild(0);
+
         // Extract arguments
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-	int period = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = quoteChild.getQuoteKind();
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
+	    ? quoteChild.getSymbol() : symbol;
+	int period = (int)getChild(1).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
         if(period <= 0)
             throw EvaluationException.EMA_RANGE_EXCEPTION;
-        int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        int offset = (int)getChild(2).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
         if (offset > 0)
            throw EvaluationException.EMA_OFFSET_EXCEPTION;
-        double smoothing = (double)getChild(3).evaluate(variables, quoteBundle, symbol, day);
+        double smoothing = (double)getChild(3).evaluate(variables, 
+							quoteBundle, 
+							explicitSymbol, 
+							day);
         if ((smoothing < 0.01) || (smoothing > 1.0))
            throw EvaluationException.EMA_SMOOTHING_EXCEPTION;
 
         // Calculate and return the average.
         QuoteBundleFunctionSource source =
-            new QuoteBundleFunctionSource(quoteBundle, symbol, quoteKind, day, offset, period);
+            new QuoteBundleFunctionSource(quoteBundle, 
+					  explicitSymbol, 
+					  quoteKind, 
+					  day, 
+					  offset, 
+					  period);
 
         return QuoteFunctions.ema(source, period, smoothing);
     }

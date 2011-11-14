@@ -50,20 +50,36 @@ public class TrendExpression extends TernaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
 
+	QuoteSymbol quoteChild = (QuoteSymbol)getChild(0);	
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
+	    ? quoteChild.getSymbol() : symbol;
+
 	// Extract arguments
-	int period = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+	int quoteKind = quoteChild.getQuoteKind();
+	int period = (int)getChild(1).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
 
 	if(period < 0)
             throw EvaluationException.AVG_RANGE_EXCEPTION;
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-        int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+
+        int offset = (int)getChild(2).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
 	
         if (offset > 0)
            throw EvaluationException.AVG_OFFSET_EXCEPTION;
 
         // Calculate and return the line of best fit.
         QuoteBundleFunctionSource source =
-            new QuoteBundleFunctionSource(quoteBundle, symbol, quoteKind, day, offset, period);
+            new QuoteBundleFunctionSource(quoteBundle, 
+					  explicitSymbol, 
+					  quoteKind, 
+					  day, 
+					  offset, 
+					  period);
 
         return QuoteFunctions.bestFit(source, period);            	
     }

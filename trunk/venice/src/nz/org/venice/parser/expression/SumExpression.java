@@ -51,15 +51,25 @@ public class SumExpression extends TernaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 	
-	int period = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+	QuoteSymbol quoteChild = (QuoteSymbol)getChild(0);
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
+	    ? quoteChild.getSymbol() : symbol;
+
+	int period = (int)getChild(1).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
         if (period <= 0)
             throw EvaluationException.SUM_RANGE_EXCEPTION;
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-        int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = quoteChild.getQuoteKind();
+        int offset = (int)getChild(2).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
         if (offset > 0)
            throw EvaluationException.SUM_OFFSET_EXCEPTION;
 
-	return sum(quoteBundle, symbol, quoteKind, period, day, offset);
+	return sum(quoteBundle, explicitSymbol, quoteKind, period, day, offset);
 
     }
 

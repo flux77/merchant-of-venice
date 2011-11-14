@@ -52,17 +52,34 @@ public class MACDExpression extends BinaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
 
+	QuoteSymbol quoteChild = (QuoteSymbol)getChild(0);
+
         // Extract arguments
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-        int offset = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = quoteChild.getQuoteKind();
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
+	    ? quoteChild.getSymbol() : symbol;
+        int offset = (int)getChild(1).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
         if (offset > 0)
            throw EvaluationException.MACD_OFFSET_EXCEPTION;
 
         // Calculate and return the MACD.
         QuoteBundleFunctionSource sourceSlow =
-            new QuoteBundleFunctionSource(quoteBundle, symbol, quoteKind, day, offset, PERIOD_SLOW);
+            new QuoteBundleFunctionSource(quoteBundle, 
+					  explicitSymbol, 
+					  quoteKind, 
+					  day, 
+					  offset, 
+					  PERIOD_SLOW);
         QuoteBundleFunctionSource sourceFast =
-            new QuoteBundleFunctionSource(quoteBundle, symbol, quoteKind, day, offset, PERIOD_FAST);
+            new QuoteBundleFunctionSource(quoteBundle, 
+					  explicitSymbol, 
+					  quoteKind, 
+					  day, 
+					  offset, 
+					  PERIOD_FAST);
 
         return QuoteFunctions.macd(sourceSlow, sourceFast);
     }

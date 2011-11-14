@@ -50,15 +50,25 @@ public class MinExpression extends TernaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-	int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
+	QuoteSymbol quoteChild = (QuoteSymbol)getChild(0);
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
+	    ? quoteChild.getSymbol() : symbol;
+
+	int days = (int)getChild(1).evaluate(variables, 
+					     quoteBundle, 
+					     explicitSymbol, 
+					     day);
         if(days <= 0)
             throw EvaluationException.MIN_RANGE_EXCEPTION;
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
-        int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        int quoteKind = quoteChild.getQuoteKind();
+        int offset = (int)getChild(2).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
         if (offset > 0)
            throw EvaluationException.MIN_OFFSET_EXCEPTION;
         
-	return min(quoteBundle, symbol, quoteKind, days, day, offset);
+	return min(quoteBundle, explicitSymbol, quoteKind, days, day, offset);
     }
 
     public String toString() {

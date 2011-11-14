@@ -50,18 +50,28 @@ public class MaxExpression extends TernaryExpression {
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
 
-        int days = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
-        int quoteKind = ((QuoteExpression)getChild(0)).getQuoteKind();
+	QuoteSymbol quoteChild = (QuoteSymbol)getChild(0);
+	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
+	    ? quoteChild.getSymbol() : symbol;
+
+        int days = (int)getChild(1).evaluate(variables, 
+					     quoteBundle, 
+					     explicitSymbol, 
+					     day);
+        int quoteKind = quoteChild.getQuoteKind();
 	
 
         if(days <= 0)
             throw EvaluationException.MAX_RANGE_EXCEPTION;
-        int offset = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+        int offset = (int)getChild(2).evaluate(variables, 
+					       quoteBundle, 
+					       explicitSymbol, 
+					       day);
 
         if (offset > 0)
            throw EvaluationException.MAX_OFFSET_EXCEPTION;
         
-	return max(quoteBundle, symbol, quoteKind, days, day, offset);
+	return max(quoteBundle, explicitSymbol, quoteKind, days, day, offset);
     }
 
     public String toString() {	

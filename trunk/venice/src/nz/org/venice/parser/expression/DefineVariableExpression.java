@@ -75,8 +75,10 @@ public class DefineVariableExpression extends UnaryExpression {
 	switch(getType()) {
 	case BOOLEAN_TYPE:
 	    string = string.concat("boolean");
+	    break;
 	case INTEGER_TYPE:
 	    string = string.concat("int");
+	    break;
 	default:
 	    assert getType() == FLOAT_TYPE;
 	    string = string.concat("float");

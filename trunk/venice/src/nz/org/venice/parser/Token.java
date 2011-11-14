@@ -391,20 +391,17 @@ public class Token {
 
 	// Is it a comment?
 	else if (string.charAt(0) == '/' && (string.length() >= 2 && string.charAt(1) == '*')) {
-	    int closingComment = string.indexOf("*/", 1);
-	    int lastComment = string.lastIndexOf("*/");
 	    
-	    closingComment = (lastComment >= 0) ? lastComment : closingComment;
-	    
-	    if (closingComment >= 0) {
-		String comment = string.substring(1, closingComment);
-		string = string.substring(closingComment + 2);
-		token.setType(Token.COMMENT_TOKEN);
-		matched = true;
-	    } else {
+	    int commentIndex = indexOfComment(string);
+	    if (commentIndex == -1) {
 		//Missing closing comment  
 		throw new ParserException(Locale.getString("MISSING_END_COMMENT"));
-	    }
+	    } 
+
+	    String comment = string.substring(1, commentIndex);
+	    string = string.substring(commentIndex + 2);
+	    token.setType(Token.COMMENT_TOKEN);
+	    matched = true;	
 	}
         
         // Is it a string?
@@ -614,6 +611,27 @@ public class Token {
     private void setStringValue(String stringValue) {
         assert getType() == STRING_TOKEN;
         this.stringValue = stringValue;
+    }
+
+    private static int indexOfComment(String str) {
+	int strlen = str.length();
+	for (int i = 2; i < strlen; i++) {
+	    if (str.charAt(i) == '/' && (strlen >= i+1 && str.charAt(i+1) == '*')) {
+		String substr = str.substring(i);
+		int index2 = indexOfComment(substr);
+		//No end comment marker in string
+		if (index2 == -1) {
+		    return -1;
+		}
+		String extractText = substr.substring(index2+2);
+		i = str.indexOf(extractText);
+
+	    }
+	    if (str.charAt(i) == '*' && (strlen >= i+1 && str.charAt(i+1) == '/')) {
+		return i;
+	    }
+	}
+	return -1;
     }
 }
 

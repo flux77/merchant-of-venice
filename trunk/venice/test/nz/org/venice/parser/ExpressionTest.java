@@ -261,6 +261,30 @@ public class ExpressionTest extends TestCase {
 	
     }
     
+    public void testCommentParse() {
+	String str1 = "(close > 5)";
+	String str2 = "/* rule */ (close > 5)";
+	String str3 = "(close > 5)/* rule */";
+	String str4 = "/* rule */ /* next comment */(close > 5)/* rule */";
+	String str5 = "/* rule /* nested comment */*/(close > 5)";
+	String str6 = "/* no end comment marker (close > 5)";
+	String str7 = "/* no nested /* end comment marker */ (close > 5)";
+
+	Expression exp1 = parse(str1);	
+	Expression exp2 = parse(str2);
+	Expression exp3 = parse(str3);
+	Expression exp4 = parse(str4);
+	Expression exp5 = parse(str5);
+	
+
+	assertTrue(exp2 != null && exp2.equals(exp1));
+	assertTrue(exp3 != null && exp3.equals(exp1));
+	assertTrue(exp4 != null && exp4.equals(exp1));
+	assertTrue(exp5 != null && exp5.equals(exp1));
+
+	assertTrue(failParse(str6));
+	assertTrue(failParse(str7));
+    }
 
 
     private Expression parse(String string) {
@@ -282,6 +306,23 @@ public class ExpressionTest extends TestCase {
             System.out.println(e);
             assert false;
             return null;
+        }
+    }
+    
+    private boolean failParse(String string) {	
+	try {
+            Variables variables = new Variables();
+            variables.add("x", Expression.INTEGER_TYPE, false);
+            variables.add("y", Expression.INTEGER_TYPE, false);
+            variables.add("a", Expression.BOOLEAN_TYPE, false);
+            variables.add("b", Expression.BOOLEAN_TYPE, false);
+            variables.add("c", Expression.BOOLEAN_TYPE, false);
+	    
+            Parser.parse(variables, string);
+	    return false;
+        }
+        catch(ExpressionException e) {
+            return true;
         }
     }
 

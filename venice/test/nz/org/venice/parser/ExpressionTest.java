@@ -219,25 +219,45 @@ public class ExpressionTest extends TestCase {
 	String cosExpString = "cos(0.0)";
 	String cos2ExpString = "cos(3.141592653/2.0)";
 	String sinExpString = "sin(3.141592653)";
+	String randExpString = "random(23042394)";
+	String randExpString2 = "random(23042394)";
+	String expSymString = "close(\"THISSYMBOLNOTFOUND\")";
 
 	Expression absExp = parse(absExpString);
 	Expression cosExp = parse(cosExpString);
 	Expression sinExp = parse(sinExpString);
+	Expression randExp = parse(randExpString);
+	Expression randExp2 = parse(randExpString);
+	Expression expSymExp = parse(expSymString);
 
 	try {
 	    Variables emptyVars = new Variables();
 	    double absVal = absExp.evaluate(emptyVars, null, null, 0);	    
 	    double cosVal = cosExp.evaluate(emptyVars, null, null, 0);
 	    double sinVal = sinExp.evaluate(emptyVars, null, null, 0);
+	    double randVal = randExp.evaluate(emptyVars, null, null, 0);
+	    //Want to check that the rand function will return the same value
+	    //given the same seed.
+	    double randVal2 = randExp2.evaluate(emptyVars, null, null, 0); 
 	    
+	
 	    assertTrue(absVal > 0.0);
 	    assertTrue(withinEpsilon(cosVal, 1.0));
 	    assertTrue(withinEpsilon(sinVal, 0.0));
+	    assertTrue(withinEpsilon(randVal, 0.653709));
+	    assertTrue(withinEpsilon(randVal, 0.653709));
 	    
 	} catch (EvaluationException e) {
 	    System.out.println("Evaluation Exception: " + e);
 	}
-	
+		
+	try {
+	    Variables emptyVars = new Variables();
+	    double closeVal = expSymExp.evaluate(emptyVars, null, null, 0);
+	    fail("Was expecting evaluationException, got: " + closeVal);
+	} catch (EvaluationException e) {
+	    assertTrue(true);
+	}
 	
     }
     

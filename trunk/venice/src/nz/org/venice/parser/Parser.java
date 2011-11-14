@@ -705,6 +705,7 @@ public class Parser {
 	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
 		arg1 = parseSubExpression(variables, tokens);
 	    } 
+	    break;
 	case (Token.ALERT_TOKEN):
 	    arg1 = parseSubExpression(variables, tokens);
 	    //Parse String arguments 

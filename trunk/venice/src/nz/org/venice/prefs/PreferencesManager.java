@@ -145,7 +145,11 @@ public class PreferencesManager {
 
 	/** Database password. */
 	public String password;
+
+	/** Prompt user to enter password instead of saving it to disk */
+	public boolean passwordPrompt;
     }
+
 
     /** Display preferences fields. */
     public class DisplayPreferences {
@@ -1383,7 +1387,8 @@ public class PreferencesManager {
         databasePreferences.port     = prefs.get("port", "3306");
         databasePreferences.database = prefs.get("dbname", "shares");
         databasePreferences.username = prefs.get("username", "");
-        databasePreferences.password = prefs.get("password", "3306");
+	databasePreferences.password = prefs.get("password", "3306");
+	databasePreferences.passwordPrompt = prefs.getBoolean("passwordPrompt", false);
         return databasePreferences;
     }
 
@@ -1401,6 +1406,7 @@ public class PreferencesManager {
 	prefs.put("dbname", databasePreferences.database);
 	prefs.put("username", databasePreferences.username);
 	prefs.put("password", databasePreferences.password);
+	prefs.putBoolean("passwordPrompt", databasePreferences.passwordPrompt);
     }
 
     /**

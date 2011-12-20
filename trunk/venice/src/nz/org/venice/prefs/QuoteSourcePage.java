@@ -34,12 +34,15 @@ import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
+import javax.swing.JCheckBox;
 import javax.swing.border.TitledBorder;
 
+import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.quote.DatabaseQuoteSource;
 import nz.org.venice.quote.DatabaseManager;
+import nz.org.venice.quote.DatabaseAccessManager;
 import nz.org.venice.quote.QuoteSourceManager;
 import nz.org.venice.util.Locale;
 
@@ -69,6 +72,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     private JTextField databaseUsername;
     private JPasswordField databasePassword;
     private JTextField databaseName;
+    private JCheckBox databasePasswordPrompt; 
 
     // Widgets from internet pane
     private JRadioButton useInternet;
@@ -205,6 +209,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                         populateDatabaseDrivers();
                         databaseUsername.setEnabled(true);
                         databasePassword.setEnabled(true);
+			databasePasswordPrompt.setEnabled(true);
                         if(databaseSoftware.getSelectedIndex() == DatabaseManager.MYSQL)
                             databasePort.setText(Integer.toString(MYSQL_DEFAULT_PORT));
                         else if(databaseSoftware.getSelectedIndex() == DatabaseManager.POSTGRESQL)
@@ -215,9 +220,10 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                             // Hypesonic SQL does not accept the username password fields
                             databaseUsername.setEnabled(false);
                             databasePassword.setEnabled(false);
-                    }
-                }
-            }});
+			    databasePasswordPrompt.setEnabled(false);
+			}
+		    }
+		}});
 
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(databaseSoftware, c);
@@ -234,7 +240,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 
         // Only display known drivers that are currently installed.
         populateDatabaseDrivers();
-
+	
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(databaseDriver, c);
         borderPanel.add(databaseDriver);
@@ -257,22 +263,49 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                                                     databasePreferences.username, gridbag, c, 15);
         
         // Password
+	String passwdString = (databasePreferences.password.equals(""))
+	    ? "" 
+	    : DatabaseAccessManager.getInstance().unMask(databasePreferences.password);
+	
         databasePassword = GridBagHelper.addPasswordRow(borderPanel, 
 							Locale.getString("PASSWORD"), 
-                                                        databasePreferences.password, 
+                                                        passwdString, 
                                                         gridbag, c, 15);
         
-        // Hypesonic SQL does not accept the username password fields
-        if(databaseSoftware.getSelectedIndex() == DatabaseManager.HSQLDB) {
-            databaseUsername.setEnabled(false);
-            databasePassword.setEnabled(false);
-        }
-
+	if (databasePreferences.passwordPrompt) {
+	    databasePassword.setEnabled(false);
+	}
+       
         // Database Name
         databaseName = GridBagHelper.addTextRow(borderPanel, 
 						Locale.getString("DATABASE_NAME"), 
                                                 databasePreferences.database, gridbag, c, 15);
-        
+	
+	databasePasswordPrompt = GridBagHelper.addCheckBoxRow(borderPanel, 
+							      Locale.getString("PROMPT_FOR_PASSWORD"), 
+							      databasePreferences.passwordPrompt, 
+							      gridbag, c);
+	
+	databasePasswordPrompt.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    if (databasePasswordPrompt.isSelected()) {
+			databasePassword.setEnabled(false);
+		    } else {
+			databasePassword.setEnabled(true);
+		    }
+		}
+	    });
+	
+		
+	
+        // Hypesonic SQL does not accept the username password fields
+        if(databaseSoftware.getSelectedIndex() == DatabaseManager.HSQLDB) {
+            databaseUsername.setEnabled(false);
+            databasePassword.setEnabled(false);
+	    databasePasswordPrompt.setEnabled(false);
+        }
+
+   
         preferencesPanel.add(borderPanel, BorderLayout.NORTH);
         
         JPanel database = new JPanel();
@@ -354,6 +387,12 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    quoteSource = PreferencesManager.SAMPLES;
 	PreferencesManager.putQuoteSource(quoteSource);
 
+	//If database preferences are changed, but the useDatabase checkbox
+	//is not checked, warn the user.
+	if (databaseSettingsChanged() && !useDatabase.isSelected()) {
+	    DesktopManager.showWarningMessage(Locale.getString("DATABASE_NOT_SELECTED_WARNING"));
+	}
+
 	// Save database preferences
         String software = (String)databaseSoftware.getSelectedItem();
         if(software.equals(Locale.getString("MYSQL")))
@@ -367,12 +406,38 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         databasePreferences.host = databaseHost.getText();
         databasePreferences.port = databasePort.getText();
         databasePreferences.username = databaseUsername.getText();
-        databasePreferences.password = new String(databasePassword.getPassword());
+        databasePreferences.password = 
+	    (databasePassword.getPassword().length > 0) 
+	    ? DatabaseAccessManager.getInstance().mask(new String(databasePassword.getPassword()))
+	    : "";
+	databasePreferences.passwordPrompt = databasePasswordPrompt.isSelected();
         databasePreferences.database = databaseName.getText();
-        
+	        
         PreferencesManager.putDatabaseSettings(databasePreferences);
-
+       
 	// This makes the next query use our new settings
 	QuoteSourceManager.flush();
+    }
+
+    //Return true if any of the database fields are different to the initial
+    //preferences. Used so that if these values are changed, but the 
+    //database is not selected, the user can be warned.
+    
+    private boolean databaseSettingsChanged() {
+	if (!databasePreferences.host.equals(databaseHost.getText())) {
+	    return true;
+	} else if (!databasePreferences.port.equals(databasePort.getText())) {
+	    return true;
+	} else if (!databasePreferences.username.equals(databaseUsername.getText())) {
+	    return true;
+	} else if (!databasePreferences.password.equals(new String(databasePassword.getPassword()))) {
+	    return true;
+	} else if (databasePreferences.passwordPrompt != databasePasswordPrompt.isSelected()) {
+	    return true;
+	} else if (!databasePreferences.database.equals(databaseName.getText())) {
+	    return true;
+	} else {
+	    return false;
+	}
     }
 }

@@ -218,7 +218,10 @@ public class HelpModule extends JPanel implements Module {
             thread.start();
 		}
 	    });
-
+	
+	
+	KeyStroke keyStroke = KeyStroke.getKeyStroke('F', InputEvent.CTRL_MASK);
+	findMenuItem.setAccelerator(keyStroke);
 	helpMenu.add(findMenuItem);
 
         JMenu goMenu = new JMenu(Locale.getString("GO"));

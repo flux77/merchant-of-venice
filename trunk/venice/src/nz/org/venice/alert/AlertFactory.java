@@ -20,6 +20,7 @@ package nz.org.venice.alert;
 
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.quote.DatabaseManager;
+import nz.org.venice.quote.DatabaseAccessManager;
 import nz.org.venice.quote.Symbol;
 import nz.org.venice.util.TradingDate;
 
@@ -53,6 +54,8 @@ public class AlertFactory {
 	PreferencesManager.DatabasePreferences prefs = 
 	    PreferencesManager.getDatabaseSettings();
         
+	String password = DatabaseAccessManager.getInstance().getPassword();
+
         DatabaseManager dbm = new DatabaseManager( 
 						 prefs.software, 
 						 prefs.driver,
@@ -60,8 +63,7 @@ public class AlertFactory {
 						 prefs.port, 
 						 prefs.database, 
 						 prefs.username, 
-						 prefs.password);
-
+						 password);
 	return new DatabaseAlertReader(dbm);
     }
 
@@ -86,6 +88,7 @@ public class AlertFactory {
         PreferencesManager.DatabasePreferences prefs = 
            PreferencesManager.getDatabaseSettings();
         
+	String password = DatabaseAccessManager.getInstance().getPassword();
         DatabaseManager dbm = new DatabaseManager( 
 						 prefs.software, 
 						 prefs.driver,
@@ -93,7 +96,7 @@ public class AlertFactory {
 						 prefs.port, 
 						 prefs.database, 
 						 prefs.username, 
-						 prefs.password);
+						 password);
 
 	return new DatabaseAlertWriter(dbm);
     }

@@ -117,9 +117,11 @@ public class QuoteSourceFactory {
      * @return	the database quote source 
      */
     public static DatabaseQuoteSource createDatabaseQuoteSource() {
+
         PreferencesManager.DatabasePreferences prefs = 
            PreferencesManager.getDatabaseSettings();
-        
+	String password = DatabaseAccessManager.getInstance().getPassword();
+
         DatabaseManager dbm = new DatabaseManager( 
 						 prefs.software, 
 						 prefs.driver,
@@ -127,7 +129,7 @@ public class QuoteSourceFactory {
 						 prefs.port, 
 						 prefs.database, 
 						 prefs.username, 
-						 prefs.password);
+						 password);
 
 	return new DatabaseQuoteSource(dbm);
     }

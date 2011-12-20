@@ -395,6 +395,7 @@ public class MainMenu implements ActionListener, ModuleListener
                                                    Locale.getString("ABOUT"));
         helpContentsMenuItem = MenuHelper.addMenuItem(this, helpMenu,
                                                       Locale.getString("CONTENTS"));
+	helpContentsMenuItem.setAccelerator(KeyStroke.getKeyStroke('H', InputEvent.CTRL_MASK));
         helpViewLicenseMenuItem = MenuHelper.addMenuItem(this, helpMenu,
                                                          Locale.getString("VIEW_LICENSE"));
         

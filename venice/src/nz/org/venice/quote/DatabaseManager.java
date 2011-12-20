@@ -45,7 +45,6 @@ import nz.org.venice.util.TradingDate;
 
 
 
-
 /**
  * Provides functionality to manage database connections and ensures the 
  * relevant tables exist. Classes manage their own queries separately.
@@ -245,7 +244,7 @@ public class DatabaseManager
 
     public boolean getConnection() {
         boolean success = true;
-	
+       
 	success = connect();
 
         // If we are connected, check the tables exist, if not, create them.
@@ -296,7 +295,11 @@ public class DatabaseManager
         }
         catch (SQLException e) {
             DesktopManager.showErrorMessage(Locale.getString("ERROR_CONNECTING_TO_DATABASE",
-                                                             e.getMessage()));
+                                   
+							     e.getMessage()));
+	    
+	    DatabaseAccessManager.getInstance().reset();
+
             return false;
         }
 
@@ -602,15 +605,7 @@ public class DatabaseManager
 
 	    if (success) {
 		List queries = (List)transactionMap.get("createAlerts");
-		executeUpdateTransaction(queries);
-		Iterator iterator = queries.iterator();
-		while (iterator.hasNext()) {
-		    String query = (String)iterator.next();
-		    
-		    Statement statement = connection.createStatement();
-		    statement.executeUpdate(query);
-		}
-            
+		executeUpdateTransaction(queries);            
 		success = true;
 	    }
 	} catch (SQLException e) {
@@ -1026,7 +1021,7 @@ public class DatabaseManager
 	return sb.toString();
 
     }
-
+    
     public String getUUID() {
 	UUID id = UUIDGenerator.getInstance().generateRandomBasedUUID();
 	return id.toString();

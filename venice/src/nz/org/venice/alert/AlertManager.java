@@ -67,6 +67,10 @@ public class AlertManager {
         // declared here so constructor is not public
     }
     
+    public static void setSourceInstance(AlertReader instance) {
+	sourceInstance = instance;
+    }
+
     //Must read and write alerts from the same place.   
     public static synchronized AlertReader getReader() {
 	if (sourceInstance == null) {

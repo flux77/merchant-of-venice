@@ -244,7 +244,10 @@ radio button. You'll be presented with several fields you need to fill in:</para
 </item>
 <item><highlight>Database Name</highlight> - This is the name of the database that you created
       earlier. You shouldn't need to touch this.
-</item></list>
+</item>
+
+<item><highlight>Show Prompt to Enter Password</highlight> - Check this option if you'd prefer not to store the database password on disk. When this option is checked, Venice will prompt you to enter the password for the database when the database is accessed for the first time.</item>
+</list>
 <para>Finally you'll need to import the quotes into the database, you can do this by
 using the <link to="Importing Quotes">Import Quotes</link> dialog.</para>
 <para>Good luck!</para>

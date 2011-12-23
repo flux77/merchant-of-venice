@@ -18,6 +18,7 @@
 
 package nz.org.venice.parser.expression;
 
+import nz.org.venice.parser.Parser;
 import nz.org.venice.parser.EvaluationException;
 import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.TypeMismatchException;
@@ -53,8 +54,11 @@ public class LagExpression extends BinaryExpression {
 	QuoteSymbol quoteChild = (QuoteSymbol)getChild(0);
 
 	int lag = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
-        if (lag > 0)
-	    throw EvaluationException.LAG_OFFSET_EXCEPTION;
+        if (lag > 0) {
+	    String lineNumber = getParseMetadata().getLineForExpression(this);
+	    throw new EvaluationException(Locale.getString("LAG_OFFSET_ERROR") + " offset: " + lag + " at line: " + lineNumber + "\n parents = " + printParents());
+					  
+	}
 	
 	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
 	    ? quoteChild.getSymbol() : symbol;
@@ -118,4 +122,5 @@ public class LagExpression extends BinaryExpression {
         return new LagExpression((Expression)getChild(0).clone(),
                                  (Expression)getChild(1).clone());
     }
+
 }

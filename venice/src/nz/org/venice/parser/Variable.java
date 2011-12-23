@@ -35,6 +35,9 @@ public class Variable {
     // Constant or variable
     private boolean isConstant;
 
+    // Function
+    private boolean isFunction;
+
     /** Indicates that the variable is constant and the value cannot be changed. */
     public final static boolean CONSTANT = true;
 
@@ -59,6 +62,30 @@ public class Variable {
         this.type = type;
         this.value = value;
 	this.isConstant = isConstant;
+	isFunction = false;
+    }
+
+        /**
+     * Create a new variable.
+     *
+     * @param name the name of the variable.
+     * @param type the type of the variable, one of {@link Expression#BOOLEAN_TYPE},
+     *        {@link Expression#FLOAT_TYPE} or {@link Expression#INTEGER_TYPE}.
+     * @param isConstant whether the variable is constant. Either @{link CONSTANT} or
+     *        {@link Variable#VARIABLE}.
+     * @param value the initial value of the variable.
+     */
+    public Variable(String name, int type, boolean isConstant, boolean isFunction, double value) {
+        assert(type == Expression.BOOLEAN_TYPE || type == Expression.FLOAT_TYPE ||
+               type == Expression.INTEGER_TYPE);
+
+        this.name = name;
+        this.type = type;
+        this.value = value;
+	this.isConstant = isConstant;
+	this.isFunction = isFunction;
+
+	assert !(isConstant && isFunction);
     }
 
     /**
@@ -88,6 +115,17 @@ public class Variable {
     public boolean isConstant() {
 	return isConstant;
     }
+    
+    /**
+     * Return whether the variable is a function.
+     *
+     * @return <code>TRUE</code> iff the variable is function constant.
+     */
+    public boolean isFunction() {
+	return isFunction;
+    }
+
+    
 
     /**
      * Return the value of the variable.
@@ -119,4 +157,11 @@ public class Variable {
     public void setValue(int value) {
         this.value = (double)value;
     }
+
+    public Object clone() throws CloneNotSupportedException {
+	Variable newVariable = new Variable(name, type, isConstant, isFunction, value);
+
+	return newVariable;
+    }
+
 }

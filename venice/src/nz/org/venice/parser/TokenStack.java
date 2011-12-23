@@ -33,7 +33,7 @@ public class TokenStack extends Vector {
     }
 
     // Get the token on the top of the stack
-    private Token get() {
+    public Token get() {
 	if(size() > 0)
 	    return (Token)firstElement();
 	else
@@ -95,13 +95,13 @@ public class TokenStack extends Vector {
 
 	    switch (t.getType()) {
 	    case Token.NUMBER_TOKEN:
-		rv += "num";
+		rv += "num: " + t.getValue();
 		break;
 	    case Token.VARIABLE_TOKEN:
-		rv += "var";
+		rv += "var: " + t.getVariableName();
 		break;
 	    case Token.STRING_TOKEN:
-		rv += "str";
+		rv += "str: " + t.getStringValue();
 		break;
 	    default:
 		rv += words[t.getType()];

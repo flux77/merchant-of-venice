@@ -170,6 +170,14 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException UNDEFINED_RESULT_EXCEPTION =
         new EvaluationException(Locale.getString("UNDEFINED_RESULT_EXCEPTION"));
 
+    /** An exception which is thrown when the result of a calculation for a day/symbol exceeds the time limit. */
+    public static EvaluationException EVAL_TIME_TOO_LONG_EXCEPTION =
+        new EvaluationException(Locale.getString("EVAL_TIME_TOO_LONG"));
+
+    /** An exception which is thrown when the function call depth exceeds the limit. e.g. possibly due to infinite recursion */
+    public static EvaluationException STACK_DEPTH_EXCEEDED_EXCEPTION =
+        new EvaluationException(Locale.getString("STACK_OVERFLOW_EXCEPTION"));
+
     /**
      * Create a new evaluation exception with the given error reason.
      * Make any exception without a run-time error message static so the

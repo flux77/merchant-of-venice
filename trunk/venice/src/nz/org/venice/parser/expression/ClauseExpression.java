@@ -73,6 +73,8 @@ public class ClauseExpression extends AbstractExpression {
         }
 
         for (int child = 0; child < getChildCount(); child++)
+	    //If variables is used instead of tmpVar, DefineVariableExpression
+	    //throws an exception 
             //	    value = getChild(child).evaluate(variables, quoteBundle, symbol,
             // day);
             value = getChild(child).evaluate(tmpVar, quoteBundle, symbol, day);

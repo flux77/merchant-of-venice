@@ -19,6 +19,7 @@
 package nz.org.venice.parser;
 
 import java.util.Iterator;
+import java.util.HashMap;
 
 import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.Symbol;
@@ -225,14 +226,12 @@ public interface Expression extends Cloneable {
      */
     public boolean validTree();
 
-    /**
-     *
-     * Print a string of all the children in a tree form.
-     * @param level The depth of the tree
-     * @param code A code (e.g. hashcode) of a node
-     * @return A string representing the expresison tree tree
-     */
-    public String printTree(int level, int code);
+    public void setParseMetadata(HashMap parseTree, HashMap tokenLineMap);
+
+    public ParseMetadata getParseMetadata();
+
+
+    public String getId();
 
 }
 

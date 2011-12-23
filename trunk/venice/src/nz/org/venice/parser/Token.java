@@ -226,8 +226,14 @@ public class Token {
     /** Represents "<code>alert()</code>" symbol */
     public static final int ALERT_TOKEN = 64;
 
+    /** Represents "<code>include</code> symbol */
+    public static final int INCLUDE_TOKEN = 65;
+
+    /** Represents "<code>function</code> symbol */
+    public static final int FUNCTION_TOKEN = 66;
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 65;
+    private static final int FIXED_LENGTH_TOKENS = 67;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -332,6 +338,8 @@ public class Token {
 	tokenStrings[TREND_TOKEN]              = "trend";
 	tokenStrings[RANDOM_TOKEN]             = "random";
 	tokenStrings[ALERT_TOKEN]              = "alert";
+	tokenStrings[INCLUDE_TOKEN]            = "include";
+	tokenStrings[FUNCTION_TOKEN]           = "function";
         
         return tokenStrings;
     }

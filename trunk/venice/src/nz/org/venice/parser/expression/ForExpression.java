@@ -21,9 +21,13 @@ package nz.org.venice.parser.expression;
 import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.EvaluationException;
 import nz.org.venice.parser.TypeMismatchException;
+import nz.org.venice.parser.AnalyserGuard;
 import nz.org.venice.parser.Variables;
 import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.Symbol;
+
+import org.safehaus.uuid.UUID;
+import org.safehaus.uuid.UUIDGenerator;
 
 /**
  * An expression which represents the <code>for</code> command.
@@ -39,6 +43,9 @@ public class ForExpression extends QuaternaryExpression {
     private final static int LOOP = 2;
     private final static int COMMAND = 3;
 
+    //Expression identifier - parent hashcode uses class hashcode
+    private UUID id;
+
     /**
      * Construct a <code>for</code> expression.
      * <pre>for(initial; condition; loop) {
@@ -52,6 +59,7 @@ public class ForExpression extends QuaternaryExpression {
     public ForExpression(Expression initial, Expression condition, Expression loop,
 			 Expression command) {
 	super(initial, condition, loop, command);
+	id = UUIDGenerator.getInstance().generateRandomBasedUUID();
     }
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
@@ -59,20 +67,34 @@ public class ForExpression extends QuaternaryExpression {
 
 	double value = 0.0D;
 
+	UUID loopId = UUIDGenerator.getInstance().generateRandomBasedUUID();
+
+	AnalyserGuard.getInstance().startLoop(this, loopId, symbol, day);
+
 	// Execute the initial
 	getChild(INITIAL).evaluate(variables, quoteBundle, symbol, day);
 
 	// Now loop running the command until the condition is no longer true
 	do {
+	    
+	    //Don't want to run forever - if the limit is exceeded
+	    //could be an infinite loop. 
+	    if (AnalyserGuard.getInstance().
+		evaluationTimeElapsed(this, loopId, symbol, day)) {
+		throw EvaluationException.EVAL_TIME_TOO_LONG_EXCEPTION;
+	    }
+	    
 	    // Execute command
 	    value = getChild(COMMAND).evaluate(variables, quoteBundle, symbol, day);
-
+	    
 	    // Execute loop
 	    getChild(LOOP).evaluate(variables, quoteBundle, symbol, day);
-
+		
 	} while(getChild(CONDITION).evaluate(variables, quoteBundle, symbol, day) >=
 		Expression.TRUE_LEVEL);
 
+	AnalyserGuard.getInstance().finishLoop(this, loopId, symbol, day);	
+    
 	// Return the results of the last command
 	return value;
     }

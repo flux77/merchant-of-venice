@@ -286,6 +286,157 @@ public class ExpressionTest extends TestCase {
 	assertTrue(failParse(str7));
     }
 
+    public void testParameterNum() {
+	//failParse sets up int variables, x,y
+	String test1 = "int function parmtest(int p1, int p2, int p3) { p1+p2} int\ntest = parmtest(x,y)\ntrue";
+
+	String test2 = "int function parmtest(int p1, int p2) { p1+p2} int test = parmtest(x,y,x)\ntrue";
+
+	String test3 = "int function parmtest(int p1, int p2) { p1+p2} int test = parmtest(x,y)\ntrue";
+
+	String test4 = "int n = 0\nint function outer() { n }\nint function parmtest() { n = outer() } int test = parmtest()\ntrue";
+	
+
+	assertTrue(failParse(test1));
+	assertTrue(failParse(test2));
+	Expression exp3 = parse(test3);
+	Expression exp4 = parse(test4);
+	assertTrue(exp3 != null);		
+	assertTrue(exp4 != null);		
+    }
+
+    public void testParameterType() {
+	String test1 = "int n = 0\n int function noop(double val) { val = 3.14 }\n n = noop(n)";
+	
+	String test2 = "int n = 0\nint function real2int(double val) { val = 2.0}\nn = real2int(3.14)";
+
+	String test3 = "int n = 0\nint function real2int(double val) { val = 3}\nn = real2int(3.14)";
+
+	String test4 = "int function retInt() { 3 }\nfloat foo = retInt()";
+	
+	String test5 = "int foo = 0\nint function localVar() {int foo = 5}";
+	String test6 = "int bar = 0\nint function localVar(int foo) {int bar = 5}";
+	
+	assertTrue(failParse(test1));
+	assertTrue(failParse(test2));
+	Expression exp3 = parse(test3);
+	assertTrue(test3 != null);
+	assertTrue(failParse(test4));
+	assertTrue(failParse(test5));
+	assertTrue(failParse(test6));
+
+
+	
+	
+    }
+
+    public void testFunctionEval() {
+	String caller1 = "int function incme(int n) { n = n + 1}\nint function decme(int n) { n = n - 1}\nfor (int i = 0; i < 5; i = i + 1) { incme(decme(i)) } i";
+	
+	String caller2 = "int function noop(int n) { n }\nint function incme(int n) { n = n + 1}\nfloat j = 0.0\nfor (int i = 0; i < 5; i = incme(noop(i))) { float k = 0.0\nk = k + 1.0\nj = j + 0.1} j";
+
+	//Simple recursive functions
+	String rec1 = "int function fact(int n) { if (n >= 2) { n*fact(n-1) } else { 1 }}\nfact(5)";
+	
+	String rec2 = "int function fib(int n) { if (n >= 2) { fib(n-1) + fib(n-2) } else { 1 }}\nfib(5)";
+
+	String rec3 = "int function fib(int n) { if (n >= 2) { fib(n-2) + fib(n-1) } else { 1 }}\nfib(5)";
+
+	Expression callExp1 = parse(caller1);
+	Expression callExp2 = parse(caller2);
+
+	Expression exprec1 = parse(rec1);
+	Expression exprec2 = parse(rec2);
+	Expression exprec3 = parse(rec3);
+	
+	assertTrue(callExp1 != null);
+	assertTrue(callExp2 != null);
+	assertTrue(exprec1 != null);
+	assertTrue(exprec2 != null);
+	assertTrue(exprec3 != null);
+
+	try {
+	    Variables variables = new Variables();
+	    double callEval1 = callExp1.evaluate(variables, null, null, 0);
+	    double callEval2 = callExp2.evaluate(variables, null, null, 0);
+	    double recEval1 = exprec1.evaluate(variables, null, null, 0);
+	    double recEval2 = exprec2.evaluate(variables, null, null, 0);
+	    double recEval3 = exprec3.evaluate(variables, null, null, 0);
+	    
+	    assertTrue(callEval1 == 5.0);
+	    assertTrue(callEval2 == 0.5);
+	    assertTrue(recEval1 == 120.0);
+	    assertTrue(recEval2 == 8.0);
+	    assertTrue(recEval3 == 8.0);
+	} catch (EvaluationException e) {
+	    System.out.println(e);
+	    assertTrue(false);
+	}
+	
+    }
+
+    public void testLimits() {
+	String forTest = "for (int i = 0; i > 0; i = i + 1) { int n = 0\n n = n + 1 }";
+	
+	String whileTest = "for (int i = 0; i > 0; i = i + 1) { int n = 0\n n = n + 1 }";
+
+	AnalyserGuard.getInstance().setRuntimeLimit(10);
+	Expression forExp = parse(forTest);
+	Expression whileExp = parse(whileTest);
+
+	assertTrue(forExp != null);
+	assertTrue(whileExp != null);
+	
+	try {
+	    Variables variables = new Variables();
+	    double forEval = forExp.evaluate(variables, null, null, 0);	    
+	    
+	    System.out.println("inf loop finished:" + forEval);
+	    assertTrue(false);
+	} catch (EvaluationException e) {
+	    if (e == EvaluationException.EVAL_TIME_TOO_LONG_EXCEPTION) {
+		assertTrue(true);
+	    } else {
+		assertTrue(false);
+	    }
+	}
+
+	try {
+	    Variables variables = new Variables();
+	    double whileEval = whileExp.evaluate(variables, null, null, 0);	    
+	    
+	    System.out.println("inf loop finished:" + whileEval);
+	    assertTrue(false);
+	} catch (EvaluationException e) {
+	    if (e == EvaluationException.EVAL_TIME_TOO_LONG_EXCEPTION) {
+		assertTrue(true);
+	    } else {
+		assertTrue(false);
+	    }
+	}	
+    }
+    
+    
+    public void testClauseReturn() {
+	String test1 = "int n = 0\nfor (int i = 0; i < 10; i = i + 1) { n = n + 1} n";
+	String test2 = "int foo = 0\nint n = 0\nfor (int i = 0; i < 10; i = i + 1) { foo = foo - 3\nn = n + 1} n";
+
+	Expression exp1 = parse(test1, Expression.INTEGER_TYPE);
+	Expression exp2 = parse(test2, Expression.INTEGER_TYPE);
+	assertTrue(exp1 != null);
+	assertTrue(exp2 != null);
+
+	try {
+	    Variables variables = new Variables();
+	    double clauseEval1 = exp1.evaluate(variables, null, null, 0);
+	    double clauseEval2 = exp2.evaluate(variables, null, null, 0);	    
+	    assertTrue(clauseEval1 == 10.0);
+	    assertTrue(clauseEval2 == 10.0);
+	} catch (EvaluationException e) {
+	    assertTrue(false);
+	}
+    }
+    
 
     private Expression parse(String string) {
 	return parse(string, Expression.INTEGER_TYPE);	

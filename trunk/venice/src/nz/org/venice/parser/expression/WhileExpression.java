@@ -21,9 +21,13 @@ package nz.org.venice.parser.expression;
 import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.EvaluationException;
 import nz.org.venice.parser.TypeMismatchException;
+import nz.org.venice.parser.AnalyserGuard;
 import nz.org.venice.parser.Variables;
 import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.Symbol;
+
+import org.safehaus.uuid.UUID;
+import org.safehaus.uuid.UUIDGenerator;
 
 /**
  * An expression which represents the <code>while</code> command.
@@ -37,6 +41,9 @@ public class WhileExpression extends BinaryExpression {
     private final static int CONDITION = 0;
     private final static int COMMAND = 1;
 
+    //Expression identifier - parent hashcode uses class hashcode    
+    private UUID id; 
+
     /**
      * Construct a <code>while</code> expression.
      * <pre>while(condition) {
@@ -47,6 +54,7 @@ public class WhileExpression extends BinaryExpression {
      */
     public WhileExpression(Expression condition, Expression command) {
 	super(condition, command);
+	id = UUIDGenerator.getInstance().generateRandomBasedUUID();
     }
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
@@ -54,13 +62,23 @@ public class WhileExpression extends BinaryExpression {
 
 	double value = 0.0D;
 
+	UUID loopId = UUIDGenerator.getInstance().generateRandomBasedUUID();
+	AnalyserGuard.getInstance().startLoop(this, loopId, symbol, day);
+
 	// Now loop running the command until the condition is no longer true
 	while(getChild(CONDITION).evaluate(variables, quoteBundle, symbol, day) >=
 	      Expression.TRUE_LEVEL) {
 	    // Execute command
 	    value = getChild(COMMAND).evaluate(variables, quoteBundle, symbol, day);
-	}
+	    //Don't want to run forever - if the limit is exceeded
+	    //could be an infinite loop. 
+	    if (AnalyserGuard.getInstance().
+		    evaluationTimeElapsed(this, loopId, symbol, day)) {
+		throw EvaluationException.EVAL_TIME_TOO_LONG_EXCEPTION;
+	    }
+	}       
 
+	AnalyserGuard.getInstance().finishLoop(this, loopId, symbol, day);	
 	// Return the results of the last command
 	return value;
     }

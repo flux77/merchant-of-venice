@@ -498,7 +498,8 @@
         <pathelement path="${lib.joone}"/>
         <pathelement path="${lib.mysql}"/>
         <pathelement path="${lib.jython}"/>
-        <pathelement path="${lib.xml}"/>
+        <pathelement path="${lib.xml}"/>	
+	<pathelement path="${lib.uuid}"/>
       </classpath>
     </javac>
 
@@ -516,6 +517,7 @@
         <pathelement path="${lib.mysql}"/>
         <pathelement path="${lib.jython}"/>
         <pathelement path="${lib.xml}"/>
+	<pathelement path="${lib.uuid}"/>
       </classpath>
       <formatter type="plain"/>
       <batchtest todir="${report}">

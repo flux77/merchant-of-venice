@@ -25,11 +25,16 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
 
 import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.ExpressionFactory;
+import nz.org.venice.parser.ParseMetadata;
 import nz.org.venice.util.VeniceLog;
+
+import org.safehaus.uuid.UUID;
+import org.safehaus.uuid.UUIDGenerator;
 
 /**
  * The abstract base class for all expressions in the <i>Gondola</i> language. This
@@ -56,7 +61,9 @@ public abstract class AbstractExpression implements Expression {
     private static java.util.logging.Handler handler;
     private static java.util.logging.Logger logger;
 
+    private ParseMetadata parseMetadata;
 
+    private final String id;
 
     /**
      * Create a new expression with no children.
@@ -66,6 +73,7 @@ public abstract class AbstractExpression implements Expression {
     public AbstractExpression() {
 	children = null;
 	this.parent = getParent();
+	id = setId();
     }
 
     /**
@@ -80,6 +88,7 @@ public abstract class AbstractExpression implements Expression {
 	}
 	this.children = children;
 	this.parent = null;
+	id = setId();
     }
 
 
@@ -97,6 +106,7 @@ public abstract class AbstractExpression implements Expression {
 	}
 	
 	this.parent = null;
+	id = setId();
     }
     
     /**
@@ -227,6 +237,7 @@ public abstract class AbstractExpression implements Expression {
     //instead of setting child to null/replacing and avoiding the problem 
     //of nulls in the expression tree.  
     public Expression simplify() {
+
 	Expression[] newChildren = new Expression[getChildCount()];
 	
 	for (int i = 0; i < getChildCount(); i++) {
@@ -396,8 +407,14 @@ public abstract class AbstractExpression implements Expression {
         if(getClass() != expression.getClass())
             return false;
         
+	if (getChildCount() != expression.getChildCount()) 
+	    return false;
+
         // Check all children are the same - only check the children
         // we currently have - we might not have them all yet!
+
+	//Not sure if the "we might not have them all yet
+	//-as of 7.3, children are immutable and not allowed to be null 
         for(int i = 0; i < getChildCount(); i++) {
             if(!getChild(i).equals(expression.getChild(i)))
                 return false;
@@ -489,26 +506,34 @@ public abstract class AbstractExpression implements Expression {
 
     abstract public Object clone();
 
-
-    /**
-     * Debugging function which prints out an expresison tree
-     * in a string.
-     *
-     * @return A string which represents the expression tree
-     */
-    public String printTree(int level, int code) {
+    public String printParents() {
 	String rv = "";
-	
-	for (int i = 0; i < level; i++) {
-	    rv += " ";
+	Expression parent = getParent();
+	while (parent != null) {
+	    //nz.org.venice.parser.expression = 32 chars
+	    rv += parent.getClass().getName().substring(32) + ".";
+	    parent = parent.getParent();
 	}
-	String subTree = "\n";
-	for (int i = 0; i < getChildCount(); i++) {
-	    if (getChild(i) != null) {
-		subTree += " " + getChild(i).printTree(level+1, code) + " ";
-	    }
-	}
-	rv += subTree;
 	return rv;
+    }
+
+    public void setParseMetadata(HashMap parseTree, HashMap tokenLineMap) {
+	parseMetadata = new ParseMetadata(parseTree, tokenLineMap);
+    }
+
+    public ParseMetadata getParseMetadata() {	
+	if (parent != null) {
+	    return parent.getParseMetadata();
+	} else {
+	    return parseMetadata;
+	}
+    }
+    
+    private String setId() {
+	return UUIDGenerator.getInstance().generateRandomBasedUUID().toString();
+    }
+
+    public String getId() {
+	return id;
     }
 }

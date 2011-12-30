@@ -97,6 +97,16 @@ public class AddExpression extends ArithmeticExpression {
         return false;
     }
 
+    public int hashCode() {
+	Expression c1 = getChild(0);	
+	Expression c2 = getChild(1);
+
+	assert c1 != null;
+	assert c2 != null;
+
+	return (c1.hashCode() ^ c2.hashCode());
+    }
+
     public String toString() {
         return super.toString("+");
     }

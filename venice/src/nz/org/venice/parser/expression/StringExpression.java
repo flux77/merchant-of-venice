@@ -59,6 +59,10 @@ public class StringExpression extends TerminalExpression {
         return false;
     }
 
+    public int hashCode() {
+	return getText().hashCode();
+    }
+
     /**
      * Get the text of the string.
      *

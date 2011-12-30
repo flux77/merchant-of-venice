@@ -149,6 +149,8 @@ public class EvalFunctionExpression extends UnaryExpression {
 
 	Expression parameterValuesList = getChild(0);
 
+	assert parameterNamesList != null;
+
 	//If no parameters are defined and sent, no checking is required.
 	if (parameterValuesList.getChildCount() != parameterNamesList.getChildCount()) {
 	    

@@ -81,6 +81,10 @@ public class GetVariableExpression extends TerminalExpression {
         return false;
     }
 
+    public int hashCode() {
+	return getName().hashCode() ^ (getType() * 37);
+    }
+
     public Object clone() {
         return new GetVariableExpression(name, type);
     }

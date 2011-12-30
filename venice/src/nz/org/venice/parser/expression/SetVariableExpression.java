@@ -105,6 +105,13 @@ public class SetVariableExpression extends UnaryExpression {
         return false;
     }
 
+    public int hashCode() {
+	Expression child1 = getChild(0);
+	assert child1 != null;
+
+	return (child1.hashCode() ^ getName().hashCode() ^ (37 * getType()));
+    }
+
     public Object clone() {
         return new SetVariableExpression(name, type, (Expression)getChild(0).clone());
     }

@@ -62,6 +62,34 @@ public class FunctionExpression extends BinaryExpression {
 	return 0.0;
     }
 
+    public boolean equals(Object object) {
+	if (!(object instanceof FunctionExpression)) {
+	    return false;
+	}
+	FunctionExpression expression = (FunctionExpression)object;
+
+	if (!expression.getName().equals(name)) {
+	    return false;
+	}
+
+	if (type != expression.getType()) {
+	    return false;
+	}
+
+	if (!getChild(0).equals(expression.getChild(0)) ||
+	    !getChild(1).equals(expression.getChild(1))) {
+	    return false;
+	} 
+
+	return true;	
+    }
+
+    public int hashCode() {
+	return name.hashCode() ^ (type * 37) ^ 
+	    getChild(0).hashCode() ^ 
+	    getChild(1).hashCode();
+    }
+
     public String toString() {
 	Expression parameterList = getChild(0);
 	Expression body = getChild(1);

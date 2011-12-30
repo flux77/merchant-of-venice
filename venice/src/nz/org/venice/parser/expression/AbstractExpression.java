@@ -396,7 +396,7 @@ public abstract class AbstractExpression implements Expression {
      * are equivalent.
      *
      * @param object the other expression
-     */
+     */    
     public boolean equals(Object object) {
 
         // Top level nodes the sames?
@@ -422,6 +422,7 @@ public abstract class AbstractExpression implements Expression {
 
         return true;
     }
+    
 
     /**
      * If you override the {@link #equals} method then you should override
@@ -429,12 +430,29 @@ public abstract class AbstractExpression implements Expression {
      *
      * @return a poor hash code of the tree
      */
+    
     public int hashCode() {
+	/*
+	  Equals now implemented and expressions being stored in HashMaps.
         // If you implement equals you should implement hashCode().
         // Since I don't need it I haven't bothered to implement a very
         // good hash.
-        return getClass().hashCode();
+        return super.hashCode();
+	*/
+	
+	//For Terminal Expressions, hash value will use class hashcode 
+	//unless they implement hashcode (which implies they implement equals)
+
+	//+i here adds an order so expression(child1, child2) has a different
+	//hash to expression(child2, child1)
+	int hc = getClass().hashCode();
+	for (int i = 0; i < getChildCount(); i++) {
+	    hc ^= (getChild(i).hashCode() + i);
+	}
+	    	
+	return hc;
     }
+    
 
     /** 
      * Count the number of nodes in the tree.

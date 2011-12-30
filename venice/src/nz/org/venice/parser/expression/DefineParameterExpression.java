@@ -66,6 +66,26 @@ public class DefineParameterExpression extends TerminalExpression {
 	return 0.0;
     }
 
+    public boolean equals(Object object) {
+	if (!(object instanceof DefineParameterExpression)) {
+	    return false;
+	}
+
+	DefineParameterExpression expression = 
+	    (DefineParameterExpression)object;
+
+	if (expression.getType() == type &&
+	    expression.getName().equals(name)) {
+	    return true;
+	} else {
+	    return false;
+	}
+    }
+
+    public int hashCode() {
+	return name.hashCode() ^ (type * 37);
+    }
+
     public String toString() {
 	String string = "";
 

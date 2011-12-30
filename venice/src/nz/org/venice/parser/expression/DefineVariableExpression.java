@@ -128,6 +128,10 @@ public class DefineVariableExpression extends UnaryExpression {
         return false;
     }
 
+    public int hashCode() {
+	return new Boolean(isConstant).hashCode() ^ getName().hashCode() ^ getType();
+    }
+
     public Object clone() {
         return new DefineVariableExpression(getName(), getType(), isConstant(), 
 					    (Expression)getChild(0).clone());

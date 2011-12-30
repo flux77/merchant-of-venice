@@ -108,6 +108,13 @@ public class NumberExpression extends TerminalExpression {
     }
 
     /**
+     * @return a hashcode of the NumberExpression.
+     */
+    public int hashCode() {
+	return ( (37 * getType()) ^ new Float(getValue()).hashCode());
+    }
+
+    /**
      * Returns whether the given expression is a NumberExpression
      * set to the given constant. This is a convenience method often
      * called when printing functions to determine whether the print

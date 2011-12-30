@@ -73,6 +73,16 @@ public class EqualThanExpression extends ComparisionExpression {
         return false;
     }
 
+    public int hashCode() {
+	Expression child1 = getChild(0);
+	Expression child2 = getChild(1);
+
+	assert child1 != null;
+	assert child2 != null;
+
+	return child1.hashCode() ^ child2.hashCode();	
+    }
+
     public String toString() {
 	return super.toString("==");
     }

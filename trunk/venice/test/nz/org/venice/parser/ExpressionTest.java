@@ -324,9 +324,6 @@ public class ExpressionTest extends TestCase {
 	assertTrue(failParse(test4));
 	assertTrue(failParse(test5));
 	assertTrue(failParse(test6));
-
-
-	
 	
     }
 
@@ -437,6 +434,80 @@ public class ExpressionTest extends TestCase {
 	}
     }
     
+    public void testEqualsHashcodeContract() {
+	String test1 = "int n = 0\nfor (int i = 0; i < 10; i = i + 1) { n = n + 1} n";
+	String test2 = "int n = 0\nfor (int i = 0; i < 10; i = i + 1) { n = n + 1} n";
+
+	String test3 = "int n = 0\nfor (int i = 0; i < 10; i = i + 1) { n = n + 1} n";
+	
+	String test4 = "int k = 0\nfor (int j = 0; j < 10; j = j + 1) { k = k + 1} k";
+
+	String test5 = "int j = 10\nwhile (j > 0) { j = j - 1} j";
+
+	String test6 = "int k = 0\nfor (int l = 0; l < 10; l = l + 1) { k = k + 1} k";
+	
+	Expression exp1 = parse(test1, Expression.INTEGER_TYPE);
+	Expression exp2 = parse(test2, Expression.INTEGER_TYPE);
+	Expression exp3 = parse(test3, Expression.INTEGER_TYPE);
+	Expression exp4 = parse(test4, Expression.INTEGER_TYPE);
+	Expression exp5 = parse(test5, Expression.INTEGER_TYPE);
+	Expression exp6 = parse(test5, Expression.INTEGER_TYPE);
+	assertTrue(exp1 != null);
+	assertTrue(exp2 != null);
+	assertTrue(exp3 != null);
+	assertTrue(exp4 != null);
+	assertTrue(exp5 != null);
+	assertTrue(exp6 != null);
+
+	//reflexifity test
+	assertTrue(exp1.equals(exp1));
+	
+	//symmetry
+	assertTrue(exp1.equals(exp2));
+	assertTrue(exp2.equals(exp1));
+
+	//transitive
+	assertTrue(exp1.equals(exp2));
+	assertTrue(exp2.equals(exp3));
+	assertTrue(exp1.equals(exp3));
+
+	//consistency
+	assertTrue(exp1.equals(exp2));
+	assertTrue(exp1.equals(exp2));
+	assertTrue(exp1.equals(exp2));
+
+	assertTrue(exp3.equals(exp4) == false);
+	assertTrue(exp3.equals(exp4) == false);
+	assertTrue(exp3.equals(exp4) == false);
+	
+	//null test
+	assertTrue(exp1.equals(null) == false);
+
+	//general equality
+	assertTrue(exp4.equals(exp5) == false);
+	assertTrue(exp3.equals(exp4) == false);
+	//Difference is in free variable name - in future may
+	//want this to be true rather than false. But we've got lots to get
+	//right first in Gondola before we get there.
+	assertTrue(exp4.equals(exp6) == false);	
+
+	System.out.println("e1 = " + exp1.getClass().getName());
+
+	//hashcode tests
+	assertTrue(exp1.hashCode() == exp2.hashCode());
+	assertTrue(exp1.hashCode() == exp3.hashCode());
+	assertTrue(exp2.hashCode() == exp3.hashCode());
+	assertTrue(exp1.hashCode() == exp1.hashCode());
+	assertTrue(exp4.hashCode() != exp5.hashCode());       
+    }
+
+    public void testHashCode() {
+	Expression num1 = new NumberExpression(3.1415926);
+	Expression num2 = new NumberExpression(3);
+
+	assertTrue(num1.hashCode() != num2.hashCode());
+	
+    }
 
     private Expression parse(String string) {
 	return parse(string, Expression.INTEGER_TYPE);	

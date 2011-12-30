@@ -239,7 +239,7 @@ public class Parser {
 		    subExpressions.add(includedExpression);
 
 		} catch (ExpressionException e) {
-		    throw new ParserException(e.getMessage()); 
+		    throw new ParserException(e.getReason()); 
 		} finally {
 		    
 		}

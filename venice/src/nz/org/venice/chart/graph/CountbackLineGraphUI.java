@@ -44,7 +44,7 @@ public class CountbackLineGraphUI implements GraphUI {
     // String name of settings
     private final static String TYPE = "type";
     private final static String QUOTE= "quote";
-
+    
     // Default values
     private final static int DEFAULT_TYPE = CountbackLineGraph.BREAKOUT;
         
@@ -82,9 +82,7 @@ public class CountbackLineGraphUI implements GraphUI {
         
     }
 
-    public String checkSettings() {
-        HashMap settings = getSettings();
-
+    public String checkSettings(HashMap settings) {
         // Check type
         String typeString = (String)settings.get(TYPE);
         int type;
@@ -102,6 +100,10 @@ public class CountbackLineGraphUI implements GraphUI {
         return null;
     }
 
+    public String checkSettings() {
+        return checkSettings(getSettings());
+    }
+
     public HashMap getSettings() {
         HashMap settings = new HashMap();
 	
@@ -111,7 +113,10 @@ public class CountbackLineGraphUI implements GraphUI {
 
     
     public void setSettings(HashMap settings) {
-	
+	String type = (String)settings.get(TYPE);
+	if (type != null && !type.equals("")) {
+	    typeComboBox.setSelectedItem(type);
+	}
     }
     
 

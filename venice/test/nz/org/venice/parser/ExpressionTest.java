@@ -388,7 +388,6 @@ public class ExpressionTest extends TestCase {
 	    Variables variables = new Variables();
 	    double forEval = forExp.evaluate(variables, null, null, 0);	    
 	    
-	    System.out.println("inf loop finished:" + forEval);
 	    assertTrue(false);
 	} catch (EvaluationException e) {
 	    if (e == EvaluationException.EVAL_TIME_TOO_LONG_EXCEPTION) {
@@ -400,9 +399,7 @@ public class ExpressionTest extends TestCase {
 
 	try {
 	    Variables variables = new Variables();
-	    double whileEval = whileExp.evaluate(variables, null, null, 0);	    
-	    
-	    System.out.println("inf loop finished:" + whileEval);
+	    double whileEval = whileExp.evaluate(variables, null, null, 0);	    	    
 	    assertTrue(false);
 	} catch (EvaluationException e) {
 	    if (e == EvaluationException.EVAL_TIME_TOO_LONG_EXCEPTION) {
@@ -491,8 +488,6 @@ public class ExpressionTest extends TestCase {
 	//right first in Gondola before we get there.
 	assertTrue(exp4.equals(exp6) == false);	
 
-	System.out.println("e1 = " + exp1.getClass().getName());
-
 	//hashcode tests
 	assertTrue(exp1.hashCode() == exp2.hashCode());
 	assertTrue(exp1.hashCode() == exp3.hashCode());
@@ -551,12 +546,8 @@ public class ExpressionTest extends TestCase {
     private String simplify(String string) {       
 	Expression expression = parse(string);
 
-	//System.out.println("Str = " + string + " exp = " + expression);
-
 	if (expression != null) {
 	    Expression retExp = expression.simplify();	
-	    //System.out.println("After simplify = " + retExp);
-
 	    return retExp.toString();
 	}
 	return "";

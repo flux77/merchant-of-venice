@@ -161,8 +161,10 @@ public class GraphSettingsDialog extends JInternalFrame {
         JButton editButton = new JButton(Locale.getString("EDIT"));
         editButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-                    buttonPressed = EDIT;
-                    dispose();
+		    if(checkSettings()) {
+			buttonPressed = EDIT;
+			dispose();
+		    }
                 }});
 
         JButton deleteButton = new JButton(Locale.getString("DELETE"));

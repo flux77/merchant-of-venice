@@ -73,10 +73,10 @@ public class Main extends JFrame {
     public static String LONG_VERSION = "0.731 beta";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "16/" + Locale.getString("OCT") + "/2011";
+    public static String RELEASE_DATE = "16/" + Locale.getString("JAN") + "/2012";
 
     /** Copyright date range, e.g. "2003-5" */
-    public static String COPYRIGHT_DATE_RANGE = "2003-11";
+    public static String COPYRIGHT_DATE_RANGE = "2003-12";
 
     /**
      * Get the main frame for the current application
@@ -156,6 +156,27 @@ public class Main extends JFrame {
 		}
 	    });
 
+		// Temporarily disable functionality if the user has not accepted the license.
+        if(PreferencesManager.getHasGPLAcceptance())
+            MainMenu.getInstance().disableMenus();
+
+        setVisible(true);
+
+        // First make sure user has agreed to GPL. If they do not agree to
+        // the license, then quit the application immediately.
+        if (PreferencesManager.getHasGPLAcceptance()) {
+            if(!GPLViewDialog.showGPLAcceptanceDialog()) {
+                dispose();
+                System.exit(0);
+            }
+
+            // Record user's acceptance and re-enable functionality.
+            else {
+                PreferencesManager.putHasGPLAcceptance();
+                MainMenu.getInstance().enableMenus();
+            }
+        }
+	
 	//Restore saved windows + state
 	//Need to make the frame visible before adding new frames
 	setVisible(true);
@@ -200,30 +221,9 @@ public class Main extends JFrame {
         }
         catch(Exception e) {
             // Shouldn't happen, but if it does just keep going
-        }
+        }	
         venice = new Main();
-
-        // Temporarily disable functionality if the user has not accepted the license.
-        if(PreferencesManager.getHasGPLAcceptance())
-            MainMenu.getInstance().disableMenus();
-
-        venice.setVisible(true);
-
-        // First make sure user has agreed to GPL. If they do not agree to
-        // the license, then quit the application immediately.
-        if (PreferencesManager.getHasGPLAcceptance()) {
-            if(!GPLViewDialog.showGPLAcceptanceDialog()) {
-                venice.dispose();
-                System.exit(0);
-            }
-
-            // Record user's acceptance and re-enable functionality.
-            else {
-                PreferencesManager.putHasGPLAcceptance();
-                MainMenu.getInstance().enableMenus();
-            }
-        }
-
+	
         // Now run Jython start up macros
         try {
             MacroManager.executeStartupMacros();

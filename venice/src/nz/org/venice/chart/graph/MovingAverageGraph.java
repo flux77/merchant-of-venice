@@ -147,6 +147,7 @@ public class MovingAverageGraph extends AbstractGraph {
         return new PeriodGraphUI(settings);
     }
 
+
     /**
      * Return the name of this graph.
      *

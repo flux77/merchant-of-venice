@@ -146,8 +146,10 @@ public class MACDGraphUI implements GraphUI {
     }
 
     public String checkSettings() {
-        HashMap settings = getSettings();
+	return checkSettings(getSettings());
+    }
 
+    public String checkSettings(HashMap settings) {
         // Check periods
         String periodFirstAverageString = (String)settings.get(PERIOD_FIRST_AVERAGE);
         String periodSecondAverageString = (String)settings.get(PERIOD_SECOND_AVERAGE);
@@ -209,6 +211,7 @@ public class MACDGraphUI implements GraphUI {
                                     MINIMUM_SMOOTHING_CONSTANT,
                                     MAXIMUM_SMOOTHING_CONSTANT);
 
+	
         // Settings are OK
         return null;
     }
@@ -220,6 +223,7 @@ public class MACDGraphUI implements GraphUI {
         settings.put(PERIOD_SECOND_AVERAGE, periodSecondAverageTextField.getText());
         settings.put(SMOOTHING_CONSTANT_FIRST_AVERAGE, smoothingConstantFirstAverageTextField.getText());
         settings.put(SMOOTHING_CONSTANT_SECOND_AVERAGE, smoothingConstantSecondAverageTextField.getText());
+	
         return settings;
     }
 
@@ -227,12 +231,17 @@ public class MACDGraphUI implements GraphUI {
         actualAverage = getAverageType(settings);
         if (actualAverage.compareTo(EMA)==0)
             radioButtons[0].setSelected(true);
-        if (actualAverage.compareTo(SMA)==0)
+        if (actualAverage.compareTo(SMA)==0) {
             radioButtons[1].setSelected(true);
+	    smoothingConstantFirstAverageTextField.setEnabled(false);
+	    smoothingConstantSecondAverageTextField.setEnabled(false);	
+	}
         periodFirstAverageTextField.setText(Integer.toString(getPeriodFirstAverage(settings)));
         periodSecondAverageTextField.setText(Integer.toString(getPeriodSecondAverage(settings)));
         smoothingConstantFirstAverageTextField.setText(Double.toString(getSmoothingConstantFirstAverage(settings)));
         smoothingConstantSecondAverageTextField.setText(Double.toString(getSmoothingConstantSecondAverage(settings)));
+	
+
     }
 
     public JPanel getPanel() {

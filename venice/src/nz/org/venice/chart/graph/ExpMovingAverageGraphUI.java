@@ -85,9 +85,8 @@ public class ExpMovingAverageGraphUI implements GraphUI {
                                      layout, c, 8);
     }
 
-    public String checkSettings() {
-        HashMap settings = getSettings();
-
+    
+    public String checkSettings(HashMap settings) {
         // Check period
         String periodString = (String)settings.get(PERIOD);
         int period;
@@ -123,6 +122,10 @@ public class ExpMovingAverageGraphUI implements GraphUI {
 
         // Settings are OK
         return null;
+    }
+
+    public String checkSettings() {
+	return checkSettings(getSettings());
     }
 
     public HashMap getSettings() {

@@ -90,8 +90,10 @@ public class RSIGraphUI implements GraphUI {
     }
 
     public String checkSettings() {
-        HashMap settings = getSettings();
-
+	return checkSettings(getSettings());
+    }
+    
+    public String checkSettings(HashMap settings) {
         // Check period
         String periodString = (String)settings.get(PERIOD);
         int period;

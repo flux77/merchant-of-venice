@@ -91,8 +91,10 @@ public class PointAndFigureGraphUI implements GraphUI {
     }
 
     public String checkSettings() {
-        HashMap settings = getSettings();
+	return checkSettings(getSettings());
+    }
 
+    public String checkSettings(HashMap settings) {
         // Check price scale
         String priceReversalScaleString = (String)settings.get(PRICE_REVERSAL_SCALE);
 	String boxPriceScaleString = (String)settings.get(BOX_PRICE_SCALE);
@@ -133,7 +135,7 @@ public class PointAndFigureGraphUI implements GraphUI {
 
     public void setSettings(HashMap settings) {
         priceReversalTextField.setText(Double.toString(getPriceReversalScale(settings,
-								     defaultPriceReversalScale)));
+									     defaultPriceReversalScale)));
         boxPriceTextField.setText(Double.toString(getBoxPriceScale(settings,
 								   defaultBoxPriceScale)));
     }
@@ -151,7 +153,9 @@ public class PointAndFigureGraphUI implements GraphUI {
      * @return the price scale
      */
     public static double getPriceReversalScale(HashMap settings, double defaultPriceReversalScale) {
-        double priceReversalScale = defaultPriceReversalScale;
+	
+	double priceReversalScale = defaultPriceReversalScale;
+
         String priceReversalScaleString = (String)settings.get(PRICE_REVERSAL_SCALE);
 
         if(priceReversalScaleString != null) {
@@ -176,8 +180,11 @@ public class PointAndFigureGraphUI implements GraphUI {
      * @return the box price
      */
     public static double getBoxPriceScale(HashMap settings, double defaultBoxPrice) {
-        double boxPriceScale = defaultBoxPrice;
+	
+	double boxPriceScale = defaultBoxPrice;
+	
         String boxPriceScaleString = (String)settings.get(BOX_PRICE_SCALE);
+
 
         if(boxPriceScaleString != null) {
             try {

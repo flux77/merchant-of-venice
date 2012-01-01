@@ -98,11 +98,14 @@ public class CustomGraphUI implements GraphUI {
     }
 
     public String checkSettings() {
+	return checkSettings(getSettings());
+    }
 
-        // Unfortunately we end up running the expression twice. Once to
+    public String checkSettings(HashMap settings) {
+	// Unfortunately we end up running the expression twice. Once to
         // verify the expression, the other time to graph the values.
         try {
-            String indicatorText = getIndicatorText(getSettings());
+            String indicatorText = getIndicatorText(settings);
             Expression indicator = Parser.parse(indicatorText);
             createCustom(indicator, source, quoteBundle, symbol);
 

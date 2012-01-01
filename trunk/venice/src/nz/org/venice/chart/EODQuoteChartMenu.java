@@ -206,7 +206,7 @@ public class EODQuoteChartMenu extends JMenu {
 	addMenuItem(graphMenu, Locale.getString("VOLUME"));
 	addMenuItem(graphMenu, Locale.getString("MOMENTUM"));
 	addMenuItem(graphMenu, Locale.getString("MACD"));
-	addMenuItem(graphMenu, Locale.getString("SIMPLE_MOVING_AVERAGE"));
+ 	addMenuItem(graphMenu, Locale.getString("SIMPLE_MOVING_AVERAGE"));
 	addMenuItem(graphMenu, Locale.getString("EXP_MOVING_AVERAGE"));
 	addMenuItem(graphMenu, Locale.getString("MULT_MOVING_AVERAGE"));
 	addMenuItem(graphMenu, Locale.getString("OBV"));
@@ -346,7 +346,10 @@ public class EODQuoteChartMenu extends JMenu {
                     // hold up the dispatch thread. See O'Reilley Swing pg 1138-9.
                     Thread thread = new Thread() {
                             public void run() {
-                                Graph graph = getGraph(text);
+				HashMap settings = (map.get(text) != null) 
+					? ((Graph)map.get(text)).getSettings()
+					: new HashMap();
+                                Graph graph = getGraph(text, settings);
                                 if (graph != null) {
 
                                     // Remove last graph first
@@ -419,10 +422,14 @@ public class EODQuoteChartMenu extends JMenu {
 				       button is delete.
 				    */
 
-                                    Graph graph = getGraph(text);				    
-                                    if (graph != null) {					
-					//Graph not in the map, means it's being added for the first
-					//time.
+				    HashMap settings = (map.get(text) != null) 
+					? ((Graph)map.get(text)).getSettings()
+					: new HashMap();
+
+                                    Graph graph = getGraph(text, settings);
+                                    if (graph != null) {  
+					//Graph not in the map, means it's 
+					//being added for the first time.
 					if (map.get(text) == null) {
 					    addGraph(graph);
 					} else {
@@ -433,7 +440,6 @@ public class EODQuoteChartMenu extends JMenu {
 					    removeGraph(text);
 					}
 					menuItem.setSelected(false);
-										
 				    }
                                 }};
 
@@ -539,19 +545,19 @@ public class EODQuoteChartMenu extends JMenu {
      * @return the instance of the graph or <code>null</code> if the
      *         operation is cancelled
      */
-    private Graph getGraph(final String text) {
+    private Graph getGraph(final String text, final HashMap settings) {
         Graph graph = newGraph(text);
 
 	GraphUI graphUI = null;
 	if (graph != null) {
-	    graphUI = graph.getUI(new HashMap());
+	    graphUI = graph.getUI(settings);
 	}
 
 	//Remove the graph if it exists and it has no settings 
 	if (graphUI == null && map.get(text) != null) {
 	    graph = null;
 	}
-
+	
         if(graphUI != null) {
             GraphSettingsDialog dialog =
                 new GraphSettingsDialog(graphUI, graph.getName(), map.get(text) == null);
@@ -560,11 +566,19 @@ public class EODQuoteChartMenu extends JMenu {
 
 	    if (buttonPressed == GraphSettingsDialog.ADD || 
 		buttonPressed == GraphSettingsDialog.EDIT) {
-                graph.setSettings(dialog.getSettings());	
+		graph.setSettings(dialog.getSettings());	
 	    } else if (buttonPressed == GraphSettingsDialog.DELETE) {
 		graph = null;
 	    }  else if (buttonPressed == GraphSettingsDialog.CANCEL) {
-		graph = (map.get(text) == null) ? null : graph;		
+		graph = (map.get(text) == null) ? null : graph;	
+		//If the cancel button is pressed, reset the settings
+		//so the graph settings persist.
+		if (graph != null) {
+		    if (graphUI.checkSettings(dialog.getSettings()) == null) {
+			graph.setSettings(dialog.getSettings());	
+		    }
+		}
+		
 	    }
         }
 	
@@ -609,7 +623,6 @@ public class EODQuoteChartMenu extends JMenu {
 	  currently testing
 
 	*/
-
 	removeGraph(graph.getName());	
 	addGraph(graph);
 

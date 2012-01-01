@@ -66,17 +66,22 @@ public class FiboGraphUI implements GraphUI {
         c.weightx = 1.0;
         c.ipadx = 5;
         c.anchor = GridBagConstraints.WEST;
+	
+	String zeroField = "";
+	String hundredField = "";
 
-        TextFieldZero = GridBagHelper.addTextRow(panel, Locale.getString("ZERO_PCT"), "",
+	TextFieldZero = GridBagHelper.addTextRow(panel, Locale.getString("ZERO_PCT"), zeroField,
                                                    layout, c, 8);
         TextField100 = GridBagHelper.addTextRow(panel,
-                                     Locale.getString("HUNDRED_PCT"), "",
+                                     Locale.getString("HUNDRED_PCT"), hundredField,
                                      layout, c, 8);
     }
 
     public String checkSettings() {
-        HashMap settings = getSettings();
+	return checkSettings(getSettings());
+    }
 
+    public String checkSettings(HashMap settings) {
         // Check input
         String temp = (String)settings.get(ZEROPCT);
 

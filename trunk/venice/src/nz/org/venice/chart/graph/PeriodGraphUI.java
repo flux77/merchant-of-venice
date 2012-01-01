@@ -44,7 +44,7 @@ public class PeriodGraphUI implements GraphUI {
     private final static String PERIOD = "period";
 
     // Minimum valid period (there doesn't seem any point in setting a maximum)
-    private final static int MINIMUM_PERIOD = 2;
+    public final static int MINIMUM_PERIOD = 2;
 
     // Default period in days. At the moment all the graphs that use this
     // user interface share the same period. If it makes sense to use a
@@ -83,8 +83,12 @@ public class PeriodGraphUI implements GraphUI {
     }
 
     public String checkSettings() {
-        HashMap settings = getSettings();
-        String periodString = (String)settings.get(PERIOD);
+        return checkSettings(getSettings());
+
+    }
+
+    public String checkSettings(HashMap settings) {
+	String periodString = (String)settings.get(PERIOD);
         int period;
 
         try {
@@ -132,7 +136,7 @@ public class PeriodGraphUI implements GraphUI {
                 period = Integer.parseInt(periodString);
             }
             catch(NumberFormatException e) {
-                // Value should already be checked
+                // Value should already be checked		
                 assert false;
             }
         }

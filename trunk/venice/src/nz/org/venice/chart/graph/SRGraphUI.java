@@ -105,8 +105,10 @@ public class SRGraphUI implements GraphUI {
     }
 
     public String checkSettings() {
-        HashMap settings = getSettings();
-
+	return checkSettings(getSettings());
+    }
+    
+    public String checkSettings(HashMap settings) {
         // Check lag + type
         String lagString = (String)settings.get(LAG);
 	String typeString = (String)settings.get(TYPE);
@@ -143,7 +145,10 @@ public class SRGraphUI implements GraphUI {
 
     public void setSettings(HashMap settings) {
         lagTextField.setText(Integer.toString(getLag(settings)));
-
+	String type = (String)settings.get(TYPE);
+	if (type != null && !type.equals("")) {
+	    typeComboBox.setSelectedItem(type);
+	}
     }
 
     public JPanel getPanel() {

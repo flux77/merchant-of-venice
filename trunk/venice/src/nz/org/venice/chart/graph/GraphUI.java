@@ -59,6 +59,15 @@ public interface GraphUI {
     public String checkSettings();
 
     /**
+     * Check previously set settings. Return
+     * an error message if the settings are invalid.
+     *
+     * @param settings Previously saved settings
+     * @return the error message or <code>null</code> if the settings are valid
+     */
+    public String checkSettings(HashMap settings);
+
+    /**
      * Display the given settings in the user interface.
      *
      * @param settings the new settings

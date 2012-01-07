@@ -110,7 +110,10 @@ public class QuoteSymbolExpression
 					0);
 	} catch(MissingQuoteException e) {
 	    // What should I do in this case?
-		return 0.0D;
+	    String message = symbol + " : " + Locale.getString("NO_QUOTES_DATE", quoteBundle.offsetToDate(day).toString());
+	    
+	    throw new EvaluationException(message);
+	    //return 0.0D;
 	}
     }
 

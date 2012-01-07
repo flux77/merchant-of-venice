@@ -131,8 +131,28 @@ public class Parser {
     public static Expression parse(Variables variables, String string)
         throws ExpressionException {
 
-	parseTree = new HashMap();
-	tokenLineMap = new HashMap();
+	return parse(variables, string, false);
+    }
+
+    /**
+     * Parse the given string into an executable expression.
+     *
+     * @param string the string to parse.
+     * @return the parsed expression.
+     * @exception ExpressionException if there was an error parsing the expression.
+     */
+    public static Expression parse(String string) throws ExpressionException
+    {
+        return parse(new Variables(), string, false);
+    }
+
+    //Private constructor - set internal to true only for rules including other
+    //rules. Otherwise parse metadata from a previous "run" will be available
+    //and that will break things like parameter count checking.
+
+    private static Expression parse(Variables variables, String string, boolean internal) throws ExpressionException {
+	
+	createMaps(internal);
 
 	// Perform lexical analysis on string - i.e. reduce it to stack of
 	// tokens
@@ -149,20 +169,22 @@ public class Parser {
 	// Check for type mismatch
 	expression.checkType();	
 	
-
 	return expression;
+
     }
 
-    /**
-     * Parse the given string into an executable expression.
-     *
-     * @param string the string to parse.
-     * @return the parsed expression.
-     * @exception ExpressionException if there was an error parsing the expression.
-     */
-    public static Expression parse(String string) throws ExpressionException
-    {
-        return parse(new Variables(), string);
+    private static void createMaps(boolean internal) {
+	if (internal) {
+	    if (parseTree == null) {
+		parseTree = new HashMap();	
+	    }
+	    if (tokenLineMap == null) {
+		tokenLineMap = new HashMap();	
+	    }	    
+	} else {
+	    parseTree = new HashMap();	
+	    tokenLineMap = new HashMap();	
+	} 
     }
 
     private static TokenStack lexicalAnalysis(Variables variables, String string)
@@ -190,10 +212,9 @@ public class Parser {
 		string = Token.stringToToken(variables, token, string);
 		if (token.getType() != Token.COMMENT_TOKEN) {
 		    tokens.add(token);
-		}
-		
+		}		
 		//Associate line number with token
-		tokenLineMap.put(token, new Integer(lineCount));
+		tokenLineMap.put(token, new Integer(lineCount));		
 	    }
 	}
 
@@ -205,9 +226,10 @@ public class Parser {
 	
 	List subExpressions = new ArrayList();
 	Token head = tokens.get();
-
+	
 	while (head.getType() == Token.INCLUDE_TOKEN) {
 	    tokens.pop();	    
+
 	    if (!tokens.match(Token.STRING_TOKEN)) {
 		throw new ParserException(Locale.getString("EXPECTED_STRING_TYPE_ERROR"));
 	    }
@@ -230,14 +252,13 @@ public class Parser {
 	    if (includedStoredExpression == null) {
 		throw new ParserException(Locale.getString("UNKNOWN_IDENTIFIER_ERROR", includeName));
 	    } else {
-
 		try {
 		    Expression includedExpression = 
 			Parser.parse(variables, 
-				     includedStoredExpression.expression);
-
+				     includedStoredExpression.expression, 
+				     true);
+		    
 		    subExpressions.add(includedExpression);
-
 		} catch (ExpressionException e) {
 		    throw new ParserException(e.getReason()); 
 		} finally {
@@ -247,8 +268,9 @@ public class Parser {
 	    head = tokens.get();	    
 	}
 
-	while(tokens.size() > 0)
+	while(tokens.size() > 0) {
 	    subExpressions.add(parseSubExpression(variables, tokens));	
+	}
 
 	if(subExpressions.size() == 0)
 	    throw new ParserException(Locale.getString("EMPTY_EQUATION_ERROR"));
@@ -932,7 +954,6 @@ public class Parser {
 			      new NumberExpression(0));
 
 	parseTree.put(lagExpression, head);
-
 	return lagExpression;
     }
 
@@ -1006,12 +1027,13 @@ public class Parser {
 	}
 	parseLeftBrace(variables, tokens);
 	Vector functionBodyList = new Vector();
+
 	Expression functionExp  = parseSubExpression(variables, tokens);
+
 	functionBodyList.add(functionExp);
 	while (!tokens.match(Token.RIGHT_BRACE_TOKEN)) {
 	    functionExp = parseSubExpression(variables, tokens);
 	    functionBodyList.add(functionExp);
-
 	}
 	Expression functionBody = new ClauseExpression(functionBodyList);
 	parseRightBrace(variables, tokens);

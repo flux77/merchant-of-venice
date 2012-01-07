@@ -403,7 +403,7 @@ public class Token {
 	    int commentIndex = indexOfComment(string);
 	    if (commentIndex == -1) {
 		//Missing closing comment  
-		throw new ParserException(Locale.getString("MISSING_END_COMMENT"));
+		throw new ParserException(Locale.getString("MISSING_CLOSING_COMMENT"));
 	    } 
 
 	    String comment = string.substring(1, commentIndex);

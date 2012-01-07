@@ -72,6 +72,22 @@ public interface QuoteBundle {
 	throws MissingQuoteException;
 
     /**
+     * Get a stock quote nearest to the given offset. 
+     *
+     * @param symbol  the stock symbol
+     * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
+     *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
+     * @param offset    fast access offset of current quote, for end-of-day quotes this
+     *                  is the fast access date offset (see {@link EODQuoteCache}). For
+     *                  intra-day quotes, it is the fast access time offset (see
+     *                  {@link IDQuoteCache}).
+     * @return the quote
+     * @exception MissingQuoteException if the quote was not found
+     */
+    public double getNearestQuote(Symbol symbol, int quoteType, int offset)
+	throws MissingQuoteException;
+
+    /**
      * Get a stock quote. If the stock is earlier than the first date in the bundle, the
      * bundle will be expand to include the new date given. If the stock symbol is not
      * included in the original symbol list, the quote bundle will be expanded to include

@@ -67,10 +67,10 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.731b";
+    public static String SHORT_VERSION = "0.74b";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION = "0.731 beta";
+    public static String LONG_VERSION = "0.74 beta";
 
     /** Release date, e.g. 13/Jan/2003 */
     public static String RELEASE_DATE = "16/" + Locale.getString("JAN") + "/2012";

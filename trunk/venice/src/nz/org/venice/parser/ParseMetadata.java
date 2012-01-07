@@ -44,7 +44,7 @@ public class ParseMetadata {
      * 
      * @param parseTree The map containing links between the tokens and 
      * constructed expressions
-     * @param tokenLinemap The map containing links between the tokens and
+     * @param tokenLineMap The map containing links between the tokens and
      * the line number on which they appeared.
      */
     public ParseMetadata(HashMap parseTree, HashMap tokenLineMap) {
@@ -102,8 +102,12 @@ public class ParseMetadata {
 	Token token = (Token)parseTree.get(expression);
 	assert token != null;
 
-	String lineNumber = ((Integer)tokenLineMap.get(token)).toString();
+	Integer tmp = (Integer)tokenLineMap.get(token);	
+	if (tmp == null) {
+	    return "undef";
+	}
+	
+	String lineNumber = tmp.toString();
 	return lineNumber;
     }
-
 }

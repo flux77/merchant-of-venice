@@ -167,7 +167,7 @@ public class AnalyserGuard {
 		
 	String key = getKey(expression, expressionID, symbol, day);
 	Integer stackDepthInt =  (Integer)functionExpressionMap.get(key);
-	
+
 	int stackDepth = (stackDepthInt == null) ? 0 : stackDepthInt.intValue() + 1;
 
 	functionExpressionMap.put(key,
@@ -188,9 +188,20 @@ public class AnalyserGuard {
 			       Symbol symbol, int day) {
 
 	String key = getKey(expression, expressionID, symbol, day);
-	
+	Integer stackDepthInt =  (Integer)functionExpressionMap.get(key);
+
 	assert functionExpressionMap.get(key) != null;
-	functionExpressionMap.remove(key);
+
+	int depth = stackDepthInt.intValue()-1;
+	if (depth < 0) {
+	    functionExpressionMap.remove(key);
+	} else {
+	    stackDepthInt = new Integer(depth);
+	    functionExpressionMap.put(key, stackDepthInt);
+	}
+	    
+
+
     }
 
     

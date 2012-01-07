@@ -4,8 +4,41 @@
   </sectioninfo>
 
    
-  <para>The latest release contains only bug fixes. 
-  <variablelist>      
+  <para>The latest release extends the Gondola language, features some user interface improvements, improved database security and some bug fixes.
+  <variablelist>   
+    <varlistentry>
+      <term>
+	<para>16/Jan/2012: Venice 0.74 beta released</para>
+	<para>Updates in this release</para>
+      </term>
+      <listitem>
+	<itemizedlist>
+	  <listitem>
+	    <para>Gondola Language Extensions: </para>
+	    <itemizedlist>
+	      <listitem>
+		<para>User defined functions: Can write new functions, and call them including passing parameters to them. </para>
+	      </listitem>
+	      <listitem>
+		<para>Rules can now include other rules</para>
+	      </listitem>
+	      <listitem>
+		<para>Comments can be added to rules</para>
+	      </listitem>
+	      <listitem>
+		<para>Alert messages can be displayed when rules are evaluated</para>
+	      </listitem>
+	    </itemizedlist>
+	  </listitem>
+	  <listitem>
+	    <para>Can explicity reference symbols within Gondola functions. (e.g. allows expresisons like: close('ABC') &gt; close)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Fixed bug #3437002 (Gondola evaluation of boolean expressions)</para>
+	  </listitem>
+	</itemizedlist>
+      </listitem>
+    </varlistentry>
     <varlistentry>
       <term>
 	<para>16/Oct/2011: Venice 0.731 beta released</para>
@@ -22,7 +55,7 @@
 	  <listitem>
 	    <para>Add Macro overwrites previous one (Bug #1328208)</para>
 	  </listitem>
-	</itemizedlist>
+	</itemizedlist>	
       </listitem>
     </varlistentry>
     <varlistentry>

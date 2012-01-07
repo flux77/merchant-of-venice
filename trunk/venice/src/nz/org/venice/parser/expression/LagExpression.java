@@ -68,9 +68,25 @@ public class LagExpression extends BinaryExpression {
             return quoteBundle.getQuote(explicitSymbol, quoteKind, day, lag);
         }
         catch(MissingQuoteException e) {
-            // What should I do in this case?
-            return 0.0D;
-        }
+	    //Used to return but causes hard to track down behaviour in
+	    //rules when this occurs.	   
+	    //return 0.0D;
+	    
+	    //Instead, return the next available quote, if one exists
+	    try {
+		double nearQuote = quoteBundle.getNearestQuote(explicitSymbol, quoteKind, day - lag);
+		return nearQuote;
+	    } catch (MissingQuoteException e2) {
+		//No suitable quote found.
+		String message = symbol + " : " + Locale.getString("NO_QUOTES_DATE", quoteBundle.offsetToDate(day).toString());
+		
+		throw new EvaluationException(message);
+	    } finally {
+		//There's another race here:
+		//paper trade doesn't always catch the exception in the return
+		//return 0.0D;
+	    }
+	}
     }
 
     public String toString() {

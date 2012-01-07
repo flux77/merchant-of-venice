@@ -1,6 +1,26 @@
-Changes for Venice, 0.732 beta ??/??/????
-
+Changes for Venice, 0.746 beta ??/??/????
+=========================================
 * Change table state save/restore to avoid saving the entire table contents 
+
+Changes for Venice, 0.745 beta ??/??/????
+
+* Intraday charts
+% Preload data for most used symbols on cache refresh.
+
+Changes for Venice, 0.74 beta 16/01/2012
+=========================================
+* Added first class functions, includes, comments and alerts to the Gondola language
+* Added ability for Gondola rules to reference symbols explicitly
+* Graph settings now persist when editing settings instead of always showing
+  defaults.  
+* Warn the user when database settings changed but the database is not selected
+* Add option to enter database password instead of storing on disk.
+* Mask database password when it is stored on disk
+* Added accelerator key for help
+* Fixed bug #(3437002) Gondola evaluation of boolean expressions.
+ 
+
+
 
 Changes for Venice, 0.731 beta 16/10/2011
 =========================================

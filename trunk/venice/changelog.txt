@@ -13,7 +13,7 @@ Changes for Venice, 0.74 beta 16/01/2012
 * Added ability for Gondola rules to reference symbols explicitly
 * Graph settings now persist when editing settings instead of always showing
   defaults.  
-* Warn the user when database settings changed but the database is not selected
+* Always use database when database settings are changed
 * Add option to enter database password instead of storing on disk.
 * Mask database password when it is stored on disk
 * Added accelerator key for help

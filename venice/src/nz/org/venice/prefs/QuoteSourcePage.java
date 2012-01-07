@@ -36,6 +36,8 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JCheckBox;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.ui.GridBagHelper;
@@ -207,6 +209,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                 public void actionPerformed(ActionEvent e) {
                     if(databasePort != null && databaseDriver != null) {
                         populateDatabaseDrivers();
+			selectuseDatabase();
                         databaseUsername.setEnabled(true);
                         databasePassword.setEnabled(true);
 			databasePasswordPrompt.setEnabled(true);
@@ -225,6 +228,27 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 		    }
 		}});
 
+	// Use ActionListener and DocumentListener to make sure useDatabase
+	// is always selected if database properties are changed
+	ActionListener al = new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
+	      selectuseDatabase();
+	    }
+	  };
+
+	DocumentListener dl = new DocumentListener() {
+	    public void changedUpdate(DocumentEvent e) {
+	    }
+            
+	    public void insertUpdate(DocumentEvent e) {
+	      selectuseDatabase();
+	    }
+	    
+	    public void removeUpdate(DocumentEvent e) {
+	      selectuseDatabase();
+	    }
+	  };
+
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(databaseSoftware, c);
         borderPanel.add(databaseSoftware);
@@ -240,6 +264,8 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 
         // Only display known drivers that are currently installed.
         populateDatabaseDrivers();
+
+	databaseDriver.addActionListener(al);
 	
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(databaseDriver, c);
@@ -250,17 +276,26 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 						Locale.getString("HOST"), 
 						databasePreferences.host,
                                                 gridbag, c, 15);
+	databaseHost.addActionListener(al);
+	databaseHost.getDocument().addDocumentListener(dl);
         
         // Port
         databasePort = GridBagHelper.addTextRow(borderPanel, 
 						Locale.getString("PORT"), 
                                                 databasePreferences.port,
                                                 gridbag, c, 15);
+
+	databasePort.addActionListener(al);
+	databasePort.getDocument().addDocumentListener(dl);
         
         // Username
         databaseUsername = GridBagHelper.addTextRow(borderPanel, 
 						    Locale.getString("USERNAME"), 
                                                     databasePreferences.username, gridbag, c, 15);
+	databaseUsername.addActionListener(al);
+	databaseUsername.getDocument().addDocumentListener(dl);
+
+
         
         // Password
 	String passwdString = (databasePreferences.password.equals(""))
@@ -271,6 +306,9 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 							Locale.getString("PASSWORD"), 
                                                         passwdString, 
                                                         gridbag, c, 15);
+	databasePassword.addActionListener(al);
+	databasePassword.getDocument().addDocumentListener(dl);
+
         
 	if (databasePreferences.passwordPrompt) {
 	    databasePassword.setEnabled(false);
@@ -280,7 +318,10 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         databaseName = GridBagHelper.addTextRow(borderPanel, 
 						Locale.getString("DATABASE_NAME"), 
                                                 databasePreferences.database, gridbag, c, 15);
-	
+	databaseName.addActionListener(al);
+	databaseName.getDocument().addDocumentListener(dl);	
+
+
 	databasePasswordPrompt = GridBagHelper.addCheckBoxRow(borderPanel, 
 							      Locale.getString("PROMPT_FOR_PASSWORD"), 
 							      databasePreferences.passwordPrompt, 
@@ -288,6 +329,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	
 	databasePasswordPrompt.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
+		    selectuseDatabase();
 		    if (databasePasswordPrompt.isSelected()) {
 			databasePassword.setEnabled(false);
 		    } else {
@@ -354,6 +396,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 		    databaseDriver.setToolTipText(null);
 		}
     }
+
     private JPanel createSamplesPanel(int quoteSource, ButtonGroup buttonGroup) {
         useSamples = new JRadioButton(Locale.getString("USE_SAMPLES"), true);
         buttonGroup.add(useSamples);
@@ -365,6 +408,11 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         samples.add(useSamples, BorderLayout.NORTH);
         
         return samples;
+    }
+
+    private void selectuseDatabase() {
+      if (!useDatabase.isSelected())
+	useDatabase.setSelected(true);
     }
 
     public JComponent getComponent() {
@@ -379,65 +427,39 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	// Save quote source preferences
 	int quoteSource;
 
-	if(useInternal.isSelected())
-	    quoteSource = PreferencesManager.INTERNAL;
-	else if(useDatabase.isSelected())
-	    quoteSource = PreferencesManager.DATABASE;
-	else
-	    quoteSource = PreferencesManager.SAMPLES;
-	PreferencesManager.putQuoteSource(quoteSource);
-
-	//If database preferences are changed, but the useDatabase checkbox
-	//is not checked, warn the user.
-	if (databaseSettingsChanged() && !useDatabase.isSelected()) {
-	    DesktopManager.showWarningMessage(Locale.getString("DATABASE_NOT_SELECTED_WARNING"));
-	}
-
-	// Save database preferences
-        String software = (String)databaseSoftware.getSelectedItem();
-        if(software.equals(Locale.getString("MYSQL")))
-            databasePreferences.software = "mysql";
-        else if(software.equals(Locale.getString("POSTGRESQL")))
+	if (useDatabase.isSelected()) {
+	  quoteSource = PreferencesManager.DATABASE;
+	
+	  // Save database preferences
+	  String software = (String)databaseSoftware.getSelectedItem();
+	  if (software.equals(Locale.getString("MYSQL")))
+	    databasePreferences.software = "mysql";
+	  else if (software.equals(Locale.getString("POSTGRESQL")))
             databasePreferences.software = "postgresql";
-        else
+	  else
             databasePreferences.software = "hsql";
-        
-        databasePreferences.driver = databaseDriver.getSelectedItem().toString();
-        databasePreferences.host = databaseHost.getText();
-        databasePreferences.port = databasePort.getText();
-        databasePreferences.username = databaseUsername.getText();
-        databasePreferences.password = 
+
+	  databasePreferences.driver = databaseDriver.getSelectedItem().toString();
+	  databasePreferences.host = databaseHost.getText();
+	  databasePreferences.port = databasePort.getText();
+	  databasePreferences.username = databaseUsername.getText();
+	  databasePreferences.password = 
 	    (databasePassword.getPassword().length > 0) 
 	    ? DatabaseAccessManager.getInstance().mask(new String(databasePassword.getPassword()))
 	    : "";
-	databasePreferences.passwordPrompt = databasePasswordPrompt.isSelected();
-        databasePreferences.database = databaseName.getText();
-	        
-        PreferencesManager.putDatabaseSettings(databasePreferences);
-       
-	// This makes the next query use our new settings
-	QuoteSourceManager.flush();
-    }
+	  databasePreferences.passwordPrompt = databasePasswordPrompt.isSelected();
+	  databasePreferences.database = databaseName.getText();
 
-    //Return true if any of the database fields are different to the initial
-    //preferences. Used so that if these values are changed, but the 
-    //database is not selected, the user can be warned.
-    
-    private boolean databaseSettingsChanged() {
-	if (!databasePreferences.host.equals(databaseHost.getText())) {
-	    return true;
-	} else if (!databasePreferences.port.equals(databasePort.getText())) {
-	    return true;
-	} else if (!databasePreferences.username.equals(databaseUsername.getText())) {
-	    return true;
-	} else if (!databasePreferences.password.equals(new String(databasePassword.getPassword()))) {
-	    return true;
-	} else if (databasePreferences.passwordPrompt != databasePasswordPrompt.isSelected()) {
-	    return true;
-	} else if (!databasePreferences.database.equals(databaseName.getText())) {
-	    return true;
-	} else {
-	    return false;
+	  PreferencesManager.putDatabaseSettings(databasePreferences);
+
+	  // This makes the next query use our new settings
 	}
+	else if (useInternal.isSelected())
+	    quoteSource = PreferencesManager.INTERNAL;
+	else
+	    quoteSource = PreferencesManager.SAMPLES;
+
+	PreferencesManager.putQuoteSource(quoteSource);
+	QuoteSourceManager.flush();
     }
 }

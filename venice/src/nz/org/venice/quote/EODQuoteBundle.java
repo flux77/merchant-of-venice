@@ -248,6 +248,67 @@ public class EODQuoteBundle implements QuoteBundle {
     }
 
     /**
+     * Get a stock quote nearest to the given offset.      
+     * @param symbol  the stock symbol
+     * @param quoteType the quote type, one of {@link Quote#DAY_OPEN}, {@link Quote#DAY_CLOSE},
+     *                  {@link Quote#DAY_LOW}, {@link Quote#DAY_HIGH}, {@link Quote#DAY_VOLUME}
+     * @param dateOffset fast access date offset, see {@link EODQuoteCache}
+     * @return the quote nearest to the given dateOffset
+     * @exception MissingQuoteException if the quote was not found
+     */
+    public double getNearestQuote(Symbol symbol, int quoteType, int dateOffset)
+	throws MissingQuoteException {
+        
+        boolean foundQuote = false;
+	double quote = 0.0D;
+
+        // First try the quote cache.
+        try {
+            quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
+            foundQuote = true;
+        }
+        catch(QuoteNotLoadedException e) {
+            // Ignore
+        }
+
+        // If the quote is not in the quote cache, perhaps the quote bundle is not loaded.
+        if(!foundQuote && tryReload()) {
+            try {
+                quote = quoteCache.getQuote(symbol, quoteType, dateOffset);
+                foundQuote = true;
+            }
+            catch(QuoteNotLoadedException e2) {
+                // Ignore
+            }
+        }
+
+	// If the quote is still not in the quote cache, find an earlier quote,
+	// if there is one.	
+        if(dateOffset > getFirstOffset()) {
+	    
+	    //Search the cache until a quote is found.
+	    while (!quoteCache.containsQuote(symbol, dateOffset--) && 
+		   dateOffset >= getFirstOffset()) {		
+	    }
+	    
+	    if (dateOffset >= getFirstOffset()) {
+		quote = getQuote(symbol, quoteType, dateOffset);
+		foundQuote = true;
+	    } else {
+		//If the loop finishes with dateOffset passing the
+		//first offset, there are no more quotes
+		foundQuote = false;
+	    }
+	}
+	      
+        // If we still don't have the quote. Give up.
+        if(!foundQuote)
+            throw MissingQuoteException.getInstance();
+
+        return quote;
+    }
+
+    /**
      * Return whether the given quote should be in this quote bundle.
      *
      * @param symbol    the symbol

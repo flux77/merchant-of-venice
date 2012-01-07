@@ -126,6 +126,31 @@ public class IDQuoteBundle implements QuoteBundle {
         return quote;
     }
 
+    public double getNearestQuote(Symbol symbol, int quoteType, int timeOffset)
+	throws MissingQuoteException {
+
+        double quote = 0.0;
+	boolean foundQuote = false;
+	
+	while (timeOffset >= getFirstOffset()) {
+	    try {
+		quote = getQuote(symbol, quoteType, timeOffset);
+		foundQuote = true;
+		break;
+	    } catch (MissingQuoteException e) {
+		
+	    } finally {
+		timeOffset--;
+	    }
+	}	    
+
+	if (!foundQuote) {
+	    throw MissingQuoteException.getInstance();
+	}
+
+        return quote;
+    }
+
     public TradingDate offsetToDate(int timeOffset) {
         // The entire quote bundle is on the same date
         return date;

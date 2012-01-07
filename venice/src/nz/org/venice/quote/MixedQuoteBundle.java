@@ -111,6 +111,35 @@ public class MixedQuoteBundle implements QuoteBundle {
             return eodQuoteBundle.offsetToDate(dateOffset);
     }
 
+    public double getNearestQuote(Symbol symbol, int quoteType, int dateOffset)
+	throws MissingQuoteException {
+
+	//TESME
+
+	double quote = 0.0;
+	boolean foundQuote = false;
+
+	try {
+	    //First try and get the actual quote first, because
+	    //it will be closest.
+	    quote = getQuote(symbol, quoteType, dateOffset);
+	    foundQuote = true;
+	} catch (MissingQuoteException e) {
+	    if(dateOffset > eodQuoteBundle.getLastOffset()) {
+		// Retrieve most recent intra-day quote
+		quote = idQuoteBundle.getNearestQuote(symbol, quoteType, idQuoteBundle.getLastOffset());		
+	    } else {
+		quote = eodQuoteBundle.getQuote(symbol, quoteType, dateOffset);
+	    }
+	    foundQuote = true;
+	}
+	
+	if (!foundQuote) {
+	    throw MissingQuoteException.getInstance();
+	}
+	return quote;
+    }
+
     /**
      * Return the fast access offset for the earliest quote in the bundle.
      *

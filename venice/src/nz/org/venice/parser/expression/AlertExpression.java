@@ -47,7 +47,7 @@ public class AlertExpression extends UnaryExpression {
      * Create a new alert expression.
      * 
      * @param arg The message expression 
-     * @param optioalArgs Optional expressions (max 4) which are appended to
+     * @param optionalArgs Optional expressions (max 4) which are appended to
      * the message defined in arg.
      */    
 
@@ -62,7 +62,7 @@ public class AlertExpression extends UnaryExpression {
      * 
      * @param variables The variables of the rule
      * @param quoteBundle The quote bundle containing the symbol data
-     * @param Symbol The implicit symbol of the rule
+     * @param symbol The implicit symbol of the rule
      * @param day The date offset used to evaluate the rule.
      * @return 0.0
      */

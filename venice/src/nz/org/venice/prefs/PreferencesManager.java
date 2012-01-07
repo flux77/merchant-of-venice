@@ -510,7 +510,7 @@ public class PreferencesManager {
     /**
      * Save the users preference for when the quotes in the cache expire.
      * 
-     * @param The number of minutes that must elapse before refreshing the 
+     * @param lifespan the number of minutes that must elapse before refreshing the 
      * cache.
      */
     public static void putCacheExpiryTime(int lifespan) {
@@ -1268,7 +1268,7 @@ public class PreferencesManager {
     /**
      * Save whether Venice should confirm exit.
      *
-     * @param State Flag when true causes venice to prompt the user to 
+     * @param state Flag when true causes venice to prompt the user to 
      *        confirm their exit.
      *
      **/

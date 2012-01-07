@@ -20,6 +20,7 @@ package nz.org.venice.parser.expression;
 
 import nz.org.venice.parser.*;
 import nz.org.venice.quote.*;
+import nz.org.venice.util.Locale;
 
 
 /**
@@ -91,7 +92,10 @@ public class QuoteExpression
 	}
 	catch(MissingQuoteException e) {
 	    // What should I do in this case?
-	    return 0.0D;
+	    String message = symbol + " : " + Locale.getString("NO_QUOTES_DATE", quoteBundle.offsetToDate(day).toString());
+	    
+	    throw new EvaluationException(message);
+	    //return 0.0D;
 	}	       
     }
 

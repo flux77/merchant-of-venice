@@ -134,7 +134,7 @@ public class EvalFunctionExpression extends UnaryExpression {
 
 
     /**
-     * @Return a Clone of the EvalExpression object.
+     * @return a Clone of the EvalExpression object.
      */
     public Object clone() {
         return new EvalFunctionExpression(getName(), 

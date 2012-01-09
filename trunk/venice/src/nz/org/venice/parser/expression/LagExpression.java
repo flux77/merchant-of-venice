@@ -55,9 +55,13 @@ public class LagExpression extends BinaryExpression {
 
 	int lag = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
         if (lag > 0) {
-	    String lineNumber = getParseMetadata().getLineForExpression(this);
-	    throw new EvaluationException(Locale.getString("LAG_OFFSET_ERROR") + " offset: " + lag + " at line: " + lineNumber + "\n parents = " + printParents());
-					  
+	    if (getParseMetadata() == null) {
+		throw EvaluationException.LAG_OFFSET_EXCEPTION;
+	    } else {
+		String lineNumber = getParseMetadata().getLineForExpression(this);
+		throw new EvaluationException(Locale.getString("LAG_OFFSET_ERROR") + " offset: " + lag + " at line: " + lineNumber + "\n parents = " + printParents());
+		
+	    }
 	}
 	
 	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 

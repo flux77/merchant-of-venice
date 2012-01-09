@@ -95,13 +95,19 @@ public class MixedQuoteBundle implements QuoteBundle {
 
         Quote quote = null;
 
-        if(useIDQuotes())
-            // Retrieve most recent intra-day quotes
-            quote = idQuoteBundle.getQuote(symbol, idQuoteBundle.getLastOffset());
-        else
-            quote = eodQuoteBundle.getQuote(symbol, offset);
-
-        return quote;
+        if(useIDQuotes()) {
+	    //lastOffset == -1 when there are no intraday quotes available
+	    if (idQuoteBundle.getLastOffset() >= 0) {		
+		// Retrieve most recent intra-day quotes
+		quote = idQuoteBundle.getQuote(symbol, idQuoteBundle.getLastOffset()); 
+	    } else {
+		quote = eodQuoteBundle.getQuote(symbol, eodQuoteBundle.getLastOffset()); 
+	    }
+	} else {
+	    quote = eodQuoteBundle.getQuote(symbol, offset);
+	}
+	
+	return quote;
     }
 
     public TradingDate offsetToDate(int dateOffset) {
@@ -155,9 +161,9 @@ public class MixedQuoteBundle implements QuoteBundle {
      * @return fast access offset
      */
     public int getLastOffset() {
-        if(useIDQuotes())
-            return eodQuoteBundle.getLastOffset() + 1;
-        else
+        if(useIDQuotes()) 
+	    return eodQuoteBundle.getLastOffset() + 1;
+	else
             return eodQuoteBundle.getLastOffset();
     }
 

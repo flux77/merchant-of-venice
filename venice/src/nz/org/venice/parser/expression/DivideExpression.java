@@ -21,6 +21,8 @@ package nz.org.venice.parser.expression;
 import nz.org.venice.parser.*;
 import nz.org.venice.quote.*;
 
+import nz.org.venice.util.Locale;
+
 /**
  * An expression which divides two sub-expressions.
  *
@@ -39,8 +41,15 @@ public class DivideExpression extends ArithmeticExpression {
 
 	if(right != 0.0D)
 	    return getChild(0).evaluate(variables, quoteBundle, symbol, day) / right;
-	else
-            throw EvaluationException.DIVIDE_BY_ZERO_EXCEPTION;
+	else {
+	    //Happens for Non paper trade analysers 	    
+	    if (getParseMetadata() == null) {
+		throw EvaluationException.DIVIDE_BY_ZERO_EXCEPTION;
+	    } else {
+		String lineNumber = getParseMetadata().getLineForExpression(this);
+		throw new EvaluationException(Locale.getString("DIVIDE_BY_ZERO_ERROR") + " at line: " + lineNumber + "\n parents = " + printParents());
+	    }
+	}
     }
 
     public Expression simplify() {

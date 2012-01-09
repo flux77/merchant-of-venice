@@ -146,7 +146,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
         // Update the table on new intra-day quotes
         IDQuoteCache.getInstance().addQuoteListener(new QuoteListener() {
                public void newQuotes(QuoteEvent event) {
-                    updateTable();
+		   updateTable();
                 }
             });
     }
@@ -267,7 +267,7 @@ public class WatchScreenModule extends AbstractTable implements Module, ActionLi
 
 	    addAlert = 
 		MenuHelper.addMenuItem(this, symbolsMenu,
-				       "addLert - Localise me");
+				       Locale.getString("ALERT_ADD"));
         }
 
         // Listen for changes in selection so we can update the menus

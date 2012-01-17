@@ -226,7 +226,7 @@ public class Parser {
 	
 	List subExpressions = new ArrayList();
 	Token head = tokens.get();
-	
+
 	while (head.getType() == Token.INCLUDE_TOKEN) {
 	    tokens.pop();	    
 
@@ -256,9 +256,9 @@ public class Parser {
 		    Expression includedExpression = 
 			Parser.parse(variables, 
 				     includedStoredExpression.expression, 
-				     true);
-		    
+				     true);		    
 		    subExpressions.add(includedExpression);
+
 		} catch (ExpressionException e) {
 		    throw new ParserException(e.getReason()); 
 		} finally {
@@ -271,11 +271,11 @@ public class Parser {
 	while(tokens.size() > 0) {
 	    subExpressions.add(parseSubExpression(variables, tokens));	
 	}
-
+	
 	if(subExpressions.size() == 0)
 	    throw new ParserException(Locale.getString("EMPTY_EQUATION_ERROR"));
-        else if(subExpressions.size() == 1) {
-	    parseTree.put(subExpressions.get(0), head);
+        else if(subExpressions.size() == 1) {	    
+	    parseTree.put(subExpressions.get(0), head);	    
 	    return (Expression)subExpressions.get(0);
         } else {
 	    Expression clauseExpression = new ClauseExpression(subExpressions);
@@ -381,7 +381,6 @@ public class Parser {
 
 	if(tokens.match(Token.ADD_TOKEN) ||
 	   tokens.match(Token.SUBTRACT_TOKEN)) {
-
 	    Token operation = tokens.pop();	
 	    Expression right = parseMultiplyExpression(variables, tokens);
 	    parseTree.put(right, operation);
@@ -429,9 +428,9 @@ public class Parser {
 	if(tokens.match(Token.NUMBER_TOKEN) ||
            tokens.match(Token.TRUE_TOKEN) ||
            tokens.match(Token.FALSE_TOKEN) ||
-           tokens.match(Token.SUBTRACT_TOKEN))
+           tokens.match(Token.SUBTRACT_TOKEN)) 
 	    expression = parseNumber(variables, tokens);
-
+	
         // STRING
         else if(tokens.match(Token.STRING_TOKEN))
             expression = parseString(variables, tokens);
@@ -554,6 +553,7 @@ public class Parser {
                 while (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
 		    parameterExpression = parseSubExpression(variables, tokens);
 		    parameterList.add(parameterExpression);
+
 		    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
 			parseComma(variables, tokens);
 		    }
@@ -578,7 +578,7 @@ public class Parser {
 		    new EvalFunctionExpression(variable.getName(),
 					       variable.getType(),
 					       parameterListExpression);
-		
+				
 		parseTree.put(evalFunctionExpression, token);		
 		return evalFunctionExpression;
 	    } else {
@@ -619,7 +619,7 @@ public class Parser {
 	else 
 	    throw new ParserException(Locale.getString("EXPECTED_VARIABLE_TYPE_ERROR"));
 			
-	if (tokens.match(Token.FUNCTION_TOKEN))  {	    
+	if (tokens.match(Token.FUNCTION_TOKEN)) {	    	   
 	    return parseUserFunction(variables, tokens, type);
 	}		
 	
@@ -714,7 +714,7 @@ public class Parser {
             // Is there a "-" infront? Handle negative numbers
             if(number.getType() == Token.SUBTRACT_TOKEN) {
                 number = tokens.pop();
-                negate = true;
+		negate = true;
             }
 
             if(number.getType() == Token.NUMBER_TOKEN) {
@@ -1025,19 +1025,26 @@ public class Parser {
 	} else {	    
 	    parseRightParenthesis(variables, tokens);
 	}
+	
 	parseLeftBrace(variables, tokens);
 	Vector functionBodyList = new Vector();
-
-	Expression functionExp  = parseSubExpression(variables, tokens);
-
-	functionBodyList.add(functionExp);
-	while (!tokens.match(Token.RIGHT_BRACE_TOKEN)) {
-	    functionExp = parseSubExpression(variables, tokens);
-	    functionBodyList.add(functionExp);
-	}
-	Expression functionBody = new ClauseExpression(functionBodyList);
-	parseRightBrace(variables, tokens);
 	
+	boolean inClause = true;
+	while(inClause) {	    
+	    functionBodyList.add(parseSubExpression(variables, tokens));
+
+	    // If there are no more symbols then we are mising the matching "}"
+	    if(tokens.size() == 0) 
+		throw new ParserException(Locale.getString("MISSING_RIGHT_BRACE_ERROR"));
+		
+	    // Keep parsing sub-expressions until we find the matching "}"
+	    if(tokens.match(Token.RIGHT_BRACE_TOKEN)) {
+		tokens.pop();
+		inClause = false;	    
+	    }
+	}
+
+	Expression functionBody = new ClauseExpression(functionBodyList);		
 	Expression userFunction = new FunctionExpression(functionName.getVariableName(), type, parameterExpression, functionBody);
 	
 	parseTree.put(userFunction, token);

@@ -78,7 +78,13 @@ public class LagExpression extends BinaryExpression {
 	    
 	    //Instead, return the next available quote, if one exists
 	    try {
+		if (day - lag > 0) {
+		    String message = Locale.getString("LAG_OFFSET_ERROR") + " offset: " + (day - lag);
+		    throw new EvaluationException(message);
+		}
+
 		double nearQuote = quoteBundle.getNearestQuote(explicitSymbol, quoteKind, day - lag);
+
 		return nearQuote;
 	    } catch (MissingQuoteException e2) {
 		//No suitable quote found.
@@ -101,11 +107,6 @@ public class LagExpression extends BinaryExpression {
 	String lagStr = (getChild(1) != null) ? getChild(1).toString() : "(null)";
 	return new String("lag(" + quoteStr + ", " + lagStr + ")");
 
-	/*
-        return new String("lag(" +
-                          quoteExpression.toString() + ", " +
-                          lagExpression.toString() + ")");
-	*/
     }
 
     public int checkType() throws TypeMismatchException {
@@ -114,12 +115,13 @@ public class LagExpression extends BinaryExpression {
             getChild(0).checkType() == INTEGER_QUOTE_TYPE) &&
 	   getChild(1).checkType() == INTEGER_TYPE)
 	    return getType();
-	else {
-	 String types = 
+	else {	
+	    String types = 
 		getChild(0).getType() + " , " + 
 		getChild(1).getType() + " , " + 
-		getChild(2).getType();
-
+		((getChildCount() > 2) ? getChild(2).getType() + "" : "");
+		
+	    
 	    String expectedTypes =
 		FLOAT_QUOTE_TYPE + " , " + 
 		INTEGER_TYPE     + " , " + 
@@ -137,7 +139,7 @@ public class LagExpression extends BinaryExpression {
             return INTEGER_TYPE;
         }
     }
-
+    
     public Object clone() {
         return new LagExpression((Expression)getChild(0).clone(),
                                  (Expression)getChild(1).clone());

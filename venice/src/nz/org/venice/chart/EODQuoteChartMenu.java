@@ -30,6 +30,7 @@ import javax.swing.JRadioButtonMenuItem;
 import java.awt.image.BufferedImage;
 import javax.swing.JFileChooser;
 import java.io.File;
+import java.util.Vector;
 
 import nz.org.venice.chart.graph.*;
 import nz.org.venice.chart.source.GraphSource;
@@ -241,6 +242,16 @@ public class EODQuoteChartMenu extends JMenu {
 		    CommandManager.getInstance().newAlert(symbol);
 		}});
     
+	JMenuItem alertListMenu = new JMenuItem(Locale.getString("ALERT_LIST"));
+	alertListMenu.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    
+		    Vector symbolList = new Vector();
+		    symbolList.add(symbol);
+		    CommandManager.getInstance().tableAlertsBySymbol(symbolList);
+		}
+	    });
+
 	//TODO - get this menuitem to select/deselect
 	JMenuItem trackerMenu = new JMenuItem(Locale.getString("CHART_TRACKED_TOGGLE"));
 	trackerMenu.addActionListener(new ActionListener() {
@@ -314,6 +325,7 @@ public class EODQuoteChartMenu extends JMenu {
 	this.add(annotateMenu);
 	this.add(exportMenu);
 	this.add(alertMenu);
+	this.add(alertListMenu);
 	this.add(trackerMenu);
 	this.add(removeMenu);	
     }

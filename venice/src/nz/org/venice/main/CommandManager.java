@@ -1305,6 +1305,9 @@ public class CommandManager {
 						  Locale.getString("VENICE_SHORT"));
 	    JOptionPane.showInternalMessageDialog(desktop, aboutMessage, aboutVenice,
                                                   JOptionPane.PLAIN_MESSAGE);
+
+	    //There is a bug in some JDKs which prevents the dialog from returning and thus 
+	    //isAboutDialogUp is never set to false again. 
             isAboutDialogUp = false;
         }
     }

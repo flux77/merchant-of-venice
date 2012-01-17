@@ -90,8 +90,12 @@
     <xsl:apply-templates/>
   </xsl:template>
 
+  <xsl:template match='linebreak'>
+    <br/>
+  </xsl:template>
+
   <xsl:template match='text()'>
     <xsl:value-of select='.'/>
   </xsl:template>
-  
+
 </xsl:stylesheet>

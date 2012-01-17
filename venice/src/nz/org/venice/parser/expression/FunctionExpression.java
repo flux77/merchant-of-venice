@@ -103,9 +103,8 @@ public class FunctionExpression extends BinaryExpression {
 	
 	//This will catch errors of returning the wrong type for the definition
 	//e.g. float function f { return true} 
-
 	if (body.checkType() != getType()) {
-	    String types = "" + getChild(1).getType();
+	    String types = "" + body.getType();
 	    String expectedTypes = "" + getType();
 	    throw new TypeMismatchException(this, types, expectedTypes);
 	} else {

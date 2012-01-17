@@ -123,7 +123,8 @@ public abstract class AbstractExpression implements Expression {
      */
     public void setParent(Expression parent) {
         assert parent != this;
-       	
+	assert parent != null;
+
         this.parent = parent;
 
     }

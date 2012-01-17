@@ -62,7 +62,7 @@ public class EvalFunctionExpression extends UnaryExpression {
         super(parameterList);
 	this.name = name;
 	this.type = type;
-
+	      
 	id = UUIDGenerator.getInstance().generateRandomBasedUUID();
     }
 
@@ -180,6 +180,9 @@ public class EvalFunctionExpression extends UnaryExpression {
     //Add/Replace variables into parameters and set their values
     private void setupParameters(Variables parameters, QuoteBundle quoteBundle, 
 				 Symbol symbol, int day) throws EvaluationException {
+
+	//AI functions shouldn't generate these expressions. 
+	assert getParseMetadata() != null;
 
 	Expression parameterNamesList = getParseMetadata().getParameterNames(name);
 	

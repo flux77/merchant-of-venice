@@ -326,6 +326,14 @@ public class ExpressionTest extends TestCase {
 	assertTrue(failParse(test6));
 	
     }
+    
+    public void testFunctionReturnType() {
+	String func1 = "float function retFl() { 3.14 }\n int function retInt() { float foo = retFl()\n -50}\n lag(close, retInt())";
+	
+	Expression funcExp1 = parse(func1);
+	assertTrue(funcExp1 == null);
+	
+    }
 
     public void testFunctionEval() {
 	String caller1 = "int function incme(int n) { n = n + 1}\nint function decme(int n) { n = n - 1}\nfor (int i = 0; i < 5; i = i + 1) { incme(decme(i)) } i";

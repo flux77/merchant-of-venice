@@ -37,11 +37,17 @@ import nz.org.venice.util.Locale;
  *
  * @author Mark Hummel
  */
+
+//Made this an UnaryExpression instead of creating one class of every number
+//of arguments ie one class instead of four: Alert1Expression, Alert2 etc
+//The flip side is that it has to implement it's own childCount and getChild
+//methods.
+
 public class AlertExpression extends UnaryExpression {
-
-    
-
-    Expression[] optionalArgs;
+   
+    private Expression mandatoryArg;
+    private Expression[] optionalArgs;
+    private final int argCount;
 
     /**
      * Create a new alert expression.
@@ -53,7 +59,15 @@ public class AlertExpression extends UnaryExpression {
 
     public AlertExpression(Expression arg, Expression[] optionalArgs) {
 	super(arg);
+	this.mandatoryArg = arg;
 	this.optionalArgs = optionalArgs;
+	int count = 1;
+	for (int i = 0; i < optionalArgs.length; i++) {
+	    if (optionalArgs[i] != null) {
+		count++;
+	    }
+	}
+	argCount = count;
     }
 
     /**
@@ -114,9 +128,18 @@ public class AlertExpression extends UnaryExpression {
 	return getType();
     }
 
+    /**
+     * Return a string representing the expression contents. 
+     *
+     * @return a string
+     */
 
     public String toString() {
-	return new String("random()");
+	String mesg = "alert(";
+	for (int i = 0; i < getChildCount(); i++) {
+	    mesg += getChild(i).toString() + ",";
+	}
+	return mesg;
     }
     
 
@@ -129,7 +152,33 @@ public class AlertExpression extends UnaryExpression {
 	return FLOAT_TYPE;
     }
 
+    /**
+     * Return the number of children required in an alert expression.
+     * This will be a minimum of <code>1</code> and a maximum of <code>4</code>.
+     *
+     * @return	<code>The number of non null arguments.</code>
+     */
+    public int getChildCount() {
+	return argCount;
+    }
+
+
+    /**
+     * Return the child of this node at the given index.
+     *
+     * @return child at given index.
+     */
+    public Expression getChild(int child) {
+	assert child <= argCount;
+
+	if (child == 0) {
+	    return mandatoryArg;
+	} else {
+	    return optionalArgs[child-1];
+	}
+    }
+
     public Object clone() {	
-        return new RandomWithSeedExpression(getChild(0));
+        return new AlertExpression(getChild(0), optionalArgs);
     }
 }

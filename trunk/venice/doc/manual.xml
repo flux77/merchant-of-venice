@@ -923,7 +923,15 @@ variable.</para>
 
 <section name="Gondola User Defined Functions">
 <para>In addition to tbe built in functions listed below, the Gondola langauage supports functions written by the user. Defining a function is similar to defining a variable - the return type and the type of any parameters must be specified. Additionally, the keyword "function" is appended after the type definition.</para>
-<para>For Example: <code>int function factorialFunction(int n) </code> defines a function returning an integer value, and takes one integer parameter "n". The body of the function has the same properties as a for or while loop in that it is the last line in the expression which is the return value. Note that the type of the return value must match the function definition.
+<para>For Example: </para>
+<para><code>int function factorialFunction(int n) </code> </para>
+<para>defines a function returning an integer value, and takes one integer parameter "n". The body of the function has the same properties as a for or while loop in that it is the last line in the expression which is the return value. Note that the type of the return value must match the function definition. A warning on returning from functions: Gondola does not have a line separator (e.g. ";") and you may have unexpected results when you try to write a function like this: <para>
+<code>int function returnSomeInteger() { <linebreak/>
+ float tmpFloat = returnSomeFloat()  <linebreak/>
+ -returnSomeInt2() <linebreak/>
+} 
+</code></para>
+<para> This will return a type mismatch because the last line actually is: <code> float tmpFloat = returnSomeFloat() - returnSomeInt2() </code>. </para>
 </para>
 <para>Variables can be defined inside functions. However, their scope will persist when the function call ends, because Gondola is not stack based at this time. Similarly, declared parameters remain in scope as well. However, variables which are declared in an included rule will not be in scope. See the following section "Including External Rules" for more details.</para>
 </section>

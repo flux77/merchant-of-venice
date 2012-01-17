@@ -65,6 +65,7 @@ public class AlertExpression extends UnaryExpression {
 	for (int i = 0; i < optionalArgs.length; i++) {
 	    if (optionalArgs[i] != null) {
 		count++;
+		optionalArgs[i].setParent(this);
 	    }
 	}
 	argCount = count;

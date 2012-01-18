@@ -297,6 +297,9 @@ public class ExpressionFactory {
 	case (Token.ALERT_TOKEN):
 	    expression = new AlertExpression(arg1, new Expression[] {arg2, arg3, arg4});
 	    break;
+	case (Token.HALT_TOKEN):
+	    expression = new HaltExpression(arg1, new Expression[] {arg2, arg3, arg4});
+	    break;
         default:
             // No such token
 	    assert false;

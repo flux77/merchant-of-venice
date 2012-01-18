@@ -232,8 +232,11 @@ public class Token {
     /** Represents "<code>function</code> symbol */
     public static final int FUNCTION_TOKEN = 66;
 
+    /** Represents "<code>halt</code> symbol */
+    public static final int HALT_TOKEN = 67;
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 67;
+    private static final int FIXED_LENGTH_TOKENS = 68;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -340,6 +343,7 @@ public class Token {
 	tokenStrings[ALERT_TOKEN]              = "alert";
 	tokenStrings[INCLUDE_TOKEN]            = "include";
 	tokenStrings[FUNCTION_TOKEN]           = "function";
+	tokenStrings[HALT_TOKEN]               = "halt";
         
         return tokenStrings;
     }

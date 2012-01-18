@@ -178,6 +178,10 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException STACK_DEPTH_EXCEEDED_EXCEPTION =
         new EvaluationException(Locale.getString("STACK_OVERFLOW_EXCEPTION"));
 
+    /** An exception which is thrown when a HaltExpression is evaluated. */
+    public static EvaluationException EVALUATION_HALTED_EXCEPTION =
+        new EvaluationException(Locale.getString("EVALUATION_HALTED_EXCEPTION"));
+
     /**
      * Create a new evaluation exception with the given error reason.
      * Make any exception without a run-time error message static so the

@@ -90,8 +90,22 @@ public class SupportAndResistenceGraph extends AbstractGraph {
 	support = new Graphable();
 	resistence = new Graphable();
 	setSettings(new HashMap());
-
     }
+
+    /**
+     * Create a new support and Resistence graph.
+     *
+     * @param	source containing the data source, typically day close.
+     * @param	settings the settings of the graph 
+     */
+    public SupportAndResistenceGraph(GraphSource source, HashMap settings) {
+	super(source);		
+	support = new Graphable();
+	resistence = new Graphable();
+	setSettings(settings);
+    }
+    
+    
 
     // See Graph.java
     public void render(Graphics g, Color c, int xoffset, int yoffset,

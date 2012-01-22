@@ -41,6 +41,7 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
     private JDesktopPane desktop;
     private JTextField minDecimalDigitsTextField;
     private JTextField maxDecimalDigitsTextField;
+    private JTextField tabSizeTextField;
     private JCheckBox scrollToLatestDataChart;
     private JCheckBox scrollToLatestDataTable; 
     private JCheckBox restoreWindowsCheckBox;
@@ -88,6 +89,12 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
                                      Integer.toString(maxDecimalDigits),
                                      gridbag, c, 10);
 
+	int tabSizeDigits = PreferencesManager.getEditTabSize();
+	tabSizeTextField = 
+            GridBagHelper.addTextRow(borderPanel, 
+                                     Locale.getString("EDIT_TAB_SIZE"), 
+                                     Integer.toString(tabSizeDigits),
+                                     gridbag, c, 10);
 
 	scrollToLatestDataChart = 
 	    GridBagHelper.addCheckBoxRow(borderPanel,
@@ -131,6 +138,7 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
     public void save() {
         int minDecimalDigits = 0;
         int maxDecimalDigits = 0;
+	int editTabSize      = 0;
 	boolean scrollToChartEnd;
 	boolean scrollToTableEnd;
 	boolean restoreSavedWindows;
@@ -139,6 +147,8 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
         try {
             minDecimalDigits = Integer.parseInt(minDecimalDigitsTextField.getText());
             maxDecimalDigits = Integer.parseInt(maxDecimalDigitsTextField.getText());
+
+	    editTabSize = Integer.parseInt(tabSizeTextField.getText());
         }
         catch(NumberFormatException e) {
             // ignore
@@ -150,6 +160,10 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
         if(maxDecimalDigits > 0) {
             PreferencesManager.putMaxDecimalDigits(maxDecimalDigitsTextField.getText());
         }
+
+	if (editTabSize > 0) {
+	    PreferencesManager.putEditTabSize(tabSizeTextField.getText());
+	}
 
 	scrollToChartEnd =  scrollToLatestDataChart.isSelected(); 
 	PreferencesManager.putDefaultChartScrollToEnd(scrollToChartEnd);

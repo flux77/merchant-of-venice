@@ -58,6 +58,17 @@ public class FiboGraph extends AbstractGraph {
         //setSettings(new HashMap());
     }
 
+    /**
+     * Create a Fibonacci chart.
+     *
+     * @param	source	the EOD source 
+     * @param	settings the settings of the graph 
+     */
+    public FiboGraph(GraphSource source, HashMap settings) {
+	super(source);
+        setSettings(settings);
+    }
+
     public void render(Graphics g, Color colour, int xoffset, int yoffset,
 		       double horizontalScale, double verticalScale,
 		       double topLineValue, double bottomLineValue, 

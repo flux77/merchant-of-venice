@@ -112,6 +112,7 @@ public class ExpressionEditorDialog {
 						       EXPRESSION_COLUMNS);
         expressionEditor.setText(expression);
         expressionEditor.setEditable(isEditable);
+	expressionEditor.setTabSize(PreferencesManager.getEditTabSize());
 
         TitledBorder titledBorder = new TitledBorder(Locale.getString("EQUATION"));
         expressionPanel.setLayout(new BorderLayout());

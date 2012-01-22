@@ -74,6 +74,8 @@ import nz.org.venice.chart.graph.MomentumGraph;
 import nz.org.venice.chart.graph.OBVGraph;
 import nz.org.venice.chart.graph.StandardDeviationGraph;
 import nz.org.venice.chart.graph.RSIGraph;
+import nz.org.venice.chart.graph.SupportAndResistenceGraph;
+import nz.org.venice.chart.graph.FiboGraph;
 import nz.org.venice.chart.graph.CustomGraph;
 
 
@@ -321,7 +323,7 @@ public class GraphSettings extends AbstractSettings {
 	    
 	}
 
-	if (title.equals(Locale.getString("MULTIPLE_MOVING_AVERAGE"))) {
+	if (title.equals(Locale.getString("MULT_MOVING_AVERAGE"))) {
 	    newGraph = new
 		MultipleMovingAverageGraph(getSource(bundle, Quote.DAY_CLOSE));
 	}
@@ -354,6 +356,17 @@ public class GraphSettings extends AbstractSettings {
 			 settings);
 	}
 
+	if (title.equals(Locale.getString("SUPPORT_AND_RESISTENCE"))) {
+	    newGraph = new 
+		SupportAndResistenceGraph(getSource(bundle, Quote.DAY_CLOSE),
+					  settings);
+	}
+
+	if (title.equals(Locale.getString("FIBO_CHART"))) {
+	    newGraph = new 
+		FiboGraph(getSource(bundle, Quote.DAY_CLOSE),
+			  settings);
+	}
 	
 	if (title.equals(Locale.getString("CUSTOM"))) {
 	    //Eventually, custom graph will be able to graph
@@ -366,7 +379,7 @@ public class GraphSettings extends AbstractSettings {
 			    bundle,
 			    settings);
 	}
-	
+	assert newGraph != null;
 
 	return newGraph;
 

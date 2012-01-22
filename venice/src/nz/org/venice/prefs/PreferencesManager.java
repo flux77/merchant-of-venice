@@ -1204,6 +1204,35 @@ public class PreferencesManager {
     }
 
     /**
+     * Load user interface setting.
+     *
+     * @return the tab size to enter in a text dialog. 
+     */
+    public static int getEditTabSize() {
+        // 8 is the default, if anything goes wrong
+	int defaultValue = 8;
+        int retValue = defaultValue;
+        Preferences prefs = getUserNode("/max_user_interface");
+        String str = prefs.get("edit_tab_size", "8");
+        try {
+            retValue = Integer.parseInt(str);
+        } catch(Exception ex) {
+            retValue = defaultValue;
+        }
+        return retValue;
+    }
+
+    /**
+     * Save user interface setting.
+     *
+     * @param tabsize the number of characters to insert when the tab key is pressed
+     */
+    public static void putEditTabSize(String tabSize) {
+        Preferences prefs = getUserNode("/max_user_interface");
+	prefs.put("edit_tab_size", tabSize);
+    }
+
+    /**
      * Load default chart setting.
      *
      * @return the default chart to be displayed

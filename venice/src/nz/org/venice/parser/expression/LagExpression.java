@@ -78,13 +78,12 @@ public class LagExpression extends BinaryExpression {
 	    
 	    //Instead, return the next available quote, if one exists
 	    try {
-		if (day - lag > 0) {
-		    String message = Locale.getString("LAG_OFFSET_ERROR") + " offset: " + (day - lag);
+		if (day + lag > 0) {
+		    String message = Locale.getString("LAG_OFFSET_ERROR") + " offset: " + (day + lag);
 		    throw new EvaluationException(message);
 		}
 
-		double nearQuote = quoteBundle.getNearestQuote(explicitSymbol, quoteKind, day - lag);
-
+		double nearQuote = quoteBundle.getNearestQuote(explicitSymbol, quoteKind, day + lag);
 		return nearQuote;
 	    } catch (MissingQuoteException e2) {
 		//No suitable quote found.

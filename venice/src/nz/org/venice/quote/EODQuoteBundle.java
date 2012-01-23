@@ -284,11 +284,11 @@ public class EODQuoteBundle implements QuoteBundle {
 
 	// If the quote is still not in the quote cache, find an earlier quote,
 	// if there is one.	
-        if(dateOffset > getFirstOffset()) {
-	    
+        if(dateOffset > getFirstOffset()) {	    
 	    //Search the cache until a quote is found.
-	    while (!quoteCache.containsQuote(symbol, dateOffset--) && 
+	    while (!quoteCache.containsQuote(symbol, dateOffset) && 
 		   dateOffset >= getFirstOffset()) {		
+		dateOffset--;
 	    }
 	    
 	    if (dateOffset >= getFirstOffset()) {

@@ -24,6 +24,7 @@ import nz.org.venice.parser.TypeMismatchException;
 import nz.org.venice.parser.Variables;
 import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.Symbol;
+import nz.org.venice.util.Locale;
 
 /**
  * An expression which calculates the square root of a number.
@@ -43,8 +44,12 @@ public class SqrtExpression extends UnaryExpression {
 
         if(number >= 0)
             return (double)Math.sqrt(number);
-        else
-            throw EvaluationException.SQUARE_ROOT_NEGATIVE_EXCEPTION;
+        else {
+	    EvaluationException e = EvaluationException.SQUARE_ROOT_NEGATIVE_EXCEPTION;
+	    e.setMessage(this, "", number);
+	    
+            throw e;
+	}
     }
 
     public String toString() {

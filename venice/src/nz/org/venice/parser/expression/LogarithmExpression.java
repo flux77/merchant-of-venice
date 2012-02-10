@@ -41,8 +41,11 @@ public class LogarithmExpression extends UnaryExpression {
 
         if(number > 0)
             return (double)Math.log(number);
-        else
-            throw EvaluationException.LOGARITHM_NEGATIVE_EXCEPTION;
+        else {
+	    EvaluationException e = EvaluationException.LOGARITHM_NEGATIVE_EXCEPTION;
+	    e.setMessage(this, "", number);
+	    throw e;
+	}
     }
 
     public Expression simplify() {

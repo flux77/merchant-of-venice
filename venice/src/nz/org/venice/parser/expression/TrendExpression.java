@@ -61,16 +61,22 @@ public class TrendExpression extends TernaryExpression {
 					       explicitSymbol, 
 					       day);
 
-	if(period < 0)
-            throw EvaluationException.AVG_RANGE_EXCEPTION;
+	if(period < 0) {
+             EvaluationException e = EvaluationException.AVG_RANGE_EXCEPTION;
+	     e.setMessage(this, "", period);
+	     throw e;
+	}
 
         int offset = (int)getChild(2).evaluate(variables, 
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
 	
-        if (offset > 0)
-           throw EvaluationException.AVG_OFFSET_EXCEPTION;
+        if (offset > 0) {
+            EvaluationException e = EvaluationException.AVG_OFFSET_EXCEPTION;
+	    e.setMessage(this, "", offset);
+	    throw e;
+	}
 
         // Calculate and return the line of best fit.
         QuoteBundleFunctionSource source =

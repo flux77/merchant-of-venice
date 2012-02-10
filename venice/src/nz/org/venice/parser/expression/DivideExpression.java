@@ -42,13 +42,10 @@ public class DivideExpression extends ArithmeticExpression {
 	if(right != 0.0D)
 	    return getChild(0).evaluate(variables, quoteBundle, symbol, day) / right;
 	else {
-	    //Happens for Non paper trade analysers 	    
-	    if (getParseMetadata() == null) {
-		throw EvaluationException.DIVIDE_BY_ZERO_EXCEPTION;
-	    } else {
-		String lineNumber = getParseMetadata().getLineForExpression(this);
-		throw new EvaluationException(Locale.getString("DIVIDE_BY_ZERO_ERROR") + " at line: " + lineNumber + "\n parents = " + printParents());
-	    }
+	    
+	    EvaluationException e = EvaluationException.DIVIDE_BY_ZERO_EXCEPTION;
+	    e.setMessage(this, "", right);
+	    throw e;
 	}
     }
 

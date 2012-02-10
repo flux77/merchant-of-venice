@@ -56,7 +56,7 @@ public class FunctionExpression extends BinaryExpression {
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
 	throws EvaluationException {
-
+	
 	//This expression defines the expression only; evaluating the expression
 	//occurs in EvalFunctionExpression when the function is called.
 	return 0.0;

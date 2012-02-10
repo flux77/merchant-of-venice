@@ -36,7 +36,7 @@ public class ExponentialExpression extends UnaryExpression {
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day) 
 	throws EvaluationException {
-
+	
 	return Math.exp(getChild(0).evaluate(variables, quoteBundle, symbol, day));
     }
 

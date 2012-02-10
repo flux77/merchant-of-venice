@@ -62,20 +62,29 @@ public class EMAExpression extends QuaternaryExpression {
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if(period <= 0)
-            throw EvaluationException.EMA_RANGE_EXCEPTION;
+        if(period <= 0) {	    
+	    EvaluationException e = EvaluationException.EMA_RANGE_EXCEPTION;
+	    e.setMessage(this, "", period);
+	    throw e;
+	}
         int offset = (int)getChild(2).evaluate(variables, 
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if (offset > 0)
-           throw EvaluationException.EMA_OFFSET_EXCEPTION;
+        if (offset > 0) { 
+	    EvaluationException e = EvaluationException.EMA_OFFSET_EXCEPTION;
+	    e.setMessage(this, "", offset);
+	    throw e;
+	}
         double smoothing = (double)getChild(3).evaluate(variables, 
 							quoteBundle, 
 							explicitSymbol, 
 							day);
-        if ((smoothing < 0.01) || (smoothing > 1.0))
-           throw EvaluationException.EMA_SMOOTHING_EXCEPTION;
+        if ((smoothing < 0.01) || (smoothing > 1.0)) {
+	    EvaluationException e = EvaluationException.EMA_SMOOTHING_EXCEPTION;
+	    e.setMessage(this, "", smoothing);
+	    throw e;
+	}
 
         // Calculate and return the average.
         QuoteBundleFunctionSource source =

@@ -53,11 +53,18 @@ public class OBVExpression extends TernaryExpression {
 
         // Extract arguments
 	int period = (int)getChild(0).evaluate(variables, quoteBundle, symbol, day);
-        if(period <= 0)
-            throw EvaluationException.OBV_RANGE_EXCEPTION;
+        if(period <= 0) {	    
+            EvaluationException e = EvaluationException.OBV_RANGE_EXCEPTION;
+	    e.setMessage(this, "", period);
+	    throw e;
+
+	}
         int offset = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
-        if (offset > 0)
-           throw EvaluationException.OBV_OFFSET_EXCEPTION;
+        if (offset > 0) {
+            EvaluationException e = EvaluationException.OBV_OFFSET_EXCEPTION;
+	    e.setMessage(this, "", offset);
+	    throw e;
+	}
         int initialValue = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
 
         // Calculate and return the OBV.

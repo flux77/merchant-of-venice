@@ -55,8 +55,11 @@ public class AvgExpression extends TernaryExpression {
 
         // Extract arguments
 	int period = (int)getChild(1).evaluate(variables, quoteBundle, symbol, day);
-        if(period <= 0)
-            throw EvaluationException.AVG_RANGE_EXCEPTION;
+        if(period <= 0) {
+	    EvaluationException e = EvaluationException.AVG_RANGE_EXCEPTION;
+	    e.setMessage(this, "", period);
+	    throw e;
+	}
         int quoteKind = quoteChild.getQuoteKind();
 	Symbol explicitSymbol = (quoteChild.getSymbol() != null) 
 	    ? quoteChild.getSymbol() : symbol;
@@ -65,8 +68,11 @@ public class AvgExpression extends TernaryExpression {
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if (offset > 0)
-           throw EvaluationException.AVG_OFFSET_EXCEPTION;
+        if (offset > 0) {
+	    EvaluationException e = EvaluationException.AVG_OFFSET_EXCEPTION;
+	    e.setMessage(this, "", offset);
+	    throw e;
+	}
 
         // Calculate and return the average.
         QuoteBundleFunctionSource source =

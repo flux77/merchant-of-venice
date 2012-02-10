@@ -58,15 +58,21 @@ public class MinExpression extends TernaryExpression {
 					     quoteBundle, 
 					     explicitSymbol, 
 					     day);
-        if(days <= 0)
-            throw EvaluationException.MIN_RANGE_EXCEPTION;
+        if(days <= 0) {
+            EvaluationException e = EvaluationException.MIN_RANGE_EXCEPTION;
+	    e.setMessage(this, "", days);
+	    throw e;
+	}
         int quoteKind = quoteChild.getQuoteKind();
         int offset = (int)getChild(2).evaluate(variables, 
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if (offset > 0)
-           throw EvaluationException.MIN_OFFSET_EXCEPTION;
+        if (offset > 0) {
+	    EvaluationException e = EvaluationException.MIN_OFFSET_EXCEPTION;
+	    e.setMessage(this, "", offset);
+	    throw e;
+	}
         
 	return min(quoteBundle, explicitSymbol, quoteKind, days, day, offset);
     }

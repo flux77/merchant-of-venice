@@ -60,15 +60,22 @@ public class StandardDeviationExpression extends TernaryExpression {
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if(period <= 0)
-            throw EvaluationException.SD_RANGE_EXCEPTION;
+        if(period <= 0) {
+             EvaluationException e = EvaluationException.SD_RANGE_EXCEPTION;
+	     e.setMessage(this, "", period);
+	     throw e;
+
+	}
         int quoteKind = quoteChild.getQuoteKind();
         int offset = (int)getChild(2).evaluate(variables, 
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if (offset > 0)
-           throw EvaluationException.SD_OFFSET_EXCEPTION;
+        if (offset > 0) {
+            EvaluationException e = EvaluationException.SD_OFFSET_EXCEPTION;
+	    e.setMessage(this, "", offset);
+	    throw e;
+	}
 
         // Calculate and return the standard deviation.
         QuoteBundleFunctionSource source =

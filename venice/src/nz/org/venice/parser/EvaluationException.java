@@ -182,6 +182,8 @@ public class EvaluationException extends ExpressionException {
     public static EvaluationException EVALUATION_HALTED_EXCEPTION =
         new EvaluationException(Locale.getString("EVALUATION_HALTED_EXCEPTION"));
 
+    private String message = null;
+
     /**
      * Create a new evaluation exception with the given error reason.
      * Make any exception without a run-time error message static so the
@@ -191,5 +193,18 @@ public class EvaluationException extends ExpressionException {
      */
     public EvaluationException(String reason) {
 	super(reason);
+    }
+       
+    public void setMessage(Expression e, String label, double value) {
+	message = super.getReason();
+	if (e.getParseMetadata() != null) {
+	    String lineNumber = e.getParseMetadata().getLineForExpression(e);
+	    
+	    message = super.getReason() + label + " : " + value + " at line: " + lineNumber;        
+	}
+    }
+
+    public String getReason() {
+	return (message != null) ? message : super.getReason();
     }
 }

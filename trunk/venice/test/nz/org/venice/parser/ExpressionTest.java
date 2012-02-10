@@ -167,6 +167,8 @@ public class ExpressionTest extends TestCase {
     //Simplify used to change the type of an expression
     //as in (0.0 + x) == -3.076. When x is integer, 
     //simplified expression, x == -3.076 is no type correct
+
+    
     public void testSimplifyTypes() {
 
 	String left1 = "x == -3.076121";
@@ -203,16 +205,20 @@ public class ExpressionTest extends TestCase {
 				  Expression.FLOAT_TYPE,
 				  Expression.FLOAT_TYPE), true);	    
 
+	    
 	    /*
-	    assertEquals(typeTest(left5, right5, 
-				  Expression.INTEGER_TYPE,
-				  Expression.FLOAT2_TYPE), true);	    
+	      assertEquals(typeTest(left5, right5, 
+	      Expression.INTEGER_TYPE,
+	      Expression.FLOAT2_TYPE), true);	    
 	    */
+	    
 
 	} catch (TypeMismatchException e) {
 	    fail("Type Mistmatch UnExpected" + e);
 	}
     }
+    
+
         
     public void testEvaluate() {
 	String absExpString = "abs(-0.0001)";
@@ -297,14 +303,16 @@ public class ExpressionTest extends TestCase {
 	String test4 = "int n = 0\nint function outer() { n }\nint function parmtest() { n = outer() } int test = parmtest()\ntrue";
 	
 
+
 	assertTrue(failParse(test1));
 	assertTrue(failParse(test2));
 	Expression exp3 = parse(test3);
 	Expression exp4 = parse(test4);
 	assertTrue(exp3 != null);		
 	assertTrue(exp4 != null);		
-    }
 
+    }
+    
     public void testParameterType() {
 	String test1 = "int n = 0\n int function noop(double val) { val = 3.14 }\n n = noop(n)";
 	
@@ -325,12 +333,80 @@ public class ExpressionTest extends TestCase {
 	assertTrue(failParse(test5));
 	assertTrue(failParse(test6));
 	
+	}
+	
+    public void testParameterDef() {	
+	String test1 = "int function test1(int n1, int n1, int n1) { n1+1}\n";
+	String test2 = "int n1 = 0\nint function test1(int n1, int n1, int n1) { n1+1}\n";
+
+	String test3 = "int function test1(int n1, int n2, int n3) { n1+1}\n";
+
+	String test4 = "int function test1(int n1, int test1, int n1) { n1+1}\n int n1 = 0";
+	String test5 = "int function test2(int test1) { test1+1}\nint function test1(int n1, int n1, int n1) { n1+1}\n int n1 = 0";
+		
+	String test6 = "int function test1(int n1, int n2, int n3) { n1+n2}\nint function test2(int n1, int n2, int n3) { n2+3}\n int n1 = 0";
+
+	String test7 = "int varname = 5\nint function setme(int varname) { varname = 2}\n \n varname";
+
+	String test8 = "int varname = 5\nint function setme(int varname) { varname = 2}\n setme(13) \n varname";
+
+	String test9 = "int varname = 5\nint function setme(int varname2) { varname = 2}\n setme(13) \n varname";
+
+	/* In C, varname would be 2, because it has globals and a stack.
+	   But we have only the concept of the variables map. 
+	   Not sure what we should do yet.	   
+	*/
+	String test10 = "int varname = 99 \n int function setme(int varname2) { varname = 2 } int function middle(int varname) { setme(varname+1) } \n int function toplevel() { middle(22) } \n toplevel() varname";
+
+	String test11 = "int varname = 99 \n int function setme(int varname2) { varname = 2 } int function middle(int varname3) { setme(varname+1) } \n int function toplevel() { middle(22) } \n toplevel() varname";
+
+	assertTrue(failParse(test1));
+	
+	Expression exp2 = parse(test2);
+	Expression exp3 = parse(test3);
+	assertTrue(exp2 != null);
+	assertTrue(exp3 != null);
+	
+	assertTrue(failParse(test4));
+	assertTrue(failParse(test5));
+
+	Expression exp6 = parse(test6);
+	Expression exp7 = parse(test7);
+	Expression exp8 = parse(test8);
+	Expression exp9 = parse(test9);
+	Expression exp10 = parse(test10);
+	Expression exp11 = parse(test11);
+	
+	assertTrue(exp6 != null);
+	assertTrue(exp7 != null);
+	assertTrue(exp8 != null);
+	assertTrue(exp9 != null);
+	assertTrue(exp10 != null);
+	assertTrue(exp11 != null);
+	
+	try {
+	    Variables variables = new Variables();
+	    double callEval7 = exp7.evaluate(variables, null, null, 0);
+	    double callEval8 = exp8.evaluate(variables, null, null, 0);
+	    double callEval9 = exp9.evaluate(variables, null, null, 0);
+	    double callEval10 = exp10.evaluate(variables, null, null, 0);
+	    double callEval11 = exp11.evaluate(variables, null, null, 0);
+	    assertTrue(callEval7 == 5.0);
+	    assertTrue(callEval8 == 5.0);
+	    assertTrue(callEval9 == 2.0);
+	    //assertTrue(callEval10 == 2.0);
+	    assertTrue(callEval10 == 99.0);
+	    assertTrue(callEval11 == 2.0);
+	} catch (EvaluationException e) {
+	    assertTrue(false);
+	}
+	
     }
-    
+        
     public void testFunctionReturnType() {
 	String func1 = "float function retFl() { 3.14 }\n int function retInt() { float foo = retFl()\n -50}\n lag(close, retInt())";
 	
-	Expression funcExp1 = parse(func1);
+	Expression funcExp1 = parse(func1);	
 	assertTrue(funcExp1 == null);
 	
     }
@@ -360,6 +436,7 @@ public class ExpressionTest extends TestCase {
 	assertTrue(exprec2 != null);
 	assertTrue(exprec3 != null);
 
+	
 	try {
 	    Variables variables = new Variables();
 	    double callEval1 = callExp1.evaluate(variables, null, null, 0);
@@ -367,7 +444,7 @@ public class ExpressionTest extends TestCase {
 	    double recEval1 = exprec1.evaluate(variables, null, null, 0);
 	    double recEval2 = exprec2.evaluate(variables, null, null, 0);
 	    double recEval3 = exprec3.evaluate(variables, null, null, 0);
-	    
+
 	    assertTrue(callEval1 == 5.0);
 	    assertTrue(callEval2 == 0.5);
 	    assertTrue(recEval1 == 120.0);
@@ -378,8 +455,11 @@ public class ExpressionTest extends TestCase {
 	    assertTrue(false);
 	}
 	
+	
     }
-
+    
+    
+        
     public void testLimits() {
 	String forTest = "for (int i = 0; i > 0; i = i + 1) { int n = 0\n n = n + 1 }";
 	
@@ -391,6 +471,8 @@ public class ExpressionTest extends TestCase {
 
 	assertTrue(forExp != null);
 	assertTrue(whileExp != null);
+	
+
 	
 	try {
 	    Variables variables = new Variables();
@@ -404,7 +486,7 @@ public class ExpressionTest extends TestCase {
 		assertTrue(false);
 	    }
 	}
-
+	
 	try {
 	    Variables variables = new Variables();
 	    double whileEval = whileExp.evaluate(variables, null, null, 0);	    	    
@@ -417,8 +499,7 @@ public class ExpressionTest extends TestCase {
 	    }
 	}	
     }
-    
-    
+        
     public void testClauseReturn() {
 	String test1 = "int n = 0\nfor (int i = 0; i < 10; i = i + 1) { n = n + 1} n";
 	String test2 = "int foo = 0\nint n = 0\nfor (int i = 0; i < 10; i = i + 1) { foo = foo - 3\nn = n + 1} n";
@@ -534,7 +615,7 @@ public class ExpressionTest extends TestCase {
         }
     }
     
-    private boolean failParse(String string) {	
+    private boolean failParse(String string, boolean debug) {
 	try {
             Variables variables = new Variables();
             variables.add("x", Expression.INTEGER_TYPE, false);
@@ -547,8 +628,15 @@ public class ExpressionTest extends TestCase {
 	    return false;
         }
         catch(ExpressionException e) {
+	    if (debug) {
+		System.out.println(e);
+	    }
             return true;
         }
+    }
+
+    private boolean failParse(String string) {	
+	return failParse(string, false);
     }
 
     private String simplify(String string) {       

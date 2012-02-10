@@ -59,14 +59,20 @@ public class MomentumExpression extends TernaryExpression {
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if(period <= 0)
-            throw EvaluationException.MOMENTUM_RANGE_EXCEPTION;
+        if(period <= 0) {
+            EvaluationException e = EvaluationException.MOMENTUM_RANGE_EXCEPTION;
+	    e.setMessage(this, "", period);
+	    throw e;
+	}
         int offset = (int)getChild(2).evaluate(variables, 
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if (offset > 0)
-           throw EvaluationException.MOMENTUM_OFFSET_EXCEPTION;
+        if (offset > 0) {
+           EvaluationException e = EvaluationException.MOMENTUM_OFFSET_EXCEPTION;
+	   e.setMessage(this, "", offset);
+	   throw e;
+	}
 
         // Calculate and return the momentum.
         QuoteBundleFunctionSource source =

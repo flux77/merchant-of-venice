@@ -19,6 +19,8 @@
 package nz.org.venice.parser;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 import java.util.Iterator;
 
 /**
@@ -260,6 +262,54 @@ public class Variables {
 
     public int getSize() {
 	return variables.size();
+    }
+
+    public void dump() {
+	Iterator iterator = variables.keySet().iterator();
+	while (iterator.hasNext()) {
+	    String v = (String)iterator.next();
+	    System.out.println("v = " + v);
+	}
+    }
+
+    /**
+     * Compare the two sets of variables and return any differences.
+     * A difference is any two variables with the same name but different
+     * values or any variables which exist in the first set, but not the second
+     * and vice versa.
+     * 
+     * @param vars1 The first set of variables
+     * @param vars2 The second set of variables
+     * @return a list of the differences found.     
+     */
+    public static List getDifferences(Variables vars1, Variables vars2)  {
+	Iterator iterator1 = vars1.variables.keySet().iterator();
+    	Iterator iterator2 = vars2.variables.keySet().iterator();
+	List diffs = new Vector();
+
+	while (iterator1.hasNext()) {
+	    String vname1 = (String)iterator1.next();
+	    Variable v1 =  vars1.get(vname1);
+	    
+	    if (vars2.contains(vname1)) {
+		if (vars2.getValue(v1.getName()) != v1.getValue()) {
+		    diffs.add(v1);
+		}
+	    } else {
+		diffs.add(v1);
+	    }			       
+	}
+
+	while (iterator2.hasNext()) {
+	    String vname2 = (String)iterator2.next();
+	    Variable v2 =  vars2.get(vname2);
+	    
+	    if (!vars1.contains(vname2)) {
+		diffs.add(v2);
+	    }			       
+	}
+
+	return diffs;
     }
 
 }

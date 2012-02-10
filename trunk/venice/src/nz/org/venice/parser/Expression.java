@@ -60,7 +60,7 @@ public interface Expression extends Cloneable {
     /** Represents a stock integer quote <b>type</b>: volume */
     public static final int INTEGER_QUOTE_TYPE = 4;
 
-    /** Represents a string type that can containy any string. */
+    /** Represents a string type that can contain any string. */
     public static final int STRING_TYPE = 5;
 
     /** Threshold level where a number is registered as <code>TRUE</code> */
@@ -77,7 +77,8 @@ public interface Expression extends Cloneable {
 
     /** Value of <code>FALSE</code> */
     public final static double FALSE = 0.0D;
-    
+
+
     /**
      * Evaluates the given expression and returns the result.
      *
@@ -223,14 +224,30 @@ public interface Expression extends Cloneable {
     /**
      *
      * @return true if none of the children of the expression are null
+     * (slightly deprecated since 7.21 - shouldn't be anything but true 
+     * because children are now immutable and consequently not allowed to be 
+     * null)
      */
     public boolean validTree();
-
+    
+    /**
+     * Store the metadata about how the expressing parsing.
+     * @param parseTree A map which relates a constructed expression with it's 
+     * associated token. 
+     * @param tokenLineMap A map which associates a token to which line number 
+     * of the rule text it appears.
+     */
     public void setParseMetadata(HashMap parseTree, HashMap tokenLineMap);
 
+    /**
+     * @return metadata information about the parse. (e.g. line numbers)
+     */
     public ParseMetadata getParseMetadata();
 
-
+    /**
+     * @return the unique id of the expression. (Not all expressions 
+     * implement a proper hashcode())
+     */
     public String getId();
 
 }

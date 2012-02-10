@@ -62,8 +62,11 @@ public class MACDExpression extends BinaryExpression {
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if (offset > 0)
-           throw EvaluationException.MACD_OFFSET_EXCEPTION;
+        if (offset > 0) {
+           EvaluationException e = EvaluationException.MACD_OFFSET_EXCEPTION;
+	   e.setMessage(this, "", offset);
+	    throw e;
+	}
 
         // Calculate and return the MACD.
         QuoteBundleFunctionSource sourceSlow =

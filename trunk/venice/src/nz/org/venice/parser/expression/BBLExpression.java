@@ -59,14 +59,23 @@ public class BBLExpression extends TernaryExpression {
 	int period = (int)getChild(1).evaluate(variables, 
 					       quoteBundle, 
 					       explicitSymbol, day);
-        if(period <= 0)
-            throw EvaluationException.BBL_RANGE_EXCEPTION;
+        if(period <= 0) {
+	    EvaluationException e = 
+		EvaluationException.BBL_RANGE_EXCEPTION;
+
+	    e.setMessage(this, "", period);
+	    throw e;
+	}
         int offset = (int)getChild(2).evaluate(variables, 
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if (offset > 0)
-           throw EvaluationException.BBL_OFFSET_EXCEPTION;
+        if (offset > 0) {
+	    EvaluationException e =
+		EvaluationException.BBL_OFFSET_EXCEPTION;
+	    e.setMessage(this, "", offset);
+	    throw e;	    
+	}
 
         // Calculate and return the BBL.
         QuoteBundleFunctionSource source =

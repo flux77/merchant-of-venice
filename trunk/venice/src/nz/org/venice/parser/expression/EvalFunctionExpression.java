@@ -18,12 +18,17 @@
 
 package nz.org.venice.parser.expression;
 
+import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import nz.org.venice.parser.Parser;
 import nz.org.venice.parser.EvaluationException;
 import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.TypeMismatchException;
 import nz.org.venice.parser.AnalyserGuard;
 import nz.org.venice.parser.Variables;
+import nz.org.venice.parser.Variable;
 import nz.org.venice.quote.MissingQuoteException;
 import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.Symbol;
@@ -44,6 +49,8 @@ public class EvalFunctionExpression extends UnaryExpression {
     private final String name; //The function name called
     private final int type;   //The value type which is returned.
 
+    private HashMap setParameters;
+
     //Expression identifier so that AnalyserGuard can monitor the "call stack"
     //(parent hashcode uses class hashcode, so it would the same for all 
     //EvalFunctionExpressions)
@@ -63,6 +70,8 @@ public class EvalFunctionExpression extends UnaryExpression {
 	this.name = name;
 	this.type = type;
 	      
+	setParameters = new HashMap();
+
 	id = UUIDGenerator.getInstance().generateRandomBasedUUID();
     }
 
@@ -84,13 +93,63 @@ public class EvalFunctionExpression extends UnaryExpression {
 	    //setup the function parameters as new variables, 
 	    //replacing variables already defined.
 	    setupParameters(parameters, quoteBundle, symbol, day);
+
 	} catch (CloneNotSupportedException e) {
 	    
 	}
 
 	Expression body = getParseMetadata().getFunctionBody(name);
-	double rv = body.evaluate(parameters, quoteBundle, symbol, day); 
-	AnalyserGuard.getInstance().finishFunction(this, id, symbol, day);
+
+	double rv = 0.0;
+	rv = body.evaluate(parameters, quoteBundle, symbol, day); 
+
+ 	AnalyserGuard.getInstance().finishFunction(this, id, symbol, day);
+
+	/*
+	  We use parameters (as a copy of variables) so that
+	  if a function sets the value of a parameter it doesn't overwrite
+	  the value of a function. 
+	
+	  But we also need to transfer the value in the case where the
+	  value of a variable is set, but it's not a parameter.
+
+	  e.g. Case 1:
+	  int myvar = 0
+	  int function procMyVar(int myvar) {
+	     myvar = 3
+	  }
+
+	  e.g. Case2:
+	  int myvar = 0
+	  int function setMyVar(int parm) {
+	      myvar = parm
+	  }
+	  
+	  In Case1, when the function exits, we want myvar to be 0.
+	  In Case2, when the function exits, we want myvar to be parm.
+	
+	*/
+
+	List updatedValues = Variables.getDifferences(parameters, variables); 
+	Iterator variableIterator  = updatedValues.iterator();
+	while (variableIterator.hasNext()) {
+	    Variable v1 = (Variable)variableIterator.next();
+	    Variable v2 = variables.get(v1.getName());
+
+	    //v2 won't be found in cases where the parameter does not
+	    //share it's name with a variable. 	    
+	    if (v2 == null) {
+		continue;
+	    }
+
+	    //If v1 isn't a parameter, and the 
+	    //values are different, update the value of the variable.
+	    if (v1.getValue() != v2.getValue() &&
+		setParameters.get(v1.getName()) == null) {		
+
+		v2.setValue(v1.getValue());
+	    }
+	}
 
 	return rv;
     }
@@ -198,14 +257,15 @@ public class EvalFunctionExpression extends UnaryExpression {
 	if (parameterNamesList.getChildCount() == 0) {
 	    return;
 	}
-
+       
 	//Evaluate the parameter names expression so that the parameter
 	//names are available to the function.
 	//Can't use ClauseExpression.evaluate because it clones the 
-	//variables and so they fall out of scope. 	
+	//variables and so they fall out of scope. 
 	for (int i = 0; i < parameterNamesList.getChildCount(); i++) {
 	    DefineParameterExpression param = (DefineParameterExpression)parameterNamesList.getChild(i);	    
 	    param.evaluate(parameters, quoteBundle, symbol, day);
+	    setParameters.put(param.getName(), param.getName());
 	}	
 
 	//Evaluate the parameter values and set the parameter values
@@ -221,4 +281,5 @@ public class EvalFunctionExpression extends UnaryExpression {
 	    parameters.setValue(nameExpression.getName(), value);
 	}
     }
+
 }

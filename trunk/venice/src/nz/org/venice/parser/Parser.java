@@ -34,6 +34,7 @@ import nz.org.venice.parser.expression.LagExpression;
 import nz.org.venice.parser.expression.NumberExpression;
 import nz.org.venice.parser.expression.SetVariableExpression;
 import nz.org.venice.parser.expression.StringExpression;
+import nz.org.venice.parser.expression.IncludeExpression;
 
 import nz.org.venice.quote.QuoteFunctions;
 import nz.org.venice.prefs.StoredExpression;
@@ -112,6 +113,7 @@ public class Parser {
 
     private static HashMap tokenLineMap;
     private static HashMap parseTree;
+    private static HashMap parameterMap;
 
     private Parser() {
         // class should not be instantiated
@@ -151,8 +153,8 @@ public class Parser {
     //and that will break things like parameter count checking.
 
     private static Expression parse(Variables variables, String string, boolean internal) throws ExpressionException {
-	
-	createMaps(internal);
+		
+	createMaps(internal);	
 
 	// Perform lexical analysis on string - i.e. reduce it to stack of
 	// tokens
@@ -180,10 +182,14 @@ public class Parser {
 	    }
 	    if (tokenLineMap == null) {
 		tokenLineMap = new HashMap();	
-	    }	    
+	    }
+	    if (parameterMap == null) {
+		parameterMap = new HashMap();
+	    }
 	} else {
 	    parseTree = new HashMap();	
 	    tokenLineMap = new HashMap();	
+	    parameterMap = new HashMap();
 	} 
     }
 
@@ -230,6 +236,8 @@ public class Parser {
 	while (head.getType() == Token.INCLUDE_TOKEN) {
 	    tokens.pop();	    
 
+	    List includedExpressions = new ArrayList();
+
 	    if (!tokens.match(Token.STRING_TOKEN)) {
 		throw new ParserException(Locale.getString("EXPECTED_STRING_TYPE_ERROR"));
 	    }
@@ -248,7 +256,7 @@ public class Parser {
 		    break;
 		}
 	    }
-
+	    
 	    if (includedStoredExpression == null) {
 		throw new ParserException(Locale.getString("UNKNOWN_IDENTIFIER_ERROR", includeName));
 	    } else {
@@ -256,8 +264,22 @@ public class Parser {
 		    Expression includedExpression = 
 			Parser.parse(variables, 
 				     includedStoredExpression.expression, 
-				     true);		    
-		    subExpressions.add(includedExpression);
+				     true); 
+		    
+		    //Included Expression different to ClauseExpression
+		    //in that variables defined and set stay in scope.
+		    //Allows an included function to access an included variable
+		    
+		    for (int i = 0; i < includedExpression.getChildCount(); i++) {
+			Expression c = includedExpression.getChild(i);
+			includedExpressions.add(c);
+		    }
+		    
+		    IncludeExpression incExpression = 
+			new IncludeExpression(includedExpressions);
+
+		    subExpressions.add(incExpression);
+
 
 		} catch (ExpressionException e) {
 		    throw new ParserException(e.getReason()); 
@@ -267,6 +289,8 @@ public class Parser {
 	    }
 	    head = tokens.get();	    
 	}
+
+	
 
 	while(tokens.size() > 0) {
 	    subExpressions.add(parseSubExpression(variables, tokens));	
@@ -641,13 +665,20 @@ public class Parser {
 	    value = new NumberExpression(0.0D, type);
 
 	// Check the variable isn't already defined
-	if(variables.contains(name))
+	// or if it is, it's defined as a function parameter
+	
+	if(variables.contains(name) && parameterMap.get(name) == null) {
 	    throw new ParserException(Locale.getString("VARIABLE_DEFINED_ERROR", name));
+	    
+	}
 
-	// Add variable
-	variables.add(name, type, isConstant);
+	// Add variable	
+	if (parameterMap.get(name) == null) {
+	    variables.add(name, type, isConstant);
+	}
 	Expression defVarExpression = 
 	    new DefineVariableExpression(name, type, isConstant, value);
+
 	parseTree.put(defVarExpression, head);
 
 	return defVarExpression;
@@ -1019,15 +1050,21 @@ public class Parser {
 	Token functionName = tokens.pop();
 	assert functionName.getType() == Token.VARIABLE_TOKEN;
 
-	if (variables.contains(functionName.getVariableName())) {
+	String functionNameStr = functionName.getVariableName();
+	
+	if (variables.contains(functionNameStr) &&
+	    parameterMap.get(functionNameStr) == null) {
 	    throw new ParserException(Locale.getString("VARIABLE_DEFINED_ERROR", functionName.getVariableName()));
+
+
 	}
 
-	variables.add(functionName.getVariableName(), 
+	variables.add(functionNameStr, 
 		      type, 
 		      false,
 		      true, 
 		      0.0);
+
 
 	
 	//parameterExpression will be replaced if parameters are defined
@@ -1037,7 +1074,10 @@ public class Parser {
 	parseLeftParenthesis(variables, tokens);
 	if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
 	    //parseParameters eats the right parenthesis
-	    parameterExpression = parseParameters(variables, tokens);
+	    parameterExpression = parseParameters(variables, 
+						  tokens, 
+						  functionName.
+						  getVariableName());
 	} else {	    
 	    parseRightParenthesis(variables, tokens);
 	}
@@ -1046,8 +1086,9 @@ public class Parser {
 	Vector functionBodyList = new Vector();
 	
 	boolean inClause = true;
-	while(inClause) {	    
-	    functionBodyList.add(parseSubExpression(variables, tokens));
+	while(inClause) {
+	    Expression se = parseSubExpression(variables, tokens);	    
+	    functionBodyList.add(se);
 
 	    // If there are no more symbols then we are mising the matching "}"
 	    if(tokens.size() == 0) 
@@ -1067,7 +1108,7 @@ public class Parser {
 	return userFunction;
     }
 
-    private static Expression parseParameters(Variables variables, TokenStack tokens) throws ParserException {
+    private static Expression parseParameters(Variables variables, TokenStack tokens, String functionName) throws ParserException {
 
 	Token token = tokens.pop();
 	int type;
@@ -1096,14 +1137,24 @@ public class Parser {
 
 	    Expression parameterExpression = 
 		new DefineParameterExpression(name, type);
+	    
+	    //Check that if the parameter is repeated, it's not doing so 
+	    //as part of the same signature.
+	    if (parameterMap.get(name) != null &&
+		parameterMap.get(name).equals(functionName)) {
+		throw new ParserException(Locale.getString("VARIABLE_DEFINED_ERROR", name));
+	    }
 
-	    //Only add the variable if it has not already been.
+	    //Only add the variable if it has not already been added.
 	    //It needs to be set once - if it's a variable, it's value 
 	    //should persist. If it's a parameter, it's value will get
 	    //overridden and have the passed value.
 	    if (variables.get(name) == null) {
 		variables.add(name, type, false);
+		parameterMap.put(name, functionName);
 	    }
+
+
 
 	    parameterExpressions.add(parameterExpression);
 	    if (tokens.match(Token.COMMA_TOKEN)) {
@@ -1165,4 +1216,5 @@ public class Parser {
 	if(!tokens.pop(Token.SEMICOLON_TOKEN))
 	    throw new ParserException(Locale.getString("EXPECTED_SEMICOLON_ERROR"));
     }
+
 }

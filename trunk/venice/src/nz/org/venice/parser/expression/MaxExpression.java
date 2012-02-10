@@ -61,15 +61,21 @@ public class MaxExpression extends TernaryExpression {
         int quoteKind = quoteChild.getQuoteKind();
 	
 
-        if(days <= 0)
-            throw EvaluationException.MAX_RANGE_EXCEPTION;
+        if(days <= 0) {
+            EvaluationException e = EvaluationException.MAX_RANGE_EXCEPTION;
+	    e.setMessage(this, "", days);
+	    throw e;
+	}
         int offset = (int)getChild(2).evaluate(variables, 
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
 
-        if (offset > 0)
-           throw EvaluationException.MAX_OFFSET_EXCEPTION;
+        if (offset > 0) {
+           EvaluationException e = EvaluationException.MAX_OFFSET_EXCEPTION;
+	   e.setMessage(this, "", offset);
+	   throw e;
+	}
         
 	return max(quoteBundle, explicitSymbol, quoteKind, days, day, offset);
     }

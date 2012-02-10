@@ -64,14 +64,20 @@ public class CorrExpression extends QuaternaryExpression {
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if(period <= 1)
-            throw EvaluationException.CORR_RANGE_EXCEPTION;
+        if(period <= 1) {
+	    EvaluationException e = EvaluationException.CORR_RANGE_EXCEPTION;
+	    e.setMessage(this, "", period);
+	    throw e;
+	}
         int offset = (int)getChild(3).evaluate(variables, 
 					       quoteBundle, 
 					       explicitSymbol, 
 					       day);
-        if (offset > 0)
-            throw EvaluationException.CORR_OFFSET_EXCEPTION;
+        if (offset > 0) {
+	    EvaluationException e = EvaluationException.CORR_OFFSET_EXCEPTION;
+	    e.setMessage(this, "", period);
+	    throw e;
+	}
 
         Symbol correlatedSymbol;
 

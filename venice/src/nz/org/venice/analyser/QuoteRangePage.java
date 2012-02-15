@@ -310,6 +310,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 
         if(orderByExpressionButton.isSelected()) {
             try {
+		if (orderByExpressionComboBox.getExpressionText().equals("")) {
+		    throw new ExpressionException(Locale.getString("MISSING_EQUATION_NAME"));
+		}
                 orderByExpression = Parser.parse(orderByExpressionComboBox.getExpressionText());
             }
             catch(ExpressionException e) {

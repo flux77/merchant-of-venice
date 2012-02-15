@@ -360,6 +360,11 @@ public class ExpressionTest extends TestCase {
 
 	String test11 = "int varname = 99 \n int function setme(int varname2) { varname = 2 } int function middle(int varname3) { setme(varname+1) } \n int function toplevel() { middle(22) } \n toplevel() varname";
 
+	//This wont parse but if it did it would evaluate because 
+	//clauseexpressions clone the variables. 
+	String test12 = "for (int iexists = 0; iexists < 10; iexists = iexists + 1) { iexists }\n for (int iexists = 0; iexists < 20; iexists = iexists + 1) { i }";
+	
+
 	assertTrue(failParse(test1));
 	
 	Expression exp2 = parse(test2);
@@ -376,6 +381,7 @@ public class ExpressionTest extends TestCase {
 	Expression exp9 = parse(test9);
 	Expression exp10 = parse(test10);
 	Expression exp11 = parse(test11);
+	Expression exp12 = parse(test12);
 	
 	assertTrue(exp6 != null);
 	assertTrue(exp7 != null);
@@ -383,6 +389,7 @@ public class ExpressionTest extends TestCase {
 	assertTrue(exp9 != null);
 	assertTrue(exp10 != null);
 	assertTrue(exp11 != null);
+	assertTrue(exp12 == null);
 	
 	try {
 	    Variables variables = new Variables();

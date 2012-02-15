@@ -29,6 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -83,8 +84,19 @@ public class EquationPage extends JPanel implements PreferencesPage
 	deleteEquationsButton = new JButton(Locale.getString("DELETE"));
 	deleteEquationsButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
+
+		    //It looks like theres a confirmation in 
+		    //ExpressionComboBox, but I've never seen it fire.
+		    int option = JOptionPane.
+			showConfirmDialog(null,
+					  Locale.getString("SURE_DELETE_EQUATION", ""),
+					  Locale.getString("DELETE_EQUATION"),
+					  JOptionPane.YES_NO_OPTION);
+		    
+		    if(option == JOptionPane.YES_OPTION) {
 			equationTable.delete(equationTable.getSelectedRows());
 			checkButtonDisabledStatus();
+		    }
 		}});
 						
 	buttonPanel.add(addEquationButton);

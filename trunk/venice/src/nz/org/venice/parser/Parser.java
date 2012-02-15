@@ -114,7 +114,7 @@ public class Parser {
     private static HashMap tokenLineMap;
     private static HashMap parseTree;
     private static HashMap parameterMap;
-
+    
     private Parser() {
         // class should not be instantiated
     }
@@ -154,6 +154,10 @@ public class Parser {
 
     private static Expression parse(Variables variables, String string, boolean internal) throws ExpressionException {
 		
+	if (string == null || string.equals("")) {
+	    throw new ExpressionException(Locale.getString("MISSING_EQUATION_NAME"));
+	}
+
 	createMaps(internal);	
 
 	// Perform lexical analysis on string - i.e. reduce it to stack of
@@ -192,7 +196,7 @@ public class Parser {
 	    parameterMap = new HashMap();
 	} 
     }
-
+    
     private static TokenStack lexicalAnalysis(Variables variables, String string)
 	throws ParserException {
 
@@ -491,7 +495,9 @@ public class Parser {
 	        tokens.match(Token.TREND_TOKEN) ||
 		tokens.match(Token.RANDOM_TOKEN) ||
 	        tokens.match(Token.ALERT_TOKEN) ||
-		tokens.match(Token.HALT_TOKEN))
+		tokens.match(Token.HALT_TOKEN) ||
+	        tokens.match(Token.FLOOR_TOKEN) ||
+		tokens.match(Token.CEIL_TOKEN)) 
 		    expression = parseFunction(variables, tokens);
 
         // ABBREVIATION QUOTE FUNCTIONS
@@ -598,7 +604,6 @@ public class Parser {
 		Expression parameterListExpression = 
 		    new ClauseExpression(parameterList);
 
-		
 		Expression evalFunctionExpression = 
 		    new EvalFunctionExpression(variable.getName(),
 					       variable.getType(),
@@ -931,6 +936,8 @@ public class Parser {
 	case(Token.COS_TOKEN):
 	case(Token.LOG_TOKEN):
 	case(Token.EXP_TOKEN):
+	case(Token.FLOOR_TOKEN):
+	case(Token.CEIL_TOKEN):
 	case (Token.RANDOM_TOKEN):
 	    //Parse optional seed argument
 	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
@@ -1215,6 +1222,6 @@ public class Parser {
     private static void parseSemicolon(Variables variables, TokenStack tokens) throws ParserException {
 	if(!tokens.pop(Token.SEMICOLON_TOKEN))
 	    throw new ParserException(Locale.getString("EXPECTED_SEMICOLON_ERROR"));
-    }
+    }    
 
 }

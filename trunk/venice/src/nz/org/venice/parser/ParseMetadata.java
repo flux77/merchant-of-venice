@@ -36,7 +36,8 @@ public class ParseMetadata {
 
     private final HashMap parseTree;
     private final HashMap tokenLineMap;
-
+    private final HashMap bodyCache;
+    
 
     /**
      * Construct an object containing the information used to construct tghe
@@ -50,7 +51,7 @@ public class ParseMetadata {
     public ParseMetadata(HashMap parseTree, HashMap tokenLineMap) {
 	this.parseTree = parseTree;
 	this.tokenLineMap = tokenLineMap;
-
+	bodyCache = new HashMap();
     }
 
     /** 
@@ -58,23 +59,28 @@ public class ParseMetadata {
      * @param functionName The name of the function which was called.
      * 
      */
-
+    
     public Expression getFunctionBody(String functionName) {
-	Iterator iterator = parseTree.keySet().iterator();
+
+	if (bodyCache.get(functionName) != null) {
+	    return (Expression)bodyCache.get(functionName);
+	}
+
+    	Iterator iterator = parseTree.keySet().iterator();
 	while (iterator.hasNext()) {
 	    Expression e = (Expression)iterator.next();
 	    
 	    if (e instanceof FunctionExpression) {
 		String funcName = ((FunctionExpression)e).getName();
 		if (funcName.equals(functionName)) {
+		    bodyCache.put(functionName, e.getChild(1));
 		    return e.getChild(1);
 		}
 	    }
 	}
 	return null;
     }
-
-
+    
     /**
      * @return The list of parameters for a given function
      * @param functionName The name of the function.

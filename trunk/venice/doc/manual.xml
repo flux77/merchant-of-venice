@@ -995,6 +995,12 @@ similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
 similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
 </section>
 
+<section name="ceil">
+  <para>The ceil function takes a floating point number and returns an integer that is not less than the given argument.</para>
+  <para>Example:</para>
+  <para><code>ceil(-3.14159)</code> returns -4.</para>
+</section>
+
 <section name="Correlation">
 <para>The correlation function returns the correlation between two stock
 quotes.</para>
@@ -1079,6 +1085,12 @@ similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
 similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
 <para>The expression <code>ema(close, 26, -1, 0.1)</code> is the same as <code>ema(close, 26, -1)</code>
 similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
+</section>
+
+<section name="Floor">
+  <para>The floor function takes a floating point number and returns an integer that is not greater than the given argument.</para>
+  <para>Example:</para>
+  <para><code>floor(-3.14159)</code> returns -3.</para>
 </section>
 
 <section name="For">

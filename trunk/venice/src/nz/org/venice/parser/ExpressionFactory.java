@@ -279,6 +279,12 @@ public class ExpressionFactory {
         case(Token.EXP_TOKEN):
             expression = new ExponentialExpression(arg1);
             break;
+	case (Token.FLOOR_TOKEN):
+	    expression = new FloorExpression(arg1);
+	    break;
+	case (Token.CEIL_TOKEN):
+	    expression = new CeilExpression(arg1);
+	    break;
 	case (Token.TREND_TOKEN):
 	    expression = new TrendExpression(arg1, arg2, arg3);
 	    break;
@@ -429,6 +435,10 @@ public class ExpressionFactory {
             expression = new LogarithmExpression(children[0]);            
         } else if (exp instanceof ExponentialExpression) {
             expression = new ExponentialExpression(children[0]);
+	} else if (exp instanceof FloorExpression) {
+	    expression = new FloorExpression(children[0]);
+	} else if (exp instanceof CeilExpression) {
+	    expression = new CeilExpression(children[0]);
 	} else if (exp instanceof TrendExpression) {
 	    expression = new TrendExpression(children[0], children[1], children[2]);
 	} else if (exp instanceof GetVariableExpression) {

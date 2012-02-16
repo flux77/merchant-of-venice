@@ -8,7 +8,7 @@
   <variablelist>   
     <varlistentry>
       <term>
-	<para>16/Jan/2012: Venice 0.74 beta released</para>
+	<para>16/Feb/2012: Venice 0.74 beta released</para>
 	<para>Updates in this release</para>
       </term>
       <listitem>
@@ -27,7 +27,7 @@
 	      </listitem>
 	      <listitem>
 		<para>Alert messages can be displayed when rules are evaluated</para>
-	      </listitem>
+	      </listitem>	      
 	    </itemizedlist>
 	  </listitem>
 	  <listitem>
@@ -35,6 +35,9 @@
 	  </listitem>
 	  <listitem>
 	    <para>Fixed bug #3437002 (Gondola evaluation of boolean expressions)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Some general usability and security fixes, including protection from infinite loop expressions. </para>
 	  </listitem>
 	</itemizedlist>
       </listitem>

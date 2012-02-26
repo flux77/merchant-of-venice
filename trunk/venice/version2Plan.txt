@@ -1,0 +1,72 @@
+Abstract
+
+This document outlines a list of tasks intended for Version 2. It contains planned rewrites for interfaces which have expanded beyond the original use and are thus difficult to maintain, deferred bugs and future features.
+
+Introduction
+The structure for version 1 was well designed because it facilitated the
+easy addition of many useful features and is fairly maintainable. So the goal would be to have a similarly flexible design for version 2.
+
+One danger this approach is that we risk falling victim to "Second System Effect", an anti-pattern where by successor systems tend to try and include all the features missing from version 1. 
+
+I mention this now, so I can keep it in mind and hopefully avoid Second System Effect.
+
+I've also started this document with the assumption that version 2 would be an entirely new work, but there's nothing to prevent version 1 from being 
+successively refactored until it has the features/structure we want.
+
+Scope
+
+This document isn't intended doesn't prevent any of these tasks being implemented in version 1. It is merely for developer guidance, allowing a developer
+to avoid spending hours on minor bugs when it may be fixed as part of a larger
+piece of work.
+
+Tasks
+
+1. A more general interface for data storage, hiding the implementation 
+details from the objects, whilst still allowing for other data stores.
+Currently the type of stores supported are : java preferences, sql databases,
+internal database. Future databases could include nosql databases, XML, JSON
+etc. 
+
+The interface would allow storage all types of Venice objects, including
+price data, equations, alerts, macros, preferences, index definitions etc. 
+
+
+2. Be less ASX centric. 
+
+We may deprecate all ordinaries table entirely, or place it under a 
+indeces menu.
+
+3. Better support for the keyboard.
+
+Deferred Bugs/Features
+
+1. Ordinary are not filtered correctly #1528817
+This problem arises out of the interaction between the quote cache and the
+table. The quote cache doesn't care about the "flavour" of a symbol, and the
+table display can only filter based on an equation. The bug is not severe enough
+to warrant reworking large sections of both the quote and table code at this time.
+
+
+3. add (sic) a criteria for selectin (sic) symbols #1528799
+This feature involves adding a "type" to a symbol. One difficulty is that
+imported quotes don't have this data, and backward compatability must be
+maintained. 
+
+
+
+
+
+Future Features for either Version 1 or 2
+1. Support for splits, ex/cum dividend trading.
+2. Add a date range to the graph dialog so the resulting chart only shows
+a chart within that range.
+3. When the cache expiry is triggered, preload most used symbols.
+4. Reduce the memory footprint of PointAndFigure charts.
+5. Allow String variables to be declared in the Gondola langauge.
+6. Make chart levels an object instead of just an integer in a list.
+   (Required so that lines drawn in a chart across levels flip and scale
+   correctly)
+7. Colour preferences -> backgrounds, charts, lines etc.
+
+authors:
+mhummel

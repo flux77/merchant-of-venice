@@ -29,7 +29,7 @@ public class VeniceLog
     private static VeniceLog instance = null;
     private FileWriter writer = null;
     private BufferedWriter bwriter = null;
-    private boolean enabled = false;
+    private boolean enabled = true;
 
     public static VeniceLog getInstance() {
 	if (instance == null) {
@@ -39,13 +39,13 @@ public class VeniceLog
     }
 
     private VeniceLog() {
-	try {
-	    writer = new FileWriter("/tmp/venice.log");
-	    bwriter = new BufferedWriter(writer);
-	    
-	} catch (IOException e) {
-	    System.err.println("Couldn't open venice.log: " + e);	    
-	}
+      try {
+          writer = new FileWriter("venice.log");
+          bwriter = new BufferedWriter(writer);
+          
+      } catch (IOException e) {
+          System.err.println("Couldn't open venice.log: " + e);	    
+      }
     }
 
     public void log(String mesg) {
@@ -55,6 +55,7 @@ public class VeniceLog
 	try {
 	    bwriter.write(mesg);
 	    bwriter.newLine();
+      bwriter.flush();
 	} catch (IOException e) {
 	    System.err.println("Couldn't write message: " + e);
 	}
@@ -69,5 +70,14 @@ public class VeniceLog
 	} catch (IOException e) {
 	    
 	}
-    } 
+    }
+    
+  protected void finalize() throws Throwable {
+      try {
+          this.close();
+      } finally {
+          super.finalize();
+      }
+  }   
+    
 }

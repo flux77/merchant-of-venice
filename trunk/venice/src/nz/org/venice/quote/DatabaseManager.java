@@ -797,7 +797,8 @@ public class DatabaseManager
      * @return Date string ready for SQL query.
      */
     public String toSQLDateString(TradingDate date) {
-    	return date.getYear() + "-" + date.getMonth() + "-" + date.getDay();
+      Integer args[] = { new Integer(date.getYear()), new Integer(date.getMonth()), new Integer(date.getDay()) };
+      return String.format("%04d-%02d-%02d", args);
     }
 
         /**

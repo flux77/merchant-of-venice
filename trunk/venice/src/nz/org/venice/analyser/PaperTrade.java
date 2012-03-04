@@ -550,7 +550,16 @@ public class PaperTrade {
 	while(dateOffset < environment.endDateOffset) {
             
             // Set the value of days elapsed from the begin of the Paper Trade process
-            variables.setValue("daysfromstart", daysRest + dateOffset);
+	    int daysFromStart = daysRest + dateOffset;
+            variables.setValue("daysfromstart", daysFromStart);
+	    
+	    // days from last transaction, if no such transaction, 
+	    // the daysfromstart value should be safe to use.
+	    TradingDate dateOfLastTransaction = environment.portfolio.getLastDate();
+	    
+	    int daysLastTrn = (dateOfLastTransaction != null) ? daysFromStart - dateOfLastTransaction.getDifference(startDate) : daysFromStart;
+
+	    variables.setValue("daysfromlastransaction", daysLastTrn);
             
             // Set the value of the number of transactions done until now
             variables.setValue("transactions", environment.portfolio.countTransactions());
@@ -563,8 +572,13 @@ public class PaperTrade {
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);
 
+	    int origTransactionCount = environment.portfolio.countTransactions();
+
             sellTrades(environment, quoteBundle, variables, sell, buy, dateOffset, tradeCost,
                        symbols, orderCache);
+	    
+	    resetDaysLastVar(environment, variables, origTransactionCount, daysLastTrn);
+
             buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost,
                       symbols, orderCache, stockValue);
 
@@ -634,7 +648,17 @@ public class PaperTrade {
 	while(dateOffset < environment.endDateOffset) {
 
             // Set the value of days elapsed from the begin of the Paper Trade process
-            variables.setValue("daysfromstart", daysRest + dateOffset);
+	    int daysFromStart = daysRest + dateOffset;
+	    
+            variables.setValue("daysfromstart", daysFromStart);
+	
+	    // days from last transaction, if no such transaction, 
+	    // the daysfromstart value should be safe to use.
+	    TradingDate dateOfLastTransaction = environment.portfolio.getLastDate();
+	    
+	    int daysLastTrn = (dateOfLastTransaction != null) ? daysFromStart - dateOfLastTransaction.getDifference(startDate) : daysFromStart;
+	    
+	    variables.setValue("daysfromlasttransaction", daysLastTrn);
             
             // Set the value of the number of transactions done until now
             variables.setValue("transactions", environment.portfolio.countTransactions());
@@ -647,15 +671,24 @@ public class PaperTrade {
             // that we have quotes for.
             List symbols = orderCache.getTodaySymbols(dateOffset);
 
+	    int origTransactionCount = environment.portfolio.countTransactions();
+
             sellTrades(environment, quoteBundle, variables, sell, buy, dateOffset, tradeCost,
                        symbols, orderCache);
+	    
+	    resetDaysLastVar(environment, variables, origTransactionCount, daysLastTrn);
+
+	    daysLastTrn = (int)variables.getValue("daysfromlasttransaction");
+
             try {
                 // stockValue = (portfolio / numberStocks) - (2 * tradeCost)
                 Money portfolioValue = environment.portfolio.getValue(quoteBundle, dateOffset);
                 Money stockValue =
                     portfolioValue.divide(numberStocks).subtract(tradeCost.multiply(2));
-                buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost,
-                          symbols, orderCache, stockValue);
+
+		buyTrades(environment, quoteBundle, variables, buy, dateOffset, tradeCost,
+			  symbols, orderCache, stockValue);
+		
             }
             catch(MissingQuoteException e) {
                 // Ignore and move on
@@ -898,5 +931,16 @@ public class PaperTrade {
         retValue.append("\n");
         
         return retValue.toString();
+    }
+
+    private static void resetDaysLastVar(Environment environment, Variables variables, int origTrnCount, int lastTrnOffset) {
+	int newTransactionCount = 
+	    environment.portfolio.countTransactions() -
+	    origTrnCount;
+
+	if (newTransactionCount > 0) {
+	    variables.setValue("daysfromlasttransaction", 
+			       0);	    
+	}
     }
 }

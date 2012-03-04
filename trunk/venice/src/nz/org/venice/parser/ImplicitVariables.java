@@ -68,6 +68,10 @@ public class ImplicitVariables {
 	if (!variables.contains("stockcapital")) {
 	    variables.add("stockcapital", Expression.FLOAT_TYPE, Variable.CONSTANT);
 	}
+
+	if (!variables.contains("daysfromlasttransaction")) {
+	    variables.add("daysfromlasttransaction", Expression.INTEGER_TYPE, Variable.CONSTANT);
+	}
     }
     
     /**

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nz.org.venice.quote.IDQuote;
+import nz.org.venice.quote.QuoteSourceManager;
 import nz.org.venice.quote.MissingQuoteException;
 import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.Quote;
@@ -216,7 +217,8 @@ public class MixedQuoteModel extends AbstractQuoteModel {
                 assert false;
             }
 
-            return new PointChangeFormat(initialQuote, finalQuote);
+            return new PointChangeFormat(initialQuote, finalQuote, 
+					 QuoteSourceManager.getSource().isMarketIndex(quote.getSymbol()));
             
         case(PERCENT_CHANGE_COLUMN):
             finalQuote = quote.getDayClose();

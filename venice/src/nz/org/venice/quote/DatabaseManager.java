@@ -30,6 +30,7 @@ import java.util.Vector;
 import java.util.List;
 import java.io.InputStream;
 
+import java.text.DecimalFormat;
 import java.util.Properties;
 import java.util.HashMap;
 import java.util.regex.*;
@@ -39,9 +40,11 @@ import org.xml.sax.helpers.*;
 import org.safehaus.uuid.UUID;
 import org.safehaus.uuid.UUIDGenerator;
 
+
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.TradingDate;
+import nz.org.venice.util.Converter;
 
 
 
@@ -797,8 +800,17 @@ public class DatabaseManager
      * @return Date string ready for SQL query.
      */
     public String toSQLDateString(TradingDate date) {
-      Integer args[] = { new Integer(date.getYear()), new Integer(date.getMonth()), new Integer(date.getDay()) };
-      return String.format("%04d-%02d-%02d", args);
+	Integer args[] = { new Integer(date.getYear()), new Integer(date.getMonth()), new Integer(date.getDay()) };
+     
+	int lengths[] = { 4, 2, 2};
+
+	String mesg = Converter.dateFormat(args, lengths, "-");
+
+	return mesg;
+	
+      //This is much better but not available in 1.4.2
+      //return String.format("%04d-%02d-%02d", args);
+
     }
 
         /**

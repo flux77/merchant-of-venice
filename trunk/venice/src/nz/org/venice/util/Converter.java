@@ -25,6 +25,13 @@ package nz.org.venice.util;
  * elsewhere and have been moved. This class is gradually dwindling away and
  * will be removed soon.
  */
+
+/* Unfortunately due to the delay of moving to a new Java, a new converter
+   method has been added.
+*/
+
+import java.text.DecimalFormat;
+
 public class Converter {
 
     /**
@@ -45,6 +52,40 @@ public class Converter {
 	}
 	return string;
     }
+
+    
+    /**
+     * Return a formatted string according to format.
+     * 
+     * @param args An array of integers containing data
+     * @param lengths An array of ints specifying how long each args should be.
+     * @return a formatted date string
+     */
+    public static String dateFormat(Integer args[], int lengths[], String separator) {
+	
+	String mesg = "";
+
+	assert args.length == lengths.length;
+	DecimalFormat[] formats = new DecimalFormat[args.length];
+	
+	for (int i = 0; i < args.length; i++) {
+	    formats[i] = new DecimalFormat(constructFormat(lengths[i]));
+	    mesg += formats[i].format(args[i]);
+	    if (i < args.length - 1) {
+		mesg += separator;
+	    }
+	}
+	return mesg;
+    }
+
+    private static String constructFormat(int length) {
+	String rv = "#";
+	for (int i = 0; i < length; i++) {
+	    rv += "0";
+	}	
+	rv += ".###";
+	return rv;
+    }    
 }
 
 

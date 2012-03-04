@@ -42,6 +42,7 @@ import nz.org.venice.util.Money;
 import nz.org.venice.util.TradingDate;
 import nz.org.venice.main.CommandManager;
 import nz.org.venice.quote.MissingQuoteException;
+import nz.org.venice.quote.QuoteSourceManager;
 import nz.org.venice.quote.Quote;
 import nz.org.venice.quote.EODQuoteBundle;
 import nz.org.venice.quote.Symbol;
@@ -167,7 +168,11 @@ public class StockHoldingTable extends AbstractTable {
                         // No big deal - we default to day open
                     }
 
-                    return new PointChangeFormat(initialQuote, finalQuote);
+                    return new PointChangeFormat(initialQuote, 
+						 finalQuote,
+						 QuoteSourceManager.getSource().
+						 isMarketIndex(symbol));
+		    
                 }
                 catch(MissingQuoteException e) {
                     return new PointChangeFormat(1.0D, 1.0D);

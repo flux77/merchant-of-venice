@@ -185,6 +185,8 @@ public class Portfolio implements Cloneable {
      * @param	transaction	a new transaction
      */
     public void addTransaction(Transaction transaction) {
+
+
 	// If the transaction is older than an existing transaction then remove all
 	// transactions. Put the new transaction with them, sort them all and then
 	// add all of the transactions. I.e. we must add the transactions in chronological

@@ -34,7 +34,7 @@ import nz.org.venice.util.Locale;
  * The main principles of this date class are speed (as fast as possible)
  * and size (as small as possible). It produces a much smaller and faster
  * date class than using the Calendar hierarchy. It also beats java.util.Date
- * by not using deprecated methods.
+7 * by not using deprecated methods.
  *
  * @author Andrew Leppard
  */
@@ -397,6 +397,61 @@ public class TradingDate implements Cloneable, Comparable {
 
         return(date.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
                date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
+    }
+
+
+    /**
+     * Return the number of trading days between this date and a given date.
+     *
+     * @param date The date to calculate the difference with.
+     * @return The number of trading days between this date and the given date
+     */
+    public int getDifference(TradingDate date) {
+	int diff = 0;
+	boolean forwardDir;
+	TradingDate tmp;
+
+	if (compareTo(date) == 0) {
+	    return 0;
+	} else if (compareTo(date) < 0) {
+	    forwardDir = false;
+	} else {
+	    forwardDir = true;
+	}
+
+	tmp = weekendShift(date, forwardDir);
+	if (forwardDir) {
+	    while (this.compareTo(tmp) != 0) {
+		tmp = tmp.next(1);
+		diff++;
+	    }
+	} else {
+	    while (this.compareTo(tmp) != 0) {
+		tmp = tmp.previous(1);
+		diff++;
+	    }
+	}
+
+	return diff;	
+    }
+
+    //Return the first date that is not a weekend date.
+    private TradingDate weekendShift(TradingDate date, 
+				     boolean forwardDirection) {
+	TradingDate tradingDate;
+
+	if (!date.isWeekend()) {
+	    return date;
+	} else {
+	    tradingDate = date;
+	    while (tradingDate.isWeekend()) {		
+		tradingDate = (forwardDirection) ? 
+		    tradingDate.next(1) 
+		    : 
+		    tradingDate.previous(1);
+	    }
+	}
+	return tradingDate;
     }
 
     /**

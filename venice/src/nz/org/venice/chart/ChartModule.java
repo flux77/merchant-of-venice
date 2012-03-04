@@ -162,6 +162,7 @@ public class ChartModule extends JPanel implements Module,
     private ChartTracking tracker;
 
     // Function Toolbar
+    private JButton select = null;
     private JButton defaultZoom = null;
     private JButton zoomIn = null;
     private JButton cloneChart = null;
@@ -202,6 +203,7 @@ public class ChartModule extends JPanel implements Module,
     // Editing images (paint, erase, text scribble, move ) aren't the
     // best we could have but at least there are unique icons for
     // different functions.
+    private String selectImage = "toolbarButtonGraphics/general/Select24.gif";
     private String defaultZoomImage = "toolbarButtonGraphics/general/Zoom24.gif";
     private String zoomInImage = "toolbarButtonGraphics/general/ZoomIn24.gif";
     private String paintInImage = "toolbarButtonGraphics/general/Edit24.gif";
@@ -406,6 +408,7 @@ public class ChartModule extends JPanel implements Module,
     private void addFunctionToolBar() {
 
 	// Create image on toolbar to zoom to default zoom level
+        URL selectURL = ClassLoader.getSystemResource(selectImage);
         URL defaultZoomURL = ClassLoader.getSystemResource(defaultZoomImage);
         URL zoomInImageURL = ClassLoader.getSystemResource(zoomInImage);
 	URL paintInImageURL = ClassLoader.getSystemResource(paintInImage);
@@ -419,6 +422,13 @@ public class ChartModule extends JPanel implements Module,
         // toolbar
         if(defaultZoomURL != null && zoomInImageURL != null) {
             JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+
+            // Create image on toolbar to return to default functionality
+            ImageIcon selectImageIcon = new ImageIcon(selectURL);
+            select = new JButton(selectImageIcon);
+            select.addActionListener(this);
+            select.setEnabled(true);
+            toolBar.add(select);
 
             // Create image on toolbar to return to default zoom
             ImageIcon defaultZoomImageIcon = new ImageIcon(defaultZoomURL);
@@ -965,7 +975,10 @@ public class ChartModule extends JPanel implements Module,
      */
     public void actionPerformed(ActionEvent e) {
 
-	if(zoomIn != null && e.getSource() == zoomIn) {
+      if (e.getSource() == select) {
+        activateButton(null);
+        viewMode = SELECTING;
+      } else if(zoomIn != null && e.getSource() == zoomIn) {
 	    try {
 		chart.zoomToHighlightedRegion();
 		zoomIn.setEnabled(zoomInEnabled = false);

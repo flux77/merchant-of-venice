@@ -281,5 +281,45 @@ public class GridBagHelper {
 	return comboBox;
 
     }
+    
+    public static JPanel addPanel(JPanel panel, 
+			String field, 
+			GridBagLayout gridbag,
+			GridBagConstraints c) {
+
+		JLabel label = new JLabel(field);
+		c.gridwidth = 1;
+		gridbag.setConstraints(label, c);
+		panel.add(label);
+		
+		JPanel sourcepanel = new JPanel();
+		if(c.gridx != -1)
+		    c.gridx++;
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		gridbag.setConstraints(sourcepanel, c);
+		panel.add(sourcepanel);
+		
+		return sourcepanel;		
+	}
+    
+    public static JPanel addPanel(JPanel panel, 
+			String field, 
+			JPanel sourcepanel,
+			GridBagLayout gridbag,
+			GridBagConstraints c) {
+
+		JLabel label = new JLabel(field);
+		c.gridwidth = 1;
+		gridbag.setConstraints(label, c);
+		panel.add(label);
+		
+		if(c.gridx != -1)
+		    c.gridx++;
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		gridbag.setConstraints(sourcepanel, c);
+		panel.add(sourcepanel);
+		
+		return sourcepanel;		
+	}
 }
 

@@ -19,6 +19,7 @@
 package nz.org.venice.quote;
 
 import nz.org.venice.util.Locale;
+import nz.org.venice.util.Report;
 import nz.org.venice.util.TradingDate;
 import nz.org.venice.util.TradingDateFormatException;
 
@@ -33,7 +34,7 @@ import nz.org.venice.util.TradingDateFormatException;
  *
  * @author Andrew Leppard
  */
-public class EzyChartQuoteFilter implements EODQuoteFilter {
+public class EzyChartQuoteFilter implements IFileEODQuoteFilter {
 
     /**
      * Creates an instance of the filter.
@@ -121,5 +122,9 @@ public class EzyChartQuoteFilter implements EODQuoteFilter {
 			  Math.round(quote.getDayLow()*100.0) + "," +
 			  Math.round(quote.getDayClose()*100.0) + "," +
 			  quote.getDayVolume());
+    }
+
+    public IFileEODQuoteImport getImporter(Report report) {
+	return new FileEODQuoteImport(report, this);
     }
 }

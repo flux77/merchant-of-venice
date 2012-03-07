@@ -21,6 +21,7 @@ package nz.org.venice.quote;
 import java.text.NumberFormat;
 
 import nz.org.venice.util.Locale;
+import nz.org.venice.util.Report;
 import nz.org.venice.util.TradingDate;
 import nz.org.venice.util.TradingDateFormatException;
 
@@ -36,7 +37,7 @@ import nz.org.venice.util.TradingDateFormatException;
  *
  * @author Andrew Leppard
  */
-public class MetaStock2QuoteFilter implements EODQuoteFilter {
+public class MetaStock2QuoteFilter implements IFileEODQuoteFilter {
 
     // Format used for writing stock quotes
     private NumberFormat format = null;
@@ -140,4 +141,8 @@ public class MetaStock2QuoteFilter implements EODQuoteFilter {
 			  format.format(quote.getDayClose()) + "," +
 			  quote.getDayVolume() / 100);
     }
+    
+	public IFileEODQuoteImport getImporter(Report report) {
+		return new FileEODQuoteImport(report, this);
+	}
 }

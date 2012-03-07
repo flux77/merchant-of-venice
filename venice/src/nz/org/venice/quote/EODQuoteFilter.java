@@ -24,8 +24,7 @@ package nz.org.venice.quote;
  *
  * @author Andrew Leppard
  */
-public interface EODQuoteFilter {
-
+public interface EODQuoteFilter {    
     /**
      * Return the name of the filter.
      *

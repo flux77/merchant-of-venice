@@ -37,7 +37,7 @@ import nz.org.venice.util.Report;
  * @see ImportQuoteModule
  * @see YahooEODQuoteImport
  */
-public class FileEODQuoteImport {
+public class FileEODQuoteImport implements IFileEODQuoteImport {
 
     // Maximum number of quotes imported by importNext()
     private static final int MAX_QUOTE_COUNT = 500;
@@ -80,7 +80,8 @@ public class FileEODQuoteImport {
      * @return <code>TRUE</code> if the file was successfully opened;\
      *         <code>FALSE</code> otherwise.
      */
-    public boolean open(File file) {
+
+	public boolean open(File file) {
         boolean success = false;
 
         assert fileStream == null;
@@ -111,7 +112,8 @@ public class FileEODQuoteImport {
      *
      * @return list of quotes
      */
-    public List importNext() {
+
+	public List importNext() {
         assert fileStream != null;
 
         List quotes = new ArrayList();
@@ -158,7 +160,8 @@ public class FileEODQuoteImport {
      * @return <code>TRUE</code> if there are more quotes to import;
      *         <code>FALSE</code> otherwise.
      */
-    public boolean isNext() {
+
+	public boolean isNext() {
         assert fileStream != null;
 
         return isNext;
@@ -167,7 +170,8 @@ public class FileEODQuoteImport {
     /**
      * Close the file being imported.
      */
-    public void close() {
+
+	public void close() {
         assert fileStream != null;
 
         try {

@@ -26,6 +26,7 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 
 import nz.org.venice.chart.graph.*;
+import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.util.Locale;
 
 /**
@@ -68,7 +69,11 @@ public class Chart extends JComponent implements MouseListener {
      * Create a new Chart component.
      */
     public Chart() {
-	setBackground(Color.white);
+
+	int colourValue = PreferencesManager.getDefaultChartBackgroundColour();
+
+	Color nc = new Color(colourValue, false);
+	setBackground(nc);
 	setForeground(Color.gray);
 	addMouseListener(this);
 	updateUI();

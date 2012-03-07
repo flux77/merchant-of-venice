@@ -21,6 +21,7 @@ package nz.org.venice.quote;
 import java.text.NumberFormat;
 
 import nz.org.venice.util.Locale;
+import nz.org.venice.util.Report;
 import nz.org.venice.util.TradingDate;
 import nz.org.venice.util.TradingDateFormatException;
 
@@ -35,7 +36,7 @@ import nz.org.venice.util.TradingDateFormatException;
  *
  * @author Andrew Leppard
  */
-public class MetaStockQuoteFilter implements EODQuoteFilter {
+public class MetaStockQuoteFilter implements IFileEODQuoteFilter {
 
     // Format used for writing stock quotes
     private NumberFormat format = null;
@@ -52,7 +53,7 @@ public class MetaStockQuoteFilter implements EODQuoteFilter {
      *
      * @return	the name of the filter.
      */
-    public String getName() {
+	public String getName() {
 	return "MetaStock";
     }
     
@@ -64,7 +65,9 @@ public class MetaStockQuoteFilter implements EODQuoteFilter {
      * @return	the stock quote
      * @exception QuoteFormatException if the quote could not be parsed
      */
-    public EODQuote toEODQuote(String quoteLine) throws QuoteFormatException {
+
+
+	public EODQuote toEODQuote(String quoteLine) throws QuoteFormatException {
 	EODQuote quote = null;
 
 	if(quoteLine != null) {
@@ -116,7 +119,8 @@ public class MetaStockQuoteFilter implements EODQuoteFilter {
      * @param	quote	a stock quote
      * @return	string version of the quote
      */
-    public String toString(EODQuote quote) {
+
+	public String toString(EODQuote quote) {
         if(format == null) {
 	    //FIXME
 	    //Replace this with something like opencsv.CSVWriter
@@ -136,4 +140,8 @@ public class MetaStockQuoteFilter implements EODQuoteFilter {
 			  format.format(quote.getDayClose()) + "," +
 			  quote.getDayVolume());
     }
+    
+	public IFileEODQuoteImport getImporter(Report report) {
+		return new FileEODQuoteImport(report, this);
+	}
 }

@@ -34,11 +34,9 @@ import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
 
 import nz.org.venice.main.Main;
-import nz.org.venice.main.Module;
 import nz.org.venice.main.ModuleFrame;
 import nz.org.venice.prefs.settings.ModuleFrameSettingsWriter;
 import nz.org.venice.prefs.settings.ModuleSettingsParserException;
-import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.macro.StoredMacro;
 import nz.org.venice.portfolio.Account;
 import nz.org.venice.portfolio.CashAccount;
@@ -1242,6 +1240,17 @@ public class PreferencesManager {
         String str = prefs.get("default_chart", "Line Graph");
         return str;
     }
+    
+    /**
+     * Load default chart setting.
+     *
+     * @return the default chart background colour
+     */
+    public static int getDefaultChartBackgroundColour() {
+        Preferences prefs = getUserNode("/default_chart_defaults");
+        int bc = prefs.getInt("default_chart_background_colour", 16777215);
+        return bc;
+    }
 
     /**
      * Load default chart scroll bar position.
@@ -1332,6 +1341,17 @@ public class PreferencesManager {
 
         Preferences prefs = getUserNode("/default_chart_defaults");
 	prefs.put("default_chart", defaultChart);
+    }
+    
+    /**
+     * Save default chart setting.
+     *
+     * @param defaultChart the chart to be displayed
+     */
+    public static void putDefaultChartBackgroundColour(int backColour) {
+
+        Preferences prefs = getUserNode("/default_chart_defaults");
+	prefs.putInt("default_chart_background_colour", backColour);
     }
 
     /**

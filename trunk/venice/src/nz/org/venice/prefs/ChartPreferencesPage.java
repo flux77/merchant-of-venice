@@ -19,18 +19,20 @@
 package nz.org.venice.prefs;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JCheckBox;
+
+import java.util.ArrayList;
 import java.util.Vector;
 
-import nz.org.venice.quote.EODQuoteCache;
+import nz.org.venice.ui.ColourSelectionPanel;
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.util.Locale;
 
@@ -47,6 +49,7 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 {
     private JDesktopPane desktop;
     private JComboBox defaultChart;     
+    private ColourSelectionPanel colourSelection;
 
 
     /**
@@ -56,7 +59,6 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
      */
     public ChartPreferencesPage(JDesktopPane desktop) {
 	this.desktop = desktop;
-
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         add(createChartDefaultsPanel());
@@ -64,7 +66,7 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
     
     private JPanel createChartDefaultsPanel() {
         JPanel borderPanel = new JPanel();
-	JPanel chartDefaultsPanel = new JPanel();
+        JPanel chartDefaultsPanel = new JPanel();
 	    
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
@@ -108,10 +110,15 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
                                      Locale.getString("CHART_DEFAULT"), 
                                      chartList,
                                      gridbag, c);
-				
-
-        chartDefaultsPanel.add(borderPanel, BorderLayout.NORTH);	
-		
+        
+        ArrayList colours = new ArrayList();
+        colours.add(Color.WHITE);
+        colours.add(Color.BLACK);
+        colourSelection = new ColourSelectionPanel(colours);
+        colourSelection.setSelectedColour(new Color(PreferencesManager.getDefaultChartBackgroundColour()));
+        GridBagHelper.addPanel(borderPanel, "Background", colourSelection, gridbag, c);
+    	
+        chartDefaultsPanel.add(borderPanel, BorderLayout.NORTH);		
         return chartDefaultsPanel;
     }
 
@@ -144,7 +151,7 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 	}
 	
 	
-	PreferencesManager.putDefaultChart(defaultChartStr);        
-	
+	PreferencesManager.putDefaultChart(defaultChartStr);
+	PreferencesManager.putDefaultChartBackgroundColour(colourSelection.getSelectedColour().getRGB());
     }
 }

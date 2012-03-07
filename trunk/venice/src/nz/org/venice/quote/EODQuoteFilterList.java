@@ -52,6 +52,7 @@ public class EODQuoteFilterList {
 	filters.add(new InsightTraderQuoteFilter());
 	filters.add(new MetaStockQuoteFilter());
 	filters.add(new MetaStock2QuoteFilter());
+	filters.add(new MetastockBinaryEODFilter());
     }
 
     /**
@@ -60,19 +61,19 @@ public class EODQuoteFilterList {
      * @param	filterName	the registered name of the filter.
      * @return	instance of the filter.
      */
-    public EODQuoteFilter getFilter(String filterName) {
+    public IFileEODQuoteFilter getFilter(String filterName) {
 	Iterator iterator = filters.iterator();
-	EODQuoteFilter filter;
+	IFileEODQuoteFilter filter;
 
 	while(iterator.hasNext()) {
-	    filter = (EODQuoteFilter)iterator.next();
+	    filter = (IFileEODQuoteFilter)iterator.next();
 
 	    if(filter.getName().equals(filterName))
 		return filter;
 	}
 	
 	// String did not match any filter! Default to first
-	return (EODQuoteFilter)filters.get(0);
+	return (IFileEODQuoteFilter)filters.get(0);
     }
 
     /**
@@ -104,10 +105,10 @@ public class EODQuoteFilterList {
      */
     public boolean isFilter(String filterName) {
 	Iterator iterator = getList().iterator();
-	EODQuoteFilter filter;
+	IFileEODQuoteFilter filter;
 
 	while(iterator.hasNext()) {
-	    filter = (EODQuoteFilter)iterator.next();
+	    filter = (IFileEODQuoteFilter)iterator.next();
 
 	    if(filter.getName().equals(filterName))
 		return true;

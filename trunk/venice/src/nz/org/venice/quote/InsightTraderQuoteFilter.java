@@ -19,6 +19,7 @@
 package nz.org.venice.quote;
 
 import nz.org.venice.util.Locale;
+import nz.org.venice.util.Report;
 import nz.org.venice.util.TradingDate;
 import nz.org.venice.util.TradingDateFormatException;
 
@@ -34,7 +35,7 @@ import nz.org.venice.util.TradingDateFormatException;
  *
  * @author Andrew Leppard
  */
-public class InsightTraderQuoteFilter implements EODQuoteFilter {
+public class InsightTraderQuoteFilter implements IFileEODQuoteFilter {
 
     /**
      * Creates an instance of the filter.
@@ -126,4 +127,8 @@ public class InsightTraderQuoteFilter implements EODQuoteFilter {
 			  Math.round(quote.getDayClose()*100) + " " +
 			  quote.getDayVolume() / 100);
     }
+    
+	public IFileEODQuoteImport getImporter(Report report) {
+		return new FileEODQuoteImport(report, this);
+	}
 }

@@ -101,7 +101,7 @@ public class ImportQuoteModule extends JPanel implements Module {
     private Settings settings;
 
     // Parsed fields for file import
-    private EODQuoteFilter filter;
+    private IFileEODQuoteFilter filter;
     private File files[];
 
     // Web site combo box entry indeces.
@@ -427,7 +427,7 @@ public class ImportQuoteModule extends JPanel implements Module {
      */
     private int importQuotesFromSingleFile(DatabaseQuoteSource database, Report report, File file) {
         int quotesImported = 0;
-        FileEODQuoteImport importer = new FileEODQuoteImport(report, filter);
+        IFileEODQuoteImport importer = ((IFileEODQuoteFilter) filter).getImporter(report);
 
         if(importer.open(file)) {
             while(importer.isNext()) {

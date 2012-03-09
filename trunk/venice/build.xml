@@ -134,8 +134,21 @@
     <delete dir="${web}/api"/>
   </target>
 
-  <!-- Generate docs -->
   <target name="doc">
+	<condition property="do-doc-generate">
+		<contains string="${java.version}" substring="1.4" casesensitive="false" />
+	</condition>
+	<antcall target="doc-warning"/>
+	<antcall target="doc-generate"/>
+  </target>
+  
+  <target name="doc-warning" unless="do-doc-generate">
+	<echo message="WARNING: To be able to build in-program documentation, you need to use JDK 1.4." />
+	<echo message="WARNING: See: https://sourceforge.net/tracker/?func=detail&amp;aid=3499268&amp;group_id=53631&amp;atid=471027" />
+  </target>
+  
+  <!-- Generate docs -->
+  <target name="doc-generate" if="do-doc-generate">
     <xmlcatalog id="document">
       <dtd publicID="-//Venice//DTD XML Document V1.0//EN"
            location="${doc}/document.dtd"/>

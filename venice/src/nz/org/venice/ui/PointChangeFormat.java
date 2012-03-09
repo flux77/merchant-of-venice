@@ -61,7 +61,7 @@ public class PointChangeFormat implements Comparable {
      *
      * @param initialValue the initial quote value
      * @param finalValue the final quote value
-     * @param if the source of the change is an index.
+     * @param isIndex if the source of the change is an index.
      */
     public PointChangeFormat(double initialValue, double finalValue, boolean isIndex) {
 	double diff = finalValue - initialValue;

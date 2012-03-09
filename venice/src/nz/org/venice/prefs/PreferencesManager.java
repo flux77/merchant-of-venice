@@ -92,10 +92,10 @@ public class PreferencesManager {
     /** @deprecated Indicates the quote source is accessing quotes in files. */
     public static int FILES = 1;
 
-    /** Indicates the quote source is accessing quotes in a database */
+    /** Indicates the quote source is accessing quotes in a database. */
     public static int DATABASE = 2;
 
-    /** Indicates the quote source is accessing the internal database */
+    /** Indicates the quote source is accessing the internal database. */
     public static int INTERNAL = 3;
 
     /** Web proxy preferences fields. */
@@ -144,7 +144,7 @@ public class PreferencesManager {
 	/** Database password. */
 	public String password;
 
-	/** Prompt user to enter password instead of saving it to disk */
+	/** Prompt user to enter password instead of saving it to disk. */
 	public boolean passwordPrompt;
     }
 
@@ -199,8 +199,8 @@ public class PreferencesManager {
     }
 
     /**
-     * Fetches the desired user node, based at the <code>base</code> branch
-     * @param node the path to the node to be fetched
+     * Fetches the desired user node, based at the <code>base</code> branch.
+     * @param node the path to the node to be fetched.
      */
     public static Preferences getUserNode(String node) {
         if (node.charAt(0) == '/') node = node.substring(1);
@@ -212,7 +212,7 @@ public class PreferencesManager {
      * license. Currently the license must be explicilty accepted by
      * the user for each version.
      *
-     * @return <code>true</code> if the user needs to explicitly accept the GPL
+     * @return <code>true</code> if the user needs to explicitly accept the GPL.
      */
     public static boolean getHasGPLAcceptance() {
         Preferences node = getUserNode("/license");
@@ -232,7 +232,7 @@ public class PreferencesManager {
     /**
      * Load the last directory used when importing quote files.
      *
-     * @param  dirtype the directory type (e.g. macros, importer, etc)
+     * @param  dirtype the directory type (e.g. macros, importer, etc).
      * @return the directory.
      */
     public static String getDirectoryLocation(String dirtype) {
@@ -304,7 +304,7 @@ public class PreferencesManager {
     /**
      * Load the list of all registered macros.
      *
-     * @return the list of registered macros
+     * @return the list of registered macros.
      * @see StoredMacro
      */
     public static synchronized List getStoredMacros() {
@@ -1048,7 +1048,7 @@ public class PreferencesManager {
      * files such as portfolios. If this directory does not exist it will be
      * created.
      *
-     * @return Home directory
+     * @return Home directory.
      */
     private static File getVeniceHome() {
         File veniceHome = new File(System.getProperty("user.home"), "Venice");
@@ -1138,7 +1138,7 @@ public class PreferencesManager {
     /**
      * Save language setting.
      *
-     * @param languageCode ISO Language Code
+     * @param languageCode ISO Language Code.
      */
     public static void putLanguageCode(String languageCode) {
         Preferences prefs = getUserNode("/language");
@@ -1148,7 +1148,7 @@ public class PreferencesManager {
     /**
      * Load user interface setting.
      *
-     * @return the minimum decimal digits to be displayed
+     * @return the minimum decimal digits to be displayed.
      */
     public static int getMinDecimalDigits() {
         // 3 is the default, if anything goes wrong
@@ -1166,7 +1166,7 @@ public class PreferencesManager {
     /**
      * Save user interface setting.
      *
-     * @param minDecimalDigits the minimum decimal digits to be displayed
+     * @param minDecimalDigits the minimum decimal digits to be displayed.
      */
     public static void putMinDecimalDigits(String minDecimalDigits) {
         Preferences prefs = getUserNode("/min_user_interface");
@@ -1176,7 +1176,7 @@ public class PreferencesManager {
     /**
      * Load user interface setting.
      *
-     * @return the maximum decimal digits to be displayed
+     * @return the maximum decimal digits to be displayed.
      */
     public static int getMaxDecimalDigits() {
         // 3 is the default, if anything goes wrong
@@ -1194,7 +1194,7 @@ public class PreferencesManager {
     /**
      * Save user interface setting.
      *
-     * @param maxDecimalDigits the maximum decimal digits to be displayed
+     * @param maxDecimalDigits the maximum decimal digits to be displayed.
      */
     public static void putMaxDecimalDigits(String maxDecimalDigits) {
         Preferences prefs = getUserNode("/max_user_interface");
@@ -1204,7 +1204,7 @@ public class PreferencesManager {
     /**
      * Load user interface setting.
      *
-     * @return the tab size to enter in a text dialog. 
+     * @return the tab size to enter in a text dialog.
      */
     public static int getEditTabSize() {
         // 8 is the default, if anything goes wrong
@@ -1223,7 +1223,7 @@ public class PreferencesManager {
     /**
      * Save user interface setting.
      *
-     * @param tabsize the number of characters to insert when the tab key is pressed
+     * @param tabSize the number of characters to insert when the tab key is pressed.
      */
     public static void putEditTabSize(String tabSize) {
         Preferences prefs = getUserNode("/max_user_interface");
@@ -1233,7 +1233,7 @@ public class PreferencesManager {
     /**
      * Load default chart setting.
      *
-     * @return the default chart to be displayed
+     * @return the default chart to be displayed.
      */
     public static String getDefaultChart() {
         Preferences prefs = getUserNode("/default_chart_defaults");
@@ -1244,7 +1244,7 @@ public class PreferencesManager {
     /**
      * Load default chart setting.
      *
-     * @return the default chart background colour
+     * @return the default chart background colour.
      */
     public static int getDefaultChartBackgroundColour() {
         Preferences prefs = getUserNode("/default_chart_defaults");
@@ -1278,7 +1278,7 @@ public class PreferencesManager {
 
 
     /**
-     * Save wether to restore windows on restart
+     * Save wether to restore windows on restart.
      *
      * @param state a boolean flag which when true causes Venice to reconstruct
      * previously open windows.
@@ -1335,7 +1335,7 @@ public class PreferencesManager {
     /**
      * Save default chart setting.
      *
-     * @param defaultChart the chart to be displayed
+     * @param defaultChart the chart to be displayed.
      */
     public static void putDefaultChart(String defaultChart) {
 
@@ -1344,9 +1344,9 @@ public class PreferencesManager {
     }
     
     /**
-     * Save default chart setting.
+     * Save default chart background colour.
      *
-     * @param defaultChart the chart to be displayed
+     * @param backColour the default background colour.
      */
     public static void putDefaultChartBackgroundColour(int backColour) {
 
@@ -1355,9 +1355,9 @@ public class PreferencesManager {
     }
 
     /**
-     * Save default chart scroll bar setting .
+     * Save default chart scroll bar setting.
      *
-     * @param isSelected if the scroll bar on a chart should be moved to the end
+     * @param isSelected if the scroll bar on a chart should be moved to the end.
      */
     public static void putDefaultChartScrollToEnd(boolean isSelected) {
 
@@ -1366,9 +1366,9 @@ public class PreferencesManager {
     }
     
     /**
-     * Save default table scroll bar setting .
+     * Save default table scroll bar setting.
      *
-     * @param isSelected if the scroll bar on a table should be moved to the end
+     * @param isSelected if the scroll bar on a table should be moved to the end.
      */
     public static void putDefaultTableScrollToEnd(boolean isSelected) {
 

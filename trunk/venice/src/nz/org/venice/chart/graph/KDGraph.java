@@ -77,16 +77,6 @@ public class KDGraph extends AbstractGraph {
 
     }
 
-    /**
-     * Create a new custom graph based on the given graph source and quote bundle.
-     *
-     * @param     indicator           the custom indicator expression
-     * @param     source              the source containing the dates to work with
-     * @param     symbol              the symbol to apply the expression
-     * @param     quoteBundle         the quote bundle containing the quotes
-     * @exception EvaluationException if there was an error evaluating the equation
-     * @return    the custom graph
-     */
     public void createKDGraph(Graphable lowGraph, Graphable highGraph, Graphable closeGraph, int period, int ksmooth, int dsmooth) {
     	indicatorKGraphable = new Graphable();
     	indicatorDGraphable = new Graphable();

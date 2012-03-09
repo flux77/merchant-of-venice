@@ -20,33 +20,55 @@ package nz.org.venice.chart;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Vector;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
-import java.awt.image.BufferedImage;
-import javax.swing.JFileChooser;
-import java.io.File;
-import java.util.Vector;
 
-import nz.org.venice.chart.graph.*;
+import nz.org.venice.chart.graph.BarChartGraph;
+import nz.org.venice.chart.graph.BarGraph;
+import nz.org.venice.chart.graph.BollingerBandsGraph;
+import nz.org.venice.chart.graph.CandleStickGraph;
+import nz.org.venice.chart.graph.CountbackLineGraph;
+import nz.org.venice.chart.graph.CustomGraph;
+import nz.org.venice.chart.graph.ExpMovingAverageGraph;
+import nz.org.venice.chart.graph.FiboGraph;
+import nz.org.venice.chart.graph.Graph;
+import nz.org.venice.chart.graph.GraphUI;
+import nz.org.venice.chart.graph.HighLowBarGraph;
+import nz.org.venice.chart.graph.KDGraph;
+import nz.org.venice.chart.graph.LineGraph;
+import nz.org.venice.chart.graph.MACDGraph;
+import nz.org.venice.chart.graph.MomentumGraph;
+import nz.org.venice.chart.graph.MovingAverageGraph;
+import nz.org.venice.chart.graph.MultipleMovingAverageGraph;
+import nz.org.venice.chart.graph.OBVGraph;
+import nz.org.venice.chart.graph.PointAndFigureGraph;
+import nz.org.venice.chart.graph.RSIGraph;
+import nz.org.venice.chart.graph.StandardDeviationGraph;
+import nz.org.venice.chart.graph.SupportAndResistenceGraph;
 import nz.org.venice.chart.source.GraphSource;
-import nz.org.venice.chart.source.OHLCVQuoteGraphSource;
 import nz.org.venice.chart.source.OHLCVIndexQuoteGraphSource;
-import nz.org.venice.ui.DesktopManager;
-import nz.org.venice.ui.ConfirmDialog;
-import nz.org.venice.util.Locale;
-import nz.org.venice.quote.Quote;
-import nz.org.venice.quote.EODQuoteBundle;
-import nz.org.venice.quote.Symbol;
-import nz.org.venice.util.ImageFilter;
-import nz.org.venice.util.BMPFile;
+import nz.org.venice.chart.source.OHLCVQuoteGraphSource;
+import nz.org.venice.main.CommandManager;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.prefs.settings.MenuSettings;
-import nz.org.venice.main.CommandManager;
+import nz.org.venice.quote.EODQuoteBundle;
+import nz.org.venice.quote.Quote;
+import nz.org.venice.quote.Symbol;
+import nz.org.venice.ui.ConfirmDialog;
+import nz.org.venice.ui.DesktopManager;
+import nz.org.venice.util.BMPFile;
+import nz.org.venice.util.ImageFilter;
+import nz.org.venice.util.Locale;
 
 /**
  * Provides a menu which is associated with a stock symbol being graphed.
@@ -207,6 +229,7 @@ public class EODQuoteChartMenu extends JMenu {
 	addMenuItem(graphMenu, Locale.getString("VOLUME"));
 	addMenuItem(graphMenu, Locale.getString("MOMENTUM"));
 	addMenuItem(graphMenu, Locale.getString("MACD"));
+	addMenuItem(graphMenu, Locale.getString("KD"));
  	addMenuItem(graphMenu, Locale.getString("SIMPLE_MOVING_AVERAGE"));
 	addMenuItem(graphMenu, Locale.getString("EXP_MOVING_AVERAGE"));
 	addMenuItem(graphMenu, Locale.getString("MULT_MOVING_AVERAGE"));
@@ -704,8 +727,11 @@ public class EODQuoteChartMenu extends JMenu {
             graph = new HighLowBarGraph(getDayLow(), getDayHigh(), getDayClose());
 
         else if(text == Locale.getString("MACD"))
-            graph = new MACDGraph(getDayClose());
-	
+        	graph = new MACDGraph(getDayClose());
+
+        else if(text == Locale.getString("KD"))
+            graph = new KDGraph(getDayLow(), getDayHigh(),getDayClose());
+
         else if(text == Locale.getString("MOMENTUM"))
             graph = new MomentumGraph(getDayClose());
 

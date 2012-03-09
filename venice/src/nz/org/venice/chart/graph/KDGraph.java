@@ -122,8 +122,8 @@ public class KDGraph extends AbstractGraph {
 
          // Calculate KD only when we have enough data
             if (closes.size()>=period) {
-            	if (maxhigh.equals(Double.valueOf(Double.MIN_VALUE))) {
-            		minlow = Double.valueOf(Double.MAX_VALUE);
+            	if (maxhigh.equals(new Double(Double.MIN_VALUE))) {
+            		minlow = new Double(Double.MAX_VALUE);
             		for(int i = 0;i<highs.size();i++) {
             			if (((Double) highs.get(i)).compareTo(maxhigh) > 0 ) maxhigh = (Double)highs.get(i);
             			if (((Double)lows.get(i)).compareTo(minlow) < 0 ) minlow = (Double)lows.get(i);
@@ -138,18 +138,18 @@ public class KDGraph extends AbstractGraph {
                 // Calculate Slow K if K Smooth > 1 and corresponding D
                 int fastksize = fastks.size();
                 if (fastksize>ksmooth) {
-                	Double k = Double.valueOf(0.0);
+                	Double k = new Double(0.0);
                 	for(int i = 1;i<=ksmooth;i++)
-            			k = Double.valueOf(k.doubleValue() + ((Double)fastks.get(fastksize-i)).doubleValue());
-                	k = Double.valueOf(k.doubleValue()/ksmooth);
+            			k = new Double(k.doubleValue() + ((Double)fastks.get(fastksize-i)).doubleValue());
+                	k = new Double(k.doubleValue()/ksmooth);
                 	ks.add(k);
                 	// We require at least 3 K to calculate D
                 	int kssize = ks.size();
                 	if (kssize>2) {
-                		Double d = Double.valueOf(0.0);
+                		Double d = new Double(0.0);
                     	for(int i = 1;i<=dsmooth;i++)
-                			d = Double.valueOf(d.doubleValue() + ((Double)ks.get(kssize-i)).doubleValue());
-            			d = Double.valueOf(d.doubleValue()/dsmooth);
+                			d = new Double(d.doubleValue() + ((Double)ks.get(kssize-i)).doubleValue());
+            			d = new Double(d.doubleValue()/dsmooth);
                     	ds.add(d);
                 		indicatorKGraphable.putY(date, (Double)ks.get(kssize-1));
                 		indicatorDGraphable.putY(date, d);
@@ -160,7 +160,7 @@ public class KDGraph extends AbstractGraph {
                 closes.remove(0);
                 // max or min being removed is the last high value, recalculate all
                 if ((maxhigh.equals(highs.get(0)) || minlow.equals(lows.get(0))))
-            		maxhigh = Double.valueOf(Double.MIN_VALUE);
+            		maxhigh = new Double(Double.MIN_VALUE);
                 highs.remove(0);
                 lows.remove(0);
             }
@@ -222,7 +222,7 @@ public class KDGraph extends AbstractGraph {
     
     // Override vertical axis
     public String getYLabel(double value) {
-    	return Integer.valueOf((int)value).toString();
+    	return new Integer((int)value).toString();
     }
     
     public void setSettings(HashMap settings) {

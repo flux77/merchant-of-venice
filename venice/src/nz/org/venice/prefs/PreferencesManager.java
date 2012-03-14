@@ -48,6 +48,10 @@ import nz.org.venice.portfolio.PortfolioWriter;
 import nz.org.venice.portfolio.Transaction;
 import nz.org.venice.quote.Symbol;
 import nz.org.venice.quote.SymbolFormatException;
+import nz.org.venice.quote.SymbolMetadata;
+import nz.org.venice.quote.SymbolMetadataReader;
+import nz.org.venice.quote.SymbolMetadataWriter;
+import nz.org.venice.quote.SymbolMetadata;
 import nz.org.venice.table.WatchScreen;
 import nz.org.venice.table.WatchScreenParserException;
 import nz.org.venice.table.WatchScreenReader;
@@ -80,7 +84,7 @@ public class PreferencesManager {
 
     // The user root from Venice's point of view
     private static Preferences userRoot = Preferences.userRoot().node(base);
-
+    
     // This class cannot be instantiated
     private PreferencesManager() {
 	// nothing to do
@@ -361,6 +365,58 @@ public class PreferencesManager {
         catch(BackingStoreException e) {
             // ignore
         }
+    }
+
+    public static List getSymbolMetadata() throws PreferencesException {
+	File symbolMetadataFile = new File(getSymbolMetadataHome(), "symbolMetadata.xml");
+
+	List symbolMetadata = null;
+
+        try {
+            FileInputStream inputStream = new FileInputStream(symbolMetadataFile);
+	    symbolMetadata = SymbolMetadataReader.read(inputStream);
+        }
+        catch(IOException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+        catch(SecurityException e) {
+            throw new PreferencesException(e.getMessage());
+        }
+	return symbolMetadata;
+    }
+
+    public static void putSymbolMetadata(List indexSymbols) throws PreferencesException {
+
+	try {
+	    File symbolMetadataFile = new File(getSymbolMetadataHome(), "symbolMetadata.xml");
+	    FileOutputStream outputStream = new FileOutputStream(symbolMetadataFile);
+	    SymbolMetadataWriter.write(indexSymbols, outputStream);
+	    outputStream.close();
+	}
+	catch(IOException e) {
+	    throw new PreferencesException(e.getMessage());
+        }
+	catch(SecurityException e) {
+	    throw new PreferencesException(e.getMessage());
+	}
+    }
+ 
+
+    public static boolean isMarketIndex(Symbol symbol) {
+	try {
+	    List symbolMetadata = getSymbolMetadata();
+	    Iterator iterator = symbolMetadata.iterator();
+	    while (iterator.hasNext()) {
+		SymbolMetadata data = (SymbolMetadata)iterator.next();
+		if (data.getSymbol().equals(symbol) &&
+		    data.isIndex()) {
+		    return true;
+		}
+	    }
+	    return false;
+	} catch (PreferencesException e) {
+	    return false;
+	}
     }
 
     //Store the users text made for this symbol
@@ -1041,6 +1097,20 @@ public class PreferencesManager {
         if (!watchScreenHome.exists())
             watchScreenHome.mkdir();
         return watchScreenHome;
+    }
+
+    /**
+     * Return the directory which contains Venice's Symbol metadata.
+     * Directory will be created if it does not already exist.
+     *
+     * @return SymbolMetaata directroy.
+     */
+    private static File getSymbolMetadataHome() {
+        File veniceHome = getVeniceHome();
+        File symbolMetadataHome = new File(veniceHome, "SymbolMetadata");
+        if (!symbolMetadataHome.exists())
+            symbolMetadataHome.mkdir();
+        return symbolMetadataHome;
     }
 
     /**

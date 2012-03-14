@@ -32,6 +32,7 @@ import java.util.HashMap;
 import nz.org.venice.util.Currency;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.TradingDate;
+import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.ui.ProgressDialog;
 import nz.org.venice.ui.ProgressDialogManager;
@@ -443,14 +444,23 @@ public class FileQuoteSource implements QuoteSource
      * @return	yes or no
      */
     public boolean isMarketIndex(Symbol symbol) {
-        // HACK. It needs to keep a file which maintains a flag
+	
+	if (PreferencesManager.isMarketIndex(symbol)) {
+	    return true;
+	} else {
+	    return false;
+	}
+
+	/* Previous version; guaranteed for ASX, not for DAX or 
+	   anything else.
+	// HACK. It needs to keep a table which maintains a flag
         // for whether a symbol is an index or not.
-	assert symbol != null;
 
 	if(symbol.length() == 3 && symbol.charAt(0) == 'X')
 	    return true;
 	else
 	    return false;
+	*/
     }
 
     /**

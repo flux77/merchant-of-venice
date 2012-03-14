@@ -16,6 +16,12 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+/**
+ * JPanel for selecting the background colour of a chart. 
+ * 
+ * @author gbonhevi
+ */
+
 package nz.org.venice.ui;
 
 import java.awt.Color;
@@ -31,12 +37,12 @@ import javax.swing.JRadioButton;
 public class ColourSelectionPanel extends JPanel {
     private ArrayList rbs;
 	
-    public ColourSelectionPanel(ArrayList colors) {
+    public ColourSelectionPanel(ArrayList colours) {
       	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     	ButtonGroup bg = new ButtonGroup();
 
 	rbs = new ArrayList();
-	for(Iterator it = colors.iterator(); it.hasNext();) {
+	for(Iterator it = colours.iterator(); it.hasNext();) {
 	    Color c = (Color)it.next();
 	    JRadioButton btn = new JRadioButton("Venice",false);    	
 	    btn.setOpaque(true);

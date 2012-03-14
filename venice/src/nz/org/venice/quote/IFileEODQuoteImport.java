@@ -19,7 +19,7 @@
 /**
  *  Interface for importing quotes from files. 
  *  
- * @author gbonhevi
+ * @author Guillermo Bonvehi (gbonvehi)
  * @see FileEODQuoteImport
 
  */

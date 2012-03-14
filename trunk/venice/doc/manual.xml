@@ -88,6 +88,9 @@ through a web proxy.</para>
 configure Venice to read stock quotes from either files or from
 a database.</para>
 
+<para><link to="Index Definition">Index Definition</link> describes how to
+tell Venice to distinguish Indeces from ordinary symbols.</para>
+
 <para><link to="Tuning">Tuning</link> describes how to
 configure Venice for optimal performance.</para>
 
@@ -266,6 +269,15 @@ reference, this is the format of the table created:</para>
 +--------+----------+------+-----+------------+-------+
 </codeblock></para>
 </section>
+</chapter>
+
+<chapter name="Index Definition">
+<para>The index page allows a user to manage the list of symbols which are also
+indeces. Venice treats indeces slightly differently. (For example, when Venice displays the point change for an index, but treats it as an ordinary stock, the point change will be out by a couple of orders of magnitude). </para>
+<para>The user is responsible for maintaining those symbols which are indeces. To define a symbol as a new index, press the 'Add' button. A new dialog appears with fields for the stock code and the index name. Enter the symbol, and optionally the name of the index. </para>
+<para>After pressing ok, Venice will treat the symbol as an index.</para>
+<para>To remove an index definition, select the index stock code and press the 'Delete' button.</para>
+
 </chapter>
 
 <chapter name="Tuning">

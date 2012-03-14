@@ -17,9 +17,12 @@
 */
 
 /**
- * Interface for ?FIXME
+ * This interface should be used by any EODQuoteFilter that reads from 
+ * files when importing EOD quotes. It extends EODQuoteFilter by adding
+ * a function to get the importer needed by the filter.
  *
- * @author gbonhevi
+ * @author Guillermo Bonvehi (gbonvehi)
+ * @see EODQuoteFilter
  */
 
 package nz.org.venice.quote;

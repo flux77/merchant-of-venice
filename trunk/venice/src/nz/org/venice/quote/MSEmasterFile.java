@@ -17,9 +17,11 @@
 */
 
 /**
- *  
+ *  This class reads and parses an EMASTER file written by Metastock.
+ *  A MSDataInfo object is generated for each entry in the file.
  *
- * @author gbonhevi
+ * @author Guillermo Bonvehi (gbonvehi)
+ * @see MSDataInfo
  */
 
 package nz.org.venice.quote;

@@ -16,6 +16,13 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+/**
+ *  This class reads and parses a record inside an EMASTER file.
+ *
+ * @author Guillermo Bonvehi (gbonvehi)
+ * @see MSEmasterFile
+ */
+
 package nz.org.venice.quote;
 
 import java.io.IOException;

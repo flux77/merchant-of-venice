@@ -18,8 +18,12 @@
 
 package nz.org.venice.util;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
+
+import java.util.Locale;
 
 /** 
  * An immutable representation of Money. This class was created to reference
@@ -379,5 +383,18 @@ public class Money implements Cloneable, Comparable {
      */
     private static long toLong(double value, double conversion) {
         return Math.round(value * conversion);
+    }
+
+    /**
+     * Returns a <code>String</code> object representing this <code>Money</code>'s value
+     * without the currency sign.
+     *
+     * @return the string representation without the currency.
+     */
+    public String export() {
+        DecimalFormat df = 
+	  new DecimalFormat("#.##", 
+	        	    new DecimalFormatSymbols(new Locale("en", "US")));
+	return df.format(doubleValue());
     }
 }

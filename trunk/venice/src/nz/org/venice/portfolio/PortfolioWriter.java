@@ -90,40 +90,40 @@ public class PortfolioWriter {
                     transactionElement = (Element)document.createElement("withdrawal");
                     transactionElement.setAttribute("cash_account",
                                                     transaction.getCashAccount().getName());
-                    transactionElement.setAttribute("amount",  
-                                                    transaction.getAmount().toString());
+                    transactionElement.setAttribute("amount",
+						    transaction.getAmount().export());
                     break;
                 case Transaction.DEPOSIT:
                     transactionElement = (Element)document.createElement("deposit");
                     transactionElement.setAttribute("cash_account",
                                                     transaction.getCashAccount().getName());
-                    transactionElement.setAttribute("amount",  
-                                                    transaction.getAmount().toString());
+                    transactionElement.setAttribute("amount",
+						    transaction.getAmount().export());
                     break;
                 case Transaction.INTEREST:
                     transactionElement = (Element)document.createElement("interest");
                     transactionElement.setAttribute("cash_account",
                                                     transaction.getCashAccount().getName());
-                    transactionElement.setAttribute("amount",  
-                                                    transaction.getAmount().toString());
+                    transactionElement.setAttribute("amount",
+						    transaction.getAmount().export());
                     break;
                 case Transaction.FEE:
                     transactionElement = (Element)document.createElement("fee");
                     transactionElement.setAttribute("cash_account",
                                                     transaction.getCashAccount().getName());
-                    transactionElement.setAttribute("amount",  
-                                                    transaction.getAmount().toString());
+                    transactionElement.setAttribute("amount",
+						    transaction.getAmount().export());
                     break;
                 case Transaction.ACCUMULATE:
                     transactionElement = (Element)document.createElement("accumulate");
-                    transactionElement.setAttribute("amount",  
-                                                    transaction.getAmount().toString());
+                    transactionElement.setAttribute("amount",
+						    transaction.getAmount().export());
                     transactionElement.setAttribute("symbol",  
                                                     transaction.getSymbol().toString());
                     transactionElement.setAttribute("shares",  
                                                     Integer.toString(transaction.getShares()));
-                    transactionElement.setAttribute("trade_cost",  
-                                                    transaction.getTradeCost().toString());
+                    transactionElement.setAttribute("trade_cost",
+						    transaction.getTradeCost().export());
                     transactionElement.setAttribute("cash_account",
                                                     transaction.getCashAccount().getName());
                     transactionElement.setAttribute("share_account",
@@ -131,14 +131,14 @@ public class PortfolioWriter {
                     break;
                 case Transaction.REDUCE:
                     transactionElement = (Element)document.createElement("reduce");
-                    transactionElement.setAttribute("amount",  
-                                                    transaction.getAmount().toString());
+                    transactionElement.setAttribute("amount",
+						    transaction.getAmount().export());
                     transactionElement.setAttribute("symbol",  
                                                     transaction.getSymbol().toString());
                     transactionElement.setAttribute("shares",  
                                                     Integer.toString(transaction.getShares()));
-                    transactionElement.setAttribute("trade_cost",  
-                                                    transaction.getTradeCost().toString());
+                    transactionElement.setAttribute("trade_cost",
+						    transaction.getTradeCost().export());
                     transactionElement.setAttribute("cash_account",
                                                     transaction.getCashAccount().getName());
                     transactionElement.setAttribute("share_account",
@@ -146,9 +146,9 @@ public class PortfolioWriter {
                     break;
                 case Transaction.DIVIDEND:
                     transactionElement = (Element)document.createElement("dividend");
-                    transactionElement.setAttribute("amount",  
-                                                    transaction.getAmount().toString());
-                    transactionElement.setAttribute("symbol",  
+                    transactionElement.setAttribute("amount",
+						    transaction.getAmount().export());
+                   transactionElement.setAttribute("symbol",  
                                                     transaction.getSymbol().toString());
                     transactionElement.setAttribute("cash_account",
                                                     transaction.getCashAccount().getName());
@@ -170,8 +170,8 @@ public class PortfolioWriter {
                                                     transaction.getCashAccount().getName());
                     transactionElement.setAttribute("destination_cash_account",
                                                     transaction.getCashAccount2().getName());
-                    transactionElement.setAttribute("amount",  
-                                                    transaction.getAmount().toString());
+                    transactionElement.setAttribute("amount",
+						    transaction.getAmount().export());
                     break;
                 default:
                     // Unknown transaction type

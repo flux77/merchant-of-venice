@@ -35,6 +35,10 @@ public class ImageExporterFactory {
 			// set the verbose level on all exporters and remove BMPFile(bool)
 			// construct.
 			return new BMPFile(true);
+		} else if (ext.equals("png")) {
+			return new PNGJPGFileExporter("png");
+		} else if (ext.equals("jpg") || ext.equals("jpeg")) {
+			return new PNGJPGFileExporter("jpg");
 		}
 		throw new IllegalArgumentException("Supported file extension expected.");
 	}

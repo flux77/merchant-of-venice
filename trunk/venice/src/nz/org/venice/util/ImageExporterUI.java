@@ -27,6 +27,7 @@
 
 package nz.org.venice.util;
 
+import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.ui.ProgressDialog;
 import nz.org.venice.ui.ProgressDialogManager;
 
@@ -49,6 +50,11 @@ import nz.org.venice.ui.ProgressDialogManager;
 
      public void display() {
 	 progress.show(Locale.getString("GRAPH_EXPORTING"));	 
+     }
+     
+     public void error(String message) {
+    	 ProgressDialogManager.closeProgressDialog(progress);
+    	 DesktopManager.showErrorMessage(message);
      }
 
      public void update() {

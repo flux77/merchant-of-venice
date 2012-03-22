@@ -66,7 +66,8 @@ import nz.org.venice.quote.Quote;
 import nz.org.venice.quote.Symbol;
 import nz.org.venice.ui.ConfirmDialog;
 import nz.org.venice.ui.DesktopManager;
-import nz.org.venice.util.BMPFile;
+import nz.org.venice.util.IImageExporter;
+import nz.org.venice.util.ImageExporterFactory;
 import nz.org.venice.util.ImageFilter;
 import nz.org.venice.util.Locale;
 
@@ -330,12 +331,8 @@ public class EODQuoteChartMenu extends JMenu {
 				    }
 
 				    if (okToWrite) {
-					BMPFile bmpwrite = new BMPFile(true);
-					bmpwrite.saveBitmap(
-							    filename, 
-							    bi, 
-							    bi.getWidth(), 
-							    bi.getHeight());				
+				    	IImageExporter exporter = ImageExporterFactory.get(filename);
+				    	exporter.export(filename, bi);
 				    }
 				}
 			    }

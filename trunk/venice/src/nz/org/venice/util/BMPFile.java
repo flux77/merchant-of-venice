@@ -35,7 +35,7 @@ package nz.org.venice.util;
  
  */
 
- public class BMPFile extends Component {
+ public class BMPFile extends Component implements IImageExporter {
      //--- Private constants
      private final static int BITMAPFILEHEADER_SIZE = 14;
      private final static int BITMAPINFOHEADER_SIZE = 40;
@@ -96,6 +96,7 @@ package nz.org.venice.util;
 	     saveEx.printStackTrace ();
 	 }
      }
+     
      /*
       *  The saveMethod is the main method of the process. This method
       *  will call the convertImage method to convert the memory image to
@@ -276,5 +277,9 @@ package nz.org.venice.util;
       retValue [2] = (byte) ((parValue >>  16) & 0x000000FF);
       retValue [3] = (byte) ((parValue >>  24) & 0x000000FF);
       return (retValue);
+   }
+   
+   public void export(String parFilename, BufferedImage parImage) {
+  	 saveBitmap(parFilename, parImage, parImage.getWidth(), parImage.getHeight());
    }
  }

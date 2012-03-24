@@ -43,10 +43,10 @@ import nz.org.venice.ui.TextDialog;
  */
 public class HelpModule extends JPanel implements Module {
     
-    // ToolBar Images - these are from jlfgr-1.0.jar
-    private String backImage = "toolbarButtonGraphics/navigation/Back24.gif";
-    private String forwardImage = "toolbarButtonGraphics/navigation/Forward24.gif";
-    private String homeImage = "toolbarButtonGraphics/navigation/Home24.gif";
+    // ToolBar Images - these are from LibreOffice
+    private String backImage = "resources/lc_navigateback.png";
+    private String forwardImage = "resources/lc_navigateforward.png";
+    private String homeImage = "resources/lc_navigator.png";
 
     // ToolBar buttons
     JButton backButton = null;

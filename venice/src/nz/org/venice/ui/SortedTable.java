@@ -69,9 +69,9 @@ public class SortedTable extends JTable
     // Our sort model
     private SortModel model;
 
-    // Up/Down images in header column - these are from jlfgr-1.0.jar
-    private String upImage = "toolbarButtonGraphics/navigation/Up16.gif";
-    private String downImage = "toolbarButtonGraphics/navigation/Down16.gif";
+    // Up/Down images in header column - these are from LibreOffice
+    private String upImage = "resources/sc_arrowshapes.up-arrow.png";
+    private String downImage = "resources/sc_arrowshapes.down-arrow.png";
 
     private class HeaderCellRenderer extends JLabel implements TableCellRenderer
     {

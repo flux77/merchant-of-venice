@@ -199,20 +199,17 @@ public class ChartModule extends JPanel implements Module,
     // Frame Icon
     private String frameIcon = "nz/org/venice/images/TableIcon.gif";
 
-    // ToolBar Images - these are from jlfgr-1.0.jar
-    // Editing images (paint, erase, text scribble, move ) aren't the
-    // best we could have but at least there are unique icons for
-    // different functions.
-    private String selectImage = "toolbarButtonGraphics/general/Select24.gif";
-    private String defaultZoomImage = "toolbarButtonGraphics/general/Zoom24.gif";
-    private String zoomInImage = "toolbarButtonGraphics/general/ZoomIn24.gif";
-    private String paintInImage = "toolbarButtonGraphics/general/Edit24.gif";
-    private String eraseInImage = "toolbarButtonGraphics/general/Remove24.gif";
-    private String moveInImage = "toolbarButtonGraphics/general/Move24.gif";
-    private String scribbleInImage = "toolbarButtonGraphics/general/Scribble24.gif";
-    private String editInImage = "toolbarButtonGraphics/general/Text24.gif";
-    private String cloneChartImage = "toolbarButtonGraphics/general/Copy24.gif";
-    private String flipChartImage = "toolbarButtonGraphics/general/Refresh24.gif";
+    // ToolBar Images - these are from LibreOffice
+    private String cloneChartImage = "resources/lc_dbnewform.png";
+    private String selectImage = "resources/lc_selectmode.png";
+    private String zoomInImage = "resources/lc_zoomin.png";
+    private String defaultZoomImage = "resources/lc_zoomout.png";
+    private String flipChartImage = "resources/lc_toggleaxisdescr.png";
+    private String paintInImage = "resources/lc_line.png";
+    private String moveInImage = "resources/lc_arrowshapes.quad-arrow.png";
+    private String scribbleInImage = "resources/lc_insertdraw.png";
+    private String editInImage = "resources/lc_text.png";
+    private String eraseInImage = "resources/lc_delete.png";
 
     //Index chart indicator - Index charts have aggregate graph sources
     private boolean indexChart = false;
@@ -408,20 +405,28 @@ public class ChartModule extends JPanel implements Module,
     private void addFunctionToolBar() {
 
 	// Create image on toolbar to zoom to default zoom level
-        URL selectURL = ClassLoader.getSystemResource(selectImage);
-        URL defaultZoomURL = ClassLoader.getSystemResource(defaultZoomImage);
-        URL zoomInImageURL = ClassLoader.getSystemResource(zoomInImage);
-	URL paintInImageURL = ClassLoader.getSystemResource(paintInImage);
-	URL eraseInImageURL = ClassLoader.getSystemResource(eraseInImage);
-	URL moveInImageURL = ClassLoader.getSystemResource(moveInImage);
-	URL scribbleInImageURL = ClassLoader.getSystemResource(scribbleInImage);	URL editInImageURL = ClassLoader.getSystemResource(editInImage);
 	URL cloneChartURL = ClassLoader.getSystemResource(cloneChartImage);
+        URL selectURL = ClassLoader.getSystemResource(selectImage);
+        URL zoomInImageURL = ClassLoader.getSystemResource(zoomInImage);
+        URL defaultZoomURL = ClassLoader.getSystemResource(defaultZoomImage);
 	URL flipChartURL = ClassLoader.getSystemResource(flipChartImage);
+	URL paintInImageURL = ClassLoader.getSystemResource(paintInImage);
+	URL moveInImageURL = ClassLoader.getSystemResource(moveInImage);
+	URL scribbleInImageURL = ClassLoader.getSystemResource(scribbleInImage);
+	URL editInImageURL = ClassLoader.getSystemResource(editInImage);
+	URL eraseInImageURL = ClassLoader.getSystemResource(eraseInImage);
 
         // If either image is not available, then do not create the
         // toolbar
         if(defaultZoomURL != null && zoomInImageURL != null) {
             JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+
+	    // Create image on toolbar to clone the graph
+	    ImageIcon cloneChartIcon = new ImageIcon(cloneChartURL);
+	    cloneChart = new JButton(cloneChartIcon);
+	    cloneChart.addActionListener(this);
+	    cloneChart.setEnabled(true);
+	    toolBar.add(cloneChart);
 
             // Create image on toolbar to return to default functionality
             ImageIcon selectImageIcon = new ImageIcon(selectURL);
@@ -430,13 +435,6 @@ public class ChartModule extends JPanel implements Module,
             select.setEnabled(true);
             toolBar.add(select);
 
-            // Create image on toolbar to return to default zoom
-            ImageIcon defaultZoomImageIcon = new ImageIcon(defaultZoomURL);
-            defaultZoom = new JButton(defaultZoomImageIcon);
-            defaultZoom.addActionListener(this);
-            defaultZoom.setEnabled(defaultZoomEnabled);
-            toolBar.add(defaultZoom);
-
             // Create image on toolbar to zoom in to highlighted region
             ImageIcon zoomInImageIcon = new ImageIcon(zoomInImageURL);
             zoomIn = new JButton(zoomInImageIcon);
@@ -444,12 +442,19 @@ public class ChartModule extends JPanel implements Module,
             zoomIn.setEnabled(zoomInEnabled);
             toolBar.add(zoomIn);
 
-	    // Create image on toolbar to clone the graph
-	    ImageIcon cloneChartIcon = new ImageIcon(cloneChartURL);
-	    cloneChart = new JButton(cloneChartIcon);
-	    cloneChart.addActionListener(this);
-	    cloneChart.setEnabled(true);
-	    toolBar.add(cloneChart);
+            // Create image on toolbar to return to default zoom
+            ImageIcon defaultZoomImageIcon = new ImageIcon(defaultZoomURL);
+            defaultZoom = new JButton(defaultZoomImageIcon);
+            defaultZoom.addActionListener(this);
+            defaultZoom.setEnabled(defaultZoomEnabled);
+            toolBar.add(defaultZoom);
+
+	    // Create image on toolbar to toggle chart orientation
+	    ImageIcon flipChartIcon = new ImageIcon(flipChartURL);
+	    flipChart = new JButton(flipChartIcon);
+	    flipChart.addActionListener(this);
+	    flipChart.setEnabled(true);
+	    toolBar.add(flipChart);
 
 	    // Create image on toolbar to paint lines on graph
 	    ImageIcon paintOnChartIcon = new ImageIcon(paintInImageURL);
@@ -486,16 +491,6 @@ public class ChartModule extends JPanel implements Module,
 	    eraseOnChart.setEnabled(true);
 	    toolBar.add(eraseOnChart);
 
-	    // Create image on toolbar to toggle chart orientation
-	    ImageIcon flipChartIcon = new ImageIcon(flipChartURL);
-	    flipChart = new JButton(flipChartIcon);
-	    flipChart.addActionListener(this);
-	    flipChart.setEnabled(true);
-	    toolBar.add(flipChart);
-	    
-
-	    
-	    
             add(toolBar, BorderLayout.WEST);
         }
     }

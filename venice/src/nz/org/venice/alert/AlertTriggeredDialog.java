@@ -64,7 +64,7 @@ public class AlertTriggeredDialog  {
 			     openChartButton, openAlertsButton};
 	
 	ImageIcon aboutIcon;
-	String about = "toolbarButtonGraphics/general/About24.gif";
+	String about = "resources/info.png";
 
 	URL aboutIconURL = ClassLoader.getSystemResource(about);
 	aboutIcon = new ImageIcon(aboutIconURL);

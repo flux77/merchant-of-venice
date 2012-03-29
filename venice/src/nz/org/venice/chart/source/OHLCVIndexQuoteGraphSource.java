@@ -229,4 +229,9 @@ public class OHLCVIndexQuoteGraphSource implements GraphSource {
 	}
     }
 
+    //I don't think Indeces get corrected for ex/div and splits.
+    public void adjust(int type, double adjustValue, Comparable start, boolean direction) {
+		
+    }
+
 }

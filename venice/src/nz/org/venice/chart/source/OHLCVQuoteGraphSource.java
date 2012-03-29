@@ -18,6 +18,8 @@
 
 package nz.org.venice.chart.source;
 
+import java.util.Iterator;
+
 import nz.org.venice.chart.*;
 import nz.org.venice.ui.QuoteFormat;
 import nz.org.venice.util.Money;
@@ -88,6 +90,72 @@ public class OHLCVQuoteGraphSource implements GraphSource {
     public int getType() {
 	return GraphSource.SYMBOL;
     }
+
+    //FIXME For some reason, adjustments aren't reversible, 
+    //ie split 2 for 1 from some date. Reverse Split 1 for 2 from same date
+    //doesn't work.
+
+    public void adjust(int type, double value, Comparable startPoint, boolean forward) {
+	double newValue = 0.0;
+
+	if (forward) {
+	    Comparable last = graphable.getEndX();	    
+	    Iterator iterator = graphable.iterator();
+	    //Advance the iterator until we're at the offset point
+
+	    while (iterator.hasNext()) {
+		Comparable X = (Comparable)iterator.next();
+		
+		if (X.compareTo(startPoint) < 0) {
+		    continue;
+		}
+		
+		Double prevValue = graphable.getY(X);
+		newValue = getNewValue(type, prevValue.doubleValue(), value);
+
+		graphable.putY(X, new Double(newValue));
+	    }	    
+	} else {
+	    Comparable last = graphable.getStartX();	    
+	    Iterator iterator = graphable.iterator();
+
+	    while (iterator.hasNext()) {
+		Comparable X = (Comparable)iterator.next();
+		
+		//Past the date point of adjustment - leave rest of data alone.
+		if (X.compareTo(startPoint) > 0) {
+		    break;
+		}		
+
+		Double prevValue = graphable.getY(X);
+		newValue = getNewValue(type, prevValue.doubleValue(), value);
+
+		graphable.putY(X, new Double(newValue));
+	    }
+	}
+    }
+    
+    private double getNewValue(int type, double oldValue, double operand) {
+	double rv = 0.0;
+
+	switch (type) {
+	case Adjustment.ADJUST_SPLIT:
+	    assert operand != 0;
+	    rv = oldValue / operand;
+	    break;
+	case Adjustment.ADJUST_DIVIDEND:	     
+	    rv = oldValue + operand;
+	    //Don't adjust into negative territory
+	    if (rv <  0.0) {
+		rv = 0.0;
+	    }
+	    break;
+	default:
+	    assert false;
+	}
+	return rv;
+    }
+    
 
     public String getToolTipText(Comparable x) {
 	// In OHLCV graphs the x axis is in dates
@@ -197,4 +265,5 @@ public class OHLCVQuoteGraphSource implements GraphSource {
 	    return minor;
 	}
     }
+
 }

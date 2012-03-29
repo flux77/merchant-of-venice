@@ -55,7 +55,7 @@ import nz.org.venice.prefs.settings.GraphSettingsGroup;
  * Example:
  * <pre>
  *	EODQuoteBundle quoteBundle = new EODQuoteBundle(new EODQuoteRange(symbol));
- *	GraphSource dayClose = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
+ `*	GraphSource dayClose = new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
  *	Graph graph = new LineGraph(dayClose, Locale.getString("LINE_CHART"), true);
  *
  *	ChartModule chart = new ChartModule(desktop);
@@ -233,7 +233,6 @@ public class ChartModule extends JPanel implements Module,
     public ChartModule(JDesktopPane desktop, boolean indexChart) {
 
 	this.desktop = desktop;
-
 	initChart(indexChart);
     }   
 
@@ -394,7 +393,7 @@ public class ChartModule extends JPanel implements Module,
 
 	
 	scrollPane = new JScrollPane(chart);
-		
+	
 	add(scrollPane, BorderLayout.CENTER);
 		
     }
@@ -738,6 +737,18 @@ public class ChartModule extends JPanel implements Module,
 	// menu as it is already there
 	append(graph, chart.getLevels().size());
     }
+
+    /**
+     * Replace a graph on the chart with a new graph.
+     * 
+     * @param oldGraph the graph to remove
+     * @param newGraph the new graph to replace the old one.
+     */
+    public void replaceGraph(Graph oldGraph, Graph newGraph) {	
+	chart.replace(oldGraph, newGraph);
+    }
+	
+
 
     /**
      * Remove the graph from the chart. Currently does not remove the

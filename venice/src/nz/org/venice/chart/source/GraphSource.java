@@ -86,6 +86,18 @@ public interface GraphSource {
      * @return	the graphable data
      */
     public Graphable getGraphable();
+    
+    /**
+     * Apply an adjustment to the data. 
+     * 
+     * @param type A split or a dividend.
+     * @param adjustValue The value applied to each data point from start point.
+     * @param startPoint The point in the data from which to start adjusting.
+     * @param direction If true, will adjust the data in a positive direction.
+     * 
+     */
+    public void adjust(int type, double adjustValue, Comparable startPoint, boolean direction);
+
 }
 
 

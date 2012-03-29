@@ -353,6 +353,39 @@ public class Chart extends JComponent implements MouseListener {
     }
 
     /**
+     * Replace the graph from the chart with another graph
+     *
+     * @param	oldGraph	the graph to remove
+     * @param	newGraph	the replacemnet graph 
+     */
+    public void replace(Graph oldGraph, Graph newGraph) {
+
+	// Find the first matching graph
+	boolean found = false;
+	Graph traverse;
+	ListIterator iterator = levels.listIterator();
+	Vector innerVector;
+	ListIterator innerIterator;
+
+	while(iterator.hasNext()) {
+	    innerVector = (Vector)iterator.next();
+	    innerIterator = innerVector.listIterator();
+
+	    while(innerIterator.hasNext()) {
+		traverse = (Graph)innerIterator.next();
+
+		// Found one to replace?
+		if(traverse == oldGraph) {
+		    innerIterator.set(newGraph);
+		    return;
+		}
+	    }
+	}
+
+	// If we got here we couldnt find it
+    }
+
+    /**
      * Return all the graphs for each level.
      *
      * @return	A <code>Vector</code> where each element represents a

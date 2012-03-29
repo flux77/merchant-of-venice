@@ -193,6 +193,37 @@ public class GridBagHelper {
     }
 
     /**
+     * Append a new row containing a text field to the form.
+     *
+     * @param panel form panel
+     * @param field text to display next to text field
+     * @param value initial value of text field
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @param length the length of text field
+     * @return the text field
+     */
+    public static JTextField addTextRow(JPanel panel, 
+					JLabel label, 
+					String value,
+                                        GridBagLayout gridbag,
+                                        GridBagConstraints c,
+                                        int length) {
+	c.gridwidth = 1;
+	gridbag.setConstraints(label, c);
+	panel.add(label);
+
+	JTextField text = new JTextField(value, length);
+        if(c.gridx != -1)
+            c.gridx++;
+	c.gridwidth = GridBagConstraints.REMAINDER;
+	gridbag.setConstraints(text, c);
+	panel.add(text);
+
+	return text;
+    }
+
+    /**
      * Append a new row containing a label field to the form.
      *
      * @param panel form panel

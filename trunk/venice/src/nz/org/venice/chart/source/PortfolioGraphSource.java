@@ -270,4 +270,10 @@ public class PortfolioGraphSource implements GraphSource {
             return minor;
         }
     }
+    
+    //Adjusting for ex/div and splits is irrelevant for portfolios.
+    public void adjust(int type, double adjustValue, Comparable start, boolean direction) {
+		
+    }
+
 }

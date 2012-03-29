@@ -58,6 +58,7 @@ import nz.org.venice.chart.graph.SupportAndResistenceGraph;
 import nz.org.venice.chart.source.GraphSource;
 import nz.org.venice.chart.source.OHLCVIndexQuoteGraphSource;
 import nz.org.venice.chart.source.OHLCVQuoteGraphSource;
+import nz.org.venice.chart.source.Adjustment;
 import nz.org.venice.main.CommandManager;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.prefs.settings.MenuSettings;
@@ -65,10 +66,12 @@ import nz.org.venice.quote.EODQuoteBundle;
 import nz.org.venice.quote.Quote;
 import nz.org.venice.quote.Symbol;
 import nz.org.venice.ui.ConfirmDialog;
+import nz.org.venice.ui.AdjustPriceDataDialog;
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.util.IImageExporter;
 import nz.org.venice.util.ImageExporterFactory;
 import nz.org.venice.util.ImageFilter;
+import nz.org.venice.util.TradingDate;
 import nz.org.venice.util.Locale;
 
 /**
@@ -340,13 +343,66 @@ public class EODQuoteChartMenu extends JMenu {
 		    thread.start();
 		}});
 
-        // Build menu items
+	JMenuItem adjustMenu = new JMenuItem(Locale.getString("SPLIT_DIV_ADJUST"));
+	adjustMenu.addActionListener(new ActionListener() {
+		Adjustment adjustment = null;
+
+		public void actionPerformed(ActionEvent e) {
+		    //Show Adjust dialog
+
+		    Thread getAdjustment = new Thread() {
+			    public void run() {
+
+				AdjustPriceDataDialog adjustDialog = 
+				    new AdjustPriceDataDialog(DesktopManager.getDesktop());
+				
+				adjustment = adjustDialog.showDialog();
+
+				HashMap replacementMap = new HashMap();
+				
+				Graph newGraph = GraphFactory.newGraph(
+								       currentViewGraph.getName(),
+								       indexChart,
+								       quoteBundle, symbol,
+								       adjustment);
+				
+				replacementMap.put(currentViewGraph, newGraph);
+				
+				Iterator graphIterator = map.keySet().iterator();
+				while (graphIterator.hasNext()) {
+				    String name = (String)graphIterator.next();
+				    Graph oldGraph = (Graph)map.get(name);
+				    
+				    newGraph = GraphFactory.newGraph(name, 
+								     indexChart,
+								     quoteBundle,
+								     symbol,
+								     adjustment);
+				    replacementMap.put(oldGraph, newGraph);		
+				}		    
+				
+				
+				graphIterator = replacementMap.keySet().iterator();
+				while (graphIterator.hasNext()) {
+				    Graph oldGraph = (Graph)graphIterator.next();
+				    newGraph = (Graph)replacementMap.get(oldGraph);
+				    listener.replaceGraph(oldGraph, newGraph);
+				}
+				listener.redraw();				
+			    }
+			};
+		    getAdjustment.start();		    
+		}
+	    });
+	
+	// Build menu items
 	this.add(graphMenu);
 	this.add(annotateMenu);
 	this.add(exportMenu);
 	this.add(alertMenu);
 	this.add(alertListMenu);
 	this.add(trackerMenu);
+	this.add(adjustMenu);
 	this.add(removeMenu);	
     }
 
@@ -578,7 +634,7 @@ public class EODQuoteChartMenu extends JMenu {
      *         operation is cancelled
      */
     private Graph getGraph(final String text, final HashMap settings) {
-        Graph graph = newGraph(text);
+	Graph graph = GraphFactory.newGraph(text, indexChart, quoteBundle, symbol);
 
 	GraphUI graphUI = null;
 	if (graph != null) {
@@ -675,101 +731,7 @@ public class EODQuoteChartMenu extends JMenu {
 	listener.remove(graph);
 	listener.redraw();
     }
-    
-
-    /**
-     * This method creates an instance of the graph that has the given
-     * localised name.
-     *
-     * @param text localised name of graph
-     * @return the instace of that graph
-     */
-    private Graph newGraph(String text) {
-        Graph graph;
-
-        if(text == Locale.getString("BAR_CHART")) {
-	    
-            graph = new BarChartGraph(getDayOpen(), getDayLow(), getDayHigh(), getDayClose());
-	}
-        else if(text == Locale.getString("BOLLINGER_BANDS"))
-            graph = new BollingerBandsGraph(getDayClose());
-
-        else if(text == Locale.getString("CANDLE_STICK"))
-            graph = new CandleStickGraph(getDayOpen(), getDayLow(), getDayHigh(), getDayClose());
         
-	else if(text == Locale.getString("COUNTBACK_LINE"))
-	    graph = new CountbackLineGraph(getDayLow(), 
-					   getDayHigh(),
-					   getDayClose());
-
-        else if(text == Locale.getString("CUSTOM"))
-            graph = new CustomGraph(getDayClose(), symbol, quoteBundle);
-
-        else if(text == Locale.getString("DAY_HIGH"))
-            graph = new LineGraph(getDayHigh(), text, true);
-	
-        else if(text == Locale.getString("DAY_LOW"))
-            graph = new LineGraph(getDayLow(), text, true);
-	
-        else if(text == Locale.getString("DAY_OPEN"))
-            graph = new LineGraph(getDayOpen(), text, true);
-
-        else if(text == Locale.getString("VOLUME"))
-            graph = new BarGraph(getDayVolume(), text, false);
-	
-        else if(text == Locale.getString("EXP_MOVING_AVERAGE"))
-            graph = new ExpMovingAverageGraph(getDayClose());
-
-        else if(text == Locale.getString("HIGH_LOW_BAR"))
-            graph = new HighLowBarGraph(getDayLow(), getDayHigh(), getDayClose());
-
-        else if(text == Locale.getString("MACD"))
-        	graph = new MACDGraph(getDayClose());
-
-        else if(text == Locale.getString("KD"))
-            graph = new KDGraph(getDayLow(), getDayHigh(),getDayClose());
-
-        else if(text == Locale.getString("MOMENTUM"))
-            graph = new MomentumGraph(getDayClose());
-
-	else if(text == Locale.getString("MULT_MOVING_AVERAGE"))
-	    graph = new MultipleMovingAverageGraph(getDayClose());
-	
-        else if(text == Locale.getString("OBV"))
-            graph = new OBVGraph(getDayOpen(), getDayClose(), getDayVolume());
-
-        else if(text == Locale.getString("POINT_AND_FIGURE")) 
-            graph = new PointAndFigureGraph(getDayClose());
-	    	    
-	else if (text == Locale.getString("SUPPORT_AND_RESISTENCE"))
-	    graph = new SupportAndResistenceGraph(getDayClose());
-
-	else if (text == Locale.getString("FIBO_CHART")) 
-	    graph = new FiboGraph(getDayClose());
-
-        else if(text == Locale.getString("RSI"))
-            graph = new RSIGraph(getDayClose());
-
-        else if(text == Locale.getString("SIMPLE_MOVING_AVERAGE"))
-            graph = new MovingAverageGraph(getDayClose());
-
-        else if(text == Locale.getString("STANDARD_DEVIATION"))
-            graph = new StandardDeviationGraph(getDayClose());
-
-        else {
-            assert(text == Locale.getString("LINE_CHART"));
-            graph = new LineGraph(getDayClose(), text, true);
-        }
-
-        // Make sure we did the right text -> graph mapping.
-	if (graph != null) {
-	    assert text == graph.getName();
-	}
-
-        return graph;
-    }
-
-    
     //Select the menuItem for graphName.
     private void selectMenuItem(String graphName) {
 	
@@ -784,5 +746,5 @@ public class EODQuoteChartMenu extends JMenu {
 	    }
 	}	
     }
-       
+    
 }

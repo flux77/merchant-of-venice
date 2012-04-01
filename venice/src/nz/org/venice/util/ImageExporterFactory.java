@@ -30,6 +30,7 @@ package nz.org.venice.util;
 public class ImageExporterFactory {
 	public static IImageExporter get(String filename) {
 		String ext = getExtension(filename);
+
 		if (ext.equals("bmp")) {
 			// TODO: Create a set method in IImageExporter to allow the program
 			// set the verbose level on all exporters and remove BMPFile(bool)
@@ -43,7 +44,7 @@ public class ImageExporterFactory {
 		throw new IllegalArgumentException("Supported file extension expected.");
 	}
 	
-	private static String getExtension(String filename) {
+	public static String getExtension(String filename) {
 		String ext = null;
 		int i = filename.lastIndexOf(".");
 		

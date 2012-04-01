@@ -24,6 +24,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.plaf.*;
 
+import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.chart.graph.*;
 
 /**
@@ -1345,6 +1346,17 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 			       Color.orange.brighter(),
 			       Color.pink.brighter()};
 	
+
+	    //Filter the colour map, removing any where the contrast is 
+	    //insufficient (ie darkblue on black)
+	    Color backgroundColour = 
+		new Color(PreferencesManager.getDefaultChartBackgroundColour());
+
+	    colours = filterColours(colours, backgroundColour);
+	    
+	    
+	   
+
 	    colourMap = new HashMap();
 	
 	    // Iterate through all graphs and grab all sources
@@ -1399,4 +1411,161 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	// to dark grey (shouldnt happen)
 	return Color.darkGray;
     }
+
+    /**
+     * 
+     * Given a colour, return it's colour wheel complement 
+     * so that it generates a useful contrast. 
+     * (e.g Given white return black, blue return orange etc)
+     * 
+     * @param colour A colour
+     * @return it's complement 
+     */
+
+    /*
+      This code treats RGB space as a vector in R3 (4 for alpha channel)
+      To find the colour complement, this method:
+      1. Finds the closest main colour defined in bright/dark array
+      2. Calculates the distance between the given colour and the closest colour.
+      3. Apply that delta to the main complement colour (ie if the closest 
+      colour is white, the closest opposite is black) and return that colour.
+            
+      Further refinment: Calculate angles from the origin, and rotate the
+      delta using those angles.
+     */
+    public static Color getComplementaryColour(Color colour) {
+	Color violet = new Color(125, 0, 125);
+		
+	Color[] brightColours = {Color.WHITE, Color.RED, Color.YELLOW, Color.ORANGE};
+	Color[] darkColours = {Color.BLACK, Color.GREEN, violet, Color.BLUE};
+	
+	Color closestColour = null;
+	Color oppositeColour = null;
+	boolean closestIsBright = false;
+
+	double[] distances = new double[2 * brightColours.length];
+
+	int minColourIndex = -1;
+	double minDistance = 30.0; //~sqrt(255+255+255)
+
+	//Find the nearest major colour in bright/dark list closest to colour
+	for (int i = 0; i < brightColours.length; i+=2) {
+	    distances[i] = getDistance(colour, brightColours[i]);
+	    distances[i+1] = getDistance(colour, darkColours[i]);
+	    
+	    if (distances[i] < minDistance) {
+		minDistance = distances[i];
+		minColourIndex = i;
+		closestColour = brightColours[i];
+		closestIsBright = true;
+	    }
+
+	    if (distances[i+1] < minDistance) {
+		minDistance = distances[i+1];
+		minColourIndex = i; //mincolourindex  applies to bright/dark
+		closestColour = darkColours[i];
+		closestIsBright = false;
+	    }
+	}
+
+	assert minColourIndex != -1;
+
+	oppositeColour = (closestIsBright) 
+	    ? darkColours[minColourIndex] 
+	    : brightColours[minColourIndex];
+
+	int[] deltaC = getDelta(colour, closestColour);
+	
+	Color rv = applyDelta(oppositeColour, deltaC);
+	return rv;	
+    }
+
+    private static double getDistance(Color colour1, Color colour2) {		
+	int r1 = colour1.getRed();
+	int g1 = colour1.getGreen();
+	int b1 = colour1.getBlue();
+
+	int r2 = colour2.getRed();
+	int g2 = colour2.getGreen();
+	int b2 = colour2.getBlue();
+
+	int rdiff = Math.abs(r2 - r1);
+	int gdiff = Math.abs(g2 - g1);
+	int bdiff = Math.abs(b2 - b1);
+
+	return Math.sqrt(rdiff + gdiff + bdiff);
+    }
+
+    private static int[] getDelta(Color colour1, Color colour2) {
+	int r1 = colour1.getRed();
+	int g1 = colour1.getGreen();
+	int b1 = colour1.getBlue();
+
+	int r2 = colour2.getRed();
+	int g2 = colour2.getGreen();
+	int b2 = colour2.getBlue();
+
+	int rdiff = Math.abs(r2 - r1);
+	int gdiff = Math.abs(g2 - g1);
+	int bdiff = Math.abs(b2 - b1);
+	
+	int[] delta = {rdiff, gdiff, bdiff};
+
+	return delta;
+
+    }
+
+    private static Color applyDelta(Color mainColour, int[] deltaColour)  {
+	int redValue = mainColour.getRed() - deltaColour[0];
+	int greenValue = mainColour.getGreen() - deltaColour[1];
+	int blueValue = mainColour.getBlue() - deltaColour[2];
+		
+	if (redValue < 0) {
+	    redValue *= -1;
+	}
+
+	if (greenValue < 0) {
+	    greenValue *= -1;
+	}
+	
+	if (blueValue < 0) {
+	    blueValue *= -1;
+	}
+
+	if (redValue > 255) {
+	    redValue %= 255;
+	}
+
+	if (greenValue > 255) {
+	    greenValue %= 255;
+	}
+
+	if (blueValue > 255) {
+	    blueValue %= 255;
+	}
+
+	return new Color(redValue, greenValue, blueValue);
+	
+    }
+
+    private Color[] filterColours(Color[] map, Color backgroundColor) {
+
+	Color[] filteredColours = new Color[map.length];
+	int filteredColourCount = 0;
+
+	for (int i = 0; i < map.length; i++) {
+	    //20 ~ sqrt(125 + 125 + 125)
+	    //Need to polish the colours and set this number more
+	    //exactly.
+	    if (getDistance(backgroundColor, map[i]) >= 18) {
+		filteredColours[filteredColourCount++] = map[i];
+	    }
+	}
+	Color[] rv = new Color[filteredColourCount];
+	for (int i = 0; i < filteredColourCount; i++) {
+	    rv[i] = filteredColours[i];
+	}
+	return rv;
+    }
+    
 }

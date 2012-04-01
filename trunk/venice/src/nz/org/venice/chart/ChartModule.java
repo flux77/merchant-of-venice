@@ -982,8 +982,9 @@ public class ChartModule extends JPanel implements Module,
     public void actionPerformed(ActionEvent e) {
 
       if (e.getSource() == select) {
-        activateButton(null);
-        viewMode = SELECTING;
+	  defaultZoom.setEnabled(defaultZoomEnabled = previousDefaultZoomState);
+	  activateButton(null);
+	  viewMode = SELECTING;
       } else if(zoomIn != null && e.getSource() == zoomIn) {
 	    try {
 		chart.zoomToHighlightedRegion();

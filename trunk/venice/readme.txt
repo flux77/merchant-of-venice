@@ -141,7 +141,7 @@ Thanks to the following people for providing additional code, patches or
 bugfixes:
 
 Daniel Makovec, Quentin Bossard, Peter Fradley, Mark Hummel, Bryan Lin,
-Alberto Nacher, Matthias Stöckel, Dennis van den Berg, Andrew Goh, Christian Brom
+Alberto Nacher, Matthias Stöckel, Dennis van den Berg, Andrew Goh, Christian Brom, Guillermo Bonhevi.
 
 And the following for providing translations:
 

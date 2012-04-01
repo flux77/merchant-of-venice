@@ -1144,7 +1144,6 @@ public class CommandManager {
             Iterator iterator = symbols.iterator();
             EODQuoteBundle quoteBundle = null;
 
-
             Graph graph = null;
 
             String title = symbols.toString();
@@ -1289,7 +1288,7 @@ public class CommandManager {
 				   Locale.getString("ADDITIONAL_CODE") + "\n" +
                                    "Daniel Makovec, Quentin Bossard, Peter Fradley, Mark Hummel,\n" +
                                    "Bryan Lin, Alberto Nacher, Matthias St\366ckel, Dennis van den Berg,\n" +
-                                   "Andrew Goh & Christian Brom.\n\n" +
+                                   "Andrew Goh, Christian Brom & Guillermo Bonhevi.\n\n" +
 
                                    Locale.getString("TRANSLATORS") + "\n" +
                                    "Benedict P. Barszcz (" + polish.getDisplayName() + "), " +

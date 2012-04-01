@@ -113,7 +113,9 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
         
         ArrayList colours = new ArrayList();
         colours.add(Color.WHITE);
-        colours.add(Color.BLACK);
+	Color tmp = new Color(0, 0, 100, 125);
+	colours.add(tmp);
+	colours.add(Color.BLACK);
         colourSelection = new ColourSelectionPanel(colours);
         colourSelection.setSelectedColour(new Color(PreferencesManager.getDefaultChartBackgroundColour()));
         GridBagHelper.addPanel(borderPanel, "Background", colourSelection, gridbag, c);

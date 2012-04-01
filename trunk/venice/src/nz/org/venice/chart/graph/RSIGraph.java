@@ -27,9 +27,11 @@ import java.util.List;
 import nz.org.venice.chart.Graphable;
 import nz.org.venice.chart.GraphableQuoteFunctionSource;
 import nz.org.venice.chart.GraphTools;
+import nz.org.venice.chart.BasicChartUI;
 import nz.org.venice.chart.source.GraphSource;
 import nz.org.venice.parser.EvaluationException;
 import nz.org.venice.quote.QuoteFunctions;
+import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.TradingDate;
 
@@ -75,7 +77,13 @@ public class RSIGraph extends AbstractGraph {
         int overSold = RSIGraphUI.getOverSold(getSettings());
         int overBought = RSIGraphUI.getOverBought(getSettings());
 
-        g.setColor(Color.BLACK);
+	int backgroundColourValue = PreferencesManager.getDefaultChartBackgroundColour();
+	
+	Color foregroundColour = 
+	    BasicChartUI.getComplementaryColour(new Color(backgroundColourValue));
+
+	g.setColor(foregroundColour);
+
         GraphTools.renderHorizontalLine(g, overSold, xoffset, yoffset, 
 					horizontalScale,
 					verticalScale, 
@@ -87,7 +95,6 @@ public class RSIGraph extends AbstractGraph {
 					verticalScale, 
 					topLineValue, bottomLineValue, xRange, 
 					vertOrientation);
-
 
 	g.setColor(colour);
 	GraphTools.renderLine(g, RSI, xoffset, yoffset,

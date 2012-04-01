@@ -32,6 +32,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JOptionPane;
 
 import nz.org.venice.chart.graph.BarChartGraph;
 import nz.org.venice.chart.graph.BarGraph;
@@ -303,8 +304,14 @@ public class EODQuoteChartMenu extends JMenu {
 				boolean okToWrite = true;
 				File f;
 				String filename = "";
-				String userDir = System.getProperty("user.home");
-				JFileChooser chooser = new JFileChooser();
+				String userDir 
+				    = PreferencesManager.getDirectoryLocation("imageExporter");
+
+				if (userDir == null) {
+				    userDir = System.getProperty("user.home");
+				}
+				    
+				JFileChooser chooser = new JFileChooser(userDir);
 				chooser.setMultiSelectionEnabled(false);
 				
 				ImageFilter filter = new ImageFilter();
@@ -318,6 +325,16 @@ public class EODQuoteChartMenu extends JMenu {
 				    BufferedImage bi = listener.getImage();
 				    f = chooser.getSelectedFile();		
 				    filename = f.getAbsolutePath();
+
+				    //Check for extension
+				    if (ImageExporterFactory.getExtension(filename) == null) {
+					JOptionPane.
+					    showInternalMessageDialog(DesktopManager.getDesktop(),
+								      Locale.getString("FILENAME_EXTENSION_MISSING"),
+								      Locale.getString("FILENAME"),
+								      JOptionPane.ERROR_MESSAGE);
+					okToWrite = false;
+				    }
 
 				    //Check existence, confirm overwrite
 				    if (f.exists()) {
@@ -333,9 +350,13 @@ public class EODQuoteChartMenu extends JMenu {
 					}
 				    }
 
+				    //Save parent directory for next time.
+				    PreferencesManager.
+					putDirectoryLocation("imageExporter", f.getParent());
+				    
 				    if (okToWrite) {
 				    	IImageExporter exporter = ImageExporterFactory.get(filename);
-				    	exporter.export(filename, bi);
+				    	exporter.export(filename, bi);										
 				    }
 				}
 			    }

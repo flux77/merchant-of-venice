@@ -905,6 +905,8 @@ and <highlight>not</highlight>. For example:</para>
 </code></item>
 </list>
 
+<para>Note that Gondola expects the binary operands (that is the above +, 0, * and /) to be grouped in pairs. Therefore, if you have an expression like A + B +C, it must be grouped into two pairs, using paranethesis. In the example above, that would either (A + B) + C, or A + (B + C)</para>
+
 <para>The type of the returned value is determined by the operands, with floating point types having precedence. The type determinations changed as of version 0.72. Prior to this version, the type of an expression was determined by the type of the first operand. 
 
 The following examples explain the behaviour:</para>

@@ -153,6 +153,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 
         useInternal = new JRadioButton(Locale.getString("USE_INTERNAL"), true);
 	buttonGroup.add(useInternal);
+	useInternal.setToolTipText(Locale.getString("QUOTESOURCE_INTERNAL_TOOLTIP"));
 
 	useInternal.setSelected(quoteSource == PreferencesManager.INTERNAL);
         
@@ -166,6 +167,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
     private JPanel createDatabasePanel(int quoteSource, ButtonGroup buttonGroup) {
 	databasePreferences = PreferencesManager.getDatabaseSettings();
         useDatabase = new JRadioButton(Locale.getString("USE_DATABASE"), true);
+	useDatabase.setToolTipText(Locale.getString("QUOTESOURCE_USE_DATABASE_TOOLTIP"));
 	buttonGroup.add(useDatabase);
 
 	useDatabase.setSelected(quoteSource == PreferencesManager.DATABASE);
@@ -195,6 +197,8 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         databaseSoftware.addItem(Locale.getString("HSQLDB"));
         databaseSoftware.addItem(Locale.getString("OTHER"));
         
+	databaseSoftware.setToolTipText(Locale.getString("QUOTESOURCE_DATABASE_TOOLTIP"));
+
 	if(databasePreferences.software.equals(DatabaseManager.MYSQL_SOFTWARE))
 	    databaseSoftware.setSelectedIndex(DatabaseManager.MYSQL);
 	    else if(databasePreferences.software.equals(DatabaseManager.POSTGRESQL_SOFTWARE))
@@ -261,6 +265,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
         
         databaseDriver = new JComboBox();
         databaseDriver.setEditable(true);
+	databaseDriver.setToolTipText(Locale.getString("QUOTESOURCE_DB_DRIVER_TOOLTIP"));
 
         // Only display known drivers that are currently installed.
         populateDatabaseDrivers();
@@ -278,6 +283,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                                                 gridbag, c, 15);
 	databaseHost.addActionListener(al);
 	databaseHost.getDocument().addDocumentListener(dl);
+	databaseHost.setToolTipText(Locale.getString("QUOTESOURCE_DB_HOST_FIELD_TOOLTIP"));
         
         // Port
         databasePort = GridBagHelper.addTextRow(borderPanel, 
@@ -287,6 +293,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 
 	databasePort.addActionListener(al);
 	databasePort.getDocument().addDocumentListener(dl);
+	databasePort.setToolTipText(Locale.getString("QUOTESOURCE_DB_PORT_FIELD_TOOLTIP"));
         
         // Username
         databaseUsername = GridBagHelper.addTextRow(borderPanel, 
@@ -294,6 +301,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                                                     databasePreferences.username, gridbag, c, 15);
 	databaseUsername.addActionListener(al);
 	databaseUsername.getDocument().addDocumentListener(dl);
+	databaseUsername.setToolTipText(Locale.getString("QUOTESOURCE_DB_USER_FIELD_TOOLTIP"));
 
 
         
@@ -308,6 +316,7 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
                                                         gridbag, c, 15);
 	databasePassword.addActionListener(al);
 	databasePassword.getDocument().addDocumentListener(dl);
+	databasePassword.setToolTipText(Locale.getString("QUOTESOURCE_DB_PASSWORD_FIELD_TOOLTIP"));
 
         
 	if (databasePreferences.passwordPrompt) {
@@ -327,6 +336,8 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 							      databasePreferences.passwordPrompt, 
 							      gridbag, c);
 	
+	databasePasswordPrompt.setToolTipText(Locale.getString("QUOTESOURCE_DB_PASSWORD_PROMPT_TOOLTIP"));
+
 	databasePasswordPrompt.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    selectuseDatabase();
@@ -393,13 +404,15 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	        databaseDriver.setToolTipText(Locale.getString("DATABASE_NO_DRIVERS_DETAIL"));
 		    databaseDriver.setSelectedIndex(0);
 		} else {
-		    databaseDriver.setToolTipText(null);
+		    databaseDriver.setToolTipText(Locale.getString("QUOTESOURCE_DB_DRIVER_TOOLTIP"));
 		}
     }
 
     private JPanel createSamplesPanel(int quoteSource, ButtonGroup buttonGroup) {
         useSamples = new JRadioButton(Locale.getString("USE_SAMPLES"), true);
         buttonGroup.add(useSamples);
+	useSamples.setToolTipText(Locale.getString("QUOTESOURCE_SAMPLES_TOOLTIP"));
+	
 
 	useSamples.setSelected(quoteSource == PreferencesManager.SAMPLES);
         

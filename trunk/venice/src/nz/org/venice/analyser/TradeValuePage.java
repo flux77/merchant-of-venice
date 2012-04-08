@@ -224,6 +224,7 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
 
         tradeValueBuyByKeyButton = new JRadioButton(Locale.getString("BY"));
         tradeValueBuyByKeyButton.setSelected(true);
+	tradeValueBuyByKeyButton.setToolTipText(Locale.getString("ANALYSIS_BUY_BY_KEY_BUTTON_TOOLTIP"));
         tradeValueBuyButtonGroup.add(tradeValueBuyByKeyButton);
 
         c.gridwidth = 1;
@@ -247,6 +248,7 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
         c.anchor = GridBagConstraints.WEST;
 
         tradeValueBuyByEquationButton = new JRadioButton(Locale.getString("BY_EQUATION"));
+	tradeValueBuyByEquationButton.setToolTipText(Locale.getString("ANALYSIS_BUY_BY_EQN_TOOLTIP"));
         tradeValueBuyButtonGroup.add(tradeValueBuyByEquationButton);
 
         c.gridwidth = 1;
@@ -277,6 +279,7 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
         c.fill = GridBagConstraints.HORIZONTAL;
 
         tradeValueSellByKeyButton = new JRadioButton(Locale.getString("BY"));
+	tradeValueSellByKeyButton.setToolTipText(Locale.getString("ANALYSIS_SELL_BY_KEY_BUTTON_TOOLTIP"));
         tradeValueSellByKeyButton.setSelected(true);
         tradeValueSellButtonGroup.add(tradeValueSellByKeyButton);
 
@@ -301,6 +304,7 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
         c.anchor = GridBagConstraints.WEST;
 
         tradeValueSellByEquationButton = new JRadioButton(Locale.getString("BY_EQUATION"));
+	tradeValueSellByEquationButton.setToolTipText(Locale.getString("ANALYSIS_SELL_BY_EQN_TOOLTIP"));
         tradeValueSellButtonGroup.add(tradeValueSellByEquationButton);
 
         c.gridwidth = 1;

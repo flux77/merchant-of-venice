@@ -26,17 +26,21 @@ package nz.org.venice.alert;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import nz.org.venice.main.CommandManager;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.TradingDate;
 import nz.org.venice.util.TradingDateFormatException;
 import nz.org.venice.parser.Parser;
 import nz.org.venice.parser.ExpressionException;
+
 
 import nz.org.venice.quote.*;
 import nz.org.venice.ui.*;
@@ -60,6 +64,7 @@ public class AlertDialog extends JInternalFrame
 
     private JButton okButton;
     private JButton cancelButton;
+    private JButton helpButton;
 
     private JPanel mainPanel;
 
@@ -146,7 +151,7 @@ public class AlertDialog extends JInternalFrame
     
 
     private void setupPanels() {
-		// Make sure we can't be hidden behind other windows
+	// Make sure we can't be hidden behind other windows
 	setLayer(JLayeredPane.MODAL_LAYER);
 
 	getContentPane().setLayout(new BorderLayout());
@@ -159,21 +164,20 @@ public class AlertDialog extends JInternalFrame
 	c.weightx = 1.0;
 	c.ipadx = 5;
 	c.anchor = GridBagConstraints.WEST;
+	 
+	Vector alertTypes = new Vector();
+	alertTypes.add(Locale.getString("QUOTES"));
+	alertTypes.add(Locale.getString("INPUT_EXPRESSION"));
 
-	alertTypeLabel = new JLabel(Locale.getString("ALERT_TYPE"));
-	c.gridwidth = 1;
-	gridbag.setConstraints(alertTypeLabel, c);
-	mainPanel.add(alertTypeLabel);
-	
-	alertTypeComboBox = new JComboBox();
-	alertTypeComboBox.addItem(Locale.getString("QUOTES"));
-	alertTypeComboBox.addItem(Locale.getString("INPUT_EXPRESSION"));
+
+	alertTypeComboBox = GridBagHelper.addComboBox(mainPanel,
+						      Locale.getString("ALERT_TYPE"),
+						      alertTypes,
+						      gridbag,
+						      c);
+
 	alertTypeComboBox.addActionListener(this);
-
-
-	c.gridwidth = GridBagConstraints.REMAINDER;
-	gridbag.setConstraints(alertTypeComboBox, c);
-	mainPanel.add(alertTypeComboBox);
+	alertTypeComboBox.setToolTipText(Locale.getString("ALERT_TYPE_TOOLTIP"));
 
 	//If an alert is provided use the alert's start date,
 	//otherwise use today
@@ -184,81 +188,75 @@ public class AlertDialog extends JInternalFrame
 	    symbolTextField =
 		GridBagHelper.addTextRow(mainPanel, Locale.getString("SYMBOL"), 
 					 "",
-					 gridbag, c, 10);
+					 gridbag, c, 15);
+	    symbolTextField.setToolTipText(Locale.getString("SYMBOL_FIELD_TOOLTIP"));
 	}
 
 	startDateTextField = 
 	    GridBagHelper.addTextRow(mainPanel, Locale.getString("START_DATE"), 
 				     startDate.toString("dd/mm/yyyy"), 
-                                     gridbag, c, 10);
+                                     gridbag, c, 15);
+
+	startDateTextField.setToolTipText(Locale.getString("START_DATE_FIELD_TOOLTIP"));
 
 	endDateTextField = 
 	    GridBagHelper.addTextRow(mainPanel, Locale.getString("END_DATE"), 
 				     "", 
-                                     gridbag, c, 10);
+                                     gridbag, c, 15);
+
+	endDateTextField.setToolTipText(Locale.getString("START_DATE_FIELD_TOOLTIP"));
 
 	targetTextField = 
 	    GridBagHelper.addTextRow(mainPanel, 
 				     Locale.getString("ALERT_TRIGGER"), 
 				     "", 
-                                     gridbag, c, 10);
+                                     gridbag, c, 15);
+
+	targetTextField.setToolTipText(Locale.getString("ALERT_TARGET_TOOLTIP"));
+
 
 	if (symbolTextField != null) {
 	    symbolTextField.addKeyListener(this);
 	}
 	startDateTextField.addKeyListener(this);
 	targetTextField.addKeyListener(this);
-	
-			
-	boundTypeLabel = new JLabel(Locale.getString("ALERT_BOUND_TYPE"));
-	c.gridwidth = 1;
-	gridbag.setConstraints(boundTypeLabel, c);
+				       
+	Vector boundTypes = new Vector();
+	boundTypes.add(Locale.getString("ALERT_UPPER_BOUND"));
+	boundTypes.add(Locale.getString("ALERT_LOWER_BOUND"));
+	boundTypes.add(Locale.getString("ALERT_EXACT_BOUND"));
+		
+	boundTypeComboBox = GridBagHelper.addComboBox(mainPanel,
+						      Locale.getString("ALERT_BOUND_TYPE"),
+						      boundTypes,
+						      gridbag, c);
 
-
-	boundTypeComboBox = new JComboBox();
-	boundTypeComboBox.addItem(Locale.getString("ALERT_UPPER_BOUND"));
-	boundTypeComboBox.addItem(Locale.getString("ALERT_LOWER_BOUND"));
-	boundTypeComboBox.addItem(Locale.getString("ALERT_EXACT_BOUND"));
 	boundTypeComboBox.addActionListener(this);
+	boundTypeComboBox.setToolTipText(Locale.getString("ALERT_BOUND_TYPE_TOOLTIP"));
+
+
+	Vector fieldTypes = new Vector();
+	fieldTypes.add(Locale.getString("DAY_OPEN"));
+	fieldTypes.add(Locale.getString("DAY_HIGH"));
+	fieldTypes.add(Locale.getString("DAY_LOW"));	
+	fieldTypes.add(Locale.getString("DAY_CLOSE"));
+	fieldTypes.add(Locale.getString("VOLUME"));
 	
+
 	fieldTypeLabel = new JLabel(Locale.getString("ALERT_FIELD_TYPE"));
 	c.gridwidth = 1;
 	gridbag.setConstraints(fieldTypeLabel, c);
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(boundTypeComboBox, c);       
 
-	fieldTypeComboBox = new JComboBox();
-	fieldTypeComboBox.addItem(Locale.getString("DAY_OPEN"));
-	fieldTypeComboBox.addItem(Locale.getString("DAY_HIGH"));
-	fieldTypeComboBox.addItem(Locale.getString("DAY_LOW"));	
-	fieldTypeComboBox.addItem(Locale.getString("DAY_CLOSE"));
-	fieldTypeComboBox.addItem(Locale.getString("VOLUME"));
+	fieldTypeComboBox = GridBagHelper.addComboBox(mainPanel,
+						      Locale.getString("ALERT_FIELD_TYPE"),
+						      fieldTypes,
+						      gridbag,
+						      c);
 		
 	fieldTypeComboBox.addActionListener(this);
-
-	c.gridwidth = GridBagConstraints.REMAINDER;
-	gridbag.setConstraints(fieldTypeComboBox, c);
-	
-	mainPanel.add(boundTypeLabel);
-	mainPanel.add(boundTypeComboBox);
-	mainPanel.add(fieldTypeLabel);
-	mainPanel.add(fieldTypeComboBox);
-
-	JPanel buttonPanel = new JPanel();
-	okButton = new JButton(Locale.getString("OK"));
-	okButton.addActionListener(this);
-	okButton.setEnabled(false);
-	getRootPane().setDefaultButton(okButton);
-
-	cancelButton = new JButton(Locale.getString("CANCEL"));
-	cancelButton.addActionListener(this);
-	buttonPanel.add(okButton);
-	buttonPanel.add(cancelButton);
-  
-	getContentPane().add(mainPanel, BorderLayout.NORTH);
-	getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-
-	setFrameSize();
+	fieldTypeComboBox.setToolTipText(Locale.getString("ALERT_OHLCV_FIELD_TOOLTIP"));
 
 
 	//If an alert was supplied, setup the dialog with it's values
@@ -277,6 +275,34 @@ public class AlertDialog extends JInternalFrame
 		targetTextField.setText(alert.getTargetValue().toString());
 	    }
 	}
+	
+	helpButton = GridBagHelper.addHelpButtonRow(mainPanel, 
+						    Locale.getString("ALERT_TITLE"),
+						    gridbag,
+						    c);	
+	helpButton.addActionListener(this);
+	
+       
+
+
+	
+	JPanel buttonPanel = new JPanel();        
+	okButton = new JButton(Locale.getString("OK"));
+	okButton.addActionListener(this);
+	okButton.setEnabled(false);
+	getRootPane().setDefaultButton(okButton);
+	
+	cancelButton = new JButton(Locale.getString("CANCEL"));
+	cancelButton.addActionListener(this);
+	buttonPanel.add(okButton);
+	buttonPanel.add(cancelButton);
+
+	getContentPane().add(mainPanel, BorderLayout.NORTH);
+	getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+	setFrameSize();
+	
+	
     }
 
 
@@ -289,11 +315,13 @@ public class AlertDialog extends JInternalFrame
 
 	int x = (desktop.getWidth() - width) / 2;
 	int y = (desktop.getHeight() - height) / 2;
-
+	
 	width = preferred.width;
 	height = preferred.height;
 
 	setBounds(x, y, width, height);
+
+	
     }
 
     /**
@@ -424,6 +452,8 @@ public class AlertDialog extends JInternalFrame
 		fieldTypeComboBox.setVisible(true);
 		fieldTypeLabel.setVisible(true);		
 	    }			   
+	} else if (e.getSource() == helpButton) {
+	    CommandManager.getInstance().openHelp("Alerts");
 	}
     }	
 

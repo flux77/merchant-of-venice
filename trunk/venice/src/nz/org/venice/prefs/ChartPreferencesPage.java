@@ -111,15 +111,18 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
                                      chartList,
                                      gridbag, c);
         
+	defaultChart.setToolTipText(Locale.getString("CHART_DEFAULT_TOOLTIP"));
+
         ArrayList colours = new ArrayList();
         colours.add(Color.WHITE);
 	Color tmp = new Color(0, 0, 100, 125);
 	colours.add(tmp);
 	colours.add(Color.BLACK);
         colourSelection = new ColourSelectionPanel(colours);
+	colourSelection.setToolTipText(Locale.getString("CHART_BACKGROUND_TOOLTIP"));
         colourSelection.setSelectedColour(new Color(PreferencesManager.getDefaultChartBackgroundColour()));
         GridBagHelper.addPanel(borderPanel, "Background", colourSelection, gridbag, c);
-    	
+	    	
         chartDefaultsPanel.add(borderPanel, BorderLayout.NORTH);		
         return chartDefaultsPanel;
     }
@@ -152,8 +155,9 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
 	    defaultChartStr = "LINE_CHART";
 	}
 	
-	
-	PreferencesManager.putDefaultChart(defaultChartStr);
+	//FIXME getRGB doesnt handle transparency
+
+	PreferencesManager.putDefaultChart(defaultChartStr);	
 	PreferencesManager.putDefaultChartBackgroundColour(colourSelection.getSelectedColour().getRGB());
     }
 }

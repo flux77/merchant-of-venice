@@ -28,7 +28,12 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
+import javax.swing.ImageIcon;
 import java.util.Vector;
+import java.net.URL;
+
+import nz.org.venice.util.Locale;
+
 
 /**
  * GridBagHelper is a class that makes it easier to create form user interfaces. Using
@@ -98,6 +103,37 @@ public class GridBagHelper {
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(button, c);
         panel.add(button);
+
+        return button;
+    }
+
+    /**
+     * Append a new row containing a help button to the form.
+     *
+     * @param panel form panel
+     * @param helpName The chapter name which will be opened
+     * @param gridbag the form's gridbag
+     * @param c the form's constraints
+     * @return the help button
+     */
+
+    public static JButton addHelpButtonRow(JPanel panel, 
+					   String helpName,
+					   GridBagLayout gridbag,
+					   GridBagConstraints c) {
+
+		
+	String about = "resources/info.png";				
+	URL aboutIconURL = ClassLoader.getSystemResource(about);
+	ImageIcon icon = new ImageIcon(aboutIconURL);
+
+        JButton button = new JButton(icon);
+        c.gridwidth = GridBagConstraints.REMAINDER;
+	c.anchor = GridBagConstraints.EAST;
+	c.gridx = 0;
+        gridbag.setConstraints(button, c);
+        panel.add(button);
+	button.setToolTipText(Locale.getString("HELP_BUTTON_TOOLTIP", helpName));
 
         return button;
     }

@@ -1335,6 +1335,23 @@ public class CommandManager {
     }
 
     /**
+     * Opens the help module at the specifed page.
+     * 
+     * @param helpName The name of a chapter in the manual
+     */
+    public void openHelp(String helpName) {
+	// Let the user open multiple instances of help if they wish. This
+	// enables them to have multiple pages open and doesn't affect
+	// correctness.
+        HelpModule helpModule = new HelpModule(desktop, helpName);
+
+        desktopManager.newFrame(helpModule, false, false, true);
+    }
+
+
+
+
+    /**
      * Displays an import file dialog that allows the user to import
      * preferences into the application from an XML file.
      */

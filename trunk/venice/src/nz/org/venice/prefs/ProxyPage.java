@@ -95,15 +95,21 @@ public class ProxyPage extends JPanel implements PreferencesPage {
 		}
 	    });
 
+	useProxyCheckBox.setToolTipText(Locale.getString("PROXY_CHECKBOX_TOOLTIP"));
+
 	hostTextField = GridBagHelper.addTextRow(borderPanel,
 						 Locale.getString("PROXY_HOST"),
 						 proxyPreferences.host,
 						 gridbag, c, 20);
 	
+	hostTextField.setToolTipText(Locale.getString("PROXY_HOST_FIELD_TOOLTIP"));
+
 	portTextField = GridBagHelper.addTextRow(borderPanel,
 						 Locale.getString("PROXY_PORT"),
 						 proxyPreferences.port,
 						 gridbag, c, 5);
+
+	portTextField.setToolTipText(Locale.getString("PROXY_PORT_FIELD_TOOLTIP"));
 	
 	useAuthCheckBox = 
 	    GridBagHelper.addCheckBoxRow(borderPanel, 
@@ -115,16 +121,22 @@ public class ProxyPage extends JPanel implements PreferencesPage {
 		}
 	    });
 
+	useAuthCheckBox.setToolTipText(Locale.getString("PROXY_AUTH_CHECKBOX_TOOLTIP"));
+
 	userTextField = GridBagHelper.addTextRow(borderPanel,
 						 Locale.getString("PROXY_USER"),
 						 proxyPreferences.user,
 						 gridbag, c, 10);
-	
+		
+	userTextField.setToolTipText(Locale.getString("PROXY_AUTH_USER_FIELD_TOOLTIP"));
+
 	passwordTextField = GridBagHelper.addPasswordRow(borderPanel,
 						 Locale.getString("PROXY_PASSWORD"),
 						 proxyPreferences.password,
 						 gridbag, c, 10);
 	
+	passwordTextField.setToolTipText(Locale.getString("PROXY_AUTH_PASSWORD_FIELD_TOOLTIP"));
+
 	proxyPanel.add(borderPanel, BorderLayout.NORTH);
 
 	checkDisabledStatus();

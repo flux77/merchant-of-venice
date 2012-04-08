@@ -89,6 +89,9 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
                                      Integer.toString(maxDecimalDigits),
                                      gridbag, c, 10);
 
+	minDecimalDigitsTextField.setToolTipText(Locale.getString("DECIMAL_DIGITS_FIELD_TOOLTIP"));
+	maxDecimalDigitsTextField.setToolTipText(Locale.getString("DECIMAL_DIGITS_FIELD_TOOLTIP"));
+
 	int tabSizeDigits = PreferencesManager.getEditTabSize();
 	tabSizeTextField = 
             GridBagHelper.addTextRow(borderPanel, 
@@ -96,11 +99,15 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
                                      Integer.toString(tabSizeDigits),
                                      gridbag, c, 10);
 
+	tabSizeTextField.setToolTipText(Locale.getString("TAB_LENGTH_FIELD_TOOLTIP"));
+
 	scrollToLatestDataChart = 
 	    GridBagHelper.addCheckBoxRow(borderPanel,
 					 Locale.getString("CHART_SHOW_LATEST_LABEL"),
 					 PreferencesManager.getDefaultChartScrollToEnd(),
 					 gridbag, c);
+
+	scrollToLatestDataChart.setToolTipText(Locale.getString("SCROLL_CHART_TO_END_TOOLTIP"));
 
 	scrollToLatestDataTable = 
 	    GridBagHelper.addCheckBoxRow(borderPanel,
@@ -108,6 +115,7 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
 					 PreferencesManager.getDefaultTableScrollToEnd(),
 					 gridbag, c);
 	
+	scrollToLatestDataTable.setToolTipText(Locale.getString("SCROLL_TABLE_TO_END_TOOLTIP"));
 	
 	restoreWindowsCheckBox = 
 	    GridBagHelper.addCheckBoxRow(borderPanel,
@@ -116,11 +124,15 @@ public class UserInterfacePage extends JPanel implements PreferencesPage
 					 gridbag, c);
 	
 	
+	restoreWindowsCheckBox.setToolTipText(Locale.getString("RESTORE_SAVED_WINDOWS_CHECKBOX_TOOLTIP"));
+
 	confirmExitCheckBox = 
 	    GridBagHelper.addCheckBoxRow(borderPanel,
 					 Locale.getString("CONFIRM_VENICE_EXIT_TITLE"),
 					 PreferencesManager.getConfirmExitSetting(),
 					 gridbag, c);
+
+	confirmExitCheckBox.setToolTipText(Locale.getString("CONFIRM_EXIT_CHECKBOX_TOOLTIP"));
 
         quotesPanel.add(borderPanel, BorderLayout.NORTH);
 	

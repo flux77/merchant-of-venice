@@ -353,6 +353,10 @@ public class RulesPage extends JPanel implements AnalyserPage {
                                                                         Locale.getString("SELL_RULE"), 
                                                                         "", gridbag, c);
             
+	    buyRuleExpressionComboBox.setToolTipText(Locale.getString("ANALYSIS_BUYRULE_BOX_TOOLTIP"));
+	    sellRuleExpressionComboBox.setToolTipText(Locale.getString("ANALYSIS_SELLRULE_BOX_TOOLTIP"));
+	    
+
             panel.add(innerPanel, BorderLayout.NORTH);
             add(panel);
         }
@@ -382,6 +386,8 @@ public class RulesPage extends JPanel implements AnalyserPage {
                         checkDisabledStatus();
                     }
                 });
+
+	    ruleFamilyEnabledCheckBox.setToolTipText(Locale.getString("ANALYSIS_RULE_FAMILY_CHECK_TOOLTIP"));
             
             aRangeTextField = 
                 GridBagHelper.addTextRow(innerPanel, Locale.getString("RANGE_A_1_TO"), "", gridbag, 
@@ -392,6 +398,10 @@ public class RulesPage extends JPanel implements AnalyserPage {
             cRangeTextField = 
                 GridBagHelper.addTextRow(innerPanel, Locale.getString("RANGE_C_1_TO"), "", gridbag, 
                                          c, 3);
+
+	    aRangeTextField.setToolTipText(Locale.getString("ANALYSIS_RULE_RANGE_FIELD_TOOLTIP"));
+	    bRangeTextField.setToolTipText(Locale.getString("ANALYSIS_RULE_RANGE_FIELD_TOOLTIP"));
+	    cRangeTextField.setToolTipText(Locale.getString("ANALYSIS_RULE_RANGE_FIELD_TOOLTIP"));
             
             panel.add(innerPanel, BorderLayout.NORTH);
             add(panel);

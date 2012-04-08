@@ -110,6 +110,7 @@ public class TransactionDialog extends JInternalFrame
 	mainPanel.add(typeLabel);
 
 	typeComboBox = new JComboBox();
+	typeComboBox.setToolTipText(Locale.getString("TRANSACTION_TYPE_TOOLTIP"));
 
 	// If the portfolio only has a cash account then dont display
 	// the share transactions
@@ -159,6 +160,8 @@ public class TransactionDialog extends JInternalFrame
 				     today.toString("dd/mm/yyyy"), 
                                      gridbag, c, 10);
 
+	dateTextField.setToolTipText(Locale.getString("DATE_FIELD_TOOLTIP"));
+
 	JPanel buttonPanel = new JPanel();
 	okButton = new JButton(Locale.getString("OK"));
 	okButton.addActionListener(this);
@@ -193,6 +196,7 @@ public class TransactionDialog extends JInternalFrame
 	Iterator iterator = accounts.iterator();
 
 	cashAccountComboBox = new JComboBox();
+	cashAccountComboBox.setToolTipText(Locale.getString("TRANSACTION_CASH_ACCOUNT_TOOLTIP"));
 	
 	while(iterator.hasNext()) {
 	    Account account = (Account)iterator.next();
@@ -236,6 +240,7 @@ public class TransactionDialog extends JInternalFrame
 	Iterator iterator = accounts.iterator();
 
 	shareAccountComboBox = new JComboBox();
+	shareAccountComboBox.setToolTipText(Locale.getString("TRANSACTION_SHARE_ACCOUNT_TOOLTIP"));
 
 	while(iterator.hasNext()) {
 	    Account account = (Account)iterator.next();
@@ -289,6 +294,7 @@ public class TransactionDialog extends JInternalFrame
 	gridbag.setConstraints(symbolLabel, c);
 	panel.add(symbolLabel);
 	JComboBox symbolComboBox = getSymbolComboBox();
+	symbolComboBox.setToolTipText(Locale.getString("TRANSACTION_SYMBOL_TOOLTIP"));
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(symbolComboBox, c);
 	panel.add(symbolComboBox);
@@ -297,6 +303,8 @@ public class TransactionDialog extends JInternalFrame
 	amountTextField = 
 	    GridBagHelper.addTextRow(panel, Locale.getString("TOTAL_DIVIDEND_VALUE"), 
 				     "", gridbag, c, 15);
+
+	amountTextField.setToolTipText(Locale.getString("TRANSACTION_DIVIDEND_AMOUNT_FIELD_TOOLTIP"));
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -335,12 +343,15 @@ public class TransactionDialog extends JInternalFrame
 	gridbag.setConstraints(symbolLabel, c);
 	panel.add(symbolLabel);
 	JComboBox symbolComboBox = getSymbolComboBox();
+	symbolComboBox.setToolTipText(Locale.getString("TRANSACTION_SYMBOL_TOOLTIP"));
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(symbolComboBox, c);
 	panel.add(symbolComboBox);
 
 	sharesTextField = 
 	    GridBagHelper.addTextRow(panel, Locale.getString("SHARES"), "", gridbag, c, 15);
+
+	sharesTextField.setToolTipText(Locale.getString("TRANSACTION_DRP_NUMBER_FIELD_TOOLTIP"));
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -387,17 +398,25 @@ public class TransactionDialog extends JInternalFrame
 	symbolTextField = 
 	    GridBagHelper.addTextRow(panel, Locale.getString("SYMBOL"), "", gridbag, c, 5);
 
+	symbolTextField.setToolTipText(Locale.getString("SYMBOL_FIELD_TOOLTIP"));
+
 	// Number Shares Line
 	sharesTextField = 
 	    GridBagHelper.addTextRow(panel, Locale.getString("SHARES"), "", gridbag, c, 15);
+
+	sharesTextField.setToolTipText(Locale.getString("TRANSACTION_NUM_SHARES_FIELD_TOOLTIP"));
 
 	// Share Value Line
 	amountTextField = 
 	    GridBagHelper.addTextRow(panel, Locale.getString("TOTAL_SHARE_VALUE"), "", 
 				     gridbag, c, 15);
 
+	amountTextField.setToolTipText(Locale.getString("TRANSACTION_TOTAL_AMOUNT_FIELD_TOOLTIP"));
+
 	tradeCostTextField = 
 	    GridBagHelper.addTextRow(panel, Locale.getString("TRADE_COST"), "", gridbag, c, 15);
+
+	tradeCostTextField.setToolTipText(Locale.getString("TRANSACTION_TRADE_AMOUNT_FIELD_TOOLTIP"));
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -425,7 +444,7 @@ public class TransactionDialog extends JInternalFrame
 	c.gridwidth = 1;
 	gridbag.setConstraints(cashAccountLabel, c);
 	panel.add(cashAccountLabel);
-	JComboBox cashAccountComboBox = getCashAccountComboBox();
+	JComboBox cashAccountComboBox = getCashAccountComboBox();	
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(cashAccountComboBox, c);
 	panel.add(cashAccountComboBox);
@@ -446,6 +465,7 @@ public class TransactionDialog extends JInternalFrame
 	gridbag.setConstraints(symbolLabel, c);
 	panel.add(symbolLabel);
 	JComboBox symbolComboBox = getSymbolComboBox();
+	symbolComboBox.setToolTipText(Locale.getString("TRANSACTION_SYMBOL_TOOLTIP"));
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	gridbag.setConstraints(symbolComboBox, c);
 	panel.add(symbolComboBox);
@@ -454,13 +474,19 @@ public class TransactionDialog extends JInternalFrame
 	sharesTextField = 
 	    GridBagHelper.addTextRow(panel, Locale.getString("SHARES"), "", gridbag, c, 15);
 
+	sharesTextField.setToolTipText(Locale.getString("TRANSACTION_NUM_SHARES_FIELD_TOOLTIP"));
+
 	// Share Value Line
 	amountTextField = 
 	    GridBagHelper.addTextRow(panel, Locale.getString("TOTAL_SHARE_VALUE"), "", 
 				     gridbag, c, 15);
 
+	amountTextField.setToolTipText(Locale.getString("TRANSACTION_TOTAL_AMOUNT_FIELD_TOOLTIP"));
+
 	tradeCostTextField = 
 	    GridBagHelper.addTextRow(panel, Locale.getString("TRADE_COST"), "", gridbag, c, 15);
+
+	tradeCostTextField.setToolTipText(Locale.getString("TRANSACTION_TRADE_AMOUNT_FIELD_TOOLTIP"));
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 
@@ -497,6 +523,9 @@ public class TransactionDialog extends JInternalFrame
 	amountTextField =
 	    GridBagHelper.addTextRow(panel, Locale.getString("AMOUNT"), "", gridbag, c,
                                      15);
+
+
+	amountTextField.setToolTipText(Locale.getString("TRANSACTION_CASH_AMOUNT_FIELD_TOOLTIP"));
 
 	borderPanel.add(panel, BorderLayout.NORTH);
 

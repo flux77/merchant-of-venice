@@ -424,6 +424,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 		GridBagHelper.addTextRow(innerPanel, Locale.getString("END_DATE"), "",
                                          gridbag, c, 15);
 
+	    startDateTextField.setToolTipText(Locale.getString("START_DATE_FIELD_TOOLTIP"));
+	    endDateTextField.setToolTipText(Locale.getString("END_DATE_FIELD_TOOLTIP"));
+
             panel.add(innerPanel, BorderLayout.NORTH);
 	    add(panel);
 	}
@@ -502,6 +505,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
                 GridBagHelper.addSymbolListComboBox(innerPanel,
                                                     Locale.getString("SYMBOLS"), "",
                                                     gridbag, c);
+
+	    symbolListComboBox.setToolTipText(Locale.getString("SYMBOL_BOX_TOOLTIP"));
+
             panel.add(innerPanel, BorderLayout.NORTH);
 	    add(panel);
 	}
@@ -526,6 +532,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             c.fill = GridBagConstraints.HORIZONTAL;
 
             orderByKeyButton = new JRadioButton(Locale.getString("BY"));
+	    orderByKeyButton.setToolTipText(Locale.getString("ANALYSIS_ORDER_BY_KEY_BUTTON_TOOLTIP"));
             orderByKeyButton.setSelected(true);
             orderByKeyButton.addActionListener(new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
@@ -553,6 +560,11 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             orderByKeyComboBox.addItem(Locale.getString("CHANGE_DECREASING"));
             orderByKeyComboBox.addItem(Locale.getString("CHANGE_INCREASING"));
 
+
+	    orderByKeyComboBox.setToolTipText(Locale.getString("ANALYSIS_ORDER_BOX_TOOLTIP"));
+
+
+
             c.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(orderByKeyComboBox, c);
             innerPanel.add(orderByKeyComboBox);
@@ -562,6 +574,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	    c.anchor = GridBagConstraints.WEST;
 
             orderByExpressionButton = new JRadioButton(Locale.getString("BY_EQUATION"));
+	    orderByExpressionButton.setToolTipText(Locale.getString("ANALYSIS_ORDER_BY_EQN_BUTTON_TOOLTIP"));
             orderByExpressionButton.addActionListener(new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
                         checkDisabledStatus();
@@ -574,6 +587,7 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             innerPanel.add(orderByExpressionButton);
 
             orderByExpressionComboBox = new ExpressionComboBox();
+	    orderByExpressionComboBox.setToolTipText(Locale.getString("ANALYSIS_ORDER_EQN_TOOLTIP"));
             c.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(orderByExpressionComboBox, c);
             innerPanel.add(orderByExpressionComboBox);

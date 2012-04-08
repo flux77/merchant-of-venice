@@ -131,6 +131,8 @@ public class ExportQuoteModule extends JPanel implements Module {
                     formatComboBox.setSelectedItem(filter.getName());
             }
             
+	    formatComboBox.setToolTipText(Locale.getString("FILE_QUOTE_FORMAT_TOOLTIP"));
+
             c.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(formatComboBox, c);
             titledPanel.add(formatComboBox);        
@@ -140,6 +142,8 @@ public class ExportQuoteModule extends JPanel implements Module {
             fileNamesTextField =
                 GridBagHelper.addTextRow(titledPanel, Locale.getString("FILE_NAMES"), fileNames,
                                          gridbag, c, 15);
+
+	    fileNamesTextField.setToolTipText(Locale.getString("FILENAMES_FIELD_TOOLTIP"));
         }
         
         add(titledPanel, BorderLayout.CENTER);

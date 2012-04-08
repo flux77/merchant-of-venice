@@ -66,8 +66,11 @@ public class AlertDestinationPage extends JPanel implements PreferencesPage, Act
 
 	ButtonGroup buttonGroup = new ButtonGroup();
 	disableButton = new JRadioButton(Locale.getString("ALERT_DISABLE_ALL"));
+	disableButton.setToolTipText(Locale.getString("ALERTSOURCE_DISABLE_BUTTON_TOOLTIP"));
 	fileButton = new JRadioButton(Locale.getString("FILE"));
+	fileButton.setToolTipText(Locale.getString("ALERTSOURCE_FILE_BUTTON_TOOLTIP"));
 	databaseButton = new JRadioButton(Locale.getString("DATABASE"));
+	databaseButton.setToolTipText(Locale.getString("ALERTSOURCE_DATABASE_BUTTON_TOOLTIP"));
 
 	disableButton.addActionListener(this);
 	fileButton.addActionListener(this);

@@ -423,6 +423,7 @@ public class ChartModule extends JPanel implements Module,
 	    // Create image on toolbar to clone the graph
 	    ImageIcon cloneChartIcon = new ImageIcon(cloneChartURL);
 	    cloneChart = new JButton(cloneChartIcon);
+	    cloneChart.setToolTipText(Locale.getString("CLONE_CHART_BUTTON_TOOLTIP"));
 	    cloneChart.addActionListener(this);
 	    cloneChart.setEnabled(true);
 	    toolBar.add(cloneChart);
@@ -430,6 +431,7 @@ public class ChartModule extends JPanel implements Module,
             // Create image on toolbar to return to default functionality
             ImageIcon selectImageIcon = new ImageIcon(selectURL);
             select = new JButton(selectImageIcon);
+	    select.setToolTipText(Locale.getString("SELECT_BUTTON_TOOLTIP"));
             select.addActionListener(this);
             select.setEnabled(true);
             toolBar.add(select);
@@ -437,6 +439,7 @@ public class ChartModule extends JPanel implements Module,
             // Create image on toolbar to zoom in to highlighted region
             ImageIcon zoomInImageIcon = new ImageIcon(zoomInImageURL);
             zoomIn = new JButton(zoomInImageIcon);
+	    zoomIn.setToolTipText(Locale.getString("ZOOMIN_BUTTON_TOOLTIP"));
             zoomIn.addActionListener(this);
             zoomIn.setEnabled(zoomInEnabled);
             toolBar.add(zoomIn);
@@ -444,6 +447,7 @@ public class ChartModule extends JPanel implements Module,
             // Create image on toolbar to return to default zoom
             ImageIcon defaultZoomImageIcon = new ImageIcon(defaultZoomURL);
             defaultZoom = new JButton(defaultZoomImageIcon);
+	    defaultZoom.setToolTipText(Locale.getString("DEFAULT_ZOOM_BUTTON_TOOLTIP"));
             defaultZoom.addActionListener(this);
             defaultZoom.setEnabled(defaultZoomEnabled);
             toolBar.add(defaultZoom);
@@ -451,6 +455,7 @@ public class ChartModule extends JPanel implements Module,
 	    // Create image on toolbar to toggle chart orientation
 	    ImageIcon flipChartIcon = new ImageIcon(flipChartURL);
 	    flipChart = new JButton(flipChartIcon);
+	    flipChart.setToolTipText(Locale.getString("FLIP_CHART_BUTTON_TOOLTIP"));
 	    flipChart.addActionListener(this);
 	    flipChart.setEnabled(true);
 	    toolBar.add(flipChart);
@@ -458,6 +463,7 @@ public class ChartModule extends JPanel implements Module,
 	    // Create image on toolbar to paint lines on graph
 	    ImageIcon paintOnChartIcon = new ImageIcon(paintInImageURL);
 	    paintOnChart = new JButton(paintOnChartIcon);
+	    paintOnChart.setToolTipText(Locale.getString("DRAW_LINE_BUTTON_TOOLTIP"));
 	    paintOnChart.addActionListener(this);
 	    paintOnChart.setEnabled(true);
 	    toolBar.add(paintOnChart);
@@ -465,6 +471,7 @@ public class ChartModule extends JPanel implements Module,
 	    // Create image on toolbar to move lines on graph
 	    ImageIcon moveOnChartIcon = new ImageIcon(moveInImageURL);
 	    moveOnChart = new JButton(moveOnChartIcon);
+	    moveOnChart.setToolTipText(Locale.getString("MOVE_LINE_BUTTON_TOOLTIP"));
 	    moveOnChart.addActionListener(this);
 	    moveOnChart.setEnabled(true);
 	    toolBar.add(moveOnChart);
@@ -472,6 +479,7 @@ public class ChartModule extends JPanel implements Module,
 	    // Create image on toolbar to scribble on graph
 	    ImageIcon scribbleOnChartIcon = new ImageIcon(scribbleInImageURL);
 	    scribbleOnChart = new JButton(scribbleOnChartIcon);
+	    scribbleOnChart.setToolTipText(Locale.getString("DRAW_FREE_HAND_BUTTON_TOOLTIP"));
 	    scribbleOnChart.addActionListener(this);
 	    scribbleOnChart.setEnabled(true);
 	    toolBar.add(scribbleOnChart);
@@ -479,6 +487,7 @@ public class ChartModule extends JPanel implements Module,
 	    // Create image on toolbar to put text on graph
 	    ImageIcon editOnChartIcon = new ImageIcon(editInImageURL);
 	    editOnChart = new JButton(editOnChartIcon);
+	    editOnChart.setToolTipText(Locale.getString("DRAW_TEXT_BUTTON_TOOLTIP"));
 	    editOnChart.addActionListener(this);
 	    editOnChart.setEnabled(true);
 	    toolBar.add(editOnChart);	    
@@ -486,6 +495,7 @@ public class ChartModule extends JPanel implements Module,
 	    // Create image on toolbar to delete lines on graph
 	    ImageIcon eraseOnChartIcon = new ImageIcon(eraseInImageURL);
 	    eraseOnChart = new JButton(eraseOnChartIcon);
+	    eraseOnChart.setToolTipText(Locale.getString("DELETE_DRAWING_BUTTON_TOOLTIP"));
 	    eraseOnChart.addActionListener(this);
 	    eraseOnChart.setEnabled(true);
 	    toolBar.add(eraseOnChart);

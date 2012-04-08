@@ -46,6 +46,7 @@ import nz.org.venice.chart.source.Adjustment;
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.util.TradingDate;
 import nz.org.venice.util.TradingDateFormatException;
+import nz.org.venice.main.CommandManager;
 import nz.org.venice.util.Locale;
 
 public class AdjustPriceDataDialog extends JInternalFrame 
@@ -58,7 +59,7 @@ public class AdjustPriceDataDialog extends JInternalFrame
     private JTextField valueField;
     private JLabel valueLabel;
 
-    private JButton okButton, cancelButton;
+    private JButton okButton, cancelButton, helpButton;
 
     private JPanel mainPanel, buttonPanel;
     private boolean isDone = false;
@@ -97,7 +98,8 @@ public class AdjustPriceDataDialog extends JInternalFrame
 
     
     private void createPanels() {
-	this.setSize(560, 200);
+	this.setSize(560, 250);
+
 	setResizable(true);
         setClosable(true);
         setTitle(Locale.getString("SPLIT_DIV_ADJUST"));
@@ -109,6 +111,7 @@ public class AdjustPriceDataDialog extends JInternalFrame
 	buttonPanel = getButtonPanel();
 	add(mainPanel, BorderLayout.CENTER);
 	add(buttonPanel, BorderLayout.SOUTH);
+
     }
 
     private JPanel getMainPanel() {
@@ -136,14 +139,19 @@ public class AdjustPriceDataDialog extends JInternalFrame
 				      adjustmentTypes,
 				      gridbag, c);
 
+	adjustmentTypeComboBox.setToolTipText(Locale.getString("ADJUST_TYPE_COMBO_TOOLTIP"));
+	
+	adjustmentTypeComboBox.addActionListener(this);
+
 	adjustmentDirectionComboBox = 
 	    GridBagHelper.addComboBox(mainPanel,
 				      Locale.getString("ADJUST_DIRECTION"),
 				      adjustmentDirections,
 				      gridbag, c);
-	
-	adjustmentTypeComboBox.addActionListener(this);
-	
+
+	adjustmentDirectionComboBox.setToolTipText(Locale.getString("ADJUST_DIRECTION_COMBO_TOOLTIP"));
+
+
 			
 	valueLabel = new JLabel();
 	setValueLabel(Locale.getString("DIVIDEND"));
@@ -153,12 +161,21 @@ public class AdjustPriceDataDialog extends JInternalFrame
 					     gridbag, c,
 					     15);
 
+	dateField.setToolTipText(Locale.getString("DATE_FIELD_TOOLTIP"));
+
 	valueField = GridBagHelper.addTextRow(mainPanel, valueLabel,
 					      "",
 					      gridbag, c,
 					      15);
-
 	
+	valueField.setToolTipText(Locale.getString("VALUE_TOOLTIP"));
+	
+	helpButton = GridBagHelper.addHelpButtonRow(mainPanel,
+						    Locale.getString("SPLIT_DIV_ADJUST"),
+						    gridbag, c);
+
+	helpButton.addActionListener(this);	
+
 	return mainPanel;
     }
 
@@ -200,9 +217,12 @@ public class AdjustPriceDataDialog extends JInternalFrame
 	    String selectedType = (String)adjustmentTypeComboBox.getSelectedItem();
 
 	    setValueLabel(selectedType);
+	} else if (e.getSource() == helpButton) {
+	    //Can link to chapters only so far
+	    CommandManager.getInstance().openHelp("Graphs");
 	} else { 
 
-	}
+	} 
     }
 
     private void setValueLabel(String type) {

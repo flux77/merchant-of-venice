@@ -93,12 +93,16 @@ public class TuningPage extends JPanel implements PreferencesPage, ActionListene
                                      Integer.toString(maximumCachedQuotes),
                                      gridbag, c, 10);
 
+	maxCachedQuotesTextField.setToolTipText(Locale.getString("TUNING_MAX_QUOTES_TOOLTIP"));
+
 	boolean cacheExpires = PreferencesManager.getCacheExpiryEnabled();
 	enableCacheExpiryButton = 
 	    GridBagHelper.addCheckBoxRow(borderPanel, 
 					 Locale.getString("CACHE_EXPIRY_ENABLED"), 
 					 cacheExpires,
 					 gridbag, c);
+
+	enableCacheExpiryButton.setToolTipText(Locale.getString("TUNING_CACHE_EXPIRY_CHECK_TOOLTIP"));
 
 	enableCacheExpiryButton.addActionListener(this);
 
@@ -109,6 +113,8 @@ public class TuningPage extends JPanel implements PreferencesPage, ActionListene
                                      Integer.toString(maximumCacheAge),
                                      gridbag, c, 10);
 
+	maxCacheAgeTextField.setToolTipText(Locale.getString("TUNING_CACHE_EXPIRY_INTERVAL_TOOLTIP"));
+
 	if (!cacheExpires) {
 	    maxCacheAgeTextField.setEnabled(false);
 	}
@@ -117,6 +123,8 @@ public class TuningPage extends JPanel implements PreferencesPage, ActionListene
 	    GridBagHelper.addButtonRow(borderPanel, 
 				       Locale.getString("FLUSH_CACHE"), 
                                      gridbag, c);
+
+	flushCacheButton.setToolTipText(Locale.getString("TUNING_FLUSH_CACHE_TOOLTIP"));
 
 	flushCacheButton.addActionListener(this);
 	    

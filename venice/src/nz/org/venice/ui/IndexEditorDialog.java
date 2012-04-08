@@ -39,6 +39,7 @@ import java.awt.event.KeyListener;
 
 
 import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.main.CommandManager;
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.quote.SymbolMetadata;
@@ -55,6 +56,7 @@ public class IndexEditorDialog extends JInternalFrame implements ActionListener,
 
     private JButton okButton;
     private JButton cancelButton;
+    private JButton helpButton;
 
     public IndexEditorDialog() {
 	super();
@@ -63,6 +65,9 @@ public class IndexEditorDialog extends JInternalFrame implements ActionListener,
 
     public IndexEditorDialog(SymbolMetadata indexSymbolEdit) {
 	super();
+
+	indexSymbol = indexSymbolEdit;
+
 	initialise();
     }
     
@@ -108,14 +113,34 @@ public class IndexEditorDialog extends JInternalFrame implements ActionListener,
 	c.anchor = GridBagConstraints.WEST;
 	
 	panel.setLayout(layout);
+
+	String symbolText = (indexSymbol != null) 
+	    ? indexSymbol.getSymbol().toString()
+	    : "";
+
 	symbolField = GridBagHelper.addTextRow(panel, Locale.getString("STOCK"),
-					       "", layout, c, 8);
+					       symbolText, layout, c, 8);
 
 	symbolField.addKeyListener(this);
+	symbolField.setToolTipText(Locale.getString("SYMBOL_FIELD_TOOLTIP"));
 	
+	String nameText = (indexSymbol != null) 
+	    ? indexSymbol.getName()
+	    : "";
+	
+
 	nameField = GridBagHelper.addTextRow(panel, Locale.getString("NAME"),
-					       "", layout, c, 8);
-	
+					       nameText, layout, c, 8);
+				   
+				   
+	nameField.setToolTipText(Locale.getString("INDEX_NAME_TOOLTIP"));
+
+	helpButton = GridBagHelper.addHelpButtonRow(panel, 
+						    Locale.getString("INDEX_SYMBOLS_TITLE"),
+						    layout,
+						    c);	
+
+	helpButton.addActionListener(this);
 
 	return panel;
     }
@@ -149,6 +174,8 @@ public class IndexEditorDialog extends JInternalFrame implements ActionListener,
 
 	} else if (e.getSource() == cancelButton) {
 	    closeDialog = true;
+	} else if (e.getSource() == helpButton) {
+	    CommandManager.getInstance().openHelp("Index Definition");
 	} else {
 
 	}

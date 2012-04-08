@@ -106,6 +106,7 @@ public class IDQuoteSyncModule extends JPanel implements Module {
 
         isEnabledCheckBox = new JCheckBox(Locale.getString("ENABLED"));
         isEnabledCheckBox.setSelected(prefs.isEnabled);
+	isEnabledCheckBox.setToolTipText(Locale.getString("IDQUOTE_SYNC_CHECKBOX_TOOLTIP"));
         isEnabledCheckBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     // Disable widgets if sync is diabled
@@ -135,6 +136,8 @@ public class IDQuoteSyncModule extends JPanel implements Module {
 
         sourceComboBox = new JComboBox();
         sourceComboBox.addItem(Locale.getString("YAHOO"));
+	sourceComboBox.setToolTipText(Locale.getString("IDQUOTE_SOURCE_TOOLTIP"));
+
 
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(sourceComboBox, c);
@@ -144,24 +147,34 @@ public class IDQuoteSyncModule extends JPanel implements Module {
                                                        prefs.symbols,
                                                        gridbag, c, 11);
 
+	symbolListTextField.setToolTipText(Locale.getString("SYMBOL_FIELD_TOOLTIP"));
+
         suffixTextField = GridBagHelper.addTextRow(titledPanel, Locale.getString("ADD_SUFFIX"),
                                                    prefs.suffix,
                                                    gridbag, c, 11);
+
+	suffixTextField.setToolTipText(Locale.getString("SUFFIX_FIELD_TOOLTIP"));
 
         openTimeTextField = GridBagHelper.addTextRow(titledPanel,
                                                      Locale.getString("OPEN_TIME"),
                                                      prefs.openTime.toString(),
                                                      gridbag, c, 11);
+	
+	openTimeTextField.setToolTipText(Locale.getString("START_TIME_FIELD_TOOLTIP"));
 
         closeTimeTextField = GridBagHelper.addTextRow(titledPanel,
                                                       Locale.getString("CLOSE_TIME"),
                                                       prefs.closeTime.toString(),
                                                       gridbag, c, 11);
 
+	closeTimeTextField.setToolTipText(Locale.getString("START_TIME_FIELD_TOOLTIP"));
+
         periodTextField = GridBagHelper.addTextRow(titledPanel,
                                                    Locale.getString("PERIOD_IN_SECONDS"),
                                                    Integer.toString(prefs.period),
                                                    gridbag, c, 11);
+
+	periodTextField.setToolTipText(Locale.getString("PERIOD_FIELD_TOOLTIP"));
 
         add(isEnabledCheckBox, BorderLayout.NORTH);
         add(titledPanel, BorderLayout.CENTER);

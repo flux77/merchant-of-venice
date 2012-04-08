@@ -146,7 +146,27 @@ public class HelpPage extends DefaultMutableTreeNode {
                 return page;
         }
         return null;
+    }
 
+    /**
+     * Search the document tree, starting with this node and return the
+     * first document that has the given name, or NULL if not found.
+     *
+     * @param name The chapter name to search
+     * @return the page found
+     */
+
+    public HelpPage findPageByName(String name) {
+        for(Enumeration enumeration = preorderEnumeration();
+            enumeration.hasMoreElements();) {
+
+            HelpPage page =
+                (HelpPage)enumeration.nextElement();
+
+            if(page.getName().equals(name))
+                return page;
+        }
+        return null;
     }
 
     // Convert the given chapter name to link

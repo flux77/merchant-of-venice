@@ -116,6 +116,9 @@ public class AccountDialog {
         currencyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);        
         comboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+	textField.setToolTipText(Locale.getString("ACCOUNT_FIELD_TOOLTIP"));
+	comboBox.setToolTipText(Locale.getString("ACCOUNT_CURRENCY_TOOLTIP"));
+
         Box box = Box.createVerticalBox();
         box.add(label);
         box.add(Box.createVerticalStrut(5));

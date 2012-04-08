@@ -163,6 +163,8 @@ public class ImportQuoteModule extends JPanel implements Module {
                 if(filter.getName().equals(selectedFilter))
                     formatComboBox.setSelectedItem(filter.getName());
             }
+	    
+	    formatComboBox.setToolTipText(Locale.getString("FILE_QUOTE_FORMAT_TOOLTIP"));
 
             c.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(formatComboBox, c);
@@ -192,6 +194,8 @@ public class ImportQuoteModule extends JPanel implements Module {
             else
                 webSiteComboBox.setSelectedIndex(FLOAT_SITE);
 
+	    webSiteComboBox.setToolTipText(Locale.getString("INTERNET_IMPORT_QUOTE_TOOLTIP"));
+
             c.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(webSiteComboBox, c);
             titledPanel.add(webSiteComboBox);
@@ -200,6 +204,8 @@ public class ImportQuoteModule extends JPanel implements Module {
             symbolList = GridBagHelper.addTextRow(titledPanel, Locale.getString("SYMBOLS"),
                                                   p.get("internetSymbolList", ""),
                                                   gridbag, c, 11);
+	    
+	    symbolList.setToolTipText(Locale.getString("SYMBOL_FIELD_TOOLTIP"));
 
             c.gridx = 1;
             prefixOrSuffixLabel = new JLabel(Locale.getString("ADD_PREFIX"));
@@ -208,6 +214,9 @@ public class ImportQuoteModule extends JPanel implements Module {
             titledPanel.add(prefixOrSuffixLabel);
 
             prefixOrSuffixTextField = new JTextField(p.get("prefixOrSuffix", ""), 11);
+
+	    prefixOrSuffixTextField.setToolTipText(Locale.getString("SUFFIX_FIELD_TOOLTIP"));
+
             if(c.gridx != -1)
                 c.gridx++;
             c.gridwidth = GridBagConstraints.REMAINDER;
@@ -217,19 +226,26 @@ public class ImportQuoteModule extends JPanel implements Module {
             c.gridx = 1;
             TradingDate today = new TradingDate();
             TradingDate previous = today.previous(30);
-
+	    
             startDateTextField = GridBagHelper.addTextRow(titledPanel,
                                                           Locale.getString("START_DATE"),
                                                           p.get("internetStartDate",
                                                                 previous.toString("dd/mm/yyyy")),
                                                           gridbag, c, 11);
+
+	    startDateTextField.setToolTipText(Locale.getString("START_DATE_FIELD_TOOLTIP"));
+
             c.gridx = 1;
             endDateTextField = GridBagHelper.addTextRow(titledPanel,
                                                         Locale.getString("END_DATE"),
                                                         p.get("internetEndDate",
                                                               today.toString("dd/mm/yyyy")),
                                                         gridbag, c, 11);
+	    
+	    endDateTextField.setToolTipText(Locale.getString("END_DATE_FIELD_TOOLTIP"));
         }
+	
+
 
         // Put all "import from" radio buttons into group
         ButtonGroup group = new ButtonGroup();

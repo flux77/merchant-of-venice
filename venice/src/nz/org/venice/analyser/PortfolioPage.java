@@ -308,6 +308,11 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
                 GridBagHelper.addTextRow(innerPanel, Locale.getString("TRADE_COST"), "", 
                                          gridbag, c, 5);
 
+
+	    initialCapitalTextField.setToolTipText(Locale.getString("ANALYSIS_INITIAL_CAPITAL_FIELD_TOOLTIP"));
+	    
+	    tradeCostTextField.setToolTipText(Locale.getString("TRANSACTION_TRADE_AMOUNT_FIELD_TOOLTIP"));
+
             panel.add(innerPanel, BorderLayout.NORTH);
             add(panel);
         }
@@ -336,6 +341,9 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
                         checkDisabledStatus();
                     }
                 });
+
+	    numberStocksButton.setToolTipText(Locale.getString("ANALYSIS_NUM_STOCKS_BUTTON_TOOLTIP"));
+
             buttonGroup.add(numberStocksButton);
             
             c.gridwidth = 1;
@@ -343,8 +351,9 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             innerPanel.add(numberStocksButton);
             
             numberStocksTextField = new JTextField("", 5);
+	    numberStocksTextField.setToolTipText(Locale.getString("ANALYSIS_NUM_STOCKS_FIELD_TOOLTIP"));
             c.gridwidth = GridBagConstraints.REMAINDER;
-            gridbag.setConstraints(numberStocksTextField, c);
+            gridbag.setConstraints(numberStocksTextField, c);	    
             innerPanel.add(numberStocksTextField);
             
             c.weightx = 1.0;
@@ -358,6 +367,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
                         checkDisabledStatus();
                     }
                 });
+	    stockValueButton.setToolTipText(Locale.getString("ANALYSIS_STOCKS_VALUE_BUTTON_TOOLTIP"));
             buttonGroup.add(stockValueButton);
             
             c.gridwidth = 1;
@@ -365,6 +375,7 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
             innerPanel.add(stockValueButton);
             
             stockValueTextField = new JTextField("", 10);
+	    stockValueTextField.setToolTipText(Locale.getString("ANALYSIS_STOCKS_VALUE_FIELD_TOOLTIP"));
             c.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(stockValueTextField, c);
             innerPanel.add(stockValueTextField);

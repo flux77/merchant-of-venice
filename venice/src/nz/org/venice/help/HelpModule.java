@@ -101,6 +101,27 @@ public class HelpModule extends JPanel implements Module {
     }
 
     /**
+     * Create a new help browser loaded at page whose chapter name is the given
+     * name
+     * 
+     * @param	desktop	the parent desktop.
+     * @param	start the chapter name to open 
+     */
+
+    public HelpModule(JDesktopPane desktop, String start) {
+	init();	
+		
+	HelpPage startPage = root.findPageByName(start);
+	if (startPage != null) {
+	    // Update visisted page stack
+	    visitedPages = new Stack();
+	    positionInStack = 0;
+	    visitedPages.push(startPage);
+	    displayPage( (HelpPage)startPage);
+	}
+    }
+
+    /**
      * Create a new help browser loaded at the root page.
      *
      * @param	desktop	the parent desktop.

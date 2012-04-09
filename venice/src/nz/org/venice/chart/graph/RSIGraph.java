@@ -77,10 +77,10 @@ public class RSIGraph extends AbstractGraph {
         int overSold = RSIGraphUI.getOverSold(getSettings());
         int overBought = RSIGraphUI.getOverBought(getSettings());
 
-	int backgroundColourValue = PreferencesManager.getDefaultChartBackgroundColour();
+	Color backgroundColour = PreferencesManager.getDefaultChartBackgroundColour();
 	
 	Color foregroundColour = 
-	    BasicChartUI.getComplementaryColour(new Color(backgroundColourValue));
+	    BasicChartUI.getComplementaryColour(backgroundColour);
 
 	g.setColor(foregroundColour);
 

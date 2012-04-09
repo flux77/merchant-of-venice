@@ -69,18 +69,14 @@ public class Chart extends JComponent implements MouseListener {
      * Create a new Chart component.
      */
     public Chart() {
-
-	int colourValue = PreferencesManager.getDefaultChartBackgroundColour();
-
-	Color nc = new Color(colourValue, false);
+	Color nc = PreferencesManager.getDefaultChartBackgroundColour();
 	setBackground(nc);
 	setForeground(Color.gray);
 	addMouseListener(this);
 	updateUI();
-
+       		       
 	drawnElements = new ChartDrawingModel();
 	normalOrientation = true;
-	
     }
 
     // Create a vector of iterators containing the x range iterators

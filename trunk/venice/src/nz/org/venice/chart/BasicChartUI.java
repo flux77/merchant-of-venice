@@ -334,18 +334,15 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	// Calculate horizontal axis
 	calculateHorizontalAxes(g, chart, width, height);
 
-	// Draw everything
-	drawBackground(g, chart, width, height);
-	drawLevels(g, chart, width, height);
+	// Draw everything	
+	drawBackground(g, chart, width, height);	
+	drawLevels(g, chart, width, height);       
 	drawHorizontalLabels(g, height);
 	drawAnnotations(g, chart);
-
 	drawLines(g, chart);
 	drawPoints(g, chart, height);
 	drawText(g, chart);
 	drawCursor(g, chart);
-
-	
     }
 
     // Create a new horizontal axis which is sized for the component
@@ -1350,7 +1347,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    //Filter the colour map, removing any where the contrast is 
 	    //insufficient (ie darkblue on black)
 	    Color backgroundColour = 
-		new Color(PreferencesManager.getDefaultChartBackgroundColour());
+		PreferencesManager.getDefaultChartBackgroundColour();
 
 	    colours = filterColours(colours, backgroundColour);
 	    
@@ -1434,7 +1431,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
       delta using those angles.
      */
     public static Color getComplementaryColour(Color colour) {
-	Color violet = new Color(125, 0, 125);
+	Color violet = new Color(125, 0, 125, 0);
 		
 	Color[] brightColours = {Color.WHITE, Color.RED, Color.YELLOW, Color.ORANGE};
 	Color[] darkColours = {Color.BLACK, Color.GREEN, violet, Color.BLUE};
@@ -1544,7 +1541,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    blueValue %= 255;
 	}
 
-	return new Color(redValue, greenValue, blueValue);
+	return new Color(redValue, greenValue, blueValue, mainColour.getAlpha());
 	
     }
 

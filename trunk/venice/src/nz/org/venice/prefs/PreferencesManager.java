@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
+import java.awt.Color;
 
 import nz.org.venice.main.Main;
 import nz.org.venice.main.ModuleFrame;
@@ -1316,10 +1317,16 @@ public class PreferencesManager {
      *
      * @return the default chart background colour.
      */
-    public static int getDefaultChartBackgroundColour() {
-        Preferences prefs = getUserNode("/default_chart_defaults");
-        int bc = prefs.getInt("default_chart_background_colour", 16777215);
-        return bc;
+    public static Color getDefaultChartBackgroundColour() {
+	
+        Preferences prefs = getUserNode("/default_chart_defaults/default_chart_background_colour");
+	int red = prefs.getInt("red", 0);
+	int green = prefs.getInt("green", 0);
+	int blue = prefs.getInt("blue", 0);
+	int alpha = prefs.getInt("alpha", 0);
+
+	Color bgColour = new Color(red, green, blue, alpha);
+	return bgColour;
     }
 
     /**
@@ -1418,10 +1425,19 @@ public class PreferencesManager {
      *
      * @param backColour the default background colour.
      */
-    public static void putDefaultChartBackgroundColour(int backColour) {
+    public static void putDefaultChartBackgroundColour(Color backColour) {
 
-        Preferences prefs = getUserNode("/default_chart_defaults");
-	prefs.putInt("default_chart_background_colour", backColour);
+	Preferences prefs = getUserNode("/default_chart_defaults/default_chart_background_colour");
+
+	int red = backColour.getRed();
+	int green = backColour.getGreen();	
+	int blue = backColour.getBlue();
+	int alpha = backColour.getAlpha();
+			
+	prefs.putInt("red", red);
+	prefs.putInt("green", green);
+	prefs.putInt("blue", blue);
+	prefs.putInt("alpha", alpha);
     }
 
     /**

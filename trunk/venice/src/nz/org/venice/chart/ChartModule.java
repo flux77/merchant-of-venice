@@ -445,11 +445,11 @@ public class ChartModule extends JPanel implements Module,
     		pause = false;
     	}
 
-		@Override
-		public void stateChanged(ChangeEvent arg0) {
-			if (!pause)
-				chart.moveTo(bar.getValue());
-		}
+      //@Override
+      public void stateChanged(ChangeEvent arg0) {
+        if (!pause)
+          chart.moveTo(bar.getValue());
+      }
     }
 
     // Add buttons to allow the user to navigate in the timeline of the chart

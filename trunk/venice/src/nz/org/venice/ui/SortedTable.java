@@ -20,6 +20,7 @@ package nz.org.venice.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
@@ -27,16 +28,17 @@ import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EventListener;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
+
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
@@ -539,6 +541,29 @@ public class SortedTable extends JTable
 	}
     }
 
+    // TODO Remove this workaround when moving to a newer Java version
+    // Fix provided in http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6428968
+    // EmptyBorder class would return a null pointer inside Java internal classes
+    // in some cases when using Win XP LAF and JRE 1.4 which makes the app crash
+    public Component getTableCellRendererComponent(TableCellRenderer tableCellRenderer, JTable table,
+            Object value,
+            boolean isSelected,
+            boolean hasFocus,
+            int row,
+            int column) {
+		Component c;
+		try {
+			c = tableCellRenderer.getTableCellRendererComponent(table,
+					value, isSelected, hasFocus, row, column);
+		} catch (NullPointerException x) {
+			JLabel tcr = (JLabel)tableCellRenderer;
+			tcr.setBorder((Border) new EmptyBorder(new Insets(0,0,0,0)));
+			c = tcr;
+		}
+		return c;
+    }
+
+    
     // We use a custom renderer for the table header so that we can
     // insert the up/down sort arrows.
     private void setCustomHeaderRenderer() {
@@ -546,8 +571,10 @@ public class SortedTable extends JTable
 
 	// Assume the header is rendered using swing components (it is) and
 	// get the component used to render the first cell of the header
-	JComponent header =
-	    (JComponent)r.getTableCellRendererComponent((JTable)this,
+	JComponent header = 
+			(JComponent)this.getTableCellRendererComponent(
+							r,
+							(JTable)this,
 							(Object)"",
 							false,
 							false,

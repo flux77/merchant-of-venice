@@ -28,6 +28,8 @@ import javax.swing.*;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import java.awt.image.BufferedImage;
 
@@ -172,6 +174,8 @@ public class ChartModule extends JPanel implements Module,
     private JButton scribbleOnChart = null;    
     private JButton editOnChart = null;
     private JButton flipChart = null;
+    
+    private TimelineHandler timelineHandler = null;
 
     // Modes
     private static final int SELECTING = 0;
@@ -345,7 +349,7 @@ public class ChartModule extends JPanel implements Module,
 
 	chart.setHighlightedStart(settings.getHighlightedStart());
 	chart.setHighlightedEnd(settings.getHighlightedEnd());
-	       
+
 	defaultZoomEnabled = settings.getDefaultZoomEnabled();
 	defaultZoom.setEnabled(defaultZoomEnabled);
 	zoomInEnabled = settings.getZoomInEnabled();
@@ -393,13 +397,68 @@ public class ChartModule extends JPanel implements Module,
 
 	
 	scrollPane = new JScrollPane(chart);
-	
+
 	add(scrollPane, BorderLayout.CENTER);
 		
     }
 
+    /**
+     *  A class that contains the scrollbar implemented to handle the timeline in a chart view
+     *  This add a JScrollbar component in the JScrollPane HeaderView and handles the events
+     * @author Guillermo Bonvehi - gbonvehi
+     *
+     * TODO: Probably this class shouldn't be here
+     */
+    class TimelineHandler implements ChangeListener {
+    	private JScrollBar bar;
+    	// Boolean to not run stateChanged while updating the value using Recalculate
+    	private boolean pause = false;
+    	public TimelineHandler() {
+    		JPanel p = new JPanel();
+    		p.setLayout(new BorderLayout());
+    		
+    		bar = new JScrollBar(JScrollBar.HORIZONTAL);
+    		TradingDate minX = (TradingDate)chart.calculateStartX();
+    		TradingDate maxX = (TradingDate)chart.calculateEndX();
+    		
+    		BoundedRangeModel brm = new DefaultBoundedRangeModel();
+    		brm.setMaximum(maxX.getDifference(minX));    		
+    		brm.setMinimum(0);
+    		brm.setValue(0);
+    		brm.addChangeListener(this);
+    		brm.setExtent(maxX.getDifference(minX));
+    		bar.setModel(brm);
+    		bar.setVisible(true);
+    		
+    		p.add(bar, BorderLayout.CENTER);
 
-    // Adds the toolbar that gives the user the options to zoom in and out
+            scrollPane.setColumnHeaderView(p);
+    	}
+    	
+    	// Call this method when the timeline was modified (zoomed in/out) to recalculate values
+    	public void Recalculate() {
+			pause = true;
+			BoundedRangeModel brm = bar.getModel(); 
+    		brm.setExtent(chart.getSpanDays());
+    		int day = ((TradingDate)chart.calculateStartX()).getDifference((TradingDate)chart.getStartX());
+    		brm.setValue(day);
+    		pause = false;
+    	}
+
+		@Override
+		public void stateChanged(ChangeEvent arg0) {
+			if (!pause)
+				chart.moveTo(bar.getValue());
+		}
+    }
+
+    // Add buttons to allow the user to navigate in the timeline of the chart
+    // with current zoom level
+    private void addTimelineHandler() {
+    	timelineHandler = new TimelineHandler();
+	}
+
+	// Adds the toolbar that gives the user the options to zoom in and out
     // of the chart
     private void addFunctionToolBar() {
 
@@ -1003,6 +1062,8 @@ public class ChartModule extends JPanel implements Module,
 		// This tells the scrollpane to re-asses whether it needs
 		// the horizontal scrollbar now
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		if (timelineHandler!=null)
+			timelineHandler.Recalculate();
 	    } catch (ChartOutOfBoundsException cobe) {
 		DesktopManager.showWarningMessage(Locale.getString("CHART_NO_DATA_AVAILABLE_WARNING"));
 	    }
@@ -1014,6 +1075,8 @@ public class ChartModule extends JPanel implements Module,
 	    // This tells the scrollpane to re-asses whether it needs
 	    // the horizontal scrollbar now
 	    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    if (timelineHandler!=null)
+			timelineHandler.Recalculate();
 	    repaint();
 	}
 	/* paintOnChart and eraseOnChart are "toggle switches" - they toggle
@@ -1468,6 +1531,14 @@ public class ChartModule extends JPanel implements Module,
 	int max = hbar.getMaximum();
 	hbar.setValue(max);
     }
+
+    /**
+     * Functions that will run after the chart has been fully loaded
+     * TODO: Check if we should implement listeners/observers
+     */
+	public void postLoad() {
+		addTimelineHandler();
+	}
 }
 
 

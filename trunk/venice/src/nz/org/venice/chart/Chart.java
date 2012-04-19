@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import nz.org.venice.chart.graph.*;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.util.Locale;
+import nz.org.venice.util.TradingDate;
 
 /**
  * New swing component that allows creation of charts. This charting
@@ -102,6 +103,24 @@ public class Chart extends JComponent implements MouseListener {
 	return graphXRangeIterators;
     }
 
+    public int getSpanDays() {
+    	TradingDate sX = (TradingDate)this.startX;
+    	TradingDate eX = (TradingDate)this.endX;
+    	return sX.getDifference(eX);
+    }
+    
+    public void moveTo(int daysFromStart) {
+    	TradingDate realStartX = (TradingDate)calculateStartX();    	
+    	TradingDate psX = realStartX.next(daysFromStart);
+    	TradingDate peX = psX.next(this.getSpanDays());    	
+    	TradingDate maxX = (TradingDate)calculateEndX();
+    	if (peX.compareTo(maxX) > 0)
+    		peX = maxX;
+    	this.setXRange(psX,peX);
+    	this.clearHighlightedRegion();
+    	this.resetBuffer();
+    }
+    
     // Create a set of X values containing every X value between startX
     // and endX (inclusive) that occurs in any one of the graphs we
     // are charting.
@@ -174,14 +193,18 @@ public class Chart extends JComponent implements MouseListener {
     }
 
     /**
-     * Get the last X value that appears in the chart.
+     *  Get the last X value that appears in the chart.
+     *  @return TradingDate (Comparable) or null
      */
     public Comparable getEndX() {
 	return endX;
     }
 
-    // Find the lowest X value in all the graphs we are going to chart
-    private Comparable calculateStartX() {
+    /**
+     *  Find the lowest X value in all the graphs we are going to chart
+     *  @return TradingDate (Comparable) or null
+     */
+    public Comparable calculateStartX() {
 	Iterator iterator = levels.iterator();
 	Comparable x;
 	Comparable startX = null;
@@ -201,8 +224,11 @@ public class Chart extends JComponent implements MouseListener {
 	return startX;
     }
 
-    // Find the highest X value in all the graphs we are going to chart
-    private Comparable calculateEndX() {
+    /**
+     *  Find the highest X value in all the graphs we are going to chart
+     *  @return TradingDate (Comparable) or null
+     */
+    public Comparable calculateEndX() {
 	Iterator iterator = levels.iterator();
 	Comparable x;
 	Comparable endX = null;

@@ -1180,10 +1180,11 @@ public class CommandManager {
 
             if (!thread.isInterrupted()) {
                 desktopManager.newFrame(chart);
-		if (PreferencesManager.getDefaultChartScrollToEnd()) {
-		    chart.setHBarToMax();
-		}
-	    }
+				if (PreferencesManager.getDefaultChartScrollToEnd()) {
+				    chart.setHBarToMax();
+				}
+				chart.postLoad();
+            }
 
             ProgressDialogManager.closeProgressDialog(progress);
         }

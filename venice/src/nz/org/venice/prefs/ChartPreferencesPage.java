@@ -116,7 +116,7 @@ public class ChartPreferencesPage extends JPanel implements PreferencesPage
         ArrayList colours = new ArrayList();
         colours.add(Color.WHITE);
 
-	Color darkBlue = new Color(0, 0, 100, 125);
+	Color darkBlue = new Color(0, 0, 100, 250);
 
 	colours.add(darkBlue);
 	colours.add(Color.BLACK);

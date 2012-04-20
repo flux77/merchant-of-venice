@@ -409,18 +409,18 @@ public class ChartModule extends JPanel implements Module,
      *
      * TODO: Probably this class shouldn't be here
      */
-    class TimelineHandler implements ChangeListener {
+    class TimelineHandler implements ChangeListener, MouseWheelListener {
     	private JScrollBar bar;
     	// Boolean to not run stateChanged while updating the value using Recalculate
     	private boolean pause = false;
     	public TimelineHandler() {
-    		JPanel p = new JPanel();
-    		p.setLayout(new BorderLayout());
-    		
+    		JToolBar p = new JToolBar(SwingConstants.HORIZONTAL);
+
+    		JLabel tl = new JLabel("Timeline: ");
+
     		bar = new JScrollBar(JScrollBar.HORIZONTAL);
     		TradingDate minX = (TradingDate)chart.calculateStartX();
     		TradingDate maxX = (TradingDate)chart.calculateEndX();
-    		
     		BoundedRangeModel brm = new DefaultBoundedRangeModel();
     		brm.setMaximum(maxX.getDifference(minX));    		
     		brm.setMinimum(0);
@@ -428,11 +428,13 @@ public class ChartModule extends JPanel implements Module,
     		brm.addChangeListener(this);
     		brm.setExtent(maxX.getDifference(minX));
     		bar.setModel(brm);
-    		bar.setVisible(true);
+    		bar.addMouseWheelListener(this);
+    		bar.setPreferredSize(new Dimension(200,20));
     		
-    		p.add(bar, BorderLayout.CENTER);
-
-            scrollPane.setColumnHeaderView(p);
+    		p.add(tl);
+    		p.add(bar);
+    		add(p, BorderLayout.NORTH);
+    		ChartModule.this.updateUI();
     	}
     	
     	// Call this method when the timeline was modified (zoomed in/out) to recalculate values
@@ -450,6 +452,15 @@ public class ChartModule extends JPanel implements Module,
       public void stateChanged(ChangeEvent arg0) {
         if (!pause)
           chart.moveTo(bar.getValue());
+      }
+
+      //@Override
+      public void mouseWheelMoved(MouseWheelEvent event) {
+    	  if (event.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+    		  BoundedRangeModel brm = bar.getModel();
+              int totalScrollAmount = event.getUnitsToScroll();
+              brm.setValue(brm.getValue() + totalScrollAmount);
+          }
       }
     }
 

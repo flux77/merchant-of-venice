@@ -937,8 +937,14 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
     // Set the background colour
     private void drawBackground(Graphics g, Chart chart, int width,
 				int height) {
+	
+	//background colours with non zero alpha value (transparency)
+	//display with artifacts without "wiping" the canvas first
+	g.setColor(Color.black);
+	g.fillRect(0, 0, width, height);
 	g.setColor(chart.getBackground());
 	g.fillRect(0, 0, width, height);
+	
     }
 
     // Draw the vertical grid and the vertical labels onto the chart

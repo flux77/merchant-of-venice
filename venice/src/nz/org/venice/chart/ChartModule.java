@@ -439,9 +439,10 @@ public class ChartModule extends JPanel implements Module,
     	public void Recalculate() {
 			pause = true;
 			BoundedRangeModel brm = bar.getModel(); 
-    		brm.setExtent(chart.getSpanDays());
+    		brm.setExtent(0);
     		int day = ((TradingDate)chart.calculateStartX()).getDifference((TradingDate)chart.getStartX());
     		brm.setValue(day);
+    		brm.setExtent(chart.getSpanDays());
     		pause = false;
     	}
 

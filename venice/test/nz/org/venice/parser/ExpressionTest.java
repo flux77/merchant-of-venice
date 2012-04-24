@@ -228,6 +228,7 @@ public class ExpressionTest extends TestCase {
 	String randExpString = "random(23042394)";
 	String randExpString2 = "random(23042394)";
 	String expSymString = "close(\"THISSYMBOLNOTFOUND\")";
+	String forNoExecString = "int i = 0\nint j = 1\nfor (i = 0; i < -10; i = i + 1) {\nj = j + 1}";
 
 	Expression absExp = parse(absExpString);
 	Expression cosExp = parse(cosExpString);
@@ -235,6 +236,7 @@ public class ExpressionTest extends TestCase {
 	Expression randExp = parse(randExpString);
 	Expression randExp2 = parse(randExpString);
 	Expression expSymExp = parse(expSymString);
+	Expression forNoExecExp = parse(forNoExecString);
 
 	try {
 	    Variables emptyVars = new Variables();
@@ -245,6 +247,7 @@ public class ExpressionTest extends TestCase {
 	    //Want to check that the rand function will return the same value
 	    //given the same seed.
 	    double randVal2 = randExp2.evaluate(emptyVars, null, null, 0); 
+	    double forVal = forNoExecExp.evaluate(emptyVars, null, null, 0);
 	    
 	
 	    assertTrue(absVal > 0.0);
@@ -252,6 +255,7 @@ public class ExpressionTest extends TestCase {
 	    assertTrue(withinEpsilon(sinVal, 0.0));
 	    assertTrue(withinEpsilon(randVal, 0.653709));
 	    assertTrue(withinEpsilon(randVal, 0.653709));
+	    assertTrue(withinEpsilon(forVal, 0.0));
 	    
 	} catch (EvaluationException e) {
 	    System.out.println("Evaluation Exception: " + e);
@@ -468,9 +472,9 @@ public class ExpressionTest extends TestCase {
     
         
     public void testLimits() {
-	String forTest = "for (int i = 0; i > 0; i = i + 1) { int n = 0\n n = n + 1 }";
+	String forTest = "for (int i = 0; i >= 0; i = i + 1) { int n = 0\n n = n + 1 }";
 	
-	String whileTest = "for (int i = 0; i > 0; i = i + 1) { int n = 0\n n = n + 1 }";
+	String whileTest = "for (int i = 0; i >= 0; i = i + 1) { int n = 0\n n = n + 1 }";
 
 	AnalyserGuard.getInstance().setRuntimeLimit(10);
 	Expression forExp = parse(forTest);
@@ -478,13 +482,11 @@ public class ExpressionTest extends TestCase {
 
 	assertTrue(forExp != null);
 	assertTrue(whileExp != null);
-	
-
-	
+		
 	try {
 	    Variables variables = new Variables();
 	    double forEval = forExp.evaluate(variables, null, null, 0);	    
-	    
+	    System.out.println("Val = " + forEval);
 	    assertTrue(false);
 	} catch (EvaluationException e) {
 	    if (e == EvaluationException.EVAL_TIME_TOO_LONG_EXCEPTION) {

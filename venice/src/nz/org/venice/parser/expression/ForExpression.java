@@ -73,10 +73,15 @@ public class ForExpression extends QuaternaryExpression {
 
 	// Execute the initial
 	getChild(INITIAL).evaluate(variables, quoteBundle, symbol, day);
-
+	
+	/*Used to be a do while, but because that executes at least once
+	  , that breaks for loops where the condition is false to begin with
+	  
+	*/
 	// Now loop running the command until the condition is no longer true
-	do {
-	    
+	while (getChild(CONDITION).evaluate(variables, quoteBundle, symbol,
+					    day) >= Expression.TRUE_LEVEL) {
+
 	    //Don't want to run forever - if the limit is exceeded
 	    //could be an infinite loop. 
 	    if (AnalyserGuard.getInstance().
@@ -89,9 +94,8 @@ public class ForExpression extends QuaternaryExpression {
 	    
 	    // Execute loop
 	    getChild(LOOP).evaluate(variables, quoteBundle, symbol, day);
-		
-	} while(getChild(CONDITION).evaluate(variables, quoteBundle, symbol, day) >=
-		Expression.TRUE_LEVEL);
+	    
+	} 
 
 	AnalyserGuard.getInstance().finishLoop(this, loopId, symbol, day);	
     

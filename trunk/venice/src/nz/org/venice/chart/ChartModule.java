@@ -28,8 +28,6 @@ import javax.swing.*;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import java.awt.image.BufferedImage;
 
@@ -402,72 +400,10 @@ public class ChartModule extends JPanel implements Module,
 		
     }
 
-    /**
-     *  A class that contains the scrollbar implemented to handle the timeline in a chart view
-     *  This add a JScrollbar component in the JScrollPane HeaderView and handles the events
-     * @author Guillermo Bonvehi - gbonvehi
-     *
-     * TODO: Probably this class shouldn't be here
-     */
-    class TimelineHandler implements ChangeListener, MouseWheelListener {
-    	private JScrollBar bar;
-    	// Boolean to not run stateChanged while updating the value using Recalculate
-    	private boolean pause = false;
-    	public TimelineHandler() {
-    		JToolBar p = new JToolBar(SwingConstants.HORIZONTAL);
-
-    		JLabel tl = new JLabel(Locale.getString("TIMELINE"));
-
-    		bar = new JScrollBar(JScrollBar.HORIZONTAL);
-    		TradingDate minX = (TradingDate)chart.calculateStartX();
-    		TradingDate maxX = (TradingDate)chart.calculateEndX();
-    		BoundedRangeModel brm = new DefaultBoundedRangeModel();
-    		brm.setMaximum(maxX.getDifference(minX));    		
-    		brm.setMinimum(0);
-    		brm.setValue(0);
-    		brm.addChangeListener(this);
-    		brm.setExtent(maxX.getDifference(minX));
-    		bar.setModel(brm);
-    		bar.addMouseWheelListener(this);
-    		bar.setPreferredSize(new Dimension(200,20));
-    		
-    		p.add(tl);
-    		p.add(bar);
-    		add(p, BorderLayout.NORTH);
-    		ChartModule.this.updateUI();
-    	}
-    	
-    	// Call this method when the timeline was modified (zoomed in/out) to recalculate values
-    	public void Recalculate() {
-			pause = true;
-			BoundedRangeModel brm = bar.getModel(); 
-    		brm.setExtent(0);
-    		int day = ((TradingDate)chart.calculateStartX()).getDifference((TradingDate)chart.getStartX());
-    		brm.setValue(day);
-    		brm.setExtent(chart.getSpanDays());
-    		pause = false;
-    	}
-
-      //@Override
-      public void stateChanged(ChangeEvent arg0) {
-        if (!pause)
-          chart.moveTo(bar.getValue());
-      }
-
-      //@Override
-      public void mouseWheelMoved(MouseWheelEvent event) {
-    	  if (event.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-    		  BoundedRangeModel brm = bar.getModel();
-              int totalScrollAmount = event.getUnitsToScroll();
-              brm.setValue(brm.getValue() + totalScrollAmount);
-          }
-      }
-    }
-
     // Add buttons to allow the user to navigate in the timeline of the chart
     // with current zoom level
     private void addTimelineHandler() {
-    	timelineHandler = new TimelineHandler();
+    	timelineHandler = new TimelineHandler(this);
 	}
 
 	// Adds the toolbar that gives the user the options to zoom in and out
@@ -1571,6 +1507,14 @@ public class ChartModule extends JPanel implements Module,
      */
 	public void postLoad() {
 		addTimelineHandler();
+	}
+	
+	/**
+	 * 
+	 * @return current Chart being used by ChartModule
+	 */
+	public Chart getChart() {
+		return this.chart;
 	}
 }
 

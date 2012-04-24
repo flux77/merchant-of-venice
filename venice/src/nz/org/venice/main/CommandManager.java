@@ -1446,7 +1446,7 @@ public class CommandManager {
     /*
       Return a new graph according to the default.
     */
-    private Graph getNewGraph(EODQuoteBundle quoteBundle, boolean index) {
+    public Graph getNewGraph(EODQuoteBundle quoteBundle, boolean index) {
 	GraphSource dayOpen = null, dayClose = null, dayHigh = null, dayLow = null;
 
 	String defaultChart = PreferencesManager.getDefaultChart();

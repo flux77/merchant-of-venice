@@ -416,7 +416,7 @@ public class ChartModule extends JPanel implements Module,
     	public TimelineHandler() {
     		JToolBar p = new JToolBar(SwingConstants.HORIZONTAL);
 
-    		JLabel tl = new JLabel("Timeline: ");
+    		JLabel tl = new JLabel(Locale.getString("TIMELINE"));
 
     		bar = new JScrollBar(JScrollBar.HORIZONTAL);
     		TradingDate minX = (TradingDate)chart.calculateStartX();
@@ -670,7 +670,6 @@ public class ChartModule extends JPanel implements Module,
         ProgressDialog progress = ProgressDialogManager.getProgressDialog();
 	EODQuoteBundle quoteBundle = null;
 	Graph graph = null;
-	GraphSource dayClose = null;
 
 	while(iterator.hasNext()) {
 	    final Symbol symbol = (Symbol)iterator.next();
@@ -679,12 +678,10 @@ public class ChartModule extends JPanel implements Module,
 	    if (!thread.isInterrupted())
 		quoteBundle = new EODQuoteBundle(new EODQuoteRange(symbol));
 	
-	    if (!thread.isInterrupted())
-		dayClose =
-		    new OHLCVQuoteGraphSource(quoteBundle, Quote.DAY_CLOSE);
-	
-	    if (!thread.isInterrupted())
-		graph = new LineGraph(dayClose, Locale.getString("DAY_CLOSE"), true);
+	    
+	    if (!thread.isInterrupted()) {
+		graph = CommandManager.getInstance().getNewGraph(quoteBundle, indexChart);
+	    }
 	
 	    if (!thread.isInterrupted()) {
 
@@ -1084,9 +1081,17 @@ public class ChartModule extends JPanel implements Module,
 	else if(defaultZoom != null && e.getSource() == defaultZoom) {
 	    chart.zoomToDefaultRegion();
             defaultZoom.setEnabled(defaultZoomEnabled = false);
+
 	    // This tells the scrollpane to re-asses whether it needs
 	    // the horizontal scrollbar now
 	    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    
+	    
+	    //FIXME - This doesnt work/do anything
+	    if (PreferencesManager.getDefaultChartScrollToEnd()) {
+		setHBarToMax();
+	    }
+
 	    if (timelineHandler!=null)
 			timelineHandler.Recalculate();
 	    repaint();
@@ -1512,18 +1517,34 @@ public class ChartModule extends JPanel implements Module,
 	return rv;
     }    
 
+    /**
+     * Activate the cursor      
+     */
     public void enableTracker() {
 	tracker.setActive(true);
     }
 
+    /**
+     * Deactivate the cursor      
+     */
     public void disableTracker() {
 	tracker.setActive(false);
     }
 
+    /**
+     * Remove all cursors.      
+     * 
+     */
     public void removeTracker() {
 	tracker = null;
 	chart.setTracker(tracker);
     }
+
+    /**
+     * Add a cursor which tracks the trading date and price
+     * 
+     * @symbol The symbol to track
+     */
 
     public void addTracker(Symbol symbol) {
 	tracker = CommandManager.getInstance().getTracker(this, chart, symbol);

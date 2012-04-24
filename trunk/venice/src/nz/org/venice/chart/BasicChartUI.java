@@ -534,8 +534,11 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	int fontSize;
 	String fontFamily = "Courier";
 	ChartDrawingModel elements = chart.getChartDrawingModel();
-
-	g.setColor(Color.BLACK);	
+	
+	g.setColor(BasicChartUI.
+		   getComplementaryColour(PreferencesManager.
+					  getDefaultChartBackgroundColour()));
+						       
 
 	HashMap map = elements.getText();
 	Iterator it = map.values().iterator();

@@ -151,6 +151,21 @@
     <p><xsl:apply-templates/></p>
   </xsl:template>
 
+  <xsl:template match='image'>
+    <img src='{@name}' alt='{@info}'>
+      <xsl:if test='@width != ""'>
+	<xsl:attribute name='width'>
+	  <xsl:value-of select='@width'/>
+	</xsl:attribute>
+      </xsl:if>
+      <xsl:if test='@height != ""'>
+	<xsl:attribute name='height'>
+	  <xsl:value-of select='@height'/>
+	</xsl:attribute>
+      </xsl:if>
+    </img>
+  </xsl:template>
+
   <xsl:template match="chapter">
     <h2>
       <a name="{@name}"/>

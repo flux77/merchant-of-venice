@@ -1428,6 +1428,9 @@ the paper trade dialogue by:</para>
 <item>Then clicking on the <highlight>Paper Trade</highlight> menu item.
 </item>
 </list>
+
+<para>The screenshots below represent the simplest use case and the minimum settings required to use the paper trade functionality.</para>
+
 <section name="The Range Page">
 <para>The range page defines the range and order of the paper trade. The
 <highlight>Date Range</highlight> defines the range of dates that the paper trade will be
@@ -1451,6 +1454,12 @@ symbols by the given options, or by entering an equation.</para>
 <item>By: Change Decreasing
 </item>
 </list>
+<para>In the example above, Venice will operate over all the symbols ANZ, WBC, CBA and NAB on all the trading days between 3/1/2000 and 24/1/2001 inclusive. It will sort the stocks in the descending order of volatility. </para>
+<!-- classes dir is the base dir -->
+
+<para>Simple example with a single stock: </para>
+<para><image name='nz/org/venice/help/doc/images/screenshot_analysis_papertrade_range.png' info='date range screenshot'></image></para>
+
 </section>
 <section name="The Rules Page">
 <para>The rules page defines the buy/sell rules that trigger trades. Venice
@@ -1463,10 +1472,11 @@ to try not only 15 and 30, but all the values up to 100? You could do this
 by entering the equation: <code>avg(close, a, 0) > avg(close, b, 0)</code>.
 Then making sure the <highlight>Enable multiple rules</highlight> checkbox is ticked.
 Then entering the maximum values for <code>a</code> and <code>b</code> into the <highlight>Range</highlight> entries.</para>
-<para>Venice makes two additional variables available to paper trade equations:</para>
+<para>Venice makes additional variables available to paper trade equations:</para>
 <list><item><code>daysfromstart</code> - defines the number of days that has been passed
       from the beginning of the paper trade. For example in the 10th day of trade daysfromstart is equal to 10.
 </item>
+<item><code>daysfromlastransaction</code> - defines the number of days that have passed since the last transaction (buy or sell)</item>
 <item><code>capital</code> - defines the capital of the portfolio calculated
       from the beginning of the paper trade. It is a float number.
 </item>
@@ -1501,6 +1511,10 @@ Then entering the maximum values for <code>a</code> and <code>b</code> into the 
 <item>Range c: 1 to: leave empty
 </item>
 </list>
+
+<para>Simple example with just the rules and no rule families: </para>
+<para><image name='nz/org/venice/help/doc/images/screenshot_analysis_papertrade_rules.png' info='Rules page screenshot'></image></para>
+
 </section>
 <section name="The Portfolio Page">
 <para>The portfolio page defines the portfolio that is used when paper trading. You
@@ -1518,6 +1532,9 @@ case Venice works out the maximum number of stocks.</para>
 <item>Number of Stocks: 1
 </item>
 </list>
+
+<para><image name='nz/org/venice/help/doc/images/screenshot_analysis_papertrade_portfolio.png' info='portfolio page screenshot'></image></para>
+
 </section>
 <section name="The Trade Value Page">
 <para>The trade value page defines the strategy used to buy or sell the stocks. You
@@ -1535,6 +1552,9 @@ the minimum value (in Gondola: low),
 the maximum value (in Gondola: high).
 Pay attention to the 'open' key word: if you put 'open' alone, you will buy or sell the stocks at open price the next day;
 if you put 'lag(open,0)', you will buy or sell the stocks at a price equal to the open price of the day before and only if this price will be reached by the stock during the next day.</para>
+
+<para><image name='nz/org/venice/help/doc/images/screenshot_analysis_papertrade_tradevalue.png' info='trade value page screenshot'></image></para>
+
 </section>
 </chapter>
 

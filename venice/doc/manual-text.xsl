@@ -57,6 +57,10 @@
     <xsl:apply-templates/>
     <xsl:text>
 
+      <xsl:template match='image'>
+	<xsl:text>Image <xsl:value-of select='@info'/>goes here</xsl:text>
+      </xsl:template>
+
 </xsl:text>
   </xsl:template>
   

@@ -27,6 +27,8 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
+import javax.swing.text.html.HTMLDocument;
+import java.io.File;
 
 import nz.org.venice.main.*;
 import nz.org.venice.util.Locale;
@@ -305,6 +307,19 @@ public class HelpModule extends JPanel implements Module {
         JEditorPane editorPane = new JEditorPane();
         editorPane.setEditable(false);
         editorPane.setContentType("text/html");
+
+	/* Enable the EditorPane to display images */
+	try {
+	    HTMLDocument tmpDoc = (HTMLDocument)editorPane.getDocument();
+
+	    //Need to set the base URL to enable relative paths 
+	    //(ie so that urls like img src='images/foo.png' can be resolved
+	    //for more information see: http://www.javaworld.com/javatips/jw-javatip109.html 
+	    File currentDir = new File(System.getProperty("user.dir"));
+	    tmpDoc.setBase(currentDir.toURI().toURL());
+	} catch (MalformedURLException e) {
+	    assert false;
+	}
 
         // This code is executed when the user clicks on a hyper text link
         editorPane.addHyperlinkListener(new HyperlinkListener() {

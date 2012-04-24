@@ -193,6 +193,14 @@
           style="${doc}/manual-html.xsl">
       <xmlcatalog refid="document"/>
     </xslt>
+
+
+    <!-- Copy any images in the manual -->
+    <copy todir="${help}/images" overwrite="y">
+      <fileset dir="${doc}/images"
+               includes="**/*.gif, **/*.png"/>
+    </copy>
+
   </target>
 
   <!-- Generate a jar -->

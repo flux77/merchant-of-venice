@@ -103,6 +103,10 @@ public class Chart extends JComponent implements MouseListener {
 	return graphXRangeIterators;
     }
 
+    /**
+     * 
+     * @return difference in days between startX and endX
+     */
     public int getSpanDays() {
     	TradingDate sX = (TradingDate)this.startX;
     	TradingDate eX = (TradingDate)this.endX;

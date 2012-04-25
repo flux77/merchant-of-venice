@@ -57,17 +57,16 @@ public class ANNPage extends Page implements AnalyserPage {
      * the output thresholds of artificial neural network, there are 2 output thresholds,
      * one for buy signal and one for sell signal.
      *
-     * @param desktop the desktop
+     * @param	desktop	the current desktop
      * @param maxHeight the height used to resize correctly the window according to
      * the other panels
      */
     public ANNPage(JDesktopPane desktop, double maxHeight) {
-        
+        this.desktop = desktop;
         Dimension preferredSize = new Dimension();
         preferredSize.setSize(this.getPreferredSize().getWidth(), maxHeight/2);
         
-        this.desktop = desktop;
-        this.ANNPageModule = new ANNPageModule(desktop);
+        this.ANNPageModule = new ANNPageModule(this);
         
         setGraphic(preferredSize);
         

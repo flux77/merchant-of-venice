@@ -31,7 +31,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
@@ -53,10 +52,9 @@ import nz.org.venice.util.TradingDate;
 import nz.org.venice.prefs.settings.Settings;
 import nz.org.venice.prefs.settings.AnalyserModuleSettings;
 
-public class PaperTradeModule extends JPanel implements Module {
+public class PaperTradeModule extends Page implements Module {
 
     private PropertyChangeSupport propertySupport;
-    private JDesktopPane desktop;
     private EODQuoteBundle quoteBundle;
     private AnalyserModuleSettings settings;
 
@@ -208,6 +206,7 @@ public class PaperTradeModule extends JPanel implements Module {
     }
 
     private void run() {
+    	
         Thread thread = new Thread(new Runnable() {
                 public void run() {
                     Thread thread = Thread.currentThread();
@@ -447,10 +446,9 @@ public class PaperTradeModule extends JPanel implements Module {
             ProgressDialogManager.closeProgressDialog(progress);
             progress = null;
 
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  e.getReason(),
-                                                  Locale.getString("ERROR_EVALUATING_EQUATION"),
-                                                  JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(
+            		e.getReason(),
+                    Locale.getString("ERROR_EVALUATING_EQUATION"));
 
             return null;
         }

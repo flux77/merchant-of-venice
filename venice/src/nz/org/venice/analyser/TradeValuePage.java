@@ -42,12 +42,10 @@ import nz.org.venice.parser.Variable;
 import nz.org.venice.parser.Variables;
 import nz.org.venice.util.Locale;
 
-public class TradeValuePage extends JPanel implements AnalyserPage {
+public class TradeValuePage extends Page implements AnalyserPage {
 
     private final static int MAX_CHARS_IN_TEXTBOXES = 15;
     
-    private JDesktopPane desktop;
-
     // Swing items
     private ButtonGroup tradeValueBuyButtonGroup;
     private JRadioButton tradeValueBuyByKeyButton;
@@ -133,10 +131,9 @@ public class TradeValuePage extends JPanel implements AnalyserPage {
                 Expression tradeValueSellExpression = Parser.parse(variables, tradeValueSellTextField.getText());
             }
         } catch(ExpressionException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ERROR_PARSING_SYSTEM_RULES"),
-                                                  Locale.getString("INVALID_BUY_SELL_SYSTEM_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("ERROR_PARSING_SYSTEM_RULES"),
+                    Locale.getString("INVALID_BUY_SELL_SYSTEM_ERROR"));
 	    return false;
 	}
         return true;

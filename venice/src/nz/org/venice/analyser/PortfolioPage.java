@@ -61,9 +61,7 @@ import nz.org.venice.util.Money;
  *
  * @author Andrew Leppard
  */
-public class PortfolioPage extends JPanel implements AnalyserPage {
-
-    private JDesktopPane desktop;
+public class PortfolioPage extends Page implements AnalyserPage {
 
     // Swing components
     private JRadioButton numberStocksButton;
@@ -172,43 +170,37 @@ public class PortfolioPage extends JPanel implements AnalyserPage {
 		    new Money(Float.parseFloat(tradeCostTextField.getText()));
 	}
 	catch(NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("ERROR_PARSING_NUMBER",
-                                                                   e.getMessage()),
-                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+		showErrorMessage(
+    			Locale.getString("ERROR_PARSING_NUMBER",e.getMessage()),
+                Locale.getString("INVALID_PORTFOLIO_ERROR"));
 	    return false;
 	}
 
 	if(initialCapital.isLessThanEqual(Money.ZERO)) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("NO_CAPITAL_ERROR"),
-                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+		showErrorMessage(
+    			Locale.getString("NO_CAPITAL_ERROR"),
+                Locale.getString("INVALID_PORTFOLIO_ERROR"));
 	    return false;
 	}
 
         if(mode == NUMBER_STOCKS_MODE && numberStocks <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("EMPTY_PORTFOLIO_ERROR"),
-                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("EMPTY_PORTFOLIO_ERROR"),
+                    Locale.getString("INVALID_PORTFOLIO_ERROR"));
 	    return false;
         }
 
         if(mode == STOCK_VALUE_MODE && stockValue.isLessThanEqual(Money.ZERO)) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("STOCK_VALUE_ERROR"),
-                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("STOCK_VALUE_ERROR"),
+                    Locale.getString("INVALID_PORTFOLIO_ERROR"));
 	    return false;
         }
 
         if(tradeCost.isLessThan(Money.ZERO)) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("INVALID_TRADE_COST_ERROR"),
-                                                  Locale.getString("INVALID_PORTFOLIO_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("INVALID_TRADE_COST_ERROR"),
+                    Locale.getString("INVALID_PORTFOLIO_ERROR"));
 	    return false;
         }
 

@@ -252,9 +252,10 @@ public class ANNPageModule extends AbstractTable implements Module {
      * It manages:
      * the input of artificial neural network table of expressions.
      *
-     * @param desktop the desktop
+     * @param A Page instance
      */
-    public ANNPageModule(Page page) {        
+    public ANNPageModule(Page page) {
+    	this.page = page;
         // Define the columns of the table of expressions
         List columns = new ArrayList();
         // Add the order column, it's the column containing the numbers that specify the order

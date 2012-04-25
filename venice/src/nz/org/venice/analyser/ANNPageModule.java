@@ -32,11 +32,9 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -74,7 +72,7 @@ public class ANNPageModule extends AbstractTable implements Module {
     */
     public static final int ORDER_LENGTH = 5;
 
-    private JDesktopPane desktop;
+    private Page page;
     private Model model;
     private Settings settings;
     
@@ -256,9 +254,7 @@ public class ANNPageModule extends AbstractTable implements Module {
      *
      * @param desktop the desktop
      */
-    public ANNPageModule(JDesktopPane desktop) {
-        this.desktop = desktop;
-        
+    public ANNPageModule(Page page) {        
         // Define the columns of the table of expressions
         List columns = new ArrayList();
         // Add the order column, it's the column containing the numbers that specify the order
@@ -570,10 +566,9 @@ public class ANNPageModule extends AbstractTable implements Module {
 	//FIXME: NO_GENERATION_ERROR is for Genetic Algorithm
 	//Add specific error message in language properties 
 	if (inputExpressions.length <= 0) {
-	    JOptionPane.showInternalMessageDialog(desktop,
-	    Locale.getString("NO_GENERATION_ERROR"),
-	    Locale.getString("INVALID_ANN_ERROR"),
-	    JOptionPane.ERROR_MESSAGE);
+	    page.showErrorMessage(
+	    		Locale.getString("NO_GENERATION_ERROR"),
+	    		Locale.getString("INVALID_ANN_ERROR"));
 
 	    return false;
 	}
@@ -592,11 +587,9 @@ public class ANNPageModule extends AbstractTable implements Module {
             inputExpressions[index] = 
                     ExpressionFactory.newExpression(iExp);
             if (inputExpressions[index] == null) {
-                JOptionPane.showInternalMessageDialog(desktop,
-                    Locale.getString("ERROR_PARSING_EXPRESSION",
-                        iExp),
-                    Locale.getString("INVALID_ANN_ERROR"),
-                    JOptionPane.ERROR_MESSAGE);
+                page.showErrorMessage(
+                    Locale.getString("ERROR_PARSING_EXPRESSION", iExp),
+                    Locale.getString("INVALID_ANN_ERROR"));
                 return false;
             }
         }

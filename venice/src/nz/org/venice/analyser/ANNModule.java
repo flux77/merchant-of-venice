@@ -32,7 +32,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
@@ -43,7 +42,6 @@ import nz.org.venice.main.Module;
 import nz.org.venice.main.ModuleFrame;
 import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.EvaluationException;
-import nz.org.venice.parser.Variable;
 import nz.org.venice.parser.Variables;
 import nz.org.venice.portfolio.Portfolio;
 import nz.org.venice.quote.EODQuoteBundle;
@@ -55,10 +53,9 @@ import nz.org.venice.util.TradingDate;
 import nz.org.venice.prefs.settings.Settings;
 import nz.org.venice.prefs.settings.AnalyserModuleSettings;
 
-public class ANNModule extends JPanel implements Module {
+public class ANNModule extends Page implements Module {
 
     private PropertyChangeSupport propertySupport;
-    private JDesktopPane desktop;
     private EODQuoteBundle quoteBundle;
 
     // Single result table for entire application
@@ -507,10 +504,9 @@ public class ANNModule extends JPanel implements Module {
             ProgressDialogManager.closeProgressDialog(progress);
             progress = null;
 
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  e.getReason(),
-                                                  Locale.getString("ERROR_EVALUATING_EQUATION"),
-                                                  JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(
+                      e.getReason(),
+                      Locale.getString("ERROR_EVALUATING_EQUATION"));
 
             return null;
         }
@@ -591,10 +587,9 @@ public class ANNModule extends JPanel implements Module {
             ProgressDialogManager.closeProgressDialog(progress);
             progress = null;
 
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  e.getReason(),
-                                                  Locale.getString("ERROR_EVALUATING_EQUATION"),
-                                                  JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(
+                 e.getReason(),
+                 Locale.getString("ERROR_EVALUATING_EQUATION"));
 
         }
     }

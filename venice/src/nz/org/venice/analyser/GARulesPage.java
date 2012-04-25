@@ -38,7 +38,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -59,9 +58,7 @@ import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.util.Locale;
 
 
-public class GARulesPage extends JPanel implements AnalyserPage {
-
-    private JDesktopPane desktop;
+public class GARulesPage extends Page implements AnalyserPage {
 
     // Swing components
     private JCheckBox ruleFamilyEnabledCheckBox;
@@ -173,19 +170,17 @@ public class GARulesPage extends JPanel implements AnalyserPage {
             variables.add(lowestGAIndividual.parameter(ii), lowestGAIndividual.type(ii), Variable.CONSTANT);
         
         if (buyRuleString.length() == 0) {
-            JOptionPane.showInternalMessageDialog(desktop, Locale
-                                                  .getString("MISSING_BUY_RULE"), Locale
-                                                  .getString("ERROR_PARSING_RULES"),
-					JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("MISSING_BUY_RULE"),
+            		Locale.getString("ERROR_PARSING_RULES"));
             
             return false;
         }
 
         if (sellRuleString.length() == 0) {
-            JOptionPane.showInternalMessageDialog(desktop, Locale
-                                                  .getString("MISSING_SELL_RULE"), Locale
-                                                  .getString("ERROR_PARSING_RULES"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("MISSING_SELL_RULE"),
+            		Locale.getString("ERROR_PARSING_RULES"));
             
             return false;
         }
@@ -199,11 +194,9 @@ public class GARulesPage extends JPanel implements AnalyserPage {
             buyRule = Parser.parse(tmpVar, buyRuleString);
         } catch (ExpressionException e) {
             buyRule = null;
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("ERROR_PARSING_BUY_RULE", 
-                                                                   e.getReason()), 
-                                                  Locale.getString("ERROR_PARSING_RULES"),
-                                                  JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(
+            		Locale.getString("ERROR_PARSING_BUY_RULE",e.getReason()), 
+                    Locale.getString("ERROR_PARSING_RULES"));
             
             return false;
         }
@@ -217,11 +210,9 @@ public class GARulesPage extends JPanel implements AnalyserPage {
             sellRule = Parser.parse(tmpVar, sellRuleString);
         } catch (ExpressionException e) {
             sellRule = null;
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("ERROR_PARSING_SELL_RULE", 
-                                                                   e.getReason()), 
-                                                  Locale.getString("ERROR_PARSING_RULES"),
-                                                  JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(
+            		Locale.getString("ERROR_PARSING_SELL_RULE",e.getReason()), 
+                    Locale.getString("ERROR_PARSING_RULES"));
             
             return false;
         }
@@ -336,9 +327,9 @@ public class GARulesPage extends JPanel implements AnalyserPage {
                 str = (String)GARulesPageModule.getValueAt(ii,GARulesPageModule.MAX_PARAMETER_COLUMN);
                 dbl = Double.valueOf(str).doubleValue();
             } catch (NumberFormatException nfe) {
-                JOptionPane.showInternalMessageDialog(desktop, Locale.getString("ERROR_PARSING_NUMBER", str),
-                                                      Locale.getString("ERROR_PARSING_RULES"),
-                                                      JOptionPane.ERROR_MESSAGE);
+            	showErrorMessage(
+                		Locale.getString("ERROR_PARSING_NUMBER", str),
+                        Locale.getString("ERROR_PARSING_RULES"));
                 return false;
             }
         }
@@ -362,19 +353,19 @@ public class GARulesPage extends JPanel implements AnalyserPage {
 
 	    //Check that the user can't add implicit variables
 	    if (ImplicitVariables.getInstance().contains(parameters[ii])) {
-		JOptionPane.showInternalMessageDialog(desktop, Locale.getString("VARIABLE_DEFINED_ERROR",
-										parameters[ii], parameters[ii]),
-						      Locale.getString("VARIABLE_DEFINED_ERROR"),
-						      JOptionPane.ERROR_MESSAGE);
+	    	showErrorMessage(
+            		Locale.getString("VARIABLE_DEFINED_ERROR",
+            				parameters[ii], parameters[ii]),
+					Locale.getString("VARIABLE_DEFINED_ERROR"));
 		return false;
 	    }
 
             for (int jj=0; jj<words.length; jj++) {
                 if (words[jj].indexOf(parameters[ii]) >= 0) {
-                    JOptionPane.showInternalMessageDialog(desktop, Locale.getString("ERROR_PARSING_PARAMETER",
-                                                                                    parameters[ii], words[jj]),
-                                                          Locale.getString("ERROR_PARSING_RULES"),
-                                                          JOptionPane.ERROR_MESSAGE);
+                	showErrorMessage(
+                    		Locale.getString("ERROR_PARSING_PARAMETER",
+                    				parameters[ii], words[jj]),
+                            Locale.getString("ERROR_PARSING_RULES"));
                     return false;
                 }
             }

@@ -35,11 +35,10 @@ import nz.org.venice.ui.ConfirmDialog;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.VeniceLog;
 
-public class GPGondolaSelection extends JPanel implements AnalyserPage {
+public class GPGondolaSelection extends Page implements AnalyserPage {
 
     private final int maxPanels = 9;
     
-    private JDesktopPane desktop;
     private Random random;
     
     // Panel inside the section (Titled Panels)

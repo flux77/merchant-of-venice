@@ -42,10 +42,9 @@ import nz.org.venice.util.TradingDate;
 import nz.org.venice.prefs.settings.Settings;
 import nz.org.venice.prefs.settings.AnalyserModuleSettings;
 
-public class GPModule extends JPanel implements Module {
+public class GPModule extends Page implements Module {
     
     private PropertyChangeSupport propertySupport;
-    private JDesktopPane desktop;
     private JTabbedPane tabbedPane;
     
     // Single result table for entire application

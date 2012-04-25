@@ -51,10 +51,7 @@ import nz.org.venice.util.Locale;
 /**
  * @author Alberto Nacher
  */
-public class ANNNetworkTypePage extends JPanel implements AnalyserPage {
-    
-    // Desktop
-    private JDesktopPane desktop;
+public class ANNNetworkTypePage extends Page implements AnalyserPage {
     // The core object which manages the Joone ANN
     private ArtificialNeuralNetwork artificialNeuralNetwork;
         
@@ -466,18 +463,14 @@ public class ANNNetworkTypePage extends JPanel implements AnalyserPage {
                         customANNButton.setSelected(true);
                     } catch (FileExtensionException ex) {
                         // Not a valid Joone extensions error
-                        JOptionPane.showInternalMessageDialog(desktop,
-                                Locale.getString("ERROR_EXTENSION_READING_FROM_FILE",
-                                    file.toString()),
-                                Locale.getString("INVALID_ANN_ERROR"),
-                                JOptionPane.ERROR_MESSAGE);
+                        showErrorMessage(
+                        		Locale.getString("ERROR_EXTENSION_READING_FROM_FILE",file.toString()),
+                                Locale.getString("INVALID_ANN_ERROR"));
                     } catch (Exception ex) {
                         // General file loading error
-                        JOptionPane.showInternalMessageDialog(desktop,
-                                Locale.getString("ERROR_READING_FROM_FILE",
-                                    file.toString()),
-                                Locale.getString("INVALID_ANN_ERROR"),
-                                JOptionPane.ERROR_MESSAGE);
+                    	showErrorMessage(
+                        		Locale.getString("ERROR_READING_FROM_FILE",file.toString()),
+                                Locale.getString("INVALID_ANN_ERROR"));
                     }
 
                 }
@@ -524,18 +517,16 @@ public class ANNNetworkTypePage extends JPanel implements AnalyserPage {
                         customANNButton.setSelected(true);
                     } catch (FileExtensionException ex) {
                         // Not a valid Joone extensions error
-                        JOptionPane.showInternalMessageDialog(desktop,
-                                Locale.getString("ERROR_EXTENSION_WRITING_TO_FILE",
+                    	showErrorMessage(
+                        		Locale.getString("ERROR_EXTENSION_WRITING_TO_FILE",
                                     file.toString()),
-                                Locale.getString("INVALID_ANN_ERROR"),
-                                JOptionPane.ERROR_MESSAGE);
+                                Locale.getString("INVALID_ANN_ERROR"));
                     } catch (Exception ex) {
                         // General file saving error
-                        JOptionPane.showInternalMessageDialog(desktop,
-                                Locale.getString("ERROR_READING_TO_FILE",
+                    	showErrorMessage(
+                        		Locale.getString("ERROR_READING_TO_FILE",
                                     file.toString()),
-                                Locale.getString("INVALID_ANN_ERROR"),
-                                JOptionPane.ERROR_MESSAGE);
+                                Locale.getString("INVALID_ANN_ERROR"));
                     }
 
                 }

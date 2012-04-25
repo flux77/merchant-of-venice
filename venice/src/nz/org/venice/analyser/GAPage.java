@@ -27,7 +27,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -61,9 +60,7 @@ import nz.org.venice.util.Locale;
  *
  * @author Alberto Nacher
  */
-public class GAPage extends JPanel implements AnalyserPage {
-
-    private JDesktopPane desktop;
+public class GAPage extends Page implements AnalyserPage {
 
     // Swing components
     private JTextField generationsTextField;
@@ -158,59 +155,51 @@ public class GAPage extends JPanel implements AnalyserPage {
 		    Integer.parseInt(randomPercentageTextField.getText());
 	}
 	catch(NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ERROR_PARSING_NUMBER",
-                                                                   e.getMessage()),
-                                                  Locale.getString("INVALID_GA_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+		showErrorMessage(
+        		Locale.getString("ERROR_PARSING_NUMBER",e.getMessage()),
+                Locale.getString("INVALID_GA_ERROR"));
 	    return false;
 	}
 
         if(displayPopulation > breedingPopulation) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("DISPLAY_POPULATION_ERROR"),
-                                                  Locale.getString("INVALID_GA_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("DISPLAY_POPULATION_ERROR"),
+                    Locale.getString("INVALID_GA_ERROR"));
 	    return false;
         }
 
         if(generations <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_GENERATION_ERROR"),
-                                                  Locale.getString("INVALID_GA_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_GENERATION_ERROR"),
+                    Locale.getString("INVALID_GA_ERROR"));
 	    return false;
         }
 
         if(population <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_INDIVIDUAL_ERROR"),
-                                                  Locale.getString("INVALID_GA_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_INDIVIDUAL_ERROR"),
+                    Locale.getString("INVALID_GA_ERROR"));
 	    return false;
         }
 
         if(breedingPopulation <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_BREEDING_INDIVIDUAL_ERROR"),
-                                                  Locale.getString("INVALID_GA_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_BREEDING_INDIVIDUAL_ERROR"),
+                    Locale.getString("INVALID_GA_ERROR"));
 	    return false;
         }
 
         if(displayPopulation <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_DISPLAY_INDIVIDUAL_ERROR"),
-                                                  Locale.getString("INVALID_GA_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_DISPLAY_INDIVIDUAL_ERROR"),
+                    Locale.getString("INVALID_GA_ERROR"));
 	    return false;
         }
 
         if(randomPercentage < 0 || randomPercentage > 100) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ERROR_GA_RANDOM_PERCENTAGE_ERROR"),
-                                                  Locale.getString("INVALID_GA_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ERROR_GA_RANDOM_PERCENTAGE_ERROR"),
+                    Locale.getString("INVALID_GA_ERROR"));
 	    return false;
         }
 

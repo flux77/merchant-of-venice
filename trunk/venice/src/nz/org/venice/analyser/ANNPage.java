@@ -23,17 +23,13 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -41,13 +37,10 @@ import javax.swing.ScrollPaneLayout;
 
 import nz.org.venice.parser.Expression;
 import nz.org.venice.prefs.PreferencesManager;
-import nz.org.venice.ui.ConfirmDialog;
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.util.Locale;
 
-public class ANNPage extends JPanel implements AnalyserPage {
-        
-    private JDesktopPane desktop;
+public class ANNPage extends Page implements AnalyserPage {
     
     private JTextField buyThresholdTextRow;
     private JTextField sellThresholdTextRow;
@@ -170,11 +163,9 @@ public class ANNPage extends JPanel implements AnalyserPage {
                         sellThresholdTextRow.getText());
             }
         } catch(NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                Locale.getString("ERROR_PARSING_NUMBER",
-                e.getMessage()),
-                Locale.getString("INVALID_ANN_ERROR"),
-                JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ERROR_PARSING_NUMBER",e.getMessage()),
+            		Locale.getString("INVALID_ANN_ERROR"));
             returnValue = false;
         }
         
@@ -182,10 +173,9 @@ public class ANNPage extends JPanel implements AnalyserPage {
         // It must be a number between 0.0 and 1.0
         if(((buyThreshold<0.0D) || (buyThreshold>1.0D)) ||
             ((sellThreshold<0.0D) || (sellThreshold>1.0D))) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ANN_THRESHOLDS_ERROR"),
-                                                  Locale.getString("INVALID_ANN_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ANN_THRESHOLDS_ERROR"),
+                    Locale.getString("INVALID_ANN_ERROR"));
 	    returnValue = false;
         }
         

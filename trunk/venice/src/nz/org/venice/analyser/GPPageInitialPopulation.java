@@ -33,7 +33,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -45,7 +44,7 @@ import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.VeniceLog;
 
-public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
+public class GPPageInitialPopulation extends Page implements AnalyserPage {
     
     private final static String format = GPModuleConstants.format;
     private final static double PERCENT_DOUBLE = GPModuleConstants.PERCENT_DOUBLE;
@@ -55,7 +54,6 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
     private final static int PERCENT_INIT_POP = 1;
     private final static int PERCENT_MAX = 2;
     
-    private JDesktopPane desktop;
     private int[] perc = new int[PERCENT_MAX];
     
     private JTextField numberMutationTextRow;
@@ -175,11 +173,9 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
                 mutations = Integer.parseInt(numberMutationTextRow.getText());
             } 
         } catch(NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-            Locale.getString("ERROR_PARSING_NUMBER",
-            e.getMessage()),
-            Locale.getString("INVALID_GP_ERROR"),
-            JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ERROR_PARSING_NUMBER",e.getMessage()),
+        			Locale.getString("INVALID_GP_ERROR"));
             returnValue = false;
         }
         
@@ -312,19 +308,16 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         try {
             setNumericalValues();
         } catch(ParseException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-            Locale.getString("ERROR_PARSING_NUMBER",
-            e.getMessage()),
-            Locale.getString("INVALID_GP_ERROR"),
-            JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ERROR_PARSING_NUMBER",e.getMessage()),
+            		Locale.getString("INVALID_GP_ERROR"));
             retValue = false;
         }
         
         if(!isAllValuesPositive()) {
-            JOptionPane.showInternalMessageDialog(desktop,
-            Locale.getString("NO_POSITIVE_VALUES_ERROR"),
-            Locale.getString("INVALID_GP_ERROR"),
-            JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_POSITIVE_VALUES_ERROR"),
+            		Locale.getString("INVALID_GP_ERROR"));
             retValue = false;
         }
         
@@ -380,10 +373,9 @@ public class GPPageInitialPopulation extends JPanel implements AnalyserPage {
         }
         // Check total == 0
         if (total==0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-            Locale.getString("NO_TOTAL_GREATER_THAN_ZERO_PAGE_ERROR"),
-            Locale.getString("INVALID_GP_ERROR"),
-            JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_TOTAL_GREATER_THAN_ZERO_PAGE_ERROR"),
+            		Locale.getString("INVALID_GP_ERROR"));
             retValue = false;
         }
         return retValue;

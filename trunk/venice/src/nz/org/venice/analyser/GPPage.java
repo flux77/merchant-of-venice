@@ -27,7 +27,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -67,9 +66,7 @@ import nz.org.venice.util.Locale;
  *
  * @author Andrew Leppard
  */
-public class GPPage extends JPanel implements AnalyserPage {
-
-    private JDesktopPane desktop;
+public class GPPage extends Page implements AnalyserPage {
 
     // Swing components
     private JTextField generationsTextField;
@@ -164,59 +161,51 @@ public class GPPage extends JPanel implements AnalyserPage {
 		    Integer.parseInt(displayPopulationTextField.getText());
 	}
 	catch(NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ERROR_PARSING_NUMBER",
-                                                                   e.getMessage()),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(
+            		Locale.getString("ERROR_PARSING_NUMBER",e.getMessage()),
+                    Locale.getString("INVALID_GP_ERROR"));
 	    return false;
 	}
 
         if(displayPopulation > breedingPopulation) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("DISPLAY_POPULATION_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("DISPLAY_POPULATION_ERROR"),
+                    Locale.getString("INVALID_GP_ERROR"));
 	    return false;
         }
 
         if(generations <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_GENERATION_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_GENERATION_ERROR"),
+                    Locale.getString("INVALID_GP_ERROR"));
 	    return false;
         }
 
         if(window < MINIMUM_WINDOW_SIZE) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("WINDOW_SIZE_ERROR", MINIMUM_WINDOW_SIZE),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("WINDOW_SIZE_ERROR", MINIMUM_WINDOW_SIZE),
+                    Locale.getString("INVALID_GP_ERROR"));
             return false;
         }
 
         if(population <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_INDIVIDUAL_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_INDIVIDUAL_ERROR"),
+                    Locale.getString("INVALID_GP_ERROR"));
 	    return false;
         }
 
         if(breedingPopulation <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_BREEDING_INDIVIDUAL_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_BREEDING_INDIVIDUAL_ERROR"),
+                    Locale.getString("INVALID_GP_ERROR"));
 	    return false;
         }
 
         if(displayPopulation <= 0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_DISPLAY_INDIVIDUAL_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("NO_DISPLAY_INDIVIDUAL_ERROR"),
+                    Locale.getString("INVALID_GP_ERROR"));
 	    return false;
         }
 

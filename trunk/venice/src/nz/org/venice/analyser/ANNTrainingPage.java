@@ -27,17 +27,14 @@ import javax.swing.border.TitledBorder;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.util.Locale;
 
-public class ANNTrainingPage extends JPanel implements AnalyserPage {
+public class ANNTrainingPage extends Page implements AnalyserPage {
         
-    private JDesktopPane desktop;
-    
     private JTextField learningRateTextRow;
     private JTextField momentumTextRow;
     private JTextField preLearningTextRow;
@@ -171,59 +168,52 @@ public class ANNTrainingPage extends JPanel implements AnalyserPage {
             }
 
         } catch(NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                Locale.getString("ERROR_PARSING_NUMBER",
-                e.getMessage()),
-                Locale.getString("INVALID_ANN_ERROR"),
-                JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ERROR_PARSING_NUMBER",e.getMessage()),
+            		Locale.getString("INVALID_ANN_ERROR"));
             returnValue = false;
         }
        
         // Check the range for learning rate
         // It must be a number between 0.0 and 1.0
         if((learningRate<0.0D) || (learningRate>1.0D)) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ANN_LEARNING_RATE_RANGE_ERROR"),
-                                                  Locale.getString("INVALID_ANN_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ANN_LEARNING_RATE_RANGE_ERROR"),
+                    Locale.getString("INVALID_ANN_ERROR"));
 	    returnValue = false;
         }
         // Check the range for momentum
         // It must be a number between 0.0 and 1.0
         if((momentum<0.0D) || (momentum>1.0D)) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ANN_MOMENTUM_RANGE_ERROR"),
-                                                  Locale.getString("INVALID_ANN_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ANN_MOMENTUM_RANGE_ERROR"),
+                    Locale.getString("INVALID_ANN_ERROR"));
 	    returnValue = false;
         }
         
         // Check the range for preLearning
         // It must be a positive number
         if(preLearning<0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ANN_PRE_LEARNING_RANGE_ERROR"),
-                                                  Locale.getString("INVALID_ANN_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ANN_PRE_LEARNING_RANGE_ERROR"),
+                    Locale.getString("INVALID_ANN_ERROR"));
 	    returnValue = false;
         }
         // Check the range for totCycles
         // It must be a positive number and not equal to zero
         if(totCycles<=0) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ANN_TOT_CYCLES_RANGE_ERROR"),
-                                                  Locale.getString("INVALID_ANN_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ANN_TOT_CYCLES_RANGE_ERROR"),
+                    Locale.getString("INVALID_ANN_ERROR"));
 	    returnValue = false;
         }
         
         // Check the range for windowForecast
         // It must be a number equal or greater then one
         if(windowForecast<1) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ANN_WINDOW_FORECAST_RANGE_ERROR"),
-                                                  Locale.getString("INVALID_ANN_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+            		Locale.getString("ANN_WINDOW_FORECAST_RANGE_ERROR"),
+                    Locale.getString("INVALID_ANN_ERROR"));
 	    returnValue = false;
         }
         

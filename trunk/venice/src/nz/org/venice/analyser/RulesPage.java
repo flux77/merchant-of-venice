@@ -24,6 +24,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -34,8 +35,10 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
+import nz.org.venice.main.CommandManager;
 import nz.org.venice.parser.Expression;
 import nz.org.venice.parser.ExpressionException;
 import nz.org.venice.parser.Parser;
@@ -73,9 +76,7 @@ import nz.org.venice.util.Locale;
 * @author Andrew Leppard
 * @see PaperTradeModule
 */
-public class RulesPage extends JPanel implements AnalyserPage {
-
-    private JDesktopPane desktop;
+public class RulesPage extends Page implements AnalyserPage {
 
     // Swing components
     private JCheckBox ruleFamilyEnabledCheckBox;
@@ -178,19 +179,17 @@ public class RulesPage extends JPanel implements AnalyserPage {
 	ImplicitVariables.getInstance().setup(variables, true);
         
         if (buyRuleString.length() == 0) {
-            JOptionPane.showInternalMessageDialog(desktop, Locale
-                                                  .getString("MISSING_BUY_RULE"), Locale
-                                                  .getString("ERROR_PARSING_RULES"),
-					JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage( 
+        			Locale.getString("MISSING_BUY_RULE"), 
+        			Locale.getString("ERROR_PARSING_RULES"));
             
             return false;
         }
 
         if (sellRuleString.length() == 0) {
-            JOptionPane.showInternalMessageDialog(desktop, Locale
-                                                  .getString("MISSING_SELL_RULE"), Locale
-                                                  .getString("ERROR_PARSING_RULES"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage( 
+        			Locale.getString("MISSING_SELL_RULE"),
+        			Locale.getString("ERROR_PARSING_RULES"));
             
             return false;
         }
@@ -204,11 +203,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
             buyRule = Parser.parse(tmpVar, buyRuleString);
         } catch (ExpressionException e) {
             buyRule = null;
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("ERROR_PARSING_BUY_RULE", 
-                                                                   e.getReason()), 
-                                                  Locale.getString("ERROR_PARSING_RULES"),
-                                                  JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(
+            		Locale.getString("ERROR_PARSING_BUY_RULE",e.getReason()), 
+            		Locale.getString("ERROR_PARSING_RULES"));
             
             return false;
         }
@@ -222,11 +219,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
             sellRule = Parser.parse(tmpVar, sellRuleString);
         } catch (ExpressionException e) {
             sellRule = null;
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("ERROR_PARSING_SELL_RULE", 
-                                                                   e.getReason()), 
-                                                  Locale.getString("ERROR_PARSING_RULES"),
-                                                  JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(
+            		Locale.getString("ERROR_PARSING_SELL_RULE", e.getReason()), 
+                    Locale.getString("ERROR_PARSING_RULES"));
             
             return false;
         }
@@ -244,11 +239,9 @@ public class RulesPage extends JPanel implements AnalyserPage {
             if (!cRangeTextField.getText().equals(""))
                 cRange = Integer.parseInt(cRangeTextField.getText());
         } catch (NumberFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop, 
-                                                  Locale.getString("ERROR_PARSING_NUMBER", 
-                                                                   e.getMessage()), 
-                                                  Locale.getString("ERROR_PARSING_RULES"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage( 
+              Locale.getString("ERROR_PARSING_NUMBER", e.getMessage()), 
+              Locale.getString("ERROR_PARSING_RULES"));
             return false;
         }
         

@@ -78,7 +78,7 @@ import nz.org.venice.util.TradingDateFormatException;
  *
  * @author Andrew Leppard
  */
-public class QuoteRangePage extends JPanel implements AnalyserPage {
+public class QuoteRangePage extends Page implements AnalyserPage {
 
     // Period types
 
@@ -118,7 +118,6 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
     /** Four year period. */
     public final static int FOUR_YEARS = 11;
 
-    private JDesktopPane desktop;
     private boolean allowMultipleDateRanges;
 
     // Swing items
@@ -233,11 +232,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
                                       TradingDate.BRITISH);
         }
         catch(TradingDateFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ERROR_PARSING_DATE",
-                                                                   e.getDate()),
-                                                  Locale.getString("INVALID_QUOTE_RANGE_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("ERROR_PARSING_DATE",e.getDate()),
+        			Locale.getString("INVALID_QUOTE_RANGE_ERROR"));
 	    return false;
 	}
 
@@ -248,28 +245,23 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
 	}
 
         if(startDate.after(endDate)) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("DATE_RANGE_ERROR"),
-                                                  Locale.getString("INVALID_QUOTE_RANGE_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("DATE_RANGE_ERROR"),
+        			Locale.getString("INVALID_QUOTE_RANGE_ERROR"));
 	    return false;
         }
 
         if(!QuoteSourceManager.getSource().containsDate(startDate)) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_QUOTES_DATE",
-                                                                   startDateTextField.getText()),
-                                                  Locale.getString("INVALID_QUOTE_RANGE_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("NO_QUOTES_DATE",startDateTextField.getText()),
+        			Locale.getString("INVALID_QUOTE_RANGE_ERROR"));
             return false;
         }
 
         if(!QuoteSourceManager.getSource().containsDate(endDate)) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_QUOTES_DATE",
-                                                                   endDateTextField.getText()),
-                                                  Locale.getString("INVALID_QUOTE_RANGE_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("NO_QUOTES_DATE",endDateTextField.getText()),
+        			Locale.getString("INVALID_QUOTE_RANGE_ERROR"));
             return false;
         }
 
@@ -277,11 +269,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             int offset = EODQuoteCache.getInstance().dateToOffset(startDate);
         }
         catch(WeekendDateException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("DATE_ON_WEEKEND",
-                                                                   startDateTextField.getText()),
-                                                  Locale.getString("INVALID_QUOTE_RANGE_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("DATE_ON_WEEKEND",startDateTextField.getText()),
+                    Locale.getString("INVALID_QUOTE_RANGE_ERROR"));
 	    return false;
         }
 
@@ -289,11 +279,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             int offset = EODQuoteCache.getInstance().dateToOffset(endDate);
         }
         catch(WeekendDateException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("DATE_ON_WEEKEND",
-                                                                   endDateTextField.getText()),
-                                                  Locale.getString("INVALID_QUOTE_RANGE_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			Locale.getString("DATE_ON_WEEKEND",endDateTextField.getText()),
+                    Locale.getString("INVALID_QUOTE_RANGE_ERROR"));
 	    return false;
         }
 
@@ -301,10 +289,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
             quoteRange = symbolListComboBox.getQuoteRange();
         }
         catch(SymbolFormatException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  e.getMessage(),
-                                                  Locale.getString("INVALID_QUOTE_RANGE_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	showErrorMessage(
+        			e.getMessage(),
+                    Locale.getString("INVALID_QUOTE_RANGE_ERROR"));
             return false;
         }
 
@@ -316,10 +303,9 @@ public class QuoteRangePage extends JPanel implements AnalyserPage {
                 orderByExpression = Parser.parse(orderByExpressionComboBox.getExpressionText());
             }
             catch(ExpressionException e) {
-                JOptionPane.showInternalMessageDialog(desktop,
-                                                      e.getReason(),
-                                                      Locale.getString("ERROR_PARSING_EQUATION"),
-                                                      JOptionPane.ERROR_MESSAGE);
+            	showErrorMessage(
+            			e.getReason(),
+                        Locale.getString("ERROR_PARSING_EQUATION"));
 
                 return false;
             }

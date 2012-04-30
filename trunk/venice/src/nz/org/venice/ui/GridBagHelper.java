@@ -232,7 +232,7 @@ public class GridBagHelper {
      * Append a new row containing a text field to the form.
      *
      * @param panel form panel
-     * @param field text to display next to text field
+     * @param label text to display next to text field
      * @param value initial value of text field
      * @param gridbag the form's gridbag
      * @param c the form's constraints

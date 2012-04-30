@@ -4,8 +4,52 @@
   </sectioninfo>
 
    
-  <para>The latest release extends the Gondola language, features some user interface improvements, improved database security and some bug fixes.
-  <variablelist>   
+  <para>The latest release is a major one, including improvements to appearance and usability, new chart display features, expanding support for new file formats and many bug fixes. 
+  <variablelist>  
+    <varlistentry>
+      <term>
+	<para>01/May/2012: Venice 0.75 beta released:</para>
+      </term>
+      <listitem>
+	<itemizedlist>
+	  <listitem>
+	    <para>Replaced older and temporary developer drawn icons with newer icons (from Libreoffice) contributing to a more uniform look and feel. Tooltips for every field, list and non standard button were added. Some dialogs now include a "display help" button.</para>
+	  </listitem>
+	  <listitem>
+	    <para>Adjusting the chart to account for splits and dividends now available. </para>
+	  </listitem>
+	  <listitem>
+	    <para>When a chart is zoomed in, it is now possible to change the timeframe displayed without zooming out and selecting a new region.</para>
+	  </listitem>
+	  <listitem>
+	    <para>Support for Metastock Binary formata added</para>
+	  </listitem>
+	  <listitem>
+	    <para>Users can now define which stocks are actually indeces with support for other metadata coming later.</para>
+	  </listitem>
+	  <listitem>
+	    <para>Added indicator Stochastic Oscillator</para>
+	  </listitem>
+	</itemizedlist>
+      </listitem>
+      <listitem>
+	<para>Bugs fixed in this release</para>
+	<itemizedlist>
+	  <listitem>
+	    <para>#3519380 (Dialogs hang when pressing Run)</para>
+	  </listitem>
+	  <listitem>
+	    <para>#132947 (Point Change lacks decimal point)</para>
+	  </listitem>
+	  <listitem>
+	    <para>#1328217 (Chart displays currency, should be points)</para>
+	  </listitem>
+	  <listitem>
+	    <para>#3519731 (Adding new symbol to existing chart doesnt follow deaults)</para>
+	  </listitem>
+	</itemizedlist>
+      </listitem>
+    </varlistentry>
     <varlistentry>
       <term>
 	<para>16/Feb/2012: Venice 0.74 beta released</para>

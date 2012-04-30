@@ -596,7 +596,9 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	
 	Color prev = g.getColor();
 	
-	g.setColor(Color.BLACK);
+	g.setColor(BasicChartUI.
+		   getComplementaryColour(PreferencesManager.
+					  getDefaultChartBackgroundColour()));
 	g.drawOval(x,y, 5, 5);
 	g.setColor(prev);
     }

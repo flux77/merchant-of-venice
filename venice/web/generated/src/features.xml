@@ -64,6 +64,9 @@
 	  <para>Chart Fibonacci Indicator</para>
 	</listitem>
 	<listitem>
+	  <para>Chart Stochastic Oscillator Indicator</para>
+	</listitem>
+	<listitem>
 	  <para>Chart Custom Indicators</para>
 	</listitem>
 	</itemizedlist>
@@ -90,6 +93,9 @@
 	  </listitem>
 	  <listitem>
 	    <para>Chart Export</para>
+	  </listitem>
+	  <listitem>
+	    <para>Adjust for Split or Dividend</para>
 	  </listitem>
 	</itemizedlist>
       </listitem>

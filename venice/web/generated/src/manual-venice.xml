@@ -88,6 +88,9 @@ through a web proxy.</para>
 configure Venice to read stock quotes from either files or from
 a database.</para>
 
+<para><link to="Index Definition">Index Definition</link> describes how to
+tell Venice to distinguish Indeces from ordinary symbols.</para>
+
 <para><link to="Tuning">Tuning</link> describes how to
 configure Venice for optimal performance.</para>
 
@@ -266,6 +269,15 @@ reference, this is the format of the table created:</para>
 +--------+----------+------+-----+------------+-------+
 </codeblock></para>
 </section>
+</chapter>
+
+<chapter name="Index Definition">
+<para>The index page allows a user to manage the list of symbols which are also
+indeces. Venice treats indeces slightly differently. (For example, when Venice displays the point change for an index, but treats it as an ordinary stock, the point change will be out by a couple of orders of magnitude). </para>
+<para>The user is responsible for maintaining those symbols which are indeces. To define a symbol as a new index, press the 'Add' button. A new dialog appears with fields for the stock code and the index name. Enter the symbol, and optionally the name of the index. </para>
+<para>After pressing ok, Venice will treat the symbol as an index.</para>
+<para>To remove an index definition, select the index stock code and press the 'Delete' button.</para>
+
 </chapter>
 
 <chapter name="Tuning">
@@ -651,6 +663,28 @@ If you switch to the Point and Figure graph while zoomed in on an area which doe
    </para>   
  </section>
 
+ <section name="Adjusting the chart for Splits and Dividends">
+   <para>If your data source doesn't automatically adjust your data for dividends or splits, you may wish to display the chart as if no split or dividend occurred. Or alternatively, you can display the chart as if the split happnened when the stock listed. You would want to do because indicators may be misleading Gondola rules may trigger unexpectedly. </para>
+
+   <para>To adjust the chart for a split or a dividend, select the 'Adjust Chart for Split/Dividend' menu item, which can be found in the chart window, under the menu of the stock being graphed. </para>
+
+   <para>An "Adjust Data" dialog appears with the following fields:
+     <list>
+       <item>Adjustment Type (Dividend or Split)</item>
+       <item>Direction (forward/backwards)</item>
+       <item>Date - The date the split or dividend occurred</item>
+       <item>Ratio or Value - The amount of the dividend or the ratio of the split</item>
+     </list>          
+   </para>
+
+   <para>For the direction field, choose forward if you want to display the chart as if the dividend or split hadn't occurred. Choose backwards if you want to display the chart as if the change had always occurred. </para>
+
+   <para>Enter the details of the split or adjustment and press OK. The chart will redraw itself and display the chart according to the change. </para>
+
+   <para>To apply a reverse split of say one for two, you would enter 0.5 in the ratio field. </para>
+
+   </section>
+
 <section name="Chart Functions">
   <para>The graph functions are accessed via the toolbar which is created on the left of the chart by default. The functions are:  </para>
   <list>
@@ -870,6 +904,8 @@ and <highlight>not</highlight>. For example:</para>
 <item><code>close * lag(close, -1)
 </code></item>
 </list>
+
+<para>Note that Gondola expects the binary operands (that is the above +, 0, * and /) to be grouped in pairs. Therefore, if you have an expression like A + B +C, it must be grouped into two pairs, using paranethesis. In the example above, that would either (A + B) + C, or A + (B + C)</para>
 
 <para>The type of the returned value is determined by the operands, with floating point types having precedence. The type determinations changed as of version 0.72. Prior to this version, the type of an expression was determined by the type of the first operand. 
 
@@ -1392,6 +1428,9 @@ the paper trade dialogue by:</para>
 <item>Then clicking on the <highlight>Paper Trade</highlight> menu item.
 </item>
 </list>
+
+<para>The screenshots below represent the simplest use case and the minimum settings required to use the paper trade functionality.</para>
+
 <section name="The Range Page">
 <para>The range page defines the range and order of the paper trade. The
 <highlight>Date Range</highlight> defines the range of dates that the paper trade will be
@@ -1415,6 +1454,12 @@ symbols by the given options, or by entering an equation.</para>
 <item>By: Change Decreasing
 </item>
 </list>
+<para>In the example above, Venice will operate over all the symbols ANZ, WBC, CBA and NAB on all the trading days between 3/1/2000 and 24/1/2001 inclusive. It will sort the stocks in the descending order of volatility. </para>
+<!-- classes dir is the base dir -->
+
+<para>Simple example with a single stock: </para>
+<para><image name='nz/org/venice/help/doc/images/screenshot_analysis_papertrade_range.png' info='date range screenshot'></image></para>
+
 </section>
 <section name="The Rules Page">
 <para>The rules page defines the buy/sell rules that trigger trades. Venice
@@ -1427,10 +1472,11 @@ to try not only 15 and 30, but all the values up to 100? You could do this
 by entering the equation: <code>avg(close, a, 0) > avg(close, b, 0)</code>.
 Then making sure the <highlight>Enable multiple rules</highlight> checkbox is ticked.
 Then entering the maximum values for <code>a</code> and <code>b</code> into the <highlight>Range</highlight> entries.</para>
-<para>Venice makes two additional variables available to paper trade equations:</para>
+<para>Venice makes additional variables available to paper trade equations:</para>
 <list><item><code>daysfromstart</code> - defines the number of days that has been passed
       from the beginning of the paper trade. For example in the 10th day of trade daysfromstart is equal to 10.
 </item>
+<item><code>daysfromlastransaction</code> - defines the number of days that have passed since the last transaction (buy or sell)</item>
 <item><code>capital</code> - defines the capital of the portfolio calculated
       from the beginning of the paper trade. It is a float number.
 </item>
@@ -1465,6 +1511,10 @@ Then entering the maximum values for <code>a</code> and <code>b</code> into the 
 <item>Range c: 1 to: leave empty
 </item>
 </list>
+
+<para>Simple example with just the rules and no rule families: </para>
+<para><image name='nz/org/venice/help/doc/images/screenshot_analysis_papertrade_rules.png' info='Rules page screenshot'></image></para>
+
 </section>
 <section name="The Portfolio Page">
 <para>The portfolio page defines the portfolio that is used when paper trading. You
@@ -1482,6 +1532,9 @@ case Venice works out the maximum number of stocks.</para>
 <item>Number of Stocks: 1
 </item>
 </list>
+
+<para><image name='nz/org/venice/help/doc/images/screenshot_analysis_papertrade_portfolio.png' info='portfolio page screenshot'></image></para>
+
 </section>
 <section name="The Trade Value Page">
 <para>The trade value page defines the strategy used to buy or sell the stocks. You
@@ -1499,6 +1552,9 @@ the minimum value (in Gondola: low),
 the maximum value (in Gondola: high).
 Pay attention to the 'open' key word: if you put 'open' alone, you will buy or sell the stocks at open price the next day;
 if you put 'lag(open,0)', you will buy or sell the stocks at a price equal to the open price of the day before and only if this price will be reached by the stock during the next day.</para>
+
+<para><image name='nz/org/venice/help/doc/images/screenshot_analysis_papertrade_tradevalue.png' info='trade value page screenshot'></image></para>
+
 </section>
 </chapter>
 

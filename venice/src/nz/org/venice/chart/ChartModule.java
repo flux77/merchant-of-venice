@@ -1479,7 +1479,7 @@ public class ChartModule extends JPanel implements Module,
     /**
      * Add a cursor which tracks the trading date and price
      * 
-     * @symbol The symbol to track
+     * @param symbol The symbol to track
      */
 
     public void addTracker(Symbol symbol) {

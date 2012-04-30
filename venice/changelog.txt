@@ -1,11 +1,34 @@
-Changes for Venice, 0.746 beta ??/??/????
+Changes for Venice, 0.751 beta ??/??/????
 =========================================
 * Change table state save/restore to avoid saving the entire table contents 
 
-Changes for Venice, 0.745 beta ??/??/????
-
 * Intraday charts
 % Preload data for most used symbols on cache refresh.
+
+Changes for Venice, 0.75 beta 01/05/2012
+* Appearance and usability improved with icons from Libreoffice (instead of the mash up of jlfgr and hand drawn icons) 
+* Can now show previous/later data in charts when zoomed in.
+* Splits and Dividends can be factored into charts display
+* Exported Portfolio Transactions now use the same format for import and export
+* PNG and JPG formats now available for exporting charts
+* Added support for Metastock Binary format
+* Users can now provide metadata for a stock, such as which stocks are actually
+indeces 
+* Added Stochastic Oscillator indicator graph 
+* Tooltips added for every field and list
+* Can now select the background colour of a chart
+* Screenshots in the manual and be displayed in the online help
+
+
+* Fixed bug #3519380 (Dialogs (ie Paper Trade) hangs when pressing Run)
+* Fixed bug #1328497 (Point Change lacks decimal point)
+* Fixed bug #1328217 (Chart display currency, should be points)
+* Fixed bug #3519731 (Adding new symbol to existing chart doesnt follow default)
+* Fixed bug in For expression evaluation 
+
+
+
+
 
 Changes for Venice, 0.74 beta 16/02/2012
 =========================================

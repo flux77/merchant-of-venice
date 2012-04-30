@@ -54,7 +54,7 @@ public class SymbolMetadataWriter {
     /**
      * Write the symbol metadata to the output stream in XML format.
      *
-     * @param data the symbol metadata to write
+     * @param symbolMetadata the symbol metadata to write
      * @param stream      the output stream to write the watch screen.
      */
     public static void write(List symbolMetadata, OutputStream stream) {

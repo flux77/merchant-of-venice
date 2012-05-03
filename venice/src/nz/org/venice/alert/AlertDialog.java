@@ -80,7 +80,6 @@ public class AlertDialog extends JInternalFrame
     private JComboBox fieldTypeComboBox;
 
     private JLabel alertTypeLabel;
-    private JLabel boundTypeLabel;
     private JLabel fieldTypeLabel;
 
     //Data Values
@@ -443,12 +442,10 @@ public class AlertDialog extends JInternalFrame
 	    //Hide the bound type field if the alert is an expresion type
 	    if (alertType.equals(Locale.getString("INPUT_EXPRESSION"))) {
 		boundTypeComboBox.setVisible(false);
-		boundTypeLabel.setVisible(false);
 		fieldTypeComboBox.setVisible(false);
 		fieldTypeLabel.setVisible(false);
 	    }  else {
 		boundTypeComboBox.setVisible(true);
-		boundTypeLabel.setVisible(true);
 		fieldTypeComboBox.setVisible(true);
 		fieldTypeLabel.setVisible(true);		
 	    }			   

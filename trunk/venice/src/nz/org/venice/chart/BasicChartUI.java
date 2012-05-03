@@ -605,6 +605,8 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 
     // For the given point, return the X coordinate
     private int getXCoordinate(Chart chart, Coordinate point) {
+	assert point != null;
+	assert chart != null;
 	return getXCoordinate(chart, point.getXData());
     }
 
@@ -1438,7 +1440,7 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
       3. Apply that delta to the main complement colour (ie if the closest 
       colour is white, the closest opposite is black) and return that colour.
             
-      Further refinment: Calculate angles from the origin, and rotate the
+      Further refinement: Calculate angles from the origin, and rotate the
       delta using those angles.
      */
     public static Color getComplementaryColour(Color colour) {
@@ -1552,8 +1554,15 @@ public class BasicChartUI extends ComponentUI implements ImageObserver  {
 	    blueValue %= 255;
 	}
 
-	return new Color(redValue, greenValue, blueValue, mainColour.getAlpha());
+	return new Color(redValue, greenValue, blueValue, mainColour.getAlpha());	
+    }
+
+    public static boolean isLightColour(Color colour) {
+	double distanceFromWhite = getDistance(colour, Color.WHITE);
+	double distanceFromBlack = getDistance(colour, Color.BLACK);
 	
+	return (distanceFromWhite < distanceFromBlack);
+
     }
 
     private Color[] filterColours(Color[] map, Color backgroundColor) {

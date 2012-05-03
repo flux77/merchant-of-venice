@@ -29,16 +29,17 @@ import java.util.List;
 import nz.org.venice.chart.Graphable;
 import nz.org.venice.chart.GraphableQuoteFunctionSource;
 import nz.org.venice.chart.GraphTools;
+import nz.org.venice.chart.BasicChartUI;
 import nz.org.venice.chart.source.GraphSource;
 import nz.org.venice.parser.EvaluationException;
 import nz.org.venice.quote.QuoteFunctions;
+import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.TradingDate;
 
 /**
  * Draw the fibonacci retracement levels on the chart
  *
- * @author Andrew Leppard
  * @author Andrew Goh
  */
 public class FiboGraph extends AbstractGraph {
@@ -73,8 +74,15 @@ public class FiboGraph extends AbstractGraph {
 		       double horizontalScale, double verticalScale,
 		       double topLineValue, double bottomLineValue, 
 		       List xRange, boolean vertOrientation) {
+
+
 	// We ignore the graph colours and use our own custom colours
-	g.setColor(Color.blue);
+	Color backgroundColour = PreferencesManager.getDefaultChartBackgroundColour();
+	if (BasicChartUI.isLightColour(backgroundColour)) {
+		g.setColor(Color.blue);
+	} else {
+	    g.setColor(BasicChartUI.getComplementaryColour(Color.blue));
+	}
 
 	double yValue = 0.0D;
 	String label;

@@ -252,7 +252,7 @@ public class ANNPageModule extends AbstractTable implements Module {
      * It manages:
      * the input of artificial neural network table of expressions.
      *
-     * @param A Page instance
+     * @param page A Page instance
      */
     public ANNPageModule(Page page) {
     	this.page = page;

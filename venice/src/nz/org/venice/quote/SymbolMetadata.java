@@ -43,7 +43,7 @@ public class SymbolMetadata {
      * 
      * @param symbol The symbol (e.g. 'ASX', or 'DAX')
      * @param name   The name of the index (e.g. Australian Stock Exchange)
-     * @param region The optional location or top level index (ie NASDAQ, the ASX)
+     * @param index The optional location or top level index (ie NASDAQ, the ASX)
      */
 
     public SymbolMetadata(Symbol symbol, String name, boolean index) {

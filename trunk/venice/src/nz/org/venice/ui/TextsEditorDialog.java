@@ -126,7 +126,6 @@ public class TextsEditorDialog {
                     close();
                 }});
 	
-	panel.getRootPane().setDefaultButton(okButton);
         buttonPanel.add(okButton);	
 	okButton.requestFocus();
 

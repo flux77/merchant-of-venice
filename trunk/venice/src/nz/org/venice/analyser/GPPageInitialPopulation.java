@@ -75,7 +75,7 @@ public class GPPageInitialPopulation extends Page implements AnalyserPage {
         preferredSize.setSize(this.getPreferredSize().getWidth(), maxHeight/2);
         
         this.desktop = desktop;
-        this.GPPageInitialPopulationModule = new GPPageInitialPopulationModule(desktop);
+        this.GPPageInitialPopulationModule = new GPPageInitialPopulationModule(this);
         
         setGraphic(preferredSize);
         

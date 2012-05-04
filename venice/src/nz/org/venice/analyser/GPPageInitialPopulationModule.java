@@ -35,11 +35,9 @@ import java.util.List;
 import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -73,7 +71,7 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
     private final static double PERCENT_DOUBLE = GPModuleConstants.PERCENT_DOUBLE;
     private final static int PERCENT_INT = GPModuleConstants.PERCENT_INT;
 
-    private JDesktopPane desktop;
+    private Page page;
     private Model model;
     private int[] perc = new int[0];
     private long seed = System.currentTimeMillis();
@@ -181,8 +179,8 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
         }
     }
     
-    public GPPageInitialPopulationModule(JDesktopPane desktop) {
-        this.desktop = desktop;
+    public GPPageInitialPopulationModule(Page page) {
+        this.page = page;
         List columns = new ArrayList();
         columns.add(new Column(BUY_RULE_COLUMN,
             Locale.getString("BUY_RULE"),
@@ -716,19 +714,16 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
         try {
             setNumericalValues();
         } catch(ParseException e) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ERROR_PARSING_NUMBER",
-                                                                   e.getMessage()),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	this.page.showErrorMessage(
+        			Locale.getString("ERROR_PARSING_NUMBER", e.getMessage()),
+        			Locale.getString("INVALID_GP_ERROR"));
 	    return false;
 	}
 
         if(!isAllValuesPositive()) {
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("NO_POSITIVE_VALUES_ERROR"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+        	this.page.showErrorMessage(
+        			Locale.getString("NO_POSITIVE_VALUES_ERROR"),
+        			Locale.getString("INVALID_GP_ERROR"));
 	    return false;
         }
 
@@ -868,10 +863,9 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
                 totalMin += perc[i];
             }
 
-            JOptionPane.showInternalMessageDialog(desktop,
-                                                  Locale.getString("ERROR_GENERATING_RANDOM_NUMBER"),
-                                                  Locale.getString("INVALID_GP_ERROR"),
-                                                  JOptionPane.ERROR_MESSAGE);
+            this.page.showErrorMessage(
+            		Locale.getString("ERROR_GENERATING_RANDOM_NUMBER"),
+            		Locale.getString("INVALID_GP_ERROR"));
         }
         return 0;
     }
@@ -881,7 +875,7 @@ public class GPPageInitialPopulationModule extends AbstractTable implements Modu
             return false;
         } else {
             if(!isFitAll()) {
-                ConfirmDialog dialog = new ConfirmDialog(desktop,
+                ConfirmDialog dialog = new ConfirmDialog(this.page.desktop,
                                                          Locale.getString("GP_FIT_PAGE"),
                                                          Locale.getString("GP_FIT_TITLE"));
                 boolean returnConfirm = dialog.showDialog();

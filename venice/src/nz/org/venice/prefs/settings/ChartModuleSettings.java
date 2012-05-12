@@ -73,6 +73,8 @@ public class ChartModuleSettings extends AbstractSettings {
     private boolean zoomInEnabled;
     private ChartDrawingModel drawnElements;
     private boolean normalOrientation;
+
+    private int timelineBarPosition;
     
     /**
      *
@@ -318,6 +320,26 @@ public class ChartModuleSettings extends AbstractSettings {
      */
     public boolean getOrientation() {
 	return normalOrientation;
+    }
+
+
+    /**
+     * 
+     * @return the value of the timeline scrollbar
+     */
+    public int getTimelineBarPosition() {
+	return timelineBarPosition; 
+    }
+
+
+    /**
+     * 
+     * Record the value of the time line bar scroll bar
+     * @param position The hbar value of the timeline bar.
+     * 
+     */
+    public void setTimelineBarPosition(int position) {
+	timelineBarPosition = position;
     }
 
     /**

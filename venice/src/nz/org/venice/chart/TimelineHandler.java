@@ -83,7 +83,7 @@ class TimelineHandler implements ChangeListener, MouseWheelListener {
 	}
 	
 	// Call this method when the timeline was modified (zoomed in/out) to recalculate values
-	public void Recalculate() {
+	public void recalculate() {
 		pause = true;
 		Chart chart = this.chartModule.getChart();
 		BoundedRangeModel brm = bar.getModel(); 
@@ -108,4 +108,13 @@ class TimelineHandler implements ChangeListener, MouseWheelListener {
           brm.setValue(brm.getValue() + totalScrollAmount);
       }
   }
+
+    public int getBarValue() {
+	return bar.getValue();
+    }
+
+    public void setBarValue(int position) {
+	bar.setValue(position);
+    }
+
 }

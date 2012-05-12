@@ -359,9 +359,13 @@ public class ChartModule extends JPanel implements Module,
 	scrollPane.getHorizontalScrollBar().setValue(settings.getHBarValue());
 	scrollPane.setVerticalScrollBarPolicy(settings.getVBarPolicy());
 	scrollPane.getVerticalScrollBar().setValue(settings.getVBarValue());
+
+	postLoad();
+	timelineHandler.recalculate();
+	timelineHandler.setBarValue(settings.getTimelineBarPosition());
+	
 	chart.resetBuffer();
 	
-
     }
 
     private void initChart(boolean indexChart) {
@@ -1008,7 +1012,7 @@ public class ChartModule extends JPanel implements Module,
 		// the horizontal scrollbar now
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		if (timelineHandler!=null)
-			timelineHandler.Recalculate();
+			timelineHandler.recalculate();
 	    } catch (ChartOutOfBoundsException cobe) {
 		DesktopManager.showWarningMessage(Locale.getString("CHART_NO_DATA_AVAILABLE_WARNING"));
 	    }
@@ -1029,7 +1033,7 @@ public class ChartModule extends JPanel implements Module,
 	    }
 
 	    if (timelineHandler!=null)
-			timelineHandler.Recalculate();
+			timelineHandler.recalculate();
 	    repaint();
 	}
 	/* paintOnChart and eraseOnChart are "toggle switches" - they toggle
@@ -1376,6 +1380,9 @@ public class ChartModule extends JPanel implements Module,
 	    settings.setZoomInEnabled(zoomInEnabled);
 	    settings.setDrawnElements(chart.getChartDrawingModel());
 	    settings.setOrientation(chart.getOrientation());
+	    
+	    settings.setTimelineBarPosition(timelineHandler.getBarValue());
+
 	}
     }
     

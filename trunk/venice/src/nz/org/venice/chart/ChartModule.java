@@ -1026,8 +1026,6 @@ public class ChartModule extends JPanel implements Module,
 	    // the horizontal scrollbar now
 	    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	    
-	    
-	    //FIXME - This doesnt work/do anything
 	    if (PreferencesManager.getDefaultChartScrollToEnd()) {
 		setHBarToMax();
 	    }
@@ -1503,7 +1501,8 @@ public class ChartModule extends JPanel implements Module,
      *
      */    
     public void setHBarToMax() {
-	JScrollBar hbar = scrollPane.getHorizontalScrollBar();
+	this.validate();
+        JScrollBar hbar = scrollPane.getHorizontalScrollBar();
 	int max = hbar.getMaximum();
 	hbar.setValue(max);
     }

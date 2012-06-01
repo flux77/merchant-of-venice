@@ -306,6 +306,7 @@ public class PaperTrade {
             }
 
             variables.setValue("held", getHoldingTime(environment, stockHolding, dateOffset));
+
             variables.setValue("stockcapital", getStockCapital(environment, stockHolding, symbol, dateOffset));
 
             try {
@@ -464,8 +465,21 @@ public class PaperTrade {
                 double price = environment.quoteBundle.getQuote(symbol, Quote.DAY_CLOSE, dateOffset);
                 retValue = (double)price*shares;
         }
-        catch(MissingQuoteException e) {
-            // do nothing
+        catch(MissingQuoteException e) {	    
+            // do nothing	    
+            // Can't do nothing unless num shares == 0, 
+	    // otherwise stockcapital will = 0
+
+	    int shares = stockHolding.getShares();
+	    
+	    try {
+		if (shares > 0) {
+		    double price = environment.quoteBundle.getNearestQuote(symbol, Quote.DAY_CLOSE, dateOffset);
+		    retValue = (double)price*shares;
+		} 
+	    } catch (MissingQuoteException mqe) {
+		//No idea what to do here
+	    }
         }
         finally {
         }

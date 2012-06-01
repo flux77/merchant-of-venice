@@ -505,6 +505,7 @@ public class QuoteFunctions {
      * using the formula:
      * slope = period * Sum(xy) - Sum(x)Sum(y) / period * Sum(x^2) - (Sum(x))^2
      * intercept = ( Sum(y) - slope * Sum(x) ) / period
+     * (Least squares regression)
      * @param source the source of quotes
      * @param period the number of days to analyse
      * @return the value of the trend at the end of period     
@@ -523,9 +524,11 @@ public class QuoteFunctions {
 
 	sumXY = sumX = sumY = sumXSq = sqSumX = 0.0;
 	
+	int count = 0;
 	for(i = 1; i <= period; i++) {
 	    value = source.getValue(i-1);
 
+	    // Happens when quote is missing
 	    if(!Double.isNaN(value)) {
 		//slope
 		sumXY += (i * value);
@@ -533,17 +536,74 @@ public class QuoteFunctions {
 		sumY += value;		
 				
 		sumXSq += (i * i);
+		count++;
 	    }
 	}
 
 	sqSumX = sumX * sumX;
 
-	slope = ( (period * sumXY) - (sumX * sumY)) / ( (period * sumXSq) - sqSumX);		
-	intercept = (sumY - slope * sumX) / period;
+	slope = ( (count * sumXY) - (sumX * sumY)) / ( (count * sumXSq) - sqSumX);		
+	intercept = (sumY - slope * sumX) / count;
 
-	double rv = (slope * (period+1) + intercept);
-	return (slope * (period+1) + intercept);
+	double rv = (slope * (count+1) + intercept);
+
+	return (slope * (count+1) + intercept);
 	
+    }
+
+    /* 
+     This function gives slightly different answers to the method above
+     (+/- 2.0). (Round off error?)
+     */
+
+    static public double bestFit2(QuoteFunctionSource source, int period) 
+	throws EvaluationException
+    {
+	/*
+	  formula 
+	  num = sum [ (xi * yi)/n] - x_y_ (x_ = mean of x)
+	  den = sum [xi * xi] /n - x_ * x_;
+	  
+	 */
+
+	double num;
+	double den;
+
+	double xy = 0.0;
+	double squareX = 0.0;
+
+	double sumX = 0.0, sumY = 0.0;
+
+	double xMean;
+	double yMean;
+
+	int count = 0;
+
+	for(int i = 0; i < period; i++) {
+	    double value = source.getValue(i);
+	    
+	    if(!Double.isNaN(value)) {				
+		sumX += i;
+		sumY += value;
+		xy += (i * value);
+		squareX += (i * i);		
+		count++;
+	    }
+	}	
+
+	if (count > 0) {
+	    xMean = sumX / count;
+	    yMean = sumY / count;
+
+	    num = (xy / count) - xMean * yMean;
+	    den = (squareX / count) - (xMean * xMean);
+	    
+	    double slope = num/den;
+	    return slope * period + yMean;
+	} else {
+	    //Means we found no quotes at all. 
+	    return 0.0;
+	}
     }
     
     /**
@@ -564,6 +624,7 @@ public class QuoteFunctions {
 	
 	double value;
 	int i;
+	int count = 0;
 	double slope = 0.0;
 	double intercept = 0.0;
 	double sumXY, sumX , sumY, sumXSq, sqSumX;
@@ -582,13 +643,14 @@ public class QuoteFunctions {
 		sumY += value;		
 				
 		sumXSq += (i * i);
+		count++;
 	    }
 	}
 
 	sqSumX = sumX * sumX;
 	
-	slope = ( (period * sumXY) - (sumX * sumY)) / ( (period * sumXSq) - sqSumX);		
-	intercept = (sumY - slope * sumX) / period;
+	slope = ( (count * sumXY) - (sumX * sumY)) / ( (period * sumXSq) - sqSumX);		
+	intercept = (sumY - slope * sumX) / count;
 	
 	rv[0] = slope;
 	rv[1] = intercept;

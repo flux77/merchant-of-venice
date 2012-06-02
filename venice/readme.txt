@@ -16,8 +16,8 @@ Venice runs on UNIX, including Mac OS X and Windows.
 
 2 Running
 
-To run Venice you will need Java J2SE JRE 1.4 or higher, available from the
-following location:
+To run Venice you will need Java J2SE JRE 1.4 (recommended 1.4.2_19) 
+or higher, available from the following location:
 
         http://java.sun.com/j2se/1.4.2/download.html
 
@@ -125,6 +125,9 @@ release Packages Venice into a file ready for release
 test    Runs the automated test suite
 web     Packages the web files ready for deployment (Not included in
         the source release).
+
+You can also use an IDE, Borland JBuilder 2005 to build and run Venice. 
+The project file is in ide/borland.
 
 6 Licenses
 

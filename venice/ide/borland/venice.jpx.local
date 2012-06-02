@@ -1,0 +1,24 @@
+build.menu.1[0]=com.borland.jbuilder.build.ProjectBuilder$ProjectBuildAction;make
+build.menu.2[0]=com.borland.jbuilder.build.ProjectBuilder$ProjectBuildAction;rebuild
+classFilter.unittest.1[0]=junit.framework.*
+classFilter.unittest.2[0]=java.lang.reflect.Method
+classFilter.unittest.3[0]=com.borland.jbuilder.unittest.JBTestRunner
+classFilter.unittest.4[0]=sun.reflect.NativeMethodAccessorImpl
+classFilter.unittest.5[0]=sun.reflect.DelegatingMethodAccessorImpl
+content.layout.xml.[0]=<project-layout><tab_container selected_index="-1"/></project-layout>
+debug.EvaluateExpressions.1[0]=max =
+debug.EvaluateExpressions.2[0]=BoundedRangeModel m = getModel();
+debug.EvaluateExpressions.3[0]=int newValue =
+debug.EvaluateExpressions.4[0]=int newValue
+debug.EvaluateExpressions.5[0]=m
+debug.EvaluateExpressions.6[0]=newValue
+debug.EvaluateExpressions.7[0]=newMax
+debug.EvaluateExpressions.8[0]=max
+debug.EvaluateExpressions.9[0]=n
+debug.NoTracingClasses.1[0]=16 java.lang.Object1  1 -1
+debug.NoTracingClasses.2[0]=21 java.lang.ClassLoader1  1 -1
+debug.NoTracingClasses.3[0]=16 java.lang.String1  1 -1
+debug.SplitThreadsAndDataView[0]=0
+import.optimize.legacyPropertiesRead[0]=1
+sys.Author[0]=
+team.lastScanned[0]=1338664953522

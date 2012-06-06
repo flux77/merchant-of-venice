@@ -1,5 +1,5 @@
 <!-- Venice Build File -->
-<project name="Venice" default="run" basedir=".">
+<project name="Venice" default="run" basedir="../..">
 
   <!-- Current version we are working towards -->
   <property name="VERSION" value="0.75beta"/>

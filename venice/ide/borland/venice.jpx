@@ -4,12 +4,14 @@
   <property category="debug.0" name="SmartStepRedefineClasses" value="0"/>
   <property category="debug.0" name="SmartStepSkipStaticInitializers" value="0"/>
   <property category="debug.0" name="SmartStepSkipSynthetics" value="0"/>
+  <property category="generalFormatting2" name="overrideBasicFormatting" value="1"/>
   <property category="javaFormatting" name="packagePrefixGroups" value="java;javax;BLANK_LINE;java.awt;javax.swing;BLANK_LINE;org;(*)"/>
+  <property category="javaFormatting" name="packageThreshold" value="0"/>
   <property category="javadoc" name="custom.tags.1" value="todo;a;To Do:"/>
   <property category="optimize.0" name="OptimizableType" value="com.borland.jbuilder.optimize.IntroOptimizeitProfiler"/>
   <property category="personality" name="personality" value=""/>
   <property category="runtime" name="DefaultConfiguration" value="-1"/>
-  <property category="runtime.0" name="BuildTargetOnRun" value="com.borland.jbuilder.build.AntBuilder;build.xml;build"/>
+  <property category="runtime.0" name="BuildTargetOnRun" value="&lt;None&gt;"/>
   <property category="runtime.0" name="ConfigurationName" value="Untitled Runtime Configuration"/>
   <property category="runtime.0" name="RunnableType" value="com.borland.jbuilder.runtime.ApplicationRunner"/>
   <property category="runtime.0" name="application.class" value="nz.org.venice.main.Main"/>
@@ -37,7 +39,7 @@
   <property category="sys" name="Libraries" value="JUnit;lib"/>
   <property category="sys" name="MakeStable" value="0"/>
   <property category="sys" name="OutPath" value="../../classes"/>
-  <property category="sys" name="SourcePath" value="../../;../../src;../../test"/>
+  <property category="sys" name="SourcePath" value="../../src;../../test"/>
   <property category="sys" name="SourceVersion" value="1.4"/>
   <property category="sys" name="TestPath" value="../../test"/>
   <property category="sys" name="Title" value=""/>
@@ -45,6 +47,5 @@
   <property category="sys" name="Version" value="1.0"/>
   <property category="sys" name="VersionLabel" value="@version"/>
   <property category="sys" name="WorkingDirectory" value="../../"/>
-  <property category="sys" name="ant.home" value="../../Program Files (x86)/Sun/apache-ant-1.7.1"/>
-  <file path="../../build.xml"/>
+  <file path="build.xml"/>
 </project>

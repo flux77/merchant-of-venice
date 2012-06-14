@@ -39,7 +39,7 @@ public class ImplicitVariables {
     /**
      * Return the static ImplcitVariables instance for this application 
      */
-    public static ImplicitVariables getInstance() {
+    public static synchronized ImplicitVariables getInstance() {
 	if (instance == null) {
 	    instance = new ImplicitVariables();
 	}

@@ -215,12 +215,15 @@ public class GPGondolaSelection extends Page implements AnalyserPage {
         int[] defaultValuesPositiveShortIntegerExpression = {
                                             /* We put as default to zero the two following experssions:
                                              * '*' and '(+1)*float'.
+					     * (Addendum: (+1)*float no longer
+					     * casts to int and have been replaced
+					     * by floor() and ceil())
                                              * That's done, because them both may increase the integer number too much
                                              * and we don't want that because we want a small positive integer.
                                              * Anyway user interface permits the use of the above expressions.
                                              */
                                             1250, 1250, 1250, 0, 1250,
-                                            1250, 1250, 1250, 1250, 0, 0};
+                                            1250, 1250, 1250, 1250, 0, 0 , 0};
         String[] defaultTextFieldValuesPositiveShortIntegerExpression = {Locale.getString("PERCENTAGE_TERMINAL"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "+"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "-"),
@@ -230,7 +233,8 @@ public class GPGondolaSelection extends Page implements AnalyserPage {
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "if(){}else{}"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "sqrt()"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "abs()"),
-                                  Locale.getString("PERCENTAGE_FUNCTIONS", "(+1)*(float expression)"),
+				  Locale.getString("PERCENTAGE_FUNCTIONS", "floor(float expression)"),
+				  Locale.getString("PERCENTAGE_FUNCTIONS", "ceil(float expression)"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "integer expression")
         };
         GPGondolaSelectionPanel[7] = new GPGondolaSelectionPanel(defaultValuesPositiveShortIntegerExpression.length,
@@ -241,13 +245,16 @@ public class GPGondolaSelection extends Page implements AnalyserPage {
         // Positive Short Integer Expression
         int[] defaultValuesNegativeShortIntegerExpression = {
                                             /* We put as default to zero the two following experssions:
-                                             * '*' and '(-1)*float'.
+                                             * '*' and '(-1)*float'.					     
                                              * That's done, because them both may increase the integer number too much
                                              * and we don't want that because we want a small positive integer.
                                              * Anyway user interface permits the use of the above expressions.
+
+					     * (-1)* float removed because it
+					     * no longer casts to int					     
                                              */
                                             1750, 1650, 1650, 0, 1650,
-                                            1650, 1650, 0, 0};
+                                            1650, 1650, 0};
         String[] defaultTextFieldValuesNegativeShortIntegerExpression = {Locale.getString("PERCENTAGE_TERMINAL"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "+"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "-"),
@@ -255,7 +262,6 @@ public class GPGondolaSelection extends Page implements AnalyserPage {
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "/"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "percent()"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "if(){}else{}"),
-                                  Locale.getString("PERCENTAGE_FUNCTIONS", "(-1)*(float expression)"),
                                   Locale.getString("PERCENTAGE_FUNCTIONS", "(-1)*(integer expression)")
         };
         GPGondolaSelectionPanel[8] = new GPGondolaSelectionPanel(defaultValuesNegativeShortIntegerExpression.length,

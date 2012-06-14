@@ -43,7 +43,7 @@ public class AnalyserGuard {
 
     private static AnalyserGuard instance = null;
 
-    public static AnalyserGuard getInstance() {
+    public static synchronized AnalyserGuard getInstance() {
 	if (instance == null) {
 	    instance = new AnalyserGuard();
 	} 
@@ -212,7 +212,7 @@ public class AnalyserGuard {
     
     //For regression testing only - don't use unless for some reason
     //we want to expose this functionality to users.
-    protected void setRuntimeLimit(int secs) {
+    protected void setRuntimeLimit(int secs) {	
 	maxRunTime = secs;
     }
 

@@ -37,7 +37,7 @@ import java.util.HashMap;
 
 class MSEmasterFile {
 	private static MSEmasterFile instance = new MSEmasterFile();
-    public static MSEmasterFile getInstance() {  
+    public static synchronized MSEmasterFile getInstance() {  
     	return instance;
     }  
 

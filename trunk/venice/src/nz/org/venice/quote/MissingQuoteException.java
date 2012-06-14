@@ -40,7 +40,7 @@ public class MissingQuoteException extends Throwable {
      * is thrown around a lot so needs to be fast - and the stack trace is
      * not important. See "Java Performance Tuning" for an explanation.
      */
-    public static MissingQuoteException getInstance() {
+    public static synchronized MissingQuoteException getInstance() {
         return instance;
     }
 }

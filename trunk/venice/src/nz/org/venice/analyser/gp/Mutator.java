@@ -27,6 +27,8 @@ import nz.org.venice.parser.ExpressionFactory;
 import nz.org.venice.parser.expression.*;
 import nz.org.venice.quote.Quote;
 
+import nz.org.venice.util.VeniceLog;
+
 /**
  * The mutator can build random expressions and randomly mutate existing
  * expressions. This class is at the heart of the GP as it creates the
@@ -422,8 +424,7 @@ public class Mutator {
 	    }
 	    
             default:
-		System.out.println("Shouldnt get here: " + type);
-		System.exit(0);
+		//Shouldn't get here - would be a sign of a serious bug
                 assert false;
                 return null;
         }
@@ -820,6 +821,12 @@ public class Mutator {
 
         int randomNumber = GPGondolaSelection.getRandomToGeneratePositiveShortInteger();
 
+	//MH: I have a feeling that the generator never returns 11 at all
+	//which might be a bug.
+	if (randomNumber == 11) {
+	    VeniceLog.getInstance().log("In genShortPosInt, random number = 11");
+	}
+
         if(randomNumber == 0) {
             return createRandomTerminal(Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE);
             
@@ -855,18 +862,24 @@ public class Mutator {
             return new AbsExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
             
         } else if(randomNumber == 9) {
-            assert randomNumber == 10;
             /* We put also the following model: (+1)*(generic float expression).
              * The generic float can be got from any econometric function.
              * This permits to use all the functions in a positive small integer number,
              * the conversion to integer is obtained with a multiply expression,
              * that is the simplest method to got the conversion in Gondola.
-            */ 
-            return new MultiplyExpression(new NumberExpression(1),
-                                          getChild(model, level, 1, Expression.FLOAT_TYPE));
-                        
+
+	     * The above is no longer true, and therefore must be done with
+	     * either ceil() or floor(). (The conversion by multiply by one
+	     * caused bugs when large floats get cast to int)
+
+	     */ 
+	    return new FloorExpression(getChild(model, level, 1, 
+						Expression.FLOAT_TYPE));
+	} else if (randomNumber == 10) {
+	    return new CeilExpression(getChild(model, level, 1, 
+					       Expression.FLOAT_TYPE));
         } else {
-            assert randomNumber == 10;
+            assert randomNumber == 11;
             /* We put also the following model: (generic integer expression).
              * The generic integer can be got from any econometric function.
              * This permits to use all the functions in a positive small integer number.
@@ -906,6 +919,12 @@ public class Mutator {
 
         int randomNumber = GPGondolaSelection.getRandomToGenerateNegativeShortInteger();
 
+	//MH: I have a feeling that the generator never returns 7 at all
+	//which might be a bug.
+	if (randomNumber == 7) {
+	    VeniceLog.getInstance().log("In genShortNegInt, random number = 7");
+	}
+
         if(randomNumber == 0) {
             return createRandomTerminal(Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE);
             
@@ -932,31 +951,9 @@ public class Mutator {
         } else if(randomNumber == 6) {
             return new IfExpression(getChild(model, level, 0, Expression.BOOLEAN_TYPE),
                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE),
-                                    getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
-            
-        } else if(randomNumber == 7) {
-
-	    //The comment below is no longer accurate because the 
-	    //type inference has has changed. Before, the type of an expression
-	    //was defined by the first operand. This lead to subtle bugs
-	    //and simplify code which was asymmetric. Now, where there are 
-	    //floats and ints mixed within an expression, the type will be
-	    //a float.
-	    //If we want explicit type casts we'll have to add it to the 
-	    //Gondola language.
-	    //
-
-            /* We put also the following model: (-1)*(generic float expression).
-             * The generic float can be got from any econometric function.
-             * This permits to use all the functions in a negative small integer number,
-             * the conversion to integer is obtained with a multiply expression,
-             * that is the simplest method to got the conversion in Gondola.
-            */ 
-            return new MultiplyExpression(new NumberExpression(-1),
-                                          getChild(model, level, 1, Expression.FLOAT_TYPE));
-            
+                                    getChild(model, level, 2, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));                                
         } else {
-            assert randomNumber == 8;
+            assert randomNumber == 7;
             /* We put also the following model: (-1)*(generic integer expression).
              * The generic integer can be got from any econometric function.
              * This permits to use all the functions in a negative small integer number.

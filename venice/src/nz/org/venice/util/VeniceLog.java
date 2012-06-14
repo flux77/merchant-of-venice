@@ -31,7 +31,7 @@ public class VeniceLog
     private BufferedWriter bwriter = null;
     private boolean enabled = true;
 
-    public static VeniceLog getInstance() {
+    public static synchronized VeniceLog getInstance() {
 	if (instance == null) {
 	    instance = new VeniceLog();
 	}

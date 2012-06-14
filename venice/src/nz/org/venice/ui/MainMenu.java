@@ -126,7 +126,7 @@ public class MainMenu implements ActionListener, ModuleListener
      * @param	frame	the window frame
      * @param	desktopManager	the desktop to lunch internal frames on
      */
-    public static MainMenu getInstance(JFrame frame,
+    public static synchronized MainMenu getInstance(JFrame frame,
             nz.org.venice.ui.DesktopManager desktopManager) {
         if(instance == null)
             instance = new MainMenu(frame, desktopManager);

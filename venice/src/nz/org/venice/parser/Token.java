@@ -241,8 +241,11 @@ public class Token {
     /** Represents "<code>ceil</code> symbol */
     public static final int CEIL_TOKEN = 69;
 
+    /** Represents "<code>logging</code> symbol. */
+    public static final int LOGGING_TOKEN = 70;
+
     // Number of fixed length tokens, i.e. the ones above ^^
-    private static final int FIXED_LENGTH_TOKENS = 70;
+    private static final int FIXED_LENGTH_TOKENS = 71;
     
     /** Represents a number symbol */
     public static final int NUMBER_TOKEN = 100;
@@ -352,6 +355,7 @@ public class Token {
 	tokenStrings[HALT_TOKEN]               = "halt";
 	tokenStrings[FLOOR_TOKEN]              = "floor";
 	tokenStrings[CEIL_TOKEN]               = "ceil";
+	tokenStrings[LOGGING_TOKEN]            = "logging";
         
         return tokenStrings;
     }

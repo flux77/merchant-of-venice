@@ -304,7 +304,10 @@ public class ExpressionFactory {
 	    expression = new AlertExpression(arg1, new Expression[] {arg2, arg3, arg4});
 	    break;
 	case (Token.HALT_TOKEN):
-	    expression = new HaltExpression(arg1, new Expression[] {arg2, arg3, arg4});
+	    expression = new HaltExpression(arg1, new Expression[] {arg2, arg3, arg4});	    
+	    break;
+	case (Token.LOGGING_TOKEN):
+	    expression = new LoggingExpression(arg1, new Expression[] {arg2, arg3, arg4});
 	    break;
         default:
             // No such token

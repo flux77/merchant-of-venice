@@ -497,7 +497,8 @@ public class Parser {
 	        tokens.match(Token.ALERT_TOKEN) ||
 		tokens.match(Token.HALT_TOKEN) ||
 	        tokens.match(Token.FLOOR_TOKEN) ||
-		tokens.match(Token.CEIL_TOKEN)) 
+		tokens.match(Token.CEIL_TOKEN) ||
+	        tokens.match(Token.LOGGING_TOKEN))
 		    expression = parseFunction(variables, tokens);
 
         // ABBREVIATION QUOTE FUNCTIONS
@@ -976,6 +977,22 @@ public class Parser {
 		arg4 = parseSubExpression(variables, tokens);
 	    }
 	    break;	
+	case (Token.LOGGING_TOKEN):
+	    arg1 = parseSubExpression(variables, tokens);
+	    //Parse String arguments 
+	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		parseComma(variables, tokens);
+		arg2 = parseSubExpression(variables, tokens);
+	    }
+	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		parseComma(variables, tokens);
+		arg3 = parseSubExpression(variables, tokens);
+	    }
+	    if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		parseComma(variables, tokens);
+		arg4 = parseSubExpression(variables, tokens);
+	    }
+	    break;
         case(Token.DAY_OF_WEEK_TOKEN):
         case(Token.DAY_OF_YEAR_TOKEN):
         case(Token.DAY_TOKEN):

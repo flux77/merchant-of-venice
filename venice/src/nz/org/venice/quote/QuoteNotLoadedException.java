@@ -38,7 +38,7 @@ public class QuoteNotLoadedException extends Throwable {
      * is thrown around a lot so needs to be fast - and the stack trace is
      * not important. See "Java Performance Tuning" for an explanation.
      */
-    public static QuoteNotLoadedException getInstance() {
+    public static synchronized QuoteNotLoadedException getInstance() {
         return instance;
     }
 }

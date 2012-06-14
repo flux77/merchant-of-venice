@@ -81,7 +81,7 @@ public class EODQuoteFilterList {
      *
      * @return	the singleton instance.
      */
-    public static EODQuoteFilterList getInstance() {
+    public static synchronized EODQuoteFilterList getInstance() {
 	if(instance == null) {
 	    instance = new EODQuoteFilterList();
 	}

@@ -129,7 +129,7 @@ public class CommandManager {
     /**
      * Return the static CommandManager for this application
      */
-    public static CommandManager getInstance() {
+    public static synchronized CommandManager getInstance() {
 	if (instance == null)
 	    instance = new CommandManager();
 

@@ -98,6 +98,13 @@ public class GPGondolaSelectionPanel extends JPanel {
         return this.getRandom(true,isOkLast);
     }
     
+    /** 
+     * Generate a random number between 0 and the number of fields in the panel, optionally restricting the last, and the secondlast fields.
+     * 
+     * @param isOkLastButOne If false the range is restricted to field length-2  
+     * @param isOkLast If false the range is restricted to field length - 1
+     */
+
     public int getRandom(boolean isOkLastButOne, boolean isOkLast) {
         
         int retValue = 0;
@@ -108,14 +115,15 @@ public class GPGondolaSelectionPanel extends JPanel {
         for (int ii=0; ii<totalLength; ii++) {
             // skip last and/or last but one from the count
             // according to input parameters
-            if(((!isOkLastButOne) && (ii==(totalLength-2))) ||
+            if( ((!isOkLastButOne) && (ii==(totalLength-2))) ||
                 ((!isOkLast) && (ii==(totalLength-1)))){
                 continue;
             }
+	    
             total += perc[ii];
         }
         int randomValue = random.nextInt(total);
-        
+        	
         int totalMin = 0;
         int totalMax = 0;
         for (int ii=0; ii<totalLength; ii++) {
@@ -126,11 +134,17 @@ public class GPGondolaSelectionPanel extends JPanel {
                 continue;
             }
             totalMax = totalMin + perc[ii];
-            if ((randomValue >= totalMin) && (randomValue < totalMax)) {
-                retValue = ii;
-            }
+ 
+	    /* FIXME: By the time loop reaches the last iteration, 
+	       totalMin == totalMax and so perc[perc.length-1] is never
+	       chosen as the return value.
+	     */
+
+            if ((randomValue >= totalMin) && (randomValue <= totalMax)) {
+                retValue = ii;            
+	    }
             totalMin += perc[ii];
-        }
+	}
         return retValue;
     }
 

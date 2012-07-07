@@ -108,7 +108,6 @@ public class GPGondolaSelectionPanel extends JPanel {
     public int getRandom(boolean isOkLastButOne, boolean isOkLast) {
         
         int retValue = 0;
-        
         int total = 0;
         int totalLength = perc.length;
 
@@ -135,16 +134,11 @@ public class GPGondolaSelectionPanel extends JPanel {
             }
             totalMax = totalMin + perc[ii];
  
-	    /* FIXME: By the time loop reaches the last iteration, 
-	       totalMin == totalMax and so perc[perc.length-1] is never
-	       chosen as the return value.
-	     */
-
-            if ((randomValue >= totalMin) && (randomValue <= totalMax)) {
+            if ((randomValue >= totalMin) && (randomValue < totalMax)) {
                 retValue = ii;            
-	    }
+	    } 	    
             totalMin += perc[ii];
-	}
+	}      
         return retValue;
     }
 

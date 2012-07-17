@@ -8,6 +8,38 @@
   <variablelist>  
     <varlistentry>
       <term>
+	<para>20/May/2012: Venice 0.751 beta released:</para>
+      </term>
+      <listitem>
+	<itemizedlist>
+	  <listitem>
+	    <para>Improvements were made to the Genetic Programming and Paper Trades modules, fixing bugs in the user interface and evaluation and replacing the deprecated cast expressions with calls to ceil() and floor(). </para>
+	  </listitem>
+	  <listitem>
+	    <para>Support for JBuilder 2005 was added.</para>
+	  </listitem>
+	  <listitem>
+	    <para>Added <code>logging</code> keyword to the Gondola language. </para>
+	  </listitem>
+	  <listitem>
+	    <para>Bugs fixed in this release</para>	    
+	    <itemizedlist>
+	      <listitem>
+		<para>#3522881 - (Null Pointer Exception when editing alerts)</para>
+	      </listitem>
+	      <listitem>
+		<para>#3523813 - (Restoring Chart removes timeline bar)</para>
+	      </listitem>
+	      <listitem>
+		<para>#3519400 - (Show End of Chart option not honoured when zooing out)</para>
+	      </listitem>	      
+	    </itemizedlist>
+	  </listitem>
+	</itemizedlist>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term>
 	<para>01/May/2012: Venice 0.75 beta released:</para>
       </term>
       <listitem>

@@ -1,9 +1,23 @@
-Changes for Venice, 0.751 beta ??/??/????
+Changes for Venice, 0.752 beta ??/??/????
 =========================================
 * Change table state save/restore to avoid saving the entire table contents 
 
 * Intraday charts
 % Preload data for most used symbols on cache refresh.
+
+Changes for Venice, 0.751 beta 20/07/2012
+=========================================
+* JBuilder 2005 Support added
+* Replaced old cast expressions with ceil() and floor()
+* Added logging keyword to Gondola
+
+
+* Fixed bug in bestfit() (trend expression)
+* Fixed bug in Papertrade - stockcapital incorrect when date falls on weekend/missing
+* Fixed bug #3519400 ('Show End of Chart' option not honoured when zooming out).
+* Fixed bug #3523813 (Restoring Chart removes timeline bar)
+* Fixed for bug #3522881 (NPE when editing alerts)
+* Fixed bugs in GP dialog handling.
 
 Changes for Venice, 0.75 beta 01/05/2012
 * Appearance and usability improved with icons from Libreoffice (instead of the mash up of jlfgr and hand drawn icons) 

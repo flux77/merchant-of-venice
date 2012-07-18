@@ -1,8 +1,10 @@
 Changes for Venice, 0.752 beta ??/??/????
 =========================================
 * Change table state save/restore to avoid saving the entire table contents 
-
+* Improve alert triggered reporting dialog, allowing the user to go back and 
+forward 
 * Intraday charts
+
 % Preload data for most used symbols on cache refresh.
 
 Changes for Venice, 0.751 beta 20/07/2012

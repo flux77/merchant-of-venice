@@ -546,7 +546,7 @@ public class EODQuoteBundle implements QuoteBundle {
 
 		// Now its definitely not on a weekend...
 		try {
-		    firstDateOffset = quoteCache.dateToOffset(getFirstDate());
+		    firstDateOffset = quoteCache.dateToOffset(firstDate);
 		}
 		catch(WeekendDateException e2) {
 		    assert false;

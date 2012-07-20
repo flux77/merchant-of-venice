@@ -237,7 +237,7 @@ public class ExpressionEditorDialog {
 	    expression = dialog.getExpression();
 
 	    if(!wasCancelled) {
-		isValid = validateStoredExpression(storedExpressions, null, name);
+		isValid = validateStoredExpression(storedExpressions, null, name, expression);
 
 		if(isValid) 
 		    storedExpression = new StoredExpression(name, expression);
@@ -330,7 +330,7 @@ public class ExpressionEditorDialog {
 	    expression = dialog.getExpression();
 
 	    if(!wasCancelled) {
-		isValid = validateStoredExpression(storedExpressions, oldName, name);
+		isValid = validateStoredExpression(storedExpressions, oldName, name, expression);
 
 		if(isValid) {
 		    storedExpression.name = name;
@@ -364,7 +364,7 @@ public class ExpressionEditorDialog {
     // Don't check the expression for syntax as we can't do this without knowing
     // the variables that will be predefined for that expression.
     private static boolean validateStoredExpression(List storedExpressions, String oldName,
-                                                    String newName) {
+                                                    String newName, String expressionText) {
 
 	boolean isValid = true;
 
@@ -396,6 +396,13 @@ public class ExpressionEditorDialog {
 						      JOptionPane.ERROR_MESSAGE);
 		isValid = false;
 	    }
+	} else if (expressionText.length() > java.util.prefs.Preferences.MAX_VALUE_LENGTH) {
+	    JOptionPane.showInternalMessageDialog(DesktopManager.getDesktop(),
+						  Locale.getString("SYMBOL_TOO_LONG",
+								   newName),
+						  Locale.getString("ERROR_STORING_EQUATION"),
+						  JOptionPane.ERROR_MESSAGE);
+	    isValid = false;
 	}
 
 	return isValid;

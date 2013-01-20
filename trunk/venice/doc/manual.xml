@@ -1255,6 +1255,14 @@ similarly for <code>open</code>, <code>high</code> and <code>low</code>.</para>
 <para>Returns the current month, which will be 8, if it is August.</para>
 </section>
 
+<section name="offsetExists">
+<para>The offsetExists function returns true if data is available for the given offset, false otherwise. Use this function to test if an offset exists for a symbol to avoid inaccurate results as a result of missing data.</para>
+<para><code>offsetExists(OFFSET)</code></para>
+<para>Example:</para>
+<para>offsetExists(-300)</para>
+<para>Returns true if there 300 days worth of historical data for the given symbol.</para>
+</section>
+
 <section name="On Balance Volume">
 <para>The OBV is the sum of volumes in the period, counted as positive if close is greater than open or
 as negative if open is greater then close.</para>

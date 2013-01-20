@@ -83,8 +83,9 @@ public class LagExpression extends BinaryExpression {
 		return nearQuote;
 	    } catch (MissingQuoteException e2) {
 		//No suitable quote found.
-		String message = symbol + " : " + Locale.getString("NO_QUOTES_DATE", quoteBundle.offsetToDate(day).toString());
+		String message = symbol + " : " + Locale.getString("NO_QUOTES_DATE", quoteBundle.offsetToDate((day + lag)).toString());
 		
+
 		throw new EvaluationException(message);
 	    } finally {
 		//There's another race here:

@@ -308,6 +308,8 @@ public class ExpressionFactory {
 	    break;
 	case (Token.LOGGING_TOKEN):
 	    expression = new LoggingExpression(arg1, new Expression[] {arg2, arg3, arg4});
+	case (Token.DATACHECK_TOKEN):
+	    expression = new DataCheckExpression(arg1, arg2);
 	    break;
         default:
             // No such token

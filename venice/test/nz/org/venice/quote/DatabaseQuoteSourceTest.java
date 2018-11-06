@@ -181,7 +181,6 @@ public class DatabaseQuoteSourceTest extends TestCase
 	    iterator =  sortedAdvDeclines.iterator();
 	    while (iterator.hasNext()) {
 		TradingDate date = (TradingDate)iterator.next();
-		
 		Integer advanceDeclineValue = 
 		    (Integer)advanceDeclines.get(date);
 		

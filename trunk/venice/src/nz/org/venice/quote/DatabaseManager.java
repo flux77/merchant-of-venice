@@ -907,7 +907,7 @@ public class DatabaseManager
 	}
     }
 
-    private List executeQueryTransaction(List queries) throws SQLException {
+    public List executeQueryTransaction(List queries) throws SQLException {
 	Vector results = new Vector();
 	Iterator iterator = queries.iterator();
 	while (iterator.hasNext()) {

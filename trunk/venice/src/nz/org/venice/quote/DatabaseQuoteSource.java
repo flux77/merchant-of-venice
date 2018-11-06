@@ -907,9 +907,13 @@ public class DatabaseQuoteSource implements QuoteSource
 	    return null;
 	}
 	HashMap rv = new HashMap();
-	List queries = manager.getQueries("getAdvanceDecline");
-	List curriedQueries = new ArrayList();
-	Iterator queryIterator = queries.iterator();
+	List queryTemplates = manager.getQueries("getAdvanceDecline");
+	List queries = new ArrayList();
+	final int countIndex = 1;
+	final int dateIndex = 2;
+	Iterator queryIterator = queryTemplates.iterator();
+	//Replace the placeholders with the appropriate data for the
+	//Advance and Decline queries
 	while (queryIterator.hasNext()) {
 	    String query = (String)queryIterator.next();
 	    query = manager.replaceParameter(query, "share_table", 
@@ -920,31 +924,49 @@ public class DatabaseQuoteSource implements QuoteSource
 					     manager.toSQLDateString(lastDate));
 	    
 	    query = manager.replaceParameter(query, "symbol_first_char",
-					     manager.left(DatabaseManager.SYMBOL_FIELD, 1));
-	    
-	    curriedQueries.add(query);
+					     manager.left(DatabaseManager.SYMBOL_FIELD, 1));	    
+	    queries.add(query);
 	}
 	try {
-	    List results = manager.executeQueryTransaction(curriedQueries);
+	    //Execute the constructed queries for Advance and Decline
+	    List results = manager.executeQueryTransaction(queries);
 	    ResultSet advanceResults = (ResultSet)results.get(0);
 	    ResultSet declineResults = (ResultSet)results.get(1);
 
+	    //We put the advance and decline results into separate maps
+	    //and then combine them into the result rv where the key set
+	    //are the dates from both advance and decline results.
+
+	    //This avoids the problem of aligning two date lists and
+	    //potentially missing values
 	    HashSet resultDates = new HashSet();
 	    HashMap advancesMap = new HashMap();
 	    HashMap declinesMap = new HashMap();	    
 	    while (advanceResults.next()) {
-		TradingDate keyDate = new TradingDate(advanceResults.getDate(2));
-		Integer count = new Integer(advanceResults.getInt(1));
+		TradingDate keyDate = new TradingDate(advanceResults.getDate(dateIndex));
+		Integer count = new Integer(advanceResults.getInt(countIndex));
 		advancesMap.put(keyDate, count);
 	    }
 	    while (declineResults.next()) {
-		TradingDate keyDate = new TradingDate(declineResults.getDate(2));
-		Integer count = new Integer(declineResults.getInt(1));
+		TradingDate keyDate = new TradingDate(declineResults.getDate(dateIndex));
+		Integer count = new Integer(declineResults.getInt(countIndex));
 
 		declinesMap.put(keyDate, count);
 	    }
+	    //Result dates could also be built while iterating over the
+	    //advance and decline results. 
+	    //No real reason except as a style preference	    
 	    resultDates.addAll(advancesMap.keySet());
 	    resultDates.addAll(declinesMap.keySet());
+
+	    //Having got a complete set of date sets, 
+	    //construct the map of advance/declines keyed by date
+ 	    //Where a result for a particular date exists in both
+	    //advance and decline, the value calcluated is 
+	    //advance - decline as expected. 
+	    //When a date is missing in one or both sets, the count is 
+	    //taken as 0.
+	    
 	    Iterator dateIterator = resultDates.iterator();
 	    while (dateIterator.hasNext()) {
 		TradingDate keyDate = (TradingDate)dateIterator.next();
@@ -959,6 +981,7 @@ public class DatabaseQuoteSource implements QuoteSource
 		    advanceDeclineValue -= decCount.intValue();
 		}
 		rv.put(keyDate, new Integer(advanceDeclineValue));
+		//Clean up
 		advanceResults.close();
 		declineResults.close();
 	    }

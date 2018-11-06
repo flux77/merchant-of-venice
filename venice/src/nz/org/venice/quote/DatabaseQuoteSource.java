@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.ui.DesktopManager;
@@ -808,7 +809,6 @@ public class DatabaseQuoteSource implements QuoteSource
      */
     public int getAdvanceDecline(TradingDate date)
         throws MissingQuoteException {
-       
 	if(!manager.getConnection())
             return 0;
 
@@ -835,9 +835,8 @@ public class DatabaseQuoteSource implements QuoteSource
             boolean isDatePresent = RS.next();
             int advanceDecline = 0;
 
-            if(isDatePresent) {
+            if(isDatePresent) {				
                 advanceDecline = RS.getInt(1);
-
                 // Clean up after ourselves
                 RS.close();
                 statement.close();
@@ -867,13 +866,11 @@ public class DatabaseQuoteSource implements QuoteSource
 			   ") = 3 AND " +
                            manager.left(DatabaseManager.SYMBOL_FIELD, 1) + 
 			   " != 'X' ");
-
             RS = statement.executeQuery(query);
             isDatePresent = RS.next();
 
             if(isDatePresent) {
                 advanceDecline -= RS.getInt(1);
-
                 // Clean up after ourselves
                 RS.close();
                 statement.close();
@@ -896,7 +893,85 @@ public class DatabaseQuoteSource implements QuoteSource
         }
     }
 
+    /**
+     * Return the advance/decline for the given date. This returns the number
+     * of all ordinary stocks that rose (day close > day open) - the number of all
+     * ordinary stocks that fell.
+     *
+     * @param firstDate the first date in the range
+     * @param lastDate  the last date in the range
+     * @exception throw MissingQuoteException if none of the dates are in the source
+     */
+    public HashMap getAdvanceDecline(TradingDate firstDate, TradingDate lastDate) throws MissingQuoteException {
+	if (!manager.getConnection()) {
+	    return null;
+	}
+	HashMap rv = new HashMap();
+	List queries = manager.getQueries("getAdvanceDecline");
+	List curriedQueries = new ArrayList();
+	Iterator queryIterator = queries.iterator();
+	while (queryIterator.hasNext()) {
+	    String query = (String)queryIterator.next();
+	    query = manager.replaceParameter(query, "share_table", 
+					     DatabaseManager.SHARE_TABLE_NAME);	
+	    query = manager.replaceParameter(query, "firstDate", 
+					     manager.toSQLDateString(firstDate));
+	    query = manager.replaceParameter(query, "lastDate", 
+					     manager.toSQLDateString(lastDate));
+	    
+	    query = manager.replaceParameter(query, "symbol_first_char",
+					     manager.left(DatabaseManager.SYMBOL_FIELD, 1));
+	    
+	    curriedQueries.add(query);
+	}
+	try {
+	    List results = manager.executeQueryTransaction(curriedQueries);
+	    ResultSet advanceResults = (ResultSet)results.get(0);
+	    ResultSet declineResults = (ResultSet)results.get(1);
 
+	    HashSet resultDates = new HashSet();
+	    HashMap advancesMap = new HashMap();
+	    HashMap declinesMap = new HashMap();	    
+	    while (advanceResults.next()) {
+		TradingDate keyDate = new TradingDate(advanceResults.getDate(2));
+		Integer count = new Integer(advanceResults.getInt(1));
+		advancesMap.put(keyDate, count);
+	    }
+	    while (declineResults.next()) {
+		TradingDate keyDate = new TradingDate(declineResults.getDate(2));
+		Integer count = new Integer(declineResults.getInt(1));
+
+		declinesMap.put(keyDate, count);
+	    }
+	    resultDates.addAll(advancesMap.keySet());
+	    resultDates.addAll(declinesMap.keySet());
+	    Iterator dateIterator = resultDates.iterator();
+	    while (dateIterator.hasNext()) {
+		TradingDate keyDate = (TradingDate)dateIterator.next();
+		int advanceDeclineValue = 0;
+		Integer advCount = (Integer)advancesMap.get(keyDate);
+		Integer decCount = (Integer)declinesMap.get(keyDate);
+		
+		if (advCount != null) {
+		    advanceDeclineValue += advCount.intValue();
+		}
+		if (decCount != null) {
+		    advanceDeclineValue -= decCount.intValue();
+		}
+		rv.put(keyDate, new Integer(advanceDeclineValue));
+		advanceResults.close();
+		declineResults.close();
+	    }
+	    return rv;		    	    
+	} catch (SQLException e) {
+	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
+							     e.getMessage()));
+
+            return null;
+	} finally {	
+
+	}
+    }
 
 
     /**
@@ -908,9 +983,9 @@ public class DatabaseQuoteSource implements QuoteSource
      * @param lastDate  the last date in the range
      * @exception throw MissingQuoteException if none of the dates are in the source
      */
-    public HashMap getAdvanceDecline(TradingDate firstDate, TradingDate lastDate)
+    public HashMap getAdvanceDecline_oldversion(TradingDate firstDate, TradingDate lastDate)
         throws MissingQuoteException {
-       
+
 	if(!manager.getConnection())
             return null;
 
@@ -989,13 +1064,13 @@ public class DatabaseQuoteSource implements QuoteSource
             areDatesPresent = false; 
 	  
 	    firstRow = true;
+	    firstDateFromQuery = (TradingDate)lastDate.clone();
 	    while (RS.next()) {
 		areDatesPresent = true;
 		TradingDate keyDate = new TradingDate(RS.getDate(2));
 		Integer advanceVal = (Integer)(advanceDeclineMap.get(keyDate));
 		
 		int advanceValue = (advanceVal != null) ? advanceVal.intValue() : 0;
-		
 		advanceDeclineMap.
 		    put( keyDate, new Integer(advanceValue - RS.getInt(1)));		
 		if (firstRow && !firstDateFromQuery.before(keyDate)) {
@@ -1006,6 +1081,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	    
 	    //Backfill map with 0 for all dates 
 	    //between firstDate and firstDateFromQuery	    
+
 	    while (firstDate.before(firstDateFromQuery)) {
 		//Decrement the date first, otherwise the first
 		//data value will be zeroed.

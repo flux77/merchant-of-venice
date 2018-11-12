@@ -62,107 +62,107 @@ public class DatabaseAlertReader implements AlertReader {
     public List getAlerts() {
 	HashMap endDateMap = new HashMap();
 	alertMap.clear();
-	List queries = manager.getQueries("getAllAlerts");	      
-
-	if (manager.getConnection()) {
-	    Iterator iterator = queries.iterator();
-	    while (iterator.hasNext()) {
-		String query = (String)iterator.next();
-
-		try {
-		    Statement statement = manager.createStatement();
-		    ResultSet RS = statement.executeQuery(query);
-		    
-		    while (RS.next()) {
-			String uuid = RS.getString(manager.ALERT_UUID_COLUMN);
-			String username = RS.getString(manager.ALERT_USER_COLUMN);
-			String host = RS.getString(manager.ALERT_HOST_COLUMN);
-						
-			if (!username.equals(manager.getUserName()) ||
-			    !host.equals(manager.getHost())) {
-			    continue;
-			}
-			
-			String symbolString = 
-			    RS.getString(manager.ALERT_SYMBOL_COLUMN);
-			String startDateString = 
-			    RS.getString(manager.ALERT_START_DATE_COLUMN);
-			String endDateString = 
-			    RS.getString(manager.ALERT_END_DATE_COLUMN);
-			String targetString = 
-			    RS.getString(manager.ALERT_TARGET_COLUMN);
-						
-			String boundTypeString =  
-			    RS.getString(manager.ALERT_BOUND_TYPE_COLUMN);
-			String targetTypeString = 
-			    RS.getString(manager.ALERT_TARGET_TYPE_COLUMN);
-			String enabledString = 
-			    RS.getString(manager.ALERT_ENABLED_COLUMN);
-
-			String dateSetString = 
-			    RS.getString(manager.ALERT_DATESET_COLUMN);
-			
-			Symbol symbol = Symbol.find(symbolString);
-
-			TradingDate startDate = 
-			    new TradingDate(startDateString, 
-					TradingDate.BRITISH);
-			
-			TradingDate endDate = null;
-
-			if (!endDateString.equals("no enddate")) {
-			    endDate = new TradingDate(endDateString,
-						      TradingDate.BRITISH);
-			    endDateMap.put(uuid, endDate);
-			}
-			
-			boolean enabled = readBoolean(enabledString);
-			
-			TradingDate dateSet = 
-			    new TradingDate(dateSetString,
-					    TradingDate.BRITISH);
-
-			
-			//When target is "no target", that means an enddate row
-			//Don't create an alert in this case.
-			if (!targetString.equals("no target")) {
-			    Alert alert = AlertFactory.newAlert(symbol,
-								startDate,
-								endDate,
-								targetString,
-								boundTypeString,
-								targetTypeString,
-								enabled,
-								dateSet);
-
-			    alertMap.put(uuid, alert);			      
-			}		    
-		    }	   
-		} catch (TradingDateFormatException e) {
-		    throw new AlertException(AlertException.
-					     INVALID_DATE_FORMAT, 
-					     e.getMessage());
-		} catch (NumberFormatException e) {
-		    throw new AlertException(AlertException.INVALID_NUMBER_VALUE,
-					     e.getMessage());
-		} catch (SymbolFormatException e) {
-		    throw new AlertException(AlertException.INVALID_SYMBOL,
-					     e.getMessage());
-		} catch (SQLException e) {
-		    DesktopManager.
-			showErrorMessage(Locale.
-					 getString("ERROR_TALKING_TO_DATABASE",
-						   e.getMessage()));
-		} finally {
-		    insertEndDates(alertMap, endDateMap);
-		    return new ArrayList(alertMap.values());
-		}
-	    }
+	if (!manager.getConnection()) {
+	    return new ArrayList();
 	}
-
-	insertEndDates(alertMap, endDateMap);
-	return new ArrayList(alertMap.values());
-    } 
+	final String queryLabel = "getAllAlerts";
+	List queries = manager.getQueries(queryLabel);	      
+	try {
+	    List results = manager.executeQueryTransaction(queryLabel, queries);
+	    Iterator iterator = results.iterator();
+	    while (iterator.hasNext()) {
+		ResultSet RS = (ResultSet)iterator.next();
+		while (RS.next()) {
+		    String uuid = RS.getString(manager.ALERT_UUID_COLUMN);
+		    String username = RS.getString(manager.ALERT_USER_COLUMN);
+		    String host = RS.getString(manager.ALERT_HOST_COLUMN);
+		    
+		    if (!username.equals(manager.getUserName()) ||
+			!host.equals(manager.getHost())) {
+			continue;
+		    }
+		    
+		    String symbolString = 
+			RS.getString(manager.ALERT_SYMBOL_COLUMN);
+		    String startDateString = 
+			RS.getString(manager.ALERT_START_DATE_COLUMN);
+		    String endDateString = 
+			RS.getString(manager.ALERT_END_DATE_COLUMN);
+		    String targetString = 
+			RS.getString(manager.ALERT_TARGET_COLUMN);
+		    
+		    String boundTypeString =  
+			RS.getString(manager.ALERT_BOUND_TYPE_COLUMN);
+		    String targetTypeString = 
+			RS.getString(manager.ALERT_TARGET_TYPE_COLUMN);
+		    String enabledString = 
+			RS.getString(manager.ALERT_ENABLED_COLUMN);
+		    
+		    String dateSetString = 
+			RS.getString(manager.ALERT_DATESET_COLUMN);
+		    
+		    Symbol symbol = Symbol.find(symbolString);
+		    
+		    TradingDate startDate = 
+			new TradingDate(startDateString, 
+					TradingDate.BRITISH);
+		    
+		    TradingDate endDate = null;
+		    
+		    if (!endDateString.equals("no enddate")) {
+			endDate = new TradingDate(endDateString,
+						  TradingDate.BRITISH);
+			endDateMap.put(uuid, endDate);
+		    }
+		    
+		    boolean enabled = readBoolean(enabledString);
+		    
+		    TradingDate dateSet = 
+			new TradingDate(dateSetString,
+					TradingDate.BRITISH);
+		    
+		    
+		    //When target is "no target", that means an enddate row
+		    //Don't create an alert in this case.
+		    if (!targetString.equals("no target")) {
+			Alert alert = AlertFactory.newAlert(symbol,
+							    startDate,
+							    endDate,
+							    targetString,
+							    boundTypeString,
+							    targetTypeString,
+							    enabled,
+							    dateSet);
+			
+			alertMap.put(uuid, alert);			      
+		    }		    
+		}	   
+	    } 
+	} catch (TradingDateFormatException e) {
+	    throw new AlertException(AlertException.
+				     INVALID_DATE_FORMAT, 
+				     e.getMessage());
+	} catch (NumberFormatException e) {
+	    throw new AlertException(AlertException.INVALID_NUMBER_VALUE,
+				     e.getMessage());
+	} catch (SymbolFormatException e) {
+	    throw new AlertException(AlertException.INVALID_SYMBOL,
+				     e.getMessage());
+	} catch (SQLException e) {
+	    DesktopManager.
+		showErrorMessage(Locale.
+				 getString("ERROR_TALKING_TO_DATABASE",
+					   e.getMessage()));
+	} finally {
+	    insertEndDates(alertMap, endDateMap);
+	    try {
+		manager.queryCleanup(queryLabel);
+	    } catch (SQLException e) {
+		
+	    }
+	    return new ArrayList(alertMap.values());
+	}            
+    }
     
     	//Update the Alerts with end dates where they have been set
     private void insertEndDates(HashMap alertMap, HashMap endDateMap) {	

@@ -151,9 +151,9 @@ public class DatabaseAlertWriter implements AlertWriter {
 	    if (uuid == null) {		
 		return;
 	    }
-
 	    ArrayList newQueryList = new ArrayList();
-	    List queries = manager.getQueries("deleteAlert");
+	    final String queryLabel = "deleteAlert";
+	    List queries = manager.getQueries(queryLabel);
 	    Iterator iterator = queries.iterator();
 	    while (iterator.hasNext()) {
 		String query = (String)iterator.next();
@@ -162,10 +162,16 @@ public class DatabaseAlertWriter implements AlertWriter {
 		newQueryList.add(query);
 	    }
 	    try {
-		manager.executeUpdateTransaction(newQueryList);
+		manager.executeUpdateTransaction(queryLabel, newQueryList);
 	    } catch (SQLException e) {
 
-	    }
+	    } finally {
+		try {
+		    manager.queryCleanup(queryLabel);
+		} catch (SQLException e) {
+		    
+		}
+	    }	    
 	}     
     }
       
@@ -190,7 +196,6 @@ public class DatabaseAlertWriter implements AlertWriter {
 	}
     }
             
-
     private void runQuery(String queryName, Alert alert, boolean newAlert) {
 	String uuid = null;
 	       
@@ -219,9 +224,15 @@ public class DatabaseAlertWriter implements AlertWriter {
 	    newQueryList.add(query);
 	}
 	try {
-	    manager.executeUpdateTransaction(newQueryList);
+	    manager.executeUpdateTransaction(queryName, newQueryList);
 	} catch (SQLException e) {
 
-	}	    
+	} finally {
+	    try {
+		manager.queryCleanup(queryName);
+	    } catch (SQLException e) {
+		
+	    }
+	}
     }    
 }

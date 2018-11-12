@@ -196,6 +196,9 @@ public class DatabaseManager
 
     //HashMap containing queries read from sql library
     private HashMap transactionMap;
+    
+    //Map containing the db resources used by queries in the above map
+    private HashMap transactionResourcesMap;
 
     /**
      * Creates a new database connection.
@@ -607,8 +610,9 @@ public class DatabaseManager
 	    success = connect();
 
 	    if (success) {
-		List queries = (List)transactionMap.get("createAlerts");
-		executeUpdateTransaction(queries);            
+		final String queryLabel = "createAlerts";
+		List queries = (List)transactionMap.get(queryLabel);
+		executeUpdateTransaction(queryLabel, queries);            
 		success = true;
 	    }
 	} catch (SQLException e) {
@@ -719,7 +723,26 @@ public class DatabaseManager
         return success;
     }
 
+    /**
+     * Tell the DB Manager to release cursors used as part of a query.
+     * 
+     * When java.sql.Statement and ResultSets are created, it is up to the     
+     * user to close them to free up the resources. Although they will be
+     * eventually reclaimed when Venice closes, running out of cursors is a risk.     
+     */
 
+    public void queryCleanup(String transactionName) throws SQLException {
+	List statementList = (List)transactionResourcesMap.get(transactionName);
+	if (statementList != null) {
+	    Iterator statementIterator = statementList.iterator();
+	    while (statementIterator.hasNext()) {
+		Statement statement = (Statement)statementIterator.next();
+		//ResultSets associated with Statements will be automatically
+		//closed when the statement is closed.
+		statement.close();
+	    }
+	}
+    }
 
     /**
      * Shutdown the database. Only used for the internal database.
@@ -887,7 +910,7 @@ public class DatabaseManager
 	return queryString;
     }
 
-    public void executeUpdateTransaction(List queries) throws SQLException {
+    public void executeUpdateTransaction(String transactionName, List queries) throws SQLException {
 	assert connection != null;
 	boolean autoCommit = connection.getAutoCommit();
 	connection.setAutoCommit(false);
@@ -898,6 +921,13 @@ public class DatabaseManager
 		String query = (String)iterator.next();
 		Statement statement = connection.createStatement();
 		statement.executeUpdate(query);
+		
+		//Track resources for release later
+		List statementList = (List)transactionResourcesMap.get(transactionName);
+		if (statementList == null) {
+		    statementList = new ArrayList();
+		}
+		statementList.add(statement);		
 	    }
 	    connection.commit();
 	    connection.setAutoCommit(autoCommit);
@@ -907,7 +937,8 @@ public class DatabaseManager
 	}
     }
 
-    public List executeQueryTransaction(List queries) throws SQLException {
+    public List executeQueryTransaction(String transactionName, List queries) throws SQLException {
+	
 	Vector results = new Vector();
 	Iterator iterator = queries.iterator();
 	while (iterator.hasNext()) {
@@ -915,12 +946,19 @@ public class DatabaseManager
 	    Statement statement = connection.createStatement();
 	    ResultSet rs = statement.executeQuery(query);
 	    results.add(rs);
+	    //Track resources for release later
+	    List statementList = (List)transactionResourcesMap.get(transactionName);
+	    if (statementList == null) {
+		statementList = new ArrayList();
+	    }
+	    statementList.add(statement);	    
 	}
 	return results;	
     }
    
     private void readQueriesFromLibrary() {
 	transactionMap = new HashMap();
+	transactionResourcesMap = new HashMap();
 	
 	String queryLib = "nz/org/venice/util/sql/venice-queries.sql.xml";
 	InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(queryLib);

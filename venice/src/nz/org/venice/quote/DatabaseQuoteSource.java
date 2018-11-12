@@ -906,8 +906,9 @@ public class DatabaseQuoteSource implements QuoteSource
 	if (!manager.getConnection()) {
 	    return null;
 	}
+	final String queryLabel = "getAdvanceDecline";
 	HashMap rv = new HashMap();
-	List queryTemplates = manager.getQueries("getAdvanceDecline");
+	List queryTemplates = manager.getQueries(queryLabel);
 	List queries = new ArrayList();
 	final int countIndex = 1;
 	final int dateIndex = 2;
@@ -929,7 +930,7 @@ public class DatabaseQuoteSource implements QuoteSource
 	}
 	try {
 	    //Execute the constructed queries for Advance and Decline
-	    List results = manager.executeQueryTransaction(queries);
+	    List results = manager.executeQueryTransaction(queryLabel, queries);
 	    ResultSet advanceResults = (ResultSet)results.get(0);
 	    ResultSet declineResults = (ResultSet)results.get(1);
 
@@ -981,10 +982,9 @@ public class DatabaseQuoteSource implements QuoteSource
 		    advanceDeclineValue -= decCount.intValue();
 		}
 		rv.put(keyDate, new Integer(advanceDeclineValue));
-		//Clean up
-		advanceResults.close();
-		declineResults.close();
 	    }
+	    //Clean up
+	    manager.queryCleanup(queryLabel);
 	    return rv;		    	    
 	} catch (SQLException e) {
 	    DesktopManager.showErrorMessage(Locale.getString("ERROR_TALKING_TO_DATABASE",
@@ -992,7 +992,6 @@ public class DatabaseQuoteSource implements QuoteSource
 
             return null;
 	} finally {	
-
 	}
     }
 

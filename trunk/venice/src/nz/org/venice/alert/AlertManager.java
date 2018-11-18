@@ -125,6 +125,11 @@ public class AlertManager {
 	
 	try {
 	    alerts = reader.getAlerts();
+	    //if there are no alerts, there's nothing to trigger	    
+	    if (alerts.size() == 0) {
+		return false;
+	    }
+
 	    ArrayList symbolList = new ArrayList();
 	    Iterator alertIterator = alerts.iterator();
 

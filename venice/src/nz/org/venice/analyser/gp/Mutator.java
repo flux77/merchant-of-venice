@@ -616,7 +616,9 @@ public class Mutator {
 
         } else if(randomNumber == 21) {
             return new RSIExpression(getChild(model, level, 0, Expression.INTEGER_TYPE, this.POSITIVE_SHORT_INTEGER_SUBTYPE),
-                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE));
+                                     getChild(model, level, 1, Expression.INTEGER_TYPE, this.NEGATIVE_SHORT_INTEGER_SUBTYPE), 
+				     new NumberExpression(false));
+	    
 
         } else if(randomNumber == 22) {
             return new StandardDeviationExpression(createRandomTerminal(Expression.FLOAT_QUOTE_TYPE),

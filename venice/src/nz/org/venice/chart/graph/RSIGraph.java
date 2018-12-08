@@ -31,6 +31,7 @@ import nz.org.venice.chart.BasicChartUI;
 import nz.org.venice.chart.source.GraphSource;
 import nz.org.venice.parser.EvaluationException;
 import nz.org.venice.quote.QuoteFunctions;
+import nz.org.venice.quote.QuoteFunctions.RSIData;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.util.Locale;
 import nz.org.venice.util.TradingDate;
@@ -156,18 +157,26 @@ public class RSIGraph extends AbstractGraph {
      * @param	period	the desired period of the RSI
      * @return	the RSI graphable
      */
-    public static Graphable createRSI(Graphable source, int period) {
+    public static Graphable createRSI(Graphable source, int period, boolean smoothing) {
 	Graphable RSI = new Graphable();
         TradingDate date = (TradingDate)source.getStartX();
         GraphableQuoteFunctionSource quoteFunctionSource 
             = new GraphableQuoteFunctionSource(source, date, period + 1);
 
+	RSIData previousData = null;
         for(Iterator iterator = source.iterator(); iterator.hasNext();) {
             date = (TradingDate)iterator.next();
             quoteFunctionSource.setDate(date);
-
+	    
             try {
-                double rsi = QuoteFunctions.rsi(quoteFunctionSource, period + 1);
+		double rsi = 0.0;
+		if (smoothing) {		    
+		    RSIData rsiData = QuoteFunctions.smoothRSI(quoteFunctionSource, period + 1, previousData);
+		    previousData = rsiData;
+		    rsi = rsiData.rsi;
+		} else {
+		    rsi = QuoteFunctions.rsi(quoteFunctionSource, period + 1);		
+		}		
                 RSI.putY(date, new Double(rsi));
             }
             catch(EvaluationException e) {
@@ -197,9 +206,10 @@ public class RSIGraph extends AbstractGraph {
 
         // Retrieve values from hashmap        
 	int period = RSIGraphUI.getPeriod(settings);
+	boolean smoothFlag = RSIGraphUI.getSmoothFlag(settings);
 
 	// create RSI
-	RSI = createRSI(getSource().getGraphable(), period); 
+	RSI = createRSI(getSource().getGraphable(), period, smoothFlag); 
 			
     }
 

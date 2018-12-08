@@ -144,6 +144,10 @@ public class DatabaseQuoteSourceTest extends TestCase
 
     //Test that bulk date AdvanceDecline returns the same data
     //as cumulating individual dates
+    
+    //This test is sensitive to bad data 
+    //(ie if you've got data for non trading days you will get different results
+    // for cumulutive and calculating one day at a time)
     public void testAdvanceDecline() {
 	TradingDate firstDate = QuoteSourceManager.getSource().getFirstDate();
         TradingDate lastDate = QuoteSourceManager.getSource().getLastDate();

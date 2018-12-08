@@ -153,7 +153,6 @@ public class Parser {
     //and that will break things like parameter count checking.
 
     private static Expression parse(Variables variables, String string, boolean internal) throws ExpressionException {
-		
 	if (string == null || string.equals("")) {
 	    throw new ExpressionException(Locale.getString("MISSING_EQUATION_NAME"));
 	}
@@ -165,7 +164,7 @@ public class Parser {
 	TokenStack tokens = lexicalAnalysis(variables, string);
 
 	// Translate stack of tokens to expression
-	Expression expression = parseRootExpression(variables, tokens);
+	Expression expression = parseRootExpression(variables, tokens, internal);
 
 	// There should be no more tokens
 	if(tokens.size() > 0)
@@ -174,7 +173,6 @@ public class Parser {
 
 	// Check for type mismatch
 	expression.checkType();	
-	
 	return expression;
 
     }
@@ -231,7 +229,11 @@ public class Parser {
 	return tokens;
     }
 
-    private static Expression parseRootExpression(Variables variables, TokenStack tokens)
+    private static Expression parseRootExpression(Variables variables, TokenStack tokens) throws ParserException {
+	return Parser.parseRootExpression(variables, tokens, false);
+    }
+    
+    private static Expression parseRootExpression(Variables variables, TokenStack tokens, boolean internal)
 	throws ParserException {
 	
 	List subExpressions = new ArrayList();
@@ -293,16 +295,20 @@ public class Parser {
 	    }
 	    head = tokens.get();	    
 	}
-
 	
-
 	while(tokens.size() > 0) {
 	    subExpressions.add(parseSubExpression(variables, tokens));	
 	}
 	
-	if(subExpressions.size() == 0)
+	if(subExpressions.size() == 0) {
 	    throw new ParserException(Locale.getString("EMPTY_EQUATION_ERROR"));
-        else if(subExpressions.size() == 1) {	    
+	} else if(subExpressions.size() == 1 && !internal) {	    	    
+	    //Single line expressions won't simplify properly if they are 
+	    //placed into a clause expression with one expression, but
+	    //functions defined in included expressions wont evaluate properly
+	    //so this avoids the problem of having to do something like:
+	    //int dummyvar = 0
+	    //float function myfunc(int myparm) { ...	   
 	    parseTree.put(subExpressions.get(0), head);	    
 	    return (Expression)subExpressions.get(0);
         } else {
@@ -566,7 +572,7 @@ public class Parser {
 	    if (variable.isFunction()) 
 		throw new ParserException(Locale.getString("VARIABLE_IS_FUNCTION"));
 
-	    Expression value = parseSubExpression(variables, tokens);
+ 	    Expression value = parseSubExpression(variables, tokens);
 	    Expression setVarExpression = 
 		new SetVariableExpression(token.getVariableName(), 
 					  variable.getType(),
@@ -657,8 +663,10 @@ public class Parser {
 	
 	// Parse the name
 	token = tokens.pop();
-	if(token.getType() == Token.VARIABLE_TOKEN)
+	if(token.getType() == Token.VARIABLE_TOKEN) {
 	    name = token.getVariableName();
+	}
+	
 	else 
 	    throw new ParserException(Locale.getString("ILLEGAL_VARIABLE_NAME_ERROR"));    
 	
@@ -675,8 +683,7 @@ public class Parser {
 	// or if it is, it's defined as a function parameter
 	
 	if(variables.contains(name) && parameterMap.get(name) == null) {
-	    throw new ParserException(Locale.getString("VARIABLE_DEFINED_ERROR", name));
-	    
+	    throw new ParserException(Locale.getString("VARIABLE_DEFINED_ERROR", name));	    
 	}
 
 	// Add variable	
@@ -823,9 +830,10 @@ public class Parser {
 	    break;
 
 	case(Token.RSI_TOKEN):	
-            // Default period and no offset
+            // Default period and no offset, no smoothing
             arg1 = new NumberExpression(QuoteFunctions.DEFAULT_RSI_PERIOD);
             arg2 = new NumberExpression(0);
+	    arg3 = new NumberExpression(false);
 
             // Parse optional period argument
             if(!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
@@ -837,6 +845,12 @@ public class Parser {
                     parseComma(variables, tokens);
                     arg2 = parseSubExpression(variables, tokens);
                 }
+
+		//Parse optional smoothing argument
+		if (!tokens.match(Token.RIGHT_PARENTHESIS_TOKEN)) {
+		    parseComma(variables, tokens);
+		    arg3 = parseSubExpression(variables, tokens);
+		}
             }
 
             break;
@@ -887,7 +901,8 @@ public class Parser {
 		// ema(quote,period)
                 arg3 = new NumberExpression(0);
 		arg4 = new NumberExpression(0.1D);
-            }
+
+	    }
 
 	    break;
 
@@ -1012,7 +1027,7 @@ public class Parser {
 	}
 
 	// Create epxression
-	expression = ExpressionFactory.newExpression(function, arg1, arg2,
+expression = ExpressionFactory.newExpression(function, arg1, arg2,
 						     arg3, arg4);
 	
 	// All functions must end with a right parenthesis
@@ -1085,8 +1100,6 @@ public class Parser {
 	if (variables.contains(functionNameStr) &&
 	    parameterMap.get(functionNameStr) == null) {
 	    throw new ParserException(Locale.getString("VARIABLE_DEFINED_ERROR", functionName.getVariableName()));
-
-
 	}
 
 	variables.add(functionNameStr, 
@@ -1095,8 +1108,6 @@ public class Parser {
 		      true, 
 		      0.0);
 
-
-	
 	//parameterExpression will be replaced if parameters are defined
 	//otherwise a terminal expression which will then be ignored is used. 
 	Expression parameterExpression = new NumberExpression(0);
@@ -1145,7 +1156,6 @@ public class Parser {
 	String name;
 	
 	Vector parameterExpressions = new Vector();
-
 	while (token.getType() != Token.RIGHT_PARENTHESIS_TOKEN) {
 	    
 	    if(token.getType() == Token.BOOLEAN_TOKEN)
@@ -1184,8 +1194,6 @@ public class Parser {
 		parameterMap.put(name, functionName);
 	    }
 
-
-
 	    parameterExpressions.add(parameterExpression);
 	    if (tokens.match(Token.COMMA_TOKEN)) {
 		parseComma(variables, tokens);
@@ -1202,6 +1210,7 @@ public class Parser {
 	
 	Expression parameterList = new ClauseExpression(parameterExpressions);
 	parseTree.put(parameterList, token);
+	
 	return parameterList;
     }
     

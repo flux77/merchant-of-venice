@@ -1295,10 +1295,14 @@ Where INITIAL_VALUE is the initial value which counting from</para>
 
 <section name="Relative Strength Index">
 <para>This function calculates the Relative Strength Index (RSI) of the current stock.</para>
-<para><code>rsi([PERIOD[, START_OFFSET]])</code></para>
-<para>Where PERIOD is the period to apply the RSI.
-Where START_OFFSET is the most recent date to calculate, 0 means the current
-trading date, -1 means the previous trading date, etc.</para>
+<para><code>rsi([PERIOD[, START_OFFSET, [SMOOTHING]]])</code></para>
+<para>Where
+  <list>
+    <item><para> PERIOD is the period to apply the RSI;</para></item>
+    <item><para>START_OFFSET is the most recent date to calculate, 0 means the current trading date, -1 means the previous trading date, etc;</para></item>
+    <item><para>SMOOTHING is a flag which uses the averages of the previous chunk to calculate a smoothed RSI.</para></item>
+  </list>
+</para>
 <para>Example:</para>
 <para><code>rsi()</code></para>
 <para>Returns the RSI of the current stock.</para>

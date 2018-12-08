@@ -187,7 +187,7 @@ public class ExpressionFactory {
 	    expression = new AvgExpression(arg1, arg2, arg3);
 	    break;
 	case(Token.RSI_TOKEN):
-	    expression = new RSIExpression(arg1, arg2);
+	    expression = new RSIExpression(arg1, arg2, arg3);
 	    break;
 	case(Token.NOT_TOKEN):
 	    expression = new NotExpression(arg1);
@@ -382,7 +382,7 @@ public class ExpressionFactory {
 	} else if (exp instanceof AvgExpression) {
 	    expression = new AvgExpression(children[0], children[1], children[2]);
 	} else if (exp instanceof RSIExpression) {
-	    expression = new RSIExpression(children[0], children[1]);
+	    expression = new RSIExpression(children[0], children[1], children[2]);
 	} else if (exp instanceof NotExpression) {
 	    expression = new NotExpression(children[0]);
 	} else if (exp instanceof IfExpression) {

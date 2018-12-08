@@ -18,6 +18,11 @@
 
 package nz.org.venice.quote;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import nz.org.venice.parser.EvaluationException;
 
 /**
@@ -32,6 +37,32 @@ public class QuoteFunctions {
 
     /** This is the default/recommended period for the RSI. */
     final public static int DEFAULT_RSI_PERIOD = 45;
+
+    static public class RSIData {
+	public final double rsi;
+	public final double avgGain;
+	public final double avgLoss;
+    
+	public RSIData(double rsi, double avgGain, double avgLoss) {
+	    this.rsi = rsi;
+	    this.avgGain = avgGain;
+	    this.avgLoss = avgLoss;	
+	} 
+    }
+
+    static public class RSIAverages {
+	public final double avgGain;
+	public final double avgLoss;
+	public final int numberGains;
+	public final int numberLosses;
+
+	public RSIAverages(double avgGain, int numberGains, double avgLoss, int numberLosses) {
+	    this.avgGain = avgGain;
+	    this.numberGains = numberGains;
+	    this.avgLoss = avgLoss;
+	    this.numberLosses = numberLosses;
+	}
+    }
 
     // This class cannot be instantiated
     private QuoteFunctions() {
@@ -200,7 +231,99 @@ public class QuoteFunctions {
 
         return r;
     }
+    /**
+     * Calculate the Relative Strength Indicator (RSI) value. Technical Analysis
+     * by Martin J. Pring describes the RSI as:
+     *
+     * "It is a momentum indicator, or oscillator, that measures the relative internal
+     *  strength of a security against <i>itself</i>....".
+     *
+     * The formula for the RSI is as follows:<pre>
+     *
+     *               100
+     * RSI = 100 - ------
+     *             1 + RS
+     *
+     * This differs from our original RSI, in that the averages are smoothed:
+     *
+     * Average Gain = (previous Average Gain) x 13 + Current Gain) / 14
+     * Average Loss = (previous Average Loss) x 13 + Current Loss) / 14
+     *
+     * where period = 14
+     
+     *       (average of x days' up closes
+     * RS = ------------------------------
+     *      average of x days' down closes
+     *
+     *
+     * (Reference: https://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi)
+     * </pre>To calculate an X day RSI you need X + 1 quote values. So make
+     * the period argument one more day that the period of the RSI.
+     *
+     * @param source source of quotes to average
+     * @param period one plus the period of the RSI
+     * @param previousData the results of the previous call to smoothRSI
+     * @return       data structure containing the RSI value, average Gains and      * average losses
+     * @see          nz.org.venice.chart.graph.RSIGraph
+     * @see          nz.org.venice.parser.expression.RSIExpression
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
+     */
+    static public RSIData smoothRSI(QuoteFunctionSource source, int period, RSIData previousData) throws EvaluationException {
+	double sumGains = 0.0;
+	double sumLosses = 0.0;
+	int numGains = 0;
+	int numLosses = 0;
+	double avgGain = 0.0;
+	double avgLoss = 0.0;
+	int i = 0;	
+	
+	List data = rsiData(source, period);	
+	if (data.size() < 2) {
+	    // If the period is too small, return a neutral result
+	    RSIData rv = new QuoteFunctions.RSIData(50.0D, 0.0, 0.0);
+	    return rv;
+	}	
 
+	RSIAverages averages = avgGainLoss(data);
+        // If avg loss is 0, then RSI returns 100 by definition.
+        if(averages.numberLosses == 0 || (averages.avgLoss == 0.0D)) {
+	    RSIData rv = new QuoteFunctions.RSIData(100.0D, avgLoss, 0.0);
+	    return rv;
+	}	
+	if (previousData != null) {	
+	    double previous = ((Double)data.get(0)).doubleValue();
+	    double current = ((Double)data.get(1)).doubleValue();
+	    double diff = current - previous;
+	    double currentGain = 0.0;
+	    double currentLoss = 0.0;
+	    
+	    if (diff > 0.0) {
+		currentGain = diff;
+		currentLoss = 0.0;
+	    } else if (diff < 0) {
+		currentGain = 0.0;
+		currentLoss = -diff;
+	    }
+
+	    double smoothedGain = (previousData.avgGain * period + currentGain) / (period + 1);
+	    double smoothedLoss = (previousData.avgLoss * period + currentLoss) / (period + 1);	    	
+
+	    double smoothedRS = smoothedGain / smoothedLoss;	
+	    double smoothedRSIVal = 100.0D - 100.0D / (1.0D + smoothedRS);
+	    RSIData rv = new QuoteFunctions.RSIData(smoothedRSIVal, 
+						    averages.avgGain, 
+						    averages.avgLoss);
+	    return rv;	    
+	} else {
+            double RS = averages.avgGain / averages.avgLoss;
+	    double rsiVal = 100.0D - 100.0D / (1.0D + RS);
+	    RSIData rv = new QuoteFunctions.RSIData(rsiVal, 
+						    averages.avgGain, 
+						    averages.avgLoss);
+	    return rv;
+	}
+    }
     /**
      * Calculate the Relative Strength Indicator (RSI) value. Technical Analysis
      * by Martin J. Pring describes the RSI as:
@@ -238,6 +361,66 @@ public class QuoteFunctions {
         int numberLosses = 0;
         double previous = Double.NaN;
         int i = 0;
+	
+	List data = rsiData(source, period);
+	// If the period is too small, return a neutral result
+	if (data.size() < 2) {
+	    return 50.0D;
+	}
+	
+	RSIAverages averages = avgGainLoss(data);
+	if(averages.numberLosses == 0 && averages.numberGains == 0)
+            return 50.0D;
+
+        // If avg loss is 0, then RSI returns 100 by definition.
+        else if(averages.numberLosses == 0 || averages.avgLoss == 0.0D)
+            return 100.0D;
+
+        else {
+            double RS = averages.avgGain / averages.avgLoss;
+            return 100.0D - 100.0D / (1.0D + RS);
+        }
+    }
+
+    /**
+     * Calculate the Relative Strength Indicator (RSI) value. Technical Analysis
+     * by Martin J. Pring describes the RSI as:
+     *
+     * "It is a momentum indicator, or oscillator, that measures the relative internal
+     *  strength of a security against <i>itself</i>....".
+     *
+     * The formula for the RSI is as follows:<pre>
+     *
+     *               100
+     * RSI = 100 - ------
+     *             1 + RS
+     *
+     *       average of x days' up closes
+     * RS = ------------------------------
+     *      average of x days' down closes
+     *
+     * </pre>To calculate an X day RSI you need X + 1 quote values. So make
+     * the period argument one more day that the period of the RSI.
+     *
+     * @param source source of quotes to average
+     * @param period one plus the period of the RSI
+     * @return       RSI
+     * @see          nz.org.venice.chart.graph.RSIGraph
+     * @see          nz.org.venice.parser.expression.RSIExpression
+     * @exception    EvaluationException if {@link QuoteBundleFunctionSource} is not
+     *               allowed access to a quote. See {@link nz.org.venice.analyser.gp.GPQuoteBundle}.
+     */
+    //This is the original rsi computation which had no support for
+    //smoothing
+    static public double rsi_old(QuoteFunctionSource source, int period)
+        throws EvaluationException {
+
+        double sumGain = 0.0D;
+        double sumLoss = 0.0D;
+        int numberGains = 0;
+        int numberLosses = 0;
+        double previous = Double.NaN;
+        int i = 0;
 
         // Get the day before the RSI calculation
         while(Double.isNaN(previous) && i < period)
@@ -245,8 +428,8 @@ public class QuoteFunctions {
 
         // Calculate average day up and down closes
         while(i < period) {
-            double value = source.getValue(i++);
-
+            double value = source.getValue(i++);	    
+		    
             if(!Double.isNaN(value)) {
                 if(value > previous) {
                     sumGain += (value - previous);
@@ -280,8 +463,65 @@ public class QuoteFunctions {
                 avgGain = sumGain / numberGains;
 
             double RS = avgGain / avgLoss;
-            return 100.0D - 100.0D / (1.0D + RS);
+            double rv = 100.0D - 100.0D / (1.0D + RS);
+	    return rv;
         }
+    }
+
+    //Shared calcuations for average gain/loss
+    private static RSIAverages avgGainLoss(List data) throws EvaluationException {
+	assert data.size() >= 2;
+
+	double previous = ((Double)data.get(0)).doubleValue();
+	int index = 0;
+	int numberGains = 0;
+	int numberLosses = 0;
+	double sumGain = 0.0;
+	double sumLoss = 0.0;
+       
+        // Calculate average day up and down closes
+	Iterator iterator = data.iterator();
+	while (iterator.hasNext()) {
+	    double value = ((Double)iterator.next()).doubleValue();
+	    if(value > previous) {
+		sumGain += (value - previous);
+		numberGains++;
+	    }                
+	    else if(value < previous) {
+		sumLoss += (previous - value);
+		numberLosses++;
+	    }
+            
+	    previous = value;
+	}        
+	double avgLoss = (numberLosses > 0) ? sumLoss / numberLosses : 0.0;    
+	double avgGain = (numberGains > 0) ? sumGain / numberGains : 0.0;
+	RSIAverages rv = new QuoteFunctions.RSIAverages(avgGain, numberGains, avgLoss, numberLosses);
+	return rv;
+    }
+
+    //Build a list of proper (ie no NaN) quotes for calculating RSI values
+    //0 <= list.size() <= period 
+    private static ArrayList rsiData(QuoteFunctionSource source, int period) throws EvaluationException {
+	
+	ArrayList data = new ArrayList();
+	double previous = Double.NaN;
+	int index = 0;
+	// Get the day before the RSI calculation
+        while(Double.isNaN(previous) && index < period)
+            previous = source.getValue(index++);
+	
+	if (!Double.isNaN(previous)) {
+	    data.add(new Double(previous));
+	}
+        while(index < period) {
+            double value = source.getValue(index++);
+
+	    if (!Double.isNaN(value)) {
+		data.add(new Double(value));
+	    }
+        }
+	return data;
     }
 
     /**
@@ -655,7 +895,8 @@ public class QuoteFunctions {
 	rv[0] = slope;
 	rv[1] = intercept;
 	
-	return rv;
-	
+	return rv;	
     }
 }
+
+

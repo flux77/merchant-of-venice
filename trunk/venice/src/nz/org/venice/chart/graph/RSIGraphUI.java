@@ -23,6 +23,7 @@ import java.awt.GridBagLayout;
 import java.util.HashMap;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JCheckBox;
 
 import nz.org.venice.ui.GridBagHelper;
 import nz.org.venice.util.Locale;
@@ -40,11 +41,13 @@ public class RSIGraphUI implements GraphUI {
     private JTextField periodTextField;
     private JTextField overSoldTextField;
     private JTextField overBoughtTextField;
+    private JCheckBox smoothFlagCheckBox;
 
     // String name of settings
     private final static String PERIOD = "period";
     private final static String OVER_SOLD = "oversold";
     private final static String OVER_BOUGHT = "overbought";
+    private final static String SMOOTH_FLAG = "smoothing";
 
     // Limits
     private final static int MINIMUM_PERIOD = 2;
@@ -57,6 +60,7 @@ public class RSIGraphUI implements GraphUI {
     private final static int DEFAULT_PERIOD = 14;
     private final static int DEFAULT_OVER_SOLD = 32;
     private final static int DEFAULT_OVER_BOUGHT = 72;
+    private final static boolean DEFAULT_SMOOTH = false;
 
     /**
      * Create a new RSI user interface with the initial settings.
@@ -87,6 +91,8 @@ public class RSIGraphUI implements GraphUI {
                                                      layout, c, 8);
         overBoughtTextField = GridBagHelper.addTextRow(panel, Locale.getString("OVER_BOUGHT"),
                                                        "", layout, c, 8);
+
+	smoothFlagCheckBox = GridBagHelper.addCheckBoxRow(panel, Locale.getString("RSI_SMOOTHING"), false, layout, c);
     }
 
     public String checkSettings() {
@@ -149,6 +155,7 @@ public class RSIGraphUI implements GraphUI {
         settings.put(PERIOD, periodTextField.getText());
         settings.put(OVER_SOLD, overSoldTextField.getText());
         settings.put(OVER_BOUGHT, overBoughtTextField.getText());
+	settings.put(SMOOTH_FLAG, new Boolean(smoothFlagCheckBox.isSelected()));
         return settings;
     }
 
@@ -156,6 +163,7 @@ public class RSIGraphUI implements GraphUI {
         periodTextField.setText(Integer.toString(getPeriod(settings)));
         overSoldTextField.setText(Integer.toString(getOverSold(settings)));
         overBoughtTextField.setText(Integer.toString(getOverBought(settings)));
+	smoothFlagCheckBox.setSelected(getSmoothFlag(settings));
     }
 
     public JPanel getPanel() {
@@ -232,5 +240,18 @@ public class RSIGraphUI implements GraphUI {
         }
 
         return overBought;
+    }
+
+    /**
+     * Retrieve the smoothing flag from the setings. Return the default (false)
+     *  if the map is empty.
+     * 
+     * @param settings the settings map
+     * @return the smoothing flag       
+     */
+    public static boolean getSmoothFlag(HashMap settings) {
+	boolean defaultSmoothFlag = DEFAULT_SMOOTH;
+        Boolean flag = (Boolean)settings.get(SMOOTH_FLAG);
+	return (flag != null) ? flag.booleanValue() : defaultSmoothFlag;
     }
 }

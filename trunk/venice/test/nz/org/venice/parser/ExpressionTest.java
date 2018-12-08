@@ -20,8 +20,17 @@ package nz.org.venice.parser;
 
 import junit.framework.TestCase;
 
+import java.util.Random;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+
 import nz.org.venice.parser.expression.NumberExpression;
 import nz.org.venice.parser.expression.AddExpression;
+import nz.org.venice.prefs.PreferencesManager;
+import nz.org.venice.prefs.StoredExpression;
+
 
 public class ExpressionTest extends TestCase {
     
@@ -598,8 +607,87 @@ public class ExpressionTest extends TestCase {
 	Expression num1 = new NumberExpression(3.1415926);
 	Expression num2 = new NumberExpression(3);
 
-	assertTrue(num1.hashCode() != num2.hashCode());
+	assertTrue(num1.hashCode() != num2.hashCode());	
+    }
+
+    /**
+       Test for RSI change. Ensure it works for the call without optional 
+       parameters and when the smoothing option is called.
+     */
+    public void testRSI() {
+	String RSIBase = "rsi()";
+	String RSIPeriod = "rsi(600)";
+	String RSIPeriodOffset = "rsi(50, -5)";
+	String RSIPeriodOffsetSmooth1 = "rsi(50, -5, true)";
+	String RSIPeriodOffsetSmooth2 = "rsi(50, -5, false)";
+	String RSIWrong = "rsi(50, false)";
+
+	Expression e1 = parse(RSIBase, Expression.FLOAT_TYPE);
+	Expression e2 = parse(RSIPeriod, Expression.FLOAT_TYPE);
+	Expression e3 = parse(RSIPeriodOffset, Expression.FLOAT_TYPE);
+	Expression e4 = parse(RSIPeriodOffsetSmooth1, Expression.FLOAT_TYPE);
+	Expression e5 = parse(RSIPeriodOffsetSmooth2, Expression.FLOAT_TYPE);
+	boolean wrongTest = failParse(RSIWrong);
 	
+    }
+
+    /**
+       This test was written due to a bug in the parsing or evaluation of
+       calling functions included from a separate rule.
+     */
+    public void testIncludeSingleClause() {	
+	//Create a temporary expression using a name which doesn't exist
+	//in the users preferences
+	String storedFuncName = getFreeName();	
+	String storedFuncExpression = "int function test_include(int offset_p) { int val = abs(offset_p) val}";
+
+	//Create a new stored expression and save it to the list of stored
+	//expressions so that Parser.parse can read it
+	StoredExpression tempStore = new StoredExpression(storedFuncName, storedFuncExpression);
+	List storedExpressions = PreferencesManager.getStoredExpressions();
+	storedExpressions.add(tempStore);
+	PreferencesManager.putStoredExpressions(storedExpressions);
+		
+	String testExpression = "include \"" + storedFuncName + "\"";
+	testExpression += "int offset = -1 int rv = test_include(offset) rv";
+	
+	try {
+	    Expression parseResult = Parser.parse(new Variables(), testExpression);
+	    double evalValue = parseResult.evaluate(new Variables(), null, null, 0);	    
+	    assertTrue(evalValue == 1);
+	    
+	} catch (ExpressionException e) {
+	    //If this happens, a bug has occurred
+	    assertTrue(false);
+	}
+
+	//Remove the test expression
+	//This doesn't seem to work - 
+	//Comment in PreferencesManager says to synchronize calls
+	storedExpressions.remove(tempStore);
+	PreferencesManager.putStoredExpressions(storedExpressions);	
+    }
+
+    private String getFreeName() {
+	Set expressionNames = new HashSet();
+	List storedExpressions = PreferencesManager.getStoredExpressions();
+	Iterator iterator = storedExpressions.iterator();
+	while (iterator.hasNext()) {
+	    StoredExpression storedExpression = (StoredExpression)iterator.next();
+	    expressionNames.add(storedExpression.name);
+	}
+
+	String base = "MyTestExpression";
+	Random random = new Random();
+	boolean found = false;
+	while (!found) {
+	    int postfix = random.nextInt();
+	    String candidateName = base + postfix;
+	    if (!expressionNames.contains(candidateName)) {
+		return candidateName;
+	    }
+	}
+	return null;
     }
 
     private Expression parse(String string) {

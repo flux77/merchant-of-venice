@@ -25,6 +25,7 @@ import nz.org.venice.parser.Variables;
 import nz.org.venice.quote.Quote;
 import nz.org.venice.quote.QuoteBundleFunctionSource;
 import nz.org.venice.quote.QuoteFunctions;
+import nz.org.venice.quote.QuoteFunctions.RSIData;
 import nz.org.venice.quote.QuoteBundle;
 import nz.org.venice.quote.Symbol;
 
@@ -33,10 +34,10 @@ import nz.org.venice.quote.Symbol;
  *
  * @author Andrew Leppard
  */
-public class RSIExpression extends BinaryExpression {
+public class RSIExpression extends TernaryExpression {
 
-    public RSIExpression(Expression days, Expression lag) {
-        super(days, lag);
+    public RSIExpression(Expression days, Expression lag, Expression smoothed) {
+        super(days, lag, smoothed);
     }
 
     public double evaluate(Variables variables, QuoteBundle quoteBundle, Symbol symbol, int day)
@@ -56,13 +57,28 @@ public class RSIExpression extends BinaryExpression {
 	    throw e;
 	}
 
+	int smoothFlag = (int)getChild(2).evaluate(variables, quoteBundle, symbol, day);
+	boolean smoothed = (smoothFlag == 1) ? true : false;
+
         // Calculate and return the RSI. We start the offset one day before the actual offset
         // and increase the period by one day, as the RSI calculation needs an extra day
         // over the period.
 	QuoteBundleFunctionSource source = 
 	    new QuoteBundleFunctionSource(quoteBundle, symbol, Quote.DAY_CLOSE, day, offset - 1,
 					  period - 1);
-	return QuoteFunctions.rsi(source, period - 1);
+	double rv;
+	//FIXME - Currently there's no mechanism for a Gondola expression
+	//in analysis mode to access the results of a previous evaluation
+	//So the smoothed RSI will return the same values as "vanilla" RSI
+	if (smoothed) {
+	    //Null paremeter is a placeholder for the results of a previous
+	    //RSISmooth call. Since this the first, there isn't one
+	    RSIData data = QuoteFunctions.smoothRSI(source, period - 1, null);
+	    rv = data.rsi;
+	} else {
+	    rv = QuoteFunctions.rsi(source, period - 1);
+	}
+	return rv;
     }
 
     public String toString() {
@@ -113,7 +129,8 @@ public class RSIExpression extends BinaryExpression {
 
     public Object clone() {
         return new RSIExpression((Expression)getChild(0).clone(),
-                                 (Expression)getChild(1).clone());
+                                 (Expression)getChild(1).clone(),
+				 (Expression)getChild(2).clone());
     }
 }
 

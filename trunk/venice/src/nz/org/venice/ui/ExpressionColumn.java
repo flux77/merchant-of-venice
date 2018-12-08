@@ -161,6 +161,13 @@ public class ExpressionColumn extends Column implements Cloneable {
 		    double result = 0.0;
 		    results.put(quote.getSymbol().toString() + quote.getDate().toString(),
                                 new ExpressionResult(expression.getType(), result));
+
+		    //But if a halt command is received, throw the exception
+		    //so the evaluation is halted as the user expects
+		    if (e == EvaluationException.EVALUATION_HALTED_EXCEPTION) {
+			throw e;
+		    }
+
 		}
             }
         }

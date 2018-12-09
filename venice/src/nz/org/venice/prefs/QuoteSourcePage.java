@@ -38,6 +38,7 @@ import javax.swing.JCheckBox;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.JOptionPane;
 
 import nz.org.venice.ui.DesktopManager;
 import nz.org.venice.ui.GridBagHelper;
@@ -46,6 +47,7 @@ import nz.org.venice.quote.DatabaseQuoteSource;
 import nz.org.venice.quote.DatabaseManager;
 import nz.org.venice.quote.DatabaseAccessManager;
 import nz.org.venice.quote.QuoteSourceManager;
+import nz.org.venice.quote.EODQuoteCache;
 import nz.org.venice.util.Locale;
 
 /** 
@@ -449,7 +451,8 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    databasePreferences.software = "mysql";
 	  else if (software.equals(Locale.getString("POSTGRESQL")))
             databasePreferences.software = "postgresql";
-	  else
+	
+  else
             databasePreferences.software = "hsql";
 
 	  databasePreferences.driver = databaseDriver.getSelectedItem().toString();
@@ -461,8 +464,20 @@ public class QuoteSourcePage extends JPanel implements PreferencesPage
 	    ? DatabaseAccessManager.getInstance().mask(new String(databasePassword.getPassword()))
 	    : "";
 	  databasePreferences.passwordPrompt = databasePasswordPrompt.isSelected();
-	  databasePreferences.database = databaseName.getText();
+	  boolean sourceChanged = !databasePreferences.database.equals(databaseName.getText());
+	  if (sourceChanged) {
+	      int flushCache = 
+		  JOptionPane.showConfirmDialog(this,
+						Locale.getString("QUOTE_SOURCE_CHANGED_QUESTION"),					    
+						Locale.getString("QUOTE_SOURCE_CHANGED_TITLE"),					    
 
+						JOptionPane.YES_NO_OPTION);
+	      
+	      if (flushCache == JOptionPane.YES_OPTION) {
+		  EODQuoteCache.expire();
+	      }
+	  }
+	  databasePreferences.database = databaseName.getText();
 	  PreferencesManager.putDatabaseSettings(databasePreferences);
 
 	  // This makes the next query use our new settings

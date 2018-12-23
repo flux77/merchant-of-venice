@@ -25,7 +25,8 @@ import java.beans.PropertyVetoException;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import nz.org.venice.main.*;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
 import nz.org.venice.prefs.PreferencesManager;
 import nz.org.venice.prefs.PreferencesException;
 import nz.org.venice.util.Locale;

@@ -28,7 +28,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import nz.org.venice.main.*;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
 import nz.org.venice.util.Locale;
 import nz.org.venice.portfolio.Portfolio;
 import nz.org.venice.quote.*;

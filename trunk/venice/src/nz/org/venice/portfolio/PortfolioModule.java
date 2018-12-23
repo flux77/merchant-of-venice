@@ -41,7 +41,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.*;
 
-import nz.org.venice.main.*;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.main.CommandManager;
 import nz.org.venice.util.Currency;
 import nz.org.venice.util.ExchangeRateCache;
 import nz.org.venice.util.Locale;

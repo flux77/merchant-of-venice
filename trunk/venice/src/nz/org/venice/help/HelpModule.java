@@ -30,7 +30,8 @@ import javax.swing.tree.*;
 import javax.swing.text.html.HTMLDocument;
 import java.io.File;
 
-import nz.org.venice.main.*;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
 import nz.org.venice.util.Locale;
 import nz.org.venice.prefs.settings.Settings;
 import nz.org.venice.prefs.settings.HelpModuleSettings;

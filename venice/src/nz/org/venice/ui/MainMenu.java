@@ -27,7 +27,9 @@ import javax.swing.*;
 
 import nz.org.venice.macro.MacroManager;
 import nz.org.venice.macro.StoredMacro;
-import nz.org.venice.main.*;
+import nz.org.venice.main.Module;
+import nz.org.venice.main.ModuleFrame;
+import nz.org.venice.main.CommandManager;
 import nz.org.venice.util.Locale;
 import nz.org.venice.portfolio.*;
 import nz.org.venice.prefs.*;

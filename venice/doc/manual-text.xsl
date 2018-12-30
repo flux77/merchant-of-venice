@@ -6,8 +6,7 @@
 
   <xsl:strip-space elements="document"/>
   <xsl:output method="text" 
-              indent="no"
-              encoding="iso-8859-1"/>
+              indent="no"/>
 
   <xsl:template match="/">
     <xsl:apply-templates/>

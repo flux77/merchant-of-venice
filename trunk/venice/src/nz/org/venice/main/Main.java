@@ -67,16 +67,16 @@ public class Main extends JFrame {
     private static Main venice;
 
     /** Short version string, e.g. "0.1a" */
-    public static String SHORT_VERSION = "0.751b";
+    public static String SHORT_VERSION = "0.752b";
 
     /** Longer version string, e.g. "0.1 alpha" */
-    public static String LONG_VERSION = "0.751 beta";
+    public static String LONG_VERSION = "0.752 beta";
 
     /** Release date, e.g. 13/Jan/2003 */
-    public static String RELEASE_DATE = "20/" + Locale.getString("JUL") + "/2012";
+    public static String RELEASE_DATE = "26/" + Locale.getString("DEC") + "/2018";
 
     /** Copyright date range, e.g. "2003-5" */
-    public static String COPYRIGHT_DATE_RANGE = "2003-12";
+    public static String COPYRIGHT_DATE_RANGE = "2003-19";
 
     /**
      * Get the main frame for the current application

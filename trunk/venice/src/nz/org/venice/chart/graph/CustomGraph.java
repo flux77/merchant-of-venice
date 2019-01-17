@@ -105,7 +105,6 @@ public class CustomGraph extends AbstractGraph {
             // Expression should already have been checked
             assert false;
         }
-
     }
 
 
@@ -196,7 +195,12 @@ public class CustomGraph extends AbstractGraph {
      * @return <code>Custom</code>
      */
     public String getName() {
-        return Locale.getString("CUSTOM");
+	return Locale.getString("CUSTOM");
+
+    }
+
+    public String getExpressionLabel() {
+	return CustomGraphUI.getIndicatorLabel(getSettings());	
     }
 
     public boolean isPrimary() {

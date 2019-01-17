@@ -138,6 +138,10 @@ public class ExpressionComboBox extends JComboBox implements PopupMenuListener {
 	    return text;
     }
 
+    public String getExpressionLabel() {
+	return getText();
+    }
+
     /**
      * Return whether the current displayed expression is a stored expression.
      * A stored expression is one the user has entered and can refer

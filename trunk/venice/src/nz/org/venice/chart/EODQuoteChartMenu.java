@@ -227,7 +227,6 @@ public class EODQuoteChartMenu extends JMenu {
         // the user wishes. For example, the user can display bollinger bands and
         // Moving Average in the same graph.
         addMenuItem(graphMenu, Locale.getString("BOLLINGER_BANDS"));
-        addMenuItem(graphMenu, Locale.getString("CUSTOM"));
         addMenuItem(graphMenu, Locale.getString("DAY_OPEN"));
         addMenuItem(graphMenu, Locale.getString("DAY_HIGH"));
 	addMenuItem(graphMenu, Locale.getString("DAY_LOW"));
@@ -242,8 +241,11 @@ public class EODQuoteChartMenu extends JMenu {
         addMenuItem(graphMenu, Locale.getString("RSI"));
 	addMenuItem(graphMenu, Locale.getString("STANDARD_DEVIATION"));
 	addMenuItem(graphMenu, Locale.getString("COUNTBACK_LINE"));
-	addMenuItem(graphMenu, Locale.getString("SUPPORT_AND_RESISTENCE"));
+	addMenuItem(graphMenu, Locale.getString("SUPPORT_AND_RESISTENCE"));	
 	addMenuItem(graphMenu, Locale.getString("FIBO_CHART"));       	
+
+	EODCustomGraphMenu customMenu = new EODCustomGraphMenu(listener, quoteBundle, symbol, indexChart);	
+	graphMenu.add(customMenu);
 
 	// Add all static menus
 	JMenuItem removeMenu = new JMenuItem(Locale.getString("REMOVE"));
@@ -705,7 +707,6 @@ public class EODQuoteChartMenu extends JMenu {
      * @param graph the graph
      */
     private synchronized void addGraph(Graph graph) {
-
         String mapIdentifier = graph.getName();
 	map.put(mapIdentifier, graph);
 
@@ -732,7 +733,8 @@ public class EODQuoteChartMenu extends JMenu {
 	  currently testing
 
 	*/
-	removeGraph(graph.getName());	
+	String mapIdentifier = graph.getName();	
+	removeGraph(mapIdentifier);	
 	addGraph(graph);
 
 	listener.redraw();
@@ -744,7 +746,6 @@ public class EODQuoteChartMenu extends JMenu {
      * @param mapIdentifier name of graph
      */
     private void removeGraph(String mapIdentifier) {
-	
 	Graph graph = (Graph)map.get(mapIdentifier);
 	map.remove(mapIdentifier);
 

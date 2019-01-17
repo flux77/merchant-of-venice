@@ -59,6 +59,17 @@ public class EODCustomGraphMenu extends JMenu implements ActionListener {
 
     private final JMenu deleteMenu = new JMenu(Locale.getString("DELETE"));
 
+    /**
+     * Create a new Custom sub-menu allowing the user to add or remove custom 
+     * graphs. There's no option to edit a custom graph as custom graphs 
+     * dont accept parameters.
+     *
+     * @param listener The parent ChartModule which manages graphs
+     * @param bundle The quote data
+     * @param symbol The symbol being graphed
+     * @param index  A flag specifiying if the chart is an indexChart
+     */
+
     public EODCustomGraphMenu(ChartModule listener, EODQuoteBundle bundle, Symbol symbol, boolean index) {
 	super(Locale.getString("CUSTOM"));
 	this.listener = listener;
@@ -124,5 +135,4 @@ public class EODCustomGraphMenu extends JMenu implements ActionListener {
 	listener.remove(graph);
 	listener.redraw();
     }
-
 }

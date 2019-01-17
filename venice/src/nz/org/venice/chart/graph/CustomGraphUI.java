@@ -60,6 +60,7 @@ public class CustomGraphUI implements GraphUI {
 
     // String name of settings
     private final static String INDICATOR = "indicator";
+    private final static String INDICATOR_LABEL = "identifier";
     private final static String IS_PRIMARY = "is_primary";
 
     /**
@@ -121,6 +122,7 @@ public class CustomGraphUI implements GraphUI {
         HashMap settings = new HashMap();
         settings.put(INDICATOR, indicatorComboBox.getExpressionText());
         settings.put(IS_PRIMARY, isPrimaryCheckBox.isSelected()? "1" : "0");
+	settings.put(INDICATOR_LABEL, indicatorComboBox.getExpressionLabel());
         return settings;
     }
 
@@ -141,11 +143,18 @@ public class CustomGraphUI implements GraphUI {
      */
     public static String getIndicatorText(HashMap settings) {
         String indicator = (String)settings.get(INDICATOR);
-
         if(indicator == null)
             indicator = "";
 
         return indicator;
+    }
+
+    public static String getIndicatorLabel(HashMap settings) {
+	String label = (String)settings.get(INDICATOR_LABEL);
+	if (label == null) {
+	    label = "";
+	}
+	return label;
     }
 
     /**
